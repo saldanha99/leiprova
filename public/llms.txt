@@ -1,0 +1,30 @@
+# LeiProva
+
+> A LeiProva é uma plataforma educacional brasileira de treino ativo da literalidade de normas para concursos públicos.
+
+## Páginas canônicas
+
+- Início: https://leiprova.2b.app.br/
+- Como memorizar lei seca: https://leiprova.2b.app.br/como-memorizar-lei-seca
+- Fontes, questões e atualização: https://leiprova.2b.app.br/fontes-e-atualizacao
+- Demonstração pública: https://leiprova.2b.app.br/demo
+- Termos de uso: https://leiprova.2b.app.br/termos
+- Política de privacidade: https://leiprova.2b.app.br/privacidade
+
+## Estado factual do acervo em 17 de agosto de 2026
+
+- O acervo persistido contém 12 questões originais de lei seca de Direito Constitucional assistidas por OpenAI Codex.
+- A fonte legal utilizada é o texto consolidado da Constituição Federal no Portal da Legislação da Presidência da República.
+- A última conferência técnica desses itens ocorreu em 16 de agosto de 2026.
+- Não há revisor humano independente registrado para esses 12 itens do beta.
+- Não há questões de provas anteriores licenciadas publicadas.
+- Não há questões inéditas no estilo de banca publicadas.
+- O laboratório ilustrativo da página inicial contém três microexemplos não persistidos, baseados na Constituição Federal e no Código Penal.
+- A estrutura para versionamento e revisão editorial existe; o monitor automático periódico das fontes ainda não está ativo.
+
+## Política editorial resumida
+
+- Texto normativo: fonte oficial, URL e data de verificação visíveis.
+- Questão anterior: somente com autorização ou licença documentada.
+- Questão inédita assistida por IA: fonte oficial, metadados do processo e análise de similaridade; revisão humana obrigatória antes de integrar a oferta comercial. Um beta sem essa revisão deve declarar a pendência de forma visível.
+- Conteúdo educacional: não substitui o Diário Oficial, o edital nem orientação jurídica.

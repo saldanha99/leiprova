@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX "question_options_one_correct_uidx" ON "question_options" USING btree ("question_id") WHERE "question_options"."is_correct";

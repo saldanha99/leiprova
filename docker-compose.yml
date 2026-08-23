@@ -1,0 +1,163 @@
+name: leiprova
+
+services:
+  db:
+    image: postgres:17.10-alpine
+    container_name: leiprova-db
+    restart: unless-stopped
+    cpus: 1.5
+    mem_limit: 3g
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-leiprova}
+      POSTGRES_USER: ${POSTGRES_OWNER_USER:-leiprova_owner}
+      POSTGRES_PASSWORD: ${POSTGRES_OWNER_PASSWORD}
+      POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256"
+      APP_DB_USER: ${APP_DB_USER:-leiprova_app}
+      APP_DB_PASSWORD: ${APP_DB_PASSWORD}
+    command:
+      - postgres
+      - -c
+      - max_connections=100
+      - -c
+      - idle_in_transaction_session_timeout=30s
+      - -c
+      - statement_timeout=30s
+    volumes:
+      - leiprova_pgdata:/var/lib/postgresql/data
+      - ./deploy/postgres-init.sh:/docker-entrypoint-initdb.d/01-app-role.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_OWNER_USER:-leiprova_owner} -d ${POSTGRES_DB:-leiprova}"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    networks:
+      - internal
+
+  pooler:
+    image: edoburu/pgbouncer:v1.25.2-p0
+    container_name: leiprova-pooler
+    restart: unless-stopped
+    cpus: 0.5
+    mem_limit: 256m
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: ${POSTGRES_DB:-leiprova}
+      DB_USER: ${APP_DB_USER:-leiprova_app}
+      DB_PASSWORD: ${APP_DB_PASSWORD}
+      AUTH_TYPE: scram-sha-256
+      POOL_MODE: transaction
+      MAX_CLIENT_CONN: 200
+      DEFAULT_POOL_SIZE: 20
+      RESERVE_POOL_SIZE: 5
+      SERVER_IDLE_TIMEOUT: 60
+      CLIENT_IDLE_TIMEOUT: 300
+      IGNORE_STARTUP_PARAMETERS: extra_float_digits
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "pg_isready", "-h", "127.0.0.1", "-p", "5432", "-U", "leiprova_app", "-d", "leiprova"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - internal
+
+  app:
+    build:
+      context: .
+      target: runner
+    container_name: leiprova-app
+    restart: unless-stopped
+    cpus: 1.5
+    mem_limit: 1g
+    environment:
+      NODE_ENV: production
+      APP_URL: https://leiprova.2b.app.br
+      NEXT_PUBLIC_APP_URL: https://leiprova.2b.app.br
+      DATABASE_URL: postgresql://${APP_DB_USER:-leiprova_app}:${APP_DB_PASSWORD}@pooler:5432/${POSTGRES_DB:-leiprova}
+      DATABASE_POOL_SIZE: 10
+      AUTH_COOKIE_NAME: leiprova_session
+      AUTH_SESSION_DAYS: 30
+      IP_HASH_SECRET: ${IP_HASH_SECRET}
+      ADMIN_EMAILS: ${ADMIN_EMAILS:-}
+      REGISTRATION_ENABLED: ${REGISTRATION_ENABLED:-false}
+      CONTACT_ENABLED: ${CONTACT_ENABLED:-false}
+      CHECKOUT_ENABLED: ${CHECKOUT_ENABLED:-false}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
+      STRIPE_PUBLISHABLE_KEY: ${STRIPE_PUBLISHABLE_KEY:-}
+      STRIPE_PRICE_RITMO: ${STRIPE_PRICE_RITMO:-}
+      STRIPE_PRICE_FOCO: ${STRIPE_PRICE_FOCO:-}
+      STRIPE_PRICE_FUNDADOR: ${STRIPE_PRICE_FUNDADOR:-}
+      STRIPE_PORTAL_CONFIGURATION_ID: ${STRIPE_PORTAL_CONFIGURATION_ID:-}
+      STRIPE_CONNECT_ENABLED: ${STRIPE_CONNECT_ENABLED:-false}
+      STRIPE_CONNECT_ONBOARDING_ENABLED: ${STRIPE_CONNECT_ONBOARDING_ENABLED:-false}
+      STRIPE_CONNECT_BR_APPROVED: ${STRIPE_CONNECT_BR_APPROVED:-false}
+      STRIPE_CONNECT_MODE: ${STRIPE_CONNECT_MODE:-test}
+      STRIPE_CONNECT_SECRET_KEY: ${STRIPE_CONNECT_SECRET_KEY:-}
+      STRIPE_CONNECT_COUNTRY: ${STRIPE_CONNECT_COUNTRY:-BR}
+      STRIPE_CONNECT_CURRENCY: ${STRIPE_CONNECT_CURRENCY:-brl}
+      STRIPE_CONNECT_RETURN_URL: ${STRIPE_CONNECT_RETURN_URL:-https://leiprova.2b.app.br/admin/stripe-connect?onboarding=retorno}
+      STRIPE_CONNECT_REFRESH_URL: ${STRIPE_CONNECT_REFRESH_URL:-https://leiprova.2b.app.br/admin/stripe-connect?onboarding=renovar}
+    depends_on:
+      pooler:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3000/api/health >/dev/null || exit 1"]
+      interval: 20s
+      timeout: 5s
+      retries: 8
+      start_period: 20s
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.leiprova.rule=Host(`leiprova.2b.app.br`)
+      - traefik.http.routers.leiprova.entrypoints=websecure
+      - traefik.http.routers.leiprova.tls.certresolver=le
+      - traefik.http.routers.leiprova.middlewares=leiprova-body-limit@docker
+      - traefik.http.services.leiprova.loadbalancer.server.port=3000
+      - traefik.docker.network=forza
+      - traefik.http.middlewares.leiprova-body-limit.buffering.maxRequestBodyBytes=1048576
+      - traefik.http.middlewares.leiprova-body-limit.buffering.memRequestBodyBytes=262144
+    networks:
+      - internal
+      - edge
+
+  migrate:
+    build:
+      context: .
+      target: migrator
+    profiles: ["tools"]
+    environment:
+      MIGRATION_DATABASE_URL: postgresql://${POSTGRES_OWNER_USER:-leiprova_owner}:${POSTGRES_OWNER_PASSWORD}@db:5432/${POSTGRES_DB:-leiprova}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - internal
+
+  seed:
+    build:
+      context: .
+      target: migrator
+    profiles: ["tools"]
+    command: ["pnpm", "db:seed"]
+    environment:
+      MIGRATION_DATABASE_URL: postgresql://${POSTGRES_OWNER_USER:-leiprova_owner}:${POSTGRES_OWNER_PASSWORD}@db:5432/${POSTGRES_DB:-leiprova}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - internal
+
+volumes:
+  leiprova_pgdata:
+
+networks:
+  internal:
+    name: leiprova_internal
+    internal: true
+  edge:
+    external: true
+    name: forza
