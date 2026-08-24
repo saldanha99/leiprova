@@ -1,7 +1,12 @@
 import type { QuizBankSlug } from "@/lib/quiz/catalog";
 
+import { CONTINUATION_ORIGINAL_QUESTIONS } from "@/lib/editorial/continuation-questions";
 import { EXPANSION_ORIGINAL_QUESTIONS } from "@/lib/editorial/expansion-questions";
 
+export {
+  ORIGINAL_STYLE_PILOT_PROMPT_VERSION_V5,
+  ORIGINAL_STYLE_PILOT_PROMPT_VERSION_V6,
+} from "@/lib/editorial/continuation-questions";
 export {
   ORIGINAL_STYLE_PILOT_PROMPT_VERSION_V3,
   ORIGINAL_STYLE_PILOT_PROMPT_VERSION_V4,
@@ -978,4 +983,5 @@ const PILOT_ORIGINAL_QUESTIONS_BASE = [
 export const PILOT_ORIGINAL_QUESTIONS = [
   ...PILOT_ORIGINAL_QUESTIONS_BASE,
   ...EXPANSION_ORIGINAL_QUESTIONS,
+  ...CONTINUATION_ORIGINAL_QUESTIONS,
 ] as const satisfies readonly PilotOriginalQuestion[];

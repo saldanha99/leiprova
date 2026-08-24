@@ -10,6 +10,8 @@ import {
   ORIGINAL_STYLE_PILOT_PROMPT_VERSION_V2,
   ORIGINAL_STYLE_PILOT_PROMPT_VERSION_V3,
   ORIGINAL_STYLE_PILOT_PROMPT_VERSION_V4,
+  ORIGINAL_STYLE_PILOT_PROMPT_VERSION_V5,
+  ORIGINAL_STYLE_PILOT_PROMPT_VERSION_V6,
   PILOT_ORIGINAL_QUESTIONS,
 } from "../src/lib/editorial/pilot-questions";
 import {
@@ -104,8 +106,8 @@ describe("fábrica autoral clean-room", () => {
   });
 
   it("mantém o lote piloto equilibrado, válido e compatível com cada perfil", () => {
-    expect(PILOT_ORIGINAL_QUESTIONS).toHaveLength(48);
-    expect(new Set(PILOT_ORIGINAL_QUESTIONS.map((item) => item.publicId)).size).toBe(48);
+    expect(PILOT_ORIGINAL_QUESTIONS).toHaveLength(72);
+    expect(new Set(PILOT_ORIGINAL_QUESTIONS.map((item) => item.publicId)).size).toBe(72);
     expect(new Set(PILOT_ORIGINAL_QUESTIONS.map((item) => item.articleRef)).size).toBe(12);
     expect(
       PILOT_ORIGINAL_QUESTIONS.filter(
@@ -127,13 +129,23 @@ describe("fábrica autoral clean-room", () => {
         (item) => item.promptVersion === ORIGINAL_STYLE_PILOT_PROMPT_VERSION_V4,
       ),
     ).toHaveLength(12);
+    expect(
+      PILOT_ORIGINAL_QUESTIONS.filter(
+        (item) => item.promptVersion === ORIGINAL_STYLE_PILOT_PROMPT_VERSION_V5,
+      ),
+    ).toHaveLength(12);
+    expect(
+      PILOT_ORIGINAL_QUESTIONS.filter(
+        (item) => item.promptVersion === ORIGINAL_STYLE_PILOT_PROMPT_VERSION_V6,
+      ),
+    ).toHaveLength(12);
 
     for (const articleRef of new Set(PILOT_ORIGINAL_QUESTIONS.map((item) => item.articleRef))) {
-      expect(PILOT_ORIGINAL_QUESTIONS.filter((item) => item.articleRef === articleRef)).toHaveLength(4);
+      expect(PILOT_ORIGINAL_QUESTIONS.filter((item) => item.articleRef === articleRef)).toHaveLength(6);
     }
 
     for (const profile of STYLE_PROFILE_SEEDS) {
-      expect(PILOT_ORIGINAL_QUESTIONS.filter((item) => item.bankSlug === profile.bankSlug)).toHaveLength(12);
+      expect(PILOT_ORIGINAL_QUESTIONS.filter((item) => item.bankSlug === profile.bankSlug)).toHaveLength(18);
     }
 
     for (const item of PILOT_ORIGINAL_QUESTIONS) {
