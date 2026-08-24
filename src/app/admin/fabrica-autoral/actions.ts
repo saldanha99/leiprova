@@ -2,7 +2,7 @@
 
 import { randomUUID } from "node:crypto";
 
-import { and, eq, isNull, ne, sql } from "drizzle-orm";
+import { and, eq, inArray, isNotNull, isNull, ne, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
@@ -21,7 +21,10 @@ import {
   quizTopics,
 } from "@/lib/db/schema";
 import {
+  EDITORIAL_BATCH_LIMIT,
+  generatedDraftBatchClaimSchema,
   generatedDraftClaimSchema,
+  originalQuestionBatchReviewSchema,
   originalQuestionDraftSchema,
   validateIndependentReview,
 } from "@/lib/editorial/clean-room";
@@ -389,6 +392,197 @@ export async function claimGeneratedDraftAction(
   };
 }
 
+export async function claimGeneratedDraftBatchAction(
+  _previousState: EditorialActionState,
+  formData: FormData,
+): Promise<EditorialActionState> {
+  const user = await requireAdmin();
+  const parsed = generatedDraftBatchClaimSchema.safeParse({
+    cleanRoomAttestation: formData.get("cleanRoomAttestation") === "on",
+  });
+
+  if (!parsed.success) {
+    return errorState(parsed.error.issues[0]?.message ?? "Confirme a declaração editorial do lote.");
+  }
+
+  const db = getDb();
+  const draftRows = await db
+    .select({
+      id: questions.id,
+      publicId: questions.publicId,
+      status: questions.editorialStatus,
+      creatorUserId: questions.createdByUserId,
+      prompt: questions.prompt,
+      type: questions.type,
+      questionSourceRights: questions.sourceRights,
+      authorshipMethod: questions.authorshipMethod,
+      generatorModel: questions.generatorModel,
+      promptVersion: questions.promptVersion,
+      articleStatus: legalArticles.editorialStatus,
+      articleSourceRights: legalArticles.sourceRights,
+      versionStatus: legalVersions.status,
+      sourceUrl: legalVersions.sourceUrl,
+      actIsActive: legalActs.isActive,
+      profileFormat: questionStyleProfiles.format,
+      profileIsActive: questionStyleProfiles.isActive,
+      bankIsActive: quizBanks.isActive,
+    })
+    .from(questions)
+    .innerJoin(legalArticles, eq(questions.legalArticleId, legalArticles.id))
+    .innerJoin(legalVersions, eq(legalArticles.legalVersionId, legalVersions.id))
+    .innerJoin(legalActs, eq(legalVersions.legalActId, legalActs.id))
+    .innerJoin(questionStyleProfiles, eq(questions.styleBankId, questionStyleProfiles.quizBankId))
+    .innerJoin(quizBanks, eq(questions.styleBankId, quizBanks.id))
+    .where(
+      and(
+        eq(questions.quizMode, "original_style"),
+        eq(questions.editorialStatus, "draft"),
+        isNull(questions.createdByUserId),
+      ),
+    )
+    .orderBy(questions.createdAt, questions.id)
+    .limit(EDITORIAL_BATCH_LIMIT);
+
+  if (!draftRows.length) return errorState("Não há rascunhos elegíveis para assumir neste lote.");
+
+  const [optionRows, existingQuestions] = await Promise.all([
+    db
+      .select({
+        questionId: questionOptions.questionId,
+        total: sql<number>`count(*)::int`,
+        correct: sql<number>`count(*) filter (where ${questionOptions.isCorrect})::int`,
+      })
+      .from(questionOptions)
+      .where(inArray(questionOptions.questionId, draftRows.map((draft) => draft.id)))
+      .groupBy(questionOptions.questionId),
+    db
+      .select({ publicId: questions.publicId, prompt: questions.prompt })
+      .from(questions)
+      .where(eq(questions.sourceRights, "original_authorial")),
+  ]);
+
+  const optionStats = new Map(
+    optionRows.map((row) => [row.questionId, { total: row.total, correct: row.correct }]),
+  );
+  const prepared: Array<{
+    id: number;
+    publicId: string;
+    generatorModel: string;
+    promptVersion: string;
+    similarityMaxBps: number;
+    similarityReferencePublicId: string | null;
+  }> = [];
+
+  for (const draft of draftRows) {
+    if (
+      draft.status !== "draft" ||
+      draft.creatorUserId ||
+      draft.questionSourceRights !== "original_authorial" ||
+      draft.authorshipMethod !== "ai_assisted" ||
+      !draft.generatorModel ||
+      !draft.promptVersion
+    ) {
+      return errorState(`O rascunho ${draft.publicId} não possui procedência autoral completa.`);
+    }
+    if (
+      draft.articleStatus !== "reviewed" ||
+      draft.articleSourceRights !== "official_text" ||
+      draft.versionStatus !== "current" ||
+      !draft.sourceUrl ||
+      !draft.actIsActive
+    ) {
+      return errorState(`A fonte oficial do rascunho ${draft.publicId} precisa ser revisada.`);
+    }
+    if (!draft.profileIsActive || !draft.bankIsActive || draft.profileFormat !== draft.type) {
+      return errorState(`O perfil editorial do rascunho ${draft.publicId} não está elegível.`);
+    }
+
+    const expectedOptionCount = draft.type === "true_false" ? 2 : 5;
+    const stats = optionStats.get(draft.id) ?? { total: 0, correct: 0 };
+    if (stats.total !== expectedOptionCount || stats.correct !== 1) {
+      return errorState(`O rascunho ${draft.publicId} possui alternativas ou gabarito inválidos.`);
+    }
+
+    const similarity = findMostSimilarQuestion(
+      draft.prompt,
+      existingQuestions.filter((question) => question.publicId !== draft.publicId),
+    );
+    if (similarity.scoreBps >= ORIGINALITY_REJECTION_THRESHOLD_BPS) {
+      return errorState(
+        `O rascunho ${draft.publicId} conflita com outro item interno (${Math.round(similarity.scoreBps / 100)}%).`,
+      );
+    }
+
+    prepared.push({
+      id: draft.id,
+      publicId: draft.publicId,
+      generatorModel: draft.generatorModel,
+      promptVersion: draft.promptVersion,
+      similarityMaxBps: similarity.scoreBps,
+      similarityReferencePublicId: similarity.referencePublicId,
+    });
+  }
+
+  const now = new Date();
+  const batchId = randomUUID();
+
+  try {
+    await db.transaction(async (transaction) => {
+      for (const draft of prepared) {
+        const updated = await transaction
+          .update(questions)
+          .set({
+            editorialStatus: "pending_review",
+            createdByUserId: user.id,
+            cleanRoomAttestedAt: now,
+            submittedAt: now,
+            similarityMaxBps: draft.similarityMaxBps,
+            similarityReferencePublicId: draft.similarityReferencePublicId,
+            originalityCheckedAt: now,
+            updatedAt: now,
+          })
+          .where(
+            and(
+              eq(questions.id, draft.id),
+              eq(questions.editorialStatus, "draft"),
+              isNull(questions.createdByUserId),
+            ),
+          )
+          .returning({ id: questions.id });
+
+        if (!updated[0]) throw new Error("O lote mudou enquanto era processado. Recarregue e tente novamente.");
+      }
+
+      await transaction.insert(auditLogs).values(
+        prepared.map((draft) => ({
+          actorUserId: user.id,
+          action: "editorial.generated_draft.batch_claimed",
+          entityType: "question",
+          entityId: draft.publicId,
+          metadata: {
+            batchId,
+            batchSize: prepared.length,
+            cleanRoomAttested: true,
+            generatorModel: draft.generatorModel,
+            promptVersion: draft.promptVersion,
+            similarityMaxBps: draft.similarityMaxBps,
+            similarityReferencePublicId: draft.similarityReferencePublicId,
+          },
+        })),
+      );
+    });
+  } catch (error) {
+    console.error("Falha ao assumir lote autoral.", error);
+    return errorState(error instanceof Error ? error.message : "Não foi possível assumir o lote.");
+  }
+
+  revalidatePath("/admin/fabrica-autoral");
+  return {
+    status: "success",
+    message: `${prepared.length} rascunhos foram assumidos e enviados à revisão independente.`,
+  };
+}
+
 const reviewSchema = z.object({
   publicId: z.string().uuid(),
   decision: z.enum(["approve", "reject"]),
@@ -470,5 +664,186 @@ export async function reviewOriginalQuestionAction(
   return {
     status: "success",
     message: approved ? "Questão aprovada e liberada no catálogo." : "Questão reprovada e retirada da fila.",
+  };
+}
+
+export async function approveOriginalQuestionBatchAction(
+  _previousState: EditorialActionState,
+  formData: FormData,
+): Promise<EditorialActionState> {
+  const user = await requireAdmin();
+  const parsed = originalQuestionBatchReviewSchema.safeParse({
+    reviewAttestation: formData.get("reviewAttestation") === "on",
+    notes: formData.get("notes") ?? "",
+  });
+
+  if (!parsed.success) {
+    return errorState(parsed.error.issues[0]?.message ?? "Confirme a revisão humana do lote.");
+  }
+
+  const db = getDb();
+  const candidateRows = await db
+    .select({
+      id: questions.id,
+      publicId: questions.publicId,
+      status: questions.editorialStatus,
+      creatorUserId: questions.createdByUserId,
+      cleanRoomAttestedAt: questions.cleanRoomAttestedAt,
+      originalityCheckedAt: questions.originalityCheckedAt,
+      similarityMaxBps: questions.similarityMaxBps,
+      prompt: questions.prompt,
+      type: questions.type,
+      questionSourceRights: questions.sourceRights,
+      articleStatus: legalArticles.editorialStatus,
+      articleSourceRights: legalArticles.sourceRights,
+      versionStatus: legalVersions.status,
+      sourceUrl: legalVersions.sourceUrl,
+      actIsActive: legalActs.isActive,
+      profileFormat: questionStyleProfiles.format,
+      profileIsActive: questionStyleProfiles.isActive,
+      bankIsActive: quizBanks.isActive,
+    })
+    .from(questions)
+    .innerJoin(legalArticles, eq(questions.legalArticleId, legalArticles.id))
+    .innerJoin(legalVersions, eq(legalArticles.legalVersionId, legalVersions.id))
+    .innerJoin(legalActs, eq(legalVersions.legalActId, legalActs.id))
+    .innerJoin(questionStyleProfiles, eq(questions.styleBankId, questionStyleProfiles.quizBankId))
+    .innerJoin(quizBanks, eq(questions.styleBankId, quizBanks.id))
+    .where(
+      and(
+        eq(questions.quizMode, "original_style"),
+        eq(questions.editorialStatus, "pending_review"),
+        isNotNull(questions.createdByUserId),
+        ne(questions.createdByUserId, user.id),
+      ),
+    )
+    .orderBy(questions.submittedAt, questions.id)
+    .limit(EDITORIAL_BATCH_LIMIT);
+
+  if (!candidateRows.length) {
+    return errorState("Não há questões enviadas por outra pessoa e elegíveis para aprovação em lote.");
+  }
+
+  const [optionRows, existingQuestions] = await Promise.all([
+    db
+      .select({
+        questionId: questionOptions.questionId,
+        total: sql<number>`count(*)::int`,
+        correct: sql<number>`count(*) filter (where ${questionOptions.isCorrect})::int`,
+      })
+      .from(questionOptions)
+      .where(inArray(questionOptions.questionId, candidateRows.map((candidate) => candidate.id)))
+      .groupBy(questionOptions.questionId),
+    db
+      .select({ publicId: questions.publicId, prompt: questions.prompt })
+      .from(questions)
+      .where(eq(questions.sourceRights, "original_authorial")),
+  ]);
+  const optionStats = new Map(
+    optionRows.map((row) => [row.questionId, { total: row.total, correct: row.correct }]),
+  );
+
+  for (const candidate of candidateRows) {
+    const independentReview = validateIndependentReview({
+      status: candidate.status,
+      creatorUserId: candidate.creatorUserId,
+      reviewerUserId: user.id,
+      cleanRoomAttestedAt: candidate.cleanRoomAttestedAt,
+    });
+    if (!independentReview.allowed) return errorState(independentReview.reason);
+
+    if (
+      candidate.questionSourceRights !== "original_authorial" ||
+      candidate.articleStatus !== "reviewed" ||
+      candidate.articleSourceRights !== "official_text" ||
+      candidate.versionStatus !== "current" ||
+      !candidate.sourceUrl ||
+      !candidate.actIsActive
+    ) {
+      return errorState(`A fonte oficial da questão ${candidate.publicId} precisa ser revisada.`);
+    }
+    if (!candidate.profileIsActive || !candidate.bankIsActive || candidate.profileFormat !== candidate.type) {
+      return errorState(`O perfil editorial da questão ${candidate.publicId} não está elegível.`);
+    }
+    if (
+      !candidate.originalityCheckedAt ||
+      candidate.similarityMaxBps >= ORIGINALITY_REJECTION_THRESHOLD_BPS
+    ) {
+      return errorState(`A questão ${candidate.publicId} não possui verificação de originalidade válida.`);
+    }
+
+    const expectedOptionCount = candidate.type === "true_false" ? 2 : 5;
+    const stats = optionStats.get(candidate.id) ?? { total: 0, correct: 0 };
+    if (stats.total !== expectedOptionCount || stats.correct !== 1) {
+      return errorState(`A questão ${candidate.publicId} possui alternativas ou gabarito inválidos.`);
+    }
+
+    const similarity = findMostSimilarQuestion(
+      candidate.prompt,
+      existingQuestions.filter((question) => question.publicId !== candidate.publicId),
+    );
+    if (similarity.scoreBps >= ORIGINALITY_REJECTION_THRESHOLD_BPS) {
+      return errorState(
+        `A questão ${candidate.publicId} passou a conflitar com outro item interno (${Math.round(similarity.scoreBps / 100)}%).`,
+      );
+    }
+  }
+
+  const now = new Date();
+  const batchId = randomUUID();
+  const reviewNote =
+    parsed.data.notes || "Aprovação editorial em lote após revisão humana confirmada pelo revisor.";
+  const candidateIds = candidateRows.map((candidate) => candidate.id);
+
+  try {
+    await db.transaction(async (transaction) => {
+      const updated = await transaction
+        .update(questions)
+        .set({
+          editorialStatus: "reviewed",
+          reviewedByUserId: user.id,
+          reviewNotes: reviewNote,
+          verifiedAt: now,
+          updatedAt: now,
+        })
+        .where(
+          and(
+            inArray(questions.id, candidateIds),
+            eq(questions.editorialStatus, "pending_review"),
+            isNotNull(questions.createdByUserId),
+            ne(questions.createdByUserId, user.id),
+          ),
+        )
+        .returning({ id: questions.id });
+
+      if (updated.length !== candidateRows.length) {
+        throw new Error("O lote mudou enquanto era processado. Recarregue e tente novamente.");
+      }
+
+      await transaction.insert(auditLogs).values(
+        candidateRows.map((candidate) => ({
+          actorUserId: user.id,
+          action: "editorial.original_question.batch_approved",
+          entityType: "question",
+          entityId: candidate.publicId,
+          metadata: {
+            batchId,
+            batchSize: candidateRows.length,
+            reviewAttested: true,
+            notes: reviewNote,
+          },
+        })),
+      );
+    });
+  } catch (error) {
+    console.error("Falha ao aprovar lote autoral.", error);
+    return errorState(error instanceof Error ? error.message : "Não foi possível aprovar o lote.");
+  }
+
+  revalidatePath("/admin/fabrica-autoral");
+  revalidatePath("/app/questoes");
+  return {
+    status: "success",
+    message: `${candidateRows.length} questões foram aprovadas e liberadas no catálogo.`,
   };
 }

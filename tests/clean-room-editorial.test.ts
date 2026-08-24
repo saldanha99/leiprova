@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  generatedDraftBatchClaimSchema,
   generatedDraftClaimSchema,
+  originalQuestionBatchReviewSchema,
   originalQuestionDraftSchema,
   validateIndependentReview,
 } from "../src/lib/editorial/clean-room";
@@ -103,6 +105,17 @@ describe("fábrica autoral clean-room", () => {
     const publicId = PILOT_ORIGINAL_QUESTIONS[0].publicId;
     expect(generatedDraftClaimSchema.safeParse({ publicId, cleanRoomAttestation: false }).success).toBe(false);
     expect(generatedDraftClaimSchema.safeParse({ publicId, cleanRoomAttestation: true }).success).toBe(true);
+  });
+
+  it("exige declarações humanas explícitas nas duas etapas em lote", () => {
+    expect(generatedDraftBatchClaimSchema.safeParse({ cleanRoomAttestation: false }).success).toBe(false);
+    expect(generatedDraftBatchClaimSchema.safeParse({ cleanRoomAttestation: true }).success).toBe(true);
+    expect(
+      originalQuestionBatchReviewSchema.safeParse({ reviewAttestation: false, notes: "" }).success,
+    ).toBe(false);
+    expect(
+      originalQuestionBatchReviewSchema.safeParse({ reviewAttestation: true, notes: "Lote conferido." }).success,
+    ).toBe(true);
   });
 
   it("mantém o lote piloto equilibrado, válido e compatível com cada perfil", () => {

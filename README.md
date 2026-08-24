@@ -89,6 +89,11 @@ Os modos de conteúdo são separados por procedência:
 
 Há modo treino, com correção após a resposta, e modo prova, cujo gabarito só é liberado após a entrega. O servidor nunca envia a alternativa correta junto com o caderno inicial.
 
+A fábrica autoral processa até 250 itens por lote em duas etapas atômicas: um
+responsável confere e envia os rascunhos; outra conta editorial registra a
+revisão humana e libera todos os itens elegíveis. Fonte, formato, gabarito,
+originalidade e independência são recalculados no servidor antes de cada lote.
+
 ## Planos de referência
 
 | Plano | Cobrança | Preço configurado na interface |

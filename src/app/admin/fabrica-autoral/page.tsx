@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 
 import { AuthoringForm } from "@/components/admin/authoring-form";
+import { BatchEditorialControls } from "@/components/admin/batch-editorial-controls";
 import { ClaimDraftControls } from "@/components/admin/claim-draft-controls";
 import { ReviewControls } from "@/components/admin/review-controls";
 import { requireAdmin } from "@/lib/auth";
@@ -38,7 +39,7 @@ const statusClasses: Record<string, string> = {
 
 export default async function EditorialFactoryPage() {
   const user = await requireAdmin();
-  const snapshot = await getEditorialFactorySnapshot();
+  const snapshot = await getEditorialFactorySnapshot(user.id);
 
   const metrics = [
     { label: "Autorais registradas", value: snapshot.metrics.total, icon: Fingerprint, tone: "text-sky-300 bg-sky-300/10" },
@@ -112,6 +113,12 @@ export default async function EditorialFactoryPage() {
           </div>
         </section>
       ) : null}
+
+      <BatchEditorialControls
+        claimableCount={snapshot.metrics.claimable}
+        reviewableCount={snapshot.metrics.reviewable}
+        ownedPendingCount={snapshot.metrics.ownedPending}
+      />
 
       <section className="mt-5" aria-labelledby="profiles-title">
         <div className="mb-3">
@@ -207,7 +214,7 @@ export default async function EditorialFactoryPage() {
             <span className="text-xs font-bold uppercase tracking-[.14em] text-sky-300">Governança editorial</span>
             <h2 id="queue-title" className="mt-2 text-xl font-semibold text-white">Fila e histórico recente</h2>
           </div>
-          <p className="text-xs text-slate-600">Até 60 itens mais recentes</p>
+          <p className="text-xs text-slate-600">Até 250 itens mais recentes</p>
         </div>
 
         {snapshot.queue.length ? (

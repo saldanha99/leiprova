@@ -76,8 +76,14 @@ grant insert (
 
 grant update (
   editorial_status,
+  created_by_user_id,
   reviewed_by_user_id,
+  clean_room_attested_at,
+  submitted_at,
   review_notes,
+  similarity_max_bps,
+  similarity_reference_public_id,
+  originality_checked_at,
   verified_at,
   updated_at
 ) on questions to :app_user;

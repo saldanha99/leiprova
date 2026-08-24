@@ -67,6 +67,21 @@ export const generatedDraftClaimSchema = z.object({
   }),
 });
 
+export const EDITORIAL_BATCH_LIMIT = 250;
+
+export const generatedDraftBatchClaimSchema = z.object({
+  cleanRoomAttestation: z.literal(true, {
+    error: "Confirme a conferência clean-room do lote antes de enviá-lo.",
+  }),
+});
+
+export const originalQuestionBatchReviewSchema = z.object({
+  reviewAttestation: z.literal(true, {
+    error: "Confirme a revisão humana do lote antes de aprová-lo.",
+  }),
+  notes: z.string().trim().max(1500, "A nota do lote deve ter no máximo 1.500 caracteres."),
+});
+
 export type ReviewTransitionInput = {
   status: string;
   creatorUserId: number | null;

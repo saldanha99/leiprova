@@ -16,8 +16,9 @@ import {
   quizTopics,
   users,
 } from "@/lib/db/schema";
+import { EDITORIAL_BATCH_LIMIT } from "@/lib/editorial/clean-room";
 
-export async function getEditorialFactorySnapshot() {
+export async function getEditorialFactorySnapshot(viewerUserId: number) {
   const db = getDb();
   const creator = alias(users, "question_creator");
   const reviewer = alias(users, "question_reviewer");
@@ -116,7 +117,7 @@ export async function getEditorialFactorySnapshot() {
       .leftJoin(reviewer, eq(questions.reviewedByUserId, reviewer.id))
       .where(eq(questions.quizMode, "original_style"))
       .orderBy(desc(questions.createdAt))
-      .limit(60),
+      .limit(EDITORIAL_BATCH_LIMIT),
     db
       .select({
         questionPublicId: questions.publicId,
@@ -130,7 +131,7 @@ export async function getEditorialFactorySnapshot() {
       .innerJoin(questions, eq(questionOptions.questionId, questions.id))
       .where(eq(questions.quizMode, "original_style"))
       .orderBy(desc(questions.createdAt), questionOptions.sortOrder)
-      .limit(300),
+      .limit(EDITORIAL_BATCH_LIMIT * 5),
     db
       .select({
         total: sql<number>`count(*)::int`,
@@ -138,6 +139,18 @@ export async function getEditorialFactorySnapshot() {
         pending: sql<number>`count(*) filter (where ${questions.editorialStatus} = 'pending_review')::int`,
         reviewed: sql<number>`count(*) filter (where ${questions.editorialStatus} = 'reviewed')::int`,
         suspended: sql<number>`count(*) filter (where ${questions.editorialStatus} = 'suspended')::int`,
+        claimable: sql<number>`count(*) filter (
+          where ${questions.editorialStatus} = 'draft' and ${questions.createdByUserId} is null
+        )::int`,
+        reviewable: sql<number>`count(*) filter (
+          where ${questions.editorialStatus} = 'pending_review'
+            and ${questions.createdByUserId} is not null
+            and ${questions.createdByUserId} <> ${viewerUserId}
+        )::int`,
+        ownedPending: sql<number>`count(*) filter (
+          where ${questions.editorialStatus} = 'pending_review'
+            and ${questions.createdByUserId} = ${viewerUserId}
+        )::int`,
       })
       .from(questions)
       .where(eq(questions.quizMode, "original_style")),
@@ -161,7 +174,16 @@ export async function getEditorialFactorySnapshot() {
     subjects,
     topics,
     queue,
-    metrics: metricRows[0] ?? { total: 0, drafts: 0, pending: 0, reviewed: 0, suspended: 0 },
+    metrics: metricRows[0] ?? {
+      total: 0,
+      drafts: 0,
+      pending: 0,
+      reviewed: 0,
+      suspended: 0,
+      claimable: 0,
+      reviewable: 0,
+      ownedPending: 0,
+    },
   };
 }
 

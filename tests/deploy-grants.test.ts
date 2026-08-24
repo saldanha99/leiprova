@@ -16,7 +16,9 @@ describe("privilégios do app em produção", () => {
   it("permite o fluxo autoral apenas nas colunas editoriais necessárias", () => {
     expect(grants).toMatch(/question_style_profiles,/);
     expect(grants).toMatch(/grant insert \([\s\S]*clean_room_attested_at,[\s\S]*\) on questions to :app_user;/);
-    expect(grants).toMatch(/grant update \([\s\S]*reviewed_by_user_id,[\s\S]*\) on questions to :app_user;/);
+    expect(grants).toMatch(
+      /grant update \(\s*editorial_status,\s*created_by_user_id,\s*reviewed_by_user_id,\s*clean_room_attested_at,\s*submitted_at,\s*review_notes,\s*similarity_max_bps,\s*similarity_reference_public_id,\s*originality_checked_at,[\s\S]*?\) on questions to :app_user;/,
+    );
     expect(grants).toMatch(/grant insert \([\s\S]*question_id,[\s\S]*\) on question_options to :app_user;/);
     expect(grants).toContain("questions_id_seq");
     expect(grants).toContain("question_options_id_seq");
