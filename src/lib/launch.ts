@@ -13,5 +13,9 @@ export function isContactEnabled() {
 }
 
 export function isCommerceOpen() {
-  return isRegistrationEnabled() && enabled("CHECKOUT_ENABLED");
+  return (
+    isRegistrationEnabled() &&
+    enabled("CHECKOUT_ENABLED") &&
+    enabled("TRANSACTIONAL_EMAIL_ENABLED")
+  );
 }

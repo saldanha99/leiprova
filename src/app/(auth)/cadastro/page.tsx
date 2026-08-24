@@ -2,9 +2,10 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Construction } from "lucide-react";
 
-import { registerAction } from "@/app/actions/auth";
+import { beginPurchaseAction, registerAction } from "@/app/actions/auth";
 import { AuthForm } from "@/components/auth/auth-form";
 import { AuthShell } from "@/components/auth/auth-shell";
+import { PurchaseIdentityForm } from "@/components/auth/purchase-identity-form";
 import { getCurrentUser } from "@/lib/auth";
 import { isRegistrationEnabled } from "@/lib/launch";
 import { getPlan } from "@/lib/plans";
@@ -39,9 +40,20 @@ export default async function RegisterPage({
     );
   }
 
+  if (selectedPlan) {
+    return (
+      <AuthShell
+        title={`Comece com o ${selectedPlan.name}`}
+        description="Informe onde deseja receber o acesso. Depois da confirmação do pagamento, enviaremos o link para você criar sua senha do portal."
+      >
+        <PurchaseIdentityForm action={beginPurchaseAction} planSlug={selectedPlan.slug} />
+      </AuthShell>
+    );
+  }
+
   return (
     <AuthShell
-      title={selectedPlan ? `Comece com o ${selectedPlan.name}` : "Crie sua conta gratuita"}
+      title="Crie sua conta gratuita"
       description="Faça um treino demonstrativo agora. Você só escolhe um plano quando quiser liberar o acervo completo."
     >
       <AuthForm mode="register" action={registerAction} nextPath={nextPath} />

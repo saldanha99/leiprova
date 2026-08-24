@@ -208,7 +208,7 @@ Roteiros detalhados: [`docs/REVISAO-JURIDICA.md`](docs/REVISAO-JURIDICA.md) e
 3. Aprovar preços, política de atualizações e SLA de suporte.
 4. Validar o checkout em modo de teste, incluindo pagamento aprovado, recusado, renovação, atraso e cancelamento.
 5. Criar rotina editorial contínua para detectar alterações legislativas e suspender questões desatualizadas.
-6. Configurar monitoramento, alertas, e-mail transacional, verificação de e-mail e recuperação de senha.
+6. Cadastrar o domínio no Cloudflare Email Service, validar SPF/DKIM/DMARC e preencher as variáveis `TRANSACTIONAL_EMAIL_*`/`CLOUDFLARE_*` somente na VPS. O primeiro acesso, a recuperação de senha e o convite após a compra já estão implementados e permanecem sem envio enquanto a flag estiver fechada.
 
 ## Segurança operacional
 

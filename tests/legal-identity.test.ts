@@ -11,6 +11,19 @@ const CAMPOS = [
   "SUPPLIER_DPO_CONTACT",
 ] as const;
 
+const AMBIENTE_CHECKOUT = [
+  "CHECKOUT_ENABLED",
+  "DATABASE_URL",
+  "STRIPE_PUBLISHABLE_KEY",
+  "STRIPE_SECRET_KEY",
+  "STRIPE_WEBHOOK_SECRET",
+  "STRIPE_PRICE_RITMO",
+  "TRANSACTIONAL_EMAIL_ENABLED",
+  "CLOUDFLARE_ACCOUNT_ID",
+  "CLOUDFLARE_EMAIL_API_TOKEN",
+  "TRANSACTIONAL_EMAIL_FROM",
+] as const;
+
 function preencherTudo() {
   process.env.SUPPLIER_LEGAL_NAME = "Exemplo Educacional Ltda.";
   process.env.SUPPLIER_TAX_ID = "00.000.000/0001-00";
@@ -22,6 +35,7 @@ function preencherTudo() {
 
 function limpar() {
   for (const campo of CAMPOS) delete process.env[campo];
+  for (const campo of AMBIENTE_CHECKOUT) delete process.env[campo];
   delete process.env.SUPPLIER_TRADE_NAME;
 }
 
@@ -80,6 +94,10 @@ describe("trava do checkout", () => {
     process.env.STRIPE_SECRET_KEY = "rk_test_exemplo";
     process.env.STRIPE_WEBHOOK_SECRET = "whsec_exemplo";
     process.env.STRIPE_PRICE_RITMO = "price_exemplo";
+    process.env.TRANSACTIONAL_EMAIL_ENABLED = "true";
+    process.env.CLOUDFLARE_ACCOUNT_ID = "account_exemplo";
+    process.env.CLOUDFLARE_EMAIL_API_TOKEN = "token_exemplo";
+    process.env.TRANSACTIONAL_EMAIL_FROM = "acesso@exemplo.test";
   }
 
   it("recusa abrir o checkout enquanto a identificação estiver incompleta", async () => {
@@ -92,5 +110,12 @@ describe("trava do checkout", () => {
     ligarStripeDeTeste();
     preencherTudo();
     expect(await disponibilidade()).toMatchObject({ available: true });
+  });
+
+  it("mantém a venda fechada sem o canal de primeiro acesso", async () => {
+    ligarStripeDeTeste();
+    preencherTudo();
+    delete process.env.TRANSACTIONAL_EMAIL_ENABLED;
+    expect(await disponibilidade()).toEqual({ available: false, reason: "transactional_email" });
   });
 });

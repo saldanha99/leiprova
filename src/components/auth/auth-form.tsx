@@ -72,10 +72,12 @@ export function AuthForm({
   mode,
   action,
   nextPath,
+  accountAccessEnabled = false,
 }: {
   mode: "login" | "register";
   action: AuthAction;
   nextPath?: string;
+  accountAccessEnabled?: boolean;
 }) {
   const [state, formAction] = useActionState(action, {});
   const isRegister = mode === "register";
@@ -111,6 +113,15 @@ export function AuthForm({
         error={state.fieldErrors?.password}
         icon={LockKeyhole}
       />
+
+      {!isRegister && accountAccessEnabled && (
+        <Link
+          href="/recuperar-acesso"
+          className="-mt-2 w-max text-xs font-semibold text-slate-400 transition hover:text-amber-300"
+        >
+          Primeiro acesso ou esqueci minha senha
+        </Link>
+      )}
 
       {isRegister && (
         <label className="flex items-start gap-3 text-xs leading-5 text-slate-400">

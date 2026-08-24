@@ -3,6 +3,7 @@ import "server-only";
 import { and, eq, isNull } from "drizzle-orm";
 import type Stripe from "stripe";
 
+import { sendPurchaseAccessEmail } from "@/lib/account-access";
 import { getDb } from "@/lib/db/client";
 import {
   checkoutAttempts,
@@ -111,6 +112,7 @@ async function handleCheckoutSession(
       providerSubscriptionId,
       status: paid ? "active" : "incomplete",
     });
+    if (paid) await notifyPurchaseAccess(context.userId, attemptId);
     return;
   }
 
@@ -120,6 +122,16 @@ async function handleCheckoutSession(
       checkoutSessionId: session.id,
       status: paid ? "active" : "incomplete",
     });
+    if (paid) await notifyPurchaseAccess(context.userId, attemptId);
+  }
+}
+
+async function notifyPurchaseAccess(userId: number, checkoutAttemptId: string) {
+  try {
+    await sendPurchaseAccessEmail({ userId, checkoutAttemptId });
+  } catch {
+    // A liberação da compra não pode ser revertida por indisponibilidade do canal de e-mail.
+    console.error("purchase_access_notification_failed", { userId, checkoutAttemptId });
   }
 }
 

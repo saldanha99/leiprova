@@ -6,6 +6,7 @@ import Stripe from "stripe";
 import { isDatabaseConfigured } from "@/lib/db/client";
 import { isSupplierIdentityComplete } from "@/lib/legal";
 import { PLANS, type PlanDefinition } from "@/lib/plans";
+import { getTransactionalEmailConfig } from "@/lib/transactional-email";
 
 const STRIPE_API_VERSION: Stripe.LatestApiVersion = "2026-07-29.dahlia";
 
@@ -33,6 +34,7 @@ export type CheckoutAvailability =
         | "disabled"
         | "supplier_identity"
         | "database"
+        | "transactional_email"
         | "publishable_key"
         | "secret_key"
         | "price"
@@ -48,6 +50,10 @@ export function getCheckoutAvailability(plan: PlanDefinition): CheckoutAvailabil
   if (!isSupplierIdentityComplete()) return { available: false, reason: "supplier_identity" };
 
   if (!isDatabaseConfigured()) return { available: false, reason: "database" };
+
+  // O comprador precisa conseguir criar a senha em outro dispositivo depois
+  // da confirmação. Sem canal transacional validado, a venda permanece fechada.
+  if (!getTransactionalEmailConfig()) return { available: false, reason: "transactional_email" };
 
   const publishableKey = readEnv("STRIPE_PUBLISHABLE_KEY");
   if (!publishableKey) return { available: false, reason: "publishable_key" };

@@ -1093,6 +1093,51 @@ export const checkoutAttempts = pgTable(
   ],
 );
 
+export const accountAccessTokens = pgTable(
+  "account_access_tokens",
+  {
+    id: text("id").primaryKey(),
+    userId: bigint("user_id", { mode: "number" })
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    checkoutAttemptId: text("checkout_attempt_id").references(() => checkoutAttempts.id, {
+      onDelete: "set null",
+    }),
+    purpose: text("purpose").notNull(),
+    deliveryStatus: text("delivery_status").notNull().default("pending"),
+    providerMessageId: text("provider_message_id"),
+    lastError: text("last_error"),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    sentAt: timestamp("sent_at", { withTimezone: true }),
+    usedAt: timestamp("used_at", { withTimezone: true }),
+    ...timestamps,
+  },
+  (table) => [
+    uniqueIndex("account_access_tokens_checkout_uidx")
+      .on(table.checkoutAttemptId)
+      .where(sql`${table.checkoutAttemptId} is not null`),
+    index("account_access_tokens_user_created_idx").on(table.userId, table.createdAt),
+    index("account_access_tokens_expires_idx").on(table.expiresAt),
+    check("account_access_tokens_id_check", sql`${table.id} ~ '^[0-9a-f]{64}$'`),
+    check(
+      "account_access_tokens_purpose_check",
+      sql`${table.purpose} in ('purchase_access', 'password_reset')`,
+    ),
+    check(
+      "account_access_tokens_delivery_check",
+      sql`${table.deliveryStatus} in ('pending', 'sent', 'failed')`,
+    ),
+    check(
+      "account_access_tokens_expiry_check",
+      sql`${table.expiresAt} > ${table.createdAt}`,
+    ),
+    check(
+      "account_access_tokens_error_check",
+      sql`${table.lastError} is null or char_length(${table.lastError}) <= 500`,
+    ),
+  ],
+);
+
 export const stripeEvents = pgTable(
   "stripe_events",
   {
