@@ -163,14 +163,18 @@ Somente usuários com `users.role = 'admin'` acessam `/admin`; editores continua
 
 A infraestrutura usa banco dedicado, papel proprietário só para migrações e papel de aplicação com privilégios mínimos. O app entra na rede externa `forza` para ser descoberto pelo Traefik já existente.
 
-Na VPS, salve as variáveis em `/opt/leiprova/.env`, com permissão `600`, e execute:
+A VPS mantém `/opt/leiprova` como clone deste repositório. O `.env` fica fora do versionamento: salve as variáveis em `/opt/leiprova/.env`, com permissão `600`.
+
+Para publicar uma nova versão, faça o push para `main` e execute na VPS:
 
 ```bash
 cd /opt/leiprova
-./deploy/deploy.sh
+./deploy/pull-deploy.sh
 ```
 
-O script compila as imagens, sobe banco e pool, executa migrações, reaplica privilégios, faz o seed idempotente e inicia o app. Verificações úteis:
+O `pull-deploy.sh` traz `origin/main` por fast-forward e chama o `deploy.sh`. Ele aborta se encontrar alteração local não commitada, de modo que uma correção feita direto no servidor nunca seja sobrescrita em silêncio — leve-a para o repositório antes de publicar. Para publicar outra ref, passe-a como argumento: `./deploy/pull-deploy.sh origin/hotfix`.
+
+O `deploy.sh` continua disponível para rodar o ciclo sem tocar no git. Ele compila as imagens, sobe banco e pool, executa migrações, reaplica privilégios, faz o seed idempotente e inicia o app. Verificações úteis:
 
 ```bash
 docker compose ps
