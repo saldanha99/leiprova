@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 
-import { eq, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 
@@ -22,6 +22,15 @@ import {
   quizTopics,
 } from "../src/lib/db/schema";
 import { STYLE_PROFILE_SEEDS } from "../src/lib/editorial/style-profiles";
+import {
+  ORIGINAL_STYLE_PILOT_GENERATOR,
+  ORIGINAL_STYLE_PILOT_PROMPT_VERSION,
+  PILOT_ORIGINAL_QUESTIONS,
+} from "../src/lib/editorial/pilot-questions";
+import {
+  findMostSimilarQuestion,
+  ORIGINALITY_REJECTION_THRESHOLD_BPS,
+} from "../src/lib/editorial/originality";
 import { OFFICIAL_EXAM_PORTALS } from "../src/lib/official-sources/exam-registry";
 import { OFFICIAL_LEGAL_SOURCES } from "../src/lib/official-sources/legal-registry";
 import { PLANS } from "../src/lib/plans";
@@ -462,14 +471,135 @@ async function seedConstitution(catalog: Awaited<ReturnType<typeof seedQuizCatal
   }
 }
 
+async function seedPilotOriginalQuestions() {
+  const [anchorRows, bankRows, existingRows] = await Promise.all([
+    db
+      .select({
+        articleId: legalArticles.id,
+        articleRef: legalArticles.articleRef,
+        actTitle: legalActs.shortTitle,
+        sourceUrl: legalVersions.sourceUrl,
+        sourceVerifiedAt: legalVersions.verifiedAt,
+        subjectId: questions.subjectId,
+        topicId: questions.topicId,
+        topic: questions.topic,
+      })
+      .from(legalArticles)
+      .innerJoin(legalVersions, eq(legalArticles.legalVersionId, legalVersions.id))
+      .innerJoin(legalActs, eq(legalVersions.legalActId, legalActs.id))
+      .innerJoin(
+        questions,
+        and(eq(questions.legalArticleId, legalArticles.id), eq(questions.quizMode, "dry_law")),
+      )
+      .where(
+        and(
+          eq(legalArticles.editorialStatus, "reviewed"),
+          eq(legalArticles.sourceRights, "official_text"),
+          eq(legalVersions.status, "current"),
+          eq(legalActs.isActive, true),
+        ),
+      ),
+    db
+      .select({ id: quizBanks.id, slug: quizBanks.slug })
+      .from(quizBanks)
+      .where(eq(quizBanks.isActive, true)),
+    db
+      .select({ publicId: questions.publicId, prompt: questions.prompt })
+      .from(questions)
+      .where(eq(questions.sourceRights, "original_authorial")),
+  ]);
+
+  const anchors = new Map(anchorRows.map((row) => [row.articleRef, row]));
+  const bankIds = new Map(bankRows.map((row) => [row.slug, row.id]));
+  const existingIds = new Set(existingRows.map((row) => row.publicId));
+  const similarityCorpus = [...existingRows];
+  let insertedCount = 0;
+
+  for (const item of PILOT_ORIGINAL_QUESTIONS) {
+    if (existingIds.has(item.publicId)) continue;
+
+    const anchor = anchors.get(item.articleRef);
+    if (!anchor?.subjectId || !anchor.topicId) {
+      throw new Error(`Fonte oficial revisada ou classificação ausente para ${item.articleRef}.`);
+    }
+
+    const styleBankId = bankIds.get(item.bankSlug);
+    if (!styleBankId) throw new Error(`Banca ativa ausente para o lote piloto: ${item.bankSlug}.`);
+
+    const profile = STYLE_PROFILE_SEEDS.find((candidate) => candidate.bankSlug === item.bankSlug);
+    if (!profile || profile.format !== item.type) {
+      throw new Error(`Formato incompatível com o perfil editorial ${item.bankSlug}.`);
+    }
+
+    const similarity = findMostSimilarQuestion(item.prompt, similarityCorpus);
+    if (similarity.scoreBps >= ORIGINALITY_REJECTION_THRESHOLD_BPS) {
+      throw new Error(
+        `Rascunho ${item.publicId} excedeu o limite interno de similaridade (${similarity.scoreBps} bps).`,
+      );
+    }
+
+    const now = new Date();
+    const [question] = await db
+      .insert(questions)
+      .values({
+        publicId: item.publicId,
+        legalArticleId: anchor.articleId,
+        subjectId: anchor.subjectId,
+        topicId: anchor.topicId,
+        quizMode: "original_style",
+        styleBankId,
+        type: item.type,
+        prompt: item.prompt,
+        explanation: item.explanation,
+        learningObjective: item.learningObjective,
+        topic: anchor.topic,
+        difficulty: item.difficulty,
+        examBoardStyle: item.bankSlug,
+        editorialStatus: "draft",
+        sourceRights: "original_authorial",
+        sourceTitle: `${anchor.actTitle} — ${anchor.articleRef}`,
+        sourceUrl: anchor.sourceUrl,
+        authorshipMethod: "ai_assisted",
+        generatorModel: ORIGINAL_STYLE_PILOT_GENERATOR,
+        promptVersion: ORIGINAL_STYLE_PILOT_PROMPT_VERSION,
+        similarityMaxBps: similarity.scoreBps,
+        similarityReferencePublicId: similarity.referencePublicId,
+        originalityCheckedAt: now,
+        verifiedAt: anchor.sourceVerifiedAt,
+      })
+      .onConflictDoNothing({ target: questions.publicId })
+      .returning({ id: questions.id });
+
+    if (!question) continue;
+
+    await db.insert(questionOptions).values(
+      item.options.map((option, sortOrder) => ({
+        questionId: question.id,
+        optionKey: option.key,
+        text: option.text,
+        isCorrect: option.isCorrect,
+        rationale: option.rationale,
+        sortOrder,
+      })),
+    );
+
+    insertedCount += 1;
+    existingIds.add(item.publicId);
+    similarityCorpus.push({ publicId: item.publicId, prompt: item.prompt });
+  }
+
+  return insertedCount;
+}
+
 async function main() {
   try {
     await seedPlans();
     const catalog = await seedQuizCatalog();
     await seedOfficialSourceRegistries();
     await seedConstitution(catalog);
+    const pilotInsertedCount = await seedPilotOriginalQuestions();
     console.log(
-      `Seed concluído: ${PLANS.length} planos, ${quizCareerCatalog.length} carreiras, ${quizSubjectCatalog.length} matérias e ${DEMO_QUESTIONS.length} questões originais assistidas por IA.`,
+      `Seed concluído: ${PLANS.length} planos, ${quizCareerCatalog.length} carreiras, ${quizSubjectCatalog.length} matérias, ${DEMO_QUESTIONS.length} questões de lei seca e ${PILOT_ORIGINAL_QUESTIONS.length} rascunhos no lote autoral (${pilotInsertedCount} novos).`,
     );
   } finally {
     await client.end();

@@ -2,6 +2,7 @@ import {
   BookOpenCheck,
   CheckCircle2,
   Clock3,
+  FilePenLine,
   FileLock2,
   Fingerprint,
   ShieldCheck,
@@ -10,6 +11,7 @@ import {
 } from "lucide-react";
 
 import { AuthoringForm } from "@/components/admin/authoring-form";
+import { ClaimDraftControls } from "@/components/admin/claim-draft-controls";
 import { ReviewControls } from "@/components/admin/review-controls";
 import { requireAdmin } from "@/lib/auth";
 import { getEditorialFactorySnapshot } from "@/lib/db/editorial-admin";
@@ -36,6 +38,7 @@ export default async function EditorialFactoryPage() {
 
   const metrics = [
     { label: "Autorais registradas", value: snapshot.metrics.total, icon: Fingerprint, tone: "text-sky-300 bg-sky-300/10" },
+    { label: "Rascunhos de IA", value: snapshot.metrics.drafts, icon: FilePenLine, tone: "text-violet-300 bg-violet-300/10" },
     { label: "Na fila", value: snapshot.metrics.pending, icon: Clock3, tone: "text-amber-300 bg-amber-300/10" },
     { label: "Liberadas", value: snapshot.metrics.reviewed, icon: CheckCircle2, tone: "text-emerald-300 bg-emerald-300/10" },
     { label: "Reprovadas", value: snapshot.metrics.suspended, icon: FileLock2, tone: "text-rose-300 bg-rose-300/10" },
@@ -66,7 +69,7 @@ export default async function EditorialFactoryPage() {
         </div>
       </header>
 
-      <section className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4" aria-label="Indicadores editoriais">
+      <section className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-5" aria-label="Indicadores editoriais">
         {metrics.map(({ label, value, icon: Icon, tone }) => (
           <article key={label} className="rounded-2xl border border-white/8 bg-[#09131f] p-4">
             <div className={`grid size-9 place-items-center rounded-xl ${tone}`}>
@@ -77,6 +80,34 @@ export default async function EditorialFactoryPage() {
           </article>
         ))}
       </section>
+
+      {snapshot.metrics.drafts > 0 ? (
+        <section
+          className="mt-5 rounded-[1.5rem] border border-violet-300/15 bg-[linear-gradient(120deg,rgba(167,139,250,.08),rgba(56,189,248,.035))] p-5 sm:p-6"
+          aria-labelledby="pilot-title"
+        >
+          <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-center">
+            <div className="max-w-3xl">
+              <span className="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-[.14em] text-violet-200">
+                <Sparkles aria-hidden="true" className="size-3.5" />
+                Lote piloto ativo
+              </span>
+              <h2 id="pilot-title" className="mt-2 text-xl font-semibold text-white">
+                {numberFormatter.format(snapshot.metrics.drafts)} questões inéditas aguardam conferência editorial
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-slate-400">
+                Foram geradas somente a partir de artigos oficiais já revisados. Permanecem fora do catálogo até um
+                responsável confirmar a fonte e outra pessoa aprovar o conteúdo.
+              </p>
+            </div>
+            <div className="grid shrink-0 grid-cols-3 gap-2 text-center text-[10px] font-bold uppercase tracking-[.08em] text-slate-500">
+              <span className="rounded-xl border border-violet-300/12 bg-black/10 px-3 py-3 text-violet-200">1. Conferir</span>
+              <span className="rounded-xl border border-amber-300/12 bg-black/10 px-3 py-3 text-amber-200">2. Revisar</span>
+              <span className="rounded-xl border border-emerald-300/12 bg-black/10 px-3 py-3 text-emerald-200">3. Liberar</span>
+            </div>
+          </div>
+        </section>
+      ) : null}
 
       <section className="mt-5" aria-labelledby="profiles-title">
         <div className="mb-3">
@@ -179,6 +210,7 @@ export default async function EditorialFactoryPage() {
           <div className="mt-5 grid gap-4 xl:grid-cols-2">
             {snapshot.queue.map((item) => {
               const canReview = item.editorialStatus === "pending_review" && item.creatorUserId !== user.id;
+              const canClaim = item.editorialStatus === "draft" && !item.creatorUserId;
               return (
                 <article key={item.publicId} className="rounded-2xl border border-white/8 bg-black/10 p-4">
                   <div className="flex flex-wrap items-center justify-between gap-2">
@@ -195,7 +227,9 @@ export default async function EditorialFactoryPage() {
                   <p className="mt-3 text-sm leading-6 text-slate-200">{item.prompt}</p>
                   {item.learningObjective ? <p className="mt-2 text-xs leading-5 text-slate-500"><strong className="text-slate-400">Objetivo:</strong> {item.learningObjective}</p> : null}
                   <div className="mt-4 border-t border-white/7 pt-3 text-[11px] leading-5 text-slate-600">
-                    Autor: {item.creatorName ?? "registro indisponível"} · método {item.authorshipMethod === "ai_assisted" ? "assistido por IA" : "humano"}
+                    Responsável editorial: {item.creatorName ?? "a definir"} · método {item.authorshipMethod === "ai_assisted" ? "assistido por IA" : "humano"}
+                    {item.generatorModel ? ` · gerador: ${item.generatorModel}` : ""}
+                    {item.promptVersion ? ` · protocolo: ${item.promptVersion}` : ""}
                     {item.reviewerName ? ` · revisor: ${item.reviewerName}` : ""}
                   </div>
                   <p className="mt-2 text-[11px] font-semibold text-sky-300/80">
@@ -203,6 +237,7 @@ export default async function EditorialFactoryPage() {
                     {item.similarityReferencePublicId ? " · comparação registrada" : " · primeiro item da base"}
                   </p>
                   {item.reviewNotes ? <p className="mt-2 rounded-lg bg-white/[.035] p-2 text-xs leading-5 text-slate-400">Nota: {item.reviewNotes}</p> : null}
+                  {canClaim ? <ClaimDraftControls publicId={item.publicId} /> : null}
                   {canReview ? <ReviewControls publicId={item.publicId} /> : null}
                   {item.editorialStatus === "pending_review" && item.creatorUserId === user.id ? (
                     <p className="mt-3 rounded-lg border border-amber-300/12 bg-amber-300/[.045] p-2.5 text-xs leading-5 text-amber-100/70">
@@ -215,7 +250,7 @@ export default async function EditorialFactoryPage() {
           </div>
         ) : (
           <div className="mt-5 rounded-2xl border border-dashed border-white/10 p-8 text-center text-sm text-slate-500">
-            A fila está vazia. A primeira questão criada aparecerá aqui ainda como pendente.
+            A fila está vazia. O primeiro rascunho ou envio editorial aparecerá aqui.
           </div>
         )}
       </section>

@@ -82,6 +82,8 @@ export async function getEditorialFactorySnapshot() {
         learningObjective: questions.learningObjective,
         editorialStatus: questions.editorialStatus,
         authorshipMethod: questions.authorshipMethod,
+        generatorModel: questions.generatorModel,
+        promptVersion: questions.promptVersion,
         bankName: quizBanks.name,
         articleRef: legalArticles.articleRef,
         sourceTitle: questions.sourceTitle,
@@ -110,6 +112,7 @@ export async function getEditorialFactorySnapshot() {
     db
       .select({
         total: sql<number>`count(*)::int`,
+        drafts: sql<number>`count(*) filter (where ${questions.editorialStatus} = 'draft')::int`,
         pending: sql<number>`count(*) filter (where ${questions.editorialStatus} = 'pending_review')::int`,
         reviewed: sql<number>`count(*) filter (where ${questions.editorialStatus} = 'reviewed')::int`,
         suspended: sql<number>`count(*) filter (where ${questions.editorialStatus} = 'suspended')::int`,
@@ -124,7 +127,7 @@ export async function getEditorialFactorySnapshot() {
     subjects,
     topics,
     queue,
-    metrics: metricRows[0] ?? { total: 0, pending: 0, reviewed: 0, suspended: 0 },
+    metrics: metricRows[0] ?? { total: 0, drafts: 0, pending: 0, reviewed: 0, suspended: 0 },
   };
 }
 

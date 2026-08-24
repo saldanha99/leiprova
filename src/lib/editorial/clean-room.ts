@@ -60,6 +60,13 @@ export const originalQuestionDraftSchema = z
 
 export type OriginalQuestionDraftInput = z.infer<typeof originalQuestionDraftSchema>;
 
+export const generatedDraftClaimSchema = z.object({
+  publicId: z.string().uuid(),
+  cleanRoomAttestation: z.literal(true, {
+    error: "Confirme a revisão clean-room antes de assumir o rascunho.",
+  }),
+});
+
 export type ReviewTransitionInput = {
   status: string;
   creatorUserId: number | null;

@@ -1,10 +1,17 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  generatedDraftClaimSchema,
   originalQuestionDraftSchema,
   validateIndependentReview,
 } from "../src/lib/editorial/clean-room";
+import { PILOT_ORIGINAL_QUESTIONS } from "../src/lib/editorial/pilot-questions";
+import {
+  ORIGINALITY_REJECTION_THRESHOLD_BPS,
+  textualSimilarityBps,
+} from "../src/lib/editorial/originality";
 import { STYLE_PROFILE_SEEDS } from "../src/lib/editorial/style-profiles";
+import { DEMO_QUESTIONS } from "../src/lib/demo-content";
 
 function validDraft() {
   return {
@@ -82,5 +89,41 @@ describe("fábrica autoral clean-room", () => {
     );
     expect(STYLE_PROFILE_SEEDS.every((profile) => profile.prohibitedPatterns.length >= 3)).toBe(true);
     expect(STYLE_PROFILE_SEEDS.every((profile) => profile.disclaimer.includes("Não contém"))).toBe(true);
+  });
+
+  it("exige declaração clean-room para assumir um rascunho gerado", () => {
+    const publicId = PILOT_ORIGINAL_QUESTIONS[0].publicId;
+    expect(generatedDraftClaimSchema.safeParse({ publicId, cleanRoomAttestation: false }).success).toBe(false);
+    expect(generatedDraftClaimSchema.safeParse({ publicId, cleanRoomAttestation: true }).success).toBe(true);
+  });
+
+  it("mantém o lote piloto equilibrado, válido e compatível com cada perfil", () => {
+    expect(PILOT_ORIGINAL_QUESTIONS).toHaveLength(12);
+    expect(new Set(PILOT_ORIGINAL_QUESTIONS.map((item) => item.publicId)).size).toBe(12);
+    expect(new Set(PILOT_ORIGINAL_QUESTIONS.map((item) => item.articleRef)).size).toBe(12);
+
+    for (const profile of STYLE_PROFILE_SEEDS) {
+      expect(PILOT_ORIGINAL_QUESTIONS.filter((item) => item.bankSlug === profile.bankSlug)).toHaveLength(3);
+    }
+
+    for (const item of PILOT_ORIGINAL_QUESTIONS) {
+      const profile = STYLE_PROFILE_SEEDS.find((candidate) => candidate.bankSlug === item.bankSlug);
+      const expectedKeys = item.type === "true_false" ? ["C", "E"] : ["A", "B", "C", "D", "E"];
+
+      expect(profile?.format).toBe(item.type);
+      expect(item.options.map((option) => option.key)).toEqual(expectedKeys);
+      expect(item.options.filter((option) => option.isCorrect)).toHaveLength(1);
+    }
+  });
+
+  it("mantém os enunciados piloto abaixo do limite de similaridade interna", () => {
+    const comparisons = PILOT_ORIGINAL_QUESTIONS.flatMap((item, index) => [
+      ...DEMO_QUESTIONS.map((existing) => textualSimilarityBps(item.prompt, existing.prompt)),
+      ...PILOT_ORIGINAL_QUESTIONS.slice(0, index).map((existing) =>
+        textualSimilarityBps(item.prompt, existing.prompt),
+      ),
+    ]);
+
+    expect(Math.max(...comparisons)).toBeLessThan(ORIGINALITY_REJECTION_THRESHOLD_BPS);
   });
 });

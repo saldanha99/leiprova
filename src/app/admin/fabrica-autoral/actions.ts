@@ -2,7 +2,7 @@
 
 import { randomUUID } from "node:crypto";
 
-import { and, eq } from "drizzle-orm";
+import { and, eq, isNull, ne, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
@@ -21,6 +21,7 @@ import {
   quizTopics,
 } from "@/lib/db/schema";
 import {
+  generatedDraftClaimSchema,
   originalQuestionDraftSchema,
   validateIndependentReview,
 } from "@/lib/editorial/clean-room";
@@ -225,6 +226,166 @@ export async function createOriginalQuestionAction(
   return {
     status: "success",
     message: "Questão enviada à revisão. Ela ainda não está publicada.",
+  };
+}
+
+export async function claimGeneratedDraftAction(
+  _previousState: EditorialActionState,
+  formData: FormData,
+): Promise<EditorialActionState> {
+  const user = await requireAdmin();
+  const parsed = generatedDraftClaimSchema.safeParse({
+    publicId: formData.get("publicId"),
+    cleanRoomAttestation: formData.get("cleanRoomAttestation") === "on",
+  });
+
+  if (!parsed.success) {
+    return errorState(parsed.error.issues[0]?.message ?? "Revise a declaração editorial.");
+  }
+
+  const db = getDb();
+  const [draftRows, optionRows, existingQuestions] = await Promise.all([
+    db
+      .select({
+        id: questions.id,
+        status: questions.editorialStatus,
+        creatorUserId: questions.createdByUserId,
+        prompt: questions.prompt,
+        type: questions.type,
+        questionSourceRights: questions.sourceRights,
+        authorshipMethod: questions.authorshipMethod,
+        generatorModel: questions.generatorModel,
+        promptVersion: questions.promptVersion,
+        articleStatus: legalArticles.editorialStatus,
+        articleSourceRights: legalArticles.sourceRights,
+        versionStatus: legalVersions.status,
+        sourceUrl: legalVersions.sourceUrl,
+        actIsActive: legalActs.isActive,
+        profileFormat: questionStyleProfiles.format,
+        profileIsActive: questionStyleProfiles.isActive,
+        bankIsActive: quizBanks.isActive,
+      })
+      .from(questions)
+      .innerJoin(legalArticles, eq(questions.legalArticleId, legalArticles.id))
+      .innerJoin(legalVersions, eq(legalArticles.legalVersionId, legalVersions.id))
+      .innerJoin(legalActs, eq(legalVersions.legalActId, legalActs.id))
+      .innerJoin(questionStyleProfiles, eq(questions.styleBankId, questionStyleProfiles.quizBankId))
+      .innerJoin(quizBanks, eq(questions.styleBankId, quizBanks.id))
+      .where(
+        and(
+          eq(questions.publicId, parsed.data.publicId),
+          eq(questions.quizMode, "original_style"),
+        ),
+      )
+      .limit(1),
+    db
+      .select({
+        total: sql<number>`count(*)::int`,
+        correct: sql<number>`count(*) filter (where ${questionOptions.isCorrect})::int`,
+      })
+      .from(questionOptions)
+      .innerJoin(questions, eq(questionOptions.questionId, questions.id))
+      .where(eq(questions.publicId, parsed.data.publicId)),
+    db
+      .select({ publicId: questions.publicId, prompt: questions.prompt })
+      .from(questions)
+      .where(
+        and(
+          eq(questions.sourceRights, "original_authorial"),
+          ne(questions.publicId, parsed.data.publicId),
+        ),
+      ),
+  ]);
+
+  const draft = draftRows[0];
+  if (!draft) return errorState("Rascunho autoral não encontrado.");
+  if (draft.status !== "draft" || draft.creatorUserId) {
+    return errorState("Este rascunho já foi assumido ou encaminhado por outra pessoa.");
+  }
+  if (
+    draft.questionSourceRights !== "original_authorial" ||
+    draft.authorshipMethod !== "ai_assisted" ||
+    !draft.generatorModel ||
+    !draft.promptVersion
+  ) {
+    return errorState("O rascunho não possui a procedência autoral e os metadados de IA exigidos.");
+  }
+  if (
+    draft.articleStatus !== "reviewed" ||
+    draft.articleSourceRights !== "official_text" ||
+    draft.versionStatus !== "current" ||
+    !draft.sourceUrl ||
+    !draft.actIsActive
+  ) {
+    return errorState("A fonte legal deixou de estar vigente, oficial ou revisada.");
+  }
+  if (!draft.profileIsActive || !draft.bankIsActive || draft.profileFormat !== draft.type) {
+    return errorState("O perfil editorial do rascunho não está ativo ou não corresponde ao formato.");
+  }
+
+  const expectedOptionCount = draft.type === "true_false" ? 2 : 5;
+  const optionStats = optionRows[0] ?? { total: 0, correct: 0 };
+  if (optionStats.total !== expectedOptionCount || optionStats.correct !== 1) {
+    return errorState("O rascunho possui alternativas incompletas ou resposta inválida.");
+  }
+
+  const similarity = findMostSimilarQuestion(draft.prompt, existingQuestions);
+  if (similarity.scoreBps >= ORIGINALITY_REJECTION_THRESHOLD_BPS) {
+    return errorState(
+      `O enunciado passou a conflitar com outro item interno (${Math.round(similarity.scoreBps / 100)}%). Revise antes de enviar.`,
+    );
+  }
+
+  const now = new Date();
+
+  try {
+    await db.transaction(async (transaction) => {
+      const updated = await transaction
+        .update(questions)
+        .set({
+          editorialStatus: "pending_review",
+          createdByUserId: user.id,
+          cleanRoomAttestedAt: now,
+          submittedAt: now,
+          similarityMaxBps: similarity.scoreBps,
+          similarityReferencePublicId: similarity.referencePublicId,
+          originalityCheckedAt: now,
+          updatedAt: now,
+        })
+        .where(
+          and(
+            eq(questions.id, draft.id),
+            eq(questions.editorialStatus, "draft"),
+            isNull(questions.createdByUserId),
+          ),
+        )
+        .returning({ id: questions.id });
+
+      if (!updated[0]) throw new Error("O rascunho já foi assumido por outro editor.");
+
+      await transaction.insert(auditLogs).values({
+        actorUserId: user.id,
+        action: "editorial.generated_draft.claimed",
+        entityType: "question",
+        entityId: parsed.data.publicId,
+        metadata: {
+          cleanRoomAttested: true,
+          generatorModel: draft.generatorModel,
+          promptVersion: draft.promptVersion,
+          similarityMaxBps: similarity.scoreBps,
+          similarityReferencePublicId: similarity.referencePublicId,
+        },
+      });
+    });
+  } catch (error) {
+    console.error("Falha ao assumir rascunho autoral.", error);
+    return errorState(error instanceof Error ? error.message : "Não foi possível assumir o rascunho.");
+  }
+
+  revalidatePath("/admin/fabrica-autoral");
+  return {
+    status: "success",
+    message: "Rascunho assumido e enviado à revisão. Outra pessoa deverá decidir a publicação.",
   };
 }
 

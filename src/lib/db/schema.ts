@@ -683,8 +683,6 @@ export const questions = pgTable(
         and ${table.styleBankId} is not null
         and ${table.sourceRights} = 'original_authorial'
         and nullif(btrim(${table.learningObjective}), '') is not null
-        and ${table.createdByUserId} is not null
-        and ${table.cleanRoomAttestedAt} is not null
       ) or (
         ${table.quizMode} = 'previous_exam'
         and ${table.subjectId} is not null
@@ -692,6 +690,15 @@ export const questions = pgTable(
         and ${table.styleBankId} is null
         and ${table.sourceRights} = 'licensed'
       )`,
+    ),
+    check(
+      "questions_original_responsibility_check",
+      sql`${table.quizMode} <> 'original_style'
+        or ${table.editorialStatus} = 'draft'
+        or (
+          ${table.createdByUserId} is not null
+          and ${table.cleanRoomAttestedAt} is not null
+        )`,
     ),
     check(
       "questions_topic_subject_check",
