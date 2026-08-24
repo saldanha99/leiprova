@@ -161,6 +161,8 @@ Somente usuários com `users.role = 'admin'` acessam `/admin`; editores continua
 
 ## Deploy
 
+> Contexto operacional completo — hospedagem, ambiente local, flags e armadilhas conhecidas — em [`docs/OPERACAO.md`](docs/OPERACAO.md).
+
 A infraestrutura usa banco dedicado, papel proprietário só para migrações e papel de aplicação com privilégios mínimos. O app entra na rede externa `forza` para ser descoberto pelo Traefik já existente.
 
 A VPS mantém `/opt/leiprova` como clone deste repositório. O `.env` fica fora do versionamento: salve as variáveis em `/opt/leiprova/.env`, com permissão `600`.

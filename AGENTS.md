@@ -7,3 +7,23 @@ This version has breaking changes — APIs, conventions, and file structure may 
 This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
 <!-- END:nextjs-agent-rules -->
+
+# LeiProva
+
+SaaS de memorização da literalidade da lei para concursos e OAB.
+Next.js 16, React 19, Tailwind 4, PostgreSQL 17 com Drizzle, Stripe, Docker + Traefik.
+
+**Leia `docs/OPERACAO.md` antes de mexer em deploy, banco ou feature flags.**
+Ele cobre onde o projeto está hospedado, como publicar, como subir o ambiente
+local e as armadilhas já conhecidas.
+
+Regras que valem sempre:
+
+- Nenhum segredo é versionado. O `.env` de produção vive só na VPS, com permissão `600`.
+- Canais comerciais (cadastro, contato, checkout, Stripe Connect) ficam fechados
+  por feature flag. Não abra nenhum sem decisão explícita do responsável.
+- Conteúdo jurídico exige fonte oficial e revisão humana antes de publicar.
+  Não faça scraping nem reutilize questões de terceiros sem licença escrita.
+- Scripts novos que rodem por `tsx` precisam de `--env-file-if-exists=.env`;
+  o projeto não tem `dotenv`.
+- Antes de entregar, rode `pnpm lint && pnpm typecheck && pnpm test && pnpm build`.
