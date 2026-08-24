@@ -6,6 +6,7 @@ import postgres from "postgres";
 
 import { DEMO_CONTENT_PROVENANCE, DEMO_QUESTIONS } from "../src/lib/demo-content";
 import {
+  examSourcePortals,
   legalActs,
   legalArticles,
   legalVersions,
@@ -21,6 +22,8 @@ import {
   quizTopics,
 } from "../src/lib/db/schema";
 import { STYLE_PROFILE_SEEDS } from "../src/lib/editorial/style-profiles";
+import { OFFICIAL_EXAM_PORTALS } from "../src/lib/official-sources/exam-registry";
+import { OFFICIAL_LEGAL_SOURCES } from "../src/lib/official-sources/legal-registry";
 import { PLANS } from "../src/lib/plans";
 import {
   quizBanks as quizBankCatalog,
@@ -249,6 +252,56 @@ async function seedQuizCatalog() {
   };
 }
 
+async function seedOfficialSourceRegistries() {
+  const now = new Date();
+
+  await db
+    .insert(legalActs)
+    .values(
+      OFFICIAL_LEGAL_SOURCES.map((source) => ({
+        slug: source.slug,
+        title: source.title,
+        shortTitle: source.shortTitle,
+        actType: source.actType,
+        actNumber: source.actNumber,
+        actYear: source.actYear,
+        jurisdiction: "federal",
+        officialUrl: source.officialUrl,
+      })),
+    )
+    .onConflictDoUpdate({
+      target: legalActs.slug,
+      set: {
+        title: sql`excluded.title`,
+        shortTitle: sql`excluded.short_title`,
+        actType: sql`excluded.act_type`,
+        actNumber: sql`excluded.act_number`,
+        actYear: sql`excluded.act_year`,
+        jurisdiction: "federal",
+        officialUrl: sql`excluded.official_url`,
+        isActive: true,
+        updatedAt: now,
+      },
+    });
+
+  const bankRows = await db.select({ id: quizBanks.id, slug: quizBanks.slug }).from(quizBanks);
+  const bankIds = new Map(bankRows.map((row) => [row.slug, row.id]));
+
+  await db
+    .insert(examSourcePortals)
+    .values(
+      OFFICIAL_EXAM_PORTALS.map((portal) => {
+        const quizBankId = bankIds.get(portal.bankSlug);
+        if (!quizBankId) throw new Error(`Banca ausente para portal oficial: ${portal.bankSlug}`);
+        return { quizBankId, officialUrl: portal.officialUrl, sourcePolicy: "metadata_only" };
+      }),
+    )
+    .onConflictDoUpdate({
+      target: examSourcePortals.quizBankId,
+      set: { officialUrl: sql`excluded.official_url`, sourcePolicy: "metadata_only", isActive: true, updatedAt: now },
+    });
+}
+
 const DEMO_TOPIC_SLUGS: Readonly<Record<string, string>> = {
   "Direitos e garantias fundamentais": "direitos-e-garantias-fundamentais",
   "Princípios da administração pública": "administracao-publica",
@@ -413,6 +466,7 @@ async function main() {
   try {
     await seedPlans();
     const catalog = await seedQuizCatalog();
+    await seedOfficialSourceRegistries();
     await seedConstitution(catalog);
     console.log(
       `Seed concluído: ${PLANS.length} planos, ${quizCareerCatalog.length} carreiras, ${quizSubjectCatalog.length} matérias e ${DEMO_QUESTIONS.length} questões originais assistidas por IA.`,

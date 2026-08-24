@@ -24,6 +24,10 @@ import {
   originalQuestionDraftSchema,
   validateIndependentReview,
 } from "@/lib/editorial/clean-room";
+import {
+  findMostSimilarQuestion,
+  ORIGINALITY_REJECTION_THRESHOLD_BPS,
+} from "@/lib/editorial/originality";
 
 export type EditorialActionState = {
   status: "idle" | "success" | "error";
@@ -76,7 +80,7 @@ export async function createOriginalQuestionAction(
   const input = parsed.data;
   const db = getDb();
 
-  const [profile, article, topic] = await Promise.all([
+  const [profile, article, topic, existingQuestions] = await Promise.all([
     db
       .select({
         bankId: quizBanks.id,
@@ -127,6 +131,10 @@ export async function createOriginalQuestionAction(
         ),
       )
       .limit(1),
+    db
+      .select({ publicId: questions.publicId, prompt: questions.prompt })
+      .from(questions)
+      .where(eq(questions.sourceRights, "original_authorial")),
   ]);
 
   if (!profile[0]) return errorState("Selecione um perfil editorial ativo.");
@@ -134,6 +142,13 @@ export async function createOriginalQuestionAction(
   if (!topic[0]) return errorState("O assunto selecionado não pertence à matéria informada.");
   if (profile[0].format !== input.type) {
     return errorState("O formato da questão precisa seguir o perfil editorial da banca selecionada.");
+  }
+
+  const similarity = findMostSimilarQuestion(input.prompt, existingQuestions);
+  if (similarity.scoreBps >= ORIGINALITY_REJECTION_THRESHOLD_BPS) {
+    return errorState(
+      `O enunciado está muito próximo de outro item interno (${Math.round(similarity.scoreBps / 100)}%). Reescreva-o de forma genuinamente nova.`,
+    );
   }
 
   const now = new Date();
@@ -167,6 +182,9 @@ export async function createOriginalQuestionAction(
           createdByUserId: user.id,
           cleanRoomAttestedAt: now,
           submittedAt: now,
+          similarityMaxBps: similarity.scoreBps,
+          similarityReferencePublicId: similarity.referencePublicId,
+          originalityCheckedAt: now,
           verifiedAt: article[0].sourceVerifiedAt,
         })
         .returning({ id: questions.id });
@@ -193,6 +211,8 @@ export async function createOriginalQuestionAction(
           sourceUrl: article[0].sourceUrl,
           cleanRoomAttested: true,
           authorshipMethod: input.authorshipMethod,
+          similarityMaxBps: similarity.scoreBps,
+          similarityReferencePublicId: similarity.referencePublicId,
         },
       });
     });

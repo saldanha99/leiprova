@@ -123,7 +123,7 @@ const UPDATE_STEPS = [
   {
     icon: Fingerprint,
     title: "2. Comparar",
-    text: "Calcular a impressão digital da versão e revisar quais artigos, alternativas e explicações foram afetados pela alteração.",
+    text: "Calcular a impressão digital do documento oficial e comparar a fotografia nova com a referência aprovada. O sistema não altera artigos, alternativas ou explicações automaticamente.",
   },
   {
     icon: ShieldCheck,
@@ -153,10 +153,11 @@ export default function SourcesAndUpdatesPage() {
                 De onde vêm as leis e as questões da LeiProva?
               </h1>
               <p className="mt-6 max-w-4xl text-lg leading-8 text-slate-300">
-                No acervo persistido do quiz, a lei utilizada hoje é a Constituição consolidada no Portal da Legislação da Presidência da República. As {DEMO_QUESTIONS.length} questões do beta são originais e assistidas por {DEMO_CONTENT_PROVENANCE.generatorModel}, com conferência técnica da literalidade; ainda não existe revisão humana independente registrada. Não há questões anteriores licenciadas nem questões inéditas no estilo de banca publicadas.
+                No acervo persistido do quiz, a lei utilizada hoje é a Constituição consolidada no Portal da Legislação da Presidência da República. O monitor acompanha dez fontes federais oficiais e encaminha qualquer nova fotografia à revisão humana. As {DEMO_QUESTIONS.length} questões do beta são originais e assistidas por {DEMO_CONTENT_PROVENANCE.generatorModel}; ainda não existe revisão humana independente registrada. Não há questões anteriores licenciadas nem questões inéditas no estilo de banca publicadas.
               </p>
               <div className="mt-7 flex flex-wrap gap-3 text-xs font-bold">
                 <span className="rounded-full border border-emerald-300/20 bg-emerald-300/8 px-4 py-2 text-emerald-200">1 norma no acervo persistido</span>
+                <span className="rounded-full border border-blue-300/20 bg-blue-300/8 px-4 py-2 text-blue-200">10 fontes federais monitoradas</span>
                 <span className="rounded-full border border-amber-300/20 bg-amber-300/8 px-4 py-2 text-amber-200">{DEMO_QUESTIONS.length} questões assistidas por IA</span>
                 <span className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-slate-300">0 questões anteriores licenciadas</span>
                 <span className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-slate-300">0 questões estilo banca publicadas</span>
@@ -275,13 +276,13 @@ export default function SourcesAndUpdatesPage() {
             <div className="max-w-4xl">
               <p className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-[0.16em] text-amber-300">
                 <RefreshCcw aria-hidden="true" className="size-4" />
-                Plano de atualização contínua com trava humana
+                Atualização contínua com trava humana
               </p>
               <h2 id="atualizacao-title" className="mt-3 text-3xl font-semibold tracking-[-0.045em] text-white sm:text-4xl">
                 Como uma mudança legislativa deve chegar ao aplicativo
               </h2>
               <p className="mt-4 text-sm leading-7 text-slate-400">
-                O banco já comporta URL oficial, impressão digital, vigência, versão atual ou substituída, data de verificação e status editorial. O monitor automático periódico ainda não está ativo; por enquanto a conferência ocorre antes da publicação. Esta é a sequência prevista para automatizar alertas sem automatizar o gabarito final.
+                O monitor periódico consulta as dez páginas federais registradas, normaliza o texto e compara sua impressão digital com o histórico. Uma mudança cria uma fotografia pendente; não modifica o acervo nem um gabarito. A sequência abaixo mantém o alerta automático e a decisão editorial separada.
               </p>
             </div>
             <ol className="mt-9 grid gap-4 md:grid-cols-2">
@@ -322,7 +323,7 @@ export default function SourcesAndUpdatesPage() {
                 <Bot aria-hidden="true" className="size-6 text-blue-300" />
                 <h3 className="mt-5 text-xl font-semibold text-white">Questões inéditas no estilo da banca</h3>
                 <p className="mt-3 text-sm leading-7 text-slate-400">
-                  Hoje há zero. Os futuros itens deverão ser originais, registrar modelo e versão do processo, passar por análise de similaridade e revisão jurídica/editorial humana. A IA poderá apoiar um rascunho; não publicará diretamente.
+                  Hoje há zero publicados. A fábrica autoral já registra modelo e versão do processo, compara o enunciado com o acervo interno e exige revisão jurídica/editorial por outra pessoa. A IA pode apoiar um rascunho; não publica diretamente.
                 </p>
               </article>
             </div>

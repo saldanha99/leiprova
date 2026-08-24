@@ -92,6 +92,9 @@ export async function getEditorialFactorySnapshot() {
         reviewerName: reviewer.name,
         submittedAt: questions.submittedAt,
         reviewNotes: questions.reviewNotes,
+        similarityMaxBps: questions.similarityMaxBps,
+        similarityReferencePublicId: questions.similarityReferencePublicId,
+        originalityCheckedAt: questions.originalityCheckedAt,
         createdAt: questions.createdAt,
       })
       .from(questions)

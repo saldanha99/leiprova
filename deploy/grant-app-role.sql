@@ -8,6 +8,7 @@ revoke all privileges on all sequences in schema public from :app_user;
 grant select on
   plans,
   legal_acts,
+  legal_source_snapshots,
   legal_versions,
   legal_articles,
   questions,
@@ -20,6 +21,7 @@ grant select on
   quiz_topics,
   quiz_career_subjects,
   exam_editions,
+  exam_source_portals,
   stripe_connect_partners,
   stripe_connect_split_rules,
   stripe_connect_split_allocations,
@@ -51,6 +53,9 @@ grant insert (
   created_by_user_id,
   clean_room_attested_at,
   submitted_at,
+  similarity_max_bps,
+  similarity_reference_public_id,
+  originality_checked_at,
   verified_at
 ) on questions to :app_user;
 
@@ -70,6 +75,57 @@ grant insert (
   rationale,
   sort_order
 ) on question_options to :app_user;
+
+grant insert (
+  public_id,
+  legal_act_id,
+  source_url,
+  checksum_sha256,
+  normalized_content,
+  content_length,
+  article_marker_count,
+  http_status,
+  status,
+  initiated_by_user_id,
+  fetched_at,
+  last_seen_at
+) on legal_source_snapshots to :app_user;
+
+grant update (
+  http_status,
+  status,
+  reviewed_by_user_id,
+  review_notes,
+  last_seen_at,
+  reviewed_at
+) on legal_source_snapshots to :app_user;
+
+grant update (
+  last_http_status,
+  last_page_title,
+  last_final_url,
+  last_error,
+  last_checked_at,
+  updated_at
+) on exam_source_portals to :app_user;
+
+grant insert (
+  public_id,
+  career_track_id,
+  bank_id,
+  title,
+  jurisdiction,
+  official_url,
+  exam_date,
+  status,
+  source_policy,
+  source_content_stored,
+  source_page_title,
+  source_http_status,
+  source_checked_at,
+  created_by_user_id,
+  updated_by_user_id
+) on exam_editions to :app_user;
 
 grant select, insert, update on
   subscriptions,
@@ -152,5 +208,7 @@ grant usage on
   saved_study_filters_id_seq,
   question_notebooks_id_seq,
   questions_id_seq,
-  question_options_id_seq
+  question_options_id_seq,
+  legal_source_snapshots_id_seq,
+  exam_editions_id_seq
 to :app_user;

@@ -60,6 +60,7 @@ export default async function EditorialFactoryPage() {
           <div className="mt-5 flex flex-wrap gap-3 text-xs font-semibold text-slate-300">
             <span className="inline-flex items-center gap-2"><BookOpenCheck className="size-4 text-amber-300" /> fonte oficial</span>
             <span className="inline-flex items-center gap-2"><ShieldCheck className="size-4 text-emerald-300" /> declaração clean-room</span>
+            <span className="inline-flex items-center gap-2"><Fingerprint className="size-4 text-sky-300" /> similaridade interna verificada</span>
             <span className="inline-flex items-center gap-2"><UserRoundCheck className="size-4 text-sky-300" /> revisor independente</span>
           </div>
         </div>
@@ -197,6 +198,10 @@ export default async function EditorialFactoryPage() {
                     Autor: {item.creatorName ?? "registro indisponível"} · método {item.authorshipMethod === "ai_assisted" ? "assistido por IA" : "humano"}
                     {item.reviewerName ? ` · revisor: ${item.reviewerName}` : ""}
                   </div>
+                  <p className="mt-2 text-[11px] font-semibold text-sky-300/80">
+                    Originalidade textual interna: {Math.max(0, 100 - Math.round(item.similarityMaxBps / 100))}%
+                    {item.similarityReferencePublicId ? " · comparação registrada" : " · primeiro item da base"}
+                  </p>
                   {item.reviewNotes ? <p className="mt-2 rounded-lg bg-white/[.035] p-2 text-xs leading-5 text-slate-400">Nota: {item.reviewNotes}</p> : null}
                   {canReview ? <ReviewControls publicId={item.publicId} /> : null}
                   {item.editorialStatus === "pending_review" && item.creatorUserId === user.id ? (

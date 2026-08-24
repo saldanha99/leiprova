@@ -151,6 +151,24 @@ services:
     networks:
       - internal
 
+  legal-monitor:
+    build:
+      context: .
+      target: migrator
+    container_name: leiprova-legal-monitor
+    restart: unless-stopped
+    cpus: 0.35
+    mem_limit: 384m
+    command: ["sh", "-c", "while true; do pnpm legal:sources:check || true; sleep 86400; done"]
+    environment:
+      DATABASE_URL: postgresql://${APP_DB_USER:-leiprova_app}:${APP_DB_PASSWORD}@pooler:5432/${POSTGRES_DB:-leiprova}
+    depends_on:
+      pooler:
+        condition: service_healthy
+    networks:
+      - internal
+      - edge
+
 volumes:
   leiprova_pgdata:
 

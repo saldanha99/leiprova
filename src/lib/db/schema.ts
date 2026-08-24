@@ -114,6 +114,35 @@ export const quizBanks = pgTable(
   ],
 );
 
+export const examSourcePortals = pgTable(
+  "exam_source_portals",
+  {
+    id: idColumn(),
+    quizBankId: bigint("quiz_bank_id", { mode: "number" })
+      .notNull()
+      .unique()
+      .references(() => quizBanks.id, { onDelete: "restrict" }),
+    officialUrl: text("official_url").notNull(),
+    sourcePolicy: text("source_policy").notNull().default("metadata_only"),
+    lastHttpStatus: integer("last_http_status"),
+    lastPageTitle: text("last_page_title"),
+    lastFinalUrl: text("last_final_url"),
+    lastError: text("last_error"),
+    lastCheckedAt: timestamp("last_checked_at", { withTimezone: true }),
+    isActive: boolean("is_active").notNull().default(true),
+    ...timestamps,
+  },
+  (table) => [
+    index("exam_source_portals_active_idx").on(table.isActive),
+    check("exam_source_portals_url_check", sql`${table.officialUrl} ~ '^https://'`),
+    check("exam_source_portals_policy_check", sql`${table.sourcePolicy} = 'metadata_only'`),
+    check(
+      "exam_source_portals_http_status_check",
+      sql`${table.lastHttpStatus} is null or ${table.lastHttpStatus} between 100 and 599`,
+    ),
+  ],
+);
+
 export const questionStyleProfiles = pgTable(
   "question_style_profiles",
   {
@@ -277,6 +306,17 @@ export const examEditions = pgTable(
     durationMinutes: integer("duration_minutes"),
     publishedAt: timestamp("published_at", { withTimezone: true }),
     status: text("status").notNull().default("draft"),
+    sourcePolicy: text("source_policy").notNull().default("metadata_only"),
+    sourceContentStored: boolean("source_content_stored").notNull().default(false),
+    sourcePageTitle: text("source_page_title"),
+    sourceHttpStatus: integer("source_http_status"),
+    sourceCheckedAt: timestamp("source_checked_at", { withTimezone: true }),
+    createdByUserId: bigint("created_by_user_id", { mode: "number" }).references(() => users.id, {
+      onDelete: "set null",
+    }),
+    updatedByUserId: bigint("updated_by_user_id", { mode: "number" }).references(() => users.id, {
+      onDelete: "set null",
+    }),
     ...timestamps,
   },
   (table) => [
@@ -288,6 +328,8 @@ export const examEditions = pgTable(
     ),
     index("exam_editions_bank_status_date_idx").on(table.bankId, table.status, table.examDate, table.id),
     index("exam_editions_specialization_id_idx").on(table.specializationId),
+    index("exam_editions_created_by_idx").on(table.createdByUserId),
+    index("exam_editions_source_policy_idx").on(table.sourcePolicy, table.examDate),
     check(
       "exam_editions_status_check",
       sql`${table.status} in ('draft', 'scheduled', 'held', 'published', 'canceled', 'archived')`,
@@ -296,6 +338,18 @@ export const examEditions = pgTable(
     check(
       "exam_editions_duration_check",
       sql`${table.durationMinutes} is null or ${table.durationMinutes} > 0`,
+    ),
+    check(
+      "exam_editions_source_policy_check",
+      sql`${table.sourcePolicy} in ('metadata_only', 'licensed_content')`,
+    ),
+    check(
+      "exam_editions_metadata_only_check",
+      sql`${table.sourcePolicy} <> 'metadata_only' or not ${table.sourceContentStored}`,
+    ),
+    check(
+      "exam_editions_source_http_status_check",
+      sql`${table.sourceHttpStatus} is null or ${table.sourceHttpStatus} between 100 and 599`,
     ),
   ],
 );
@@ -376,6 +430,74 @@ export const legalActs = pgTable(
   (table) => [
     index("legal_acts_title_idx").on(table.title),
     check("legal_acts_year_check", sql`${table.actYear} is null or ${table.actYear} between 1800 and 2200`),
+  ],
+);
+
+export const legalSourceSnapshots = pgTable(
+  "legal_source_snapshots",
+  {
+    id: idColumn(),
+    publicId: text("public_id").notNull().unique(),
+    legalActId: bigint("legal_act_id", { mode: "number" })
+      .notNull()
+      .references(() => legalActs.id, { onDelete: "cascade" }),
+    sourceUrl: text("source_url").notNull(),
+    checksumSha256: text("checksum_sha256").notNull(),
+    normalizedContent: text("normalized_content").notNull(),
+    contentLength: integer("content_length").notNull(),
+    articleMarkerCount: integer("article_marker_count").notNull(),
+    httpStatus: integer("http_status").notNull(),
+    status: text("status").notNull().default("pending_review"),
+    initiatedByUserId: bigint("initiated_by_user_id", { mode: "number" }).references(() => users.id, {
+      onDelete: "set null",
+    }),
+    reviewedByUserId: bigint("reviewed_by_user_id", { mode: "number" }).references(() => users.id, {
+      onDelete: "set null",
+    }),
+    reviewNotes: text("review_notes"),
+    fetchedAt: timestamp("fetched_at", { withTimezone: true }).notNull(),
+    lastSeenAt: timestamp("last_seen_at", { withTimezone: true }).notNull(),
+    reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("legal_source_snapshots_act_checksum_uidx").on(
+      table.legalActId,
+      table.checksumSha256,
+    ),
+    index("legal_source_snapshots_act_status_idx").on(table.legalActId, table.status, table.fetchedAt),
+    index("legal_source_snapshots_initiated_by_idx").on(table.initiatedByUserId),
+    index("legal_source_snapshots_reviewed_by_idx").on(table.reviewedByUserId),
+    check(
+      "legal_source_snapshots_public_id_check",
+      sql`${table.publicId} ~ '^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'`,
+    ),
+    check(
+      "legal_source_snapshots_url_check",
+      sql`${table.sourceUrl} ~ '^https://legis\\.senado\\.leg\\.br/norma/[0-9]+$'`,
+    ),
+    check("legal_source_snapshots_checksum_check", sql`${table.checksumSha256} ~ '^[0-9a-f]{64}$'`),
+    check("legal_source_snapshots_content_check", sql`${table.contentLength} >= 1000`),
+    check("legal_source_snapshots_article_count_check", sql`${table.articleMarkerCount} >= 1`),
+    check("legal_source_snapshots_http_status_check", sql`${table.httpStatus} between 200 and 299`),
+    check(
+      "legal_source_snapshots_status_check",
+      sql`${table.status} in ('pending_review', 'approved', 'superseded', 'rejected')`,
+    ),
+    check(
+      "legal_source_snapshots_review_check",
+      sql`${table.status} <> 'approved' or (${table.reviewedByUserId} is not null and ${table.reviewedAt} is not null)`,
+    ),
+    check(
+      "legal_source_snapshots_independent_review_check",
+      sql`${table.status} <> 'approved'
+        or ${table.initiatedByUserId} is null
+        or ${table.reviewedByUserId} <> ${table.initiatedByUserId}`,
+    ),
+    check(
+      "legal_source_snapshots_review_notes_check",
+      sql`${table.reviewNotes} is null or char_length(${table.reviewNotes}) <= 1500`,
+    ),
   ],
 );
 
@@ -489,6 +611,9 @@ export const questions = pgTable(
     cleanRoomAttestedAt: timestamp("clean_room_attested_at", { withTimezone: true }),
     submittedAt: timestamp("submitted_at", { withTimezone: true }),
     reviewNotes: text("review_notes"),
+    similarityMaxBps: integer("similarity_max_bps").notNull().default(0),
+    similarityReferencePublicId: text("similarity_reference_public_id"),
+    originalityCheckedAt: timestamp("originality_checked_at", { withTimezone: true }),
     verifiedAt: timestamp("verified_at", { withTimezone: true }).notNull(),
     ...timestamps,
   },
@@ -609,6 +734,14 @@ export const questions = pgTable(
     check(
       "questions_review_notes_check",
       sql`${table.reviewNotes} is null or char_length(${table.reviewNotes}) <= 1500`,
+    ),
+    check(
+      "questions_similarity_score_check",
+      sql`${table.similarityMaxBps} between 0 and 10000`,
+    ),
+    check(
+      "questions_originality_check",
+      sql`${table.quizMode} <> 'original_style' or ${table.originalityCheckedAt} is not null`,
     ),
   ],
 );
@@ -1292,3 +1425,4 @@ export type NewUser = typeof users.$inferInsert;
 export type Question = typeof questions.$inferSelect;
 export type QuestionOption = typeof questionOptions.$inferSelect;
 export type QuestionStyleProfile = typeof questionStyleProfiles.$inferSelect;
+export type LegalSourceSnapshot = typeof legalSourceSnapshots.$inferSelect;
