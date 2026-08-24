@@ -1,21 +1,21 @@
-import { ExternalLink, FileCheck2, LibraryBig, Search } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, ExternalLink, FileCheck2, LibraryBig } from "lucide-react";
 
 import { PageHeader } from "@/components/platform/page-header";
+import { requireUser } from "@/lib/auth";
 import { listLegalLibrary } from "@/lib/db/queries";
+import { getStudyEntitlement } from "@/lib/study/entitlement";
 
 export default async function LawsPage() {
-  const acts = await listLegalLibrary();
+  const user = await requireUser("/app/leis");
+  const entitlement = await getStudyEntitlement(user.id);
+  const acts = await listLegalLibrary(entitlement);
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-7 sm:px-7 lg:px-9 lg:py-10">
       <PageHeader eyebrow="Acervo rastreável" title="Leis e normas" description="Literalidade vinculada à fonte oficial, versão verificada e questões originais associadas a cada dispositivo." icon={LibraryBig} />
 
-      <div className="mt-8 flex min-h-12 items-center gap-3 rounded-xl border border-white/8 bg-[#09131f] px-4 text-slate-500">
-        <Search className="size-4" />
-        <span className="text-sm">Busca por lei, artigo ou assunto disponível na próxima etapa editorial</span>
-      </div>
-
-      <section className="mt-4 grid gap-4">
+      <section className="mt-8 grid gap-4">
         {acts.length ? acts.map((act) => (
           <article key={act.id} className="grid gap-5 rounded-2xl border border-white/8 bg-[#09131f] p-5 sm:grid-cols-[1fr_auto] sm:items-center sm:p-6">
             <div className="flex items-start gap-4">
@@ -26,7 +26,10 @@ export default async function LawsPage() {
                 <p className="mt-1 text-[11px] text-slate-600">Verificado em {act.verifiedAt ? new Intl.DateTimeFormat("pt-BR").format(new Date(act.verifiedAt)) : "revisão editorial"}</p>
               </div>
             </div>
-            <a href={act.officialUrl} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 px-4 py-2.5 text-xs font-semibold text-slate-300 transition hover:border-emerald-300/20 hover:text-white">Abrir fonte oficial <ExternalLink className="size-3.5" /></a>
+            <div className="flex flex-wrap gap-2">
+              <a href={act.officialUrl} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/10 px-4 py-2.5 text-xs font-semibold text-slate-300 transition hover:border-emerald-300/20 hover:text-white">Fonte oficial <ExternalLink className="size-3.5" /></a>
+              <Link href={`/app/leis/${act.slug}`} className="inline-flex items-center justify-center gap-2 rounded-xl bg-amber-400 px-4 py-2.5 text-xs font-bold text-slate-950 transition hover:bg-amber-300">Estudar por artigo <ArrowRight className="size-3.5" /></Link>
+            </div>
           </article>
         )) : (
           <article className="rounded-[1.75rem] border border-dashed border-white/10 bg-[#09131f] p-10 text-center">

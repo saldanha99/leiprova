@@ -1,6 +1,6 @@
 import "server-only";
 
-import { and, asc, desc, eq, gte, lte, sql } from "drizzle-orm";
+import { and, asc, desc, eq, gte, inArray, lte, sql } from "drizzle-orm";
 
 import { getDb } from "@/lib/db/client";
 import {
@@ -15,6 +15,7 @@ import {
   userAttempts,
   users,
 } from "@/lib/db/schema";
+import { FREE_STUDY_QUESTION_IDS, type StudyEntitlement } from "@/lib/study/access-policy";
 
 export async function getDashboardSnapshot(userId: number) {
   const db = getDb();
@@ -116,7 +117,10 @@ function saoPauloDate(date = new Date()) {
   }).format(date);
 }
 
-export async function listLegalLibrary() {
+export async function listLegalLibrary(entitlement: StudyEntitlement) {
+  const accessCondition = entitlement.hasFullAccess
+    ? undefined
+    : inArray(questions.publicId, [...FREE_STUDY_QUESTION_IDS]);
   return getDb()
     .select({
       id: legalActs.id,
@@ -130,9 +134,25 @@ export async function listLegalLibrary() {
       verifiedAt: sql<Date | null>`max(${legalVersions.verifiedAt})`,
     })
     .from(legalActs)
-    .leftJoin(legalVersions, eq(legalVersions.legalActId, legalActs.id))
-    .leftJoin(legalArticles, eq(legalArticles.legalVersionId, legalVersions.id))
-    .leftJoin(questions, eq(questions.legalArticleId, legalArticles.id))
+    .leftJoin(
+      legalVersions,
+      and(eq(legalVersions.legalActId, legalActs.id), eq(legalVersions.status, "current")),
+    )
+    .leftJoin(
+      legalArticles,
+      and(
+        eq(legalArticles.legalVersionId, legalVersions.id),
+        eq(legalArticles.editorialStatus, "reviewed"),
+      ),
+    )
+    .leftJoin(
+      questions,
+      and(
+        eq(questions.legalArticleId, legalArticles.id),
+        eq(questions.editorialStatus, "reviewed"),
+        accessCondition,
+      ),
+    )
     .where(eq(legalActs.isActive, true))
     .groupBy(legalActs.id)
     .orderBy(asc(legalActs.shortTitle));

@@ -3,6 +3,7 @@ import Link from "next/link";
 import {
   AlertCircle,
   ArrowRight,
+  Bookmark,
   BookOpenText,
   CheckCircle2,
   FileText,
@@ -12,10 +13,13 @@ import {
   ShieldCheck,
 } from "lucide-react";
 
+import { deleteQuestionNotebookAction } from "@/app/actions/study-library";
 import { FlashcardDeck } from "@/components/materials/flashcard-deck";
+import { ConfirmDeleteButton, NotebookCreateForm } from "@/components/materials/study-library-forms";
 import { PageHeader } from "@/components/platform/page-header";
 import { requireUser } from "@/lib/auth";
 import { getMaterialsSnapshot } from "@/lib/db/materials";
+import { listQuestionNotebooks } from "@/lib/db/legal-library";
 import { FREE_STUDY_QUESTION_IDS } from "@/lib/study/access-policy";
 import { getStudyEntitlement } from "@/lib/study/entitlement";
 
@@ -27,10 +31,10 @@ export const metadata: Metadata = {
 export default async function MaterialsPage() {
   const user = await requireUser("/app/materiais");
   const entitlement = await getStudyEntitlement(user.id);
-  const { recentErrors, flashcards, notebooks } = await getMaterialsSnapshot(
-    user.id,
-    entitlement,
-  );
+  const [{ recentErrors, flashcards, notebooks }, personalNotebooks] = await Promise.all([
+    getMaterialsSnapshot(user.id, entitlement),
+    listQuestionNotebooks(user.id),
+  ]);
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-7 sm:px-7 lg:px-9 lg:py-10">
@@ -60,6 +64,58 @@ export default async function MaterialsPage() {
             Ver planos <ArrowRight className="size-3.5" />
           </Link>
         )}
+      </section>
+
+      <section id="meus-cadernos" className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1fr)_330px]">
+        <article className="rounded-[1.75rem] border border-sky-300/12 bg-[radial-gradient(circle_at_top_right,rgba(125,211,252,.07),transparent_38%),#09131f] p-5 sm:p-7">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[.15em] text-sky-300"><Bookmark className="size-4" />Meus cadernos</p>
+              <h2 className="mt-2 text-2xl font-semibold tracking-[-.03em]">Guarde as questões que merecem voltar</h2>
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">Crie recortes pessoais para prazos, exceções ou qualquer padrão que você queira reforçar.</p>
+            </div>
+            <span className="rounded-full bg-white/5 px-2.5 py-1 text-[11px] text-slate-500">{personalNotebooks.length}/30 cadernos</span>
+          </div>
+
+          {personalNotebooks.length ? (
+            <div className="mt-6 grid gap-3 md:grid-cols-2">
+              {personalNotebooks.map((notebook) => (
+                <article key={notebook.id} className="flex min-h-48 flex-col rounded-2xl border border-white/8 bg-slate-950/30 p-5">
+                  <div className="flex items-start justify-between gap-3">
+                    <span className="grid size-10 place-items-center rounded-xl bg-sky-300/10 text-sky-300"><Bookmark className="size-4.5" /></span>
+                    <form action={deleteQuestionNotebookAction}>
+                      <input name="notebookId" type="hidden" value={notebook.id} />
+                      <ConfirmDeleteButton
+                        label={`Excluir caderno ${notebook.name}`}
+                        message={`Excluir o caderno “${notebook.name}” e suas associações?`}
+                      />
+                    </form>
+                  </div>
+                  <Link href={`/app/materiais/cadernos/${notebook.publicId}`} className="mt-4 font-semibold text-slate-100 transition hover:text-sky-200">{notebook.name}</Link>
+                  <p className="mt-1 line-clamp-2 text-xs leading-5 text-slate-500">{notebook.description || "Caderno pessoal de recuperação ativa."}</p>
+                  <div className="mt-auto flex items-end justify-between gap-3 pt-5">
+                    <span className="text-[11px] text-slate-600">{notebook.questionCount} {notebook.questionCount === 1 ? "questão" : "questões"}</span>
+                    <Link href={`/app/materiais/cadernos/${notebook.publicId}`} className="inline-flex min-h-9 items-center gap-2 rounded-lg bg-sky-300 px-3 text-xs font-bold text-slate-950">
+                      Abrir <ArrowRight className="size-3.5" />
+                    </Link>
+                  </div>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <div className="mt-6 rounded-2xl border border-dashed border-white/10 bg-slate-950/20 p-8 text-center">
+              <Bookmark className="mx-auto size-7 text-slate-600" />
+              <h3 className="mt-3 text-sm font-semibold text-slate-300">Crie seu primeiro caderno</h3>
+              <p className="mx-auto mt-1 max-w-lg text-xs leading-5 text-slate-600">Depois, você poderá guardar uma questão diretamente na correção do treino.</p>
+            </div>
+          )}
+        </article>
+
+        <aside className="rounded-[1.5rem] border border-white/8 bg-[#09131f] p-5">
+          <h2 className="font-semibold">Novo caderno</h2>
+          <p className="mt-1 text-xs leading-5 text-slate-500">Use nomes objetivos para encontrar o recorte rapidamente.</p>
+          <div className="mt-5"><NotebookCreateForm /></div>
+        </aside>
       </section>
 
       <section className="mt-5 rounded-[1.75rem] border border-white/8 bg-[#09131f] p-5 sm:p-7">

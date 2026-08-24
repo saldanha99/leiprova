@@ -19,6 +19,7 @@ import {
   X,
 } from "lucide-react";
 
+import { NotebookPicker } from "@/components/materials/study-library-forms";
 import { cn } from "@/lib/utils";
 
 type Confidence = "guess" | "almost" | "sure";
@@ -60,9 +61,21 @@ const confidenceOptions: Array<{
 export function LiveStudySession({
   mode = "normal",
   topic,
+  legalActSlug,
+  articleStartOrder,
+  articleEndOrder,
+  sequential = false,
+  notebookPublicId,
+  notebooks = [],
 }: {
   mode?: StudyMode;
   topic?: string;
+  legalActSlug?: string;
+  articleStartOrder?: number;
+  articleEndOrder?: number;
+  sequential?: boolean;
+  notebookPublicId?: string;
+  notebooks?: Array<{ publicId: string; name: string; questionCount: number }>;
 }) {
   const [questions, setQuestions] = useState<StudyQuestion[]>([]);
   const [index, setIndex] = useState(0);
@@ -83,6 +96,11 @@ export function LiveStudySession({
     const sessionParams = new URLSearchParams();
     if (mode === "revisao") sessionParams.set("modo", "revisao");
     if (topic) sessionParams.set("tema", topic);
+    if (legalActSlug) sessionParams.set("lei", legalActSlug);
+    if (articleStartOrder !== undefined) sessionParams.set("de", String(articleStartOrder));
+    if (articleEndOrder !== undefined) sessionParams.set("ate", String(articleEndOrder));
+    if (sequential) sessionParams.set("ordem", "sequencial");
+    if (notebookPublicId) sessionParams.set("caderno", notebookPublicId);
     const sessionUrl = `/api/study/session${sessionParams.size ? `?${sessionParams.toString()}` : ""}`;
     fetch(sessionUrl, { cache: "no-store" })
       .then(async (response) => {
@@ -101,7 +119,7 @@ export function LiveStudySession({
     return () => {
       active = false;
     };
-  }, [mode, topic]);
+  }, [articleEndOrder, articleStartOrder, legalActSlug, mode, notebookPublicId, sequential, topic]);
 
   useEffect(() => {
     if (feedback) feedbackRef.current?.focus();
@@ -188,7 +206,8 @@ export function LiveStudySession({
   }
 
   if (!question) {
-    return <div className="grid min-h-[70vh] place-items-center px-5 text-center"><div><BookOpenCheck className="mx-auto size-8 text-slate-600" /><h1 className="mt-4 text-xl font-semibold">Treino indisponível</h1><p className="mt-2 text-sm text-slate-500">{error ?? (topic ? `Não há questões liberadas no caderno “${topic}”.` : "O acervo ainda não foi publicado.")}</p>{topic && <Link href="/app/materiais" className="mt-5 inline-flex min-h-10 items-center gap-2 rounded-xl border border-white/10 px-4 text-xs font-semibold text-white"><ArrowLeft className="size-3.5" />Voltar aos materiais</Link>}</div></div>;
+    const scoped = topic || legalActSlug || notebookPublicId;
+    return <div className="grid min-h-[70vh] place-items-center px-5 text-center"><div><BookOpenCheck className="mx-auto size-8 text-slate-600" /><h1 className="mt-4 text-xl font-semibold">Treino indisponível</h1><p className="mt-2 text-sm text-slate-500">{error ?? (scoped ? "Não há questões liberadas neste recorte." : "O acervo ainda não foi publicado.")}</p>{scoped && <Link href={legalActSlug ? `/app/leis/${legalActSlug}` : "/app/materiais"} className="mt-5 inline-flex min-h-10 items-center gap-2 rounded-xl border border-white/10 px-4 text-xs font-semibold text-white"><ArrowLeft className="size-3.5" />Voltar ao recorte</Link>}</div></div>;
   }
 
   return (
@@ -288,6 +307,13 @@ export function LiveStudySession({
               <p className="mt-4 text-sm leading-6 text-slate-400">{feedback.explanation}</p>
               <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-xs"><a href={feedback.officialUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 font-semibold text-emerald-300">Conferir no Planalto <ExternalLink className="size-3.5" /></a><span className="text-slate-600">revisão agendada para {new Intl.DateTimeFormat("pt-BR").format(new Date(feedback.nextReviewAt))}</span></div>
               <p className="mt-3 text-[10px] leading-4 text-slate-600">Trecho meramente informativo e não oficial; não substitui a publicação no Diário Oficial da União.</p>
+              <div className="mt-4">
+                <NotebookPicker
+                  key={question.publicId}
+                  questionPublicId={question.publicId}
+                  notebooks={notebooks}
+                />
+              </div>
             </div>
           ) : (
             <button onClick={submitAnswer} disabled={!selected || !confidence || submitting} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-amber-400 px-5 text-sm font-bold text-slate-950 transition hover:bg-amber-300 disabled:cursor-not-allowed disabled:opacity-35">{submitting ? <LoaderCircle className="size-4 animate-spin" /> : "Confirmar resposta"}<ArrowRight className="size-4" /></button>

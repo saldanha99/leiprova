@@ -85,6 +85,13 @@
       "when": 1786939562000,
       "tag": "0011_safe_connect_rebalance",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1787588538922,
+      "tag": "0012_gigantic_dakota_north",
+      "breakpoints": true
     }
   ]
 }

@@ -765,6 +765,76 @@ export const reviewQueue = pgTable(
   ],
 );
 
+export const savedStudyFilters = pgTable(
+  "saved_study_filters",
+  {
+    id: idColumn(),
+    userId: bigint("user_id", { mode: "number" })
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    legalActId: bigint("legal_act_id", { mode: "number" })
+      .notNull()
+      .references(() => legalActs.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    articleStartOrder: integer("article_start_order").notNull(),
+    articleEndOrder: integer("article_end_order").notNull(),
+    ...timestamps,
+  },
+  (table) => [
+    uniqueIndex("saved_study_filters_user_name_uidx").on(table.userId, sql`lower(${table.name})`),
+    index("saved_study_filters_user_updated_idx").on(table.userId, table.updatedAt),
+    index("saved_study_filters_legal_act_id_idx").on(table.legalActId),
+    check("saved_study_filters_name_check", sql`char_length(btrim(${table.name})) between 1 and 80`),
+    check(
+      "saved_study_filters_article_range_check",
+      sql`${table.articleStartOrder} >= 0 and ${table.articleEndOrder} >= ${table.articleStartOrder}`,
+    ),
+  ],
+);
+
+export const questionNotebooks = pgTable(
+  "question_notebooks",
+  {
+    id: idColumn(),
+    publicId: text("public_id").notNull().unique(),
+    userId: bigint("user_id", { mode: "number" })
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    description: text("description"),
+    ...timestamps,
+  },
+  (table) => [
+    uniqueIndex("question_notebooks_user_name_uidx").on(table.userId, sql`lower(${table.name})`),
+    index("question_notebooks_user_updated_idx").on(table.userId, table.updatedAt),
+    check("question_notebooks_name_check", sql`char_length(btrim(${table.name})) between 1 and 80`),
+    check(
+      "question_notebooks_description_check",
+      sql`${table.description} is null or char_length(${table.description}) <= 240`,
+    ),
+  ],
+);
+
+export const questionNotebookItems = pgTable(
+  "question_notebook_items",
+  {
+    notebookId: bigint("notebook_id", { mode: "number" })
+      .notNull()
+      .references(() => questionNotebooks.id, { onDelete: "cascade" }),
+    questionId: bigint("question_id", { mode: "number" })
+      .notNull()
+      .references(() => questions.id, { onDelete: "restrict" }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    primaryKey({
+      columns: [table.notebookId, table.questionId],
+      name: "question_notebook_items_pkey",
+    }),
+    index("question_notebook_items_question_id_idx").on(table.questionId),
+  ],
+);
+
 export const studyDays = pgTable(
   "study_days",
   {
