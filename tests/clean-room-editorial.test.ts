@@ -5,7 +5,11 @@ import {
   originalQuestionDraftSchema,
   validateIndependentReview,
 } from "../src/lib/editorial/clean-room";
-import { PILOT_ORIGINAL_QUESTIONS } from "../src/lib/editorial/pilot-questions";
+import {
+  ORIGINAL_STYLE_PILOT_PROMPT_VERSION_V1,
+  ORIGINAL_STYLE_PILOT_PROMPT_VERSION_V2,
+  PILOT_ORIGINAL_QUESTIONS,
+} from "../src/lib/editorial/pilot-questions";
 import {
   ORIGINALITY_REJECTION_THRESHOLD_BPS,
   textualSimilarityBps,
@@ -98,12 +102,26 @@ describe("fábrica autoral clean-room", () => {
   });
 
   it("mantém o lote piloto equilibrado, válido e compatível com cada perfil", () => {
-    expect(PILOT_ORIGINAL_QUESTIONS).toHaveLength(12);
-    expect(new Set(PILOT_ORIGINAL_QUESTIONS.map((item) => item.publicId)).size).toBe(12);
+    expect(PILOT_ORIGINAL_QUESTIONS).toHaveLength(24);
+    expect(new Set(PILOT_ORIGINAL_QUESTIONS.map((item) => item.publicId)).size).toBe(24);
     expect(new Set(PILOT_ORIGINAL_QUESTIONS.map((item) => item.articleRef)).size).toBe(12);
+    expect(
+      PILOT_ORIGINAL_QUESTIONS.filter(
+        (item) => item.promptVersion === ORIGINAL_STYLE_PILOT_PROMPT_VERSION_V1,
+      ),
+    ).toHaveLength(12);
+    expect(
+      PILOT_ORIGINAL_QUESTIONS.filter(
+        (item) => item.promptVersion === ORIGINAL_STYLE_PILOT_PROMPT_VERSION_V2,
+      ),
+    ).toHaveLength(12);
+
+    for (const articleRef of new Set(PILOT_ORIGINAL_QUESTIONS.map((item) => item.articleRef))) {
+      expect(PILOT_ORIGINAL_QUESTIONS.filter((item) => item.articleRef === articleRef)).toHaveLength(2);
+    }
 
     for (const profile of STYLE_PROFILE_SEEDS) {
-      expect(PILOT_ORIGINAL_QUESTIONS.filter((item) => item.bankSlug === profile.bankSlug)).toHaveLength(3);
+      expect(PILOT_ORIGINAL_QUESTIONS.filter((item) => item.bankSlug === profile.bankSlug)).toHaveLength(6);
     }
 
     for (const item of PILOT_ORIGINAL_QUESTIONS) {

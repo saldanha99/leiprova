@@ -8,6 +8,7 @@ import {
   legalActs,
   legalArticles,
   legalVersions,
+  questionOptions,
   questions,
   questionStyleProfiles,
   quizBanks,
@@ -21,7 +22,7 @@ export async function getEditorialFactorySnapshot() {
   const creator = alias(users, "question_creator");
   const reviewer = alias(users, "question_reviewer");
 
-  const [profiles, articles, subjects, topics, queue, metricRows] = await Promise.all([
+  const [profiles, articles, subjects, topics, queueRows, optionRows, metricRows] = await Promise.all([
     db
       .select({
         id: questionStyleProfiles.id,
@@ -78,15 +79,21 @@ export async function getEditorialFactorySnapshot() {
     db
       .select({
         publicId: questions.publicId,
+        type: questions.type,
         prompt: questions.prompt,
+        explanation: questions.explanation,
         learningObjective: questions.learningObjective,
+        difficulty: questions.difficulty,
         editorialStatus: questions.editorialStatus,
         authorshipMethod: questions.authorshipMethod,
         generatorModel: questions.generatorModel,
         promptVersion: questions.promptVersion,
         bankName: quizBanks.name,
         articleRef: legalArticles.articleRef,
+        literalText: legalArticles.literalText,
         sourceTitle: questions.sourceTitle,
+        sourceUrl: legalVersions.sourceUrl,
+        sourceVerifiedAt: legalVersions.verifiedAt,
         subjectName: quizSubjects.name,
         topicName: quizTopics.name,
         creatorUserId: questions.createdByUserId,
@@ -102,6 +109,7 @@ export async function getEditorialFactorySnapshot() {
       .from(questions)
       .innerJoin(quizBanks, eq(questions.styleBankId, quizBanks.id))
       .innerJoin(legalArticles, eq(questions.legalArticleId, legalArticles.id))
+      .innerJoin(legalVersions, eq(legalArticles.legalVersionId, legalVersions.id))
       .innerJoin(quizSubjects, eq(questions.subjectId, quizSubjects.id))
       .leftJoin(quizTopics, eq(questions.topicId, quizTopics.id))
       .leftJoin(creator, eq(questions.createdByUserId, creator.id))
@@ -109,6 +117,20 @@ export async function getEditorialFactorySnapshot() {
       .where(eq(questions.quizMode, "original_style"))
       .orderBy(desc(questions.createdAt))
       .limit(60),
+    db
+      .select({
+        questionPublicId: questions.publicId,
+        optionKey: questionOptions.optionKey,
+        text: questionOptions.text,
+        isCorrect: questionOptions.isCorrect,
+        rationale: questionOptions.rationale,
+        sortOrder: questionOptions.sortOrder,
+      })
+      .from(questionOptions)
+      .innerJoin(questions, eq(questionOptions.questionId, questions.id))
+      .where(eq(questions.quizMode, "original_style"))
+      .orderBy(desc(questions.createdAt), questionOptions.sortOrder)
+      .limit(300),
     db
       .select({
         total: sql<number>`count(*)::int`,
@@ -120,6 +142,18 @@ export async function getEditorialFactorySnapshot() {
       .from(questions)
       .where(eq(questions.quizMode, "original_style")),
   ]);
+
+  const optionsByQuestion = new Map<string, typeof optionRows>();
+  for (const option of optionRows) {
+    const current = optionsByQuestion.get(option.questionPublicId) ?? [];
+    current.push(option);
+    optionsByQuestion.set(option.questionPublicId, current);
+  }
+
+  const queue = queueRows.map((item) => ({
+    ...item,
+    options: optionsByQuestion.get(item.publicId) ?? [],
+  }));
 
   return {
     profiles,

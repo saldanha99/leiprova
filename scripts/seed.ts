@@ -24,7 +24,6 @@ import {
 import { STYLE_PROFILE_SEEDS } from "../src/lib/editorial/style-profiles";
 import {
   ORIGINAL_STYLE_PILOT_GENERATOR,
-  ORIGINAL_STYLE_PILOT_PROMPT_VERSION,
   PILOT_ORIGINAL_QUESTIONS,
 } from "../src/lib/editorial/pilot-questions";
 import {
@@ -561,7 +560,7 @@ async function seedPilotOriginalQuestions() {
         sourceUrl: anchor.sourceUrl,
         authorshipMethod: "ai_assisted",
         generatorModel: ORIGINAL_STYLE_PILOT_GENERATOR,
-        promptVersion: ORIGINAL_STYLE_PILOT_PROMPT_VERSION,
+        promptVersion: item.promptVersion,
         similarityMaxBps: similarity.scoreBps,
         similarityReferencePublicId: similarity.referencePublicId,
         originalityCheckedAt: now,

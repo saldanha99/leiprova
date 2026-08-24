@@ -1,7 +1,9 @@
 import {
   BookOpenCheck,
   CheckCircle2,
+  ChevronDown,
   Clock3,
+  ExternalLink,
   FilePenLine,
   FileLock2,
   Fingerprint,
@@ -18,6 +20,7 @@ import { getEditorialFactorySnapshot } from "@/lib/db/editorial-admin";
 
 const numberFormatter = new Intl.NumberFormat("pt-BR");
 const dateFormatter = new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeStyle: "short" });
+const sourceDateFormatter = new Intl.DateTimeFormat("pt-BR", { dateStyle: "long" });
 
 const statusLabels: Record<string, string> = {
   pending_review: "Aguardando revisão",
@@ -34,7 +37,8 @@ const statusClasses: Record<string, string> = {
 };
 
 export default async function EditorialFactoryPage() {
-  const [user, snapshot] = await Promise.all([requireAdmin(), getEditorialFactorySnapshot()]);
+  const user = await requireAdmin();
+  const snapshot = await getEditorialFactorySnapshot();
 
   const metrics = [
     { label: "Autorais registradas", value: snapshot.metrics.total, icon: Fingerprint, tone: "text-sky-300 bg-sky-300/10" },
@@ -58,7 +62,7 @@ export default async function EditorialFactoryPage() {
           </h1>
           <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-400 sm:text-base">
             O perfil da banca orienta forma e dificuldade; o conteúdo nasce somente da lei oficial. Nenhuma questão
-            entra no catálogo sem autoria declarada e revisão por outra pessoa.
+            entra no catálogo sem responsabilidade editorial registrada e revisão por outra pessoa.
           </p>
           <div className="mt-5 flex flex-wrap gap-3 text-xs font-semibold text-slate-300">
             <span className="inline-flex items-center gap-2"><BookOpenCheck className="size-4 text-amber-300" /> fonte oficial</span>
@@ -138,7 +142,7 @@ export default async function EditorialFactoryPage() {
           <div className="mb-6">
             <span className="text-xs font-bold uppercase tracking-[.14em] text-amber-300">Nova questão</span>
             <h2 className="mt-2 text-xl font-semibold tracking-[-.025em] text-white">Enviar conteúdo inédito à revisão</h2>
-            <p className="mt-2 text-sm leading-6 text-slate-500">O envio cria um item pendente. O autor nunca pode aprovar o próprio trabalho.</p>
+            <p className="mt-2 text-sm leading-6 text-slate-500">O envio cria um item pendente. O responsável nunca pode aprovar o próprio trabalho.</p>
           </div>
           <AuthoringForm
             profiles={snapshot.profiles}
@@ -226,6 +230,98 @@ export default async function EditorialFactoryPage() {
                   </div>
                   <p className="mt-3 text-sm leading-6 text-slate-200">{item.prompt}</p>
                   {item.learningObjective ? <p className="mt-2 text-xs leading-5 text-slate-500"><strong className="text-slate-400">Objetivo:</strong> {item.learningObjective}</p> : null}
+
+                  <details className="group mt-4 overflow-hidden rounded-xl border border-white/8 bg-[#07111d]">
+                    <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-3.5 py-2.5 text-xs font-bold text-sky-200 outline-none transition hover:bg-white/[.025] focus-visible:ring-2 focus-visible:ring-sky-300/50">
+                      <span className="inline-flex items-center gap-2">
+                        <BookOpenCheck aria-hidden="true" className="size-4" />
+                        Abrir dossiê de conferência
+                      </span>
+                      <ChevronDown aria-hidden="true" className="size-4 transition-transform group-open:rotate-180" />
+                    </summary>
+                    <div className="space-y-4 border-t border-white/7 p-3.5 sm:p-4">
+                      <section aria-label="Fonte legal do item">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <div>
+                            <p className="text-[10px] font-extrabold uppercase tracking-[.12em] text-amber-300">Texto oficial de controle</p>
+                            <p className="mt-1 text-[11px] text-slate-600">
+                              Verificado em {sourceDateFormatter.format(item.sourceVerifiedAt)}
+                            </p>
+                          </div>
+                          <a
+                            href={item.sourceUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-amber-300/15 bg-amber-300/[.045] px-2.5 text-[11px] font-bold text-amber-100 transition hover:bg-amber-300/[.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300/50"
+                          >
+                            Conferir no portal oficial
+                            <ExternalLink aria-hidden="true" className="size-3.5" />
+                          </a>
+                        </div>
+                        <blockquote className="mt-3 rounded-lg border-l-2 border-amber-300/40 bg-amber-300/[.035] px-3 py-2.5 text-xs leading-6 text-slate-300">
+                          {item.literalText}
+                        </blockquote>
+                      </section>
+
+                      <section aria-label="Alternativas e gabarito">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <p className="text-[10px] font-extrabold uppercase tracking-[.12em] text-sky-300">Alternativas e gabarito</p>
+                          <span className="text-[10px] font-semibold text-slate-600">
+                            {item.type === "true_false" ? "Certo ou errado" : "Múltipla escolha"} · dificuldade {item.difficulty}/5
+                          </span>
+                        </div>
+                        {item.options.length ? (
+                          <ol className="mt-3 space-y-2">
+                            {item.options.map((option) => (
+                              <li
+                                key={option.optionKey}
+                                className={`rounded-lg border p-3 ${
+                                  option.isCorrect
+                                    ? "border-emerald-300/20 bg-emerald-300/[.055]"
+                                    : "border-white/7 bg-black/10"
+                                }`}
+                              >
+                                <div className="flex items-start gap-2.5">
+                                  <span
+                                    className={`grid size-6 shrink-0 place-items-center rounded-md text-[11px] font-extrabold ${
+                                      option.isCorrect
+                                        ? "bg-emerald-300 text-emerald-950"
+                                        : "bg-white/7 text-slate-400"
+                                    }`}
+                                  >
+                                    {option.optionKey}
+                                  </span>
+                                  <div className="min-w-0 flex-1">
+                                    <div className="flex flex-wrap items-start justify-between gap-2">
+                                      <p className="text-xs leading-5 text-slate-200">{option.text}</p>
+                                      {option.isCorrect ? (
+                                        <span className="rounded-md bg-emerald-300/12 px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-[.08em] text-emerald-200">
+                                          Gabarito
+                                        </span>
+                                      ) : null}
+                                    </div>
+                                    {option.rationale ? (
+                                      <p className="mt-1.5 text-[11px] leading-5 text-slate-500">{option.rationale}</p>
+                                    ) : null}
+                                  </div>
+                                </div>
+                              </li>
+                            ))}
+                          </ol>
+                        ) : (
+                          <p className="mt-3 rounded-lg border border-rose-300/15 bg-rose-300/[.045] p-3 text-xs text-rose-100">
+                            Alternativas indisponíveis. Não assuma este item até a correção.
+                          </p>
+                        )}
+                      </section>
+
+                      <section className="rounded-lg border border-white/7 bg-black/10 p-3" aria-label="Explicação editorial">
+                        <p className="text-[10px] font-extrabold uppercase tracking-[.12em] text-violet-300">Explicação proposta</p>
+                        <p className="mt-2 text-xs leading-6 text-slate-400">{item.explanation}</p>
+                      </section>
+                    </div>
+                  </details>
+
                   <div className="mt-4 border-t border-white/7 pt-3 text-[11px] leading-5 text-slate-600">
                     Responsável editorial: {item.creatorName ?? "a definir"} · método {item.authorshipMethod === "ai_assisted" ? "assistido por IA" : "humano"}
                     {item.generatorModel ? ` · gerador: ${item.generatorModel}` : ""}
@@ -241,7 +337,7 @@ export default async function EditorialFactoryPage() {
                   {canReview ? <ReviewControls publicId={item.publicId} /> : null}
                   {item.editorialStatus === "pending_review" && item.creatorUserId === user.id ? (
                     <p className="mt-3 rounded-lg border border-amber-300/12 bg-amber-300/[.045] p-2.5 text-xs leading-5 text-amber-100/70">
-                      Você é o autor. Outro editor precisa revisar este item.
+                      Você é o responsável editorial. Outro administrador precisa revisar este item.
                     </p>
                   ) : null}
                 </article>
