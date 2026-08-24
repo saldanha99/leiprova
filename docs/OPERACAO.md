@@ -96,6 +96,7 @@ Tudo que é comercial fecha por padrão. Estado em produção na última verific
 | `REGISTRATION_ENABLED` | `false` | `/cadastro` exibe "Cadastros abrem em breve", sem formulário. |
 | `CONTACT_ENABLED` | `false` | Formulário de contato fecha. |
 | `CHECKOUT_ENABLED` | `false` | Sem chaves Stripe preenchidas. |
+| `SUPPLIER_*` | vazias | Seis variáveis de identificação do fornecedor. Enquanto faltar qualquer uma, o checkout não abre — trava aplicada em `getCheckoutAvailability`, não em documentação. |
 | `STRIPE_CONNECT_ENABLED` | `true` | **Diverge do README**, que pede `false`. |
 | `STRIPE_CONNECT_ONBOARDING_ENABLED` | `true` | Idem. |
 | `STRIPE_CONNECT_MODE` | `test` | Contém o risco do item acima. |
@@ -124,6 +125,8 @@ ssh wisewolf-vps 'docker exec leiprova-db pg_dump -U leiprova_owner -d leiprova 
 ```
 
 ## Estado do conteúdo
+
+`pnpm content:verify` confere as questões contra o Planalto e falha se um gabarito não for verbatim ou se um distrator reproduzir a norma.
 
 O banco de produção tem **12 questões**, todas ancoradas na Constituição Federal,
 assistidas por IA e conferidas contra a fonte oficial — mas **sem revisão humana

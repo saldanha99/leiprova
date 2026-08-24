@@ -48,6 +48,15 @@ pnpm test
 pnpm build
 ```
 
+Para conferir as questões contra o texto oficial no Planalto:
+
+```bash
+pnpm content:verify
+```
+
+O comando falha se algum gabarito deixar de ser verbatim ou se um distrator
+passar a reproduzir a norma — o que daria à questão duas respostas defensáveis.
+
 ## Conteúdo jurídico
 
 O conteúdo demonstrativo fica em `src/lib/demo-content.ts` e é inserido pelo `scripts/seed.ts`. Cada item contém:
@@ -188,7 +197,10 @@ O backup lógico está em `deploy/backup.sh`, mantém 14 dias e grava em `/opt/l
 
 ## Antes de vender
 
-1. Substituir nas páginas legais os dados provisórios pela razão social/nome empresarial, CNPJ/CPF empresarial, endereço e canal de atendimento.
+Roteiros detalhados: [`docs/REVISAO-JURIDICA.md`](docs/REVISAO-JURIDICA.md) e
+[`docs/CHECKOUT-SANDBOX.md`](docs/CHECKOUT-SANDBOX.md).
+
+1. Preencher a identificação do fornecedor nas variáveis `SUPPLIER_*` do `.env`. Enquanto qualquer campo estiver vazio, `getCheckoutAvailability` devolve `supplier_identity` e o checkout não abre.
 2. Fazer revisão jurídica dos termos, privacidade, reembolso e promessas comerciais.
 3. Aprovar preços, escopo do vitalício, política de atualizações e SLA de suporte.
 4. Validar o checkout em modo de teste, incluindo pagamento aprovado, recusado, renovação, atraso e cancelamento.

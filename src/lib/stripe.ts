@@ -4,6 +4,7 @@ import type { NextRequest } from "next/server";
 import Stripe from "stripe";
 
 import { isDatabaseConfigured } from "@/lib/db/client";
+import { isSupplierIdentityComplete } from "@/lib/legal";
 import { PLANS, type PlanDefinition } from "@/lib/plans";
 
 const STRIPE_API_VERSION: Stripe.LatestApiVersion = "2026-07-29.dahlia";
@@ -28,11 +29,24 @@ export type CheckoutAvailability =
     }
   | {
       available: false;
-      reason: "disabled" | "database" | "publishable_key" | "secret_key" | "price" | "webhook";
+      reason:
+        | "disabled"
+        | "supplier_identity"
+        | "database"
+        | "publishable_key"
+        | "secret_key"
+        | "price"
+        | "webhook";
     };
 
 export function getCheckoutAvailability(plan: PlanDefinition): CheckoutAvailability {
   if (!isCheckoutEnabled()) return { available: false, reason: "disabled" };
+
+  // Vender sem exibir nome empresarial, CNPJ e endereços viola o Decreto
+  // 7.962/2013, art. 2º, I. A trava fica aqui, e não numa lista de tarefas,
+  // para que seja impossível abrir o checkout com os documentos incompletos.
+  if (!isSupplierIdentityComplete()) return { available: false, reason: "supplier_identity" };
+
   if (!isDatabaseConfigured()) return { available: false, reason: "database" };
 
   const publishableKey = readEnv("STRIPE_PUBLISHABLE_KEY");

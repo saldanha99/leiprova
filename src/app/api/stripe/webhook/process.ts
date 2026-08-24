@@ -12,15 +12,15 @@ import {
 } from "@/lib/db/schema";
 import { getPlanByStripePriceId } from "@/lib/stripe";
 
-type LocalSubscriptionStatus =
-  | "incomplete"
-  | "trialing"
-  | "active"
-  | "past_due"
-  | "paused"
-  | "canceled"
-  | "unpaid"
-  | "expired";
+import {
+  isLeiProvaMetadata,
+  normalizeSubscriptionStatus,
+  objectId,
+  parsePositiveInteger,
+  subscriptionPeriod,
+  unixDate,
+  type LocalSubscriptionStatus,
+} from "./mapping";
 
 type BillingContext = {
   userId: number;
@@ -408,57 +408,5 @@ async function attachCustomerToUser(userId: number, customerId: string) {
       .update(users)
       .set({ stripeCustomerId: customerId, updatedAt: new Date() })
       .where(and(eq(users.id, userId), isNull(users.stripeCustomerId)));
-  }
-}
-
-function isLeiProvaMetadata(metadata: Stripe.Metadata | null | undefined): metadata is Stripe.Metadata {
-  return metadata?.app === "leiprova";
-}
-
-function objectId(value: { id: string } | string | null | undefined) {
-  if (!value) return null;
-  return typeof value === "string" ? value : value.id;
-}
-
-function unixDate(value: number | null | undefined) {
-  return typeof value === "number" ? new Date(value * 1000) : null;
-}
-
-function parsePositiveInteger(value: string | null | undefined) {
-  if (!value || !/^\d+$/.test(value)) return null;
-  const parsed = Number(value);
-  return Number.isSafeInteger(parsed) && parsed > 0 ? parsed : null;
-}
-
-function subscriptionPeriod(subscription: Stripe.Subscription) {
-  const starts = subscription.items.data.map((item) => item.current_period_start).filter(Number.isFinite);
-  const ends = subscription.items.data.map((item) => item.current_period_end).filter(Number.isFinite);
-
-  return {
-    start: starts.length ? unixDate(Math.min(...starts)) : null,
-    end: ends.length ? unixDate(Math.max(...ends)) : null,
-  };
-}
-
-function normalizeSubscriptionStatus(status: Stripe.Subscription.Status): LocalSubscriptionStatus {
-  switch (status) {
-    case "incomplete":
-      return "incomplete";
-    case "trialing":
-      return "trialing";
-    case "active":
-      return "active";
-    case "past_due":
-      return "past_due";
-    case "paused":
-      return "paused";
-    case "canceled":
-      return "canceled";
-    case "unpaid":
-      return "unpaid";
-    case "incomplete_expired":
-      return "expired";
-    default:
-      return "incomplete";
   }
 }
