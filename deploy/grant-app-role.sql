@@ -12,6 +12,7 @@ grant select on
   legal_articles,
   questions,
   question_options,
+  question_style_profiles,
   quiz_banks,
   quiz_career_tracks,
   quiz_career_specializations,
@@ -25,6 +26,50 @@ grant select on
   stripe_connect_transfer_batches,
   stripe_connect_transfers
 to :app_user;
+
+grant insert (
+  public_id,
+  legal_article_id,
+  subject_id,
+  topic_id,
+  quiz_mode,
+  style_bank_id,
+  type,
+  prompt,
+  explanation,
+  learning_objective,
+  topic,
+  difficulty,
+  exam_board_style,
+  editorial_status,
+  source_rights,
+  source_title,
+  source_url,
+  authorship_method,
+  generator_model,
+  prompt_version,
+  created_by_user_id,
+  clean_room_attested_at,
+  submitted_at,
+  verified_at
+) on questions to :app_user;
+
+grant update (
+  editorial_status,
+  reviewed_by_user_id,
+  review_notes,
+  verified_at,
+  updated_at
+) on questions to :app_user;
+
+grant insert (
+  question_id,
+  option_key,
+  text,
+  is_correct,
+  rationale,
+  sort_order
+) on question_options to :app_user;
 
 grant select, insert, update on
   subscriptions,
@@ -105,5 +150,7 @@ grant usage on
   contact_messages_id_seq,
   stripe_connect_partners_id_seq,
   saved_study_filters_id_seq,
-  question_notebooks_id_seq
+  question_notebooks_id_seq,
+  questions_id_seq,
+  question_options_id_seq
 to :app_user;

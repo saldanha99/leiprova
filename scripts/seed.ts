@@ -11,6 +11,7 @@ import {
   legalVersions,
   plans,
   questionOptions,
+  questionStyleProfiles,
   questions,
   quizBanks,
   quizCareerSpecializations,
@@ -19,6 +20,7 @@ import {
   quizSubjects,
   quizTopics,
 } from "../src/lib/db/schema";
+import { STYLE_PROFILE_SEEDS } from "../src/lib/editorial/style-profiles";
 import { PLANS } from "../src/lib/plans";
 import {
   quizBanks as quizBankCatalog,
@@ -87,6 +89,46 @@ async function seedQuizCatalog() {
       set: {
         name: sql`excluded.name`,
         fullName: sql`excluded.full_name`,
+        isActive: true,
+        updatedAt: now,
+      },
+    });
+
+  const bankRows = await db.select({ id: quizBanks.id, slug: quizBanks.slug }).from(quizBanks);
+  const bankIds = new Map(bankRows.map((row) => [row.slug, row.id]));
+
+  await db
+    .insert(questionStyleProfiles)
+    .values(
+      STYLE_PROFILE_SEEDS.map((profile) => {
+        const quizBankId = bankIds.get(profile.bankSlug);
+        if (!quizBankId) throw new Error(`Banca ausente no catálogo persistido: ${profile.bankSlug}`);
+
+        return {
+          quizBankId,
+          version: 1,
+          format: profile.format,
+          commandStyle: profile.commandStyle,
+          reasoningDemand: profile.reasoningDemand,
+          authoringGuidelines: [...profile.authoringGuidelines],
+          distractorGuidance: [...profile.distractorGuidance],
+          prohibitedPatterns: [...profile.prohibitedPatterns],
+          disclaimer: profile.disclaimer,
+          isActive: true,
+        };
+      }),
+    )
+    .onConflictDoUpdate({
+      target: questionStyleProfiles.quizBankId,
+      set: {
+        version: sql`excluded.version`,
+        format: sql`excluded.format`,
+        commandStyle: sql`excluded.command_style`,
+        reasoningDemand: sql`excluded.reasoning_demand`,
+        authoringGuidelines: sql`excluded.authoring_guidelines`,
+        distractorGuidance: sql`excluded.distractor_guidance`,
+        prohibitedPatterns: sql`excluded.prohibited_patterns`,
+        disclaimer: sql`excluded.disclaimer`,
         isActive: true,
         updatedAt: now,
       },

@@ -114,6 +114,52 @@ export const quizBanks = pgTable(
   ],
 );
 
+export const questionStyleProfiles = pgTable(
+  "question_style_profiles",
+  {
+    id: idColumn(),
+    quizBankId: bigint("quiz_bank_id", { mode: "number" })
+      .notNull()
+      .unique()
+      .references(() => quizBanks.id, { onDelete: "restrict" }),
+    version: integer("version").notNull().default(1),
+    format: text("format").notNull(),
+    commandStyle: text("command_style").notNull(),
+    reasoningDemand: text("reasoning_demand").notNull(),
+    authoringGuidelines: jsonb("authoring_guidelines")
+      .$type<string[]>()
+      .notNull()
+      .default(sql`'[]'::jsonb`),
+    distractorGuidance: jsonb("distractor_guidance")
+      .$type<string[]>()
+      .notNull()
+      .default(sql`'[]'::jsonb`),
+    prohibitedPatterns: jsonb("prohibited_patterns")
+      .$type<string[]>()
+      .notNull()
+      .default(sql`'[]'::jsonb`),
+    disclaimer: text("disclaimer").notNull(),
+    isActive: boolean("is_active").notNull().default(true),
+    updatedByUserId: bigint("updated_by_user_id", { mode: "number" }).references(() => users.id, {
+      onDelete: "set null",
+    }),
+    ...timestamps,
+  },
+  (table) => [
+    index("question_style_profiles_active_idx").on(table.isActive),
+    index("question_style_profiles_updated_by_idx").on(table.updatedByUserId),
+    check("question_style_profiles_version_check", sql`${table.version} >= 1`),
+    check(
+      "question_style_profiles_format_check",
+      sql`${table.format} in ('multiple_choice', 'true_false')`,
+    ),
+    check(
+      "question_style_profiles_disclaimer_check",
+      sql`char_length(btrim(${table.disclaimer})) between 20 and 500`,
+    ),
+  ],
+);
+
 export const quizCareerTracks = pgTable(
   "quiz_career_tracks",
   {
@@ -414,6 +460,7 @@ export const questions = pgTable(
     type: text("type").notNull(),
     prompt: text("prompt").notNull(),
     explanation: text("explanation").notNull(),
+    learningObjective: text("learning_objective"),
     topic: text("topic").notNull(),
     difficulty: smallint("difficulty").notNull().default(2),
     mutationKind: text("mutation_kind"),
@@ -433,9 +480,15 @@ export const questions = pgTable(
     authorshipMethod: text("authorship_method").notNull().default("human"),
     generatorModel: text("generator_model"),
     promptVersion: text("prompt_version"),
+    createdByUserId: bigint("created_by_user_id", { mode: "number" }).references(() => users.id, {
+      onDelete: "set null",
+    }),
     reviewedByUserId: bigint("reviewed_by_user_id", { mode: "number" }).references(() => users.id, {
       onDelete: "set null",
     }),
+    cleanRoomAttestedAt: timestamp("clean_room_attested_at", { withTimezone: true }),
+    submittedAt: timestamp("submitted_at", { withTimezone: true }),
+    reviewNotes: text("review_notes"),
     verifiedAt: timestamp("verified_at", { withTimezone: true }).notNull(),
     ...timestamps,
   },
@@ -445,6 +498,7 @@ export const questions = pgTable(
     index("questions_topic_id_idx").on(table.topicId),
     index("questions_style_bank_id_idx").on(table.styleBankId),
     index("questions_exam_edition_id_idx").on(table.examEditionId),
+    index("questions_created_by_user_id_idx").on(table.createdByUserId),
     index("questions_reviewed_by_user_id_idx").on(table.reviewedByUserId),
     index("questions_topic_status_idx").on(table.topic, table.editorialStatus),
     index("questions_mode_status_subject_topic_idx").on(
@@ -498,10 +552,14 @@ export const questions = pgTable(
         and ${table.styleBankId} is null
       ) or (
         ${table.quizMode} = 'original_style'
+        and ${table.legalArticleId} is not null
         and ${table.subjectId} is not null
         and ${table.examEditionId} is null
         and ${table.styleBankId} is not null
         and ${table.sourceRights} = 'original_authorial'
+        and nullif(btrim(${table.learningObjective}), '') is not null
+        and ${table.createdByUserId} is not null
+        and ${table.cleanRoomAttestedAt} is not null
       ) or (
         ${table.quizMode} = 'previous_exam'
         and ${table.subjectId} is not null
@@ -535,6 +593,22 @@ export const questions = pgTable(
     check(
       "questions_reviewed_provenance_check",
       sql`${table.editorialStatus} <> 'reviewed' or ${table.quizMode} = 'dry_law' or ${table.reviewedByUserId} is not null`,
+    ),
+    check(
+      "questions_independent_review_check",
+      sql`${table.editorialStatus} <> 'reviewed'
+        or ${table.quizMode} <> 'original_style'
+        or ${table.reviewedByUserId} <> ${table.createdByUserId}`,
+    ),
+    check(
+      "questions_submission_check",
+      sql`${table.editorialStatus} not in ('pending_review', 'reviewed')
+        or ${table.quizMode} <> 'original_style'
+        or ${table.submittedAt} is not null`,
+    ),
+    check(
+      "questions_review_notes_check",
+      sql`${table.reviewNotes} is null or char_length(${table.reviewNotes}) <= 1500`,
     ),
   ],
 );
@@ -1217,3 +1291,4 @@ export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 export type Question = typeof questions.$inferSelect;
 export type QuestionOption = typeof questionOptions.$inferSelect;
+export type QuestionStyleProfile = typeof questionStyleProfiles.$inferSelect;

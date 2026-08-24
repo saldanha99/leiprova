@@ -12,4 +12,13 @@ describe("privilégios do app em produção", () => {
     expect(grants).toContain("saved_study_filters_id_seq");
     expect(grants).toContain("question_notebooks_id_seq");
   });
+
+  it("permite o fluxo autoral apenas nas colunas editoriais necessárias", () => {
+    expect(grants).toMatch(/question_style_profiles,/);
+    expect(grants).toMatch(/grant insert \([\s\S]*clean_room_attested_at,[\s\S]*\) on questions to :app_user;/);
+    expect(grants).toMatch(/grant update \([\s\S]*reviewed_by_user_id,[\s\S]*\) on questions to :app_user;/);
+    expect(grants).toMatch(/grant insert \([\s\S]*question_id,[\s\S]*\) on question_options to :app_user;/);
+    expect(grants).toContain("questions_id_seq");
+    expect(grants).toContain("question_options_id_seq");
+  });
 });

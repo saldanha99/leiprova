@@ -99,14 +99,14 @@ export async function requireUser(nextPath = "/app") {
   return user;
 }
 
-export async function requireAdmin() {
-  const user = await requireUser("/admin");
+export async function requireAdmin(nextPath = "/admin") {
+  const user = await requireUser(nextPath);
   if (user.role !== "admin" && user.role !== "editor") redirect("/app");
   return user;
 }
 
-export async function requireSuperAdmin() {
-  const user = await requireUser("/admin");
+export async function requireSuperAdmin(nextPath = "/admin") {
+  const user = await requireUser(nextPath);
   if (user.role !== "admin") redirect("/app");
   return user;
 }

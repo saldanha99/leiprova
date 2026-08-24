@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   ArrowUpRight,
+  BookOpenCheck,
   CreditCard,
   LayoutDashboard,
   LogOut,
@@ -16,20 +17,22 @@ import type { AuthUser } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 
 const adminNavItems = [
-  { href: "/admin", label: "Visão geral", icon: LayoutDashboard },
-  { href: "/admin/stripe-connect", label: "Stripe Connect", icon: CreditCard },
+  { href: "/admin", label: "Visão geral", icon: LayoutDashboard, adminOnly: true },
+  { href: "/admin/fabrica-autoral", label: "Fábrica autoral", icon: BookOpenCheck, adminOnly: false },
+  { href: "/admin/stripe-connect", label: "Stripe Connect", icon: CreditCard, adminOnly: true },
 ] as const;
 
 function isCurrentPath(pathname: string, href: string) {
   return href === "/admin" ? pathname === href : pathname.startsWith(href);
 }
 
-function NavigationLinks({ mobile = false }: { mobile?: boolean }) {
+function NavigationLinks({ user, mobile = false }: { user: AuthUser; mobile?: boolean }) {
   const pathname = usePathname();
+  const items = adminNavItems.filter((item) => !item.adminOnly || user.role === "admin");
 
   return (
-    <nav className="grid gap-1.5" aria-label="Navegação do super admin">
-      {adminNavItems.map(({ href, label, icon: Icon }) => {
+    <nav className="grid gap-1.5" aria-label="Navegação da operação">
+      {items.map(({ href, label, icon: Icon }) => {
         const active = isCurrentPath(pathname, href);
 
         return (
@@ -86,18 +89,21 @@ function AdminIdentity({ user }: { user: AuthUser }) {
 }
 
 export function AdminSidebar({ user }: { user: AuthUser }) {
+  const homeHref = user.role === "admin" ? "/admin" : "/admin/fabrica-autoral";
+  const roleLabel = user.role === "admin" ? "Super admin" : "Editor";
+
   return (
     <aside className="sticky top-0 hidden h-screen w-[276px] shrink-0 border-r border-white/8 bg-[#07101b] px-4 py-5 lg:flex lg:flex-col">
       <div className="px-2">
-        <LeiProvaMark href="/admin" />
+        <LeiProvaMark href={homeHref} />
         <span className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-emerald-300/15 bg-emerald-300/8 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[.14em] text-emerald-200">
           <ShieldCheck aria-hidden="true" className="size-3" />
-          Super admin
+          {roleLabel}
         </span>
       </div>
 
       <div className="mt-8">
-        <NavigationLinks />
+        <NavigationLinks user={user} />
       </div>
 
       <div className="mt-auto space-y-3 border-t border-white/8 pt-4">
@@ -115,28 +121,31 @@ export function AdminSidebar({ user }: { user: AuthUser }) {
 }
 
 export function MobileAdminHeader({ user }: { user: AuthUser }) {
+  const homeHref = user.role === "admin" ? "/admin" : "/admin/fabrica-autoral";
+  const roleLabel = user.role === "admin" ? "Super admin" : "Editor";
+
   return (
     <header className="sticky top-0 z-40 border-b border-white/8 bg-[#07101b]/95 px-4 py-3 backdrop-blur lg:hidden">
       <div className="flex items-center justify-between gap-4">
         <div className="flex min-w-0 items-center gap-3">
-          <LeiProvaMark href="/admin" compact />
+          <LeiProvaMark href={homeHref} compact />
           <div className="min-w-0">
             <p className="truncate text-sm font-semibold text-white">LeiProva</p>
             <p className="text-[10px] font-bold uppercase tracking-[.13em] text-emerald-300">
-              Super admin
+              {roleLabel}
             </p>
           </div>
         </div>
 
         <details className="relative">
           <summary
-            aria-label="Abrir menu do super admin"
+            aria-label="Abrir menu da operação"
             className="grid size-10 cursor-pointer list-none place-items-center rounded-xl border border-white/10 bg-white/5 font-bold text-amber-200"
           >
             {user.name.slice(0, 1).toUpperCase()}
           </summary>
           <div className="absolute right-0 top-12 w-[min(19rem,calc(100vw-2rem))] rounded-2xl border border-white/10 bg-[#0a1522] p-2 shadow-2xl">
-            <NavigationLinks mobile />
+            <NavigationLinks user={user} mobile />
             <div className="mt-2 border-t border-white/8 pt-2">
               <Link
                 href="/app"
