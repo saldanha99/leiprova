@@ -5,7 +5,7 @@ import {
   generatedDraftClaimSchema,
   originalQuestionBatchReviewSchema,
   originalQuestionDraftSchema,
-  validateIndependentReview,
+  validateHumanReview,
 } from "../src/lib/editorial/clean-room";
 import {
   ORIGINAL_STYLE_PILOT_PROMPT_VERSION_V1,
@@ -73,24 +73,22 @@ describe("fábrica autoral clean-room", () => {
     ).toBe(true);
   });
 
-  it("impede o autor de revisar o próprio item", () => {
+  it("permite a revisão humana pelo responsável depois do envio", () => {
     expect(
-      validateIndependentReview({
+      validateHumanReview({
         status: "pending_review",
         creatorUserId: 10,
-        reviewerUserId: 10,
-        cleanRoomAttestedAt: new Date(),
-      }),
-    ).toEqual({ allowed: false, reason: "A revisão precisa ser feita por outra pessoa." });
-
-    expect(
-      validateIndependentReview({
-        status: "pending_review",
-        creatorUserId: 10,
-        reviewerUserId: 11,
         cleanRoomAttestedAt: new Date(),
       }).allowed,
     ).toBe(true);
+
+    expect(
+      validateHumanReview({
+        status: "pending_review",
+        creatorUserId: null,
+        cleanRoomAttestedAt: new Date(),
+      }).allowed,
+    ).toBe(false);
   });
 
   it("mantém perfis abstratos com limites explícitos e sem material de terceiros", () => {

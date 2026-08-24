@@ -32,11 +32,9 @@ function Feedback({ state }: { state: EditorialActionState }) {
 export function BatchEditorialControls({
   claimableCount,
   reviewableCount,
-  ownedPendingCount,
 }: {
   claimableCount: number;
   reviewableCount: number;
-  ownedPendingCount: number;
 }) {
   const [claimState, claimAction, claimPending] = useActionState(
     claimGeneratedDraftBatchAction,
@@ -115,7 +113,7 @@ export function BatchEditorialControls({
                     Liberar {reviewBatchSize} questões no catálogo
                   </h3>
                   <p id="quick-review-confirmation" className="mt-1 text-xs leading-5 text-slate-500">
-                    Ao clicar, você confirma a revisão humana dos itens enviados por outra pessoa.
+                    Ao clicar, você confirma a revisão humana dos itens pendentes deste lote.
                   </p>
                 </div>
               </div>
@@ -139,13 +137,9 @@ export function BatchEditorialControls({
             <CheckCircle2 aria-hidden="true" className="size-5" />
           </span>
           <div>
-            <h3 className="text-base font-semibold text-white">
-              {ownedPendingCount ? `${ownedPendingCount} questões já foram enviadas` : "Nenhuma ação pendente"}
-            </h3>
+            <h3 className="text-base font-semibold text-white">Nenhuma ação pendente</h3>
             <p className="mt-1 text-xs leading-5 text-slate-400">
-              {ownedPendingCount
-                ? "Agora basta entrar com a outra conta editorial e clicar uma vez para publicar o lote."
-                : "Os lotes disponíveis aparecerão aqui com uma única ação."}
+              Os lotes disponíveis aparecerão aqui com uma única ação.
             </p>
           </div>
         </div>

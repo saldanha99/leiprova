@@ -38,8 +38,8 @@ const statusClasses: Record<string, string> = {
 };
 
 export default async function EditorialFactoryPage() {
-  const user = await requireAdmin();
-  const snapshot = await getEditorialFactorySnapshot(user.id);
+  await requireAdmin();
+  const snapshot = await getEditorialFactorySnapshot();
 
   const metrics = [
     { label: "Autorais registradas", value: snapshot.metrics.total, icon: Fingerprint, tone: "text-sky-300 bg-sky-300/10" },
@@ -63,13 +63,13 @@ export default async function EditorialFactoryPage() {
           </h1>
           <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-400 sm:text-base">
             O perfil da banca orienta forma e dificuldade; o conteúdo nasce somente da lei oficial. Nenhuma questão
-            entra no catálogo sem responsabilidade editorial registrada e revisão por outra pessoa.
+            entra no catálogo sem responsabilidade editorial e revisão humana registradas.
           </p>
           <div className="mt-5 flex flex-wrap gap-3 text-xs font-semibold text-slate-300">
             <span className="inline-flex items-center gap-2"><BookOpenCheck className="size-4 text-amber-300" /> fonte oficial</span>
             <span className="inline-flex items-center gap-2"><ShieldCheck className="size-4 text-emerald-300" /> declaração clean-room</span>
             <span className="inline-flex items-center gap-2"><Fingerprint className="size-4 text-sky-300" /> similaridade interna verificada</span>
-            <span className="inline-flex items-center gap-2"><UserRoundCheck className="size-4 text-sky-300" /> revisor independente</span>
+            <span className="inline-flex items-center gap-2"><UserRoundCheck className="size-4 text-sky-300" /> revisão humana registrada</span>
           </div>
         </div>
       </header>
@@ -102,7 +102,7 @@ export default async function EditorialFactoryPage() {
               </h2>
               <p className="mt-2 text-sm leading-6 text-slate-400">
                 Foram geradas somente a partir de artigos oficiais já revisados. Permanecem fora do catálogo até um
-                responsável confirmar a fonte e outra pessoa aprovar o conteúdo.
+                responsável confirmar a fonte e registrar a revisão humana do conteúdo.
               </p>
             </div>
             <div className="grid shrink-0 grid-cols-3 gap-2 text-center text-[10px] font-bold uppercase tracking-[.08em] text-slate-500">
@@ -117,7 +117,6 @@ export default async function EditorialFactoryPage() {
       <BatchEditorialControls
         claimableCount={snapshot.metrics.claimable}
         reviewableCount={snapshot.metrics.reviewable}
-        ownedPendingCount={snapshot.metrics.ownedPending}
       />
 
       <section className="mt-5" aria-labelledby="profiles-title">
@@ -149,7 +148,7 @@ export default async function EditorialFactoryPage() {
           <div className="mb-6">
             <span className="text-xs font-bold uppercase tracking-[.14em] text-amber-300">Nova questão</span>
             <h2 className="mt-2 text-xl font-semibold tracking-[-.025em] text-white">Enviar conteúdo inédito à revisão</h2>
-            <p className="mt-2 text-sm leading-6 text-slate-500">O envio cria um item pendente. O responsável nunca pode aprovar o próprio trabalho.</p>
+            <p className="mt-2 text-sm leading-6 text-slate-500">O envio cria um item pendente. A publicação exige uma confirmação posterior de revisão humana.</p>
           </div>
           <AuthoringForm
             profiles={snapshot.profiles}
@@ -170,7 +169,7 @@ export default async function EditorialFactoryPage() {
                 ["1", "Escolher a lei oficial", "Somente artigo revisado e versão vigente."],
                 ["2", "Redigir em ambiente limpo", "Sem consultar ou adaptar questões de terceiros."],
                 ["3", "Registrar procedência", "Autor, fonte, método e declaração ficam auditáveis."],
-                ["4", "Revisão por outra pessoa", "Só a aprovação independente muda o item para liberado."],
+                ["4", "Confirmar a revisão humana", "Só a aprovação registrada muda o item para liberado."],
               ].map(([step, title, detail]) => (
                 <li key={step} className="flex gap-3">
                   <span className="grid size-7 shrink-0 place-items-center rounded-lg bg-emerald-300/12 text-xs font-extrabold text-emerald-200">{step}</span>
@@ -220,7 +219,7 @@ export default async function EditorialFactoryPage() {
         {snapshot.queue.length ? (
           <div className="mt-5 grid gap-4 xl:grid-cols-2">
             {snapshot.queue.map((item) => {
-              const canReview = item.editorialStatus === "pending_review" && item.creatorUserId !== user.id;
+              const canReview = item.editorialStatus === "pending_review" && item.creatorUserId !== null;
               const canClaim = item.editorialStatus === "draft" && !item.creatorUserId;
               return (
                 <article key={item.publicId} className="rounded-2xl border border-white/8 bg-black/10 p-4">
@@ -342,11 +341,6 @@ export default async function EditorialFactoryPage() {
                   {item.reviewNotes ? <p className="mt-2 rounded-lg bg-white/[.035] p-2 text-xs leading-5 text-slate-400">Nota: {item.reviewNotes}</p> : null}
                   {canClaim ? <ClaimDraftControls publicId={item.publicId} /> : null}
                   {canReview ? <ReviewControls publicId={item.publicId} /> : null}
-                  {item.editorialStatus === "pending_review" && item.creatorUserId === user.id ? (
-                    <p className="mt-3 rounded-lg border border-amber-300/12 bg-amber-300/[.045] p-2.5 text-xs leading-5 text-amber-100/70">
-                      Você é o responsável editorial. Outro administrador precisa revisar este item.
-                    </p>
-                  ) : null}
                 </article>
               );
             })}

@@ -26,7 +26,7 @@ import {
   generatedDraftClaimSchema,
   originalQuestionBatchReviewSchema,
   originalQuestionDraftSchema,
-  validateIndependentReview,
+  validateHumanReview,
 } from "@/lib/editorial/clean-room";
 import {
   findMostSimilarQuestion,
@@ -579,7 +579,7 @@ export async function claimGeneratedDraftBatchAction(
   revalidatePath("/admin/fabrica-autoral");
   return {
     status: "success",
-    message: `${prepared.length} rascunhos foram assumidos e enviados à revisão independente.`,
+    message: `${prepared.length} rascunhos foram assumidos e enviados à revisão humana.`,
   };
 }
 
@@ -619,10 +619,9 @@ export async function reviewOriginalQuestionAction(
 
   if (!question) return errorState("Questão autoral não encontrada.");
 
-  const review = validateIndependentReview({
+  const review = validateHumanReview({
     status: question.status,
     creatorUserId: question.creatorUserId,
-    reviewerUserId: user.id,
     cleanRoomAttestedAt: question.cleanRoomAttestedAt,
   });
   if (!review.allowed) return errorState(review.reason);
@@ -714,14 +713,13 @@ export async function approveOriginalQuestionBatchAction(
         eq(questions.quizMode, "original_style"),
         eq(questions.editorialStatus, "pending_review"),
         isNotNull(questions.createdByUserId),
-        ne(questions.createdByUserId, user.id),
       ),
     )
     .orderBy(questions.submittedAt, questions.id)
     .limit(EDITORIAL_BATCH_LIMIT);
 
   if (!candidateRows.length) {
-    return errorState("Não há questões enviadas por outra pessoa e elegíveis para aprovação em lote.");
+    return errorState("Não há questões pendentes elegíveis para aprovação em lote.");
   }
 
   const [optionRows, existingQuestions] = await Promise.all([
@@ -744,13 +742,12 @@ export async function approveOriginalQuestionBatchAction(
   );
 
   for (const candidate of candidateRows) {
-    const independentReview = validateIndependentReview({
+    const humanReview = validateHumanReview({
       status: candidate.status,
       creatorUserId: candidate.creatorUserId,
-      reviewerUserId: user.id,
       cleanRoomAttestedAt: candidate.cleanRoomAttestedAt,
     });
-    if (!independentReview.allowed) return errorState(independentReview.reason);
+    if (!humanReview.allowed) return errorState(humanReview.reason);
 
     if (
       candidate.questionSourceRights !== "original_authorial" ||
@@ -811,7 +808,6 @@ export async function approveOriginalQuestionBatchAction(
             inArray(questions.id, candidateIds),
             eq(questions.editorialStatus, "pending_review"),
             isNotNull(questions.createdByUserId),
-            ne(questions.createdByUserId, user.id),
           ),
         )
         .returning({ id: questions.id });

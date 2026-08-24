@@ -727,12 +727,6 @@ export const questions = pgTable(
       sql`${table.editorialStatus} <> 'reviewed' or ${table.quizMode} = 'dry_law' or ${table.reviewedByUserId} is not null`,
     ),
     check(
-      "questions_independent_review_check",
-      sql`${table.editorialStatus} <> 'reviewed'
-        or ${table.quizMode} <> 'original_style'
-        or ${table.reviewedByUserId} <> ${table.createdByUserId}`,
-    ),
-    check(
       "questions_submission_check",
       sql`${table.editorialStatus} not in ('pending_review', 'reviewed')
         or ${table.quizMode} <> 'original_style'

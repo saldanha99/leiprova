@@ -113,6 +113,13 @@
       "when": 1787598419703,
       "tag": "0015_pale_the_renegades",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1787608505693,
+      "tag": "0016_shocking_ares",
+      "breakpoints": true
     }
   ]
 }

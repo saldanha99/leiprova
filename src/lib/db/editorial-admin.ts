@@ -18,7 +18,7 @@ import {
 } from "@/lib/db/schema";
 import { EDITORIAL_BATCH_LIMIT } from "@/lib/editorial/clean-room";
 
-export async function getEditorialFactorySnapshot(viewerUserId: number) {
+export async function getEditorialFactorySnapshot() {
   const db = getDb();
   const creator = alias(users, "question_creator");
   const reviewer = alias(users, "question_reviewer");
@@ -145,11 +145,6 @@ export async function getEditorialFactorySnapshot(viewerUserId: number) {
         reviewable: sql<number>`count(*) filter (
           where ${questions.editorialStatus} = 'pending_review'
             and ${questions.createdByUserId} is not null
-            and ${questions.createdByUserId} <> ${viewerUserId}
-        )::int`,
-        ownedPending: sql<number>`count(*) filter (
-          where ${questions.editorialStatus} = 'pending_review'
-            and ${questions.createdByUserId} = ${viewerUserId}
         )::int`,
       })
       .from(questions)
@@ -182,7 +177,6 @@ export async function getEditorialFactorySnapshot(viewerUserId: number) {
       suspended: 0,
       claimable: 0,
       reviewable: 0,
-      ownedPending: 0,
     },
   };
 }

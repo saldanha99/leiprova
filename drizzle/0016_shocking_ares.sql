@@ -1,0 +1,1 @@
+ALTER TABLE "questions" DROP CONSTRAINT "questions_independent_review_check";

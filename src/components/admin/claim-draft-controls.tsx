@@ -60,7 +60,7 @@ export function ClaimDraftControls({ publicId }: { publicId: string }) {
         {pending ? "Enviando..." : "Assumir e enviar à revisão"}
       </button>
       <p className="mt-2 text-[10px] leading-4 text-slate-600">
-        Você não poderá aprovar o próprio envio; a liberação exige outro administrador.
+        Depois do envio, a publicação exige uma confirmação de revisão humana.
       </p>
     </form>
   );

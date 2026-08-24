@@ -85,19 +85,15 @@ export const originalQuestionBatchReviewSchema = z.object({
 export type ReviewTransitionInput = {
   status: string;
   creatorUserId: number | null;
-  reviewerUserId: number;
   cleanRoomAttestedAt: Date | null;
 };
 
-export function validateIndependentReview(input: ReviewTransitionInput) {
+export function validateHumanReview(input: ReviewTransitionInput) {
   if (input.status !== "pending_review") {
     return { allowed: false, reason: "Somente itens pendentes podem ser revisados." } as const;
   }
   if (!input.creatorUserId || !input.cleanRoomAttestedAt) {
     return { allowed: false, reason: "O item não possui autoria limpa e responsável registrados." } as const;
-  }
-  if (input.creatorUserId === input.reviewerUserId) {
-    return { allowed: false, reason: "A revisão precisa ser feita por outra pessoa." } as const;
   }
   return { allowed: true, reason: null } as const;
 }

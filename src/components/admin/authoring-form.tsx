@@ -344,7 +344,7 @@ export function AuthoringForm({ profiles, articles, subjects, topics }: Authorin
         className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-amber-400 px-5 text-sm font-extrabold text-slate-950 transition hover:bg-amber-300 disabled:cursor-wait disabled:opacity-60 sm:w-auto"
       >
         <Send aria-hidden="true" className="size-4" />
-        {pending ? "Enviando..." : "Enviar para revisão independente"}
+        {pending ? "Enviando..." : "Enviar para revisão humana"}
       </button>
     </form>
   );

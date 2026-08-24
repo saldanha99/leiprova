@@ -323,7 +323,7 @@ export default function SourcesAndUpdatesPage() {
                 <Bot aria-hidden="true" className="size-6 text-blue-300" />
                 <h3 className="mt-5 text-xl font-semibold text-white">Questões inéditas no estilo da banca</h3>
                 <p className="mt-3 text-sm leading-7 text-slate-400">
-                  Hoje há zero publicados. A fábrica autoral já registra modelo e versão do processo, compara o enunciado com o acervo interno e exige revisão jurídica/editorial por outra pessoa. A IA pode apoiar um rascunho; não publica diretamente.
+                  Hoje há zero publicados. A fábrica autoral já registra modelo e versão do processo, compara o enunciado com o acervo interno e exige revisão humana confirmada. A IA pode apoiar um rascunho; não publica diretamente.
                 </p>
               </article>
             </div>
