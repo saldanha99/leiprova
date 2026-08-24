@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { PLANS, formatBRL, getPlan } from "@/lib/plans";
+import { PLANS, RETIRED_PLAN_SLUGS, formatBRL, getPlan } from "@/lib/plans";
 
 describe("plans", () => {
   it("usa slugs e variáveis Stripe únicas", () => {
@@ -9,8 +9,16 @@ describe("plans", () => {
   });
 
   it("não aceita um plano arbitrário enviado pelo navegador", () => {
-    expect(getPlan("foco")?.mode).toBe("subscription");
+    expect(getPlan("foco")?.name).toBe("Foco Anual");
     expect(getPlan("plano-inventado")).toBeNull();
+  });
+
+  it("mantém o plano vitalício retirado do catálogo e do checkout", () => {
+    expect(PLANS).toHaveLength(2);
+    expect(PLANS.map((plan) => plan.slug)).toEqual(["ritmo", "foco"]);
+    expect(PLANS.some((plan) => plan.stripePriceEnv.includes("FUNDADOR"))).toBe(false);
+    expect(RETIRED_PLAN_SLUGS).toContain("fundador");
+    expect(getPlan("fundador")).toBeNull();
   });
 
   it("formata valores em reais", () => {

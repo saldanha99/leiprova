@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 
@@ -32,7 +32,7 @@ import {
 } from "../src/lib/editorial/originality";
 import { OFFICIAL_EXAM_PORTALS } from "../src/lib/official-sources/exam-registry";
 import { OFFICIAL_LEGAL_SOURCES } from "../src/lib/official-sources/legal-registry";
-import { PLANS } from "../src/lib/plans";
+import { PLANS, RETIRED_PLAN_SLUGS, type PlanSlug } from "../src/lib/plans";
 import {
   quizBanks as quizBankCatalog,
   quizCareerTracks as quizCareerCatalog,
@@ -48,10 +48,9 @@ if (!databaseUrl) {
 const client = postgres(databaseUrl, { max: 1, prepare: false });
 const db = drizzle(client);
 
-function billingType(slug: string) {
+function billingType(slug: PlanSlug) {
   if (slug === "ritmo") return "month";
-  if (slug === "foco") return "year";
-  return "lifetime";
+  return "year";
 }
 
 async function seedPlans() {
@@ -81,6 +80,11 @@ async function seedPlans() {
         },
       });
   }
+
+  await db
+    .update(plans)
+    .set({ isActive: false, updatedAt: new Date() })
+    .where(inArray(plans.slug, [...RETIRED_PLAN_SLUGS]));
 }
 
 async function seedQuizCatalog() {

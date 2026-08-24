@@ -95,7 +95,6 @@ Há modo treino, com correção após a resposta, e modo prova, cujo gabarito s�
 |---|---:|---:|
 | Ritmo Mensal | recorrente | R$ 49,90/mês |
 | Foco Anual | recorrente | R$ 497,00/ano |
-| Fundador Vitalício | única | R$ 897,00 |
 
 Os valores são decisões comerciais iniciais. Confirme-os antes de criar os Prices na Stripe e habilitar pagamentos.
 
@@ -112,7 +111,6 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 STRIPE_PUBLISHABLE_KEY=pk_test_ou_pk_live_...
 STRIPE_PRICE_RITMO=price_...
 STRIPE_PRICE_FOCO=price_...
-STRIPE_PRICE_FUNDADOR=price_...
 STRIPE_PORTAL_CONFIGURATION_ID=bpc_...
 ```
 
@@ -136,7 +134,7 @@ Restrinja a chave ao IP fixo da VPS. Cadastre o endpoint `https://leiprova.2b.ap
 - `invoice.payment_failed`
 - `invoice.payment_action_required`
 
-Cartão e Link atendem às assinaturas. Pix só deve ser oferecido no plano de pagamento único, pois não é um método recorrente na Stripe.
+Cartão e Link atendem às assinaturas. Pix não está habilitado porque os planos atuais são recorrentes.
 
 ## Sociedade e split de pagamentos
 
@@ -202,7 +200,7 @@ Roteiros detalhados: [`docs/REVISAO-JURIDICA.md`](docs/REVISAO-JURIDICA.md) e
 
 1. Preencher a identificação do fornecedor nas variáveis `SUPPLIER_*` do `.env`. Enquanto qualquer campo estiver vazio, `getCheckoutAvailability` devolve `supplier_identity` e o checkout não abre.
 2. Fazer revisão jurídica dos termos, privacidade, reembolso e promessas comerciais.
-3. Aprovar preços, escopo do vitalício, política de atualizações e SLA de suporte.
+3. Aprovar preços, política de atualizações e SLA de suporte.
 4. Validar o checkout em modo de teste, incluindo pagamento aprovado, recusado, renovação, atraso e cancelamento.
 5. Criar rotina editorial contínua para detectar alterações legislativas e suspender questões desatualizadas.
 6. Configurar monitoramento, alertas, e-mail transacional, verificação de e-mail e recuperação de senha.

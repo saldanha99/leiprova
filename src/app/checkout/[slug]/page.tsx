@@ -22,7 +22,7 @@ export default async function CheckoutPage({
 
   const user = await requireUser(`/checkout/${plan.slug}`);
   const price = formatBRL(plan.priceCents);
-  const buttonLabel = plan.mode === "subscription" ? `Assinar por ${price}` : `Comprar por ${price}`;
+  const buttonLabel = `Assinar por ${price}`;
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#050b12] px-4 py-5 text-white sm:px-6 lg:py-8">
@@ -106,7 +106,7 @@ export default async function CheckoutPage({
             />
 
             <p className="mt-6 border-t border-white/8 pt-5 text-center text-[11px] leading-5 text-slate-600">
-              Ao continuar, você concorda com os termos da oferta e com a política de privacidade. {plan.mode === "subscription" ? "A renovação ocorre no período indicado até o cancelamento." : "Esta oferta não possui renovação automática."}
+              Ao continuar, você concorda com os termos da oferta e com a política de privacidade. A renovação ocorre no período indicado até o cancelamento.
             </p>
           </section>
         </div>

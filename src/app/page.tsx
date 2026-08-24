@@ -153,11 +153,6 @@ const FAQS = [
     answer:
       "Sim. A proposta é manter o mesmo progresso entre notebook, tablet e celular, com sessões curtas para aproveitar intervalos e revisões mais longas quando houver tempo.",
   },
-  {
-    question: "O que significa acesso vitalício no plano Fundador?",
-    answer:
-      "É o acesso contínuo ao acervo contratado e aos módulos essenciais indicados na oferta, sem renovação automática. As condições completas devem ser apresentadas no checkout e nos termos antes do pagamento.",
-  },
 ] as const;
 
 const homeStructuredData = {
@@ -173,7 +168,7 @@ const homeStructuredData = {
       inLanguage: "pt-BR",
       isPartOf: { "@id": WEBSITE_ID },
       about: { "@id": ORGANIZATION_ID },
-      dateModified: "2026-08-17",
+      dateModified: "2026-08-24",
     },
     {
       "@type": "FAQPage",
@@ -600,10 +595,7 @@ export default function Home() {
                     <span>{plan.billingLabel}</span>
                   </div>
                   <p className="pricing-card__equivalent">
-                    {plan.equivalentMonthly ??
-                      (plan.mode === "payment"
-                        ? "sem renovação automática"
-                        : "cobrança recorrente conforme o ciclo")}
+                    {plan.equivalentMonthly ?? "cobrança recorrente conforme o ciclo"}
                   </p>
 
                   <ul>
@@ -626,9 +618,7 @@ export default function Home() {
                     {commerceOpen
                       ? plan.slug === "ritmo"
                         ? "Começar no Ritmo"
-                        : plan.slug === "foco"
-                          ? "Escolher o Foco"
-                          : "Ser fundador"
+                        : "Escolher o Foco"
                       : "Testar a demonstração"}
                     <ArrowCta />
                   </Link>

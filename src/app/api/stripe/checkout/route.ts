@@ -152,7 +152,7 @@ export async function POST(request: NextRequest) {
 
     const params: Stripe.Checkout.SessionCreateParams = {
       ui_mode: "custom",
-      mode: plan.mode,
+      mode: "subscription",
       customer: customerId,
       client_reference_id: user.publicId,
       line_items: [{ price: availability.priceId, quantity: 1 }],
@@ -162,9 +162,7 @@ export async function POST(request: NextRequest) {
       expires_at: expiresAt,
       return_url: `${origin}/checkout/retorno?session_id={CHECKOUT_SESSION_ID}`,
       metadata,
-      ...(plan.mode === "subscription"
-        ? { subscription_data: { metadata } }
-        : { payment_intent_data: { metadata } }),
+      subscription_data: { metadata },
     };
 
     const session = await stripe.checkout.sessions.create(params, {

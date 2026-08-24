@@ -1,4 +1,6 @@
-export type PlanSlug = "ritmo" | "foco" | "fundador";
+export type PlanSlug = "ritmo" | "foco";
+
+export const RETIRED_PLAN_SLUGS = ["fundador"] as const;
 
 export type PlanDefinition = {
   slug: PlanSlug;
@@ -8,7 +10,6 @@ export type PlanDefinition = {
   billingLabel: string;
   equivalentMonthly?: string;
   stripePriceEnv: string;
-  mode: "subscription" | "payment";
   featured?: boolean;
   features: string[];
 };
@@ -21,7 +22,6 @@ export const PLANS: readonly PlanDefinition[] = [
     priceCents: 4990,
     billingLabel: "/mês",
     stripePriceEnv: "STRIPE_PRICE_RITMO",
-    mode: "subscription",
     features: [
       "Treinos ilimitados de literalidade",
       "Fila de revisão espaçada",
@@ -37,7 +37,6 @@ export const PLANS: readonly PlanDefinition[] = [
     billingLabel: "/ano",
     equivalentMonthly: "equivale a R$ 41,42/mês",
     stripePriceEnv: "STRIPE_PRICE_FOCO",
-    mode: "subscription",
     featured: true,
     features: [
       "Tudo do plano Ritmo",
@@ -45,22 +44,6 @@ export const PLANS: readonly PlanDefinition[] = [
       "Cronogramas e desafios guiados",
       "Cadernos, flashcards e simulados",
       "12 meses de atualizações",
-    ],
-  },
-  {
-    slug: "fundador",
-    name: "Fundador Vitalício",
-    eyebrow: "Uma compra, acesso contínuo ao produto",
-    priceCents: 89700,
-    billingLabel: "pagamento único",
-    stripePriceEnv: "STRIPE_PRICE_FUNDADOR",
-    mode: "payment",
-    features: [
-      "Tudo do plano Foco",
-      "Acesso vitalício ao acervo contratado",
-      "Novos módulos essenciais incluídos",
-      "Selo e canal de feedback de fundador",
-      "Sem renovação automática",
     ],
   },
 ] as const;

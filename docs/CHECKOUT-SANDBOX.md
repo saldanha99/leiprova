@@ -17,7 +17,7 @@ O que este roteiro cobre é o que só aparece com a Stripe de verdade no circuit
    `SUPPLIER_SUPPORT_CHANNEL`, `SUPPLIER_DPO_CONTACT`. Sem isso
    `getCheckoutAvailability` devolve `supplier_identity` e o checkout **não abre**,
    por decisão de código.
-2. Criar uma configuração de **teste** na Stripe, com os três Prices, e uma
+2. Criar uma configuração de **teste** na Stripe, com os dois Prices recorrentes, e uma
    restricted key nova. Nunca reaproveitar chave que já circulou em conversa.
 3. `CHECKOUT_ENABLED=true` e `REGISTRATION_ENABLED=true` apenas no ambiente local.
 4. Encaminhar os eventos para a aplicação:
@@ -52,12 +52,11 @@ tabela `stripe_events`.
    restrito às cinco questões livres.
 3. **3DS exigido.** O acesso só é liberado após a autenticação, não antes.
 4. **Falha após autenticação.** Mesmo resultado do caso 2.
-5. **Pagamento único (Fundador).** Acesso concedido sem renovação futura.
-6. **Renovação.** Avance o relógio com `stripe billing` ou dispare
+5. **Renovação.** Avance o relógio com `stripe billing` ou dispare
    `invoice.paid`; a janela de vigência deve estender, não duplicar.
-7. **Atraso.** `past_due` **não** pode liberar acesso.
-8. **Cancelamento.** Acesso permanece até o fim do ciclo pago e cessa depois.
-9. **Reembolso dentro de 7 dias.** Confirme que o acesso é revogado e que o
+6. **Atraso.** `past_due` **não** pode liberar acesso.
+7. **Cancelamento.** Acesso permanece até o fim do ciclo pago e cessa depois.
+8. **Reembolso dentro de 7 dias.** Confirme que o acesso é revogado e que o
    registro permite provar a data do pedido.
 
 ## Verificações que costumam passar despercebidas
@@ -91,5 +90,5 @@ não passa silenciosamente.
 - Cadastrar o endpoint `https://leiprova.2b.app.br/api/stripe/webhook` e assinar
   os dez eventos listados no README.
 - Restringir a chave ao IP fixo da VPS.
-- Rodar o caso 1 e o caso 9 uma vez em produção, com valor real e cartão próprio,
+- Rodar o caso 1 e o caso 8 uma vez em produção, com valor real e cartão próprio,
   antes de abrir para o público.

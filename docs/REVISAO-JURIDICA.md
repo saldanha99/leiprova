@@ -24,6 +24,7 @@ Documentos em revisão: [`/termos`](../src/app/termos/page.tsx),
 | Prazos de retenção | "serão publicados" | prazos concretos por categoria, incluindo 6 meses de registros de acesso (Marco Civil, art. 15) |
 | Cancelamento | genérico | meio eficaz e confirmação imediata (Decreto 7.962/2013, art. 5º) |
 | Foro | ausente | domicílio do consumidor (CDC, art. 101, I) |
+| Oferta vitalícia | plano Fundador com promessa de acesso contínuo | retirada do catálogo, da interface e do checkout; registro histórico mantido inativo no banco |
 
 A trava mais importante não está no texto e sim no código: `getCheckoutAvailability`
 devolve `supplier_identity` e **impede o checkout de abrir** enquanto a
@@ -36,36 +37,28 @@ Não há como o software resolver estes; são dados e escolhas de negócio.
 1. **Identificação:** razão social, CNPJ, endereço com CEP, e-mail e horário de
    atendimento. Vão no `.env`, não no código — o repositório é público.
 2. **Encarregado de dados:** quem é e qual o contato público.
-3. **Escopo do plano vitalício.** O maior risco contratual do produto. "Acesso
-   vitalício" a um serviço com custo recorrente precisa definir: vitalício de
-   quem, do produto ou do comprador; o que acontece em caso de descontinuação;
-   e se novos módulos entram ou não. Hoje a página promete "acesso vitalício ao
-   acervo contratado" e "novos módulos essenciais incluídos" — a palavra
-   "essenciais" é o ponto a ser definido antes de vender.
-4. **Política de atualizações e SLA de suporte.**
-5. **Preços definitivos**, hoje R$ 49,90/mês, R$ 497/ano e R$ 897 único.
+3. **Política de atualizações e SLA de suporte.**
+4. **Preços definitivos**, hoje R$ 49,90/mês e R$ 497/ano.
 
 ## Para análise profissional
 
-1. **Redação do vitalício**, à luz do art. 51 do CDC (cláusulas abusivas) e da
-   possibilidade de descontinuação do serviço.
-2. **Renovação automática** e o dever de informar com destaque, incluindo aviso
+1. **Renovação automática** e o dever de informar com destaque, incluindo aviso
    prévio de cobrança.
-3. **Promessas de resultado.** A seção 8 dos termos afasta garantia de aprovação;
+2. **Promessas de resultado.** A seção 8 dos termos afasta garantia de aprovação;
    confirmar se a comunicação de marketing acompanha o mesmo cuidado.
-4. **Conteúdo de terceiros.** O schema distingue `dry_law`, `previous_exam` e
+3. **Conteúdo de terceiros.** O schema distingue `dry_law`, `previous_exam` e
    `original_style`. A modalidade `previous_exam` exige licença, titular e
    validade registrados. Confirmar o desenho antes de publicar qualquer item
    nessa modalidade — reprodução de caderno de banca sem licença é o risco
    autoral mais concreto do produto.
-5. **Base legal do legítimo interesse** para métricas de qualidade de conteúdo,
+4. **Base legal do legítimo interesse** para métricas de qualidade de conteúdo,
    e se cabe LIA documentada.
-6. **Cookies.** Hoje só há cookie essencial de sessão, o que dispensa banner de
+5. **Cookies.** Hoje só há cookie essencial de sessão, o que dispensa banner de
    consentimento. Se entrar analytics, a análise muda.
-7. **Uso de IA na elaboração de questões.** A procedência está declarada em
+6. **Uso de IA na elaboração de questões.** A procedência está declarada em
    `DEMO_CONTENT_PROVENANCE` com `humanReviewRecorded: false`. Avaliar se e como
    isso deve aparecer para o consumidor.
-8. **Stripe Connect.** Se houver repasse a professores, o desenho contratual da
+7. **Stripe Connect.** Se houver repasse a professores, o desenho contratual da
    participação precede a habilitação técnica. Ver seção correspondente no README.
 
 ## Verificação de conteúdo já disponível
