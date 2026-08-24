@@ -1,5 +1,12 @@
 import type { QuizBankSlug } from "@/lib/quiz/catalog";
 
+import { EXPANSION_ORIGINAL_QUESTIONS } from "@/lib/editorial/expansion-questions";
+
+export {
+  ORIGINAL_STYLE_PILOT_PROMPT_VERSION_V3,
+  ORIGINAL_STYLE_PILOT_PROMPT_VERSION_V4,
+} from "@/lib/editorial/expansion-questions";
+
 export const ORIGINAL_STYLE_PILOT_PROMPT_VERSION_V1 = "constitutional-original-pilot-v1";
 export const ORIGINAL_STYLE_PILOT_PROMPT_VERSION_V2 = "constitutional-original-pilot-v2";
 export const ORIGINAL_STYLE_PILOT_GENERATOR = "OpenAI Codex";
@@ -29,7 +36,7 @@ export type PilotOriginalQuestion = {
  * já revisados na biblioteca. O seed registra estes itens como rascunhos de IA:
  * nenhum deles é publicado ou atribuído a uma pessoa antes da assunção editorial.
  */
-export const PILOT_ORIGINAL_QUESTIONS = [
+const PILOT_ORIGINAL_QUESTIONS_BASE = [
   {
     publicId: "fed46abe-967f-46c8-8a3f-3e7ce4bbbd09",
     promptVersion: ORIGINAL_STYLE_PILOT_PROMPT_VERSION_V1,
@@ -966,4 +973,9 @@ export const PILOT_ORIGINAL_QUESTIONS = [
       },
     ],
   },
+] as const satisfies readonly PilotOriginalQuestion[];
+
+export const PILOT_ORIGINAL_QUESTIONS = [
+  ...PILOT_ORIGINAL_QUESTIONS_BASE,
+  ...EXPANSION_ORIGINAL_QUESTIONS,
 ] as const satisfies readonly PilotOriginalQuestion[];
