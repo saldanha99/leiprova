@@ -30,33 +30,48 @@ grant select on
 to :app_user;
 
 grant insert (
+  id,
   public_id,
   legal_article_id,
   subject_id,
   topic_id,
   quiz_mode,
   style_bank_id,
+  exam_edition_id,
   type,
   prompt,
   explanation,
   learning_objective,
   topic,
   difficulty,
+  mutation_kind,
   exam_board_style,
   editorial_status,
   source_rights,
   source_title,
   source_url,
+  source_rights_holder,
+  license_basis,
+  license_reference,
+  licensed_at,
+  license_expires_at,
+  original_question_number,
+  original_question_order,
+  original_booklet,
   authorship_method,
   generator_model,
   prompt_version,
   created_by_user_id,
+  reviewed_by_user_id,
   clean_room_attested_at,
   submitted_at,
+  review_notes,
   similarity_max_bps,
   similarity_reference_public_id,
   originality_checked_at,
-  verified_at
+  verified_at,
+  created_at,
+  updated_at
 ) on questions to :app_user;
 
 grant update (
@@ -68,15 +83,18 @@ grant update (
 ) on questions to :app_user;
 
 grant insert (
+  id,
   question_id,
   option_key,
   text,
   is_correct,
+  mutation_kind,
   rationale,
   sort_order
 ) on question_options to :app_user;
 
 grant insert (
+  id,
   public_id,
   legal_act_id,
   source_url,
@@ -87,8 +105,12 @@ grant insert (
   http_status,
   status,
   initiated_by_user_id,
+  reviewed_by_user_id,
+  review_notes,
   fetched_at,
-  last_seen_at
+  last_seen_at,
+  reviewed_at,
+  created_at
 ) on legal_source_snapshots to :app_user;
 
 grant update (
@@ -110,13 +132,18 @@ grant update (
 ) on exam_source_portals to :app_user;
 
 grant insert (
+  id,
   public_id,
   career_track_id,
+  specialization_id,
   bank_id,
   title,
+  organizer,
   jurisdiction,
   official_url,
   exam_date,
+  duration_minutes,
+  published_at,
   status,
   source_policy,
   source_content_stored,
@@ -124,7 +151,9 @@ grant insert (
   source_http_status,
   source_checked_at,
   created_by_user_id,
-  updated_by_user_id
+  updated_by_user_id,
+  created_at,
+  updated_at
 ) on exam_editions to :app_user;
 
 grant select, insert, update on

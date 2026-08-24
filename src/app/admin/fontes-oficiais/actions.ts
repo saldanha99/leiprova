@@ -26,6 +26,13 @@ function errorState(message: string): SourceActionState {
   return { status: "error", message };
 }
 
+function safeLogDetail(error: unknown) {
+  const cause = error instanceof Error && "cause" in error ? error.cause : error;
+  if (!cause || typeof cause !== "object") return "falha sem código";
+  const record = cause as { code?: unknown; name?: unknown };
+  return `${typeof record.name === "string" ? record.name : "Error"}${typeof record.code === "string" ? ` (${record.code})` : ""}`;
+}
+
 const slugSchema = z.string().trim().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
 
 export async function syncLegalSourceAction(
@@ -79,7 +86,7 @@ export async function syncLegalSourceAction(
       message: saved.status === "pending_review" ? "Nova fotografia registrada para revisão independente." : "Fonte conferida; o conteúdo oficial permanece igual à fotografia já registrada.",
     };
   } catch (error) {
-    console.error("Falha ao sincronizar fonte jurídica.", error);
+    console.error("Falha ao sincronizar fonte jurídica.", safeLogDetail(error));
     return errorState(error instanceof Error ? error.message : "Não foi possível consultar a fonte oficial.");
   }
 }

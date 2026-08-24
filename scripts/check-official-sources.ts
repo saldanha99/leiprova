@@ -21,6 +21,19 @@ const client = postgres(databaseUrl, { max: 1, prepare: false });
 const db = drizzle(client);
 const pause = () => new Promise((resolve) => setTimeout(resolve, 400));
 
+function safeError(error: unknown) {
+  const cause = error instanceof Error && "cause" in error ? error.cause : error;
+  if (cause && typeof cause === "object") {
+    const record = cause as { code?: unknown; message?: unknown; name?: unknown };
+    return JSON.stringify({
+      name: typeof record.name === "string" ? record.name : "Error",
+      code: typeof record.code === "string" ? record.code : undefined,
+      message: typeof record.message === "string" ? record.message.slice(0, 300) : "Falha sem detalhe seguro.",
+    });
+  }
+  return "Falha sem detalhe seguro.";
+}
+
 async function checkLaws() {
   const acts = await db
     .select({ id: legalActs.id, slug: legalActs.slug, officialUrl: legalActs.officialUrl })
@@ -59,7 +72,7 @@ async function checkLaws() {
       checked += 1;
     } catch (error) {
       failed += 1;
-      console.error(`[lei:${act.slug}]`, error instanceof Error ? error.message : error);
+      console.error(`[lei:${act.slug}]`, safeError(error));
     }
     await pause();
   }
