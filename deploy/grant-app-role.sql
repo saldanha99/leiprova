@@ -88,6 +88,10 @@ to :app_user;
 grant select, insert on quiz_session_questions to :app_user;
 grant select, insert, update on quiz_session_answers to :app_user;
 
+grant select, insert, delete on saved_study_filters to :app_user;
+grant select, insert, update, delete on question_notebooks to :app_user;
+grant select, insert, delete on question_notebook_items to :app_user;
+
 grant delete on rate_limit_counters to :app_user;
 
 grant delete on auth_sessions to :app_user;
@@ -99,5 +103,7 @@ grant usage on
   question_reports_id_seq,
   audit_logs_id_seq,
   contact_messages_id_seq,
-  stripe_connect_partners_id_seq
+  stripe_connect_partners_id_seq,
+  saved_study_filters_id_seq,
+  question_notebooks_id_seq
 to :app_user;
