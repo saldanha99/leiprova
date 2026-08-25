@@ -22,6 +22,9 @@ export function buildAccountAccessEmail({
   const firstName = name.trim().split(/\s+/)[0] || "estudante";
   const safeName = escapeHtml(firstName);
   const safeUrl = escapeHtml(accessUrl);
+  const safeLogoUrl = escapeHtml(
+    new URL("/brand/leiprova-email.png", accessUrl).toString(),
+  );
   const intro = purchase
     ? "Seu pagamento foi confirmado e o acesso ao LeiProva já está liberado."
     : "Recebemos um pedido para criar ou atualizar a senha da sua conta LeiProva.";
@@ -46,7 +49,17 @@ export function buildAccountAccessEmail({
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#050b12;padding:32px 16px">
       <tr><td align="center">
         <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:560px;border:1px solid #1c2b3d;border-radius:22px;background:#0a1420;overflow:hidden">
-          <tr><td style="padding:30px 32px 12px;color:#fbbf24;font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase">LeiProva</td></tr>
+          <tr><td style="padding:28px 32px 12px">
+            <table role="presentation" cellspacing="0" cellpadding="0">
+              <tr>
+                <td style="padding-right:13px"><img src="${safeLogoUrl}" width="48" height="48" alt="LeiProva" style="display:block;width:48px;height:48px;border:0;border-radius:12px" /></td>
+                <td>
+                  <strong style="display:block;color:#fbbf24;font-size:13px;letter-spacing:.12em;text-transform:uppercase">LeiProva</strong>
+                  <span style="display:block;margin-top:4px;color:#7f8ea3;font-size:12px">Literalidade que permanece</span>
+                </td>
+              </tr>
+            </table>
+          </td></tr>
           <tr><td style="padding:8px 32px 30px">
             <h1 style="margin:0 0 14px;color:#ffffff;font-size:28px;line-height:1.2">Olá, ${safeName}!</h1>
             <p style="margin:0;color:#a9b6c8;font-size:16px;line-height:1.65">${escapeHtml(intro)}</p>

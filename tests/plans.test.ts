@@ -21,7 +21,13 @@ describe("plans", () => {
     expect(getPlan("fundador")).toBeNull();
   });
 
+  it("publica apenas os preços comerciais aprovados", () => {
+    expect(getPlan("ritmo")?.priceCents).toBe(29700);
+    expect(getPlan("foco")?.priceCents).toBe(89700);
+    expect(getPlan("foco")?.equivalentMonthly).toBe("equivale a R$ 74,75/mês");
+  });
+
   it("formata valores em reais", () => {
-    expect(formatBRL(49700)).toContain("497,00");
+    expect(formatBRL(89700)).toContain("897,00");
   });
 });

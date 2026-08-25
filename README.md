@@ -98,8 +98,8 @@ são recalculados no servidor antes de cada lote.
 
 | Plano | Cobrança | Preço configurado na interface |
 |---|---:|---:|
-| Ritmo Mensal | recorrente | R$ 49,90/mês |
-| Foco Anual | recorrente | R$ 497,00/ano |
+| Ritmo Mensal | recorrente | R$ 297,00/mês |
+| Foco Anual | recorrente | R$ 897,00/ano |
 
 Os valores são decisões comerciais iniciais. Confirme-os antes de criar os Prices na Stripe e habilitar pagamentos.
 

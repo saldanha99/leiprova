@@ -38,7 +38,7 @@ Não há como o software resolver estes; são dados e escolhas de negócio.
    atendimento. Vão no `.env`, não no código — o repositório é público.
 2. **Encarregado de dados:** quem é e qual o contato público.
 3. **Política de atualizações e SLA de suporte.**
-4. **Preços definitivos**, hoje R$ 49,90/mês e R$ 497/ano.
+4. **Preços definitivos**, hoje R$ 297,00/mês e R$ 897,00/ano.
 
 ## Para análise profissional
 

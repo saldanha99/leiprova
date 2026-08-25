@@ -19,7 +19,7 @@ export const PLANS: readonly PlanDefinition[] = [
     slug: "ritmo",
     name: "Ritmo Mensal",
     eyebrow: "Comece sem compromisso longo",
-    priceCents: 4990,
+    priceCents: 29700,
     billingLabel: "/mês",
     stripePriceEnv: "STRIPE_PRICE_RITMO",
     features: [
@@ -33,9 +33,9 @@ export const PLANS: readonly PlanDefinition[] = [
     slug: "foco",
     name: "Foco Anual",
     eyebrow: "O melhor equilíbrio para o ciclo de estudos",
-    priceCents: 49700,
+    priceCents: 89700,
     billingLabel: "/ano",
-    equivalentMonthly: "equivale a R$ 41,42/mês",
+    equivalentMonthly: "equivale a R$ 74,75/mês",
     stripePriceEnv: "STRIPE_PRICE_FOCO",
     featured: true,
     features: [
