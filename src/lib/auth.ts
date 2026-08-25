@@ -60,13 +60,13 @@ export async function createStudentUser(input: {
   // public signup needs, so it can never choose an elevated role.
   const rows = await getDb().execute<{ id: number }>(sql`
     insert into ${users} (
-      ${users.publicId},
-      ${users.name},
-      ${users.email},
-      ${users.passwordHash},
-      ${users.termsAcceptedAt},
-      ${users.termsVersion},
-      ${users.privacyVersion}
+      public_id,
+      name,
+      email,
+      password_hash,
+      terms_accepted_at,
+      terms_version,
+      privacy_version
     ) values (
       ${input.publicId},
       ${input.name},
@@ -76,7 +76,7 @@ export async function createStudentUser(input: {
       ${input.termsVersion},
       ${input.privacyVersion}
     )
-    returning ${users.id} as id
+    returning id
   `);
 
   const created = rows[0];
