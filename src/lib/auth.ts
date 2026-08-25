@@ -72,7 +72,7 @@ export async function createStudentUser(input: {
       ${input.name},
       ${input.email},
       ${input.passwordHash},
-      ${input.termsAcceptedAt},
+      ${input.termsAcceptedAt.toISOString()},
       ${input.termsVersion},
       ${input.privacyVersion}
     )
