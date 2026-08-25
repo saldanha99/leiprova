@@ -1,4 +1,4 @@
-import { getSupplierIdentity } from "@/lib/legal";
+import { getDataProtectionContact, getSupplierIdentity } from "@/lib/legal";
 
 /**
  * Bloco de identificação do fornecedor exigido pelo Decreto 7.962/2013,
@@ -43,9 +43,9 @@ export function SupplierIdentityBlock() {
 
 /** Contato do encarregado pelo tratamento de dados (LGPD, art. 41). */
 export function DataProtectionContact() {
-  const supplier = getSupplierIdentity();
+  const contact = getDataProtectionContact();
 
-  if (!supplier) {
+  if (!contact) {
     return (
       <p>
         O contato do encarregado pelo tratamento de dados será publicado nesta página junto com a
@@ -56,8 +56,11 @@ export function DataProtectionContact() {
 
   return (
     <p>
-      Encarregado pelo tratamento de dados pessoais: {supplier.dataProtectionContact}. Os pedidos
-      são respondidos nos prazos da Lei 13.709/2018.
+      Encarregado pelo tratamento de dados pessoais:{" "}
+      <a className="font-semibold text-amber-300 hover:text-amber-200" href={`mailto:${contact}`}>
+        {contact}
+      </a>
+      . Os pedidos são respondidos nos prazos da Lei 13.709/2018.
     </p>
   );
 }

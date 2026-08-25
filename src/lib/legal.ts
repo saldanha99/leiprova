@@ -34,6 +34,10 @@ function readEnv(name: string) {
   return value || null;
 }
 
+export function getDataProtectionContact() {
+  return readEnv("SUPPLIER_DPO_CONTACT");
+}
+
 /**
  * Devolve a identificação apenas quando **todos** os campos obrigatórios estão
  * preenchidos. Uma identificação parcial é pior que nenhuma: ela aparenta

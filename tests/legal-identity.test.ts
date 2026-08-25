@@ -1,6 +1,11 @@
 import { afterEach, describe, expect, it } from "vitest";
 
-import { getSupplierIdentity, isSupplierIdentityComplete, missingSupplierFields } from "@/lib/legal";
+import {
+  getDataProtectionContact,
+  getSupplierIdentity,
+  isSupplierIdentityComplete,
+  missingSupplierFields,
+} from "@/lib/legal";
 
 const CAMPOS = [
   "SUPPLIER_LEGAL_NAME",
@@ -73,6 +78,14 @@ describe("identificação do fornecedor", () => {
       taxId: "00.000.000/0001-00",
       tradeName: null,
     });
+  });
+
+  it("publica o contato LGPD mesmo com a identificação comercial ainda incompleta", () => {
+    limpar();
+    process.env.SUPPLIER_DPO_CONTACT = "lgpd@exemplo.test";
+
+    expect(getDataProtectionContact()).toBe("lgpd@exemplo.test");
+    expect(getSupplierIdentity()).toBeNull();
   });
 });
 

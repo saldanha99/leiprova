@@ -3,7 +3,7 @@
 Documento de contexto para quem for continuar o projeto — pessoa ou assistente de IA.
 Descreve onde as coisas estão, como publicar e quais armadilhas já custaram tempo.
 
-Última verificação completa: 2026-08-23.
+Última verificação completa: 2026-08-25.
 
 ## Onde o projeto vive
 
@@ -95,6 +95,7 @@ Tudo que é comercial fecha por padrão. Estado em produção na última verific
 |---|---|---|
 | `REGISTRATION_ENABLED` | `false` | `/cadastro` exibe "Cadastros abrem em breve", sem formulário. |
 | `CONTACT_ENABLED` | `false` | Formulário de contato fecha. |
+| `PRIVACY_REQUESTS_ENABLED` | `false` por padrão | Abre somente o formulário de direitos LGPD em `/privacidade`; não abre cadastro, contato comercial ou checkout. |
 | `CHECKOUT_ENABLED` | `false` | Sem chaves Stripe preenchidas. |
 | `SUPPLIER_*` | vazias | Seis variáveis de identificação do fornecedor. Enquanto faltar qualquer uma, o checkout não abre — trava aplicada em `getCheckoutAvailability`, não em documentação. |
 | `STRIPE_CONNECT_ENABLED` | `true` | **Diverge do README**, que pede `false`. |
@@ -109,6 +110,26 @@ valor pode se mover. Ainda assim, decida se o README muda ou se a flag volta.
 
 **Antes de ligar o checkout:** as chaves Stripe que circularam em conversa devem
 ser tratadas como comprometidas e rotacionadas. Nunca versione segredo.
+
+## Canal de privacidade
+
+O formulário de `/privacidade` é independente dos canais comerciais. Quando
+`PRIVACY_REQUESTS_ENABLED=true`, a solicitação é registrada em
+`contact_messages`, recebe protocolo no formato `LP-LGPD-AAAAMMDD-XXXXXXXX` e
+usa um modelo publicado no Resend para confirmar o recebimento.
+
+Variáveis mantidas somente no `.env` da VPS:
+
+```dotenv
+PRIVACY_REQUESTS_ENABLED=true
+SUPPLIER_DPO_CONTACT=lgpd@dominio.example
+RESEND_LGPD_TEMPLATE_ID=identificador-do-modelo-publicado
+LGPD_EMAIL_FROM=LeiProva Privacidade <lgpd@dominio.example>
+```
+
+O envio depende também de `TRANSACTIONAL_EMAIL_ENABLED`, `RESEND_API_KEY` e do
+domínio autenticado. O formulário aplica honeypot, validação no servidor,
+limites separados por IP/e-mail e não registra o IP em texto puro.
 
 ## Backups
 

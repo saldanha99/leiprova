@@ -12,6 +12,10 @@ export function isContactEnabled() {
   return enabled("CONTACT_ENABLED");
 }
 
+export function isPrivacyRequestsEnabled() {
+  return enabled("PRIVACY_REQUESTS_ENABLED");
+}
+
 export function isCommerceOpen() {
   return (
     isRegistrationEnabled() &&

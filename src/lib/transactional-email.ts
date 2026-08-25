@@ -8,13 +8,27 @@ type TransactionalEmailConfig = {
   from: string;
 };
 
-export type TransactionalEmailMessage = {
+type TransactionalHtmlEmailMessage = {
   to: string;
   subject: string;
   html: string;
   text: string;
   idempotencyKey: string;
 };
+
+type TransactionalTemplateEmailMessage = {
+  to: string;
+  from?: string;
+  template: {
+    id: string;
+    variables: Record<string, string | number>;
+  };
+  idempotencyKey: string;
+};
+
+export type TransactionalEmailMessage =
+  | TransactionalHtmlEmailMessage
+  | TransactionalTemplateEmailMessage;
 
 type ResendEmailResponse = {
   id?: string;
@@ -81,13 +95,21 @@ export async function sendTransactionalEmail(
           "Idempotency-Key": message.idempotencyKey,
           "User-Agent": "leiprova/0.1.0",
         },
-        body: JSON.stringify({
-          to: message.to,
-          from: config.from,
-          subject: message.subject,
-          html: message.html,
-          text: message.text,
-        }),
+        body: JSON.stringify(
+          "template" in message
+            ? {
+                to: message.to,
+                from: message.from ?? config.from,
+                template: message.template,
+              }
+            : {
+                to: message.to,
+                from: config.from,
+                subject: message.subject,
+                html: message.html,
+                text: message.text,
+              },
+        ),
         signal: AbortSignal.timeout(8_000),
       });
     } catch {

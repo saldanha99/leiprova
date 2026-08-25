@@ -21,6 +21,8 @@ export const RATE_LIMIT_POLICIES = {
   accessActivateIp: { scope: "auth_access_activate_ip", limit: 20, windowSeconds: 15 * 60 },
   contactIp: { scope: "contact_ip", limit: 5, windowSeconds: 60 * 60 },
   contactEmail: { scope: "contact_email", limit: 3, windowSeconds: 60 * 60 },
+  privacyRequestIp: { scope: "privacy_request_ip", limit: 5, windowSeconds: 60 * 60 },
+  privacyRequestEmail: { scope: "privacy_request_email", limit: 3, windowSeconds: 60 * 60 },
   quizSessionUserMinute: { scope: "quiz_session_user_minute", limit: 15, windowSeconds: 60 },
   quizSessionIpMinute: { scope: "quiz_session_ip_minute", limit: 30, windowSeconds: 60 },
   studyAttemptUserMinute: { scope: "study_attempt_user_minute", limit: 60, windowSeconds: 60 },
