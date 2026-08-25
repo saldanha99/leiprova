@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 
-import { PLANS, RETIRED_PLAN_SLUGS, formatBRL, getPlan } from "@/lib/plans";
+import {
+  PLANS,
+  RETIRED_PLAN_SLUGS,
+  formatBRL,
+  getMonthlyEquivalentCents,
+  getPlan,
+} from "@/lib/plans";
 
 describe("plans", () => {
   it("usa slugs e variáveis Stripe únicas", () => {
@@ -24,7 +30,17 @@ describe("plans", () => {
   it("publica apenas os preços comerciais aprovados", () => {
     expect(getPlan("ritmo")?.priceCents).toBe(29700);
     expect(getPlan("foco")?.priceCents).toBe(89700);
-    expect(getPlan("foco")?.equivalentMonthly).toBe("equivale a R$ 74,75/mês");
+  });
+
+  it("calcula a equivalência mensal do ciclo anual sem alterar a cobrança total", () => {
+    const monthly = getPlan("ritmo");
+    const annual = getPlan("foco");
+
+    expect(monthly?.billingMonths).toBe(1);
+    expect(annual?.billingMonths).toBe(12);
+    expect(monthly && getMonthlyEquivalentCents(monthly)).toBe(29700);
+    expect(annual && getMonthlyEquivalentCents(annual)).toBe(7475);
+    expect(annual?.priceCents).toBe(89700);
   });
 
   it("formata valores em reais", () => {

@@ -5,7 +5,7 @@ import { CheckoutClient } from "@/components/checkout/checkout-client";
 import { CheckoutUnavailable } from "@/components/checkout/checkout-unavailable";
 import { LeiProvaMark } from "@/components/ui/leiprova-mark";
 import { requireUser } from "@/lib/auth";
-import { formatBRL, getPlan } from "@/lib/plans";
+import { formatBRL, getMonthlyEquivalentCents, getPlan } from "@/lib/plans";
 import { getCheckoutAvailability } from "@/lib/stripe";
 
 export default async function CheckoutPage({
@@ -22,6 +22,8 @@ export default async function CheckoutPage({
 
   const user = await requireUser(`/checkout/${plan.slug}`);
   const price = formatBRL(plan.priceCents);
+  const isAnnual = plan.slug === "foco";
+  const monthlyEquivalent = formatBRL(getMonthlyEquivalentCents(plan));
   const buttonLabel = `Assinar por ${price}`;
 
   return (
@@ -58,10 +60,27 @@ export default async function CheckoutPage({
                 </span>
               </div>
 
-              <div className="mt-6 flex items-end gap-2 border-b border-white/8 pb-6">
-                <strong className="text-3xl tracking-[-.045em]">{price}</strong>
-                <span className="pb-1 text-sm text-slate-500">{plan.billingLabel}</span>
-              </div>
+              {isAnnual ? (
+                <div className="mt-6 border-b border-white/8 pb-6">
+                  <p className="text-xs font-bold uppercase tracking-[.13em] text-slate-500">
+                    Equivalente a
+                  </p>
+                  <div className="mt-2 flex flex-wrap items-end gap-x-2 gap-y-1">
+                    <span className="pb-1 text-sm font-semibold text-amber-200">12x de</span>
+                    <strong className="text-3xl tracking-[-.045em] text-amber-200">
+                      {monthlyEquivalent}
+                    </strong>
+                  </div>
+                  <p className="mt-2 text-xs leading-5 text-slate-500">
+                    {price} cobrados a cada 12 meses.
+                  </p>
+                </div>
+              ) : (
+                <div className="mt-6 flex items-end gap-2 border-b border-white/8 pb-6">
+                  <strong className="text-3xl tracking-[-.045em]">{price}</strong>
+                  <span className="pb-1 text-sm text-slate-500">{plan.billingLabel}</span>
+                </div>
+              )}
 
               <ul className="mt-6 space-y-3">
                 {plan.features.map((feature) => (

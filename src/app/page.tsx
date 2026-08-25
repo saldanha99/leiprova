@@ -30,11 +30,11 @@ import {
 import { BrandMark } from "@/components/brand/BrandMark";
 import { LandingHeader } from "@/components/landing/LandingHeader";
 import { LiteralLab } from "@/components/landing/LiteralLab";
+import { PricingPlans } from "@/components/landing/PricingPlans";
 import { ProductShowcase } from "@/components/landing/ProductShowcase";
 import { SectionHeading } from "@/components/landing/SectionHeading";
 import { JsonLd } from "@/components/seo/json-ld";
 import { isCommerceOpen } from "@/lib/launch";
-import { formatBRL, PLANS } from "@/lib/plans";
 import {
   ORGANIZATION_ID,
   SOCIAL_IMAGE,
@@ -562,69 +562,19 @@ export default function Home() {
           <div className="pricing-glow" aria-hidden="true" />
           <div className="site-container">
             <SectionHeading
-              eyebrow="Escolha o seu ritmo"
+              eyebrow="Plano recomendado"
               title={
                 <span id="pricing-title">
-                  Um plano para começar. <em>Um método para continuar.</em>
+                  Doze meses de método. <em>Um valor que cabe no mês.</em>
                 </span>
               }
               description={commerceOpen
-                ? "Todos os planos colocam o laboratório de literalidade no centro. A diferença está no horizonte, nas ferramentas e na profundidade do roteiro."
-                : "Prévia dos planos planejados para o lançamento. O checkout ainda não está aberto e nenhuma cobrança pode ser feita agora."}
+                ? "Comece pelo anual para ter o ciclo completo de estudo por um valor equivalente a R$ 74,75 por mês. Se preferir, o plano mensal continua disponível."
+                : "Conheça primeiro o plano anual, equivalente a R$ 74,75 por mês. Esta é uma prévia: o checkout ainda não está aberto e nenhuma cobrança pode ser feita agora."}
               align="center"
             />
 
-            <div className="pricing-grid">
-              {PLANS.map((plan) => (
-                <article
-                  className={`pricing-card${plan.featured ? " pricing-card--featured" : ""}`}
-                  key={plan.slug}
-                >
-                  {plan.featured && (
-                    <span className="pricing-card__badge">
-                      <Sparkles aria-hidden="true" size={14} />
-                      Melhor equilíbrio
-                    </span>
-                  )}
-                  <div className="pricing-card__heading">
-                    <span>{plan.eyebrow}</span>
-                    <h3>{plan.name}</h3>
-                  </div>
-                  <div className="pricing-card__price">
-                    <strong>{formatBRL(plan.priceCents)}</strong>
-                    <span>{plan.billingLabel}</span>
-                  </div>
-                  <p className="pricing-card__equivalent">
-                    {plan.equivalentMonthly ?? "cobrança recorrente conforme o ciclo"}
-                  </p>
-
-                  <ul>
-                    {plan.features.map((feature) => (
-                      <li key={feature}>
-                        <span>
-                          <Check aria-hidden="true" size={15} />
-                        </span>
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
-
-                  <Link
-                    className={`button button--full ${
-                      plan.featured ? "button--amber" : "button--outline"
-                    }`}
-                    href={commerceOpen ? `/cadastro?plano=${plan.slug}` : "/demo"}
-                  >
-                    {commerceOpen
-                      ? plan.slug === "ritmo"
-                        ? "Começar no Ritmo"
-                        : "Escolher o Foco"
-                      : "Testar a demonstração"}
-                    <ArrowCta />
-                  </Link>
-                </article>
-              ))}
-            </div>
+            <PricingPlans commerceOpen={commerceOpen} />
 
             <div className="pricing-note">
               <LockKeyhole aria-hidden="true" size={17} />

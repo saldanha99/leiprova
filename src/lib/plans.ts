@@ -8,7 +8,7 @@ export type PlanDefinition = {
   eyebrow: string;
   priceCents: number;
   billingLabel: string;
-  equivalentMonthly?: string;
+  billingMonths: 1 | 12;
   stripePriceEnv: string;
   featured?: boolean;
   features: string[];
@@ -21,6 +21,7 @@ export const PLANS: readonly PlanDefinition[] = [
     eyebrow: "Comece sem compromisso longo",
     priceCents: 29700,
     billingLabel: "/mês",
+    billingMonths: 1,
     stripePriceEnv: "STRIPE_PRICE_RITMO",
     features: [
       "Treinos ilimitados de literalidade",
@@ -35,7 +36,7 @@ export const PLANS: readonly PlanDefinition[] = [
     eyebrow: "O melhor equilíbrio para o ciclo de estudos",
     priceCents: 89700,
     billingLabel: "/ano",
-    equivalentMonthly: "equivale a R$ 74,75/mês",
+    billingMonths: 12,
     stripePriceEnv: "STRIPE_PRICE_FOCO",
     featured: true,
     features: [
@@ -50,6 +51,10 @@ export const PLANS: readonly PlanDefinition[] = [
 
 export function getPlan(slug: string | null | undefined) {
   return PLANS.find((plan) => plan.slug === slug) ?? null;
+}
+
+export function getMonthlyEquivalentCents(plan: PlanDefinition) {
+  return Math.round(plan.priceCents / plan.billingMonths);
 }
 
 export function formatBRL(cents: number) {
