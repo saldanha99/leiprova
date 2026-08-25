@@ -1,7 +1,7 @@
 import "server-only";
 
 import { hash, verify } from "@node-rs/argon2";
-import { and, eq, gt } from "drizzle-orm";
+import { and, eq, gt, sql } from "drizzle-orm";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createHash, createHmac, randomBytes } from "node:crypto";
@@ -45,6 +45,43 @@ export async function verifyPassword(passwordHash: string, password: string) {
   } catch {
     return false;
   }
+}
+
+export async function createStudentUser(input: {
+  publicId: string;
+  name: string;
+  email: string;
+  passwordHash: string;
+  termsAcceptedAt: Date;
+  termsVersion: string;
+  privacyVersion: string;
+}) {
+  // Keep this explicit: the production role can insert only the fields a
+  // public signup needs, so it can never choose an elevated role.
+  const rows = await getDb().execute<{ id: number }>(sql`
+    insert into ${users} (
+      ${users.publicId},
+      ${users.name},
+      ${users.email},
+      ${users.passwordHash},
+      ${users.termsAcceptedAt},
+      ${users.termsVersion},
+      ${users.privacyVersion}
+    ) values (
+      ${input.publicId},
+      ${input.name},
+      ${input.email},
+      ${input.passwordHash},
+      ${input.termsAcceptedAt},
+      ${input.termsVersion},
+      ${input.privacyVersion}
+    )
+    returning ${users.id} as id
+  `);
+
+  const created = rows[0];
+  if (!created) throw new Error("Falha ao criar a conta.");
+  return { id: Number(created.id) };
 }
 
 export async function createUserSession(userId: number) {

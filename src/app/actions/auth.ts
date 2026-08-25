@@ -7,6 +7,7 @@ import { randomBytes, randomUUID } from "node:crypto";
 import { z } from "zod";
 
 import {
+  createStudentUser,
   createUserSession,
   destroyCurrentSession,
   hashPassword,
@@ -102,18 +103,15 @@ export async function registerAction(
   }
 
   try {
-    const [created] = await db
-      .insert(users)
-      .values({
-        publicId: randomUUID(),
-        name: parsed.data.name,
-        email: parsed.data.email,
-        passwordHash: await hashPassword(parsed.data.password),
-        termsAcceptedAt: new Date(),
-        termsVersion: TERMS_VERSION,
-        privacyVersion: PRIVACY_VERSION,
-      })
-      .returning({ id: users.id });
+    const created = await createStudentUser({
+      publicId: randomUUID(),
+      name: parsed.data.name,
+      email: parsed.data.email,
+      passwordHash: await hashPassword(parsed.data.password),
+      termsAcceptedAt: new Date(),
+      termsVersion: TERMS_VERSION,
+      privacyVersion: PRIVACY_VERSION,
+    });
 
     await createUserSession(created.id);
   } catch (error) {
@@ -202,18 +200,15 @@ export async function beginPurchaseAction(
 
   try {
     const provisionalPassword = randomBytes(32).toString("base64url");
-    const [created] = await db
-      .insert(users)
-      .values({
-        publicId: randomUUID(),
-        name: parsed.data.name,
-        email: parsed.data.email,
-        passwordHash: await hashPassword(provisionalPassword),
-        termsAcceptedAt: new Date(),
-        termsVersion: TERMS_VERSION,
-        privacyVersion: PRIVACY_VERSION,
-      })
-      .returning({ id: users.id });
+    const created = await createStudentUser({
+      publicId: randomUUID(),
+      name: parsed.data.name,
+      email: parsed.data.email,
+      passwordHash: await hashPassword(provisionalPassword),
+      termsAcceptedAt: new Date(),
+      termsVersion: TERMS_VERSION,
+      privacyVersion: PRIVACY_VERSION,
+    });
 
     await createUserSession(created.id);
   } catch (error) {
