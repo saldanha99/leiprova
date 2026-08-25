@@ -18,6 +18,9 @@ const contentSecurityPolicy = [
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  images: {
+    qualities: [75, 90],
+  },
   outputFileTracingIncludes: {
     "/*": ["node_modules/@swc/helpers/**/*"],
   },

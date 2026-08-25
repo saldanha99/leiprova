@@ -264,8 +264,9 @@ export default function Home() {
                 alt="LeiProva em notebook, celular e tablet com questões, texto legal e painel de desempenho"
                 width={1586}
                 height={992}
-                priority
-                sizes="(max-width: 900px) 100vw, 58vw"
+                preload
+                quality={90}
+                sizes="(max-width: 460px) 135vw, (max-width: 720px) 123vw, (max-width: 980px) 112vw, (max-width: 1120px) 65vw, 58vw"
               />
               <span className="hero-visual__caption">Interface ilustrativa</span>
               <div className="hero-float-card hero-float-card--top">
