@@ -151,7 +151,7 @@ export async function POST(request: NextRequest) {
     const expiresAt = Math.floor(Date.now() / 1000) + 60 * 60;
 
     const params: Stripe.Checkout.SessionCreateParams = {
-      ui_mode: "custom",
+      ui_mode: "elements",
       mode: "subscription",
       customer: customerId,
       client_reference_id: user.publicId,
