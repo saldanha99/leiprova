@@ -231,6 +231,7 @@ export async function consumeAccountAccessToken({
   if (!accountAccessTokenSchema.safeParse(rawToken).success) return null;
 
   const now = new Date();
+  const nowIso = now.toISOString();
   return getDb().transaction(async (transaction) => {
     const [claimed] = await transaction
       .update(accountAccessTokens)
@@ -250,7 +251,7 @@ export async function consumeAccountAccessToken({
       .update(users)
       .set({
         passwordHash,
-        emailVerifiedAt: sql`coalesce(${users.emailVerifiedAt}, ${now})`,
+        emailVerifiedAt: sql`coalesce(${users.emailVerifiedAt}, ${nowIso}::timestamptz)`,
         updatedAt: now,
       })
       .where(eq(users.id, claimed.userId))
