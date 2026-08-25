@@ -67,6 +67,12 @@ function mapFieldErrors(error: z.ZodError) {
   return fields;
 }
 
+function describeServerError(error: unknown) {
+  if (!(error instanceof Error)) return { code: "", name: "UnknownError", message: "Non-error thrown" };
+  const code = "code" in error ? String(error.code) : "";
+  return { code, name: error.name, message: error.message.slice(0, 300) };
+}
+
 export async function registerAction(
   _previousState: AuthActionState,
   formData: FormData,
@@ -115,9 +121,9 @@ export async function registerAction(
 
     await createUserSession(created.id);
   } catch (error) {
-    const code = typeof error === "object" && error && "code" in error ? String(error.code) : "";
+    const { code, ...details } = describeServerError(error);
     if (code === "23505") return { fieldErrors: { email: "Já existe uma conta com este e-mail." } };
-    console.error("register_failed", { code });
+    console.error("register_failed", { code, ...details });
     return { error: "Não foi possível criar sua conta agora. Tente novamente." };
   }
 
@@ -212,11 +218,11 @@ export async function beginPurchaseAction(
 
     await createUserSession(created.id);
   } catch (error) {
-    const code = typeof error === "object" && error && "code" in error ? String(error.code) : "";
+    const { code, ...details } = describeServerError(error);
     if (code === "23505") {
       return { fieldErrors: { email: "Já existe uma conta com este e-mail. Entre para continuar a compra." } };
     }
-    console.error("purchase_identity_failed", { code });
+    console.error("purchase_identity_failed", { code, ...details });
     return { error: "Não foi possível preparar sua compra agora. Tente novamente." };
   }
 
