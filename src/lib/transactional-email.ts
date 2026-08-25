@@ -1,10 +1,9 @@
 import "server-only";
 
-const CLOUDFLARE_EMAIL_ENDPOINT = "https://api.cloudflare.com/client/v4/accounts";
-const RETRYABLE_STATUSES = new Set([429, 500, 503]);
+const RESEND_EMAIL_ENDPOINT = "https://api.resend.com/emails";
+const RETRYABLE_STATUSES = new Set([500, 502, 503, 504]);
 
 type TransactionalEmailConfig = {
-  accountId: string;
   apiToken: string;
   from: string;
 };
@@ -14,17 +13,13 @@ export type TransactionalEmailMessage = {
   subject: string;
   html: string;
   text: string;
+  idempotencyKey: string;
 };
 
-type CloudflareEmailResponse = {
-  success?: boolean;
-  result?: {
-    delivered?: string[];
-    queued?: string[];
-    permanent_bounces?: string[];
-    message_id?: string;
-  } | null;
-  errors?: Array<{ code?: number; message?: string }>;
+type ResendEmailResponse = {
+  id?: string;
+  name?: string;
+  message?: string;
 };
 
 export class TransactionalEmailError extends Error {
@@ -44,17 +39,21 @@ function readEnv(name: string) {
 export function getTransactionalEmailConfig(): TransactionalEmailConfig | null {
   if (readEnv("TRANSACTIONAL_EMAIL_ENABLED")?.toLowerCase() !== "true") return null;
 
-  const accountId = readEnv("CLOUDFLARE_ACCOUNT_ID");
-  const apiToken = readEnv("CLOUDFLARE_EMAIL_API_TOKEN");
+  const apiToken = readEnv("RESEND_API_KEY");
   const from = readEnv("TRANSACTIONAL_EMAIL_FROM");
 
-  if (!accountId || !apiToken || !from) return null;
-  return { accountId, apiToken, from };
+  if (!apiToken || !from) return null;
+  return { apiToken, from };
 }
 
-function apiErrorCode(payload: CloudflareEmailResponse | null) {
-  const code = payload?.errors?.[0]?.code;
-  return code ? `cloudflare_${code}` : "cloudflare_request_failed";
+function apiErrorCode(payload: ResendEmailResponse | null) {
+  const name = payload?.name?.trim().toLowerCase().replace(/[^a-z0-9_-]+/g, "_");
+  return name ? `resend_${name}` : "resend_request_failed";
+}
+
+function shouldRetry(status: number, payload: ResendEmailResponse | null) {
+  if (RETRYABLE_STATUSES.has(status)) return true;
+  return status === 429 && payload?.name === "rate_limit_exceeded";
 }
 
 export async function sendTransactionalEmail(
@@ -68,18 +67,19 @@ export async function sendTransactionalEmail(
     );
   }
 
-  const endpoint = `${CLOUDFLARE_EMAIL_ENDPOINT}/${encodeURIComponent(config.accountId)}/email/sending/send`;
   let lastStatus = 0;
-  let lastPayload: CloudflareEmailResponse | null = null;
+  let lastPayload: ResendEmailResponse | null = null;
 
   for (let attempt = 0; attempt < 2; attempt += 1) {
     let response: Response;
     try {
-      response = await fetch(endpoint, {
+      response = await fetch(RESEND_EMAIL_ENDPOINT, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${config.apiToken}`,
           "Content-Type": "application/json",
+          "Idempotency-Key": message.idempotencyKey,
+          "User-Agent": "leiprova/0.1.0",
         },
         body: JSON.stringify({
           to: message.to,
@@ -98,21 +98,21 @@ export async function sendTransactionalEmail(
     }
 
     lastStatus = response.status;
-    lastPayload = (await response.json().catch(() => null)) as CloudflareEmailResponse | null;
+    lastPayload = (await response.json().catch(() => null)) as ResendEmailResponse | null;
 
-    const delivered = lastPayload?.result?.delivered ?? [];
-    const queued = lastPayload?.result?.queued ?? [];
-    const bounced = lastPayload?.result?.permanent_bounces ?? [];
-
-    if (response.ok && lastPayload?.success && !bounced.length && (delivered.length || queued.length)) {
+    if (response.ok && lastPayload?.id) {
       return {
-        messageId: lastPayload.result?.message_id ?? null,
-        status: delivered.length ? "delivered" : "queued",
+        messageId: lastPayload.id,
+        status: "queued",
       };
     }
 
-    if (!RETRYABLE_STATUSES.has(response.status) || attempt === 1) break;
-    await new Promise((resolve) => setTimeout(resolve, 250));
+    if (!shouldRetry(response.status, lastPayload) || attempt === 1) break;
+    const retryAfterSeconds = Number(response.headers.get("retry-after"));
+    const delayMs = Number.isFinite(retryAfterSeconds)
+      ? Math.min(Math.max(retryAfterSeconds * 1_000, 250), 1_000)
+      : 250;
+    await new Promise((resolve) => setTimeout(resolve, delayMs));
   }
 
   throw new TransactionalEmailError(

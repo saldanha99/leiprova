@@ -15,8 +15,7 @@ import {
 
 const ENV_KEYS = [
   "TRANSACTIONAL_EMAIL_ENABLED",
-  "CLOUDFLARE_ACCOUNT_ID",
-  "CLOUDFLARE_EMAIL_API_TOKEN",
+  "RESEND_API_KEY",
   "TRANSACTIONAL_EMAIL_FROM",
 ] as const;
 
@@ -54,7 +53,7 @@ describe("account access email", () => {
   });
 });
 
-describe("Cloudflare transactional email", () => {
+describe("Resend transactional email", () => {
   beforeEach(() => {
     for (const key of ENV_KEYS) delete process.env[key];
   });
@@ -65,25 +64,20 @@ describe("Cloudflare transactional email", () => {
   });
 
   it("permanece fechado sem flag e segredos completos", () => {
-    process.env.CLOUDFLARE_ACCOUNT_ID = "account";
-    process.env.CLOUDFLARE_EMAIL_API_TOKEN = "secret";
+    process.env.RESEND_API_KEY = "secret";
     process.env.TRANSACTIONAL_EMAIL_FROM = "acesso@example.com";
     expect(getTransactionalEmailConfig()).toBeNull();
   });
 
   it("envia HTML e texto pela API REST sem expor o token no endereço", async () => {
     process.env.TRANSACTIONAL_EMAIL_ENABLED = "true";
-    process.env.CLOUDFLARE_ACCOUNT_ID = "account-123";
-    process.env.CLOUDFLARE_EMAIL_API_TOKEN = "secret-token";
+    process.env.RESEND_API_KEY = "secret-token";
     process.env.TRANSACTIONAL_EMAIL_FROM = "acesso@example.com";
     const fetchMock = vi.fn().mockResolvedValue(
-      new Response(
-        JSON.stringify({
-          success: true,
-          result: { delivered: ["student@example.com"], queued: [], permanent_bounces: [], message_id: "msg-1" },
-        }),
-        { status: 200, headers: { "Content-Type": "application/json" } },
-      ),
+      new Response(JSON.stringify({ id: "msg-1" }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }),
     );
     vi.stubGlobal("fetch", fetchMock);
 
@@ -92,13 +86,18 @@ describe("Cloudflare transactional email", () => {
       subject: "Acesso",
       html: "<p>Olá</p>",
       text: "Olá",
+      idempotencyKey: "account-access/test-token",
     });
 
-    expect(result).toEqual({ messageId: "msg-1", status: "delivered" });
+    expect(result).toEqual({ messageId: "msg-1", status: "queued" });
     expect(fetchMock).toHaveBeenCalledOnce();
     const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
-    expect(url).toBe("https://api.cloudflare.com/client/v4/accounts/account-123/email/sending/send");
-    expect(init.headers).toMatchObject({ Authorization: "Bearer secret-token" });
+    expect(url).toBe("https://api.resend.com/emails");
+    expect(init.headers).toMatchObject({
+      Authorization: "Bearer secret-token",
+      "Idempotency-Key": "account-access/test-token",
+      "User-Agent": "leiprova/0.1.0",
+    });
     expect(JSON.parse(String(init.body))).toMatchObject({
       to: "student@example.com",
       from: "acesso@example.com",
@@ -109,12 +108,11 @@ describe("Cloudflare transactional email", () => {
 
   it("não repete uma falha permanente do provedor", async () => {
     process.env.TRANSACTIONAL_EMAIL_ENABLED = "true";
-    process.env.CLOUDFLARE_ACCOUNT_ID = "account-123";
-    process.env.CLOUDFLARE_EMAIL_API_TOKEN = "secret-token";
+    process.env.RESEND_API_KEY = "secret-token";
     process.env.TRANSACTIONAL_EMAIL_FROM = "acesso@example.com";
     const fetchMock = vi.fn().mockResolvedValue(
       new Response(
-        JSON.stringify({ success: false, errors: [{ code: 10001, message: "invalid" }] }),
+        JSON.stringify({ name: "validation_error", message: "invalid" }),
         { status: 400, headers: { "Content-Type": "application/json" } },
       ),
     );
@@ -125,11 +123,75 @@ describe("Cloudflare transactional email", () => {
       subject: "Acesso",
       html: "<p>Olá</p>",
       text: "Olá",
+      idempotencyKey: "account-access/test-token",
     });
 
     const error = await request.catch((caught: unknown) => caught);
     expect(error).toBeInstanceOf(TransactionalEmailError);
-    expect((error as TransactionalEmailError).code).toBe("cloudflare_10001");
+    expect((error as TransactionalEmailError).code).toBe("resend_validation_error");
     expect(fetchMock).toHaveBeenCalledOnce();
+  });
+
+  it("não repete quando a cota gratuita foi esgotada", async () => {
+    process.env.TRANSACTIONAL_EMAIL_ENABLED = "true";
+    process.env.RESEND_API_KEY = "secret-token";
+    process.env.TRANSACTIONAL_EMAIL_FROM = "acesso@example.com";
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify({ name: "daily_quota_exceeded", message: "quota exceeded" }),
+        { status: 429, headers: { "Content-Type": "application/json" } },
+      ),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    const error = await sendTransactionalEmail({
+      to: "student@example.com",
+      subject: "Acesso",
+      html: "<p>Olá</p>",
+      text: "Olá",
+      idempotencyKey: "account-access/test-token",
+    }).catch((caught: unknown) => caught);
+
+    expect(error).toBeInstanceOf(TransactionalEmailError);
+    expect((error as TransactionalEmailError).code).toBe("resend_daily_quota_exceeded");
+    expect(fetchMock).toHaveBeenCalledOnce();
+  });
+
+  it("repete uma limitação temporária com a mesma chave idempotente", async () => {
+    process.env.TRANSACTIONAL_EMAIL_ENABLED = "true";
+    process.env.RESEND_API_KEY = "secret-token";
+    process.env.TRANSACTIONAL_EMAIL_FROM = "acesso@example.com";
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({ name: "rate_limit_exceeded", message: "try again" }),
+          {
+            status: 429,
+            headers: { "Content-Type": "application/json", "retry-after": "0" },
+          },
+        ),
+      )
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ id: "msg-after-retry" }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        }),
+      );
+    vi.stubGlobal("fetch", fetchMock);
+
+    const result = await sendTransactionalEmail({
+      to: "student@example.com",
+      subject: "Acesso",
+      html: "<p>Olá</p>",
+      text: "Olá",
+      idempotencyKey: "account-access/test-token",
+    });
+
+    expect(result).toEqual({ messageId: "msg-after-retry", status: "queued" });
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    for (const [, init] of fetchMock.mock.calls as Array<[string, RequestInit]>) {
+      expect(init.headers).toMatchObject({ "Idempotency-Key": "account-access/test-token" });
+    }
   });
 });

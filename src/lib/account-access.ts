@@ -77,6 +77,7 @@ async function deliverToken({
       subject: email.subject,
       html: email.html,
       text: email.text,
+      idempotencyKey: `account-access/${tokenId}`,
     });
     const now = new Date();
 
@@ -98,7 +99,7 @@ async function deliverToken({
         metadata: {
           purpose,
           checkoutAttemptId,
-          provider: "cloudflare_email_service",
+          provider: "resend",
           providerStatus: delivered.status,
         },
       });
@@ -117,7 +118,7 @@ async function deliverToken({
         action: "account_access.email_failed",
         entityType: "user",
         entityId: user.publicId,
-        metadata: { purpose, checkoutAttemptId, provider: "cloudflare_email_service", code },
+        metadata: { purpose, checkoutAttemptId, provider: "resend", code },
       });
     });
     console.error("account_access_email_failed", { userId, purpose, code });

@@ -21,22 +21,23 @@ A tela `/recuperar-acesso` usa a mesma infraestrutura. Ela nunca revela se o e-m
 - Uma indisponibilidade do provedor de e-mail não desfaz nem bloqueia a compra confirmada.
 - Status de envio e falhas sem segredo são registrados em `account_access_tokens` e `audit_logs`.
 
-## Configuração do Cloudflare Email Service
+## Configuração do Resend
 
-O aplicativo na VPS usa a API REST do Cloudflare Email Service. Antes de ligar o envio:
+O aplicativo na VPS usa a API REST do Resend. Antes de ligar o envio:
 
-1. Cadastre o domínio em **Compute > Email Service > Email Sending**.
+1. Cadastre `2b.app.br` no Resend. A configuração usa `send.2b.app.br` como Return-Path, sem substituir os MX da Locaweb no domínio principal.
 2. Aguarde a validação dos registros SPF, DKIM e DMARC.
-3. Crie um API Token com permissão mínima de envio de e-mail.
+3. Crie uma API key com permissão somente de envio e restrita ao domínio cadastrado.
 4. Preencha somente em `/opt/leiprova/.env`:
 
 ```dotenv
 TRANSACTIONAL_EMAIL_ENABLED=true
-CLOUDFLARE_ACCOUNT_ID=...
-CLOUDFLARE_EMAIL_API_TOKEN=...
-TRANSACTIONAL_EMAIL_FROM=acesso@seu-dominio.com
+RESEND_API_KEY=re_...
+TRANSACTIONAL_EMAIL_FROM=LeiProva <acesso@2b.app.br>
 ```
 
 5. Teste primeiro com uma compra Stripe em modo de teste e confirme recebimento, spam, expiração e reuso do link.
+
+O plano gratuito do Resend é suficiente para a validação inicial, mas tem cotas diária e mensal. Monitore o uso e a taxa de rejeição antes de abrir o checkout.
 
 Não ligue `CHECKOUT_ENABLED`, `REGISTRATION_ENABLED` ou `TRANSACTIONAL_EMAIL_ENABLED` até concluir identificação do fornecedor, rotação das chaves e validação do sandbox.

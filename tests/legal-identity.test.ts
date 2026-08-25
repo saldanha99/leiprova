@@ -19,8 +19,7 @@ const AMBIENTE_CHECKOUT = [
   "STRIPE_WEBHOOK_SECRET",
   "STRIPE_PRICE_RITMO",
   "TRANSACTIONAL_EMAIL_ENABLED",
-  "CLOUDFLARE_ACCOUNT_ID",
-  "CLOUDFLARE_EMAIL_API_TOKEN",
+  "RESEND_API_KEY",
   "TRANSACTIONAL_EMAIL_FROM",
 ] as const;
 
@@ -95,8 +94,7 @@ describe("trava do checkout", () => {
     process.env.STRIPE_WEBHOOK_SECRET = "whsec_exemplo";
     process.env.STRIPE_PRICE_RITMO = "price_exemplo";
     process.env.TRANSACTIONAL_EMAIL_ENABLED = "true";
-    process.env.CLOUDFLARE_ACCOUNT_ID = "account_exemplo";
-    process.env.CLOUDFLARE_EMAIL_API_TOKEN = "token_exemplo";
+    process.env.RESEND_API_KEY = "token_exemplo";
     process.env.TRANSACTIONAL_EMAIL_FROM = "acesso@exemplo.test";
   }
 
