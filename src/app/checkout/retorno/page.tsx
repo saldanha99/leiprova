@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { AlertTriangle } from "lucide-react";
+import { connection } from "next/server";
 
 import { CheckoutUnavailable } from "@/components/checkout/checkout-unavailable";
 import { ReturnStatus } from "@/components/checkout/return-status";
@@ -14,6 +15,7 @@ export default async function CheckoutReturnPage({
 }: {
   searchParams: Promise<{ session_id?: string | string[] }>;
 }) {
+  await connection();
   if (!getStripePortalConfiguration()) return <CheckoutUnavailable />;
 
   const query = await searchParams;

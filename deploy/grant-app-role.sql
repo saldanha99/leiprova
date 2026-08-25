@@ -183,10 +183,14 @@ grant insert (
   privacy_version
 ) on users to :app_user;
 grant update (
+  password_hash,
+  email_verified_at,
   stripe_customer_id,
   last_seen_at,
   updated_at
 ) on users to :app_user;
+
+grant select, insert, update on account_access_tokens to :app_user;
 
 grant insert (
   public_id,

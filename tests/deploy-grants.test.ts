@@ -33,4 +33,12 @@ describe("privilégios do app em produção", () => {
     expect(grants).toContain("legal_source_snapshots_id_seq");
     expect(grants).toContain("exam_editions_id_seq");
   });
+
+  it("permite emitir e consumir o convite de acesso sem elevar o papel do comprador", () => {
+    expect(grants).toMatch(/grant select, insert, update on account_access_tokens to :app_user;/);
+    expect(grants).toMatch(
+      /grant update \(\s*password_hash,\s*email_verified_at,\s*stripe_customer_id,\s*last_seen_at,\s*updated_at\s*\) on users to :app_user;/,
+    );
+    expect(grants).not.toMatch(/grant (?:select, insert, update, delete|all).*users to :app_user;/);
+  });
 });
