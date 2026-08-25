@@ -131,6 +131,11 @@ O envio depende também de `TRANSACTIONAL_EMAIL_ENABLED`, `RESEND_API_KEY` e do
 domínio autenticado. O formulário aplica honeypot, validação no servidor,
 limites separados por IP/e-mail e não registra o IP em texto puro.
 
+O atendimento comercial pode usar o próprio formulário de `/contato` como
+endereço eletrônico do fornecedor, sem depender de caixa postal externa. Nesse
+caso, configure `SUPPLIER_EMAIL` com a URL HTTPS do formulário e mantenha
+`CONTACT_ENABLED=true`; as mensagens ficam registradas em `contact_messages`.
+
 ## Backups
 
 `deploy/backup.sh` roda diariamente às 03:17 UTC, grava em

@@ -33,8 +33,24 @@ export function SupplierIdentityBlock() {
       <dd className="text-slate-200">{supplier.taxId}</dd>
       <dt className="text-slate-500">Endereço</dt>
       <dd className="text-slate-200">{supplier.address}</dd>
-      <dt className="text-slate-500">E-mail</dt>
-      <dd className="text-slate-200">{supplier.email}</dd>
+      <dt className="text-slate-500">Endereço eletrônico</dt>
+      <dd className="text-slate-200">
+        {supplier.email.startsWith("https://") || supplier.email.startsWith("http://") ? (
+          <a
+            className="font-semibold text-amber-300 transition hover:text-amber-200"
+            href={supplier.email}
+          >
+            Acessar canal digital
+          </a>
+        ) : (
+          <a
+            className="font-semibold text-amber-300 transition hover:text-amber-200"
+            href={`mailto:${supplier.email}`}
+          >
+            {supplier.email}
+          </a>
+        )}
+      </dd>
       <dt className="text-slate-500">Atendimento</dt>
       <dd className="text-slate-200">{supplier.supportChannel}</dd>
     </dl>

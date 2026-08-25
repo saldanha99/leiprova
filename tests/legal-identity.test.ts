@@ -87,6 +87,13 @@ describe("identificação do fornecedor", () => {
     expect(getDataProtectionContact()).toBe("lgpd@exemplo.test");
     expect(getSupplierIdentity()).toBeNull();
   });
+
+  it("aceita o formulário HTTPS como endereço eletrônico do fornecedor", () => {
+    preencherTudo();
+    process.env.SUPPLIER_EMAIL = "https://leiprova.example/contato";
+
+    expect(getSupplierIdentity()?.email).toBe("https://leiprova.example/contato");
+  });
 });
 
 describe("trava do checkout", () => {

@@ -21,7 +21,7 @@ export type SupplierIdentity = {
   taxId: string;
   /** Endereço físico completo, com CEP. */
   address: string;
-  /** Endereço eletrônico de atendimento. */
+  /** Endereço eletrônico de atendimento: e-mail ou URL de canal digital. */
   email: string;
   /** Canal e horário de atendimento ao consumidor. */
   supportChannel: string;
