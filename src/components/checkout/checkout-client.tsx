@@ -151,10 +151,8 @@ function PaymentForm({ buttonLabel }: { buttonLabel: string }) {
     setError(null);
 
     try {
-      const sessionId = result.checkout.id;
       const confirmation = await result.checkout.confirm({
         redirect: "if_required",
-        returnUrl: `${window.location.origin}/checkout/retorno?session_id=${encodeURIComponent(sessionId)}`,
       });
 
       if (confirmation.type === "error") {
