@@ -2508,6 +2508,10 @@ summary:focus-visible {
   transform: none;
 }
 
+.pricing-grid--single .pricing-card {
+  padding-top: 50px;
+}
+
 .pricing-card {
   position: relative;
   display: flex;
@@ -3659,6 +3663,10 @@ summary:focus-visible {
 
   .pricing-grid--single {
     margin-top: 28px;
+  }
+
+  .pricing-grid--single .pricing-card {
+    padding-top: 48px;
   }
 
   .guarantee-section {

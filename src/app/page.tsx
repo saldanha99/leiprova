@@ -35,6 +35,7 @@ import { ProductShowcase } from "@/components/landing/ProductShowcase";
 import { SectionHeading } from "@/components/landing/SectionHeading";
 import { JsonLd } from "@/components/seo/json-ld";
 import { isCommerceOpen } from "@/lib/launch";
+import { getAnnualDiscountPercentage } from "@/lib/plans";
 import {
   ORGANIZATION_ID,
   SOCIAL_IMAGE,
@@ -192,6 +193,7 @@ function ArrowCta() {
 
 export default function Home() {
   const commerceOpen = isCommerceOpen();
+  const annualDiscountPercentage = getAnnualDiscountPercentage();
   const primaryHref = commerceOpen ? "/cadastro?plano=foco" : "/demo";
 
   return (
@@ -562,7 +564,7 @@ export default function Home() {
           <div className="pricing-glow" aria-hidden="true" />
           <div className="site-container">
             <SectionHeading
-              eyebrow="Plano recomendado"
+              eyebrow={`${annualDiscountPercentage}% de desconto no anual`}
               title={
                 <span id="pricing-title">
                   Doze meses de método. <em>Um valor que cabe no mês.</em>

@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Check, Sparkles } from "lucide-react";
+import { ArrowRight, BadgePercent, Check } from "lucide-react";
 import { useState } from "react";
 
 import {
   PLANS,
   formatBRL,
+  getAnnualDiscountPercentage,
   getMonthlyEquivalentCents,
   getPlan,
   type PlanSlug,
@@ -24,6 +25,7 @@ export function PricingPlans({ commerceOpen }: PricingPlansProps) {
 
   const isAnnual = activePlan.slug === "foco";
   const monthlyEquivalent = formatBRL(getMonthlyEquivalentCents(activePlan));
+  const annualDiscountPercentage = getAnnualDiscountPercentage();
 
   return (
     <>
@@ -52,8 +54,8 @@ export function PricingPlans({ commerceOpen }: PricingPlansProps) {
         >
           {activePlan.featured && (
             <span className="pricing-card__badge">
-              <Sparkles aria-hidden="true" size={14} />
-              Plano recomendado
+              <BadgePercent aria-hidden="true" size={14} />
+              {annualDiscountPercentage}% de desconto
             </span>
           )}
 

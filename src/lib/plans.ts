@@ -57,6 +57,28 @@ export function getMonthlyEquivalentCents(plan: PlanDefinition) {
   return Math.round(plan.priceCents / plan.billingMonths);
 }
 
+export function getPlanDiscountPercentage(
+  plan: PlanDefinition,
+  comparisonPlan: PlanDefinition,
+) {
+  const planMonthlyEquivalent = getMonthlyEquivalentCents(plan);
+  const comparisonMonthlyEquivalent = getMonthlyEquivalentCents(comparisonPlan);
+
+  return Math.max(
+    0,
+    Math.round((1 - planMonthlyEquivalent / comparisonMonthlyEquivalent) * 100),
+  );
+}
+
+export function getAnnualDiscountPercentage() {
+  const annualPlan = getPlan("foco");
+  const monthlyPlan = getPlan("ritmo");
+
+  if (!annualPlan || !monthlyPlan) return 0;
+
+  return getPlanDiscountPercentage(annualPlan, monthlyPlan);
+}
+
 export function formatBRL(cents: number) {
   return new Intl.NumberFormat("pt-BR", {
     style: "currency",

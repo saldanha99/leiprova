@@ -4,6 +4,7 @@ import {
   PLANS,
   RETIRED_PLAN_SLUGS,
   formatBRL,
+  getAnnualDiscountPercentage,
   getMonthlyEquivalentCents,
   getPlan,
 } from "@/lib/plans";
@@ -41,6 +42,10 @@ describe("plans", () => {
     expect(monthly && getMonthlyEquivalentCents(monthly)).toBe(29700);
     expect(annual && getMonthlyEquivalentCents(annual)).toBe(7475);
     expect(annual?.priceCents).toBe(89700);
+  });
+
+  it("calcula o desconto anual a partir dos preços aprovados", () => {
+    expect(getAnnualDiscountPercentage()).toBe(75);
   });
 
   it("formata valores em reais", () => {
