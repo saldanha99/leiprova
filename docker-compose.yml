@@ -176,7 +176,7 @@ services:
         test -n "$${OPPORTUNITY_APPROVAL_REFERENCE}"
         pnpm opportunities:approve -- --approve
     environment:
-      MIGRATION_DATABASE_URL: postgresql://${POSTGRES_OWNER_USER:-leiprova_owner}:${POSTGRES_OWNER_PASSWORD}@db:5432/${POSTGRES_DB:-leiprova}
+      MIGRATION_DATABASE_URL: postgresql://${POSTGRES_OWNER_USER:-leiprova_owner}:${POSTGRES_OWNER_PASSWORD}@leiprova-db:5432/${POSTGRES_DB:-leiprova}
       ADMIN_EMAILS: ${ADMIN_EMAILS:-}
       OPPORTUNITY_APPROVE: ${OPPORTUNITY_APPROVE:-false}
       OPPORTUNITY_APPROVAL_REFERENCE: ${OPPORTUNITY_APPROVAL_REFERENCE:-}

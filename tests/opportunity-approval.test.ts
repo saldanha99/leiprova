@@ -222,6 +222,7 @@ describe("guardas estáticas do comando de aprovação", () => {
       /opportunity-approver:[\s\S]*?networks:[\s\S]*?- internal[\s\S]*?- edge/,
     );
     const service = compose.split("  opportunity-approver:")[1]?.split("\n  legal-monitor:")[0];
+    expect(service).toContain("@leiprova-db:5432/");
     expect(service).not.toContain("ports:");
     expect(service).not.toContain("labels:");
     expect(service).not.toContain("OPPORTUNITY_REVIEWER_USER_ID");
