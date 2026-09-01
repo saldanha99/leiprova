@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "LeiProva",
-    short_name: "LeiProva",
+    name: "Editalume",
+    short_name: "Editalume",
     description: "Treino de literalidade da lei para concursos públicos.",
     start_url: "/app",
     display: "standalone",
@@ -11,7 +11,8 @@ export default function manifest(): MetadataRoute.Manifest {
     theme_color: "#060b13",
     lang: "pt-BR",
     icons: [
-      { src: "/icon.svg", sizes: "any", type: "image/svg+xml", purpose: "any" },
+      { src: "/brand/editalume-icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
+      { src: "/brand/editalume-icon-512.png", sizes: "512x512", type: "image/png", purpose: "any" },
     ],
   };
 }

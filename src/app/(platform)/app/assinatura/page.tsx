@@ -22,7 +22,7 @@ export default async function SubscriptionPage() {
             <Link href="/#planos" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-amber-400 px-5 text-sm font-bold text-slate-950">Conhecer os planos</Link>
           )}
         </div>
-        <div className="mt-8 flex items-start gap-3 rounded-xl border border-emerald-300/10 bg-emerald-300/5 p-4 text-xs leading-5 text-slate-400"><ShieldCheck className="mt-0.5 size-4 shrink-0 text-emerald-300" /><p>A LeiProva não armazena dados completos do cartão. O formulário e o portal de cobrança são fornecidos pela Stripe.</p></div>
+        <div className="mt-8 flex items-start gap-3 rounded-xl border border-emerald-300/10 bg-emerald-300/5 p-4 text-xs leading-5 text-slate-400"><ShieldCheck className="mt-0.5 size-4 shrink-0 text-emerald-300" /><p>A Editalume não armazena dados completos do cartão. O formulário e o portal de cobrança são fornecidos pela Stripe.</p></div>
       </section>
     </main>
   );

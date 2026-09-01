@@ -1,4 +1,4 @@
-export const SITE_NAME = "LeiProva";
+export const SITE_NAME = "Editalume";
 export const SITE_URL = (
   process.env.NEXT_PUBLIC_APP_URL ?? "https://leiprova.2b.app.br"
 ).replace(/\/$/, "");
@@ -10,7 +10,7 @@ export const SOCIAL_IMAGE = {
   url: SOCIAL_IMAGE_PATH,
   width: 1586,
   height: 992,
-  alt: "Interface de estudo da LeiProva em notebook, tablet e celular",
+  alt: "Interface de estudo da Editalume em notebook, tablet e celular",
 } as const;
 
 export function absoluteUrl(path = "/") {
@@ -31,7 +31,9 @@ export const siteIdentityGraph = {
       url: absoluteUrl(),
       logo: {
         "@type": "ImageObject",
-        url: absoluteUrl("/icon.svg"),
+        url: absoluteUrl("/brand/editalume-logo.png"),
+        width: 1774,
+        height: 887,
       },
       description:
         "Plataforma educacional de treino ativo da literalidade de normas para concursos públicos.",

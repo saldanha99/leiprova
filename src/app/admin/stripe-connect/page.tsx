@@ -24,10 +24,10 @@ const readinessMessages = {
   return_url_invalid: "A URL de retorno do onboarding é inválida.",
   refresh_url_missing: "Configure a URL para renovar o onboarding.",
   refresh_url_invalid: "A URL para renovar o onboarding é inválida.",
-  app_url_missing: "Configure a origem pública da LeiProva no servidor.",
-  app_url_invalid: "A origem pública da LeiProva é inválida.",
+  app_url_missing: "Configure a origem pública da Editalume no servidor.",
+  app_url_invalid: "A origem pública da Editalume é inválida.",
   redirect_origin_mismatch: "As URLs de retorno e renovação precisam usar a mesma origem.",
-  callback_origin_mismatch: "As URLs do onboarding precisam pertencer ao domínio público da LeiProva.",
+  callback_origin_mismatch: "As URLs do onboarding precisam pertencer ao domínio público da Editalume.",
   live_redirect_requires_https: "O modo live exige HTTPS nas URLs de onboarding.",
 } as const;
 

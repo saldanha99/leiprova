@@ -4,7 +4,7 @@ import robots from "@/app/robots";
 import sitemap from "@/app/sitemap";
 import { LITERAL_LAB_EXAMPLES } from "@/components/landing/LiteralLab";
 import { DEMO_QUESTIONS } from "@/lib/demo-content";
-import { serializeJsonLd } from "@/lib/seo";
+import { SITE_NAME, serializeJsonLd, siteIdentityGraph } from "@/lib/seo";
 import { createPublicWebPageStructuredData } from "@/lib/seo/page-structured-data";
 
 describe("fundação GEO e SEO", () => {
@@ -60,6 +60,24 @@ describe("fundação GEO e SEO", () => {
   it("serializa JSON-LD sem permitir fechamento de script por conteúdo", () => {
     expect(serializeJsonLd({ value: "</script><script>alert(1)</script>" })).not.toContain("<");
     expect(serializeJsonLd({ value: "</script>" })).toContain("\\u003c/script>");
+  });
+
+  it("publica a identidade e o logotipo vigentes da Editalume", () => {
+    expect(SITE_NAME).toBe("Editalume");
+    expect(siteIdentityGraph["@graph"]).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          "@type": "Organization",
+          name: "Editalume",
+          logo: expect.objectContaining({
+            url: "https://leiprova.2b.app.br/brand/editalume-logo.png",
+            width: 1774,
+            height: 887,
+          }),
+        }),
+        expect.objectContaining({ "@type": "WebSite", name: "Editalume" }),
+      ]),
+    );
   });
 
   it("descreve a página pública e a mesma trilha visível em JSON-LD", () => {

@@ -72,7 +72,7 @@ function OnboardingLink({ result }: { result: OnboardingResponse }) {
         Formulário criado para {result.partner.displayName}
       </p>
       <p className="mt-2 text-xs leading-5 text-slate-400">
-        O link é temporário e deve ser enviado somente ao titular. A LeiProva não recebe os documentos nem os dados bancários.
+        O link é temporário e deve ser enviado somente ao titular. A Editalume não recebe os documentos nem os dados bancários.
       </p>
       <div className="mt-4 flex flex-wrap gap-2">
         <button

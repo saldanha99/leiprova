@@ -98,7 +98,7 @@ export function FlashcardDeck({ cards }: { cards: Flashcard[] }) {
           </Link>
         </div>
       </div>
-      {revealed && <p className="mt-3 text-[11px] text-slate-600">Redação verificada em {new Intl.DateTimeFormat("pt-BR").format(new Date(card.verifiedAt))}. O enunciado de recuperação é original da LeiProva.</p>}
+      {revealed && <p className="mt-3 text-[11px] text-slate-600">Redação verificada em {new Intl.DateTimeFormat("pt-BR").format(new Date(card.verifiedAt))}. O enunciado de recuperação é original da Editalume.</p>}
     </div>
   );
 }

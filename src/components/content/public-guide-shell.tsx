@@ -39,7 +39,7 @@ export function PublicGuideShell({ children }: { children: ReactNode }) {
           <div>
             <p className="flex items-center gap-2 font-semibold text-slate-300">
               <BookOpenCheck aria-hidden="true" className="size-4 text-amber-300" />
-              LeiProva
+              Editalume
             </p>
             <p className="mt-2 max-w-xl leading-6">
               Conteúdo meramente informativo e não oficial. Consulte a publicação vigente no diário oficial e o edital do seu concurso.

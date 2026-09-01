@@ -1,6 +1,6 @@
-# LeiProva
+# Editalume
 
-> A LeiProva é uma plataforma educacional brasileira de treino ativo da literalidade de normas para concursos públicos.
+> A Editalume é uma plataforma educacional brasileira de treino ativo da literalidade de normas para concursos públicos.
 
 ## Páginas canônicas
 

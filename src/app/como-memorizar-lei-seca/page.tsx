@@ -35,20 +35,20 @@ export const metadata: Metadata = {
   openGraph: {
     type: "article",
     url: PAGE_PATH,
-    title: `${PAGE_TITLE} | LeiProva`,
+    title: `${PAGE_TITLE} | Editalume`,
     description: PAGE_DESCRIPTION,
     images: [
       {
         url: "/assets/leiprova-ecosystem.png",
         width: 1586,
         height: 992,
-        alt: "Interface de estudo da LeiProva em notebook, tablet e celular",
+        alt: "Interface de estudo da Editalume em notebook, tablet e celular",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: `${PAGE_TITLE} | LeiProva`,
+    title: `${PAGE_TITLE} | Editalume`,
     description: PAGE_DESCRIPTION,
     images: ["/assets/leiprova-ecosystem.png"],
   },
@@ -58,7 +58,7 @@ const FAQS = [
   {
     question: "Só reler a lei seca é suficiente para memorizar?",
     answer:
-      "A releitura ajuda a reencontrar o texto, mas não comprova que você consegue recuperá-lo sem apoio. Por isso, a LeiProva combina leitura com questões, correção e novas tentativas distribuídas no tempo.",
+      "A releitura ajuda a reencontrar o texto, mas não comprova que você consegue recuperá-lo sem apoio. Por isso, a Editalume combina leitura com questões, correção e novas tentativas distribuídas no tempo.",
   },
   {
     question: "Qual é o melhor intervalo de revisão?",
@@ -163,7 +163,7 @@ export default function MemorizeDryLawPage() {
             <div className="mt-9 grid gap-10 lg:grid-cols-[1.2fr_.8fr] lg:items-center">
               <div>
                 <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-emerald-300">
-                  Método LeiProva
+                  Método Editalume
                 </p>
                 <h1 className="mt-4 max-w-4xl text-4xl font-semibold tracking-[-0.05em] text-white sm:text-6xl">
                   Como memorizar lei seca sem depender só da releitura
@@ -172,7 +172,7 @@ export default function MemorizeDryLawPage() {
                   Leia um trecho curto, tente recuperar a redação sem olhar, corrija a diferença e volte ao artigo em sessões espaçadas. Essa sequência transforma a lei em prática verificável — sem prometer aprovação e sem substituir compreensão, jurisprudência ou edital.
                 </p>
                 <p className="mt-5 text-sm text-slate-500">
-                  Publicado pela LeiProva em 17 de agosto de 2026; fontes científicas conferidas nesta data.
+                  Publicado pela Editalume em 17 de agosto de 2026; fontes científicas conferidas nesta data.
                 </p>
               </div>
 

@@ -7,18 +7,18 @@ import { SOCIAL_IMAGE, SOCIAL_IMAGE_PATH } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Política de Reembolso",
-  description: "Condições previstas para arrependimento, cancelamento e reembolso na LeiProva.",
+  description: "Condições previstas para arrependimento, cancelamento e reembolso na Editalume.",
   alternates: { canonical: "/reembolso" },
   openGraph: {
     url: "/reembolso",
-    title: "Política de Reembolso | LeiProva",
-    description: "Condições previstas para arrependimento, cancelamento e reembolso na LeiProva.",
+    title: "Política de Reembolso | Editalume",
+    description: "Condições previstas para arrependimento, cancelamento e reembolso na Editalume.",
     images: [SOCIAL_IMAGE],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Política de Reembolso | LeiProva",
-    description: "Condições previstas para arrependimento, cancelamento e reembolso na LeiProva.",
+    title: "Política de Reembolso | Editalume",
+    description: "Condições previstas para arrependimento, cancelamento e reembolso na Editalume.",
     images: [SOCIAL_IMAGE_PATH],
   },
 };

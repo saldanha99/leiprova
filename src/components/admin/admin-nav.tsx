@@ -132,7 +132,7 @@ export function MobileAdminHeader({ user }: { user: AuthUser }) {
         <div className="flex min-w-0 items-center gap-3">
           <LeiProvaMark href={homeHref} compact />
           <div className="min-w-0">
-            <p className="truncate text-sm font-semibold text-white">LeiProva</p>
+            <p className="truncate text-sm font-semibold text-white">Editalume</p>
             <p className="text-[10px] font-bold uppercase tracking-[.13em] text-emerald-300">
               {roleLabel}
             </p>

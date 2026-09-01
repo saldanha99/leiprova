@@ -21,14 +21,14 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     url: "/demo",
-    title: "Demonstração gratuita | LeiProva",
+    title: "Demonstração gratuita | Editalume",
     description:
       "Resolva cinco questões originais assistidas por IA de literalidade constitucional, com correção e fonte oficial.",
     images: [SOCIAL_IMAGE],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Demonstração gratuita | LeiProva",
+    title: "Demonstração gratuita | Editalume",
     description:
       "Resolva cinco questões originais assistidas por IA de literalidade constitucional, com correção e fonte oficial.",
     images: [SOCIAL_IMAGE_PATH],
@@ -48,7 +48,7 @@ const structuredData = {
   "@type": "WebPage",
   "@id": `${absoluteUrl("/demo")}#webpage`,
   url: absoluteUrl("/demo"),
-  name: "Demonstração gratuita da LeiProva",
+  name: "Demonstração gratuita da Editalume",
   description:
     "Sessão gratuita com cinco questões originais assistidas por IA de literalidade da Constituição Federal.",
   inLanguage: "pt-BR",

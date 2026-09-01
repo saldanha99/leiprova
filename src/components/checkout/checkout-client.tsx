@@ -211,7 +211,7 @@ function PaymentForm({ buttonLabel }: { buttonLabel: string }) {
 
       <div className="flex items-start gap-2.5 text-xs leading-5 text-slate-500">
         <ShieldCheck className="mt-0.5 size-4 shrink-0 text-emerald-300" aria-hidden="true" />
-        <p>Seus dados de pagamento são enviados diretamente à Stripe e não passam pelos servidores da LeiProva.</p>
+        <p>Seus dados de pagamento são enviados diretamente à Stripe e não passam pelos servidores da Editalume.</p>
       </div>
     </form>
   );

@@ -25,7 +25,7 @@ export default async function RegisterPage({
     return (
       <AuthShell
         title="Cadastros abrem em breve"
-        description="Esta é uma prévia pública do LeiProva. Enquanto concluímos a revisão jurídica e operacional, você pode experimentar o método sem informar dados pessoais."
+        description="Esta é uma prévia pública da Editalume. Enquanto concluímos a revisão jurídica e operacional, você pode experimentar o método sem informar dados pessoais."
       >
         <div className="grid gap-4 text-center">
           <Construction className="mx-auto size-10 text-amber-300" aria-hidden="true" />

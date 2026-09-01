@@ -32,9 +32,9 @@ import {
 } from "@/lib/seo";
 
 const PAGE_PATH = "/fontes-e-atualizacao";
-const PAGE_TITLE = "Fontes, questões e atualização da LeiProva";
+const PAGE_TITLE = "Fontes, questões e atualização da Editalume";
 const PAGE_DESCRIPTION =
-  "Veja de onde vêm as leis e questões da LeiProva, o que existe hoje no acervo e as regras de versionamento, revisão e licenciamento para manter o conteúdo confiável.";
+  "Veja de onde vêm as leis e questões da Editalume, o que existe hoje no acervo e as regras de versionamento, revisão e licenciamento para manter o conteúdo confiável.";
 const PENAL_CODE_OFFICIAL_URL =
   "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848compilado.htm";
 
@@ -45,20 +45,20 @@ export const metadata: Metadata = {
   openGraph: {
     type: "article",
     url: PAGE_PATH,
-    title: `${PAGE_TITLE} | LeiProva`,
+    title: `${PAGE_TITLE} | Editalume`,
     description: PAGE_DESCRIPTION,
     images: [
       {
         url: "/assets/leiprova-ecosystem.png",
         width: 1586,
         height: 992,
-        alt: "Ecossistema de estudo LeiProva",
+        alt: "Ecossistema de estudo Editalume",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: `${PAGE_TITLE} | LeiProva`,
+    title: `${PAGE_TITLE} | Editalume`,
     description: PAGE_DESCRIPTION,
     images: ["/assets/leiprova-ecosystem.png"],
   },
@@ -150,7 +150,7 @@ export default function SourcesAndUpdatesPage() {
                 Transparência editorial
               </p>
               <h1 className="mt-4 text-4xl font-semibold tracking-[-0.05em] text-white sm:text-6xl">
-                De onde vêm as leis e as questões da LeiProva?
+                De onde vêm as leis e as questões da Editalume?
               </h1>
               <p className="mt-6 max-w-4xl text-lg leading-8 text-slate-300">
                 No acervo persistido do quiz, a lei utilizada hoje é a Constituição consolidada no Portal da Legislação da Presidência da República. O monitor acompanha dez fontes federais oficiais e encaminha qualquer nova fotografia à revisão humana. As {DEMO_QUESTIONS.length} questões do beta são originais e assistidas por {DEMO_CONTENT_PROVENANCE.generatorModel}; ainda não existe revisão humana independente registrada. Não há questões anteriores licenciadas nem questões inéditas no estilo de banca publicadas.
@@ -178,7 +178,7 @@ export default function SourcesAndUpdatesPage() {
                   O primeiro recorte é Direito Constitucional: arts. {articleSummary} da Constituição Federal. Cada questão guarda a URL oficial, a data de verificação, a alternativa literal, o tipo de alteração usado nos distratores e a explicação.
                 </p>
                 <p>
-                  A versão atual foi verificada em <strong className="font-semibold text-slate-200">16 de agosto de 2026</strong>. Essa data não significa que a LeiProva substitui o Diário Oficial nem garante que nenhuma mudança tenha ocorrido depois dela; é o marco editorial que permite ao usuário avaliar a atualidade do item.
+                  A versão atual foi verificada em <strong className="font-semibold text-slate-200">16 de agosto de 2026</strong>. Essa data não significa que a Editalume substitui o Diário Oficial nem garante que nenhuma mudança tenha ocorrido depois dela; é o marco editorial que permite ao usuário avaliar a atualidade do item.
                 </p>
                 <p>
                   Separadamente, o laboratório ilustrativo da página inicial contém três microexemplos não persistidos no quiz: Constituição, art. 5º, LIV; Constituição, art. 37, caput; e Código Penal, art. 1º. Esses trechos foram novamente conferidos nas páginas oficiais em 17 de agosto de 2026.
@@ -246,7 +246,7 @@ export default function SourcesAndUpdatesPage() {
                 },
                 {
                   title: "Normas estaduais e locais",
-                  text: "Assembleia Legislativa, governo e diário oficial do ente responsável. A LeiProva não reutiliza automaticamente uma URL federal para outro ente.",
+                  text: "Assembleia Legislativa, governo e diário oficial do ente responsável. A Editalume não reutiliza automaticamente uma URL federal para outro ente.",
                   href: null,
                   label: null,
                 },
@@ -342,7 +342,7 @@ export default function SourcesAndUpdatesPage() {
                 A Lei nº 9.610/1998 exclui textos de leis, decretos, regulamentos, decisões judiciais e demais atos oficiais da proteção autoral prevista nessa lei. A mesma norma reserva ao autor os direitos de utilização, reprodução, adaptação, distribuição e inclusão em base de dados de obras protegidas. Por isso, tratamos texto normativo e caderno de prova como categorias distintas.
               </p>
               <p>
-                O Portal da Legislação também possui política própria de reutilização. A fonte, a URL e a data de acesso devem acompanhar o conteúdo. Os trechos exibidos na LeiProva são meramente informativos e não oficiais e não substituem a publicação no Diário Oficial da União.
+                O Portal da Legislação também possui política própria de reutilização. A fonte, a URL e a data de acesso devem acompanhar o conteúdo. Os trechos exibidos na Editalume são meramente informativos e não oficiais e não substituem a publicação no Diário Oficial da União.
               </p>
               <div className="flex flex-wrap gap-4">
                 <a className="inline-flex items-center gap-2 font-semibold text-amber-300 underline decoration-amber-300/30 underline-offset-4 hover:text-amber-200" href="https://www.planalto.gov.br/ccivil_03/leis/l9610.htm" rel="noreferrer">

@@ -205,7 +205,7 @@ export function ProductShowcase() {
           <aside className="study-app__sidebar" aria-label="Menu ilustrativo da plataforma">
             <span className="study-app__mini-brand">
               <i aria-hidden="true">L</i>
-              LeiProva
+              Editalume
             </span>
             <nav>
               <span className={view === "roteiro" ? "is-active" : undefined}>

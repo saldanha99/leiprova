@@ -42,6 +42,7 @@ export type InternalOpportunityCandidate = Readonly<{
   institutionAcronym: string;
   institutionName: string;
   roleName: string;
+  officialNoticeNumber: string | null;
   lifecycleStatus:
     | "authorized"
     | "pre_notice"
@@ -49,6 +50,7 @@ export type InternalOpportunityCandidate = Readonly<{
     | "registration_open"
     | "registration_closed";
   statusAsOf: IsoDate;
+  noticePublishedAt: IsoDate | null;
   registrationStartsAt: IsoDate | null;
   registrationEndsAt: IsoDate | null;
   examDate: IsoDate | null;
@@ -102,12 +104,15 @@ export const OFFICIAL_OPPORTUNITY_CANDIDATES = Object.freeze([
     institutionAcronym: "ENFAM",
     institutionName: "Escola Nacional de Formação e Aperfeiçoamento de Magistrados",
     roleName: "Habilitação nacional para concursos da magistratura",
+    officialNoticeNumber: "02/2026",
     lifecycleStatus: "registration_open",
     statusAsOf: "2026-08-31",
+    noticePublishedAt: "2026-08-24",
     registrationStartsAt: "2026-08-25",
     registrationEndsAt: "2026-09-24",
     examDate: "2026-11-29",
-    summary: "A página institucional e o portal da executora indicavam inscrições em andamento.",
+    summary:
+      "Inscrições abertas até 24 de setembro de 2026, com prova objetiva prevista para 29 de novembro, segundo ENFAM e FGV.",
     officialUrl:
       "https://www.enfam.jus.br/publicado-o-edital-da-sexta-edicao-do-exame-nacional-da-magistratura/",
     officialSources: [
@@ -158,12 +163,15 @@ export const OFFICIAL_OPPORTUNITY_CANDIDATES = Object.freeze([
     institutionAcronym: "CNJ",
     institutionName: "Conselho Nacional de Justiça",
     roleName: "Habilitação nacional para concursos de cartórios",
+    officialNoticeNumber: "02/2026",
     lifecycleStatus: "registration_open",
     statusAsOf: "2026-08-31",
+    noticePublishedAt: "2026-08-28",
     registrationStartsAt: "2026-08-31",
     registrationEndsAt: "2026-09-29",
-    examDate: null,
-    summary: "A página institucional e o portal da executora indicavam inscrições abertas.",
+    examDate: "2026-11-22",
+    summary:
+      "Inscrições abertas até 29 de setembro de 2026, com prova objetiva prevista para 22 de novembro, segundo CNJ e FGV.",
     officialUrl:
       "https://www.cnj.jus.br/4o-exame-nacional-dos-cartorios-abre-inscricoes-nesta-segunda-feira-31-8/",
     officialSources: [
@@ -213,23 +221,19 @@ export const OFFICIAL_OPPORTUNITY_CANDIDATES = Object.freeze([
     cycleYear: 2026,
     institutionAcronym: "PC-BA",
     institutionName: "Polícia Civil do Estado da Bahia",
-    roleName: "Cargos policiais a confirmar em edital",
+    roleName: "Delegado, escrivão e investigador",
+    officialNoticeNumber: null,
     lifecycleStatus: "authorized",
     statusAsOf: "2026-08-31",
+    noticePublishedAt: null,
     registrationStartsAt: null,
     registrationEndsAt: null,
     examDate: null,
-    summary: "Há sinal oficial de autorização; cargos, cronograma e organizadora exigem confirmação.",
+    summary:
+      "O certame está autorizado para 750 vagas — 100 para delegado, 150 para escrivão e 500 para investigador —; edital, cronograma e organizadora ainda aguardam publicação oficial.",
     officialUrl:
-      "https://www.ba.gov.br/policiacivil/noticias/2026-03/24530/governo-da-bahia-alcanca-marca-de-9000-policiais-peritos-e-bombeiros",
+      "https://www.ba.gov.br/ssp/sites/site-ssp/files/2026-05/Relatorio_de_Gestao_2025___rev.final___consolidado___2026.04.23.pdf",
     officialSources: [
-      {
-        sourceId: "governo-bahia",
-        publisher: "Governo do Estado da Bahia",
-        url: "https://www.ba.gov.br/policiacivil/noticias/2026-03/24530/governo-da-bahia-alcanca-marca-de-9000-policiais-peritos-e-bombeiros",
-        documentType: "official_announcement",
-        ...PENDING_SOURCE_POLICY,
-      },
       {
         sourceId: "governo-bahia",
         publisher: "Secretaria da Segurança Pública da Bahia",
@@ -252,12 +256,15 @@ export const OFFICIAL_OPPORTUNITY_CANDIDATES = Object.freeze([
     institutionAcronym: "PC-MA",
     institutionName: "Polícia Civil do Estado do Maranhão",
     roleName: "Cargos policiais a confirmar em edital",
+    officialNoticeNumber: null,
     lifecycleStatus: "pre_notice",
     statusAsOf: "2026-08-31",
+    noticePublishedAt: null,
     registrationStartsAt: null,
     registrationEndsAt: null,
     examDate: null,
-    summary: "Há anúncio institucional de futuro concurso; ato formal, divisão de cargos e organizadora ainda exigem confirmação.",
+    summary:
+      "O Governo do Maranhão anunciou novo concurso com 415 vagas; edital, distribuição por cargo, cronograma e organizadora ainda aguardam publicação oficial.",
     officialUrl:
       "https://www.policiacivil.ma.gov.br/policia-civil-participa-de-solenidade-de-promocao-de-integrantes-da-policia-militar-e-do-corpo-de-bombeiros-do-maranhao/",
     officialSources: [
@@ -283,21 +290,17 @@ export const OFFICIAL_OPPORTUNITY_CANDIDATES = Object.freeze([
     institutionAcronym: "PC-PR",
     institutionName: "Polícia Civil do Estado do Paraná",
     roleName: "Delegado, agente de polícia judiciária e papiloscopista",
+    officialNoticeNumber: "01/2026",
     lifecycleStatus: "registration_closed",
     statusAsOf: "2026-08-31",
-    registrationStartsAt: null,
-    registrationEndsAt: null,
-    examDate: null,
-    summary: "O certame constava em andamento no portal oficial da executora.",
+    noticePublishedAt: "2026-07-06",
+    registrationStartsAt: "2026-07-14",
+    registrationEndsAt: "2026-08-12",
+    examDate: "2026-10-11",
+    summary:
+      "O Edital nº 01/2026, executado pela FGV, prevê cadastro de reserva para delegado, agente de polícia judiciária e papiloscopista, com prova objetiva em 11 de outubro.",
     officialUrl: "https://conhecimento.fgv.br/concursos/pcpr26",
     officialSources: [
-      {
-        sourceId: "policia-civil-parana",
-        publisher: "Polícia Civil do Estado do Paraná",
-        url: "https://www.policiacivil.pr.gov.br/Noticia/PCPR-divulga-assinatura-de-contrato-com-banca-examinadora-para-realizacao-de-concurso",
-        documentType: "organizer_contract",
-        ...PENDING_SOURCE_POLICY,
-      },
       {
         sourceId: "fgv-conhecimento",
         publisher: "FGV Conhecimento",
@@ -329,12 +332,15 @@ export const OFFICIAL_OPPORTUNITY_CANDIDATES = Object.freeze([
     institutionAcronym: "PGM-MANAUS",
     institutionName: "Procuradoria-Geral do Município de Manaus",
     roleName: "Procurador do Município de 3ª Classe",
+    officialNoticeNumber: "01/2026",
     lifecycleStatus: "registration_closed",
     statusAsOf: "2026-08-31",
+    noticePublishedAt: "2026-07-02",
     registrationStartsAt: "2026-07-06",
     registrationEndsAt: "2026-08-04",
-    examDate: null,
-    summary: "O edital foi anunciado pela Prefeitura e o prazo de inscrição já havia terminado.",
+    examDate: "2026-09-20",
+    summary:
+      "O Edital nº 01/2026 oferece seis vagas para Procurador do Município de 3ª Classe, com execução da FCC e prova objetiva em 20 de setembro.",
     officialUrl:
       "https://www.manaus.am.gov.br/noticia/edital/concurso-publico-com-vagas-para-procurador-do-municipio/",
     officialSources: [
@@ -345,6 +351,13 @@ export const OFFICIAL_OPPORTUNITY_CANDIDATES = Object.freeze([
         documentType: "official_announcement",
         ...PENDING_SOURCE_POLICY,
       },
+      {
+        sourceId: "fcc-concursos",
+        publisher: "Fundação Carlos Chagas",
+        url: "https://www.concursosfcc.com.br/concursos/pgmam126/index.html",
+        documentType: "notice",
+        ...PENDING_SOURCE_POLICY,
+      },
     ],
     organizerSignals: [
       {
@@ -353,8 +366,7 @@ export const OFFICIAL_OPPORTUNITY_CANDIDATES = Object.freeze([
         role: "primary_responsible",
         quizBankSlug: "fcc",
         status: "pending_review",
-        sourceUrl:
-          "https://www.manaus.am.gov.br/noticia/edital/concurso-publico-com-vagas-para-procurador-do-municipio/",
+        sourceUrl: "https://www.concursosfcc.com.br/concursos/pgmam126/index.html",
       },
     ],
     ...INTERNAL_REVIEW_GATE,

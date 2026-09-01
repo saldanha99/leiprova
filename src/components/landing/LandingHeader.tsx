@@ -19,7 +19,7 @@ export function LandingHeader({ commerceOpen }: { commerceOpen: boolean }) {
   return (
     <header className="landing-header">
       <div className="site-container landing-header__inner">
-        <BrandMark />
+        <BrandMark eager />
 
         <nav className="landing-header__nav" aria-label="Navegação principal">
           {NAV_ITEMS.map((item) => (

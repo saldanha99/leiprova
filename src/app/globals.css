@@ -159,69 +159,41 @@ summary:focus-visible {
 .brand-mark {
   display: inline-flex;
   align-items: center;
-  gap: 11px;
   width: max-content;
 }
 
-.brand-mark__symbol {
-  display: grid;
+.editalume-logo {
+  position: relative;
+  display: block;
+  width: 216px;
+  height: 52px;
+  overflow: hidden;
+  flex: none;
+  border: 1px solid rgba(25, 182, 162, 0.22);
+  border-radius: 14px;
+  background: #f8fafc;
+  box-shadow: 0 10px 30px rgba(1, 14, 32, 0.24);
+}
+
+.editalume-logo__image {
+  position: absolute;
+  top: -37px;
+  left: -17px;
+  width: 250px;
+  max-width: none;
+  height: auto;
+}
+
+.editalume-logo--compact {
   width: 42px;
   height: 42px;
-  place-items: center;
-  flex: none;
-  border: 1px solid rgba(255, 189, 67, 0.32);
-  border-radius: 14px;
-  background:
-    radial-gradient(circle at 28% 18%, rgba(255, 231, 163, 0.2), transparent 38%),
-    linear-gradient(145deg, rgba(255, 189, 67, 0.19), rgba(255, 189, 67, 0.06));
-  box-shadow: 0 10px 28px rgba(255, 170, 25, 0.12);
+  border-radius: 12px;
 }
 
-.brand-mark__symbol svg {
-  width: 32px;
-  height: 32px;
-}
-
-.brand-mark__book {
-  fill: none;
-  stroke: var(--amber);
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-width: 2.1;
-}
-
-.brand-mark__check {
-  fill: none;
-  stroke: var(--emerald-bright);
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-width: 2.6;
-}
-
-.brand-mark__copy {
-  display: grid;
-  line-height: 1;
-}
-
-.brand-mark__copy strong {
-  color: var(--text);
-  font-size: 20px;
-  font-weight: 830;
-  letter-spacing: -0.045em;
-}
-
-.brand-mark__copy small {
-  margin-top: 6px;
-  color: var(--muted);
-  font-size: 9px;
-  font-weight: 720;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.brand-mark--compact .brand-mark__symbol {
-  width: 38px;
-  height: 38px;
+.editalume-logo--compact .editalume-logo__image {
+  top: -20px;
+  left: -10px;
+  width: 165px;
 }
 
 /* Buttons */
@@ -3352,23 +3324,15 @@ summary:focus-visible {
     min-height: 68px;
   }
 
-  .brand-mark__symbol {
-    width: 38px;
-    height: 38px;
-    border-radius: 12px;
+  .brand-mark .editalume-logo:not(.editalume-logo--compact) {
+    width: 180px;
+    height: 44px;
   }
 
-  .brand-mark__symbol svg {
-    width: 29px;
-    height: 29px;
-  }
-
-  .brand-mark__copy strong {
-    font-size: 18px;
-  }
-
-  .brand-mark__copy small {
-    display: none;
+  .brand-mark .editalume-logo:not(.editalume-logo--compact) .editalume-logo__image {
+    top: -31px;
+    left: -14px;
+    width: 208px;
   }
 
   .hero-section {

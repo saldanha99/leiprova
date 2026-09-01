@@ -163,6 +163,37 @@ services:
     networks:
       - internal
 
+  opportunity-approver:
+    build:
+      context: .
+      target: migrator
+    profiles: ["tools"]
+    command:
+      - sh
+      - -ec
+      - |
+        test "$${OPPORTUNITY_APPROVE}" = "true"
+        test -n "$${OPPORTUNITY_APPROVAL_REFERENCE}"
+        pnpm opportunities:approve -- --approve
+    environment:
+      MIGRATION_DATABASE_URL: postgresql://${POSTGRES_OWNER_USER:-leiprova_owner}:${POSTGRES_OWNER_PASSWORD}@db:5432/${POSTGRES_DB:-leiprova}
+      ADMIN_EMAILS: ${ADMIN_EMAILS:-}
+      OPPORTUNITY_APPROVE: ${OPPORTUNITY_APPROVE:-false}
+      OPPORTUNITY_APPROVAL_REFERENCE: ${OPPORTUNITY_APPROVAL_REFERENCE:-}
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 64
+    cpus: 0.5
+    mem_limit: 512m
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - internal
+      - edge
+
   legal-monitor:
     build:
       context: .

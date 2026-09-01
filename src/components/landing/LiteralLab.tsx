@@ -174,7 +174,7 @@ export function LiteralLab() {
               </span>
               <h3>Uma palavra muda a resposta.</h3>
               <p>
-                Escolha uma alternativa para ver como o LeiProva transforma o erro em uma pista de
+                Escolha uma alternativa para ver como a Editalume transforma o erro em uma pista de
                 memória.
               </p>
             </div>

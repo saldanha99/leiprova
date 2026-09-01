@@ -47,6 +47,12 @@ export const OFFICIAL_OPPORTUNITY_SOURCE_POLICIES = [
     allowedHosts: ["manaus.am.gov.br", "www.manaus.am.gov.br"],
     allowedPathPrefixes: ["/noticia/", "/pgm/"],
   },
+  {
+    id: "fcc-concursos",
+    publisher: "Fundação Carlos Chagas",
+    allowedHosts: ["concursosfcc.com.br", "www.concursosfcc.com.br"],
+    allowedPathPrefixes: ["/concursos/"],
+  },
 ] as const;
 
 export type OfficialOpportunitySourcePolicy =

@@ -22,7 +22,7 @@ import { createPublicWebPageStructuredData } from "@/lib/seo/page-structured-dat
 const PAGE_PATH = "/metodologia";
 const PAGE_TITLE = "Como editais viram prioridades de estudo e simulados";
 const PAGE_DESCRIPTION =
-  "Entenda as regras da LeiProva para detectar editais em fontes oficiais, validar a edição e seu responsável, analisar evidências e publicar simulados originais com revisão humana.";
+  "Entenda as regras da Editalume para detectar editais em fontes oficiais, validar a edição e seu responsável, analisar evidências e publicar simulados originais com revisão humana.";
 
 export const metadata: Metadata = {
   title: PAGE_TITLE,
@@ -31,20 +31,20 @@ export const metadata: Metadata = {
   openGraph: {
     type: "article",
     url: PAGE_PATH,
-    title: `${PAGE_TITLE} | LeiProva`,
+    title: `${PAGE_TITLE} | Editalume`,
     description: PAGE_DESCRIPTION,
     images: [
       {
         url: "/assets/leiprova-ecosystem.png",
         width: 1586,
         height: 992,
-        alt: "Interface de estudo da LeiProva em notebook, tablet e celular",
+        alt: "Interface de estudo da Editalume em notebook, tablet e celular",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: `${PAGE_TITLE} | LeiProva`,
+    title: `${PAGE_TITLE} | Editalume`,
     description: PAGE_DESCRIPTION,
     images: ["/assets/leiprova-ecosystem.png"],
   },

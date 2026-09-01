@@ -163,7 +163,7 @@ export default async function MaterialsPage() {
           <div>
             <p className="text-xs font-bold uppercase tracking-[.15em] text-emerald-300">Flashcards autorais</p>
             <h2 className="mt-1 text-2xl font-semibold tracking-[-.03em]">Tente lembrar antes de revelar</h2>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">O comando de recuperação é original da LeiProva; a resposta reproduz o dispositivo oficial verificado e oferece acesso à fonte.</p>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">O comando de recuperação é original da Editalume; a resposta reproduz o dispositivo oficial verificado e oferece acesso à fonte.</p>
           </div>
         </div>
         <div className="mt-6"><FlashcardDeck cards={flashcards} /></div>

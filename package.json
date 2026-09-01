@@ -16,6 +16,7 @@
     "content:verify": "tsx scripts/verify-content.ts",
     "legal:sources:check": "tsx --env-file-if-exists=.env scripts/check-official-sources.ts",
     "opportunities:sources:check": "tsx --env-file-if-exists=.env scripts/check-open-opportunities.ts",
+    "opportunities:approve": "tsx --env-file-if-exists=.env scripts/approve-official-opportunities.ts",
     "db:seed": "tsx --env-file-if-exists=.env scripts/seed.ts",
     "admin:bootstrap": "tsx --env-file-if-exists=.env scripts/bootstrap-admin.ts"
   },

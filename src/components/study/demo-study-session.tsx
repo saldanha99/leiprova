@@ -532,7 +532,7 @@ function CompletionScreen({
             Você não só respondeu. Você comparou a lei palavra por palavra.
           </h2>
           <p className="relative mx-auto mt-4 max-w-xl text-sm leading-6 text-slate-400 sm:text-base">
-            Este foi um recorte da experiência LeiProva. Seu resultado mostra acerto e também onde a confiança merece calibração.
+            Este foi um recorte da experiência Editalume. Seu resultado mostra acerto e também onde a confiança merece calibração.
           </p>
         </div>
 

@@ -5,6 +5,7 @@ import {
   OFFICIAL_OPPORTUNITY_CANDIDATES,
 } from "@/lib/opportunities/official-candidates";
 import { parseOfficialOpportunitySourceUrl } from "@/lib/opportunities/source-monitor-policy";
+import { isOpportunityFreshForPublicCatalog } from "@/lib/opportunities/catalog-policy";
 
 describe("candidatos oficiais internos de oportunidades", () => {
   it("mantém todos os candidatos pendentes, metadata-only e fora de indexação", () => {
@@ -17,6 +18,7 @@ describe("candidatos oficiais internos de oportunidades", () => {
       expect(candidate.sourceContentStored).toBe(false);
       expect(candidate.statusAsOf).toMatch(/^2026-\d{2}-\d{2}$/);
       expect(candidate.officialSources.length).toBeGreaterThan(0);
+      expect(isOpportunityFreshForPublicCatalog(candidate, "2026-09-01")).toBe(true);
       expect(Object.isFrozen(candidate)).toBe(true);
       expect(Object.isFrozen(candidate.officialSources)).toBe(true);
 
@@ -74,5 +76,22 @@ describe("candidatos oficiais internos de oportunidades", () => {
         status: "pending_review",
       },
     ]);
+  });
+
+  it("mantém somente fontes cujo HEAD comprova disponibilidade", () => {
+    const urls = OFFICIAL_OPPORTUNITY_CANDIDATES.flatMap((candidate) =>
+      candidate.officialSources.map((source) => source.url),
+    );
+
+    expect(urls).toHaveLength(9);
+    expect(urls).not.toContain(
+      "https://www.ba.gov.br/policiacivil/noticias/2026-03/24530/governo-da-bahia-alcanca-marca-de-9000-policiais-peritos-e-bombeiros",
+    );
+    expect(urls).not.toContain(
+      "https://www.policiacivil.pr.gov.br/Noticia/PCPR-divulga-assinatura-de-contrato-com-banca-examinadora-para-realizacao-de-concurso",
+    );
+    expect(getOfficialOpportunityCandidate("pc-ba-2026")?.officialUrl).toBe(
+      "https://www.ba.gov.br/ssp/sites/site-ssp/files/2026-05/Relatorio_de_Gestao_2025___rev.final___consolidado___2026.04.23.pdf",
+    );
   });
 });

@@ -25,7 +25,7 @@ import { createPublicWebPageStructuredData } from "@/lib/seo/page-structured-dat
 const PAGE_PATH = "/concursos";
 const PAGE_TITLE = "Concursos organizados por categoria, estado e edição";
 const PAGE_DESCRIPTION =
-  "Acompanhe como a LeiProva organiza concursos por categoria, estado e edição, com fonte oficial, situação do responsável e revisão humana antes da publicação.";
+  "Acompanhe como a Editalume organiza concursos por categoria, estado e edição, com fonte oficial, situação do responsável e revisão humana antes da publicação.";
 
 export const metadata: Metadata = {
   title: PAGE_TITLE,
@@ -34,20 +34,20 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     url: PAGE_PATH,
-    title: `${PAGE_TITLE} | LeiProva`,
+    title: `${PAGE_TITLE} | Editalume`,
     description: PAGE_DESCRIPTION,
     images: [
       {
         url: "/assets/leiprova-ecosystem.png",
         width: 1586,
         height: 992,
-        alt: "Interface de estudo da LeiProva em notebook, tablet e celular",
+        alt: "Interface de estudo da Editalume em notebook, tablet e celular",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: `${PAGE_TITLE} | LeiProva`,
+    title: `${PAGE_TITLE} | Editalume`,
     description: PAGE_DESCRIPTION,
     images: ["/assets/leiprova-ecosystem.png"],
   },
@@ -109,7 +109,7 @@ export default async function ContestsPage() {
                   {PAGE_TITLE}
                 </h1>
                 <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-300">
-                  A LeiProva está estruturando páginas específicas para editais abertos e pré-editais. Cada página só entra no catálogo público depois de confirmar a edição em fonte oficial, registrar se já existe responsável vigente e concluir revisão humana.
+                  A Editalume está estruturando páginas específicas para editais abertos e pré-editais. Cada página só entra no catálogo público depois de confirmar a edição em fonte oficial, registrar se já existe responsável vigente e concluir revisão humana.
                 </p>
               </div>
 

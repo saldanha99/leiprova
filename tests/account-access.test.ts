@@ -48,9 +48,10 @@ describe("account access email", () => {
     expect(email.html).toContain("&lt;Ana&gt;");
     expect(email.html).toContain("token=a&amp;next=b");
     expect(email.html).toContain(
-      'src="https://leiprova.example/brand/leiprova-email.png"',
+      'src="https://leiprova.example/brand/editalume-icon-180.png"',
     );
-    expect(email.html).toContain('alt="LeiProva"');
+    expect(email.html).toContain('alt="Editalume"');
+    expect(email.html).toContain("Lei seca guiada pelo edital");
     expect(email.html).not.toContain("<Ana>");
     expect(email.text).toContain("https://leiprova.example/ativar?token=a&next=b");
     expect(email.text).toContain("expira em 24 horas");

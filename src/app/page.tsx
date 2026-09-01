@@ -45,21 +45,21 @@ import {
 } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: { absolute: "LeiProva | Treino inteligente de lei seca para concursos" },
+  title: { absolute: "Editalume | Lei seca guiada pelo edital" },
   description:
     "Transforme a literalidade da lei em treinos de múltipla escolha, revisão espaçada e um roteiro de estudos que mostra o que revisar agora.",
   alternates: { canonical: "/" },
   openGraph: {
     type: "website",
     url: "/",
-    title: "LeiProva | Treino inteligente de lei seca para concursos",
+    title: "Editalume | Lei seca guiada pelo edital",
     description:
       "Treine a literalidade da lei com questões originais, fonte oficial e revisão distribuída para concursos públicos.",
     images: [SOCIAL_IMAGE],
   },
   twitter: {
     card: "summary_large_image",
-    title: "LeiProva | Treino inteligente de lei seca para concursos",
+    title: "Editalume | Lei seca guiada pelo edital",
     description:
       "Treine a literalidade da lei com questões originais, fonte oficial e revisão distribuída para concursos públicos.",
     images: [SOCIAL_IMAGE_PATH],
@@ -130,7 +130,7 @@ const TRUST_ITEMS = [
 
 const FAQS = [
   {
-    question: "O LeiProva substitui a leitura da lei seca?",
+    question: "A Editalume substitui a leitura da lei seca?",
     answer:
       "Não. A plataforma organiza a leitura e cria recuperação ativa logo depois dela. A proposta é fazer você voltar ao texto legal com direção e testar se a redação realmente permaneceu na memória.",
   },
@@ -163,7 +163,7 @@ const homeStructuredData = {
       "@type": "WebPage",
       "@id": `${absoluteUrl()}#webpage`,
       url: absoluteUrl(),
-      name: "LeiProva | Treino inteligente de lei seca para concursos",
+      name: "Editalume | Lei seca guiada pelo edital",
       description:
         "Plataforma de treino ativo da literalidade da lei com questões originais, fonte oficial e revisão distribuída.",
       inLanguage: "pt-BR",
@@ -226,7 +226,7 @@ export default function Home() {
                 <span>Comece a lembrar.</span>
               </h1>
               <p className="hero-lead">
-                O LeiProva transforma artigos, prazos e exceções em rodadas de múltipla escolha que
+                A Editalume transforma artigos, prazos e exceções em rodadas de múltipla escolha que
                 revelam onde a sua atenção falhou — e trazem o ponto de volta antes que você esqueça.
               </p>
 
@@ -256,12 +256,12 @@ export default function Home() {
               </ul>
             </div>
 
-            <div className="hero-visual" aria-label="Prévia visual do ecossistema LeiProva">
+            <div className="hero-visual" aria-label="Prévia visual do ecossistema Editalume">
               <div className="hero-visual__halo" aria-hidden="true" />
               <Image
                 className="hero-visual__image"
                 src="/assets/leiprova-ecosystem.png"
-                alt="LeiProva em notebook, celular e tablet com questões, texto legal e painel de desempenho"
+                alt="Editalume em notebook, celular e tablet com questões, texto legal e painel de desempenho"
                 width={1586}
                 height={992}
                 preload
@@ -663,7 +663,7 @@ export default function Home() {
               Leia. Escolha. Erre melhor. <span>Acerte quando valer ponto.</span>
             </h2>
             <p>
-              Comece com uma demonstração ou monte seu primeiro roteiro de literalidade no LeiProva.
+              Comece com uma demonstração ou monte seu primeiro roteiro de literalidade na Editalume.
             </p>
             <div>
               <Link className="button button--amber button--large" href={primaryHref}>
@@ -713,7 +713,7 @@ export default function Home() {
         </div>
 
         <div className="site-container site-footer__bottom">
-          <p>© {new Date().getFullYear()} LeiProva. Todos os direitos reservados.</p>
+          <p>© {new Date().getFullYear()} Editalume. Todos os direitos reservados.</p>
           <p>
             Conteúdo meramente informativo e não oficial. A plataforma não presta consultoria jurídica nem substitui a publicação vigente no diário oficial.
           </p>

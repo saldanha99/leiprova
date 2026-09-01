@@ -20,29 +20,37 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "LeiProva — Literalidade que fica na memória",
-    template: "%s | LeiProva",
+    default: "Editalume — Lei seca guiada pelo edital",
+    template: "%s | Editalume",
   },
   description:
     "Treine a literalidade da lei com questões originais, feedback imediato, fonte oficial e revisão espaçada para concursos públicos.",
-  applicationName: "LeiProva",
+  applicationName: "Editalume",
   category: "education",
-  creator: "LeiProva",
-  publisher: "LeiProva",
+  creator: "Editalume",
+  publisher: "Editalume",
   referrer: "origin-when-cross-origin",
-  icons: { icon: "/icon.svg" },
+  icons: {
+    icon: [
+      { url: "/brand/editalume-icon-32.png", type: "image/png", sizes: "32x32" },
+      { url: "/brand/editalume-icon-192.png", type: "image/png", sizes: "192x192" },
+    ],
+    apple: [
+      { url: "/brand/editalume-icon-180.png", type: "image/png", sizes: "180x180" },
+    ],
+  },
   keywords: ["lei seca", "concursos públicos", "literalidade", "questões de direito", "revisão espaçada"],
   openGraph: {
     type: "website",
     locale: "pt_BR",
-    siteName: "LeiProva",
-    title: "LeiProva — Literalidade que fica na memória",
+    siteName: "Editalume",
+    title: "Editalume — Lei seca guiada pelo edital",
     description: "Treinos curtos para memorizar prazos, exceções e competências cobrados em concursos.",
     images: [SOCIAL_IMAGE],
   },
   twitter: {
     card: "summary_large_image",
-    title: "LeiProva — Literalidade que fica na memória",
+    title: "Editalume — Lei seca guiada pelo edital",
     description: "Treinos curtos para memorizar prazos, exceções e competências cobrados em concursos.",
     images: [SOCIAL_IMAGE_PATH],
   },

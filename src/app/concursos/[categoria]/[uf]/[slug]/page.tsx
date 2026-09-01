@@ -57,14 +57,14 @@ export async function generateMetadata({ params }: ContestOpportunityPageProps):
       url: path,
       title: result.opportunity.title,
       description: result.opportunity.summary,
-      siteName: "LeiProva",
+      siteName: "Editalume",
       locale: "pt_BR",
       images: [
         {
           url: "/assets/leiprova-ecosystem.png",
           width: 1586,
           height: 992,
-          alt: "Interface de estudo da LeiProva em notebook, tablet e celular",
+          alt: "Interface de estudo da Editalume em notebook, tablet e celular",
         },
       ],
     },
@@ -163,7 +163,7 @@ export default async function ContestOpportunityPage({ params }: ContestOpportun
 
           <div className="mt-12 grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
             <section className="rounded-3xl border border-white/10 bg-white/[0.045] p-7 sm:p-9" aria-labelledby="edicao-title">
-              <h2 id="edicao-title" className="text-2xl font-black text-white">Edição confirmada</h2>
+              <h2 id="edicao-title" className="text-2xl font-black text-white">Situação oficial da edição</h2>
               <dl className="mt-6 grid gap-5 sm:grid-cols-2">
                 <div><dt className="text-sm text-slate-400">Órgão</dt><dd className="mt-1 font-bold text-white">{opportunity.institutionName}</dd></div>
                 <div><dt className="text-sm text-slate-400">Cargo</dt><dd className="mt-1 font-bold text-white">{opportunity.roleName}</dd></div>

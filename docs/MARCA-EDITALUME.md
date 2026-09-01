@@ -1,7 +1,8 @@
-# Proposta de marca: Editalume
+# Marca: Editalume
 
-> Proposta de trabalho. A aplicação continua se chamando LeiProva até a decisão
-> do responsável, a busca formal de marca e a compra do domínio.
+> Identidade aprovada pelo responsável e adotada no produto em 01/09/2026. A
+> aplicação continua no domínio técnico atual enquanto busca formal de marca,
+> compra do domínio definitivo e plano de migração permanecem pendentes.
 
 ## Nome e posicionamento
 
@@ -12,7 +13,7 @@
 - **Diferença estratégica:** a marca não imita o nome nem os símbolos do
   concorrente; evita cérebro, livro, martelo e balança.
 
-## Identidade visual proposta
+## Identidade visual
 
 - Azul-marinho: `#0B172A` — confiança e leitura jurídica.
 - Verde-petróleo: `#19B6A2` — atualização e progresso.
@@ -27,7 +28,7 @@ consulta de disponibilidade do Registro.br e não foi encontrado registro RDAP
 para `editalume.com`. Isso não constitui reserva: a disponibilidade pode mudar a
 qualquer instante.
 
-Antes da troca de marca:
+Antes da migração para o domínio definitivo:
 
 1. fazer busca nominativa e figurativa no INPI, especialmente nas classes 9,
    41 e 42;
