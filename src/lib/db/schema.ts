@@ -221,6 +221,10 @@ export const quizCareerSpecializations = pgTable(
   },
   (table) => [
     uniqueIndex("quiz_career_specializations_career_slug_uidx").on(table.careerTrackId, table.slug),
+    uniqueIndex("quiz_career_specializations_id_career_uidx").on(
+      table.id,
+      table.careerTrackId,
+    ),
     index("quiz_career_specializations_career_active_idx").on(table.careerTrackId, table.isActive),
     check(
       "quiz_career_specializations_slug_check",
@@ -291,13 +295,11 @@ export const examEditions = pgTable(
     careerTrackId: bigint("career_track_id", { mode: "number" })
       .notNull()
       .references(() => quizCareerTracks.id, { onDelete: "restrict" }),
-    specializationId: bigint("specialization_id", { mode: "number" }).references(
-      () => quizCareerSpecializations.id,
-      { onDelete: "restrict" },
-    ),
+    specializationId: bigint("specialization_id", { mode: "number" }),
     bankId: bigint("bank_id", { mode: "number" })
       .notNull()
       .references(() => quizBanks.id, { onDelete: "restrict" }),
+    sourceExternalId: text("source_external_id"),
     title: text("title").notNull(),
     organizer: text("organizer"),
     jurisdiction: text("jurisdiction"),
@@ -320,6 +322,14 @@ export const examEditions = pgTable(
     ...timestamps,
   },
   (table) => [
+    foreignKey({
+      columns: [table.specializationId, table.careerTrackId],
+      foreignColumns: [quizCareerSpecializations.id, quizCareerSpecializations.careerTrackId],
+      name: "exam_editions_specialization_career_fk",
+    }).onDelete("restrict"),
+    uniqueIndex("exam_editions_bank_source_external_uidx")
+      .on(table.bankId, table.sourceExternalId)
+      .where(sql`${table.sourceExternalId} is not null`),
     index("exam_editions_career_status_date_idx").on(
       table.careerTrackId,
       table.status,
@@ -335,6 +345,18 @@ export const examEditions = pgTable(
       sql`${table.status} in ('draft', 'scheduled', 'held', 'published', 'canceled', 'archived')`,
     ),
     check("exam_editions_public_id_check", sql`${table.publicId} ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$'`),
+    check(
+      "exam_editions_source_external_id_check",
+      sql`${table.sourceExternalId} is null or char_length(btrim(${table.sourceExternalId})) > 0`,
+    ),
+    check(
+      "exam_editions_eligible_source_check",
+      sql`${table.status} not in ('held', 'published') or (
+        ${table.officialUrl} is not null
+        and char_length(btrim(${table.officialUrl})) > 0
+        and ${table.sourceCheckedAt} is not null
+      )`,
+    ),
     check(
       "exam_editions_duration_check",
       sql`${table.durationMinutes} is null or ${table.durationMinutes} > 0`,
@@ -540,7 +562,7 @@ export const legalArticles = pgTable(
     heading: text("heading"),
     path: text("path").notNull(),
     literalText: text("literal_text").notNull(),
-    editorialStatus: text("editorial_status").notNull().default("reviewed"),
+    editorialStatus: text("editorial_status").notNull().default("draft"),
     sourceRights: text("source_rights").notNull().default("official_text"),
     ...timestamps,
   },
@@ -554,6 +576,567 @@ export const legalArticles = pgTable(
     check(
       "legal_articles_source_rights_check",
       sql`${table.sourceRights} in ('official_text', 'original_authorial', 'licensed')`,
+    ),
+  ],
+);
+
+export const contestCategories = pgTable(
+  "contest_categories",
+  {
+    id: idColumn(),
+    slug: text("slug").notNull().unique(),
+    name: text("name").notNull(),
+    description: text("description").notNull(),
+    sortOrder: smallint("sort_order").notNull().default(0),
+    isActive: boolean("is_active").notNull().default(true),
+    ...timestamps,
+  },
+  (table) => [
+    index("contest_categories_active_sort_idx").on(table.isActive, table.sortOrder),
+    check(
+      "contest_categories_slug_check",
+      sql`${table.slug} ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$'`,
+    ),
+  ],
+);
+
+export const contestCategoryCareers = pgTable(
+  "contest_category_careers",
+  {
+    categoryId: bigint("category_id", { mode: "number" })
+      .notNull()
+      .references(() => contestCategories.id, { onDelete: "cascade" }),
+    careerTrackId: bigint("career_track_id", { mode: "number" })
+      .notNull()
+      .references(() => quizCareerTracks.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    primaryKey({
+      columns: [table.categoryId, table.careerTrackId],
+      name: "contest_category_careers_pkey",
+    }),
+    index("contest_category_careers_career_idx").on(table.careerTrackId),
+  ],
+);
+
+export const contestOpportunities = pgTable(
+  "contest_opportunities",
+  {
+    id: idColumn(),
+    publicId: text("public_id").notNull().unique(),
+    slug: text("slug").notNull().unique(),
+    categoryId: bigint("category_id", { mode: "number" })
+      .notNull()
+      .references(() => contestCategories.id, { onDelete: "restrict" }),
+    careerTrackId: bigint("career_track_id", { mode: "number" })
+      .notNull()
+      .references(() => quizCareerTracks.id, { onDelete: "restrict" }),
+    specializationId: bigint("specialization_id", { mode: "number" }),
+    jurisdictionCode: text("jurisdiction_code").notNull(),
+    scope: text("scope").notNull(),
+    cycleYear: integer("cycle_year").notNull(),
+    institutionAcronym: text("institution_acronym").notNull(),
+    institutionName: text("institution_name").notNull(),
+    roleName: text("role_name").notNull(),
+    officialNoticeNumber: text("official_notice_number"),
+    title: text("title").notNull(),
+    summary: text("summary").notNull(),
+    lifecycleStatus: text("lifecycle_status").notNull().default("authorized"),
+    statusAsOf: date("status_as_of").notNull(),
+    officialUrl: text("official_url"),
+    announcedAt: date("announced_at"),
+    noticePublishedAt: date("notice_published_at"),
+    registrationStartsAt: date("registration_starts_at"),
+    registrationEndsAt: date("registration_ends_at"),
+    examDate: date("exam_date"),
+    sourceCheckedAt: timestamp("source_checked_at", { withTimezone: true }),
+    editorialStatus: text("editorial_status").notNull().default("draft"),
+    publishedAt: timestamp("published_at", { withTimezone: true }),
+    createdByUserId: bigint("created_by_user_id", { mode: "number" }).references(() => users.id, {
+      onDelete: "set null",
+    }),
+    updatedByUserId: bigint("updated_by_user_id", { mode: "number" }).references(() => users.id, {
+      onDelete: "set null",
+    }),
+    reviewedByUserId: bigint("reviewed_by_user_id", { mode: "number" }).references(() => users.id, {
+      onDelete: "set null",
+    }),
+    reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+    reviewNotes: text("review_notes"),
+    isFeatured: boolean("is_featured").notNull().default(false),
+    ...timestamps,
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.categoryId, table.careerTrackId],
+      foreignColumns: [
+        contestCategoryCareers.categoryId,
+        contestCategoryCareers.careerTrackId,
+      ],
+      name: "contest_opportunities_category_career_fk",
+    }).onDelete("restrict"),
+    foreignKey({
+      columns: [table.specializationId, table.careerTrackId],
+      foreignColumns: [quizCareerSpecializations.id, quizCareerSpecializations.careerTrackId],
+      name: "contest_opportunities_specialization_career_fk",
+    }).onDelete("restrict"),
+    uniqueIndex("contest_opportunities_identity_uidx")
+      .on(
+        table.institutionAcronym,
+        table.officialNoticeNumber,
+        table.cycleYear,
+        table.roleName,
+      )
+      .where(sql`${table.officialNoticeNumber} is not null`),
+    uniqueIndex("contest_opportunities_pre_notice_identity_uidx")
+      .on(
+        table.institutionAcronym,
+        table.cycleYear,
+        table.roleName,
+        table.jurisdictionCode,
+      )
+      .where(sql`${table.officialNoticeNumber} is null`),
+    index("contest_opportunities_public_catalog_idx").on(
+      table.editorialStatus,
+      table.lifecycleStatus,
+      table.statusAsOf,
+      table.id,
+    ),
+    index("contest_opportunities_category_jurisdiction_idx").on(
+      table.categoryId,
+      table.jurisdictionCode,
+      table.lifecycleStatus,
+    ),
+    index("contest_opportunities_career_idx").on(table.careerTrackId, table.cycleYear),
+    index("contest_opportunities_specialization_idx").on(table.specializationId),
+    index("contest_opportunities_created_by_idx").on(table.createdByUserId),
+    index("contest_opportunities_updated_by_idx").on(table.updatedByUserId),
+    index("contest_opportunities_reviewed_by_idx").on(table.reviewedByUserId),
+    check(
+      "contest_opportunities_public_id_check",
+      sql`${table.publicId} ~ '^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'`,
+    ),
+    check(
+      "contest_opportunities_slug_check",
+      sql`${table.slug} ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$'`,
+    ),
+    check(
+      "contest_opportunities_jurisdiction_check",
+      sql`${table.jurisdictionCode} ~ '^(AC|AL|AP|AM|BA|CE|DF|ES|GO|MA|MT|MS|MG|PA|PB|PR|PE|PI|RJ|RN|RS|RO|RR|SC|SP|SE|TO|BR)$'`,
+    ),
+    check(
+      "contest_opportunities_scope_check",
+      sql`${table.scope} in ('national', 'federal', 'state', 'regional', 'municipal')`,
+    ),
+    check(
+      "contest_opportunities_year_check",
+      sql`${table.cycleYear} between 2000 and 2200`,
+    ),
+    check(
+      "contest_opportunities_lifecycle_check",
+      sql`${table.lifecycleStatus} in ('authorized', 'commission_formed', 'organizer_selected', 'pre_notice', 'notice_published', 'registration_open', 'registration_closed', 'exam_scheduled', 'exam_held', 'result_published', 'homologated', 'closed', 'suspended', 'canceled')`,
+    ),
+    check(
+      "contest_opportunities_editorial_check",
+      sql`${table.editorialStatus} in ('draft', 'pending_review', 'reviewed', 'suspended')`,
+    ),
+    check(
+      "contest_opportunities_url_check",
+      sql`${table.officialUrl} is null or ${table.officialUrl} ~* '^https://[a-z0-9.-]+(?:/|$)'`,
+    ),
+    check(
+      "contest_opportunities_registration_range_check",
+      sql`${table.registrationEndsAt} is null or ${table.registrationStartsAt} is null or ${table.registrationEndsAt} >= ${table.registrationStartsAt}`,
+    ),
+    check(
+      "contest_opportunities_notice_date_check",
+      sql`${table.lifecycleStatus} not in ('notice_published', 'registration_open', 'registration_closed', 'exam_scheduled', 'exam_held', 'result_published', 'homologated', 'closed') or ${table.noticePublishedAt} is not null`,
+    ),
+    check(
+      "contest_opportunities_review_check",
+      sql`${table.editorialStatus} <> 'reviewed' or (
+        ${table.officialUrl} is not null
+        and ${table.sourceCheckedAt} is not null
+        and ${table.reviewedByUserId} is not null
+        and ${table.reviewedAt} is not null
+        and ${table.reviewedAt} >= ${table.sourceCheckedAt}
+        and ${table.publishedAt} is not null
+      )`,
+    ),
+    check(
+      "contest_opportunities_independent_review_check",
+      sql`${table.editorialStatus} <> 'reviewed'
+        or ${table.createdByUserId} is null
+        or ${table.reviewedByUserId} <> ${table.createdByUserId}`,
+    ),
+    check(
+      "contest_opportunities_review_notes_check",
+      sql`${table.reviewNotes} is null or char_length(${table.reviewNotes}) <= 2000`,
+    ),
+  ],
+);
+
+export const opportunitySourceDocuments = pgTable(
+  "opportunity_source_documents",
+  {
+    id: idColumn(),
+    publicId: text("public_id").notNull().unique(),
+    opportunityId: bigint("opportunity_id", { mode: "number" })
+      .notNull()
+      .references(() => contestOpportunities.id, { onDelete: "cascade" }),
+    documentType: text("document_type").notNull(),
+    sourceExternalId: text("source_external_id"),
+    title: text("title").notNull(),
+    sourceUrl: text("source_url").notNull(),
+    sourceHost: text("source_host").notNull(),
+    publishedAt: timestamp("published_at", { withTimezone: true }),
+    observedAt: timestamp("observed_at", { withTimezone: true }).notNull(),
+    lastSeenAt: timestamp("last_seen_at", { withTimezone: true }).notNull(),
+    checksumSha256: text("checksum_sha256"),
+    httpStatus: integer("http_status").notNull(),
+    contentType: text("content_type"),
+    sourcePolicy: text("source_policy").notNull().default("metadata_only"),
+    sourceContentStored: boolean("source_content_stored").notNull().default(false),
+    supersedesPublicId: text("supersedes_public_id"),
+    status: text("status").notNull().default("pending_review"),
+    initiatedByUserId: bigint("initiated_by_user_id", { mode: "number" }).references(() => users.id, {
+      onDelete: "set null",
+    }),
+    reviewedByUserId: bigint("reviewed_by_user_id", { mode: "number" }).references(() => users.id, {
+      onDelete: "set null",
+    }),
+    reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+    reviewNotes: text("review_notes"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("opportunity_source_documents_opportunity_url_uidx").on(
+      table.opportunityId,
+      table.sourceUrl,
+    ),
+    uniqueIndex("opportunity_source_documents_external_uidx")
+      .on(table.opportunityId, table.sourceExternalId)
+      .where(sql`${table.sourceExternalId} is not null`),
+    index("opportunity_source_documents_status_idx").on(
+      table.opportunityId,
+      table.status,
+      table.observedAt,
+    ),
+    index("opportunity_source_documents_reviewed_by_idx").on(table.reviewedByUserId),
+    check(
+      "opportunity_source_documents_public_id_check",
+      sql`${table.publicId} ~ '^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'`,
+    ),
+    check(
+      "opportunity_source_documents_type_check",
+      sql`${table.documentType} in ('authorization', 'commission_act', 'procurement_notice', 'organizer_contract', 'official_announcement', 'notice', 'correction', 'suspension', 'cancellation', 'result', 'homologation', 'other')`,
+    ),
+    check(
+      "opportunity_source_documents_url_check",
+      sql`${table.sourceUrl} ~* '^https://[a-z0-9.-]+(?:/|$)'`,
+    ),
+    check(
+      "opportunity_source_documents_host_check",
+      sql`${table.sourceHost} = lower(${table.sourceHost})
+        and ${table.sourceHost} ~ '^[a-z0-9.-]+$'
+        and ${table.sourceHost} = lower(substring(${table.sourceUrl} from '^https://([^/:?#]+)'))`,
+    ),
+    check(
+      "opportunity_source_documents_checksum_check",
+      sql`${table.checksumSha256} is null or ${table.checksumSha256} ~ '^[0-9a-f]{64}$'`,
+    ),
+    check(
+      "opportunity_source_documents_http_check",
+      sql`${table.httpStatus} between 100 and 599`,
+    ),
+    check(
+      "opportunity_source_documents_policy_check",
+      sql`${table.sourcePolicy} in ('metadata_only', 'official_document', 'licensed_content')`,
+    ),
+    check(
+      "opportunity_source_documents_metadata_only_check",
+      sql`${table.sourcePolicy} <> 'metadata_only' or not ${table.sourceContentStored}`,
+    ),
+    check(
+      "opportunity_source_documents_status_check",
+      sql`${table.status} in ('pending_review', 'approved', 'superseded', 'rejected')`,
+    ),
+    check(
+      "opportunity_source_documents_review_check",
+      sql`${table.status} <> 'approved' or (${table.reviewedByUserId} is not null and ${table.reviewedAt} is not null)`,
+    ),
+    check(
+      "opportunity_source_documents_independent_review_check",
+      sql`${table.status} <> 'approved'
+        or ${table.initiatedByUserId} is null
+        or ${table.reviewedByUserId} <> ${table.initiatedByUserId}`,
+    ),
+    check(
+      "opportunity_source_documents_review_notes_check",
+      sql`${table.reviewNotes} is null or char_length(${table.reviewNotes}) <= 2000`,
+    ),
+  ],
+);
+
+export const opportunityOrganizerAssignments = pgTable(
+  "opportunity_organizer_assignments",
+  {
+    id: idColumn(),
+    opportunityId: bigint("opportunity_id", { mode: "number" })
+      .notNull()
+      .references(() => contestOpportunities.id, { onDelete: "cascade" }),
+    quizBankId: bigint("quiz_bank_id", { mode: "number" }).references(() => quizBanks.id, {
+      onDelete: "restrict",
+    }),
+    sourceDocumentId: bigint("source_document_id", { mode: "number" })
+      .notNull()
+      .references(() => opportunitySourceDocuments.id, { onDelete: "restrict" }),
+    responsibleType: text("responsible_type").notNull(),
+    role: text("role").notNull().default("primary_responsible"),
+    organizerSlug: text("organizer_slug").notNull(),
+    organizerName: text("organizer_name").notNull(),
+    validFrom: date("valid_from").notNull(),
+    validUntil: date("valid_until"),
+    status: text("status").notNull().default("pending_review"),
+    reviewedByUserId: bigint("reviewed_by_user_id", { mode: "number" }).references(() => users.id, {
+      onDelete: "set null",
+    }),
+    reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+    reviewNotes: text("review_notes"),
+    ...timestamps,
+  },
+  (table) => [
+    uniqueIndex("opportunity_organizer_assignments_primary_active_uidx")
+      .on(table.opportunityId)
+      .where(
+        sql`${table.role} = 'primary_responsible' and ${table.status} = 'reviewed' and ${table.validUntil} is null`,
+      ),
+    uniqueIndex("opportunity_organizer_assignments_exam_provider_active_uidx")
+      .on(table.opportunityId)
+      .where(
+        sql`${table.role} = 'examination_provider' and ${table.status} = 'reviewed' and ${table.validUntil} is null`,
+      ),
+    index("opportunity_organizer_assignments_bank_idx").on(table.quizBankId),
+    index("opportunity_organizer_assignments_source_idx").on(table.sourceDocumentId),
+    index("opportunity_organizer_assignments_reviewed_by_idx").on(table.reviewedByUserId),
+    check(
+      "opportunity_organizer_assignments_type_check",
+      sql`${table.responsibleType} in ('external_organizer', 'institutional_commission', 'hybrid')`,
+    ),
+    check(
+      "opportunity_organizer_assignments_role_check",
+      sql`${table.role} in ('primary_responsible', 'examination_provider', 'logistics_provider')`,
+    ),
+    check(
+      "opportunity_organizer_assignments_slug_check",
+      sql`${table.organizerSlug} ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$'`,
+    ),
+    check(
+      "opportunity_organizer_assignments_bank_check",
+      sql`(${table.responsibleType} <> 'institutional_commission' or ${table.quizBankId} is null)
+        and (${table.role} <> 'logistics_provider' or ${table.quizBankId} is null)`,
+    ),
+    check(
+      "opportunity_organizer_assignments_date_check",
+      sql`${table.validUntil} is null or ${table.validUntil} >= ${table.validFrom}`,
+    ),
+    check(
+      "opportunity_organizer_assignments_status_check",
+      sql`${table.status} in ('pending_review', 'reviewed', 'superseded', 'rejected')`,
+    ),
+    check(
+      "opportunity_organizer_assignments_review_check",
+      sql`${table.status} <> 'reviewed' or (${table.reviewedByUserId} is not null and ${table.reviewedAt} is not null)`,
+    ),
+    check(
+      "opportunity_organizer_assignments_review_notes_check",
+      sql`${table.reviewNotes} is null or char_length(${table.reviewNotes}) <= 2000`,
+    ),
+  ],
+);
+
+export const opportunityRequirements = pgTable(
+  "opportunity_requirements",
+  {
+    id: idColumn(),
+    opportunityId: bigint("opportunity_id", { mode: "number" })
+      .notNull()
+      .references(() => contestOpportunities.id, { onDelete: "cascade" }),
+    sourceDocumentId: bigint("source_document_id", { mode: "number" })
+      .notNull()
+      .references(() => opportunitySourceDocuments.id, { onDelete: "restrict" }),
+    subjectId: bigint("subject_id", { mode: "number" }).references(() => quizSubjects.id, {
+      onDelete: "restrict",
+    }),
+    topicId: bigint("topic_id", { mode: "number" }).references(() => quizTopics.id, {
+      onDelete: "restrict",
+    }),
+    legalActId: bigint("legal_act_id", { mode: "number" }).references(() => legalActs.id, {
+      onDelete: "restrict",
+    }),
+    legalArticleId: bigint("legal_article_id", { mode: "number" }).references(() => legalArticles.id, {
+      onDelete: "restrict",
+    }),
+    requirementText: text("requirement_text").notNull(),
+    sourceLocator: text("source_locator").notNull(),
+    editorialStatus: text("editorial_status").notNull().default("draft"),
+    reviewedByUserId: bigint("reviewed_by_user_id", { mode: "number" }).references(() => users.id, {
+      onDelete: "set null",
+    }),
+    reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+    ...timestamps,
+  },
+  (table) => [
+    index("opportunity_requirements_opportunity_status_idx").on(
+      table.opportunityId,
+      table.editorialStatus,
+      table.subjectId,
+    ),
+    index("opportunity_requirements_source_idx").on(table.sourceDocumentId),
+    index("opportunity_requirements_topic_idx").on(table.topicId),
+    index("opportunity_requirements_legal_act_idx").on(table.legalActId),
+    index("opportunity_requirements_legal_article_idx").on(table.legalArticleId),
+    index("opportunity_requirements_reviewed_by_idx").on(table.reviewedByUserId),
+    check(
+      "opportunity_requirements_status_check",
+      sql`${table.editorialStatus} in ('draft', 'pending_review', 'reviewed', 'suspended')`,
+    ),
+    check(
+      "opportunity_requirements_topic_subject_check",
+      sql`${table.topicId} is null or ${table.subjectId} is not null`,
+    ),
+    check(
+      "opportunity_requirements_article_act_check",
+      sql`${table.legalArticleId} is null or ${table.legalActId} is not null`,
+    ),
+    check(
+      "opportunity_requirements_review_check",
+      sql`${table.editorialStatus} <> 'reviewed' or (${table.reviewedByUserId} is not null and ${table.reviewedAt} is not null)`,
+    ),
+  ],
+);
+
+export const opportunityAnalysisSnapshots = pgTable(
+  "opportunity_analysis_snapshots",
+  {
+    id: idColumn(),
+    publicId: text("public_id").notNull().unique(),
+    opportunityId: bigint("opportunity_id", { mode: "number" })
+      .notNull()
+      .references(() => contestOpportunities.id, { onDelete: "cascade" }),
+    organizerAssignmentId: bigint("organizer_assignment_id", { mode: "number" })
+      .notNull()
+      .references(() => opportunityOrganizerAssignments.id, { onDelete: "restrict" }),
+    analysisKind: text("analysis_kind").notNull(),
+    methodologyVersion: text("methodology_version").notNull(),
+    lookbackYears: smallint("lookback_years").notNull().default(10),
+    windowStartYear: integer("window_start_year").notNull(),
+    windowEndYear: integer("window_end_year").notNull(),
+    sampleSize: integer("sample_size").notNull().default(0),
+    corpusBasis: text("corpus_basis").notNull(),
+    corpusRightsReference: text("corpus_rights_reference"),
+    methodology: text("methodology").notNull(),
+    scores: jsonb("scores").$type<Record<string, unknown>>().notNull().default(sql`'{}'::jsonb`),
+    confidenceBps: integer("confidence_bps").notNull().default(0),
+    limitations: text("limitations").notNull(),
+    status: text("status").notNull().default("draft"),
+    createdByUserId: bigint("created_by_user_id", { mode: "number" }).references(() => users.id, {
+      onDelete: "set null",
+    }),
+    reviewedByUserId: bigint("reviewed_by_user_id", { mode: "number" }).references(() => users.id, {
+      onDelete: "set null",
+    }),
+    reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+    ...timestamps,
+  },
+  (table) => [
+    index("opportunity_analysis_snapshots_catalog_idx").on(
+      table.opportunityId,
+      table.status,
+      table.updatedAt,
+    ),
+    index("opportunity_analysis_snapshots_assignment_idx").on(table.organizerAssignmentId),
+    index("opportunity_analysis_snapshots_created_by_idx").on(table.createdByUserId),
+    index("opportunity_analysis_snapshots_reviewed_by_idx").on(table.reviewedByUserId),
+    check(
+      "opportunity_analysis_snapshots_public_id_check",
+      sql`${table.publicId} ~ '^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'`,
+    ),
+    check(
+      "opportunity_analysis_snapshots_kind_check",
+      sql`${table.analysisKind} in ('syllabus_frequency', 'question_incidence', 'legal_change_risk')`,
+    ),
+    check(
+      "opportunity_analysis_snapshots_lookback_check",
+      sql`${table.lookbackYears} between 1 and 10`,
+    ),
+    check(
+      "opportunity_analysis_snapshots_window_check",
+      sql`${table.windowStartYear} between 2000 and 2200
+        and ${table.windowEndYear} between ${table.windowStartYear} and 2200
+        and ${table.windowEndYear} - ${table.windowStartYear} + 1 = ${table.lookbackYears}`,
+    ),
+    check(
+      "opportunity_analysis_snapshots_sample_check",
+      sql`${table.sampleSize} >= 0`,
+    ),
+    check(
+      "opportunity_analysis_snapshots_corpus_check",
+      sql`${table.corpusBasis} in ('official_syllabi', 'licensed_questions', 'mixed_authorized')`,
+    ),
+    check(
+      "opportunity_analysis_snapshots_question_rights_check",
+      sql`${table.analysisKind} <> 'question_incidence' or ${table.corpusBasis} in ('licensed_questions', 'mixed_authorized')`,
+    ),
+    check(
+      "opportunity_analysis_snapshots_confidence_check",
+      sql`${table.confidenceBps} between 0 and 10000`,
+    ),
+    check(
+      "opportunity_analysis_snapshots_status_check",
+      sql`${table.status} in ('draft', 'pending_review', 'reviewed', 'suspended')`,
+    ),
+    check(
+      "opportunity_analysis_snapshots_review_check",
+      sql`${table.status} <> 'reviewed' or (
+        ${table.sampleSize} > 0
+        and nullif(btrim(${table.corpusRightsReference}), '') is not null
+        and ${table.reviewedByUserId} is not null
+        and ${table.reviewedAt} is not null
+      )`,
+    ),
+    check(
+      "opportunity_analysis_snapshots_independent_review_check",
+      sql`${table.status} <> 'reviewed'
+        or ${table.createdByUserId} is null
+        or ${table.reviewedByUserId} <> ${table.createdByUserId}`,
+    ),
+  ],
+);
+
+export const contestOpportunityPlans = pgTable(
+  "contest_opportunity_plans",
+  {
+    opportunityId: bigint("opportunity_id", { mode: "number" })
+      .notNull()
+      .references(() => contestOpportunities.id, { onDelete: "cascade" }),
+    planId: bigint("plan_id", { mode: "number" })
+      .notNull()
+      .references(() => plans.id, { onDelete: "restrict" }),
+    availability: text("availability").notNull().default("planned"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    primaryKey({
+      columns: [table.opportunityId, table.planId],
+      name: "contest_opportunity_plans_pkey",
+    }),
+    index("contest_opportunity_plans_plan_idx").on(table.planId),
+    check(
+      "contest_opportunity_plans_availability_check",
+      sql`${table.availability} in ('planned', 'active', 'retired')`,
     ),
   ],
 );
@@ -587,7 +1170,7 @@ export const questions = pgTable(
     difficulty: smallint("difficulty").notNull().default(2),
     mutationKind: text("mutation_kind"),
     examBoardStyle: text("exam_board_style"),
-    editorialStatus: text("editorial_status").notNull().default("reviewed"),
+    editorialStatus: text("editorial_status").notNull().default("draft"),
     sourceRights: text("source_rights").notNull().default("original_authorial"),
     sourceTitle: text("source_title"),
     sourceUrl: text("source_url"),
@@ -724,7 +1307,7 @@ export const questions = pgTable(
     ),
     check(
       "questions_reviewed_provenance_check",
-      sql`${table.editorialStatus} <> 'reviewed' or ${table.quizMode} = 'dry_law' or ${table.reviewedByUserId} is not null`,
+      sql`${table.editorialStatus} <> 'reviewed' or ${table.reviewedByUserId} is not null`,
     ),
     check(
       "questions_submission_check",
@@ -743,6 +1326,40 @@ export const questions = pgTable(
     check(
       "questions_originality_check",
       sql`${table.quizMode} <> 'original_style' or ${table.originalityCheckedAt} is not null`,
+    ),
+  ],
+);
+
+export const questionOpportunities = pgTable(
+  "question_opportunities",
+  {
+    questionId: bigint("question_id", { mode: "number" })
+      .notNull()
+      .references(() => questions.id, { onDelete: "cascade" }),
+    opportunityId: bigint("opportunity_id", { mode: "number" })
+      .notNull()
+      .references(() => contestOpportunities.id, { onDelete: "cascade" }),
+    relationship: text("relationship").notNull(),
+    analysisSnapshotId: bigint("analysis_snapshot_id", { mode: "number" }).references(
+      () => opportunityAnalysisSnapshots.id,
+      { onDelete: "set null" },
+    ),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    primaryKey({
+      columns: [table.questionId, table.opportunityId],
+      name: "question_opportunities_pkey",
+    }),
+    index("question_opportunities_opportunity_idx").on(table.opportunityId),
+    index("question_opportunities_analysis_idx").on(table.analysisSnapshotId),
+    check(
+      "question_opportunities_relationship_check",
+      sql`${table.relationship} in ('direct_requirement', 'statistical_priority', 'legal_change')`,
+    ),
+    check(
+      "question_opportunities_statistical_snapshot_check",
+      sql`${table.relationship} <> 'statistical_priority' or ${table.analysisSnapshotId} is not null`,
     ),
   ],
 );
@@ -844,7 +1461,13 @@ export const quizSessions = pgTable(
     check("quiz_sessions_exam_scope_check", sql`${table.examScope} in ('latest', 'all')`),
     check(
       "quiz_sessions_exam_edition_check",
-      sql`${table.examEditionId} is null or ${table.mode} = 'previous_exam'`,
+      sql`${table.examEditionId} is null or (
+        ${table.examScope} = 'latest'
+        and (
+          ${table.path} = 'career'
+          or (${table.path} = 'bank' and ${table.mode} = 'previous_exam')
+        )
+      )`,
     ),
     check(
       "quiz_sessions_count_check",

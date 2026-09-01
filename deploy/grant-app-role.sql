@@ -1,5 +1,7 @@
 \set ON_ERROR_STOP on
 
+begin;
+
 alter default privileges in schema public revoke all privileges on tables from :app_user;
 alter default privileges in schema public revoke all privileges on sequences from :app_user;
 revoke all privileges on all tables in schema public from :app_user;
@@ -22,6 +24,15 @@ grant select on
   quiz_career_subjects,
   exam_editions,
   exam_source_portals,
+  contest_categories,
+  contest_category_careers,
+  contest_opportunities,
+  contest_opportunity_plans,
+  opportunity_source_documents,
+  opportunity_organizer_assignments,
+  opportunity_requirements,
+  opportunity_analysis_snapshots,
+  question_opportunities,
   stripe_connect_partners,
   stripe_connect_split_rules,
   stripe_connect_split_allocations,
@@ -143,14 +154,13 @@ grant insert (
   career_track_id,
   specialization_id,
   bank_id,
+  source_external_id,
   title,
   organizer,
   jurisdiction,
   official_url,
   exam_date,
   duration_minutes,
-  published_at,
-  status,
   source_policy,
   source_content_stored,
   source_page_title,
@@ -161,6 +171,186 @@ grant insert (
   created_at,
   updated_at
 ) on exam_editions to :app_user;
+
+grant update (
+  title,
+  organizer,
+  jurisdiction,
+  official_url,
+  exam_date,
+  duration_minutes,
+  source_checked_at,
+  updated_at
+) on exam_editions to :app_user;
+
+grant insert (
+  public_id,
+  slug,
+  category_id,
+  career_track_id,
+  specialization_id,
+  jurisdiction_code,
+  scope,
+  cycle_year,
+  institution_acronym,
+  institution_name,
+  role_name,
+  official_notice_number,
+  title,
+  summary,
+  lifecycle_status,
+  status_as_of,
+  official_url,
+  announced_at,
+  notice_published_at,
+  registration_starts_at,
+  registration_ends_at,
+  exam_date,
+  source_checked_at,
+  created_by_user_id,
+  updated_by_user_id,
+  is_featured
+) on contest_opportunities to :app_user;
+
+grant update (
+  title,
+  summary,
+  lifecycle_status,
+  status_as_of,
+  official_url,
+  announced_at,
+  notice_published_at,
+  registration_starts_at,
+  registration_ends_at,
+  exam_date,
+  source_checked_at,
+  editorial_status,
+  published_at,
+  updated_by_user_id,
+  reviewed_by_user_id,
+  reviewed_at,
+  review_notes,
+  is_featured,
+  updated_at
+) on contest_opportunities to :app_user;
+
+grant insert (
+  public_id,
+  opportunity_id,
+  document_type,
+  source_external_id,
+  title,
+  source_url,
+  source_host,
+  published_at,
+  observed_at,
+  last_seen_at,
+  checksum_sha256,
+  http_status,
+  content_type,
+  source_policy,
+  source_content_stored,
+  supersedes_public_id,
+  initiated_by_user_id
+) on opportunity_source_documents to :app_user;
+
+grant update (
+  title,
+  published_at,
+  last_seen_at,
+  checksum_sha256,
+  http_status,
+  content_type,
+  supersedes_public_id,
+  status,
+  reviewed_by_user_id,
+  reviewed_at,
+  review_notes
+) on opportunity_source_documents to :app_user;
+
+grant insert (
+  opportunity_id,
+  quiz_bank_id,
+  source_document_id,
+  responsible_type,
+  role,
+  organizer_slug,
+  organizer_name,
+  valid_from,
+  valid_until
+) on opportunity_organizer_assignments to :app_user;
+
+grant update (
+  valid_until,
+  status,
+  reviewed_by_user_id,
+  reviewed_at,
+  review_notes,
+  updated_at
+) on opportunity_organizer_assignments to :app_user;
+
+grant insert (
+  opportunity_id,
+  source_document_id,
+  subject_id,
+  topic_id,
+  legal_act_id,
+  legal_article_id,
+  requirement_text,
+  source_locator
+) on opportunity_requirements to :app_user;
+
+grant update (
+  subject_id,
+  topic_id,
+  legal_act_id,
+  legal_article_id,
+  requirement_text,
+  source_locator,
+  editorial_status,
+  reviewed_by_user_id,
+  reviewed_at,
+  updated_at
+) on opportunity_requirements to :app_user;
+
+grant insert (
+  public_id,
+  opportunity_id,
+  organizer_assignment_id,
+  analysis_kind,
+  methodology_version,
+  lookback_years,
+  window_start_year,
+  window_end_year,
+  sample_size,
+  corpus_basis,
+  corpus_rights_reference,
+  methodology,
+  scores,
+  confidence_bps,
+  limitations,
+  created_by_user_id
+) on opportunity_analysis_snapshots to :app_user;
+
+grant update (
+  methodology_version,
+  lookback_years,
+  window_start_year,
+  window_end_year,
+  sample_size,
+  corpus_basis,
+  corpus_rights_reference,
+  methodology,
+  scores,
+  confidence_bps,
+  limitations,
+  status,
+  reviewed_by_user_id,
+  reviewed_at,
+  updated_at
+) on opportunity_analysis_snapshots to :app_user;
+
+grant insert, delete on question_opportunities to :app_user;
 
 grant select, insert, update on
   subscriptions,
@@ -249,5 +439,12 @@ grant usage on
   questions_id_seq,
   question_options_id_seq,
   legal_source_snapshots_id_seq,
-  exam_editions_id_seq
+  exam_editions_id_seq,
+  contest_opportunities_id_seq,
+  opportunity_source_documents_id_seq,
+  opportunity_organizer_assignments_id_seq,
+  opportunity_requirements_id_seq,
+  opportunity_analysis_snapshots_id_seq
 to :app_user;
+
+commit;

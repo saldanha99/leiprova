@@ -5,6 +5,11 @@ import { describe, expect, it } from "vitest";
 const grants = readFileSync(new URL("../deploy/grant-app-role.sql", import.meta.url), "utf8");
 
 describe("privilégios do app em produção", () => {
+  it("reaplica revogações e concessões de forma atômica", () => {
+    expect(grants).toMatch(/\\set ON_ERROR_STOP on\s+begin;/);
+    expect(grants.trimEnd()).toMatch(/commit;$/);
+  });
+
   it("permite operar filtros e cadernos sem ampliar o acesso global", () => {
     expect(grants).toMatch(/grant select, insert, delete on saved_study_filters to :app_user;/);
     expect(grants).toMatch(/grant select, insert, update, delete on question_notebooks to :app_user;/);
@@ -29,7 +34,15 @@ describe("privilégios do app em produção", () => {
     expect(grants).toMatch(/exam_source_portals,/);
     expect(grants).toMatch(/grant insert \([\s\S]*normalized_content,[\s\S]*\) on legal_source_snapshots to :app_user;/);
     expect(grants).toMatch(/grant update \([\s\S]*last_checked_at,[\s\S]*\) on exam_source_portals to :app_user;/);
-    expect(grants).toMatch(/grant insert \([\s\S]*source_content_stored,[\s\S]*\) on exam_editions to :app_user;/);
+    expect(grants).toMatch(
+      /grant insert \([\s\S]*source_external_id,[\s\S]*source_content_stored,[\s\S]*\) on exam_editions to :app_user;/,
+    );
+    expect(grants).toMatch(
+      /grant update \(\s*title,\s*organizer,\s*jurisdiction,\s*official_url,\s*exam_date,\s*duration_minutes,\s*source_checked_at,\s*updated_at\s*\) on exam_editions to :app_user;/,
+    );
+    expect(grants).not.toMatch(
+      /grant insert \([^;]*\b(?:published_at|status)\b[^;]*\) on exam_editions to :app_user;/,
+    );
     expect(grants).toContain("legal_source_snapshots_id_seq");
     expect(grants).toContain("exam_editions_id_seq");
   });

@@ -15,8 +15,10 @@ import {
   legalActs,
   legalSourceSnapshots,
   quizBanks,
+  quizCareerSpecializations,
   quizCareerTracks,
 } from "@/lib/db/schema";
+import { resolveExamMetadataSpecialization } from "@/lib/official-sources/exam-metadata-selection";
 import { verifyOfficialExamUrl, fetchOfficialLegalDocument } from "@/lib/official-sources/fetch";
 import { getOfficialLegalSource } from "@/lib/official-sources/legal-registry";
 
@@ -202,6 +204,10 @@ export async function verifyExamPortalAction(
 const examMetadataSchema = z.object({
   bankId: z.coerce.number().int().positive(),
   careerTrackId: z.coerce.number().int().positive(),
+  specializationId: z.preprocess(
+    (value) => (value === null || value === "" ? undefined : value),
+    z.coerce.number().int().positive().optional(),
+  ),
   title: z.string().trim().min(5).max(220),
   examDate: z.iso.date(),
   jurisdiction: z.string().trim().max(120),
@@ -219,16 +225,31 @@ export async function createExamMetadataAction(
   const user = await requireAdmin();
   const parsed = examMetadataSchema.safeParse({
     bankId: formData.get("bankId"), careerTrackId: formData.get("careerTrackId"), title: formData.get("title"),
-    examDate: formData.get("examDate"), jurisdiction: formData.get("jurisdiction"), officialUrl: formData.get("officialUrl"),
+    specializationId: formData.get("specializationId"), examDate: formData.get("examDate"),
+    jurisdiction: formData.get("jurisdiction"), officialUrl: formData.get("officialUrl"),
   });
   if (!parsed.success) return errorState(parsed.error.issues[0]?.message ?? "Revise os metadados da prova.");
 
   const db = getDb();
-  const [bank, career] = await Promise.all([
+  const [bank, career, activeSpecializations] = await Promise.all([
     db.select({ id: quizBanks.id, slug: quizBanks.slug }).from(quizBanks).where(and(eq(quizBanks.id, parsed.data.bankId), eq(quizBanks.isActive, true))).limit(1),
     db.select({ id: quizCareerTracks.id }).from(quizCareerTracks).where(and(eq(quizCareerTracks.id, parsed.data.careerTrackId), eq(quizCareerTracks.isActive, true))).limit(1),
+    db
+      .select({ id: quizCareerSpecializations.id })
+      .from(quizCareerSpecializations)
+      .where(
+        and(
+          eq(quizCareerSpecializations.careerTrackId, parsed.data.careerTrackId),
+          eq(quizCareerSpecializations.isActive, true),
+        ),
+      ),
   ]);
   if (!bank[0] || !career[0]) return errorState("Banca ou carreira indisponível.");
+  const specialization = resolveExamMetadataSpecialization(
+    activeSpecializations,
+    parsed.data.specializationId,
+  );
+  if (!specialization.success) return errorState(specialization.message);
 
   try {
     const checked = await verifyOfficialExamUrl(bank[0].slug, parsed.data.officialUrl);
@@ -238,11 +259,11 @@ export async function createExamMetadataAction(
         publicId,
         bankId: bank[0].id,
         careerTrackId: career[0].id,
+        specializationId: specialization.specializationId,
         title: parsed.data.title,
         examDate: parsed.data.examDate,
         jurisdiction: parsed.data.jurisdiction || null,
         officialUrl: checked.finalUrl,
-        status: "draft",
         sourcePolicy: "metadata_only",
         sourceContentStored: false,
         sourcePageTitle: checked.pageTitle,
@@ -251,7 +272,7 @@ export async function createExamMetadataAction(
         createdByUserId: user.id,
         updatedByUserId: user.id,
       });
-      await transaction.insert(auditLogs).values({ actorUserId: user.id, action: "editorial.exam_metadata.created", entityType: "exam_edition", entityId: publicId, metadata: { policy: "metadata_only", sourceContentStored: false, officialUrl: checked.finalUrl } });
+      await transaction.insert(auditLogs).values({ actorUserId: user.id, action: "editorial.exam_metadata.created", entityType: "exam_edition", entityId: publicId, metadata: { policy: "metadata_only", sourceContentStored: false, officialUrl: checked.finalUrl, specializationId: specialization.specializationId } });
     });
     revalidatePath("/admin/fontes-oficiais");
     return { status: "success", message: "Metadados registrados. Nenhum enunciado, alternativa ou gabarito foi copiado." };

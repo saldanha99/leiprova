@@ -5,6 +5,7 @@ import { useState } from "react";
 import { QuizBuilder } from "./quiz-builder";
 import { QuizSession } from "./quiz-session";
 import { isQuizConfigReady, type QuizConfig, type QuizSessionPayload } from "./types";
+import type { QuizExamEditionOption } from "@/lib/quiz/exam-edition-catalog";
 
 const initialConfig: QuizConfig = {
   path: "career",
@@ -14,14 +15,19 @@ const initialConfig: QuizConfig = {
   examScope: "latest",
 };
 
-export function QuizExperience() {
+export function QuizExperience({
+  examEditions,
+}: {
+  examEditions: readonly QuizExamEditionOption[];
+}) {
   const [config, setConfig] = useState<QuizConfig>(initialConfig);
   const [session, setSession] = useState<QuizSessionPayload | null>(null);
+  const [sessionConfig, setSessionConfig] = useState<QuizConfig | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function requestSession(nextConfig: QuizConfig) {
-    if (!isQuizConfigReady(nextConfig)) return;
+    if (!isQuizConfigReady(nextConfig, examEditions)) return;
     setLoading(true);
     setError(null);
     try {
@@ -41,10 +47,12 @@ export function QuizExperience() {
           experience: nextConfig.experience,
           timed: nextConfig.timed,
           examScope: nextConfig.examScope,
+          examEditionId: nextConfig.examEditionId,
         }),
       });
       if (!response.ok) throw new Error("session_failed");
       const payload = (await response.json()) as QuizSessionPayload;
+      setSessionConfig(nextConfig);
       setSession(payload);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch {
@@ -55,35 +63,48 @@ export function QuizExperience() {
   }
 
   function changeConfig(nextConfig: QuizConfig) {
+    if (loading) return;
     setConfig(nextConfig);
     setError(null);
   }
 
   function backToBuilder() {
     setSession(null);
+    setSessionConfig(null);
     setError(null);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   function switchMode(mode: "dry_law" | "original_style") {
-    const nextConfig = { ...config, mode };
+    const nextConfig = { ...(sessionConfig ?? config), mode };
     setConfig(nextConfig);
     setSession(null);
+    setSessionConfig(null);
     void requestSession(nextConfig);
   }
 
   if (session) {
+    const activeConfig = sessionConfig ?? config;
     return (
       <QuizSession
-        config={config}
+        config={activeConfig}
         key={session.sessionId}
         onBackToBuilder={backToBuilder}
-        onRestart={() => void requestSession(config)}
+        onRestart={() => void requestSession(activeConfig)}
         onSwitchMode={switchMode}
         payload={session}
       />
     );
   }
 
-  return <QuizBuilder config={config} error={error} loading={loading} onChange={changeConfig} onStart={() => void requestSession(config)} />;
+  return (
+    <QuizBuilder
+      config={config}
+      error={error}
+      examEditions={examEditions}
+      loading={loading}
+      onChange={changeConfig}
+      onStart={() => void requestSession(config)}
+    />
+  );
 }

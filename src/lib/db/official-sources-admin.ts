@@ -1,6 +1,6 @@
 import "server-only";
 
-import { desc, eq, sql } from "drizzle-orm";
+import { and, desc, eq, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
 import { getDb } from "@/lib/db/client";
@@ -10,6 +10,7 @@ import {
   legalActs,
   legalSourceSnapshots,
   quizBanks,
+  quizCareerSpecializations,
   quizCareerTracks,
   users,
 } from "@/lib/db/schema";
@@ -19,7 +20,7 @@ export async function getOfficialSourcesSnapshot() {
   const initiator = alias(users, "source_initiator");
   const reviewer = alias(users, "source_reviewer");
 
-  const [laws, snapshots, portals, careers, exams, metrics] = await Promise.all([
+  const [laws, snapshots, portals, careerRows, exams, metrics] = await Promise.all([
     db
       .select({
         id: legalActs.id,
@@ -76,10 +77,22 @@ export async function getOfficialSourcesSnapshot() {
       .innerJoin(quizBanks, eq(examSourcePortals.quizBankId, quizBanks.id))
       .orderBy(quizBanks.name),
     db
-      .select({ id: quizCareerTracks.id, name: quizCareerTracks.name })
+      .select({
+        id: quizCareerTracks.id,
+        name: quizCareerTracks.name,
+        specializationId: quizCareerSpecializations.id,
+        specializationName: quizCareerSpecializations.name,
+      })
       .from(quizCareerTracks)
+      .leftJoin(
+        quizCareerSpecializations,
+        and(
+          eq(quizCareerSpecializations.careerTrackId, quizCareerTracks.id),
+          eq(quizCareerSpecializations.isActive, true),
+        ),
+      )
       .where(eq(quizCareerTracks.isActive, true))
-      .orderBy(quizCareerTracks.name),
+      .orderBy(quizCareerTracks.name, quizCareerSpecializations.name),
     db
       .select({
         publicId: examEditions.publicId,
@@ -107,6 +120,24 @@ export async function getOfficialSourcesSnapshot() {
       db.select({ value: sql<number>`count(*)::int` }).from(examEditions).where(eq(examEditions.sourcePolicy, "metadata_only")),
     ]),
   ]);
+
+  const careers = Array.from(
+    careerRows.reduce(
+      (grouped, row) => {
+        const career = grouped.get(row.id) ?? {
+          id: row.id,
+          name: row.name,
+          specializations: [] as Array<{ id: number; name: string }>,
+        };
+        if (row.specializationId !== null && row.specializationName !== null) {
+          career.specializations.push({ id: row.specializationId, name: row.specializationName });
+        }
+        grouped.set(row.id, career);
+        return grouped;
+      },
+      new Map<number, { id: number; name: string; specializations: Array<{ id: number; name: string }> }>(),
+    ).values(),
+  );
 
   return {
     laws,

@@ -4,7 +4,8 @@ import Link from "next/link";
 import { BrandMark } from "@/components/brand/BrandMark";
 
 const NAV_ITEMS = [
-  { href: "#metodo", label: "Método" },
+  { href: "/concursos", label: "Concursos" },
+  { href: "/metodologia", label: "Método" },
   { href: "#laboratorio", label: "Laboratório" },
   { href: "#recursos", label: "Recursos" },
   { href: "/fontes-e-atualizacao", label: "Fontes" },

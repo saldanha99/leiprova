@@ -12,7 +12,14 @@ import {
   quizBanks,
 } from "../src/lib/db/schema";
 import { verifyOfficialExamUrl, fetchOfficialLegalDocument } from "../src/lib/official-sources/fetch";
-import { getOfficialLegalSource } from "../src/lib/official-sources/legal-registry";
+import {
+  LegalCatalogLookupError,
+  lookupLegalActMetadata,
+} from "../src/lib/official-sources/lexml-catalog";
+import {
+  officialSourceMonitorHasHardFailures,
+  resolveOfficialLegalSource,
+} from "../src/lib/official-sources/monitor-policy";
 
 const databaseUrl = process.env.DATABASE_URL;
 if (!databaseUrl) throw new Error("Defina DATABASE_URL antes de executar o monitor.");
@@ -36,18 +43,56 @@ function safeError(error: unknown) {
 
 async function checkLaws() {
   const acts = await db
-    .select({ id: legalActs.id, slug: legalActs.slug, officialUrl: legalActs.officialUrl })
+    .select({ id: legalActs.id, slug: legalActs.slug, urn: legalActs.urn, officialUrl: legalActs.officialUrl })
     .from(legalActs)
     .where(eq(legalActs.isActive, true));
   let checked = 0;
   let failed = 0;
+  let catalogUnavailable = 0;
 
   for (const act of acts) {
-    const registered = getOfficialLegalSource(act.slug);
-    if (!registered || registered.officialUrl !== act.officialUrl) continue;
+    const resolution = resolveOfficialLegalSource(act.slug, act.officialUrl);
+    if (!resolution.matched) {
+      failed += 1;
+      console.error(`[lei:${act.slug}] configuração sem correspondência exata (${resolution.reason}).`);
+      await pause();
+      continue;
+    }
+    const registered = resolution.source;
 
     try {
-      const snapshot = await fetchOfficialLegalDocument(registered.monitorUrl);
+      if (act.urn !== registered.lexmlUrn) {
+        throw new Error(`A URN persistida diverge do registro oficial esperado para ${act.slug}.`);
+      }
+
+      const [snapshot, catalogResult] = await Promise.all([
+        fetchOfficialLegalDocument(registered.monitorUrl),
+        lookupLegalActMetadata(
+          {
+            urn: registered.lexmlUrn,
+            type: registered.actType,
+            ...(registered.actNumber === null ? {} : { number: registered.actNumber }),
+            year: registered.actYear,
+          },
+          { timeoutMs: 15_000 },
+        ).then(
+          (metadata) => ({ status: "verified" as const, metadata }),
+          (error: unknown) => {
+            if (error instanceof LegalCatalogLookupError && error.code === "unavailable") {
+              return { status: "unavailable" as const, error };
+            }
+            throw error;
+          },
+        ),
+      ]);
+      if (catalogResult.status === "verified" && catalogResult.metadata.urn !== registered.lexmlUrn) {
+        throw new Error(`O catálogo jurídico retornou uma URN divergente para ${act.slug}.`);
+      }
+      if (catalogResult.status === "unavailable") {
+        catalogUnavailable += 1;
+        console.warn(`[lexml:${act.slug}] catálogo temporariamente indisponível; mantida a última identidade validada.`);
+      }
+
       const [saved] = await db
         .insert(legalSourceSnapshots)
         .values({
@@ -67,7 +112,15 @@ async function checkLaws() {
         action: "monitor.legal_source.checked",
         entityType: "legal_source_snapshot",
         entityId: saved.publicId,
-        metadata: { legalActSlug: act.slug, checksum: snapshot.checksumSha256, status: saved.status },
+        metadata: {
+          legalActSlug: act.slug,
+          checksum: snapshot.checksumSha256,
+          status: saved.status,
+          lexmlUrn: registered.lexmlUrn,
+          legalCatalogStatus: catalogResult.status,
+          legalCatalogProvider:
+            catalogResult.status === "verified" ? catalogResult.metadata.provider : null,
+        },
       });
       checked += 1;
     } catch (error) {
@@ -77,7 +130,7 @@ async function checkLaws() {
     await pause();
   }
 
-  return { checked, failed };
+  return { checked, failed, catalogUnavailable };
 }
 
 async function checkExamPortals() {
@@ -123,7 +176,7 @@ async function main() {
   try {
     const [laws, portals] = await Promise.all([checkLaws(), checkExamPortals()]);
     console.log(JSON.stringify({ completedAt: new Date().toISOString(), laws, portals }));
-    if (laws.checked + portals.checked === 0 && laws.failed + portals.failed > 0) process.exitCode = 1;
+    if (officialSourceMonitorHasHardFailures(laws, portals)) process.exitCode = 1;
   } finally {
     await client.end();
   }

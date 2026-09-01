@@ -44,6 +44,11 @@ import {
   formatQuizQuestionSource,
 } from "@/lib/quiz/response";
 import {
+  ELIGIBLE_QUIZ_EXAM_STATUSES,
+  isQuizExamEditionAvailableForSelection,
+  saoPauloDateIso,
+} from "@/lib/quiz/exam-edition-catalog";
+import {
   quizSessionRequestSchema,
   resolveCatalogSelection,
   type QuizSessionQuestion,
@@ -54,7 +59,6 @@ import { getStudyEntitlement } from "@/lib/study/entitlement";
 export const dynamic = "force-dynamic";
 
 const MAX_BODY_BYTES = 16 * 1024;
-const eligibleExamStatuses = ["published", "held"] as const;
 
 type DbSelection = {
   careerTrackId: number | null;
@@ -162,15 +166,19 @@ function subjectCondition(selection: DbSelection) {
 
 function examEditionConditions(
   selection: DbSelection,
-  now: Date,
+  todayIso: string,
   examEditionPublicId?: string,
 ) {
   return and(
-    inArray(examEditions.status, [...eligibleExamStatuses]),
-    lte(examEditions.examDate, now.toISOString().slice(0, 10)),
+    inArray(examEditions.status, [...ELIGIBLE_QUIZ_EXAM_STATUSES]),
+    lte(examEditions.examDate, todayIso),
+    isNotNull(examEditions.officialUrl),
+    sql`char_length(btrim(${examEditions.officialUrl})) > 0`,
     selection.careerTrackId ? eq(examEditions.careerTrackId, selection.careerTrackId) : undefined,
-    selection.specializationId
-      ? eq(examEditions.specializationId, selection.specializationId)
+    selection.careerTrackId
+      ? selection.specializationId
+        ? eq(examEditions.specializationId, selection.specializationId)
+        : isNull(examEditions.specializationId)
       : undefined,
     selection.bankId ? eq(examEditions.bankId, selection.bankId) : undefined,
     examEditionPublicId ? eq(examEditions.publicId, examEditionPublicId) : undefined,
@@ -199,11 +207,12 @@ function licensedPreviousQuestionConditions(selection: DbSelection, now: Date) {
 
 async function selectExamEdition(
   selection: DbSelection,
-  now: Date,
+  todayIso: string,
   request: ReturnType<typeof quizSessionRequestSchema.parse>,
 ) {
-  if (request.mode !== "previous_exam") return null;
-  if (request.examScope === "all" && !request.examEditionId) return null;
+  if (!request.examEditionId && (request.mode !== "previous_exam" || request.examScope === "all")) {
+    return null;
+  }
 
   const rows = await getDb()
     .select({
@@ -213,16 +222,35 @@ async function selectExamEdition(
       examDate: examEditions.examDate,
       durationMinutes: examEditions.durationMinutes,
       status: examEditions.status,
+      officialUrl: examEditions.officialUrl,
+      careerTrackId: examEditions.careerTrackId,
+      specializationId: examEditions.specializationId,
+      bankId: quizBanks.id,
       bankSlug: quizBanks.slug,
       bankName: quizBanks.name,
+      bankIsActive: quizBanks.isActive,
     })
     .from(examEditions)
     .innerJoin(quizBanks, eq(examEditions.bankId, quizBanks.id))
-    .where(examEditionConditions(selection, now, request.examEditionId))
+    .where(
+      and(
+        examEditionConditions(selection, todayIso, request.examEditionId),
+        eq(quizBanks.isActive, true),
+      ),
+    )
     .orderBy(desc(examEditions.examDate), desc(examEditions.id))
     .limit(1);
 
-  return rows[0] ?? null;
+  const edition = rows[0];
+  return edition &&
+    isQuizExamEditionAvailableForSelection(
+      edition,
+      selection,
+      todayIso,
+      request.examEditionId,
+    )
+    ? edition
+    : null;
 }
 
 export async function POST(request: Request) {
@@ -255,11 +283,16 @@ export async function POST(request: Request) {
   }
 
   const now = new Date();
+  const todayIso = saoPauloDateIso(now);
   const entitlement = await getStudyEntitlement(user.id, now);
-  const selectedExamEdition = await selectExamEdition(selection, now, parsed.data);
+  const selectedExamEdition = await selectExamEdition(selection, todayIso, parsed.data);
   if (parsed.data.examEditionId && !selectedExamEdition) {
     return NextResponse.json({ error: "exam_edition_not_available" }, { status: 400 });
   }
+  const effectiveSelection =
+    parsed.data.path === "career" && selectedExamEdition
+      ? { ...selection, bankId: selectedExamEdition.bankId }
+      : selection;
 
   const modeConditions =
     parsed.data.mode === "dry_law"
@@ -273,13 +306,15 @@ export async function POST(request: Request) {
       : parsed.data.mode === "original_style"
         ? and(
             eq(questions.quizMode, "original_style"),
-            eq(questions.styleBankId, selection.bankId!),
+            effectiveSelection.bankId
+              ? eq(questions.styleBankId, effectiveSelection.bankId)
+              : sql`false`,
             eq(questions.sourceRights, "original_authorial"),
             isNotNull(questions.reviewedByUserId),
           )
         : and(
-            licensedPreviousQuestionConditions(selection, now),
-            examEditionConditions(selection, now, parsed.data.examEditionId),
+            licensedPreviousQuestionConditions(effectiveSelection, now),
+            examEditionConditions(effectiveSelection, todayIso, parsed.data.examEditionId),
             parsed.data.examScope === "latest" || parsed.data.examEditionId
               ? selectedExamEdition
                 ? eq(questions.examEditionId, selectedExamEdition.id)
@@ -295,8 +330,8 @@ export async function POST(request: Request) {
       where eligible_correct_option.question_id = ${questions.id}
         and eligible_correct_option.is_correct = true
     )`,
-    subjectCondition(selection),
-    selection.topicId ? eq(questions.topicId, selection.topicId) : undefined,
+    subjectCondition(effectiveSelection),
+    effectiveSelection.topicId ? eq(questions.topicId, effectiveSelection.topicId) : undefined,
     modeConditions,
   );
 
@@ -379,7 +414,8 @@ export async function POST(request: Request) {
   const deadlineAt = calculateQuizDeadline(now, {
     timed: parsed.data.timed,
     count: questionRows.length || parsed.data.count,
-    editionDurationMinutes: selectedExamEdition?.durationMinutes,
+    editionDurationMinutes:
+      parsed.data.mode === "previous_exam" ? selectedExamEdition?.durationMinutes : undefined,
   });
   const expiresAt = new Date(now.getTime() + 24 * 60 * 60 * 1_000);
   await getDb().transaction(async (tx) => {
@@ -387,11 +423,11 @@ export async function POST(request: Request) {
       id: sessionId,
       userId: user.id,
       path: parsed.data.path,
-      careerTrackId: selection.careerTrackId,
-      specializationId: selection.specializationId,
-      bankId: selection.bankId,
-      subjectId: selection.subjectId,
-      topicId: selection.topicId,
+      careerTrackId: effectiveSelection.careerTrackId,
+      specializationId: effectiveSelection.specializationId,
+      bankId: effectiveSelection.bankId,
+      subjectId: effectiveSelection.subjectId,
+      topicId: effectiveSelection.topicId,
       mode: parsed.data.mode,
       experience: parsed.data.experience,
       timed: parsed.data.timed,
@@ -439,7 +475,7 @@ export async function POST(request: Request) {
       verifiedAt: question.verifiedAt,
       legalActTitle: question.legalActTitle,
       officialLegalUrl: question.officialLegalUrl,
-      styleBankName: resolved.bank?.name ?? null,
+      styleBankName: selectedExamEdition?.bankName ?? resolved.bank?.name ?? null,
     }),
   }));
 
@@ -464,7 +500,11 @@ export async function POST(request: Request) {
         path: parsed.data.path,
         career: resolved.career ? { slug: resolved.career.slug, name: resolved.career.name } : null,
         specialization: resolved.specialization,
-        bank: resolved.bank ? { slug: resolved.bank.slug, name: resolved.bank.name } : null,
+        bank: selectedExamEdition
+          ? { slug: selectedExamEdition.bankSlug, name: selectedExamEdition.bankName }
+          : resolved.bank
+            ? { slug: resolved.bank.slug, name: resolved.bank.name }
+            : null,
         subject: resolved.subject ? { slug: resolved.subject.slug, name: resolved.subject.name } : null,
         topic: resolved.topic,
         mode: { slug: resolved.mode.slug, name: resolved.mode.name },

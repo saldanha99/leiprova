@@ -17,7 +17,7 @@ if [ ! -d .git ]; then
   exit 1
 fi
 
-if ! git diff --quiet HEAD 2>/dev/null; then
+if [ -n "$(git status --porcelain)" ]; then
   echo "erro: há alterações locais não commitadas em $(pwd)." >&2
   git status --short >&2
   echo "Reverta com 'git checkout -- <arquivo>' ou leve a correção para o repositório." >&2

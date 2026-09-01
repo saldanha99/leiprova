@@ -56,6 +56,20 @@ export const quizSessionRequestSchema = z
         message: "O caminho por banca não aceita carreira ou especialização.",
       });
     }
+    if (selection.path === "career" && selection.bankSlug) {
+      context.addIssue({
+        code: "custom",
+        path: ["bankSlug"],
+        message: "A banca deve ser derivada da edição oficial selecionada.",
+      });
+    }
+    if (selection.path === "bank" && selection.examEditionId) {
+      context.addIssue({
+        code: "custom",
+        path: ["examEditionId"],
+        message: "O caminho por banca não aceita uma edição de carreira específica.",
+      });
+    }
     if (selection.careerSlug && !career) {
       context.addIssue({ code: "custom", path: ["careerSlug"], message: "Carreira inválida." });
     }
@@ -106,11 +120,15 @@ export const quizSessionRequestSchema = z
         message: "Selecione a especialização da carreira.",
       });
     }
-    if (selection.mode === "original_style" && !selection.bankSlug) {
+    if (
+      selection.path === "career" &&
+      (selection.mode === "previous_exam" || selection.mode === "original_style") &&
+      !selection.examEditionId
+    ) {
       context.addIssue({
         code: "custom",
-        path: ["bankSlug"],
-        message: "Questões inéditas precisam de uma banca de referência.",
+        path: ["examEditionId"],
+        message: "Selecione a edição oficial que determina a banca desta carreira.",
       });
     }
     if (
@@ -124,11 +142,11 @@ export const quizSessionRequestSchema = z
         message: "Selecione uma matéria para este tipo de sessão.",
       });
     }
-    if (selection.examEditionId && selection.mode !== "previous_exam") {
+    if (selection.examEditionId && selection.examScope !== "latest") {
       context.addIssue({
         code: "custom",
-        path: ["examEditionId"],
-        message: "Uma edição específica só pode ser usada em questões anteriores.",
+        path: ["examScope"],
+        message: "Uma edição específica não pode ser combinada com todas as edições.",
       });
     }
   });

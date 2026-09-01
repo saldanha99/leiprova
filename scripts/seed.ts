@@ -6,6 +6,8 @@ import postgres from "postgres";
 
 import { DEMO_CONTENT_PROVENANCE, DEMO_QUESTIONS } from "../src/lib/demo-content";
 import {
+  contestCategories,
+  contestCategoryCareers,
   examSourcePortals,
   legalActs,
   legalArticles,
@@ -21,6 +23,7 @@ import {
   quizSubjects,
   quizTopics,
 } from "../src/lib/db/schema";
+import { contestCategories as contestCategoryCatalog } from "../src/lib/opportunities/categories";
 import { STYLE_PROFILE_SEEDS } from "../src/lib/editorial/style-profiles";
 import {
   ORIGINAL_STYLE_PILOT_GENERATOR,
@@ -38,6 +41,7 @@ import {
   quizCareerTracks as quizCareerCatalog,
   quizSubjects as quizSubjectCatalog,
 } from "../src/lib/quiz/catalog";
+import { classifyPilotAnchor } from "../src/lib/quiz/pilot-seed-policy";
 
 const databaseUrl = process.env.MIGRATION_DATABASE_URL ?? process.env.DATABASE_URL;
 
@@ -278,6 +282,7 @@ async function seedOfficialSourceRegistries() {
         actNumber: source.actNumber,
         actYear: source.actYear,
         jurisdiction: "federal",
+        urn: source.lexmlUrn,
         officialUrl: source.officialUrl,
       })),
     )
@@ -290,6 +295,7 @@ async function seedOfficialSourceRegistries() {
         actNumber: sql`excluded.act_number`,
         actYear: sql`excluded.act_year`,
         jurisdiction: "federal",
+        urn: sql`excluded.urn`,
         officialUrl: sql`excluded.official_url`,
         isActive: true,
         updatedAt: now,
@@ -312,6 +318,53 @@ async function seedOfficialSourceRegistries() {
       target: examSourcePortals.quizBankId,
       set: { officialUrl: sql`excluded.official_url`, sourcePolicy: "metadata_only", isActive: true, updatedAt: now },
     });
+}
+
+async function seedContestCategories() {
+  const now = new Date();
+
+  await db
+    .insert(contestCategories)
+    .values(
+      contestCategoryCatalog.map((category, sortOrder) => ({
+        slug: category.slug,
+        name: category.name,
+        description: category.description,
+        sortOrder,
+      })),
+    )
+    .onConflictDoUpdate({
+      target: contestCategories.slug,
+      set: {
+        name: sql`excluded.name`,
+        description: sql`excluded.description`,
+        sortOrder: sql`excluded.sort_order`,
+        isActive: true,
+        updatedAt: now,
+      },
+    });
+
+  const [categoryRows, careerRows] = await Promise.all([
+    db.select({ id: contestCategories.id, slug: contestCategories.slug }).from(contestCategories),
+    db.select({ id: quizCareerTracks.id, slug: quizCareerTracks.slug }).from(quizCareerTracks),
+  ]);
+  const categoryIds = new Map(categoryRows.map((row) => [row.slug, row.id]));
+  const careerIds = new Map(careerRows.map((row) => [row.slug, row.id]));
+
+  const categoryCareerRows = contestCategoryCatalog.flatMap((category) => {
+    const categoryId = categoryIds.get(category.slug);
+    if (!categoryId) throw new Error(`Categoria ausente no catálogo persistido: ${category.slug}`);
+
+    return category.careerSlugs.map((careerSlug) => {
+      const careerTrackId = careerIds.get(careerSlug);
+      if (!careerTrackId) {
+        throw new Error(`Carreira inválida na categoria ${category.slug}: ${careerSlug}`);
+      }
+      return { categoryId, careerTrackId };
+    });
+  });
+
+  await db.insert(contestCategoryCareers).values(categoryCareerRows).onConflictDoNothing();
 }
 
 const DEMO_TOPIC_SLUGS: Readonly<Record<string, string>> = {
@@ -386,7 +439,7 @@ async function seedConstitution(catalog: Awaited<ReturnType<typeof seedQuizCatal
         heading: item.topic,
         path: item.articleRef.toLowerCase().replaceAll(" ", "-").replaceAll("º", "").replaceAll(",", ""),
         literalText: item.literalText,
-        editorialStatus: "reviewed",
+        editorialStatus: "pending_review",
         sourceRights: "official_text",
       })
       .onConflictDoUpdate({
@@ -395,7 +448,6 @@ async function seedConstitution(catalog: Awaited<ReturnType<typeof seedQuizCatal
           literalText: item.literalText,
           heading: item.topic,
           updatedAt: new Date(),
-          editorialStatus: "reviewed",
         },
       })
       .returning({ id: legalArticles.id });
@@ -403,6 +455,21 @@ async function seedConstitution(catalog: Awaited<ReturnType<typeof seedQuizCatal
     const topicSlug = DEMO_TOPIC_SLUGS[item.topic];
     const topicId = topicSlug ? catalog.constitutionalTopicIds.get(topicSlug) : undefined;
     if (!topicId) throw new Error(`Tópico constitucional não mapeado: ${item.topic}`);
+    const questionMaterialChanged = sql<boolean>`(
+      ${questions.legalArticleId} is distinct from excluded."legal_article_id"
+      or ${questions.subjectId} is distinct from excluded."subject_id"
+      or ${questions.topicId} is distinct from excluded."topic_id"
+      or ${questions.quizMode} is distinct from excluded."quiz_mode"
+      or ${questions.prompt} is distinct from excluded."prompt"
+      or ${questions.explanation} is distinct from excluded."explanation"
+      or ${questions.topic} is distinct from excluded."topic"
+      or ${questions.difficulty} is distinct from excluded."difficulty"
+      or ${questions.sourceUrl} is distinct from excluded."source_url"
+      or ${questions.authorshipMethod} is distinct from excluded."authorship_method"
+      or ${questions.generatorModel} is distinct from excluded."generator_model"
+      or ${questions.promptVersion} is distinct from excluded."prompt_version"
+      or ${questions.verifiedAt} is distinct from excluded."verified_at"
+    )`;
     const [question] = await db
       .insert(questions)
       .values({
@@ -416,7 +483,7 @@ async function seedConstitution(catalog: Awaited<ReturnType<typeof seedQuizCatal
         explanation: item.explanation,
         topic: item.topic,
         difficulty,
-        editorialStatus: "reviewed",
+        editorialStatus: "pending_review",
         sourceRights: "original_authorial",
         sourceTitle: "Questão original LeiProva assistida por IA e baseada em texto oficial",
         sourceUrl: item.officialUrl,
@@ -437,7 +504,22 @@ async function seedConstitution(catalog: Awaited<ReturnType<typeof seedQuizCatal
           topic: item.topic,
           difficulty,
           verifiedAt: new Date(`${item.verifiedAt}T12:00:00Z`),
-          editorialStatus: "reviewed",
+          editorialStatus: sql`case
+            when ${questionMaterialChanged} then 'pending_review'
+            else ${questions.editorialStatus}
+          end`,
+          reviewedByUserId: sql`case
+            when ${questionMaterialChanged} then null
+            else ${questions.reviewedByUserId}
+          end`,
+          submittedAt: sql`case
+            when ${questionMaterialChanged} then null
+            else ${questions.submittedAt}
+          end`,
+          reviewNotes: sql`case
+            when ${questionMaterialChanged} then null
+            else ${questions.reviewNotes}
+          end`,
           sourceRights: "original_authorial",
           sourceTitle: "Questão original LeiProva assistida por IA e baseada em texto oficial",
           sourceUrl: item.officialUrl,
@@ -480,6 +562,7 @@ async function seedPilotOriginalQuestions() {
       .select({
         articleId: legalArticles.id,
         articleRef: legalArticles.articleRef,
+        articleStatus: legalArticles.editorialStatus,
         actTitle: legalActs.shortTitle,
         sourceUrl: legalVersions.sourceUrl,
         sourceVerifiedAt: legalVersions.verifiedAt,
@@ -496,7 +579,6 @@ async function seedPilotOriginalQuestions() {
       )
       .where(
         and(
-          eq(legalArticles.editorialStatus, "reviewed"),
           eq(legalArticles.sourceRights, "official_text"),
           eq(legalVersions.status, "current"),
           eq(legalActs.isActive, true),
@@ -517,13 +599,27 @@ async function seedPilotOriginalQuestions() {
   const existingIds = new Set(existingRows.map((row) => row.publicId));
   const similarityCorpus = [...existingRows];
   let insertedCount = 0;
+  let skippedByReviewCount = 0;
 
   for (const item of PILOT_ORIGINAL_QUESTIONS) {
     if (existingIds.has(item.publicId)) continue;
 
     const anchor = anchors.get(item.articleRef);
-    if (!anchor?.subjectId || !anchor.topicId) {
-      throw new Error(`Fonte oficial revisada ou classificação ausente para ${item.articleRef}.`);
+    if (!anchor) {
+      throw new Error(`Fonte oficial ausente para ${item.articleRef}.`);
+    }
+
+    const anchorEligibility = classifyPilotAnchor({
+      editorialStatus: anchor.articleStatus,
+      subjectId: anchor.subjectId,
+      topicId: anchor.topicId,
+    });
+    if (anchorEligibility === "blocked_by_review") {
+      skippedByReviewCount += 1;
+      continue;
+    }
+    if (anchorEligibility === "invalid_classification") {
+      throw new Error(`Classificação revisada ausente para ${item.articleRef}.`);
     }
 
     const styleBankId = bankIds.get(item.bankSlug);
@@ -591,18 +687,19 @@ async function seedPilotOriginalQuestions() {
     similarityCorpus.push({ publicId: item.publicId, prompt: item.prompt });
   }
 
-  return insertedCount;
+  return { insertedCount, skippedByReviewCount };
 }
 
 async function main() {
   try {
     await seedPlans();
     const catalog = await seedQuizCatalog();
+    await seedContestCategories();
     await seedOfficialSourceRegistries();
     await seedConstitution(catalog);
-    const pilotInsertedCount = await seedPilotOriginalQuestions();
+    const pilotResult = await seedPilotOriginalQuestions();
     console.log(
-      `Seed concluído: ${PLANS.length} planos, ${quizCareerCatalog.length} carreiras, ${quizSubjectCatalog.length} matérias, ${DEMO_QUESTIONS.length} questões de lei seca e ${PILOT_ORIGINAL_QUESTIONS.length} rascunhos no lote autoral (${pilotInsertedCount} novos).`,
+      `Seed concluído: ${PLANS.length} planos, ${contestCategoryCatalog.length} categorias, ${quizCareerCatalog.length} carreiras, ${quizSubjectCatalog.length} matérias, ${DEMO_QUESTIONS.length} questões de lei seca e ${PILOT_ORIGINAL_QUESTIONS.length} rascunhos no lote autoral (${pilotResult.insertedCount} novos; ${pilotResult.skippedByReviewCount} aguardando revisão).`,
     );
   } finally {
     await client.end();

@@ -5,10 +5,11 @@ import sitemap from "@/app/sitemap";
 import { LITERAL_LAB_EXAMPLES } from "@/components/landing/LiteralLab";
 import { DEMO_QUESTIONS } from "@/lib/demo-content";
 import { serializeJsonLd } from "@/lib/seo";
+import { createPublicWebPageStructuredData } from "@/lib/seo/page-structured-data";
 
 describe("fundação GEO e SEO", () => {
-  it("publica URLs canônicas de conteúdo com datas editoriais estáveis", () => {
-    const entries = sitemap();
+  it("publica URLs canônicas de conteúdo com datas editoriais estáveis", async () => {
+    const entries = await sitemap();
     const urls = entries.map((entry) => entry.url);
 
     expect(urls).toEqual(
@@ -17,10 +18,13 @@ describe("fundação GEO e SEO", () => {
         "https://leiprova.2b.app.br/demo",
         "https://leiprova.2b.app.br/como-memorizar-lei-seca",
         "https://leiprova.2b.app.br/fontes-e-atualizacao",
+        "https://leiprova.2b.app.br/concursos",
+        "https://leiprova.2b.app.br/metodologia",
       ]),
     );
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls).not.toContain("https://leiprova.2b.app.br/contato");
+    expect(urls.some((url) => url.startsWith("https://leiprova.2b.app.br/concursos/"))).toBe(false);
     expect(
       entries.every((entry) =>
         entry.lastModified instanceof Date && !Number.isNaN(entry.lastModified.getTime()),
@@ -47,11 +51,49 @@ describe("fundação GEO e SEO", () => {
         { userAgent: "Google-Extended", disallow: "/" },
       ]),
     );
+    const genericRule = Array.isArray(rules)
+      ? rules.find((rule) => rule.userAgent === "*")
+      : undefined;
+    expect(genericRule?.disallow).toEqual(["/app/", "/admin/", "/api/"]);
   });
 
   it("serializa JSON-LD sem permitir fechamento de script por conteúdo", () => {
     expect(serializeJsonLd({ value: "</script><script>alert(1)</script>" })).not.toContain("<");
     expect(serializeJsonLd({ value: "</script>" })).toContain("\\u003c/script>");
+  });
+
+  it("descreve a página pública e a mesma trilha visível em JSON-LD", () => {
+    const structuredData = createPublicWebPageStructuredData({
+      path: "/concursos",
+      name: "Concursos organizados por categoria, estado e edição",
+      description: "Catálogo público revisado.",
+      breadcrumbs: [
+        { name: "Início", path: "/" },
+        { name: "Concursos", path: "/concursos" },
+      ],
+      about: ["Concursos públicos"],
+    });
+
+    expect(structuredData["@graph"]).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          "@type": "WebPage",
+          url: "https://leiprova.2b.app.br/concursos",
+          name: "Concursos organizados por categoria, estado e edição",
+        }),
+        expect.objectContaining({
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            expect.objectContaining({ position: 1, name: "Início", item: "https://leiprova.2b.app.br/" }),
+            expect.objectContaining({
+              position: 2,
+              name: "Concursos",
+              item: "https://leiprova.2b.app.br/concursos",
+            }),
+          ],
+        }),
+      ]),
+    );
   });
 
   it("mantém a declaração pública do acervo alinhada ao inventário original", () => {

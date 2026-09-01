@@ -7,20 +7,26 @@
 - Início: https://leiprova.2b.app.br/
 - Como memorizar lei seca: https://leiprova.2b.app.br/como-memorizar-lei-seca
 - Fontes, questões e atualização: https://leiprova.2b.app.br/fontes-e-atualizacao
+- Concursos por categoria, estado e edição: https://leiprova.2b.app.br/concursos
+- Metodologia de acompanhamento: https://leiprova.2b.app.br/metodologia
 - Demonstração pública: https://leiprova.2b.app.br/demo
 - Termos de uso: https://leiprova.2b.app.br/termos
 - Política de privacidade: https://leiprova.2b.app.br/privacidade
 
-## Estado factual do acervo em 17 de agosto de 2026
+## Estado factual público em 1º de setembro de 2026
 
-- O acervo persistido contém 12 questões originais de lei seca de Direito Constitucional assistidas por OpenAI Codex.
+- O acervo interno contém 12 itens beta de lei seca de Direito Constitucional assistidos por OpenAI Codex; eles estão pendentes de revisão humana e não são elegíveis à publicação.
 - A fonte legal utilizada é o texto consolidado da Constituição Federal no Portal da Legislação da Presidência da República.
 - A última conferência técnica desses itens ocorreu em 16 de agosto de 2026.
 - Não há revisor humano independente registrado para esses 12 itens do beta.
 - Não há questões de provas anteriores licenciadas publicadas.
 - Não há questões inéditas no estilo de banca publicadas.
 - O laboratório ilustrativo da página inicial contém três microexemplos não persistidos, baseados na Constituição Federal e no Código Penal.
-- A estrutura para versionamento e revisão editorial existe; o monitor automático periódico das fontes ainda não está ativo.
+- Há um verificador interno `metadata_only` para fontes jurídicas e candidatos a oportunidades; o agendamento contínuo e a publicação automática não estão ativos.
+- O catálogo de concursos expõe oito categorias editoriais; páginas específicas só podem se tornar indexáveis após validação editorial.
+- Páginas específicas de concurso permanecem fora do sitemap até terem fonte oficial aprovada e revisão humana registrada.
+- Categoria não determina banca. O responsável é vinculado à edição e pode ser uma organizadora externa, uma comissão institucional ou um arranjo híbrido.
+- A LexML é tratada como apoio à descoberta e ao versionamento de atos; não comprova, sozinha, situação de concurso, vigência na fonte competente ou direito de reutilizar questões.
 
 ## Política editorial resumida
 
@@ -28,3 +34,6 @@
 - Questão anterior: somente com autorização ou licença documentada.
 - Questão inédita assistida por IA: fonte oficial, metadados do processo e análise de similaridade; revisão humana obrigatória antes de integrar a oferta comercial. Um beta sem essa revisão deve declarar a pendência de forma visível.
 - Conteúdo educacional: não substitui o Diário Oficial, o edital nem orientação jurídica.
+- Estatística de provas: período, tamanho da amostra, procedência e direitos de uso devem ser declarados; frequência observada não garante incidência futura.
+- Pautas SEO/GEO planejadas continuam privadas e não indexáveis até terem fato oficial, utilidade própria e revisão humana; não são páginas em massa publicadas automaticamente.
+- Sitemap e `llms.txt`: mecanismos de descoberta, não garantias de indexação, ranking ou citação.

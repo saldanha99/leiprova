@@ -17,8 +17,11 @@ export function PublicGuideShell({ children }: { children: ReactNode }) {
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-4">
           <LeiProvaMark />
           <nav className="flex items-center gap-2 text-sm font-semibold text-slate-400" aria-label="Navegação pública">
-            <Link className="hidden rounded-lg px-3 py-2 hover:bg-white/5 hover:text-white sm:inline-flex" href="/como-memorizar-lei-seca">
-              Método
+            <Link className="hidden rounded-lg px-3 py-2 hover:bg-white/5 hover:text-white md:inline-flex" href="/concursos">
+              Concursos
+            </Link>
+            <Link className="hidden rounded-lg px-3 py-2 hover:bg-white/5 hover:text-white md:inline-flex" href="/metodologia">
+              Metodologia
             </Link>
             <Link className="hidden rounded-lg px-3 py-2 hover:bg-white/5 hover:text-white sm:inline-flex" href="/fontes-e-atualizacao">
               Fontes
@@ -43,6 +46,8 @@ export function PublicGuideShell({ children }: { children: ReactNode }) {
             </p>
           </div>
           <div className="flex flex-wrap gap-x-5 gap-y-2 font-semibold">
+            <Link className="hover:text-white" href="/concursos">Concursos</Link>
+            <Link className="hover:text-white" href="/metodologia">Metodologia</Link>
             <Link className="hover:text-white" href="/demo">Demonstração</Link>
             <Link className="hover:text-white" href="/fontes-e-atualizacao">Fontes</Link>
             <Link className="hover:text-white" href="/termos">Termos</Link>

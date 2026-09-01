@@ -42,8 +42,8 @@ export function parseOfficialExamUrl(bankSlug: string, input: string) {
     throw new Error("Informe uma URL oficial válida.");
   }
 
-  if (url.protocol !== "https:" || url.username || url.password) {
-    throw new Error("A fonte precisa usar HTTPS e não pode conter credenciais.");
+  if (url.protocol !== "https:" || url.username || url.password || url.port) {
+    throw new Error("A fonte precisa usar HTTPS, porta padrão e não pode conter credenciais.");
   }
 
   if (!(portal.allowedHosts as readonly string[]).includes(url.hostname.toLowerCase())) {
@@ -51,4 +51,13 @@ export function parseOfficialExamUrl(bankSlug: string, input: string) {
   }
 
   return url;
+}
+
+export function isOfficialExamUrl(bankSlug: string, input: string) {
+  try {
+    parseOfficialExamUrl(bankSlug, input);
+    return true;
+  } catch {
+    return false;
+  }
 }

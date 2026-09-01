@@ -7,6 +7,7 @@ import {
   BookOpenCheck,
   BriefcaseBusiness,
   Building2,
+  CalendarDays,
   Check,
   ChevronRight,
   Clock3,
@@ -14,6 +15,7 @@ import {
   FileQuestion,
   Landmark,
   LoaderCircle,
+  LockKeyhole,
   Scale,
   ShieldCheck,
   Sparkles,
@@ -30,11 +32,11 @@ import {
   quizSubjects,
 } from "@/lib/quiz/catalog";
 import { cn } from "@/lib/utils";
+import type { QuizExamEditionOption } from "@/lib/quiz/exam-edition-catalog";
 
 import {
   isQuizConfigReady,
   type QuizConfig,
-  type QuizExamScope,
   type QuizExperienceMode,
   type QuizPath,
 } from "./types";
@@ -42,6 +44,7 @@ import {
 type QuizBuilderProps = {
   config: QuizConfig;
   error: string | null;
+  examEditions: readonly QuizExamEditionOption[];
   loading: boolean;
   onChange: (config: QuizConfig) => void;
   onStart: () => void;
@@ -58,7 +61,7 @@ const pathOptions: Array<{
   {
     id: "career",
     title: "Por cargo ou concurso",
-    description: "Defina sua carreira, especialização, banca e matéria.",
+    description: "Defina a carreira e a edição oficial; a banca vem vinculada.",
     icon: BriefcaseBusiness,
   },
   {
@@ -89,12 +92,19 @@ const experienceOptions: Array<{
   },
 ];
 
-export function QuizBuilder({ config, error, loading, onChange, onStart }: QuizBuilderProps) {
+export function QuizBuilder({
+  config,
+  error,
+  examEditions,
+  loading,
+  onChange,
+  onStart,
+}: QuizBuilderProps) {
   const availableSubjects = config.path === "career" && config.careerSlug
     ? getSubjectsForCareer(config.careerSlug)
     : quizSubjects;
   const subject = availableSubjects.find((item) => item.slug === config.subjectSlug);
-  const canStart = isQuizConfigReady(config);
+  const canStart = isQuizConfigReady(config, examEditions);
 
   function update(patch: Partial<QuizConfig>) {
     onChange({ ...config, ...patch });
@@ -106,7 +116,7 @@ export function QuizBuilder({ config, error, loading, onChange, onStart }: QuizB
       count: config.count,
       experience: config.experience,
       timed: config.timed,
-      examScope: config.examScope,
+      examScope: path === "bank" ? "all" : "latest",
     });
   }
 
@@ -115,6 +125,8 @@ export function QuizBuilder({ config, error, loading, onChange, onStart }: QuizB
       ...config,
       careerSlug,
       specializationSlug: undefined,
+      examYear: undefined,
+      examEditionId: undefined,
       subjectSlug: undefined,
       topicSlug: undefined,
       bankSlug: undefined,
@@ -128,6 +140,7 @@ export function QuizBuilder({ config, error, loading, onChange, onStart }: QuizB
   }
 
   return (
+    <fieldset aria-busy={loading} className="contents" disabled={loading}>
     <div className="mt-8 grid gap-5 xl:grid-cols-[minmax(0,1fr)_300px]">
       <div className="grid min-w-0 gap-5">
         <section className="rounded-[1.75rem] border border-white/8 bg-[#09131f] p-4 sm:p-6">
@@ -164,6 +177,7 @@ export function QuizBuilder({ config, error, loading, onChange, onStart }: QuizB
         {config.path === "career" ? (
           <CareerPathSection
             config={config}
+            examEditions={examEditions}
             onCareerChange={chooseCareer}
             onChange={update}
           />
@@ -287,21 +301,61 @@ export function QuizBuilder({ config, error, loading, onChange, onStart }: QuizB
         </section>
       </div>
 
-      <QuizSummary config={config} canStart={canStart} error={error} loading={loading} onStart={onStart} />
+      <QuizSummary
+        config={config}
+        canStart={canStart}
+        error={error}
+        examEditions={examEditions}
+        loading={loading}
+        onStart={onStart}
+      />
     </div>
+    </fieldset>
   );
 }
 
 function CareerPathSection({
   config,
+  examEditions,
   onCareerChange,
   onChange,
 }: {
   config: QuizConfig;
+  examEditions: readonly QuizExamEditionOption[];
   onCareerChange: (slug: string) => void;
   onChange: (patch: Partial<QuizConfig>) => void;
 }) {
   const career = config.careerSlug ? getCareerBySlug(config.careerSlug) : undefined;
+  const matchingEditions = examEditions.filter(
+    (edition) =>
+      edition.careerSlug === config.careerSlug &&
+      (edition.specializationSlug ?? undefined) === (config.specializationSlug ?? undefined),
+  );
+  const years = [...new Set(matchingEditions.map((edition) => edition.examYear))].sort(
+    (left, right) => right - left,
+  );
+  const editionsForYear = config.examYear
+    ? matchingEditions.filter((edition) => edition.examYear === config.examYear)
+    : [];
+
+  function chooseSpecialization(specializationSlug: string) {
+    onChange({
+      specializationSlug,
+      examYear: undefined,
+      examEditionId: undefined,
+      bankSlug: undefined,
+      examScope: "latest",
+    });
+  }
+
+  function chooseYear(examYear: number) {
+    onChange({
+      examYear,
+      examEditionId: undefined,
+      bankSlug: undefined,
+      examScope: "latest",
+    });
+  }
 
   return (
     <>
@@ -336,45 +390,82 @@ function CareerPathSection({
             <div className="mt-3 grid gap-2 sm:grid-cols-3">
               {career.specializations.map((specialization) => (
                 <label key={specialization.slug} className={cn("cursor-pointer rounded-xl border p-3 text-sm transition focus-within:ring-2 focus-within:ring-amber-300", config.specializationSlug === specialization.slug ? "border-amber-300/35 bg-amber-300/8 text-amber-200" : "border-white/8 bg-slate-950/25 text-slate-400 hover:border-white/16")}>
-                  <input className="sr-only" type="radio" name="specialization" checked={config.specializationSlug === specialization.slug} onChange={() => onChange({ specializationSlug: specialization.slug })} />
+                  <input className="sr-only" type="radio" name="specialization" checked={config.specializationSlug === specialization.slug} onChange={() => chooseSpecialization(specialization.slug)} />
                   <span className="flex items-center gap-2"><Landmark className="size-4" />{specialization.name}</span>
                 </label>
               ))}
             </div>
-            {career.slug === "magistratura" && <p className="mt-3 text-[11px] leading-5 text-slate-600">A banca pode variar entre editais. O filtro não presume que toda magistratura estadual seja organizada pela mesma instituição.</p>}
+            {career.slug === "magistratura" && <p className="mt-3 text-[11px] leading-5 text-slate-600">A banca pode variar entre editais. Cada edição oficial informa sua própria organizadora.</p>}
           </fieldset>
         ) : null}
       </section>
 
       {career && (
         <section className="rounded-[1.75rem] border border-white/8 bg-[#09131f] p-4 sm:p-6">
-          <StepHeading number="03" title="Prova e banca" description="A edição exata só é identificada quando existir material licenciado compatível." />
-          <div className="mt-5 grid gap-5 lg:grid-cols-[.8fr_1.2fr]">
-            <fieldset>
-              <legend className="text-xs font-bold uppercase tracking-[.13em] text-slate-500">Recorte das provas</legend>
-              <div className="mt-3 grid gap-2">
-                <ExamScopeOption id="latest" selected={config.examScope === "latest"} onChange={(examScope) => onChange({ examScope })} />
-                <ExamScopeOption id="all" selected={config.examScope === "all"} onChange={(examScope) => onChange({ examScope })} />
-              </div>
-            </fieldset>
-            <fieldset>
-              <legend className="text-xs font-bold uppercase tracking-[.13em] text-slate-500">Banca organizadora</legend>
-              <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
-                <label className={cn("cursor-pointer rounded-xl border p-3 transition focus-within:ring-2 focus-within:ring-amber-300", !config.bankSlug ? "border-emerald-300/35 bg-emerald-300/7" : "border-white/8 bg-slate-950/25 hover:border-white/16")}>
-                  <input className="sr-only" type="radio" name="career-bank" checked={!config.bankSlug} onChange={() => onChange({ bankSlug: undefined })} />
-                  <strong className="block text-xs text-slate-200">Sem fixar banca</strong>
-                  <span className="mt-1 block text-[9px] leading-4 text-slate-600">A edição encontrada informa a organizadora real.</span>
-                </label>
-                {quizBanks.map((bank) => (
-                  <label key={bank.slug} className={cn("cursor-pointer rounded-xl border p-3 transition focus-within:ring-2 focus-within:ring-amber-300", config.bankSlug === bank.slug ? "border-emerald-300/35 bg-emerald-300/7" : "border-white/8 bg-slate-950/25 hover:border-white/16")}>
-                    <input className="sr-only" type="radio" name="career-bank" checked={config.bankSlug === bank.slug} onChange={() => onChange({ bankSlug: bank.slug })} />
-                    <strong className="block text-xs text-slate-200">{bank.name}</strong>
-                    <span className="mt-1 block truncate text-[9px] text-slate-600" title={bank.fullName}>{bank.fullName}</span>
-                  </label>
-                ))}
-              </div>
-            </fieldset>
-          </div>
+          <StepHeading number="03" title="Ano, edição e banca" description="Escolha a prova oficial. A banca é informada pelo edital e não pode ser trocada manualmente." />
+          {career.specializations.length > 0 && !config.specializationSlug ? (
+            <CatalogNotice message="Escolha a especialização acima para consultar as edições sincronizadas." />
+          ) : years.length === 0 ? (
+            <CatalogNotice message="Ainda não há edição oficial revisada e sincronizada para este recorte. A lei seca continua disponível sem atribuir uma banca fictícia." />
+          ) : (
+            <div className="mt-5 grid gap-5 lg:grid-cols-[.6fr_1.4fr]">
+              <fieldset>
+                <legend className="text-xs font-bold uppercase tracking-[.13em] text-slate-500">Ano da prova</legend>
+                <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-2">
+                  {years.map((year) => (
+                    <label key={year} className={cn("cursor-pointer rounded-xl border p-3 text-center text-sm font-bold transition focus-within:ring-2 focus-within:ring-amber-300", config.examYear === year ? "border-sky-300/35 bg-sky-300/8 text-sky-200" : "border-white/8 bg-slate-950/25 text-slate-500 hover:border-white/16")}>
+                      <input className="sr-only" type="radio" name="exam-year" checked={config.examYear === year} onChange={() => chooseYear(year)} />
+                      {year}
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+              <fieldset>
+                <legend className="text-xs font-bold uppercase tracking-[.13em] text-slate-500">Edição oficial</legend>
+                {!config.examYear ? (
+                  <p className="mt-3 rounded-xl border border-white/8 bg-slate-950/25 p-4 text-xs leading-5 text-slate-600">Selecione o ano para ver o órgão, a edição e a banca responsável.</p>
+                ) : (
+                  <div className="mt-3 grid gap-2">
+                    {editionsForYear.map((edition) => {
+                      const selected = config.examEditionId === edition.publicId;
+                      return (
+                        <button
+                          key={edition.publicId}
+                          aria-pressed={selected}
+                          className={cn("rounded-xl border p-4 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300", selected ? "border-emerald-300/35 bg-emerald-300/7" : "border-white/8 bg-slate-950/25 hover:border-white/16")}
+                          onClick={() => onChange({ examEditionId: selected ? undefined : edition.publicId, bankSlug: undefined, examScope: "latest" })}
+                          type="button"
+                        >
+                          <span className="flex items-start justify-between gap-3">
+                            <span>
+                              <strong className="block text-sm text-slate-100">{edition.title}</strong>
+                              <span className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] text-slate-500">
+                                <span className="inline-flex items-center gap-1"><CalendarDays className="size-3" />{formatExamDate(edition.examDate)}</span>
+                                {(edition.organizer || edition.jurisdiction) && <span>{[edition.organizer, edition.jurisdiction].filter(Boolean).join(" · ")}</span>}
+                              </span>
+                            </span>
+                            {selected && <Check className="size-4 shrink-0 text-emerald-300" />}
+                          </span>
+                          <span className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-amber-300/15 bg-amber-300/7 px-2.5 py-1 text-[10px] font-bold text-amber-200">
+                            <LockKeyhole className="size-3" /> Banca vinculada: {edition.bank.name}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+                {config.examEditionId && config.mode === "dry_law" ? (
+                  <button
+                    className="mt-3 text-xs font-semibold text-slate-500 underline-offset-4 hover:text-slate-300 hover:underline"
+                    onClick={() => onChange({ examEditionId: undefined, bankSlug: undefined })}
+                    type="button"
+                  >
+                    Usar lei seca sem vincular uma edição
+                  </button>
+                ) : null}
+              </fieldset>
+            </div>
+          )}
         </section>
       )}
     </>
@@ -412,9 +503,24 @@ function BankPathSection({ config, onChange }: { config: QuizConfig; onChange: (
   );
 }
 
-function QuizSummary({ config, canStart, error, loading, onStart }: { config: QuizConfig; canStart: boolean; error: string | null; loading: boolean; onStart: () => void }) {
+function QuizSummary({
+  config,
+  canStart,
+  error,
+  examEditions,
+  loading,
+  onStart,
+}: {
+  config: QuizConfig;
+  canStart: boolean;
+  error: string | null;
+  examEditions: readonly QuizExamEditionOption[];
+  loading: boolean;
+  onStart: () => void;
+}) {
   const career = config.careerSlug ? getCareerBySlug(config.careerSlug) : undefined;
-  const bank = quizBanks.find((item) => item.slug === config.bankSlug);
+  const edition = examEditions.find((item) => item.publicId === config.examEditionId);
+  const bank = edition?.bank ?? quizBanks.find((item) => item.slug === config.bankSlug);
   const subjects = config.path === "career" && config.careerSlug ? getSubjectsForCareer(config.careerSlug) : quizSubjects;
   const subject = subjects.find((item) => item.slug === config.subjectSlug);
   const topic = subject?.topics.find((item) => item.slug === config.topicSlug);
@@ -429,11 +535,12 @@ function QuizSummary({ config, canStart, error, loading, onStart }: { config: Qu
       <dl className="mt-5 grid gap-3 border-y border-white/8 py-5 text-xs">
         <SummaryRow label="Caminho" value={config.path === "career" ? career?.name : "Por banca e matéria"} />
         {config.specializationSlug && <SummaryRow label="Especialização" value={career?.specializations.find((item) => item.slug === config.specializationSlug)?.name} />}
-        <SummaryRow label="Banca" value={bank?.name ?? (config.path === "career" && config.mode !== "original_style" ? "Automática / não fixada" : undefined)} />
-        <SummaryRow label="Matéria" value={subject?.name ?? (config.path === "career" && config.mode === "previous_exam" && config.examScope === "latest" ? "Sem filtro de matéria" : undefined)} />
-        <SummaryRow label="Recorte" value={topic?.name ?? (subject ? "Matéria completa" : config.path === "career" && config.mode === "previous_exam" && config.examScope === "latest" ? "Edição mais recente" : undefined)} />
+        {config.path === "career" && <SummaryRow label="Edição" value={edition ? `${edition.examYear} · ${edition.title}` : config.mode === "dry_law" ? "Opcional na lei seca" : undefined} />}
+        <SummaryRow label="Banca" value={bank?.name ?? (config.path === "career" && config.mode === "dry_law" ? "Não atribuída" : undefined)} />
+        <SummaryRow label="Matéria" value={subject?.name ?? (config.path === "career" && config.mode === "previous_exam" ? "Prova completa" : undefined)} />
+        <SummaryRow label="Recorte" value={topic?.name ?? (subject ? "Matéria completa" : config.path === "career" && config.mode === "previous_exam" ? "Edição selecionada" : undefined)} />
         <SummaryRow label="Questões" value={mode?.name} />
-        {config.mode === "previous_exam" && <SummaryRow label="Edições" value={config.examScope === "latest" ? "Questões da última edição" : "Questões de todas as edições"} />}
+        {config.mode === "previous_exam" && <SummaryRow label="Prova" value={config.path === "career" ? edition?.title : "Edições da banca"} />}
         <SummaryRow label="Experiência" value={config.experience === "training" ? "Modo treino" : "Modo prova"} />
         <SummaryRow
           label="Ritmo"
@@ -491,14 +598,12 @@ function TimingOption({ icon: Icon, label, helper, selected, onClick }: { icon: 
   );
 }
 
-function ExamScopeOption({ id, selected, onChange }: { id: QuizExamScope; selected: boolean; onChange: (value: QuizExamScope) => void }) {
-  const latest = id === "latest";
+function CatalogNotice({ message }: { message: string }) {
   return (
-    <label className={cn("cursor-pointer rounded-xl border p-3.5 transition focus-within:ring-2 focus-within:ring-amber-300", selected ? "border-sky-300/30 bg-sky-300/7" : "border-white/8 bg-slate-950/25")}>
-      <input className="sr-only" type="radio" name="exam-scope" checked={selected} onChange={() => onChange(id)} />
-      <span className="flex items-center gap-2 text-xs font-semibold text-slate-200">{latest ? "Questões da última edição" : "Questões de todas as edições"}{latest && <span className="rounded-full bg-amber-300 px-1.5 py-0.5 text-[8px] font-black uppercase text-slate-950">Preferido</span>}</span>
-      <span className="mt-1.5 block text-[10px] leading-4 text-slate-600">{latest ? "Usa a edição licenciada mais recente, quando existir." : "Mistura somente edições licenciadas no acervo."}</span>
-    </label>
+    <div className="mt-5 flex items-start gap-3 rounded-2xl border border-sky-300/12 bg-sky-300/5 p-4 text-xs leading-5 text-sky-100/70">
+      <ShieldCheck className="mt-0.5 size-4 shrink-0 text-sky-300" />
+      <p>{message}</p>
+    </div>
   );
 }
 
@@ -510,4 +615,9 @@ function formatDuration(seconds: number) {
   const minutes = Math.floor(seconds / 60);
   const remainder = seconds % 60;
   return remainder ? `${minutes}min${String(remainder).padStart(2, "0")}` : `${minutes}min`;
+}
+
+function formatExamDate(value: string) {
+  const [year, month, day] = value.split("-");
+  return `${day}/${month}/${year}`;
 }

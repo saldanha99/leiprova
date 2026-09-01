@@ -79,7 +79,7 @@ O construtor de quiz oferece dois caminhos:
 
 O catálogo inclui VUNESP, FGV, FCC e CEBRASPE; Polícia Federal em destaque; e as carreiras Defensoria, Analista, Analista Jurídico, Promotoria, Magistratura, Técnico Judiciário, Delegado, Polícia Civil, Polícia Federal, OAB, Oficial da Promotoria, Oficial de Justiça e Escrivão de Polícia Civil. Magistratura possui recortes Federal, Estadual e do Trabalho.
 
-A banca pertence à edição do concurso, não à carreira. O sistema encontra a última prova pela data da edição e não presume, por exemplo, que toda Magistratura Estadual seja sempre organizada pela FGV.
+A banca pertence à edição do concurso, não à carreira. Nos modos que dependem desse perfil, o usuário escolhe uma edição oficial elegível e o servidor deriva a banca vinculada; não presume, por exemplo, que toda Magistratura Estadual seja sempre organizada pela FGV.
 
 Os modos de conteúdo são separados por procedência:
 
@@ -174,6 +174,8 @@ Somente usuários com `users.role = 'admin'` acessam `/admin`; editores continua
 ## Deploy
 
 > Contexto operacional completo — hospedagem, ambiente local, flags e armadilhas conhecidas — em [`docs/OPERACAO.md`](docs/OPERACAO.md).
+
+> A regra temporal carreira → edição → banca e a integração LexML/Senado estão documentadas em [`docs/SINCRONIZACAO-CATALOGO.md`](docs/SINCRONIZACAO-CATALOGO.md).
 
 A infraestrutura usa banco dedicado, papel proprietário só para migrações e papel de aplicação com privilégios mínimos. O app entra na rede externa `forza` para ser descoberto pelo Traefik já existente.
 
