@@ -2,7 +2,7 @@
 
 import { randomUUID } from "node:crypto";
 
-import { and, eq, inArray, isNull } from "drizzle-orm";
+import { and, eq, inArray, isNull, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
@@ -392,59 +392,82 @@ export async function captureNoticeDocumentAction(
 
   try {
     const publicId = randomUUID();
-    const [saved] = await db
-      .insert(opportunityDocumentSnapshots)
-      .values({
-        publicId,
-        sourceDocumentId: source.id,
-        documentUrl: captured.documentUrl,
-        sourceHost: captured.sourceHost,
-        fileName: captured.fileName,
-        mimeType: captured.mimeType,
-        documentBytes: captured.documentBytes,
-        checksumSha256: captured.checksumSha256,
-        byteLength: captured.byteLength,
-        pageCount: captured.pageCount,
-        extractedText: captured.extractedText,
-        pageTexts: [...captured.pageTexts],
-        textLength: captured.textLength,
-        parserVersion: captured.parserVersion,
-        sourcePolicy: "official_document",
-        authorizationScope: OFFICIAL_DOCUMENT_AUTHORIZATION_SCOPE,
-        authorizedAt: new Date("2026-09-01T12:00:00.000-03:00"),
-        initiatedByUserId: user.id,
-      })
-      .onConflictDoNothing({
-        target: [
-          opportunityDocumentSnapshots.sourceDocumentId,
-          opportunityDocumentSnapshots.checksumSha256,
-        ],
-      })
-      .returning({ publicId: opportunityDocumentSnapshots.publicId });
-    if (!saved) return errorState("Esta versão do PDF já está armazenada para a fonte.");
-
-    await db.insert(auditLogs).values({
-      actorUserId: user.id,
-      action: "editorial.notice_document.captured",
-      entityType: "opportunity_document_snapshot",
-      entityId: saved.publicId,
-      metadata: {
-        sourceDocumentPublicId: parsed.data.sourceDocumentPublicId,
-        documentUrl: captured.documentUrl,
-        checksumSha256: captured.checksumSha256,
-        byteLength: captured.byteLength,
-        pageCount: captured.pageCount,
-        textLength: captured.textLength,
-        authorizationScope: OFFICIAL_DOCUMENT_AUTHORIZATION_SCOPE,
-      },
+    // Keep the target list aligned with the production role's column grant.
+    // Drizzle's regular insert mentions every defaulted review column.
+    const saved = await db.transaction(async (transaction) => {
+      const savedRows = await transaction.execute<{ public_id: string }>(sql`
+        insert into opportunity_document_snapshots (
+          public_id,
+          source_document_id,
+          document_url,
+          source_host,
+          file_name,
+          mime_type,
+          document_bytes,
+          checksum_sha256,
+          byte_length,
+          page_count,
+          extracted_text,
+          page_texts,
+          text_length,
+          parser_version,
+          source_policy,
+          authorization_scope,
+          authorized_at,
+          initiated_by_user_id
+        ) values (
+          ${publicId},
+          ${source.id},
+          ${captured.documentUrl},
+          ${captured.sourceHost},
+          ${captured.fileName},
+          ${captured.mimeType},
+          ${captured.documentBytes},
+          ${captured.checksumSha256},
+          ${captured.byteLength},
+          ${captured.pageCount},
+          ${captured.extractedText},
+          ${JSON.stringify(captured.pageTexts)}::jsonb,
+          ${captured.textLength},
+          ${captured.parserVersion},
+          'official_document',
+          ${OFFICIAL_DOCUMENT_AUTHORIZATION_SCOPE},
+          ${new Date("2026-09-01T12:00:00.000-03:00").toISOString()},
+          ${user.id}
+        )
+        on conflict (source_document_id, checksum_sha256) do nothing
+        returning public_id
+      `);
+      const row = savedRows[0];
+      if (!row) return null;
+      await transaction.insert(auditLogs).values({
+        actorUserId: user.id,
+        action: "editorial.notice_document.captured",
+        entityType: "opportunity_document_snapshot",
+        entityId: row.public_id,
+        metadata: {
+          sourceDocumentPublicId: parsed.data.sourceDocumentPublicId,
+          documentUrl: captured.documentUrl,
+          checksumSha256: captured.checksumSha256,
+          byteLength: captured.byteLength,
+          pageCount: captured.pageCount,
+          textLength: captured.textLength,
+          authorizationScope: OFFICIAL_DOCUMENT_AUTHORIZATION_SCOPE,
+        },
+      });
+      return row;
     });
+    if (!saved) return errorState("Esta versão do PDF já está armazenada para a fonte.");
     refreshNoticeEngine();
     return {
       status: "success",
       message: `PDF oficial capturado (${captured.pageCount} páginas) e enviado para revisão independente.`,
     };
   } catch (error) {
-    console.error("Falha ao persistir captura oficial.", error);
+    console.error(
+      "Falha ao persistir captura oficial.",
+      error instanceof Error ? error.name : "UnknownError",
+    );
     return errorState("Não foi possível armazenar o PDF oficial. A equipe técnica foi informada.");
   }
 }
