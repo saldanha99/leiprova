@@ -917,6 +917,7 @@ export const opportunityDocumentSnapshots = pgTable(
       { onDelete: "set null" },
     ),
     status: text("status").notNull().default("pending_review"),
+    approvalBasis: text("approval_basis").notNull().default("independent_review"),
     reviewedByUserId: bigint("reviewed_by_user_id", { mode: "number" }).references(
       () => users.id,
       { onDelete: "set null" },
@@ -980,6 +981,10 @@ export const opportunityDocumentSnapshots = pgTable(
       sql`${table.status} in ('pending_review', 'approved', 'superseded', 'rejected')`,
     ),
     check(
+      "opportunity_document_snapshots_approval_basis_check",
+      sql`${table.approvalBasis} in ('independent_review', 'owner_override')`,
+    ),
+    check(
       "opportunity_document_snapshots_review_check",
       sql`${table.status} <> 'approved' or (${table.reviewedByUserId} is not null and ${table.reviewedAt} is not null)`,
     ),
@@ -987,7 +992,11 @@ export const opportunityDocumentSnapshots = pgTable(
       "opportunity_document_snapshots_independent_review_check",
       sql`${table.status} <> 'approved'
         or ${table.initiatedByUserId} is null
-        or ${table.reviewedByUserId} <> ${table.initiatedByUserId}`,
+        or ${table.reviewedByUserId} <> ${table.initiatedByUserId}
+        or (${table.approvalBasis} = 'owner_override'
+          and ${table.authorizationScope} = 'owner-approval-2026-09-01'
+          and ${table.authorizedByUserId} is not null
+          and ${table.authorizedByUserId} = ${table.reviewedByUserId})`,
     ),
     check(
       "opportunity_document_snapshots_review_notes_check",

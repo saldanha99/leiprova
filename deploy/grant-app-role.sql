@@ -61,6 +61,7 @@ grant select (
   authorized_by_user_id,
   initiated_by_user_id,
   status,
+  approval_basis,
   reviewed_by_user_id,
   reviewed_at,
   review_notes,
@@ -306,6 +307,8 @@ grant insert (
 
 grant update (
   status,
+  approval_basis,
+  authorized_by_user_id,
   reviewed_by_user_id,
   reviewed_at,
   review_notes,

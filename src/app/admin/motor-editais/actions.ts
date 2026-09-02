@@ -35,6 +35,7 @@ import {
   findMostSimilarQuestion,
   ORIGINALITY_REJECTION_THRESHOLD_BPS,
 } from "@/lib/editorial/originality";
+import { isEditorialOwnerApprover } from "@/lib/editorial/owner-approval";
 import { parseSyllabusItems } from "@/lib/editorial/syllabus-parser";
 import { extractOfficialSyllabusCandidates } from "@/lib/editorial/official-syllabus-extractor";
 import type { InternalOpportunitySourceCandidate } from "@/lib/opportunities/official-candidates";
@@ -476,6 +477,7 @@ const snapshotReviewSchema = z.object({
   snapshotPublicId: z.string().uuid(),
   decision: z.enum(["approve", "reject"]),
   notes: z.string().trim().max(2_000),
+  ownerOverride: z.enum(["true"]).optional(),
 });
 
 export async function reviewNoticeDocumentAction(
@@ -487,6 +489,7 @@ export async function reviewNoticeDocumentAction(
     snapshotPublicId: formData.get("snapshotPublicId"),
     decision: formData.get("decision"),
     notes: formData.get("notes"),
+    ownerOverride: formData.get("ownerOverride") || undefined,
   });
   if (!parsed.success) return errorState("Revise os dados da decisão do PDF.");
   if (parsed.data.decision === "reject" && parsed.data.notes.length < 10) {
@@ -499,6 +502,7 @@ export async function reviewNoticeDocumentAction(
       id: opportunityDocumentSnapshots.id,
       status: opportunityDocumentSnapshots.status,
       initiatedByUserId: opportunityDocumentSnapshots.initiatedByUserId,
+      authorizationScope: opportunityDocumentSnapshots.authorizationScope,
       sourceStatus: opportunitySourceDocuments.status,
     })
     .from(opportunityDocumentSnapshots)
@@ -511,14 +515,26 @@ export async function reviewNoticeDocumentAction(
   if (!snapshot || snapshot.status !== "pending_review") {
     return errorState("Esta captura não está mais pendente.");
   }
-  if (snapshot.initiatedByUserId === user.id) {
-    return errorState("Quem capturou o PDF não pode aprovar a própria captura.");
+  const approved = parsed.data.decision === "approve";
+  const isInitiator = snapshot.initiatedByUserId === user.id;
+  const ownerOverride = approved && isInitiator && parsed.data.ownerOverride === "true";
+  if (approved && isInitiator && !ownerOverride) {
+    return errorState("Confirme que esta é uma aprovação explícita do proprietário.");
+  }
+  if (approved && parsed.data.ownerOverride === "true" && !isInitiator) {
+    return errorState("A exceção do proprietário só pode ser registrada pelo autor da captura.");
+  }
+  if (ownerOverride && !isEditorialOwnerApprover(user.email)) {
+    return errorState("Somente a conta do proprietário configurada pode registrar esta exceção.");
+  }
+  if (ownerOverride && snapshot.authorizationScope !== OFFICIAL_DOCUMENT_AUTHORIZATION_SCOPE) {
+    return errorState("Esta captura não possui a autorização formal exigida para a exceção.");
   }
   if (parsed.data.decision === "approve" && snapshot.sourceStatus !== "approved") {
     return errorState("A fonte oficial vinculada precisa continuar aprovada.");
   }
 
-  const approved = parsed.data.decision === "approve";
+  const approvalBasis = ownerOverride ? "owner_override" : "independent_review";
   const now = new Date();
   try {
     await db.transaction(async (transaction) => {
@@ -526,6 +542,8 @@ export async function reviewNoticeDocumentAction(
         .update(opportunityDocumentSnapshots)
         .set({
           status: approved ? "approved" : "rejected",
+          approvalBasis,
+          authorizedByUserId: ownerOverride ? user.id : undefined,
           reviewedByUserId: user.id,
           reviewedAt: now,
           reviewNotes: parsed.data.notes || null,
@@ -546,14 +564,20 @@ export async function reviewNoticeDocumentAction(
           : "editorial.notice_document.rejected",
         entityType: "opportunity_document_snapshot",
         entityId: parsed.data.snapshotPublicId,
-        metadata: { notes: parsed.data.notes || null },
+        metadata: {
+          notes: parsed.data.notes || null,
+          approvalBasis,
+          authorizationScope: snapshot.authorizationScope,
+        },
       });
     });
     refreshNoticeEngine();
     return {
       status: "success",
       message: approved
-        ? "PDF oficial aprovado para extração do programa."
+        ? ownerOverride
+          ? "PDF oficial aprovado pelo proprietário. Requisitos e questões continuam em revisão separada."
+          : "PDF oficial aprovado para extração do programa."
         : "PDF rejeitado e preservado no histórico.",
     };
   } catch (error) {

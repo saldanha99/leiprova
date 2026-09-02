@@ -111,9 +111,13 @@ revisar:
 - a base de licença/procedência exigida pelo fluxo editorial.
 
 Sem essa decisão jurídica explícita, o material de prova permanece fora do motor. A captura de
-edital usa a política `official_document`, exige revisão independente da versão e produz apenas
-itens literais em `draft`. Matéria, assunto, artigo legal e aprovação são decisões humanas;
-somente depois o gerador autoral pode criar um rascunho de questão.
+edital usa a política `official_document`, exige uma decisão humana registrada sobre a versão e
+produz apenas itens literais em `draft`. O padrão é revisão independente. A conta editorial do
+proprietário, designada na configuração do servidor, pode registrar uma exceção explícita,
+vinculando autorizador e aprovador na trilha de auditoria sem transformar a decisão em revisão
+independente. Matéria, assunto, artigo legal e
+aprovação dos requisitos continuam sendo decisões humanas separadas; somente depois o gerador
+autoral pode criar um rascunho de questão.
 
 ## Operação
 

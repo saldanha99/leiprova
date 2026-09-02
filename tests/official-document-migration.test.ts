@@ -6,6 +6,10 @@ const migration = readFileSync(
   new URL("../drizzle/0022_certain_baron_strucker.sql", import.meta.url),
   "utf8",
 );
+const ownerApprovalMigration = readFileSync(
+  new URL("../drizzle/0023_young_omega_sentinel.sql", import.meta.url),
+  "utf8",
+);
 
 describe("migração da captura oficial de editais", () => {
   it("persiste bytes, texto por página, checksum e autorização com limites", () => {
@@ -23,5 +27,13 @@ describe("migração da captura oficial de editais", () => {
     expect(migration).toMatch(/validate_opportunity_requirement_snapshot_context/);
     expect(migration).toMatch(/Conteúdo programático revisado exige captura oficial aprovada/);
     expect(migration).toMatch(/opportunity_document_snapshot_publication_guard/);
+  });
+
+  it("registra a exceção do proprietário sem afrouxar a revisão dos derivados", () => {
+    expect(ownerApprovalMigration).toContain('"approval_basis" text DEFAULT \'independent_review\' NOT NULL');
+    expect(ownerApprovalMigration).toMatch(/approval_basis" in \('independent_review', 'owner_override'\)/);
+    expect(ownerApprovalMigration).toMatch(/authorization_scope" = 'owner-approval-2026-09-01'/);
+    expect(ownerApprovalMigration).toMatch(/authorized_by_user_id" = "opportunity_document_snapshots"\."reviewed_by_user_id"/);
+    expect(ownerApprovalMigration).not.toContain("opportunity_requirements_independent_review_check");
   });
 });

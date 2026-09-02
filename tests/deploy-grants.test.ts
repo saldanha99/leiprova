@@ -50,7 +50,7 @@ describe("privilégios do app em produção", () => {
   it("isola o PDF bruto e limita a captura oficial a colunas editoriais", () => {
     expect(grants).toMatch(/grant select \([\s\S]*page_texts,[\s\S]*\) on opportunity_document_snapshots/);
     expect(grants).toMatch(/grant insert \([\s\S]*document_bytes,[\s\S]*authorization_scope,[\s\S]*\) on opportunity_document_snapshots/);
-    expect(grants).toMatch(/grant update \(\s*status,\s*reviewed_by_user_id,\s*reviewed_at,\s*review_notes,\s*updated_at\s*\) on opportunity_document_snapshots/);
+    expect(grants).toMatch(/grant update \(\s*status,\s*approval_basis,\s*authorized_by_user_id,\s*reviewed_by_user_id,\s*reviewed_at,\s*review_notes,\s*updated_at\s*\) on opportunity_document_snapshots/);
     const broadSelect = grants.match(/grant select on[\s\S]*?to :app_user;/)?.[0] ?? "";
     expect(broadSelect).not.toContain("opportunity_document_snapshots");
     expect(grants).toContain("opportunity_document_snapshots_id_seq");

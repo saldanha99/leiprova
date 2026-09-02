@@ -114,6 +114,7 @@ export async function getNoticeEngineSnapshot() {
         parserVersion: opportunityDocumentSnapshots.parserVersion,
         authorizationScope: opportunityDocumentSnapshots.authorizationScope,
         status: opportunityDocumentSnapshots.status,
+        approvalBasis: opportunityDocumentSnapshots.approvalBasis,
         initiatedByUserId: opportunityDocumentSnapshots.initiatedByUserId,
         initiatorName: snapshotInitiator.name,
         reviewerName: snapshotReviewer.name,

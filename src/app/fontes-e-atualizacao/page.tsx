@@ -258,7 +258,7 @@ export default function SourcesAndUpdatesPage() {
                 },
                 {
                   title: "Editais e conteúdo programático",
-                  text: "O portal oficial do órgão ou da organizadora é validado antes da captura. Somente editais e anexos oficiais podem ser armazenados; cada versão recebe checksum e revisão independente. Provas, cadernos e gabaritos permanecem bloqueados.",
+                  text: "O portal oficial do órgão ou da organizadora é validado antes da captura. Somente editais e anexos oficiais podem ser armazenados; cada versão recebe checksum e uma decisão humana auditável, preferencialmente por revisor independente. Exceções do proprietário ficam identificadas. Provas, cadernos e gabaritos permanecem bloqueados.",
                   href: null,
                   label: null,
                 },

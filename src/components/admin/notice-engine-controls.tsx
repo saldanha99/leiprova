@@ -192,11 +192,23 @@ export function OfficialDocumentDiscoveryControls({
   );
 }
 
-export function NoticeDocumentReviewControls({ snapshotPublicId }: { snapshotPublicId: string }) {
+export function NoticeDocumentReviewControls({
+  snapshotPublicId,
+  allowOwnerOverride = false,
+}: {
+  snapshotPublicId: string;
+  allowOwnerOverride?: boolean;
+}) {
   const [state, action, pending] = useActionState(reviewNoticeDocumentAction, initialState);
   return (
     <form action={action} className="mt-4 rounded-xl border border-white/8 bg-black/15 p-3">
       <input type="hidden" name="snapshotPublicId" value={snapshotPublicId} />
+      {allowOwnerOverride ? <input type="hidden" name="ownerOverride" value="true" /> : null}
+      {allowOwnerOverride ? (
+        <p className="mb-3 rounded-lg border border-amber-300/15 bg-amber-300/[.055] p-3 text-xs leading-5 text-amber-100/85">
+          Esta decisão será registrada como aprovação explícita do proprietário, não como revisão independente. Requisitos e questões continuam exigindo revisão humana separada.
+        </p>
+      ) : null}
       <textarea
         name="notes"
         maxLength={2000}
@@ -206,7 +218,7 @@ export function NoticeDocumentReviewControls({ snapshotPublicId }: { snapshotPub
       <Feedback state={state} />
       <div className="mt-3 flex flex-wrap gap-2">
         <button name="decision" value="approve" disabled={pending} className="min-h-9 rounded-lg bg-emerald-300 px-3 text-xs font-extrabold text-emerald-950 disabled:opacity-50">
-          Aprovar captura
+          {allowOwnerOverride ? "Aprovar como proprietário" : "Aprovar captura"}
         </button>
         <button name="decision" value="reject" disabled={pending} className="min-h-9 rounded-lg border border-rose-300/20 bg-rose-300/8 px-3 text-xs font-bold text-rose-100 disabled:opacity-50">
           Rejeitar

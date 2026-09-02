@@ -25,6 +25,7 @@ import {
 } from "@/components/admin/notice-engine-controls";
 import { requireAdmin } from "@/lib/auth";
 import { getNoticeEngineSnapshot } from "@/lib/db/notice-engine-admin";
+import { isEditorialOwnerApprover } from "@/lib/editorial/owner-approval";
 
 const numberFormatter = new Intl.NumberFormat("pt-BR");
 const dateFormatter = new Intl.DateTimeFormat("pt-BR", {
@@ -210,7 +211,8 @@ export default async function NoticeEnginePage() {
         {snapshot.documentSnapshots.length ? (
           <div className="mt-5 grid gap-4 xl:grid-cols-2">
             {snapshot.documentSnapshots.map((item) => {
-              const canReview = item.status === "pending_review" && item.initiatedByUserId !== user.id;
+              const allowOwnerOverride = item.initiatedByUserId === user.id && isEditorialOwnerApprover(user.email);
+              const canReview = item.status === "pending_review" && (item.initiatedByUserId !== user.id || allowOwnerOverride);
               return (
                 <article key={item.publicId} className="rounded-2xl border border-white/8 bg-black/10 p-4">
                   <div className="flex flex-wrap items-start justify-between gap-3">
@@ -229,9 +231,14 @@ export default async function NoticeEnginePage() {
                   </dl>
                   <a href={item.documentUrl} target="_blank" rel="noreferrer" className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-cyan-300 hover:text-cyan-200">Abrir PDF oficial <ExternalLink aria-hidden="true" className="size-3.5" /></a>
                   <p className="mt-3 text-[11px] leading-5 text-slate-600">Capturado por {item.initiatorName ?? "rotina interna"}{item.reviewerName ? ` · revisado por ${item.reviewerName}` : ""} · autorização {item.authorizationScope}</p>
+                  {item.status === "approved" ? (
+                    <p className="mt-2 text-[11px] font-semibold text-slate-400">
+                      Base da decisão: {item.approvalBasis === "owner_override" ? "aprovação explícita do proprietário" : "revisão humana independente"}.
+                    </p>
+                  ) : null}
                   {item.reviewNotes ? <p className="mt-2 rounded-lg bg-white/[.035] p-2 text-xs text-slate-400">{item.reviewNotes}</p> : null}
-                  {canReview ? <NoticeDocumentReviewControls snapshotPublicId={item.publicId} /> : null}
-                  {item.status === "pending_review" && item.initiatedByUserId === user.id ? <p className="mt-3 text-xs text-amber-200/70">Outra pessoa deve conferir esta captura.</p> : null}
+                  {canReview ? <NoticeDocumentReviewControls snapshotPublicId={item.publicId} allowOwnerOverride={allowOwnerOverride} /> : null}
+                  {item.status === "pending_review" && item.initiatedByUserId === user.id && !allowOwnerOverride ? <p className="mt-3 text-xs text-amber-200/70">Outra pessoa deve conferir esta captura.</p> : null}
                   {item.status === "approved" ? <ExtractSnapshotButton snapshotPublicId={item.publicId} /> : null}
                 </article>
               );
