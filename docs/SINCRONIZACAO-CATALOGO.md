@@ -93,17 +93,27 @@ Publicação oficial da norma -> fotografia/checksum -> revisão humana -> conte
 O LexML não determina qual banca organizou um concurso. Essa informação deve vir do portal da
 banca ou do órgão responsável, com um identificador externo estável.
 
-## Trava para provas e PDFs
+## Trava para provas e captura autorizada de editais
 
-Nenhum PDF, enunciado, alternativa ou gabarito é baixado ou armazenado automaticamente por
-esta camada. Antes de habilitar um coletor de provas, é obrigatório registrar e revisar:
+A autorização do responsável registrada como `owner-approval-2026-09-01` permite capturar
+somente editais e anexos oficiais de conteúdo programático. A origem metadata-only precisa ser
+aprovada primeiro; o coletor então redescobre o link no portal permitido, valida cada
+redirecionamento, limita o arquivo a 15 MB e 250 páginas, confirma a assinatura PDF e guarda a
+versão integral, o texto por página e o checksum em `opportunity_document_snapshots`.
+
+Provas, cadernos, questões, alternativas, respostas e gabaritos continuam bloqueados antes do
+download. Para habilitar qualquer coletor desse material, permanece obrigatório registrar e
+revisar:
 
 - a norma específica alegada como autorização, com link oficial e URN LexML;
 - seu alcance material e temporal;
 - eventuais direitos de terceiros e termos do portal de origem;
 - a base de licença/procedência exigida pelo fluxo editorial.
 
-Sem essa decisão jurídica explícita, o motor trabalha em `metadata_only`.
+Sem essa decisão jurídica explícita, o material de prova permanece fora do motor. A captura de
+edital usa a política `official_document`, exige revisão independente da versão e produz apenas
+itens literais em `draft`. Matéria, assunto, artigo legal e aprovação são decisões humanas;
+somente depois o gerador autoral pode criar um rascunho de questão.
 
 ## Operação
 
@@ -111,9 +121,10 @@ O verificador manual `pnpm legal:sources:check` confere a página oficial da nor
 LexML/Senado. O agendamento contínuo ainda não está ativo. Scripts `tsx` devem continuar usando
 `--env-file-if-exists=.env`, conforme `docs/OPERACAO.md`.
 
-O protótipo `pnpm opportunities:sources:check` executa apenas `HEAD` nas URLs oficiais
+O verificador `pnpm opportunities:sources:check` executa apenas `HEAD` nas URLs oficiais
 permitidas, valida redirecionamento, host e caminho e devolve metadados de observação. Ele não
-baixa nem guarda HTML ou PDF e não publica nada. Respostas que bloqueiam `HEAD` viram alerta;
+baixa nem guarda HTML ou PDF. A captura integral é uma operação editorial separada na rota
+`/admin/motor-editais`, aplicada somente a uma fonte já aprovada. Respostas que bloqueiam `HEAD` viram alerta;
 URLs ausentes, redirecionamentos fora da allowlist e falhas de origem exigem investigação.
 
 Qualquer análise de até dez anos deve registrar janela, amostra, denominadores, metodologia,

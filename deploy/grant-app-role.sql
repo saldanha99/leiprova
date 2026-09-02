@@ -40,6 +40,34 @@ grant select on
   stripe_connect_transfers
 to :app_user;
 
+grant select (
+  id,
+  public_id,
+  source_document_id,
+  document_url,
+  source_host,
+  file_name,
+  mime_type,
+  checksum_sha256,
+  byte_length,
+  page_count,
+  page_texts,
+  text_length,
+  extraction_method,
+  parser_version,
+  source_policy,
+  authorization_scope,
+  authorized_at,
+  authorized_by_user_id,
+  initiated_by_user_id,
+  status,
+  reviewed_by_user_id,
+  reviewed_at,
+  review_notes,
+  created_at,
+  updated_at
+) on opportunity_document_snapshots to :app_user;
+
 grant insert (
   id,
   public_id,
@@ -254,6 +282,36 @@ grant insert (
   initiated_by_user_id
 ) on opportunity_source_documents to :app_user;
 
+grant insert (
+  public_id,
+  source_document_id,
+  document_url,
+  source_host,
+  file_name,
+  mime_type,
+  document_bytes,
+  checksum_sha256,
+  byte_length,
+  page_count,
+  extracted_text,
+  page_texts,
+  text_length,
+  extraction_method,
+  parser_version,
+  source_policy,
+  authorization_scope,
+  authorized_at,
+  initiated_by_user_id
+) on opportunity_document_snapshots to :app_user;
+
+grant update (
+  status,
+  reviewed_by_user_id,
+  reviewed_at,
+  review_notes,
+  updated_at
+) on opportunity_document_snapshots to :app_user;
+
 grant update (
   document_type,
   source_external_id,
@@ -296,6 +354,7 @@ grant update (
 grant insert (
   opportunity_id,
   source_document_id,
+  source_snapshot_id,
   subject_id,
   topic_id,
   legal_act_id,
@@ -312,6 +371,7 @@ grant update (
   legal_article_id,
   requirement_text,
   source_locator,
+  created_by_user_id,
   editorial_status,
   reviewed_by_user_id,
   reviewed_at,
@@ -448,6 +508,7 @@ grant usage on
   exam_editions_id_seq,
   contest_opportunities_id_seq,
   opportunity_source_documents_id_seq,
+  opportunity_document_snapshots_id_seq,
   opportunity_organizer_assignments_id_seq,
   opportunity_requirements_id_seq,
   opportunity_analysis_snapshots_id_seq

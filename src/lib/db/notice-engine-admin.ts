@@ -11,6 +11,7 @@ import {
   legalArticles,
   legalVersions,
   opportunityOrganizerAssignments,
+  opportunityDocumentSnapshots,
   opportunityRequirements,
   opportunitySourceDocuments,
   questionOpportunities,
@@ -29,10 +30,13 @@ export async function getNoticeEngineSnapshot() {
   const sourceReviewer = alias(users, "notice_source_reviewer");
   const requirementCreator = alias(users, "notice_requirement_creator");
   const requirementReviewer = alias(users, "notice_requirement_reviewer");
+  const snapshotInitiator = alias(users, "notice_snapshot_initiator");
+  const snapshotReviewer = alias(users, "notice_snapshot_reviewer");
 
   const [
     opportunities,
     sourceDocuments,
+    documentSnapshots,
     requirements,
     assignments,
     articles,
@@ -94,12 +98,57 @@ export async function getNoticeEngineSnapshot() {
       .limit(150),
     db
       .select({
+        id: opportunityDocumentSnapshots.id,
+        publicId: opportunityDocumentSnapshots.publicId,
+        sourceDocumentId: opportunityDocumentSnapshots.sourceDocumentId,
+        sourceDocumentPublicId: opportunitySourceDocuments.publicId,
+        sourceDocumentTitle: opportunitySourceDocuments.title,
+        opportunityTitle: contestOpportunities.title,
+        documentUrl: opportunityDocumentSnapshots.documentUrl,
+        sourceHost: opportunityDocumentSnapshots.sourceHost,
+        fileName: opportunityDocumentSnapshots.fileName,
+        checksumSha256: opportunityDocumentSnapshots.checksumSha256,
+        byteLength: opportunityDocumentSnapshots.byteLength,
+        pageCount: opportunityDocumentSnapshots.pageCount,
+        textLength: opportunityDocumentSnapshots.textLength,
+        parserVersion: opportunityDocumentSnapshots.parserVersion,
+        authorizationScope: opportunityDocumentSnapshots.authorizationScope,
+        status: opportunityDocumentSnapshots.status,
+        initiatedByUserId: opportunityDocumentSnapshots.initiatedByUserId,
+        initiatorName: snapshotInitiator.name,
+        reviewerName: snapshotReviewer.name,
+        reviewNotes: opportunityDocumentSnapshots.reviewNotes,
+        createdAt: opportunityDocumentSnapshots.createdAt,
+      })
+      .from(opportunityDocumentSnapshots)
+      .innerJoin(
+        opportunitySourceDocuments,
+        eq(opportunityDocumentSnapshots.sourceDocumentId, opportunitySourceDocuments.id),
+      )
+      .innerJoin(
+        contestOpportunities,
+        eq(opportunitySourceDocuments.opportunityId, contestOpportunities.id),
+      )
+      .leftJoin(
+        snapshotInitiator,
+        eq(opportunityDocumentSnapshots.initiatedByUserId, snapshotInitiator.id),
+      )
+      .leftJoin(
+        snapshotReviewer,
+        eq(opportunityDocumentSnapshots.reviewedByUserId, snapshotReviewer.id),
+      )
+      .orderBy(desc(opportunityDocumentSnapshots.createdAt))
+      .limit(100),
+    db
+      .select({
         id: opportunityRequirements.id,
         opportunityId: opportunityRequirements.opportunityId,
         opportunityTitle: contestOpportunities.title,
         sourceDocumentPublicId: opportunitySourceDocuments.publicId,
         sourceDocumentTitle: opportunitySourceDocuments.title,
         sourceDocumentStatus: opportunitySourceDocuments.status,
+        sourceSnapshotPublicId: opportunityDocumentSnapshots.publicId,
+        sourceSnapshotStatus: opportunityDocumentSnapshots.status,
         requirementText: opportunityRequirements.requirementText,
         sourceLocator: opportunityRequirements.sourceLocator,
         editorialStatus: opportunityRequirements.editorialStatus,
@@ -107,6 +156,7 @@ export async function getNoticeEngineSnapshot() {
         creatorName: requirementCreator.name,
         reviewerName: requirementReviewer.name,
         reviewNotes: opportunityRequirements.reviewNotes,
+        subjectId: opportunityRequirements.subjectId,
         subjectName: quizSubjects.name,
         topicName: quizTopics.name,
         actTitle: legalActs.shortTitle,
@@ -121,6 +171,10 @@ export async function getNoticeEngineSnapshot() {
       .innerJoin(
         opportunitySourceDocuments,
         eq(opportunityRequirements.sourceDocumentId, opportunitySourceDocuments.id),
+      )
+      .leftJoin(
+        opportunityDocumentSnapshots,
+        eq(opportunityRequirements.sourceSnapshotId, opportunityDocumentSnapshots.id),
       )
       .leftJoin(quizSubjects, eq(opportunityRequirements.subjectId, quizSubjects.id))
       .leftJoin(quizTopics, eq(opportunityRequirements.topicId, quizTopics.id))
@@ -220,6 +274,7 @@ export async function getNoticeEngineSnapshot() {
       generatedQuestionCount: questionCounts.get(item.id) ?? 0,
     })),
     sourceDocuments,
+    documentSnapshots,
     requirements: requirements.map((item) => ({
       ...item,
       assignment: assignmentByOpportunity.get(item.opportunityId) ?? null,
@@ -231,6 +286,8 @@ export async function getNoticeEngineSnapshot() {
       opportunities: opportunities.length,
       approvedSources: sourceDocuments.filter((item) => item.status === "approved").length,
       pendingSources: sourceDocuments.filter((item) => item.status === "pending_review").length,
+      approvedSnapshots: documentSnapshots.filter((item) => item.status === "approved").length,
+      pendingSnapshots: documentSnapshots.filter((item) => item.status === "pending_review").length,
       reviewedRequirements: requirements.filter((item) => item.editorialStatus === "reviewed").length,
       pendingRequirements: requirements.filter(
         (item) => item.editorialStatus === "pending_review",

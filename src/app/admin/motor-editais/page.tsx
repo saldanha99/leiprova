@@ -3,6 +3,7 @@ import {
   ArrowRight,
   BookOpenCheck,
   CheckCircle2,
+  Database,
   ExternalLink,
   FileCheck2,
   FileSearch,
@@ -15,6 +16,10 @@ import {
   GenerateRequirementButton,
   NoticeSourceForm,
   NoticeSourceReviewControls,
+  NoticeDocumentReviewControls,
+  OfficialDocumentDiscoveryControls,
+  ExtractSnapshotButton,
+  RequirementMappingControls,
   RequirementReviewControls,
   SyllabusImportForm,
 } from "@/components/admin/notice-engine-controls";
@@ -34,6 +39,7 @@ const statusLabels: Record<string, string> = {
   superseded: "Substituída",
   reviewed: "Requisito revisado",
   suspended: "Suspenso",
+  draft: "Aguardando mapeamento",
 };
 
 function statusClass(status: string) {
@@ -71,6 +77,7 @@ export default async function NoticeEnginePage() {
   const metrics = [
     { label: "Fontes aprovadas", value: snapshot.metrics.approvedSources, icon: FileCheck2, tone: "bg-emerald-300/10 text-emerald-300" },
     { label: "Fontes pendentes", value: snapshot.metrics.pendingSources, icon: FileSearch, tone: "bg-amber-300/10 text-amber-300" },
+    { label: "PDFs aprovados", value: snapshot.metrics.approvedSnapshots, icon: Database, tone: "bg-cyan-300/10 text-cyan-300" },
     { label: "Requisitos revisados", value: snapshot.metrics.reviewedRequirements, icon: CheckCircle2, tone: "bg-sky-300/10 text-sky-300" },
     { label: "Rascunhos gerados", value: snapshot.metrics.generatedQuestions, icon: Sparkles, tone: "bg-violet-300/10 text-violet-300" },
   ];
@@ -97,7 +104,7 @@ export default async function NoticeEnginePage() {
         </div>
       </header>
 
-      <section className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4" aria-label="Indicadores do motor">
+      <section className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-5" aria-label="Indicadores do motor">
         {metrics.map(({ label, value, icon: Icon, tone }) => (
           <article key={label} className="rounded-2xl border border-white/8 bg-[#09131f] p-4">
             <div className={`grid size-9 place-items-center rounded-xl ${tone}`}><Icon aria-hidden="true" className="size-4" /></div>
@@ -109,8 +116,8 @@ export default async function NoticeEnginePage() {
 
       <section className="mt-5 grid gap-3 lg:grid-cols-4" aria-label="Fluxo editorial">
         {[
-          ["1", "Confirmar a origem", "O sistema consulta apenas metadados do endereço oficial."],
-          ["2", "Mapear o programa", "O editor cola o trecho e vincula matéria, assunto e norma."],
+          ["1", "Confirmar a origem", "O sistema valida o endereço oficial e localiza o PDF elegível."],
+          ["2", "Capturar e mapear", "O edital é lido por página e cada item recebe matéria, assunto e norma."],
           ["3", "Gerar o treino", "A questão nasce do artigo vigente, sem texto de prova anterior."],
           ["4", "Revisar e liberar", "A Fábrica Autoral exige responsável e revisão humana."],
         ].map(([step, title, detail]) => (
@@ -127,7 +134,7 @@ export default async function NoticeEnginePage() {
           <span className="text-xs font-bold uppercase tracking-[.14em] text-amber-300">Entrada segura</span>
           <h2 className="mt-2 text-xl font-semibold text-white">Registrar uma fonte do concurso</h2>
           <p className="mt-2 text-sm leading-6 text-slate-500">
-            O endereço precisa pertencer à lista de órgãos e bancas permitidos. Nesta primeira versão, só os metadados da fonte são consultados; nenhum PDF ou página completa é armazenado.
+            O endereço precisa pertencer à lista de órgãos e bancas permitidos. Depois da revisão da origem, o motor consegue localizar e capturar apenas editais e anexos oficiais — nunca provas, gabaritos ou cadernos de questões.
           </p>
           <NoticeSourceForm opportunities={opportunityOptions} />
         </article>
@@ -182,12 +189,56 @@ export default async function NoticeEnginePage() {
                   {item.reviewNotes ? <p className="mt-2 rounded-lg bg-white/[.035] p-2 text-xs text-slate-400">{item.reviewNotes}</p> : null}
                   {canReview ? <NoticeSourceReviewControls publicId={item.publicId} /> : null}
                   {item.status === "pending_review" && item.initiatedByUserId === user.id ? <p className="mt-3 text-xs text-amber-200/70">Outra pessoa deve decidir esta fonte.</p> : null}
+                  {item.status === "approved" ? <OfficialDocumentDiscoveryControls sourceDocumentPublicId={item.publicId} /> : null}
                 </article>
               );
             })}
           </div>
         ) : (
           <p className="mt-5 rounded-xl border border-dashed border-white/10 p-7 text-center text-sm text-slate-500">Nenhuma fonte foi registrada ainda.</p>
+        )}
+      </section>
+
+      <section className="mt-5 rounded-[1.5rem] border border-white/8 bg-[#09131f] p-5 sm:p-6">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <span className="text-xs font-bold uppercase tracking-[.14em] text-cyan-300">Captura oficial</span>
+            <h2 className="mt-2 text-xl font-semibold text-white">Versões armazenadas dos editais</h2>
+          </div>
+          <p className="text-xs text-slate-600">PDF integral + texto por página + checksum</p>
+        </div>
+        {snapshot.documentSnapshots.length ? (
+          <div className="mt-5 grid gap-4 xl:grid-cols-2">
+            {snapshot.documentSnapshots.map((item) => {
+              const canReview = item.status === "pending_review" && item.initiatedByUserId !== user.id;
+              return (
+                <article key={item.publicId} className="rounded-2xl border border-white/8 bg-black/10 p-4">
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="text-[11px] font-semibold text-cyan-200">{item.opportunityTitle}</p>
+                      <h3 className="mt-1 break-words font-semibold text-white">{item.fileName}</h3>
+                      <p className="mt-1 text-[11px] text-slate-500">{item.sourceDocumentTitle}</p>
+                    </div>
+                    <span className={`rounded-lg border px-2.5 py-1 text-[10px] font-bold ${statusClass(item.status)}`}>{statusLabels[item.status] ?? item.status}</span>
+                  </div>
+                  <dl className="mt-3 grid grid-cols-2 gap-2 text-[11px] text-slate-500 sm:grid-cols-4">
+                    <div><dt>Páginas</dt><dd className="mt-0.5 font-semibold text-slate-300">{item.pageCount}</dd></div>
+                    <div><dt>Tamanho</dt><dd className="mt-0.5 font-semibold text-slate-300">{(item.byteLength / 1024 / 1024).toFixed(1)} MB</dd></div>
+                    <div><dt>Texto</dt><dd className="mt-0.5 font-semibold text-slate-300">{numberFormatter.format(item.textLength)} caracteres</dd></div>
+                    <div><dt>Prova de versão</dt><dd className="mt-0.5 font-mono text-slate-300">{item.checksumSha256.slice(0, 10)}…</dd></div>
+                  </dl>
+                  <a href={item.documentUrl} target="_blank" rel="noreferrer" className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-cyan-300 hover:text-cyan-200">Abrir PDF oficial <ExternalLink aria-hidden="true" className="size-3.5" /></a>
+                  <p className="mt-3 text-[11px] leading-5 text-slate-600">Capturado por {item.initiatorName ?? "rotina interna"}{item.reviewerName ? ` · revisado por ${item.reviewerName}` : ""} · autorização {item.authorizationScope}</p>
+                  {item.reviewNotes ? <p className="mt-2 rounded-lg bg-white/[.035] p-2 text-xs text-slate-400">{item.reviewNotes}</p> : null}
+                  {canReview ? <NoticeDocumentReviewControls snapshotPublicId={item.publicId} /> : null}
+                  {item.status === "pending_review" && item.initiatedByUserId === user.id ? <p className="mt-3 text-xs text-amber-200/70">Outra pessoa deve conferir esta captura.</p> : null}
+                  {item.status === "approved" ? <ExtractSnapshotButton snapshotPublicId={item.publicId} /> : null}
+                </article>
+              );
+            })}
+          </div>
+        ) : (
+          <p className="mt-5 rounded-xl border border-dashed border-white/10 p-7 text-center text-sm text-slate-500">Nenhum PDF foi capturado. Em uma fonte aprovada, use “Procurar PDF do edital”.</p>
         )}
       </section>
 
@@ -225,6 +276,15 @@ export default async function NoticeEnginePage() {
                   </dl>
                   <p className="mt-3 text-[11px] text-slate-600">Importado por {item.creatorName ?? "rotina interna"}{item.reviewerName ? ` · revisado por ${item.reviewerName}` : ""}</p>
                   {item.reviewNotes ? <p className="mt-2 rounded-lg bg-white/[.035] p-2 text-xs text-slate-400">{item.reviewNotes}</p> : null}
+                  {item.editorialStatus === "draft" && item.sourceSnapshotPublicId ? (
+                    <RequirementMappingControls
+                      requirementId={item.id}
+                      suggestedSubjectId={item.subjectId}
+                      subjects={snapshot.subjects}
+                      topics={snapshot.topics}
+                      articles={articleOptions}
+                    />
+                  ) : null}
                   {canReview ? <RequirementReviewControls requirementId={item.id} /> : null}
                   {item.editorialStatus === "pending_review" && item.createdByUserId === user.id ? <p className="mt-3 text-xs text-amber-200/70">Outra pessoa deve revisar este requisito.</p> : null}
                   {canGenerate ? <GenerateRequirementButton requirementId={item.id} /> : null}
@@ -239,9 +299,9 @@ export default async function NoticeEnginePage() {
       </section>
 
       <aside className="mt-5 rounded-[1.5rem] border border-amber-300/15 bg-amber-300/[.04] p-5 sm:p-6">
-        <h2 className="flex items-center gap-2 font-semibold text-amber-100"><ShieldCheck className="size-5" /> Limite intencional desta entrega</h2>
+        <h2 className="flex items-center gap-2 font-semibold text-amber-100"><ShieldCheck className="size-5" /> Escopo autorizado e protegido</h2>
         <p className="mt-2 max-w-4xl text-sm leading-6 text-slate-400">
-          A captura automática do texto integral de PDFs ainda está fechada. Para ativá-la com segurança, cada origem precisa de autorização documental e política de retenção aprovadas. O motor atual já cobre verificação da fonte, mapeamento, geração autoral, auditoria e revisão humana sem armazenar o documento de terceiros.
+          A captura automática está limitada a editais e anexos oficiais, com até 15 MB e 250 páginas. Provas, gabaritos, cadernos e questões são bloqueados antes do download. A extração preserva o texto oficial e só cria uma fila: o vínculo pedagógico, a norma, a aprovação e a publicação continuam humanos e auditáveis.
         </p>
       </aside>
     </main>

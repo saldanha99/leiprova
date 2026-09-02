@@ -15,6 +15,7 @@ import {
   legalArticles,
   legalVersions,
   opportunityOrganizerAssignments,
+  opportunityDocumentSnapshots,
   opportunityRequirements,
   opportunitySourceDocuments,
   questionOpportunities,
@@ -35,16 +36,24 @@ import {
   ORIGINALITY_REJECTION_THRESHOLD_BPS,
 } from "@/lib/editorial/originality";
 import { parseSyllabusItems } from "@/lib/editorial/syllabus-parser";
+import { extractOfficialSyllabusCandidates } from "@/lib/editorial/official-syllabus-extractor";
 import type { InternalOpportunitySourceCandidate } from "@/lib/opportunities/official-candidates";
+import {
+  captureOfficialPdf,
+  discoverOfficialDocumentCandidates,
+} from "@/lib/opportunities/official-document-fetch";
+import type { OfficialDocumentCandidate } from "@/lib/opportunities/official-document-policy";
 import { checkOpportunitySourceMetadata } from "@/lib/opportunities/source-metadata-check";
 import {
   parseOfficialOpportunitySourceUrl,
+  OFFICIAL_DOCUMENT_AUTHORIZATION_SCOPE,
   type OfficialOpportunitySourceId,
 } from "@/lib/opportunities/source-monitor-policy";
 
 export type NoticeEngineActionState = {
   status: "idle" | "success" | "error";
   message: string;
+  candidates?: readonly OfficialDocumentCandidate[];
 };
 
 function errorState(message: string): NoticeEngineActionState {
@@ -280,6 +289,340 @@ export async function reviewNoticeSourceAction(
   };
 }
 
+const discoverDocumentsSchema = z.object({ sourceDocumentPublicId: z.string().uuid() });
+
+export async function discoverNoticeDocumentsAction(
+  _state: NoticeEngineActionState,
+  formData: FormData,
+): Promise<NoticeEngineActionState> {
+  await requireAdmin("/admin/motor-editais");
+  const parsed = discoverDocumentsSchema.safeParse({
+    sourceDocumentPublicId: formData.get("sourceDocumentPublicId"),
+  });
+  if (!parsed.success) return errorState("Selecione uma fonte oficial válida.");
+
+  const db = getDb();
+  const [source] = await db
+    .select({
+      sourceUrl: opportunitySourceDocuments.sourceUrl,
+      title: opportunitySourceDocuments.title,
+      status: opportunitySourceDocuments.status,
+    })
+    .from(opportunitySourceDocuments)
+    .where(eq(opportunitySourceDocuments.publicId, parsed.data.sourceDocumentPublicId))
+    .limit(1);
+  if (!source || source.status !== "approved") {
+    return errorState("A fonte precisa estar aprovada antes de procurar anexos.");
+  }
+
+  try {
+    const official = parseOfficialOpportunitySourceUrl(source.sourceUrl);
+    const candidates = await discoverOfficialDocumentCandidates(
+      official.url,
+      official.sourceId,
+      source.title,
+    );
+    if (!candidates.length) {
+      return {
+        status: "error",
+        message: "Nenhum PDF de edital ou conteúdo programático foi encontrado nesta página oficial.",
+      };
+    }
+    return {
+      status: "success",
+      message: `${candidates.length} documento(s) oficial(is) elegível(is) encontrado(s). Escolha qual capturar.`,
+      candidates,
+    };
+  } catch (error) {
+    return errorState(
+      error instanceof Error ? error.message : "Não foi possível procurar anexos oficiais.",
+    );
+  }
+}
+
+const captureDocumentSchema = z.object({
+  sourceDocumentPublicId: z.string().uuid(),
+  documentUrl: z.url().max(2_000),
+});
+
+export async function captureNoticeDocumentAction(
+  _state: NoticeEngineActionState,
+  formData: FormData,
+): Promise<NoticeEngineActionState> {
+  const user = await requireAdmin("/admin/motor-editais");
+  const parsed = captureDocumentSchema.safeParse({
+    sourceDocumentPublicId: formData.get("sourceDocumentPublicId"),
+    documentUrl: formData.get("documentUrl"),
+  });
+  if (!parsed.success) return errorState("O documento selecionado é inválido.");
+
+  const db = getDb();
+  const [source] = await db
+    .select({
+      id: opportunitySourceDocuments.id,
+      title: opportunitySourceDocuments.title,
+      sourceUrl: opportunitySourceDocuments.sourceUrl,
+      status: opportunitySourceDocuments.status,
+    })
+    .from(opportunitySourceDocuments)
+    .where(eq(opportunitySourceDocuments.publicId, parsed.data.sourceDocumentPublicId))
+    .limit(1);
+  if (!source || source.status !== "approved") {
+    return errorState("A fonte precisa continuar aprovada para permitir a captura.");
+  }
+
+  try {
+    const official = parseOfficialOpportunitySourceUrl(source.sourceUrl);
+    const candidates = await discoverOfficialDocumentCandidates(
+      official.url,
+      official.sourceId,
+      source.title,
+    );
+    const candidate = candidates.find((item) => item.url === parsed.data.documentUrl);
+    if (!candidate) {
+      return errorState("O PDF não pertence mais à lista elegível descoberta na fonte oficial.");
+    }
+    const captured = await captureOfficialPdf(candidate, official.sourceId);
+    const publicId = randomUUID();
+    const [saved] = await db
+      .insert(opportunityDocumentSnapshots)
+      .values({
+        publicId,
+        sourceDocumentId: source.id,
+        documentUrl: captured.documentUrl,
+        sourceHost: captured.sourceHost,
+        fileName: captured.fileName,
+        mimeType: captured.mimeType,
+        documentBytes: captured.documentBytes,
+        checksumSha256: captured.checksumSha256,
+        byteLength: captured.byteLength,
+        pageCount: captured.pageCount,
+        extractedText: captured.extractedText,
+        pageTexts: [...captured.pageTexts],
+        textLength: captured.textLength,
+        parserVersion: captured.parserVersion,
+        sourcePolicy: "official_document",
+        authorizationScope: OFFICIAL_DOCUMENT_AUTHORIZATION_SCOPE,
+        authorizedAt: new Date("2026-09-01T12:00:00.000-03:00"),
+        initiatedByUserId: user.id,
+      })
+      .onConflictDoNothing({
+        target: [
+          opportunityDocumentSnapshots.sourceDocumentId,
+          opportunityDocumentSnapshots.checksumSha256,
+        ],
+      })
+      .returning({ publicId: opportunityDocumentSnapshots.publicId });
+    if (!saved) return errorState("Esta versão do PDF já está armazenada para a fonte.");
+
+    await db.insert(auditLogs).values({
+      actorUserId: user.id,
+      action: "editorial.notice_document.captured",
+      entityType: "opportunity_document_snapshot",
+      entityId: saved.publicId,
+      metadata: {
+        sourceDocumentPublicId: parsed.data.sourceDocumentPublicId,
+        documentUrl: captured.documentUrl,
+        checksumSha256: captured.checksumSha256,
+        byteLength: captured.byteLength,
+        pageCount: captured.pageCount,
+        textLength: captured.textLength,
+        authorizationScope: OFFICIAL_DOCUMENT_AUTHORIZATION_SCOPE,
+      },
+    });
+    refreshNoticeEngine();
+    return {
+      status: "success",
+      message: `PDF oficial capturado (${captured.pageCount} páginas) e enviado para revisão independente.`,
+    };
+  } catch (error) {
+    console.error("Falha ao capturar PDF oficial.", error);
+    return errorState(
+      error instanceof Error ? error.message : "Não foi possível capturar o PDF oficial.",
+    );
+  }
+}
+
+const snapshotReviewSchema = z.object({
+  snapshotPublicId: z.string().uuid(),
+  decision: z.enum(["approve", "reject"]),
+  notes: z.string().trim().max(2_000),
+});
+
+export async function reviewNoticeDocumentAction(
+  _state: NoticeEngineActionState,
+  formData: FormData,
+): Promise<NoticeEngineActionState> {
+  const user = await requireAdmin("/admin/motor-editais");
+  const parsed = snapshotReviewSchema.safeParse({
+    snapshotPublicId: formData.get("snapshotPublicId"),
+    decision: formData.get("decision"),
+    notes: formData.get("notes"),
+  });
+  if (!parsed.success) return errorState("Revise os dados da decisão do PDF.");
+  if (parsed.data.decision === "reject" && parsed.data.notes.length < 10) {
+    return errorState("Explique a rejeição em pelo menos 10 caracteres.");
+  }
+
+  const db = getDb();
+  const [snapshot] = await db
+    .select({
+      id: opportunityDocumentSnapshots.id,
+      status: opportunityDocumentSnapshots.status,
+      initiatedByUserId: opportunityDocumentSnapshots.initiatedByUserId,
+      sourceStatus: opportunitySourceDocuments.status,
+    })
+    .from(opportunityDocumentSnapshots)
+    .innerJoin(
+      opportunitySourceDocuments,
+      eq(opportunityDocumentSnapshots.sourceDocumentId, opportunitySourceDocuments.id),
+    )
+    .where(eq(opportunityDocumentSnapshots.publicId, parsed.data.snapshotPublicId))
+    .limit(1);
+  if (!snapshot || snapshot.status !== "pending_review") {
+    return errorState("Esta captura não está mais pendente.");
+  }
+  if (snapshot.initiatedByUserId === user.id) {
+    return errorState("Quem capturou o PDF não pode aprovar a própria captura.");
+  }
+  if (parsed.data.decision === "approve" && snapshot.sourceStatus !== "approved") {
+    return errorState("A fonte oficial vinculada precisa continuar aprovada.");
+  }
+
+  const approved = parsed.data.decision === "approve";
+  const now = new Date();
+  try {
+    await db.transaction(async (transaction) => {
+      const [updated] = await transaction
+        .update(opportunityDocumentSnapshots)
+        .set({
+          status: approved ? "approved" : "rejected",
+          reviewedByUserId: user.id,
+          reviewedAt: now,
+          reviewNotes: parsed.data.notes || null,
+          updatedAt: now,
+        })
+        .where(
+          and(
+            eq(opportunityDocumentSnapshots.id, snapshot.id),
+            eq(opportunityDocumentSnapshots.status, "pending_review"),
+          ),
+        )
+        .returning({ id: opportunityDocumentSnapshots.id });
+      if (!updated) throw new Error("A captura já foi decidida por outro editor.");
+      await transaction.insert(auditLogs).values({
+        actorUserId: user.id,
+        action: approved
+          ? "editorial.notice_document.approved"
+          : "editorial.notice_document.rejected",
+        entityType: "opportunity_document_snapshot",
+        entityId: parsed.data.snapshotPublicId,
+        metadata: { notes: parsed.data.notes || null },
+      });
+    });
+    refreshNoticeEngine();
+    return {
+      status: "success",
+      message: approved
+        ? "PDF oficial aprovado para extração do programa."
+        : "PDF rejeitado e preservado no histórico.",
+    };
+  } catch (error) {
+    return errorState(error instanceof Error ? error.message : "Não foi possível revisar o PDF.");
+  }
+}
+
+const extractSnapshotSchema = z.object({ snapshotPublicId: z.string().uuid() });
+
+export async function extractSnapshotSyllabusAction(
+  _state: NoticeEngineActionState,
+  formData: FormData,
+): Promise<NoticeEngineActionState> {
+  const user = await requireAdmin("/admin/motor-editais");
+  const parsed = extractSnapshotSchema.safeParse({
+    snapshotPublicId: formData.get("snapshotPublicId"),
+  });
+  if (!parsed.success) return errorState("Selecione uma captura aprovada.");
+
+  const db = getDb();
+  const [snapshotRows, subjects] = await Promise.all([
+    db
+      .select({
+        id: opportunityDocumentSnapshots.id,
+        status: opportunityDocumentSnapshots.status,
+        pageTexts: opportunityDocumentSnapshots.pageTexts,
+        sourceDocumentId: opportunityDocumentSnapshots.sourceDocumentId,
+        sourceStatus: opportunitySourceDocuments.status,
+        opportunityId: opportunitySourceDocuments.opportunityId,
+      })
+      .from(opportunityDocumentSnapshots)
+      .innerJoin(
+        opportunitySourceDocuments,
+        eq(opportunityDocumentSnapshots.sourceDocumentId, opportunitySourceDocuments.id),
+      )
+      .where(eq(opportunityDocumentSnapshots.publicId, parsed.data.snapshotPublicId))
+      .limit(1),
+    db
+      .select({ id: quizSubjects.id, name: quizSubjects.name })
+      .from(quizSubjects)
+      .where(eq(quizSubjects.isActive, true)),
+  ]);
+  const snapshot = snapshotRows[0];
+  if (!snapshot || snapshot.status !== "approved" || snapshot.sourceStatus !== "approved") {
+    return errorState("O PDF e sua fonte precisam estar aprovados antes da extração.");
+  }
+
+  const candidates = extractOfficialSyllabusCandidates(snapshot.pageTexts, subjects);
+  if (!candidates.length) {
+    return errorState(
+      "Não foi possível reconhecer matérias no conteúdo programático. Use a importação manual preservando o texto oficial.",
+    );
+  }
+
+  try {
+    const inserted = await db.transaction(async (transaction) => {
+      const rows = await transaction
+        .insert(opportunityRequirements)
+        .values(
+          candidates.map((candidate) => ({
+            opportunityId: snapshot.opportunityId,
+            sourceDocumentId: snapshot.sourceDocumentId,
+            sourceSnapshotId: snapshot.id,
+            subjectId: candidate.suggestedSubjectId,
+            requirementText: candidate.requirementText,
+            sourceLocator: candidate.sourceLocator,
+            editorialStatus: "draft",
+            createdByUserId: user.id,
+          })),
+        )
+        .onConflictDoNothing({
+          target: [opportunityRequirements.sourceDocumentId, opportunityRequirements.requirementText],
+        })
+        .returning({ id: opportunityRequirements.id });
+      await transaction.insert(auditLogs).values({
+        actorUserId: user.id,
+        action: "editorial.notice_syllabus.extracted",
+        entityType: "opportunity_document_snapshot",
+        entityId: parsed.data.snapshotPublicId,
+        metadata: {
+          identified: candidates.length,
+          inserted: rows.length,
+          extractionPolicy: "deterministic_verbatim_lines",
+        },
+      });
+      return rows;
+    });
+    refreshNoticeEngine();
+    return {
+      status: "success",
+      message: `${inserted.length} item(ns) extraído(s) para mapeamento humano; ${candidates.length - inserted.length} duplicado(s) ignorado(s).`,
+    };
+  } catch (error) {
+    console.error("Falha ao extrair conteúdo programático.", error);
+    return errorState("Não foi possível criar a fila de mapeamento do edital.");
+  }
+}
+
 const importRequirementsSchema = z.object({
   sourceDocumentPublicId: z.string().uuid(),
   subjectId: z.coerce.number().int().positive(),
@@ -414,6 +757,113 @@ export async function importSyllabusRequirementsAction(
   }
 }
 
+const mapRequirementSchema = z.object({
+  requirementId: z.coerce.number().int().positive(),
+  subjectId: z.coerce.number().int().positive(),
+  topicId: z.coerce.number().int().positive(),
+  legalArticleId: z.coerce.number().int().positive(),
+});
+
+export async function mapExtractedRequirementAction(
+  _state: NoticeEngineActionState,
+  formData: FormData,
+): Promise<NoticeEngineActionState> {
+  const user = await requireAdmin("/admin/motor-editais");
+  const parsed = mapRequirementSchema.safeParse({
+    requirementId: formData.get("requirementId"),
+    subjectId: formData.get("subjectId"),
+    topicId: formData.get("topicId"),
+    legalArticleId: formData.get("legalArticleId"),
+  });
+  if (!parsed.success) return errorState("Selecione matéria, assunto e dispositivo legal.");
+
+  const db = getDb();
+  const [requirementRows, topicRows, articleRows] = await Promise.all([
+    db
+      .select({
+        id: opportunityRequirements.id,
+        status: opportunityRequirements.editorialStatus,
+        sourceSnapshotId: opportunityRequirements.sourceSnapshotId,
+      })
+      .from(opportunityRequirements)
+      .where(eq(opportunityRequirements.id, parsed.data.requirementId))
+      .limit(1),
+    db
+      .select({ id: quizTopics.id })
+      .from(quizTopics)
+      .innerJoin(quizSubjects, eq(quizTopics.subjectId, quizSubjects.id))
+      .where(
+        and(
+          eq(quizTopics.id, parsed.data.topicId),
+          eq(quizTopics.subjectId, parsed.data.subjectId),
+          eq(quizTopics.isActive, true),
+          eq(quizSubjects.isActive, true),
+        ),
+      )
+      .limit(1),
+    db
+      .select({ id: legalArticles.id, legalActId: legalVersions.legalActId })
+      .from(legalArticles)
+      .innerJoin(legalVersions, eq(legalArticles.legalVersionId, legalVersions.id))
+      .innerJoin(legalActs, eq(legalVersions.legalActId, legalActs.id))
+      .where(
+        and(
+          eq(legalArticles.id, parsed.data.legalArticleId),
+          eq(legalArticles.editorialStatus, "reviewed"),
+          eq(legalArticles.sourceRights, "official_text"),
+          eq(legalVersions.status, "current"),
+          eq(legalActs.isActive, true),
+        ),
+      )
+      .limit(1),
+  ]);
+  const requirement = requirementRows[0];
+  const article = articleRows[0];
+  if (!requirement || requirement.status !== "draft" || !requirement.sourceSnapshotId) {
+    return errorState("Este item não está mais aguardando mapeamento automático.");
+  }
+  if (!topicRows[0]) return errorState("O assunto não pertence à matéria selecionada.");
+  if (!article) return errorState("O dispositivo legal precisa estar vigente e revisado.");
+
+  const now = new Date();
+  const [updated] = await db
+    .update(opportunityRequirements)
+    .set({
+      subjectId: parsed.data.subjectId,
+      topicId: parsed.data.topicId,
+      legalActId: article.legalActId,
+      legalArticleId: article.id,
+      editorialStatus: "pending_review",
+      createdByUserId: user.id,
+      reviewedByUserId: null,
+      reviewedAt: null,
+      reviewNotes: null,
+      updatedAt: now,
+    })
+    .where(
+      and(
+        eq(opportunityRequirements.id, requirement.id),
+        eq(opportunityRequirements.editorialStatus, "draft"),
+      ),
+    )
+    .returning({ id: opportunityRequirements.id });
+  if (!updated) return errorState("O item já foi mapeado por outro editor.");
+
+  await db.insert(auditLogs).values({
+    actorUserId: user.id,
+    action: "editorial.notice_requirement.mapped",
+    entityType: "opportunity_requirement",
+    entityId: String(requirement.id),
+    metadata: {
+      subjectId: parsed.data.subjectId,
+      topicId: parsed.data.topicId,
+      legalArticleId: parsed.data.legalArticleId,
+    },
+  });
+  refreshNoticeEngine();
+  return { status: "success", message: "Item mapeado e enviado para revisão independente." };
+}
+
 const requirementReviewSchema = z.object({
   requirementId: z.coerce.number().int().positive(),
   decision: z.enum(["approve", "reject"]),
@@ -441,6 +891,10 @@ export async function reviewRequirementAction(
       id: opportunityRequirements.id,
       status: opportunityRequirements.editorialStatus,
       createdByUserId: opportunityRequirements.createdByUserId,
+      sourceSnapshotId: opportunityRequirements.sourceSnapshotId,
+      subjectId: opportunityRequirements.subjectId,
+      topicId: opportunityRequirements.topicId,
+      legalArticleId: opportunityRequirements.legalArticleId,
       sourceStatus: opportunitySourceDocuments.status,
     })
     .from(opportunityRequirements)
@@ -458,6 +912,22 @@ export async function reviewRequirementAction(
   }
   if (parsed.data.decision === "approve" && requirement.sourceStatus !== "approved") {
     return errorState("A fonte oficial precisa continuar aprovada.");
+  }
+  if (
+    parsed.data.decision === "approve" &&
+    (!requirement.subjectId || !requirement.topicId || !requirement.legalArticleId)
+  ) {
+    return errorState("Mapeie matéria, assunto e dispositivo legal antes de aprovar.");
+  }
+  if (parsed.data.decision === "approve" && requirement.sourceSnapshotId) {
+    const [snapshot] = await db
+      .select({ status: opportunityDocumentSnapshots.status })
+      .from(opportunityDocumentSnapshots)
+      .where(eq(opportunityDocumentSnapshots.id, requirement.sourceSnapshotId))
+      .limit(1);
+    if (!snapshot || snapshot.status !== "approved") {
+      return errorState("A versão capturada do PDF precisa continuar aprovada.");
+    }
   }
 
   const approved = parsed.data.decision === "approve";

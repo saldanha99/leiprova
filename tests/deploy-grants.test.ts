@@ -47,6 +47,15 @@ describe("privilégios do app em produção", () => {
     expect(grants).toContain("exam_editions_id_seq");
   });
 
+  it("isola o PDF bruto e limita a captura oficial a colunas editoriais", () => {
+    expect(grants).toMatch(/grant select \([\s\S]*page_texts,[\s\S]*\) on opportunity_document_snapshots/);
+    expect(grants).toMatch(/grant insert \([\s\S]*document_bytes,[\s\S]*authorization_scope,[\s\S]*\) on opportunity_document_snapshots/);
+    expect(grants).toMatch(/grant update \(\s*status,\s*reviewed_by_user_id,\s*reviewed_at,\s*review_notes,\s*updated_at\s*\) on opportunity_document_snapshots/);
+    const broadSelect = grants.match(/grant select on[\s\S]*?to :app_user;/)?.[0] ?? "";
+    expect(broadSelect).not.toContain("opportunity_document_snapshots");
+    expect(grants).toContain("opportunity_document_snapshots_id_seq");
+  });
+
   it("permite emitir e consumir o convite de acesso sem elevar o papel do comprador", () => {
     expect(grants).toMatch(/grant select, insert, update on account_access_tokens to :app_user;/);
     expect(grants).toMatch(

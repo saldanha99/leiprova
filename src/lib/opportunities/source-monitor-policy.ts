@@ -66,6 +66,8 @@ export type ValidatedOfficialOpportunityUrl = Readonly<{
   url: string;
 }>;
 
+export const OFFICIAL_DOCUMENT_AUTHORIZATION_SCOPE = "owner-approval-2026-09-01" as const;
+
 export type OpportunitySourceMetadata = Readonly<{
   sourceId: OfficialOpportunitySourceId;
   publisher: string;
@@ -185,6 +187,54 @@ export function parseOfficialOpportunitySourceUrl(
     hostname: url.hostname.toLowerCase(),
     url: url.toString(),
   });
+}
+
+/**
+ * Document assets may live outside the landing-page prefix (for example under
+ * /sites/default/files), but they must stay on an exact host in the source registry.
+ */
+export function parseOfficialOpportunityDocumentUrl(
+  input: string,
+  expectedSourceId: OfficialOpportunitySourceId,
+): ValidatedOfficialOpportunityUrl {
+  if (typeof input !== "string") throw new Error("Informe uma URL de documento válida.");
+
+  let url: URL;
+  try {
+    url = new URL(input.trim());
+  } catch {
+    throw new Error("Informe uma URL de documento válida.");
+  }
+
+  const policy = getOfficialOpportunitySourcePolicy(expectedSourceId);
+  if (
+    !policy ||
+    url.protocol !== "https:" ||
+    url.username ||
+    url.password ||
+    url.port ||
+    !(policy.allowedHosts as readonly string[]).includes(url.hostname.toLowerCase())
+  ) {
+    throw new Error("O documento precisa permanecer na mesma origem oficial permitida.");
+  }
+
+  url.hash = "";
+  return Object.freeze({
+    sourceId: policy.id,
+    publisher: policy.publisher,
+    hostname: url.hostname.toLowerCase(),
+    url: url.toString(),
+  });
+}
+
+export function resolveOfficialOpportunityDocumentRedirect(
+  currentUrl: string,
+  location: string,
+  expectedSourceId: OfficialOpportunitySourceId,
+) {
+  const current = parseOfficialOpportunityDocumentUrl(currentUrl, expectedSourceId);
+  const redirected = new URL(location, current.url);
+  return parseOfficialOpportunityDocumentUrl(redirected.toString(), expectedSourceId);
 }
 
 export function isOfficialOpportunitySourceUrl(

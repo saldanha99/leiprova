@@ -1,12 +1,17 @@
 "use client";
 
 import { useActionState, useMemo, useState } from "react";
-import { Check, FilePlus2, LoaderCircle, RotateCcw, Sparkles } from "lucide-react";
+import { Check, Download, FilePlus2, LoaderCircle, RotateCcw, Search, Sparkles } from "lucide-react";
 
 import {
+  captureNoticeDocumentAction,
+  discoverNoticeDocumentsAction,
+  extractSnapshotSyllabusAction,
   generateRequirementDraftAction,
   importSyllabusRequirementsAction,
+  mapExtractedRequirementAction,
   registerNoticeSourceAction,
+  reviewNoticeDocumentAction,
   reviewNoticeSourceAction,
   reviewRequirementAction,
   type NoticeEngineActionState,
@@ -127,6 +132,104 @@ export function NoticeSourceReviewControls({ publicId }: { publicId: string }) {
   );
 }
 
+function CaptureCandidateButton({
+  sourceDocumentPublicId,
+  candidate,
+}: {
+  sourceDocumentPublicId: string;
+  candidate: NonNullable<NoticeEngineActionState["candidates"]>[number];
+}) {
+  const [state, action, pending] = useActionState(captureNoticeDocumentAction, initialState);
+  return (
+    <form action={action} className="rounded-xl border border-sky-300/10 bg-sky-300/[.035] p-3">
+      <input type="hidden" name="sourceDocumentPublicId" value={sourceDocumentPublicId} />
+      <input type="hidden" name="documentUrl" value={candidate.url} />
+      <p className="text-xs font-bold leading-5 text-slate-200">{candidate.label}</p>
+      <p className="mt-1 truncate text-[10px] text-slate-600" title={candidate.url}>{candidate.url}</p>
+      <button
+        disabled={pending}
+        className="mt-3 inline-flex min-h-9 items-center gap-2 rounded-lg bg-sky-300 px-3 text-xs font-extrabold text-sky-950 disabled:opacity-50"
+      >
+        {pending ? <LoaderCircle aria-hidden="true" className="size-3.5 animate-spin" /> : <Download aria-hidden="true" className="size-3.5" />}
+        {pending ? "Capturando e lendo…" : "Capturar este PDF"}
+      </button>
+      <Feedback state={state} />
+    </form>
+  );
+}
+
+export function OfficialDocumentDiscoveryControls({
+  sourceDocumentPublicId,
+}: {
+  sourceDocumentPublicId: string;
+}) {
+  const [state, action, pending] = useActionState(discoverNoticeDocumentsAction, initialState);
+  return (
+    <div className="mt-4 rounded-xl border border-sky-300/10 bg-[#07111d] p-3">
+      <form action={action}>
+        <input type="hidden" name="sourceDocumentPublicId" value={sourceDocumentPublicId} />
+        <button
+          disabled={pending}
+          className="inline-flex min-h-9 items-center gap-2 rounded-lg border border-sky-300/20 bg-sky-300/8 px-3 text-xs font-bold text-sky-100 disabled:opacity-50"
+        >
+          {pending ? <LoaderCircle aria-hidden="true" className="size-3.5 animate-spin" /> : <Search aria-hidden="true" className="size-3.5" />}
+          {pending ? "Procurando anexos…" : "Procurar PDF do edital"}
+        </button>
+      </form>
+      <Feedback state={state} />
+      {state.candidates?.length ? (
+        <div className="mt-3 grid gap-2">
+          {state.candidates.map((candidate) => (
+            <CaptureCandidateButton
+              key={candidate.url}
+              sourceDocumentPublicId={sourceDocumentPublicId}
+              candidate={candidate}
+            />
+          ))}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+export function NoticeDocumentReviewControls({ snapshotPublicId }: { snapshotPublicId: string }) {
+  const [state, action, pending] = useActionState(reviewNoticeDocumentAction, initialState);
+  return (
+    <form action={action} className="mt-4 rounded-xl border border-white/8 bg-black/15 p-3">
+      <input type="hidden" name="snapshotPublicId" value={snapshotPublicId} />
+      <textarea
+        name="notes"
+        maxLength={2000}
+        className={`${fieldClass} min-h-16 resize-y py-2`}
+        placeholder="Nota da conferência; obrigatória ao rejeitar."
+      />
+      <Feedback state={state} />
+      <div className="mt-3 flex flex-wrap gap-2">
+        <button name="decision" value="approve" disabled={pending} className="min-h-9 rounded-lg bg-emerald-300 px-3 text-xs font-extrabold text-emerald-950 disabled:opacity-50">
+          Aprovar captura
+        </button>
+        <button name="decision" value="reject" disabled={pending} className="min-h-9 rounded-lg border border-rose-300/20 bg-rose-300/8 px-3 text-xs font-bold text-rose-100 disabled:opacity-50">
+          Rejeitar
+        </button>
+      </div>
+    </form>
+  );
+}
+
+export function ExtractSnapshotButton({ snapshotPublicId }: { snapshotPublicId: string }) {
+  const [state, action, pending] = useActionState(extractSnapshotSyllabusAction, initialState);
+  return (
+    <form action={action} className="mt-4">
+      <input type="hidden" name="snapshotPublicId" value={snapshotPublicId} />
+      <button disabled={pending} className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-amber-300 px-4 text-xs font-extrabold text-amber-950 disabled:opacity-50">
+        {pending ? <LoaderCircle aria-hidden="true" className="size-4 animate-spin" /> : <Sparkles aria-hidden="true" className="size-4" />}
+        {pending ? "Extraindo programa…" : "Extrair conteúdo programático"}
+      </button>
+      <Feedback state={state} />
+    </form>
+  );
+}
+
 type SourceOption = Readonly<{
   publicId: string;
   title: string;
@@ -238,6 +341,62 @@ export function SyllabusImportForm({
           {pending ? "Separando itens…" : "Importar para revisão"}
         </button>
         {!sources.length ? <p className="mt-3 text-xs text-amber-200">Aprove ao menos uma fonte antes de importar.</p> : null}
+        <Feedback state={state} />
+      </div>
+    </form>
+  );
+}
+
+export function RequirementMappingControls({
+  requirementId,
+  suggestedSubjectId,
+  subjects,
+  topics,
+  articles,
+}: {
+  requirementId: number;
+  suggestedSubjectId: number | null;
+  subjects: readonly SubjectOption[];
+  topics: readonly TopicOption[];
+  articles: readonly ArticleOption[];
+}) {
+  const [state, action, pending] = useActionState(mapExtractedRequirementAction, initialState);
+  const [subjectId, setSubjectId] = useState(suggestedSubjectId ? String(suggestedSubjectId) : "");
+  const availableTopics = useMemo(
+    () => topics.filter((topic) => String(topic.subjectId) === subjectId),
+    [subjectId, topics],
+  );
+  return (
+    <form action={action} className="mt-4 grid gap-3 rounded-xl border border-amber-300/10 bg-amber-300/[.025] p-3 sm:grid-cols-2">
+      <input type="hidden" name="requirementId" value={requirementId} />
+      <label className="text-xs font-semibold text-slate-400">
+        Matéria sugerida
+        <select name="subjectId" required className={fieldClass} value={subjectId} onChange={(event) => setSubjectId(event.target.value)}>
+          <option value="">Selecione</option>
+          {subjects.map((subject) => <option key={subject.id} value={subject.id}>{subject.name}</option>)}
+        </select>
+      </label>
+      <label className="text-xs font-semibold text-slate-400">
+        Assunto
+        <select name="topicId" required className={fieldClass} disabled={!subjectId}>
+          <option value="">Selecione</option>
+          {availableTopics.map((topic) => <option key={topic.id} value={topic.id}>{topic.name}</option>)}
+        </select>
+      </label>
+      <label className="text-xs font-semibold text-slate-400 sm:col-span-2">
+        Dispositivo legal oficial
+        <select name="legalArticleId" required className={fieldClass}>
+          <option value="">Selecione</option>
+          {articles.map((article) => (
+            <option key={article.id} value={article.id}>{article.actTitle} · {article.articleRef}{article.heading ? ` · ${article.heading}` : ""}</option>
+          ))}
+        </select>
+      </label>
+      <div className="sm:col-span-2">
+        <button disabled={pending} className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-amber-300 px-4 text-xs font-extrabold text-amber-950 disabled:opacity-50">
+          {pending ? <LoaderCircle aria-hidden="true" className="size-4 animate-spin" /> : <Check aria-hidden="true" className="size-4" />}
+          {pending ? "Mapeando…" : "Enviar para revisão"}
+        </button>
         <Feedback state={state} />
       </div>
     </form>

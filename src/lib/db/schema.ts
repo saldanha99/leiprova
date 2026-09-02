@@ -3,6 +3,7 @@ import {
   bigint,
   boolean,
   check,
+  customType,
   date,
   foreignKey,
   index,
@@ -15,6 +16,10 @@ import {
   timestamp,
   uniqueIndex,
 } from "drizzle-orm/pg-core";
+
+const bytea = customType<{ data: Buffer; driverData: Buffer }>({
+  dataType: () => "bytea",
+});
 
 const idColumn = () =>
   bigint("id", { mode: "number" }).primaryKey().generatedAlwaysAsIdentity();
@@ -879,6 +884,118 @@ export const opportunitySourceDocuments = pgTable(
   ],
 );
 
+export const opportunityDocumentSnapshots = pgTable(
+  "opportunity_document_snapshots",
+  {
+    id: idColumn(),
+    publicId: text("public_id").notNull().unique(),
+    sourceDocumentId: bigint("source_document_id", { mode: "number" })
+      .notNull()
+      .references(() => opportunitySourceDocuments.id, { onDelete: "restrict" }),
+    documentUrl: text("document_url").notNull(),
+    sourceHost: text("source_host").notNull(),
+    fileName: text("file_name").notNull(),
+    mimeType: text("mime_type").notNull(),
+    documentBytes: bytea("document_bytes").notNull(),
+    checksumSha256: text("checksum_sha256").notNull(),
+    byteLength: integer("byte_length").notNull(),
+    pageCount: integer("page_count").notNull(),
+    extractedText: text("extracted_text").notNull(),
+    pageTexts: jsonb("page_texts").$type<string[]>().notNull(),
+    textLength: integer("text_length").notNull(),
+    extractionMethod: text("extraction_method").notNull().default("pdfjs"),
+    parserVersion: text("parser_version").notNull(),
+    sourcePolicy: text("source_policy").notNull().default("official_document"),
+    authorizationScope: text("authorization_scope").notNull(),
+    authorizedAt: timestamp("authorized_at", { withTimezone: true }).notNull(),
+    authorizedByUserId: bigint("authorized_by_user_id", { mode: "number" }).references(
+      () => users.id,
+      { onDelete: "set null" },
+    ),
+    initiatedByUserId: bigint("initiated_by_user_id", { mode: "number" }).references(
+      () => users.id,
+      { onDelete: "set null" },
+    ),
+    status: text("status").notNull().default("pending_review"),
+    reviewedByUserId: bigint("reviewed_by_user_id", { mode: "number" }).references(
+      () => users.id,
+      { onDelete: "set null" },
+    ),
+    reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+    reviewNotes: text("review_notes"),
+    ...timestamps,
+  },
+  (table) => [
+    uniqueIndex("opportunity_document_snapshots_source_checksum_uidx").on(
+      table.sourceDocumentId,
+      table.checksumSha256,
+    ),
+    index("opportunity_document_snapshots_source_status_idx").on(
+      table.sourceDocumentId,
+      table.status,
+      table.createdAt,
+    ),
+    index("opportunity_document_snapshots_initiated_by_idx").on(table.initiatedByUserId),
+    index("opportunity_document_snapshots_reviewed_by_idx").on(table.reviewedByUserId),
+    check(
+      "opportunity_document_snapshots_public_id_check",
+      sql`${table.publicId} ~ '^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'`,
+    ),
+    check(
+      "opportunity_document_snapshots_url_check",
+      sql`${table.documentUrl} ~* '^https://[a-z0-9.-]+(?:/|$)'`,
+    ),
+    check(
+      "opportunity_document_snapshots_host_check",
+      sql`${table.sourceHost} = lower(${table.sourceHost})
+        and ${table.sourceHost} ~ '^[a-z0-9.-]+$'
+        and ${table.sourceHost} = lower(substring(${table.documentUrl} from '^https://([^/:?#]+)'))`,
+    ),
+    check(
+      "opportunity_document_snapshots_checksum_check",
+      sql`${table.checksumSha256} ~ '^[0-9a-f]{64}$'`,
+    ),
+    check(
+      "opportunity_document_snapshots_size_check",
+      sql`${table.byteLength} between 5 and 15728640 and octet_length(${table.documentBytes}) = ${table.byteLength}`,
+    ),
+    check(
+      "opportunity_document_snapshots_pages_check",
+      sql`${table.pageCount} between 1 and 250`,
+    ),
+    check(
+      "opportunity_document_snapshots_text_check",
+      sql`${table.textLength} between 100 and 2000000 and char_length(${table.extractedText}) = ${table.textLength}`,
+    ),
+    check(
+      "opportunity_document_snapshots_policy_check",
+      sql`${table.sourcePolicy} = 'official_document'`,
+    ),
+    check(
+      "opportunity_document_snapshots_authorization_check",
+      sql`${table.authorizationScope} = 'owner-approval-2026-09-01'`,
+    ),
+    check(
+      "opportunity_document_snapshots_status_check",
+      sql`${table.status} in ('pending_review', 'approved', 'superseded', 'rejected')`,
+    ),
+    check(
+      "opportunity_document_snapshots_review_check",
+      sql`${table.status} <> 'approved' or (${table.reviewedByUserId} is not null and ${table.reviewedAt} is not null)`,
+    ),
+    check(
+      "opportunity_document_snapshots_independent_review_check",
+      sql`${table.status} <> 'approved'
+        or ${table.initiatedByUserId} is null
+        or ${table.reviewedByUserId} <> ${table.initiatedByUserId}`,
+    ),
+    check(
+      "opportunity_document_snapshots_review_notes_check",
+      sql`${table.reviewNotes} is null or char_length(${table.reviewNotes}) <= 2000`,
+    ),
+  ],
+);
+
 export const opportunityOrganizerAssignments = pgTable(
   "opportunity_organizer_assignments",
   {
@@ -966,6 +1083,10 @@ export const opportunityRequirements = pgTable(
     sourceDocumentId: bigint("source_document_id", { mode: "number" })
       .notNull()
       .references(() => opportunitySourceDocuments.id, { onDelete: "restrict" }),
+    sourceSnapshotId: bigint("source_snapshot_id", { mode: "number" }).references(
+      () => opportunityDocumentSnapshots.id,
+      { onDelete: "restrict" },
+    ),
     subjectId: bigint("subject_id", { mode: "number" }).references(() => quizSubjects.id, {
       onDelete: "restrict",
     }),
@@ -1002,6 +1123,7 @@ export const opportunityRequirements = pgTable(
       table.subjectId,
     ),
     index("opportunity_requirements_source_idx").on(table.sourceDocumentId),
+    index("opportunity_requirements_snapshot_idx").on(table.sourceSnapshotId),
     index("opportunity_requirements_topic_idx").on(table.topicId),
     index("opportunity_requirements_legal_act_idx").on(table.legalActId),
     index("opportunity_requirements_legal_article_idx").on(table.legalArticleId),

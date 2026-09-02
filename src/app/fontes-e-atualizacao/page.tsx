@@ -256,6 +256,12 @@ export default function SourcesAndUpdatesPage() {
                   href: "https://www2.camara.leg.br/atividade-legislativa/legislacao",
                   label: "Legislação — Câmara dos Deputados",
                 },
+                {
+                  title: "Editais e conteúdo programático",
+                  text: "O portal oficial do órgão ou da organizadora é validado antes da captura. Somente editais e anexos oficiais podem ser armazenados; cada versão recebe checksum e revisão independente. Provas, cadernos e gabaritos permanecem bloqueados.",
+                  href: null,
+                  label: null,
+                },
               ].map((source) => (
                 <article key={source.title} className="rounded-[1.5rem] border border-white/9 bg-[#0a1420] p-6">
                   <BookOpenCheck aria-hidden="true" className="size-5 text-amber-300" />
