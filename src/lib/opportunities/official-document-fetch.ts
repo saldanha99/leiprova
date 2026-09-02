@@ -214,7 +214,10 @@ export async function captureOfficialPdf(
     throw new Error("Cadernos, questões, respostas e gabaritos de terceiros não podem ser capturados.");
   }
 
-  const pdf = await getDocumentProxy(bytes);
+  // PDF.js may transfer/detach the input ArrayBuffer. Keep an independent copy
+  // for persistence and give the parser another copy that it may consume.
+  const documentBytes = Buffer.from(bytes);
+  const pdf = await getDocumentProxy(new Uint8Array(documentBytes));
   try {
     if (pdf.numPages < 1 || pdf.numPages > MAX_OFFICIAL_DOCUMENT_PAGES) {
       throw new Error(`O PDF precisa ter entre 1 e ${MAX_OFFICIAL_DOCUMENT_PAGES} páginas.`);
@@ -232,7 +235,6 @@ export async function captureOfficialPdf(
     }
 
     const official = parseOfficialOpportunityDocumentUrl(finalUrl, sourceId);
-    const documentBytes = Buffer.from(bytes);
     return Object.freeze({
       documentUrl: official.url,
       sourceHost: official.hostname,

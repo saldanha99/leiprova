@@ -371,6 +371,7 @@ export async function captureNoticeDocumentAction(
     return errorState("A fonte precisa continuar aprovada para permitir a captura.");
   }
 
+  let captured: Awaited<ReturnType<typeof captureOfficialPdf>>;
   try {
     const official = parseOfficialOpportunitySourceUrl(source.sourceUrl);
     const candidates = await discoverOfficialDocumentCandidates(
@@ -382,7 +383,14 @@ export async function captureNoticeDocumentAction(
     if (!candidate) {
       return errorState("O PDF não pertence mais à lista elegível descoberta na fonte oficial.");
     }
-    const captured = await captureOfficialPdf(candidate, official.sourceId);
+    captured = await captureOfficialPdf(candidate, official.sourceId);
+  } catch (error) {
+    return errorState(
+      error instanceof Error ? error.message : "Não foi possível ler o PDF oficial.",
+    );
+  }
+
+  try {
     const publicId = randomUUID();
     const [saved] = await db
       .insert(opportunityDocumentSnapshots)
@@ -436,10 +444,8 @@ export async function captureNoticeDocumentAction(
       message: `PDF oficial capturado (${captured.pageCount} páginas) e enviado para revisão independente.`,
     };
   } catch (error) {
-    console.error("Falha ao capturar PDF oficial.", error);
-    return errorState(
-      error instanceof Error ? error.message : "Não foi possível capturar o PDF oficial.",
-    );
+    console.error("Falha ao persistir captura oficial.", error);
+    return errorState("Não foi possível armazenar o PDF oficial. A equipe técnica foi informada.");
   }
 }
 
