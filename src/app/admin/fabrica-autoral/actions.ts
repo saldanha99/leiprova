@@ -24,6 +24,7 @@ import {
   EDITORIAL_BATCH_LIMIT,
   generatedDraftBatchClaimSchema,
   generatedDraftClaimSchema,
+  isGeneratedAuthorshipMethod,
   originalQuestionBatchReviewSchema,
   originalQuestionDraftSchema,
   validateHumanReview,
@@ -307,11 +308,11 @@ export async function claimGeneratedDraftAction(
   }
   if (
     draft.questionSourceRights !== "original_authorial" ||
-    draft.authorshipMethod !== "ai_assisted" ||
+    !isGeneratedAuthorshipMethod(draft.authorshipMethod) ||
     !draft.generatorModel ||
     !draft.promptVersion
   ) {
-    return errorState("O rascunho não possui a procedência autoral e os metadados de IA exigidos.");
+    return errorState("O rascunho não possui a procedência autoral e os metadados de geração exigidos.");
   }
   if (
     draft.articleStatus !== "reviewed" ||
@@ -478,7 +479,7 @@ export async function claimGeneratedDraftBatchAction(
       draft.status !== "draft" ||
       draft.creatorUserId ||
       draft.questionSourceRights !== "original_authorial" ||
-      draft.authorshipMethod !== "ai_assisted" ||
+      !isGeneratedAuthorshipMethod(draft.authorshipMethod) ||
       !draft.generatorModel ||
       !draft.promptVersion
     ) {

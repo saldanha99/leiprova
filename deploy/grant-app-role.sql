@@ -255,14 +255,18 @@ grant insert (
 ) on opportunity_source_documents to :app_user;
 
 grant update (
+  document_type,
+  source_external_id,
   title,
   published_at,
+  observed_at,
   last_seen_at,
   checksum_sha256,
   http_status,
   content_type,
   supersedes_public_id,
   status,
+  initiated_by_user_id,
   reviewed_by_user_id,
   reviewed_at,
   review_notes
@@ -297,7 +301,8 @@ grant insert (
   legal_act_id,
   legal_article_id,
   requirement_text,
-  source_locator
+  source_locator,
+  created_by_user_id
 ) on opportunity_requirements to :app_user;
 
 grant update (
@@ -310,6 +315,7 @@ grant update (
   editorial_status,
   reviewed_by_user_id,
   reviewed_at,
+  review_notes,
   updated_at
 ) on opportunity_requirements to :app_user;
 

@@ -981,13 +981,21 @@ export const opportunityRequirements = pgTable(
     requirementText: text("requirement_text").notNull(),
     sourceLocator: text("source_locator").notNull(),
     editorialStatus: text("editorial_status").notNull().default("draft"),
+    createdByUserId: bigint("created_by_user_id", { mode: "number" }).references(() => users.id, {
+      onDelete: "set null",
+    }),
     reviewedByUserId: bigint("reviewed_by_user_id", { mode: "number" }).references(() => users.id, {
       onDelete: "set null",
     }),
     reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+    reviewNotes: text("review_notes"),
     ...timestamps,
   },
   (table) => [
+    uniqueIndex("opportunity_requirements_source_text_uidx").on(
+      table.sourceDocumentId,
+      table.requirementText,
+    ),
     index("opportunity_requirements_opportunity_status_idx").on(
       table.opportunityId,
       table.editorialStatus,
@@ -997,6 +1005,7 @@ export const opportunityRequirements = pgTable(
     index("opportunity_requirements_topic_idx").on(table.topicId),
     index("opportunity_requirements_legal_act_idx").on(table.legalActId),
     index("opportunity_requirements_legal_article_idx").on(table.legalArticleId),
+    index("opportunity_requirements_created_by_idx").on(table.createdByUserId),
     index("opportunity_requirements_reviewed_by_idx").on(table.reviewedByUserId),
     check(
       "opportunity_requirements_status_check",
@@ -1013,6 +1022,16 @@ export const opportunityRequirements = pgTable(
     check(
       "opportunity_requirements_review_check",
       sql`${table.editorialStatus} <> 'reviewed' or (${table.reviewedByUserId} is not null and ${table.reviewedAt} is not null)`,
+    ),
+    check(
+      "opportunity_requirements_independent_review_check",
+      sql`${table.editorialStatus} <> 'reviewed'
+        or ${table.createdByUserId} is null
+        or ${table.reviewedByUserId} <> ${table.createdByUserId}`,
+    ),
+    check(
+      "opportunity_requirements_review_notes_check",
+      sql`${table.reviewNotes} is null or char_length(${table.reviewNotes}) <= 1500`,
     ),
   ],
 );
@@ -1242,11 +1261,11 @@ export const questions = pgTable(
     ),
     check(
       "questions_authorship_method_check",
-      sql`${table.authorshipMethod} in ('human', 'ai_assisted')`,
+      sql`${table.authorshipMethod} in ('human', 'ai_assisted', 'rule_based')`,
     ),
     check(
-      "questions_ai_metadata_check",
-      sql`${table.authorshipMethod} <> 'ai_assisted' or (
+      "questions_generator_metadata_check",
+      sql`${table.authorshipMethod} = 'human' or (
         nullif(btrim(${table.generatorModel}), '') is not null
         and nullif(btrim(${table.promptVersion}), '') is not null
       )`,

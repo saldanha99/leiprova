@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   generatedDraftBatchClaimSchema,
   generatedDraftClaimSchema,
+  isGeneratedAuthorshipMethod,
   originalQuestionBatchReviewSchema,
   originalQuestionDraftSchema,
   validateHumanReview,
@@ -103,6 +104,20 @@ describe("fábrica autoral clean-room", () => {
     const publicId = PILOT_ORIGINAL_QUESTIONS[0].publicId;
     expect(generatedDraftClaimSchema.safeParse({ publicId, cleanRoomAttestation: false }).success).toBe(false);
     expect(generatedDraftClaimSchema.safeParse({ publicId, cleanRoomAttestation: true }).success).toBe(true);
+  });
+
+  it("reconhece rascunhos assistidos e determinísticos sem abrir autoria manual", () => {
+    expect(isGeneratedAuthorshipMethod("ai_assisted")).toBe(true);
+    expect(isGeneratedAuthorshipMethod("rule_based")).toBe(true);
+    expect(isGeneratedAuthorshipMethod("human")).toBe(false);
+    expect(
+      originalQuestionDraftSchema.safeParse({
+        ...validDraft(),
+        authorshipMethod: "rule_based",
+        generatorModel: "entrada-adulterada",
+        promptVersion: "v1",
+      }).success,
+    ).toBe(false);
   });
 
   it("exige declarações humanas explícitas nas duas etapas em lote", () => {

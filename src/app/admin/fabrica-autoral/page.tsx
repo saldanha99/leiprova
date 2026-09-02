@@ -43,7 +43,7 @@ export default async function EditorialFactoryPage() {
 
   const metrics = [
     { label: "Autorais registradas", value: snapshot.metrics.total, icon: Fingerprint, tone: "text-sky-300 bg-sky-300/10" },
-    { label: "Rascunhos de IA", value: snapshot.metrics.drafts, icon: FilePenLine, tone: "text-violet-300 bg-violet-300/10" },
+    { label: "Rascunhos gerados", value: snapshot.metrics.drafts, icon: FilePenLine, tone: "text-violet-300 bg-violet-300/10" },
     { label: "Na fila", value: snapshot.metrics.pending, icon: Clock3, tone: "text-amber-300 bg-amber-300/10" },
     { label: "Liberadas", value: snapshot.metrics.reviewed, icon: CheckCircle2, tone: "text-emerald-300 bg-emerald-300/10" },
     { label: "Reprovadas", value: snapshot.metrics.suspended, icon: FileLock2, tone: "text-rose-300 bg-rose-300/10" },
@@ -329,7 +329,7 @@ export default async function EditorialFactoryPage() {
                   </details>
 
                   <div className="mt-4 border-t border-white/7 pt-3 text-[11px] leading-5 text-slate-600">
-                    Responsável editorial: {item.creatorName ?? "a definir"} · método {item.authorshipMethod === "ai_assisted" ? "assistido por IA" : "humano"}
+                    Responsável editorial: {item.creatorName ?? "a definir"} · método {item.authorshipMethod === "ai_assisted" ? "assistido por IA" : item.authorshipMethod === "rule_based" ? "gerado por regras verificáveis" : "humano"}
                     {item.generatorModel ? ` · gerador: ${item.generatorModel}` : ""}
                     {item.promptVersion ? ` · protocolo: ${item.promptVersion}` : ""}
                     {item.reviewerName ? ` · revisor: ${item.reviewerName}` : ""}

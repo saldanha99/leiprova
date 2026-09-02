@@ -3,6 +3,10 @@ import { z } from "zod";
 export const editorialQuestionTypeSchema = z.enum(["multiple_choice", "true_false"]);
 export const authorshipMethodSchema = z.enum(["human", "ai_assisted"]);
 
+export function isGeneratedAuthorshipMethod(value: string) {
+  return value === "ai_assisted" || value === "rule_based";
+}
+
 const optionSchema = z.object({
   key: z.string().trim().min(1).max(2),
   text: z.string().trim().min(2, "Preencha o texto de todas as alternativas.").max(1200),

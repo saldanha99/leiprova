@@ -6,6 +6,7 @@ import {
   ArrowUpRight,
   BookOpenCheck,
   CreditCard,
+  FileSearch,
   LayoutDashboard,
   LogOut,
   RefreshCcw,
@@ -21,6 +22,7 @@ const adminNavItems = [
   { href: "/admin", label: "Visão geral", icon: LayoutDashboard, adminOnly: true },
   { href: "/admin/fabrica-autoral", label: "Fábrica autoral", icon: BookOpenCheck, adminOnly: false },
   { href: "/admin/fontes-oficiais", label: "Fontes oficiais", icon: RefreshCcw, adminOnly: false },
+  { href: "/admin/motor-editais", label: "Motor de editais", icon: FileSearch, adminOnly: false },
   { href: "/admin/stripe-connect", label: "Stripe Connect", icon: CreditCard, adminOnly: true },
 ] as const;
 
