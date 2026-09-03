@@ -634,24 +634,34 @@ export async function extractSnapshotSyllabusAction(
 
   try {
     const inserted = await db.transaction(async (transaction) => {
-      const rows = await transaction
-        .insert(opportunityRequirements)
-        .values(
-          candidates.map((candidate) => ({
-            opportunityId: snapshot.opportunityId,
-            sourceDocumentId: snapshot.sourceDocumentId,
-            sourceSnapshotId: snapshot.id,
-            subjectId: candidate.suggestedSubjectId,
-            requirementText: candidate.requirementText,
-            sourceLocator: candidate.sourceLocator,
-            editorialStatus: "draft",
-            createdByUserId: user.id,
-          })),
-        )
-        .onConflictDoNothing({
-          target: [opportunityRequirements.sourceDocumentId, opportunityRequirements.requirementText],
-        })
-        .returning({ id: opportunityRequirements.id });
+      // Keep the target list aligned with the production role's column grant.
+      // Drizzle's regular insert mentions every defaulted review column.
+      const values = candidates.map(
+        (candidate) => sql`(
+          ${snapshot.opportunityId},
+          ${snapshot.sourceDocumentId},
+          ${snapshot.id},
+          ${candidate.suggestedSubjectId},
+          ${candidate.requirementText},
+          ${candidate.sourceLocator},
+          'draft',
+          ${user.id}
+        )`,
+      );
+      const rows = await transaction.execute<{ id: string }>(sql`
+        insert into opportunity_requirements (
+          opportunity_id,
+          source_document_id,
+          source_snapshot_id,
+          subject_id,
+          requirement_text,
+          source_locator,
+          editorial_status,
+          created_by_user_id
+        ) values ${sql.join(values, sql`, `)}
+        on conflict (source_document_id, requirement_text) do nothing
+        returning id::text
+      `);
       await transaction.insert(auditLogs).values({
         actorUserId: user.id,
         action: "editorial.notice_syllabus.extracted",
@@ -671,7 +681,10 @@ export async function extractSnapshotSyllabusAction(
       message: `${inserted.length} item(ns) extraído(s) para mapeamento humano; ${candidates.length - inserted.length} duplicado(s) ignorado(s).`,
     };
   } catch (error) {
-    console.error("Falha ao extrair conteúdo programático.", error);
+    console.error(
+      "Falha ao extrair conteúdo programático.",
+      error instanceof Error ? error.name : "UnknownError",
+    );
     return errorState("Não foi possível criar a fila de mapeamento do edital.");
   }
 }
