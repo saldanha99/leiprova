@@ -59,7 +59,43 @@ export function PortalVerifyButton({ portalId }: { portalId: number }) {
 
 export function SnapshotReviewControls({ publicId }: { publicId: string }) {
   const [state, action, pending] = useActionState(reviewLegalSnapshotAction, initialState);
-  return <form action={action} className="mt-4 rounded-xl border border-white/8 bg-black/15 p-3"><input type="hidden" name="publicId" value={publicId} /><textarea name="notes" maxLength={1500} className="min-h-16 w-full resize-y rounded-lg border border-white/10 bg-[#07111d] px-3 py-2 text-xs text-slate-200 outline-none focus:border-amber-300/40" placeholder="Nota da revisão; obrigatória ao rejeitar." /><Feedback state={state} /><div className="mt-2 flex flex-wrap gap-2"><button name="decision" value="approve" disabled={pending} className="inline-flex min-h-9 items-center gap-2 rounded-lg bg-emerald-300 px-3 text-xs font-extrabold text-emerald-950 disabled:opacity-50"><Check className="size-3.5" />Aprovar referência</button><button name="decision" value="reject" disabled={pending} className="inline-flex min-h-9 items-center gap-2 rounded-lg border border-rose-300/20 bg-rose-300/8 px-3 text-xs font-bold text-rose-100 disabled:opacity-50"><RotateCcw className="size-3.5" />Rejeitar</button></div></form>;
+  return (
+    <form action={action} className="mt-4 rounded-xl border border-white/8 bg-black/15 p-3">
+      <input type="hidden" name="publicId" value={publicId} />
+      <label className="text-[11px] font-semibold text-slate-400">
+        Nota da revisão humana
+        <textarea
+          name="notes"
+          required
+          minLength={10}
+          maxLength={1500}
+          className="mt-2 min-h-16 w-full resize-y rounded-lg border border-white/10 bg-[#07111d] px-3 py-2 text-xs text-slate-200 outline-none focus:border-amber-300/40"
+          placeholder="Registre o que foi conferido na fonte oficial."
+        />
+      </label>
+      <Feedback state={state} />
+      <div className="mt-2 flex flex-wrap gap-2">
+        <button
+          name="decision"
+          value="approve"
+          disabled={pending}
+          className="inline-flex min-h-9 items-center gap-2 rounded-lg bg-emerald-300 px-3 text-xs font-extrabold text-emerald-950 disabled:opacity-50"
+        >
+          <Check className="size-3.5" />
+          Aprovar referência
+        </button>
+        <button
+          name="decision"
+          value="reject"
+          disabled={pending}
+          className="inline-flex min-h-9 items-center gap-2 rounded-lg border border-rose-300/20 bg-rose-300/8 px-3 text-xs font-bold text-rose-100 disabled:opacity-50"
+        >
+          <RotateCcw className="size-3.5" />
+          Rejeitar
+        </button>
+      </div>
+    </form>
+  );
 }
 
 export function LegalTextReviewControls({ publicId }: { publicId: string }) {

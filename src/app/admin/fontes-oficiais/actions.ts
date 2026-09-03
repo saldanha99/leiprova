@@ -21,6 +21,7 @@ import {
   quizCareerSpecializations,
   quizCareerTracks,
 } from "@/lib/db/schema";
+import { canReviewEditorialSubmission } from "@/lib/editorial/owner-approval";
 import { resolveExamMetadataSpecialization } from "@/lib/official-sources/exam-metadata-selection";
 import {
   fetchOfficialConsolidatedLegalText,
@@ -108,7 +109,7 @@ export async function syncLegalSourceAction(
     revalidatePath("/admin/fontes-oficiais");
     return {
       status: "success",
-      message: saved.status === "pending_review" ? "Nova fotografia registrada para revisão independente." : "Fonte conferida; o conteúdo oficial permanece igual à fotografia já registrada.",
+      message: saved.status === "pending_review" ? "Nova fotografia registrada para revisão humana auditada." : "Fonte conferida; o conteúdo oficial permanece igual à fotografia já registrada.",
     };
   } catch (error) {
     console.error("Falha ao sincronizar fonte jurídica.", safeLogDetail(error));
@@ -133,10 +134,6 @@ export async function reviewLegalSnapshotAction(
     notes: formData.get("notes"),
   });
   if (!parsed.success) return errorState("Revise os dados da decisão.");
-  if (parsed.data.decision === "reject" && parsed.data.notes.length < 10) {
-    return errorState("Explique a rejeição em pelo menos 10 caracteres.");
-  }
-
   const db = getDb();
   const [snapshot] = await db
     .select({ id: legalSourceSnapshots.id, legalActId: legalSourceSnapshots.legalActId, status: legalSourceSnapshots.status, initiatorId: legalSourceSnapshots.initiatedByUserId })
@@ -144,9 +141,21 @@ export async function reviewLegalSnapshotAction(
     .where(eq(legalSourceSnapshots.publicId, parsed.data.publicId))
     .limit(1);
   if (!snapshot || snapshot.status !== "pending_review") return errorState("A fotografia não está mais pendente.");
-  if (snapshot.initiatorId === user.id) return errorState("Quem iniciou a conferência não pode aprovar ou rejeitar a própria fotografia.");
+  if (
+    !canReviewEditorialSubmission({
+      initiatorUserId: snapshot.initiatorId,
+      reviewerUserId: user.id,
+      reviewerEmail: user.email,
+    })
+  ) {
+    return errorState("Somente a conta proprietária pode revisar a própria fotografia.");
+  }
+  if (parsed.data.notes.length < 10) {
+    return errorState("Registre uma nota de revisão com pelo menos 10 caracteres.");
+  }
 
   const approved = parsed.data.decision === "approve";
+  const approvalMode = snapshot.initiatorId === user.id ? "owner_self_review" : "independent_review";
   const now = new Date();
 
   try {
@@ -175,7 +184,7 @@ export async function reviewLegalSnapshotAction(
         action: approved ? "editorial.legal_source.approved" : "editorial.legal_source.rejected",
         entityType: "legal_source_snapshot",
         entityId: parsed.data.publicId,
-        metadata: { notes: parsed.data.notes || null },
+        metadata: { notes: parsed.data.notes, approvalMode },
       });
     });
   } catch (error) {
@@ -261,7 +270,7 @@ export async function captureLegalTextAction(
       status: "success",
       message:
         saved.status === "pending_review"
-          ? `${captured.articleCount} artigo(s) capturado(s) e preservado(s) para revisão independente.`
+          ? `${captured.articleCount} artigo(s) capturado(s) e preservado(s) para revisão humana auditada.`
           : "Texto conferido; a compilação oficial permanece igual à versão já registrada.",
     };
   } catch (error) {
@@ -310,11 +319,18 @@ export async function reviewLegalTextAction(
   if (!snapshot || snapshot.status !== "pending_review") {
     return errorState("A compilação não está mais pendente.");
   }
-  if (snapshot.initiatorId === user.id) {
-    return errorState("Quem capturou o texto não pode aprovar ou rejeitar a própria compilação.");
+  if (
+    !canReviewEditorialSubmission({
+      initiatorUserId: snapshot.initiatorId,
+      reviewerUserId: user.id,
+      reviewerEmail: user.email,
+    })
+  ) {
+    return errorState("Somente a conta proprietária pode revisar a própria compilação.");
   }
 
   const approved = parsed.data.decision === "approve";
+  const approvalMode = snapshot.initiatorId === user.id ? "owner_self_review" : "independent_review";
   let articles: ReturnType<typeof parseConsolidatedLegalArticles> = [];
   if (approved) {
     try {
@@ -436,6 +452,7 @@ export async function reviewLegalTextAction(
           notes: parsed.data.notes,
           articleCount: snapshot.articleCount,
           checksum: snapshot.checksumSha256,
+          approvalMode,
         },
       });
     });

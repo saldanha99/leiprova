@@ -517,12 +517,6 @@ export const legalSourceSnapshots = pgTable(
       sql`${table.status} <> 'approved' or (${table.reviewedByUserId} is not null and ${table.reviewedAt} is not null)`,
     ),
     check(
-      "legal_source_snapshots_independent_review_check",
-      sql`${table.status} <> 'approved'
-        or ${table.initiatedByUserId} is null
-        or ${table.reviewedByUserId} <> ${table.initiatedByUserId}`,
-    ),
-    check(
       "legal_source_snapshots_review_notes_check",
       sql`${table.reviewNotes} is null or char_length(${table.reviewNotes}) <= 1500`,
     ),
@@ -604,12 +598,6 @@ export const legalTextSnapshots = pgTable(
     check(
       "legal_text_snapshots_review_check",
       sql`${table.status} <> 'approved' or (${table.reviewedByUserId} is not null and ${table.reviewedAt} is not null)`,
-    ),
-    check(
-      "legal_text_snapshots_independent_review_check",
-      sql`${table.status} <> 'approved'
-        or ${table.initiatedByUserId} is null
-        or ${table.reviewedByUserId} <> ${table.initiatedByUserId}`,
     ),
     check(
       "legal_text_snapshots_review_notes_check",

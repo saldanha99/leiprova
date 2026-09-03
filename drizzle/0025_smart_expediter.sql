@@ -1,0 +1,2 @@
+ALTER TABLE "legal_source_snapshots" DROP CONSTRAINT "legal_source_snapshots_independent_review_check";--> statement-breakpoint
+ALTER TABLE "legal_text_snapshots" DROP CONSTRAINT "legal_text_snapshots_independent_review_check";

@@ -86,10 +86,11 @@ Depois que a fotografia de monitoramento é aprovada, o painel editorial pode lo
 `Compilação Monovigente` da mesma norma no sistema oficial do Senado. O coletor exige que o
 identificador da norma permaneça idêntico, limita a resposta, remove redações riscadas e notas
 editoriais de alteração e separa os artigos de forma determinística. Texto integral, checksum,
-contagem e versão do parser ficam em `legal_text_snapshots`. Uma segunda pessoa aprova ou rejeita
-a compilação inteira; somente a aprovação cria a `legal_version` vigente e ativa seus artigos
-oficiais. Se a fonte não oferece compilação monovigente, o motor falha fechado e não usa a
-publicação original como se fosse texto consolidado.
+contagem e versão do parser ficam em `legal_text_snapshots`. A conta proprietária configurada
+pode capturar e revisar a compilação inteira com uma nota humana obrigatória; outras contas
+continuam exigindo um revisor diferente. Somente a aprovação cria a `legal_version` vigente e
+ativa seus artigos oficiais. Se a fonte não oferece compilação monovigente, o motor falha fechado
+e não usa a publicação original como se fosse texto consolidado.
 
 ## Separação das sincronizações
 

@@ -103,16 +103,20 @@ Tudo que é comercial fecha por padrão. Estado em produção na última verific
 | `STRIPE_CONNECT_MODE` | `test` | Contém o risco do item acima. |
 | `STRIPE_CONNECT_BR_APPROVED` | `false` | Trava final. |
 
-`EDITORIAL_OWNER_APPROVER_EMAIL` identifica a única conta editorial que pode registrar uma
-exceção explícita do proprietário na aprovação de um PDF oficial. A decisão fica auditada como
-`owner_override`; não conta como revisão independente e não libera requisitos nem questões sem
-as revisões humanas separadas exigidas por esses objetos.
+`EDITORIAL_OWNER_APPROVER_EMAIL` identifica a única conta editorial proprietária. Ela pode
+registrar a exceção `owner_override` na aprovação de um PDF oficial e também concluir sozinha
+a captura e a revisão das fotografias e compilações em `/admin/fontes-oficiais`. Nesses dois
+fluxos jurídicos a nota humana continua obrigatória e a auditoria registra
+`owner_self_review`. Outras contas continuam impedidas de revisar o que elas mesmas iniciaram.
+Essa permissão não libera requisitos nem questões sem as revisões humanas exigidas por esses
+objetos.
 
 O corpus jurídico integral é capturado em `/admin/fontes-oficiais` somente depois que a
 fotografia de monitoramento da norma foi aprovada. A captura encontra a compilação monovigente
-da mesma norma no Senado e permanece pendente. Uma conta diferente precisa conferir e aprovar a
-versão; essa decisão ativa os artigos em lote e fica registrada na auditoria. A ausência de uma
-compilação monovigente bloqueia a importação, em vez de promover texto original ou histórico.
+da mesma norma no Senado e permanece pendente. A conta proprietária configurada pode conferir e
+aprovar a versão que ela própria capturou; a decisão exige nota, ativa os artigos em lote e fica
+registrada na auditoria. A ausência de uma compilação monovigente bloqueia a importação, em vez
+de promover texto original ou histórico.
 
 A divergência do Connect está contida em quatro camadas: modo `test`, chave
 `rk_test` (não live), `BR_APPROVED=false` e o único parceiro cadastrado em

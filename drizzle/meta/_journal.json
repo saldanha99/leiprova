@@ -176,6 +176,13 @@
       "when": 1788441536528,
       "tag": "0024_reflective_avengers",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1788457960265,
+      "tag": "0025_smart_expediter",
+      "breakpoints": true
     }
   ]
 }
