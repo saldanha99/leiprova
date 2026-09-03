@@ -644,7 +644,6 @@ export async function extractSnapshotSyllabusAction(
           ${candidate.suggestedSubjectId},
           ${candidate.requirementText},
           ${candidate.sourceLocator},
-          'draft',
           ${user.id}
         )`,
       );
@@ -656,7 +655,6 @@ export async function extractSnapshotSyllabusAction(
           subject_id,
           requirement_text,
           source_locator,
-          editorial_status,
           created_by_user_id
         ) values ${sql.join(values, sql`, `)}
         on conflict (source_document_id, requirement_text) do nothing
