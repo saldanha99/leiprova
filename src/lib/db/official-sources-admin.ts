@@ -8,7 +8,10 @@ import {
   examEditions,
   examSourcePortals,
   legalActs,
+  legalArticles,
   legalSourceSnapshots,
+  legalTextSnapshots,
+  legalVersions,
   quizBanks,
   quizCareerSpecializations,
   quizCareerTracks,
@@ -20,7 +23,7 @@ export async function getOfficialSourcesSnapshot() {
   const initiator = alias(users, "source_initiator");
   const reviewer = alias(users, "source_reviewer");
 
-  const [laws, snapshots, portals, careerRows, exams, metrics] = await Promise.all([
+  const [laws, snapshots, textSnapshots, portals, careerRows, exams, metrics] = await Promise.all([
     db
       .select({
         id: legalActs.id,
@@ -60,6 +63,30 @@ export async function getOfficialSourcesSnapshot() {
       .leftJoin(reviewer, eq(legalSourceSnapshots.reviewedByUserId, reviewer.id))
       .orderBy(desc(legalSourceSnapshots.fetchedAt))
       .limit(80),
+    db
+      .select({
+        publicId: legalTextSnapshots.publicId,
+        legalActId: legalTextSnapshots.legalActId,
+        actTitle: legalActs.shortTitle,
+        sourceUrl: legalTextSnapshots.sourceUrl,
+        checksumSha256: legalTextSnapshots.checksumSha256,
+        contentLength: legalTextSnapshots.contentLength,
+        articleCount: legalTextSnapshots.articleCount,
+        parserVersion: legalTextSnapshots.parserVersion,
+        status: legalTextSnapshots.status,
+        initiatedByUserId: legalTextSnapshots.initiatedByUserId,
+        initiatorName: initiator.name,
+        reviewerName: reviewer.name,
+        reviewNotes: legalTextSnapshots.reviewNotes,
+        fetchedAt: legalTextSnapshots.fetchedAt,
+        reviewedAt: legalTextSnapshots.reviewedAt,
+      })
+      .from(legalTextSnapshots)
+      .innerJoin(legalActs, eq(legalTextSnapshots.legalActId, legalActs.id))
+      .leftJoin(initiator, eq(legalTextSnapshots.initiatedByUserId, initiator.id))
+      .leftJoin(reviewer, eq(legalTextSnapshots.reviewedByUserId, reviewer.id))
+      .orderBy(desc(legalTextSnapshots.fetchedAt))
+      .limit(40),
     db
       .select({
         id: examSourcePortals.id,
@@ -118,6 +145,17 @@ export async function getOfficialSourcesSnapshot() {
       db.select({ value: sql<number>`count(*)::int` }).from(legalSourceSnapshots).where(eq(legalSourceSnapshots.status, "pending_review")),
       db.select({ value: sql<number>`count(*) filter (where ${examSourcePortals.lastHttpStatus} between 200 and 399)::int` }).from(examSourcePortals),
       db.select({ value: sql<number>`count(*)::int` }).from(examEditions).where(eq(examEditions.sourcePolicy, "metadata_only")),
+      db.select({ value: sql<number>`count(*)::int` }).from(legalTextSnapshots).where(eq(legalTextSnapshots.status, "pending_review")),
+      db
+        .select({ value: sql<number>`count(*)::int` })
+        .from(legalArticles)
+        .innerJoin(legalVersions, eq(legalArticles.legalVersionId, legalVersions.id))
+        .where(
+          and(
+            eq(legalArticles.editorialStatus, "reviewed"),
+            eq(legalVersions.status, "current"),
+          ),
+        ),
     ]),
   ]);
 
@@ -142,6 +180,7 @@ export async function getOfficialSourcesSnapshot() {
   return {
     laws,
     snapshots,
+    textSnapshots,
     portals,
     careers,
     exams,
@@ -150,6 +189,8 @@ export async function getOfficialSourcesSnapshot() {
       pendingSnapshots: metrics[1][0]?.value ?? 0,
       healthyPortals: metrics[2][0]?.value ?? 0,
       metadataExams: metrics[3][0]?.value ?? 0,
+      pendingLegalTexts: metrics[4][0]?.value ?? 0,
+      activeLegalArticles: metrics[5][0]?.value ?? 0,
     },
   };
 }

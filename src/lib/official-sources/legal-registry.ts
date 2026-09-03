@@ -120,3 +120,24 @@ export function getOfficialLegalSource(slug: string) {
 export function isAllowedOfficialLegalUrl(url: string) {
   return OFFICIAL_LEGAL_SOURCES.some((source) => source.monitorUrl === url);
 }
+
+export function isAllowedOfficialLegalTextUrl(url: string) {
+  try {
+    const parsed = new URL(url);
+    if (
+      parsed.protocol !== "https:" ||
+      parsed.hostname !== "legis.senado.leg.br" ||
+      parsed.search ||
+      parsed.hash
+    ) {
+      return false;
+    }
+    const match = /^\/norma\/(\d+)\/publicacao\/\d+$/u.exec(parsed.pathname);
+    if (!match) return false;
+    return OFFICIAL_LEGAL_SOURCES.some(
+      (source) => new URL(source.monitorUrl).pathname === `/norma/${match[1]}`,
+    );
+  } catch {
+    return false;
+  }
+}

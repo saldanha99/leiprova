@@ -2,7 +2,10 @@ import { describe, expect, it } from "vitest";
 
 import { parseOfficialExamUrl } from "@/lib/official-sources/exam-registry";
 import { extractOfficialDocumentText, normalizeOfficialText } from "@/lib/official-sources/fetch";
-import { OFFICIAL_LEGAL_SOURCES } from "@/lib/official-sources/legal-registry";
+import {
+  isAllowedOfficialLegalTextUrl,
+  OFFICIAL_LEGAL_SOURCES,
+} from "@/lib/official-sources/legal-registry";
 
 describe("fontes oficiais", () => {
   it("aceita apenas HTTPS no domínio oficial da banca", () => {
@@ -23,5 +26,21 @@ describe("fontes oficiais", () => {
 
     expect(new Set(urns).size).toBe(urns.length);
     expect(urns.every((urn) => /^urn:lex:br:federal:[^\s]+$/.test(urn))).toBe(true);
+  });
+
+  it("aceita somente publicações consolidadas vinculadas a uma norma registrada", () => {
+    expect(
+      isAllowedOfficialLegalTextUrl(
+        "https://legis.senado.leg.br/norma/552282/publicacao/34620807",
+      ),
+    ).toBe(true);
+    expect(
+      isAllowedOfficialLegalTextUrl("https://legis.senado.leg.br/norma/999/publicacao/1"),
+    ).toBe(false);
+    expect(
+      isAllowedOfficialLegalTextUrl(
+        "https://legis.senado.leg.br/norma/552282/publicacao/34620807?download=1",
+      ),
+    ).toBe(false);
   });
 });

@@ -47,6 +47,22 @@ describe("privilégios do app em produção", () => {
     expect(grants).toContain("exam_editions_id_seq");
   });
 
+  it("limita a captura e ativação do corpus legal às colunas auditadas", () => {
+    expect(grants).toMatch(/legal_text_snapshots,/);
+    expect(grants).toMatch(
+      /grant insert \(\s*public_id,\s*legal_act_id,\s*monitor_snapshot_id,[\s\S]*?\) on legal_text_snapshots to :app_user;/,
+    );
+    expect(grants).toMatch(
+      /grant update \(\s*status,\s*reviewed_by_user_id,\s*review_notes,\s*last_seen_at,\s*reviewed_at,\s*updated_at\s*\) on legal_text_snapshots to :app_user;/,
+    );
+    expect(grants).toMatch(
+      /grant insert \(\s*legal_act_id,\s*source_url,\s*checksum_sha256,\s*verified_at,\s*status\s*\) on legal_versions to :app_user;/,
+    );
+    expect(grants).toContain("legal_text_snapshots_id_seq");
+    expect(grants).toContain("legal_versions_id_seq");
+    expect(grants).toContain("legal_articles_id_seq");
+  });
+
   it("isola o PDF bruto e limita a captura oficial a colunas editoriais", () => {
     expect(grants).toMatch(/grant select \([\s\S]*page_texts,[\s\S]*\) on opportunity_document_snapshots/);
     expect(grants).toMatch(/grant insert \([\s\S]*document_bytes,[\s\S]*authorization_scope,[\s\S]*\) on opportunity_document_snapshots/);

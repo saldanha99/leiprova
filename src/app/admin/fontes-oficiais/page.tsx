@@ -1,7 +1,14 @@
 import Link from "next/link";
-import { BookOpenCheck, CheckCircle2, Database, ExternalLink, FileSearch, Link2, ShieldCheck } from "lucide-react";
+import { BookOpenCheck, CheckCircle2, Database, ExternalLink, FileSearch, FileText, Link2, ShieldCheck } from "lucide-react";
 
-import { ExamMetadataForm, LegalSyncButton, PortalVerifyButton, SnapshotReviewControls } from "@/components/admin/source-actions";
+import {
+  ExamMetadataForm,
+  LegalSyncButton,
+  LegalTextCaptureButton,
+  LegalTextReviewControls,
+  PortalVerifyButton,
+  SnapshotReviewControls,
+} from "@/components/admin/source-actions";
 import { requireAdmin } from "@/lib/auth";
 import { getOfficialSourcesSnapshot } from "@/lib/db/official-sources-admin";
 
@@ -23,6 +30,8 @@ export default async function OfficialSourcesPage() {
     { label: "Fotografias pendentes", value: snapshot.metrics.pendingSnapshots, icon: FileSearch, tone: "text-sky-300 bg-sky-300/10" },
     { label: "Portais saudáveis", value: snapshot.metrics.healthyPortals, icon: Link2, tone: "text-emerald-300 bg-emerald-300/10" },
     { label: "Provas só com metadados", value: snapshot.metrics.metadataExams, icon: Database, tone: "text-violet-300 bg-violet-300/10" },
+    { label: "Textos aguardando revisão", value: snapshot.metrics.pendingLegalTexts, icon: FileText, tone: "text-cyan-300 bg-cyan-300/10" },
+    { label: "Artigos oficiais ativos", value: snapshot.metrics.activeLegalArticles, icon: CheckCircle2, tone: "text-emerald-300 bg-emerald-300/10" },
   ];
 
   return (
@@ -37,15 +46,53 @@ export default async function OfficialSourcesPage() {
         </div>
       </header>
 
-      <section className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4" aria-label="Indicadores das fontes">
+      <section className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3" aria-label="Indicadores das fontes">
         {metrics.map(({ label, value, icon: Icon, tone }) => <article key={label} className="rounded-2xl border border-white/8 bg-[#09131f] p-4"><div className={`grid size-9 place-items-center rounded-xl ${tone}`}><Icon className="size-4" /></div><p className="mt-4 text-2xl font-semibold text-white">{numberFormatter.format(value)}</p><p className="mt-1 text-xs font-semibold text-slate-500">{label}</p></article>)}
       </section>
 
       <section className="mt-5 rounded-[1.5rem] border border-white/8 bg-[#09131f] p-5 sm:p-6">
         <div className="flex flex-wrap items-end justify-between gap-4"><div><span className="text-xs font-bold uppercase tracking-[.14em] text-amber-300">Leis federais</span><h2 className="mt-2 text-xl font-semibold text-white">Fotografias da página oficial</h2><p className="mt-2 max-w-3xl text-sm leading-6 text-slate-500">Uma conferência calcula a impressão digital da página que reúne publicação e atos modificadores. Ela sinaliza mudanças, mas não altera artigos nem gabaritos; uma pessoa diferente precisa aprovar a nova referência.</p></div><Link href="/fontes-e-atualizacao" className="text-xs font-bold text-amber-300 hover:text-amber-200">Ver política pública →</Link></div>
         <div className="mt-5 grid gap-3 md:grid-cols-2 2xl:grid-cols-3">
-          {snapshot.laws.map((law) => <article key={law.id} className="rounded-2xl border border-white/8 bg-black/10 p-4"><div className="flex items-start justify-between gap-3"><div><h3 className="font-semibold text-white">{law.shortTitle}</h3><p className="mt-1 text-[11px] text-slate-600">{law.pendingCount} pendente(s) · {law.approvedCount} referência(s) atual(is)</p></div><a href={law.officialUrl} target="_blank" rel="noreferrer" aria-label={`Abrir ${law.shortTitle} na fonte oficial`} className="text-slate-500 hover:text-amber-300"><ExternalLink className="size-4" /></a></div><p className="mt-3 text-xs text-slate-500">{law.lastSeenAt ? `Última leitura: ${dateFormatter.format(law.lastSeenAt)}` : "Ainda não conferida pelo monitor."}</p><LegalSyncButton slug={law.slug} /></article>)}
+          {snapshot.laws.map((law) => <article key={law.id} className="rounded-2xl border border-white/8 bg-black/10 p-4"><div className="flex items-start justify-between gap-3"><div><h3 className="font-semibold text-white">{law.shortTitle}</h3><p className="mt-1 text-[11px] text-slate-600">{law.pendingCount} pendente(s) · {law.approvedCount} referência(s) atual(is)</p></div><a href={law.officialUrl} target="_blank" rel="noreferrer" aria-label={`Abrir ${law.shortTitle} na fonte oficial`} className="text-slate-500 hover:text-amber-300"><ExternalLink className="size-4" /></a></div><p className="mt-3 text-xs text-slate-500">{law.lastSeenAt ? `Última leitura: ${dateFormatter.format(law.lastSeenAt)}` : "Ainda não conferida pelo monitor."}</p><LegalSyncButton slug={law.slug} /><LegalTextCaptureButton slug={law.slug} enabled={law.approvedCount > 0} /></article>)}
         </div>
+      </section>
+
+      <section className="mt-5 rounded-[1.5rem] border border-white/8 bg-[#09131f] p-5 sm:p-6">
+        <span className="text-xs font-bold uppercase tracking-[.14em] text-emerald-300">Corpus legal consolidado</span>
+        <h2 className="mt-2 text-xl font-semibold text-white">Versões integrais prontas para ativação</h2>
+        <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-500">
+          O sistema localiza a compilação monovigente no Senado, remove redações riscadas, separa os artigos e preserva o texto com checksum. Uma pessoa diferente confere a versão inteira antes de os artigos entrarem no motor.
+        </p>
+        {snapshot.textSnapshots.length ? (
+          <div className="mt-5 grid gap-4 xl:grid-cols-2">
+            {snapshot.textSnapshots.map((item) => {
+              const canReview = item.status === "pending_review" && item.initiatedByUserId !== user.id;
+              return (
+                <article key={item.publicId} className="rounded-2xl border border-white/8 bg-black/10 p-4">
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                      <strong className="text-sm text-white">{item.actTitle}</strong>
+                      <p className="mt-1 text-[11px] text-slate-600">Parser {item.parserVersion}</p>
+                    </div>
+                    <span className={`rounded-full px-2.5 py-1 text-[10px] font-bold ${item.status === "approved" ? "bg-emerald-300/10 text-emerald-200" : item.status === "pending_review" ? "bg-amber-300/10 text-amber-200" : "bg-white/5 text-slate-400"}`}>{snapshotLabels[item.status] ?? item.status}</span>
+                  </div>
+                  <dl className="mt-3 grid grid-cols-2 gap-2 text-[11px] text-slate-500">
+                    <div><dt>Texto preservado</dt><dd className="mt-0.5 font-semibold text-slate-300">{numberFormatter.format(item.contentLength)} caracteres</dd></div>
+                    <div><dt>Artigos reconhecidos</dt><dd className="mt-0.5 font-semibold text-slate-300">{numberFormatter.format(item.articleCount)}</dd></div>
+                  </dl>
+                  <a href={item.sourceUrl} target="_blank" rel="noreferrer" className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-emerald-300 hover:text-emerald-200">Abrir compilação oficial <ExternalLink className="size-3.5" /></a>
+                  <p className="mt-3 break-all font-mono text-[10px] text-slate-600">SHA-256 {item.checksumSha256}</p>
+                  <p className="mt-3 text-[11px] leading-5 text-slate-600">Capturada em {dateFormatter.format(item.fetchedAt)} · iniciada por {item.initiatorName ?? "rotina interna"}{item.reviewerName ? ` · revisada por ${item.reviewerName}` : ""}</p>
+                  {item.reviewNotes ? <p className="mt-2 rounded-lg bg-white/[.035] p-2 text-xs text-slate-400">{item.reviewNotes}</p> : null}
+                  {canReview ? <LegalTextReviewControls publicId={item.publicId} /> : null}
+                  {item.status === "pending_review" && item.initiatedByUserId === user.id ? <p className="mt-3 text-xs text-amber-200/70">Outra pessoa deve conferir esta compilação.</p> : null}
+                </article>
+              );
+            })}
+          </div>
+        ) : (
+          <p className="mt-5 rounded-xl border border-dashed border-white/10 p-6 text-center text-sm text-slate-500">Nenhuma compilação integral foi capturada. Aprove uma fotografia de monitoramento e use “Capturar texto consolidado”.</p>
+        )}
       </section>
 
       <section className="mt-5 rounded-[1.5rem] border border-white/8 bg-[#09131f] p-5 sm:p-6">

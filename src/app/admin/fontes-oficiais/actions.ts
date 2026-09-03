@@ -2,7 +2,7 @@
 
 import { randomUUID } from "node:crypto";
 
-import { and, eq, ne } from "drizzle-orm";
+import { and, desc, eq, ne, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
@@ -13,14 +13,22 @@ import {
   examEditions,
   examSourcePortals,
   legalActs,
+  legalArticles,
   legalSourceSnapshots,
+  legalTextSnapshots,
+  legalVersions,
   quizBanks,
   quizCareerSpecializations,
   quizCareerTracks,
 } from "@/lib/db/schema";
 import { resolveExamMetadataSpecialization } from "@/lib/official-sources/exam-metadata-selection";
-import { verifyOfficialExamUrl, fetchOfficialLegalDocument } from "@/lib/official-sources/fetch";
+import {
+  fetchOfficialConsolidatedLegalText,
+  fetchOfficialLegalDocument,
+  verifyOfficialExamUrl,
+} from "@/lib/official-sources/fetch";
 import { getOfficialLegalSource } from "@/lib/official-sources/legal-registry";
+import { parseConsolidatedLegalArticles } from "@/lib/official-sources/legal-text";
 
 export type SourceActionState = { status: "idle" | "success" | "error"; message: string };
 
@@ -161,6 +169,279 @@ export async function reviewLegalSnapshotAction(
 
   revalidatePath("/admin/fontes-oficiais");
   return { status: "success", message: approved ? "Fotografia aprovada como referência de conferência." : "Fotografia rejeitada e mantida apenas no histórico." };
+}
+
+export async function captureLegalTextAction(
+  _state: SourceActionState,
+  formData: FormData,
+): Promise<SourceActionState> {
+  const user = await requireAdmin();
+  const parsed = slugSchema.safeParse(formData.get("slug"));
+  if (!parsed.success) return errorState("Fonte jurídica inválida.");
+
+  const registered = getOfficialLegalSource(parsed.data);
+  if (!registered) return errorState("A lei não pertence ao registro oficial permitido.");
+
+  const db = getDb();
+  const [act] = await db
+    .select({ id: legalActs.id, officialUrl: legalActs.officialUrl })
+    .from(legalActs)
+    .where(and(eq(legalActs.slug, registered.slug), eq(legalActs.isActive, true)))
+    .limit(1);
+  if (!act || act.officialUrl !== registered.officialUrl) {
+    return errorState("O registro da lei diverge da configuração oficial.");
+  }
+
+  const [monitorSnapshot] = await db
+    .select({ id: legalSourceSnapshots.id })
+    .from(legalSourceSnapshots)
+    .where(
+      and(
+        eq(legalSourceSnapshots.legalActId, act.id),
+        eq(legalSourceSnapshots.status, "approved"),
+      ),
+    )
+    .orderBy(desc(legalSourceSnapshots.reviewedAt), desc(legalSourceSnapshots.fetchedAt))
+    .limit(1);
+  if (!monitorSnapshot) {
+    return errorState("A fotografia de monitoramento precisa ser revisada antes da captura integral.");
+  }
+
+  try {
+    const captured = await fetchOfficialConsolidatedLegalText(registered.monitorUrl);
+    const [saved] = await db
+      .insert(legalTextSnapshots)
+      .values({
+        publicId: randomUUID(),
+        legalActId: act.id,
+        monitorSnapshotId: monitorSnapshot.id,
+        ...captured,
+        status: "pending_review",
+        initiatedByUserId: user.id,
+        lastSeenAt: captured.fetchedAt,
+      })
+      .onConflictDoUpdate({
+        target: [legalTextSnapshots.legalActId, legalTextSnapshots.checksumSha256],
+        set: { lastSeenAt: captured.fetchedAt },
+      })
+      .returning({ publicId: legalTextSnapshots.publicId, status: legalTextSnapshots.status });
+
+    await db.insert(auditLogs).values({
+      actorUserId: user.id,
+      action: "editorial.legal_text.captured",
+      entityType: "legal_text_snapshot",
+      entityId: saved.publicId,
+      metadata: {
+        legalActSlug: registered.slug,
+        sourceUrl: captured.sourceUrl,
+        checksum: captured.checksumSha256,
+        articleCount: captured.articleCount,
+        parserVersion: captured.parserVersion,
+        status: saved.status,
+      },
+    });
+    revalidatePath("/admin/fontes-oficiais");
+    revalidatePath("/admin/motor-editais");
+    return {
+      status: "success",
+      message:
+        saved.status === "pending_review"
+          ? `${captured.articleCount} artigo(s) capturado(s) e preservado(s) para revisão independente.`
+          : "Texto conferido; a compilação oficial permanece igual à versão já registrada.",
+    };
+  } catch (error) {
+    console.error("Falha ao capturar texto jurídico consolidado.", safeLogDetail(error));
+    return errorState(
+      error instanceof Error ? error.message : "Não foi possível capturar a compilação oficial.",
+    );
+  }
+}
+
+const reviewLegalTextSchema = z.object({
+  publicId: z.string().uuid(),
+  decision: z.enum(["approve", "reject"]),
+  notes: z.string().trim().min(10).max(1500),
+});
+
+export async function reviewLegalTextAction(
+  _state: SourceActionState,
+  formData: FormData,
+): Promise<SourceActionState> {
+  const user = await requireAdmin();
+  const parsed = reviewLegalTextSchema.safeParse({
+    publicId: formData.get("publicId"),
+    decision: formData.get("decision"),
+    notes: formData.get("notes"),
+  });
+  if (!parsed.success) {
+    return errorState("Registre uma nota de revisão com pelo menos 10 caracteres.");
+  }
+
+  const db = getDb();
+  const [snapshot] = await db
+    .select({
+      id: legalTextSnapshots.id,
+      legalActId: legalTextSnapshots.legalActId,
+      monitorSnapshotId: legalTextSnapshots.monitorSnapshotId,
+      sourceUrl: legalTextSnapshots.sourceUrl,
+      checksumSha256: legalTextSnapshots.checksumSha256,
+      normalizedContent: legalTextSnapshots.normalizedContent,
+      articleCount: legalTextSnapshots.articleCount,
+      fetchedAt: legalTextSnapshots.fetchedAt,
+      status: legalTextSnapshots.status,
+      initiatorId: legalTextSnapshots.initiatedByUserId,
+    })
+    .from(legalTextSnapshots)
+    .where(eq(legalTextSnapshots.publicId, parsed.data.publicId))
+    .limit(1);
+  if (!snapshot || snapshot.status !== "pending_review") {
+    return errorState("A compilação não está mais pendente.");
+  }
+  if (snapshot.initiatorId === user.id) {
+    return errorState("Quem capturou o texto não pode aprovar ou rejeitar a própria compilação.");
+  }
+
+  const approved = parsed.data.decision === "approve";
+  let articles: ReturnType<typeof parseConsolidatedLegalArticles> = [];
+  if (approved) {
+    try {
+      articles = parseConsolidatedLegalArticles(snapshot.normalizedContent);
+    } catch (error) {
+      return errorState(
+        error instanceof Error ? error.message : "Não foi possível validar os artigos capturados.",
+      );
+    }
+    if (articles.length !== snapshot.articleCount) {
+      return errorState("A contagem de artigos divergiu da captura original.");
+    }
+  }
+
+  const now = new Date();
+  try {
+    await db.transaction(async (transaction) => {
+      if (approved) {
+        const [monitor] = await transaction
+          .select({ status: legalSourceSnapshots.status })
+          .from(legalSourceSnapshots)
+          .where(eq(legalSourceSnapshots.id, snapshot.monitorSnapshotId))
+          .limit(1);
+        if (!monitor || monitor.status !== "approved") {
+          throw new Error("A fotografia de monitoramento deixou de estar aprovada.");
+        }
+
+        await transaction
+          .update(legalTextSnapshots)
+          .set({ status: "superseded", updatedAt: now })
+          .where(
+            and(
+              eq(legalTextSnapshots.legalActId, snapshot.legalActId),
+              eq(legalTextSnapshots.status, "approved"),
+              ne(legalTextSnapshots.id, snapshot.id),
+            ),
+          );
+        await transaction
+          .update(legalVersions)
+          .set({ status: "superseded" })
+          .where(
+            and(
+              eq(legalVersions.legalActId, snapshot.legalActId),
+              eq(legalVersions.status, "current"),
+            ),
+          );
+
+        const [version] = await transaction
+          .insert(legalVersions)
+          .values({
+            legalActId: snapshot.legalActId,
+            sourceUrl: snapshot.sourceUrl,
+            checksumSha256: snapshot.checksumSha256,
+            verifiedAt: snapshot.fetchedAt,
+            status: "current",
+          })
+          .onConflictDoUpdate({
+            target: [legalVersions.legalActId, legalVersions.checksumSha256],
+            set: {
+              sourceUrl: snapshot.sourceUrl,
+              verifiedAt: snapshot.fetchedAt,
+              status: "current",
+            },
+          })
+          .returning({ id: legalVersions.id });
+
+        for (let offset = 0; offset < articles.length; offset += 250) {
+          await transaction
+            .insert(legalArticles)
+            .values(
+              articles.slice(offset, offset + 250).map((article) => ({
+                legalVersionId: version.id,
+                articleRef: article.articleRef,
+                articleOrder: article.articleOrder,
+                heading: article.heading,
+                path: article.path,
+                literalText: article.literalText,
+                editorialStatus: "reviewed" as const,
+                sourceRights: "official_text" as const,
+              })),
+            )
+            .onConflictDoUpdate({
+              target: [legalArticles.legalVersionId, legalArticles.path],
+              set: {
+                articleRef: sql`excluded.article_ref`,
+                articleOrder: sql`excluded.article_order`,
+                heading: sql`excluded.heading`,
+                literalText: sql`excluded.literal_text`,
+                editorialStatus: "reviewed",
+                sourceRights: "official_text",
+                updatedAt: now,
+              },
+            });
+        }
+      }
+
+      const updated = await transaction
+        .update(legalTextSnapshots)
+        .set({
+          status: approved ? "approved" : "rejected",
+          reviewedByUserId: user.id,
+          reviewedAt: now,
+          reviewNotes: parsed.data.notes,
+          updatedAt: now,
+        })
+        .where(
+          and(
+            eq(legalTextSnapshots.id, snapshot.id),
+            eq(legalTextSnapshots.status, "pending_review"),
+          ),
+        )
+        .returning({ id: legalTextSnapshots.id });
+      if (!updated[0]) throw new Error("A compilação já foi decidida por outro editor.");
+
+      await transaction.insert(auditLogs).values({
+        actorUserId: user.id,
+        action: approved ? "editorial.legal_text.approved" : "editorial.legal_text.rejected",
+        entityType: "legal_text_snapshot",
+        entityId: parsed.data.publicId,
+        metadata: {
+          notes: parsed.data.notes,
+          articleCount: snapshot.articleCount,
+          checksum: snapshot.checksumSha256,
+        },
+      });
+    });
+  } catch (error) {
+    return errorState(
+      error instanceof Error ? error.message : "Não foi possível registrar a decisão.",
+    );
+  }
+
+  revalidatePath("/admin/fontes-oficiais");
+  revalidatePath("/admin/motor-editais");
+  return {
+    status: "success",
+    message: approved
+      ? `${articles.length} artigo(s) ativado(s) a partir da compilação revisada.`
+      : "Compilação rejeitada e preservada no histórico.",
+  };
 }
 
 export async function verifyExamPortalAction(

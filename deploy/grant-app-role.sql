@@ -11,6 +11,7 @@ grant select on
   plans,
   legal_acts,
   legal_source_snapshots,
+  legal_text_snapshots,
   legal_versions,
   legal_articles,
   questions,
@@ -158,6 +159,66 @@ grant insert (
   reviewed_at,
   created_at
 ) on legal_source_snapshots to :app_user;
+
+grant insert (
+  public_id,
+  legal_act_id,
+  monitor_snapshot_id,
+  source_url,
+  checksum_sha256,
+  normalized_content,
+  content_length,
+  article_count,
+  parser_version,
+  status,
+  initiated_by_user_id,
+  fetched_at,
+  last_seen_at
+) on legal_text_snapshots to :app_user;
+
+grant update (
+  status,
+  reviewed_by_user_id,
+  review_notes,
+  last_seen_at,
+  reviewed_at,
+  updated_at
+) on legal_text_snapshots to :app_user;
+
+grant insert (
+  legal_act_id,
+  source_url,
+  checksum_sha256,
+  verified_at,
+  status
+) on legal_versions to :app_user;
+
+grant update (
+  source_url,
+  verified_at,
+  status
+) on legal_versions to :app_user;
+
+grant insert (
+  legal_version_id,
+  article_ref,
+  article_order,
+  heading,
+  path,
+  literal_text,
+  editorial_status,
+  source_rights
+) on legal_articles to :app_user;
+
+grant update (
+  article_ref,
+  article_order,
+  heading,
+  literal_text,
+  editorial_status,
+  source_rights,
+  updated_at
+) on legal_articles to :app_user;
 
 grant update (
   http_status,
@@ -508,6 +569,9 @@ grant usage on
   questions_id_seq,
   question_options_id_seq,
   legal_source_snapshots_id_seq,
+  legal_text_snapshots_id_seq,
+  legal_versions_id_seq,
+  legal_articles_id_seq,
   exam_editions_id_seq,
   contest_opportunities_id_seq,
   opportunity_source_documents_id_seq,

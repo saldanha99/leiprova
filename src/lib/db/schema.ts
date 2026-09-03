@@ -492,6 +492,7 @@ export const legalSourceSnapshots = pgTable(
       table.legalActId,
       table.checksumSha256,
     ),
+    uniqueIndex("legal_source_snapshots_id_act_uidx").on(table.id, table.legalActId),
     index("legal_source_snapshots_act_status_idx").on(table.legalActId, table.status, table.fetchedAt),
     index("legal_source_snapshots_initiated_by_idx").on(table.initiatedByUserId),
     index("legal_source_snapshots_reviewed_by_idx").on(table.reviewedByUserId),
@@ -523,6 +524,95 @@ export const legalSourceSnapshots = pgTable(
     ),
     check(
       "legal_source_snapshots_review_notes_check",
+      sql`${table.reviewNotes} is null or char_length(${table.reviewNotes}) <= 1500`,
+    ),
+  ],
+);
+
+export const legalTextSnapshots = pgTable(
+  "legal_text_snapshots",
+  {
+    id: idColumn(),
+    publicId: text("public_id").notNull().unique(),
+    legalActId: bigint("legal_act_id", { mode: "number" })
+      .notNull()
+      .references(() => legalActs.id, { onDelete: "cascade" }),
+    monitorSnapshotId: bigint("monitor_snapshot_id", { mode: "number" }).notNull(),
+    sourceUrl: text("source_url").notNull(),
+    checksumSha256: text("checksum_sha256").notNull(),
+    normalizedContent: text("normalized_content").notNull(),
+    contentLength: integer("content_length").notNull(),
+    articleCount: integer("article_count").notNull(),
+    parserVersion: text("parser_version").notNull(),
+    status: text("status").notNull().default("pending_review"),
+    initiatedByUserId: bigint("initiated_by_user_id", { mode: "number" }).references(
+      () => users.id,
+      { onDelete: "set null" },
+    ),
+    reviewedByUserId: bigint("reviewed_by_user_id", { mode: "number" }).references(
+      () => users.id,
+      { onDelete: "set null" },
+    ),
+    reviewNotes: text("review_notes"),
+    fetchedAt: timestamp("fetched_at", { withTimezone: true }).notNull(),
+    lastSeenAt: timestamp("last_seen_at", { withTimezone: true }).notNull(),
+    reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+    ...timestamps,
+  },
+  (table) => [
+    uniqueIndex("legal_text_snapshots_act_checksum_uidx").on(
+      table.legalActId,
+      table.checksumSha256,
+    ),
+    foreignKey({
+      columns: [table.monitorSnapshotId, table.legalActId],
+      foreignColumns: [legalSourceSnapshots.id, legalSourceSnapshots.legalActId],
+      name: "legal_text_snapshots_monitor_act_fk",
+    }).onDelete("restrict"),
+    index("legal_text_snapshots_act_status_idx").on(
+      table.legalActId,
+      table.status,
+      table.fetchedAt,
+    ),
+    index("legal_text_snapshots_monitor_idx").on(table.monitorSnapshotId),
+    index("legal_text_snapshots_initiated_by_idx").on(table.initiatedByUserId),
+    index("legal_text_snapshots_reviewed_by_idx").on(table.reviewedByUserId),
+    check(
+      "legal_text_snapshots_public_id_check",
+      sql`${table.publicId} ~ '^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'`,
+    ),
+    check(
+      "legal_text_snapshots_url_check",
+      sql`${table.sourceUrl} ~ '^https://legis\\.senado\\.leg\\.br/norma/[0-9]+/publicacao/[0-9]+$'`,
+    ),
+    check(
+      "legal_text_snapshots_checksum_check",
+      sql`${table.checksumSha256} ~ '^[0-9a-f]{64}$'`,
+    ),
+    check(
+      "legal_text_snapshots_content_check",
+      sql`${table.contentLength} between 1000 and 5000000 and char_length(${table.normalizedContent}) = ${table.contentLength}`,
+    ),
+    check(
+      "legal_text_snapshots_article_count_check",
+      sql`${table.articleCount} between 1 and 5000`,
+    ),
+    check(
+      "legal_text_snapshots_status_check",
+      sql`${table.status} in ('pending_review', 'approved', 'superseded', 'rejected')`,
+    ),
+    check(
+      "legal_text_snapshots_review_check",
+      sql`${table.status} <> 'approved' or (${table.reviewedByUserId} is not null and ${table.reviewedAt} is not null)`,
+    ),
+    check(
+      "legal_text_snapshots_independent_review_check",
+      sql`${table.status} <> 'approved'
+        or ${table.initiatedByUserId} is null
+        or ${table.reviewedByUserId} <> ${table.initiatedByUserId}`,
+    ),
+    check(
+      "legal_text_snapshots_review_notes_check",
       sql`${table.reviewNotes} is null or char_length(${table.reviewNotes}) <= 1500`,
     ),
   ],
@@ -2245,3 +2335,4 @@ export type Question = typeof questions.$inferSelect;
 export type QuestionOption = typeof questionOptions.$inferSelect;
 export type QuestionStyleProfile = typeof questionStyleProfiles.$inferSelect;
 export type LegalSourceSnapshot = typeof legalSourceSnapshots.$inferSelect;
+export type LegalTextSnapshot = typeof legalTextSnapshots.$inferSelect;

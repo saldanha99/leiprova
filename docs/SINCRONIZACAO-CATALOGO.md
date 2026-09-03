@@ -82,12 +82,21 @@ continua vindo da publicação oficial registrada, gera uma fotografia com check
 revisão humana. Uma indisponibilidade simultânea dos catálogos não apaga a última URN validada
 nem transforma conteúdo pendente em aprovado.
 
+Depois que a fotografia de monitoramento é aprovada, o painel editorial pode localizar a
+`Compilação Monovigente` da mesma norma no sistema oficial do Senado. O coletor exige que o
+identificador da norma permaneça idêntico, limita a resposta, remove redações riscadas e notas
+editoriais de alteração e separa os artigos de forma determinística. Texto integral, checksum,
+contagem e versão do parser ficam em `legal_text_snapshots`. Uma segunda pessoa aprova ou rejeita
+a compilação inteira; somente a aprovação cria a `legal_version` vigente e ativa seus artigos
+oficiais. Se a fonte não oferece compilação monovigente, o motor falha fechado e não usa a
+publicação original como se fosse texto consolidado.
+
 ## Separação das sincronizações
 
 ```text
 Portais oficiais das bancas -> metadados da edição -> carreira/edição/banca
 LexML + Dados Abertos Senado -> URN e identidade do ato -> monitor jurídico
-Publicação oficial da norma -> fotografia/checksum -> revisão humana -> conteúdo vigente
+Publicação consolidada oficial -> fotografia/checksum -> revisão humana independente -> artigos vigentes
 ```
 
 O LexML não determina qual banca organizou um concurso. Essa informação deve vir do portal da

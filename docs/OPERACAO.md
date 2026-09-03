@@ -108,6 +108,12 @@ exceção explícita do proprietário na aprovação de um PDF oficial. A decis�
 `owner_override`; não conta como revisão independente e não libera requisitos nem questões sem
 as revisões humanas separadas exigidas por esses objetos.
 
+O corpus jurídico integral é capturado em `/admin/fontes-oficiais` somente depois que a
+fotografia de monitoramento da norma foi aprovada. A captura encontra a compilação monovigente
+da mesma norma no Senado e permanece pendente. Uma conta diferente precisa conferir e aprovar a
+versão; essa decisão ativa os artigos em lote e fica registrada na auditoria. A ausência de uma
+compilação monovigente bloqueia a importação, em vez de promover texto original ou histórico.
+
 A divergência do Connect está contida em quatro camadas: modo `test`, chave
 `rk_test` (não live), `BR_APPROVED=false` e o único parceiro cadastrado em
 status `restricted` com `charges_enabled` e `payouts_enabled` falsos. Nenhum
