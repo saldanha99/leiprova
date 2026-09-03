@@ -8,6 +8,7 @@ import {
   FileCheck2,
   FileSearch,
   Radar,
+  RefreshCcw,
   ShieldCheck,
   Sparkles,
 } from "lucide-react";
@@ -66,6 +67,7 @@ export default async function NoticeEnginePage() {
     title,
     editorialStatus,
   }));
+  const isOwnerApprover = isEditorialOwnerApprover(user.email);
   const approvedSourceOptions = snapshot.sourceDocuments
     .filter((item) => item.status === "approved")
     .map(({ publicId, title, opportunityTitle }) => ({ publicId, title, opportunityTitle }));
@@ -113,6 +115,23 @@ export default async function NoticeEnginePage() {
             <p className="mt-1 text-xs font-semibold text-slate-500">{label}</p>
           </article>
         ))}
+      </section>
+
+      <section className="mt-5 flex flex-col gap-4 rounded-2xl border border-emerald-300/15 bg-emerald-300/[.035] p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5" aria-label="Estado da automação editorial">
+        <div className="flex items-start gap-3">
+          <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-emerald-300/10 text-emerald-300">
+            <RefreshCcw aria-hidden="true" className="size-4" />
+          </span>
+          <div>
+            <h2 className="text-sm font-bold text-emerald-100">Coleta editorial automática a cada 6 horas</h2>
+            <p className="mt-1 max-w-3xl text-xs leading-5 text-slate-400">A rotina procura PDFs elegíveis nas fontes aprovadas, captura versões novas e extrai o conteúdo programático. Ela cria somente pendências e rascunhos; nenhuma aprovação ou publicação é automática.</p>
+          </div>
+        </div>
+        <p className="shrink-0 text-xs font-semibold text-slate-500">
+          {snapshot.automationRun
+            ? `Última execução: ${dateFormatter.format(snapshot.automationRun.createdAt)}`
+            : "Aguardando a primeira execução"}
+        </p>
       </section>
 
       <section className="mt-5 grid gap-3 lg:grid-cols-4" aria-label="Fluxo editorial">
@@ -166,7 +185,9 @@ export default async function NoticeEnginePage() {
         {snapshot.sourceDocuments.length ? (
           <div className="mt-5 grid gap-4 xl:grid-cols-2">
             {snapshot.sourceDocuments.map((item) => {
-              const canReview = item.status === "pending_review" && item.initiatedByUserId !== user.id;
+              const canReview =
+                item.status === "pending_review" &&
+                (item.initiatedByUserId !== user.id || isOwnerApprover);
               return (
                 <article key={item.publicId} className="rounded-2xl border border-white/8 bg-black/10 p-4">
                   <div className="flex flex-wrap items-start justify-between gap-3">
@@ -189,7 +210,7 @@ export default async function NoticeEnginePage() {
                   </p>
                   {item.reviewNotes ? <p className="mt-2 rounded-lg bg-white/[.035] p-2 text-xs text-slate-400">{item.reviewNotes}</p> : null}
                   {canReview ? <NoticeSourceReviewControls publicId={item.publicId} /> : null}
-                  {item.status === "pending_review" && item.initiatedByUserId === user.id ? <p className="mt-3 text-xs text-amber-200/70">Outra pessoa deve decidir esta fonte.</p> : null}
+                  {item.status === "pending_review" && item.initiatedByUserId === user.id && !isOwnerApprover ? <p className="mt-3 text-xs text-amber-200/70">Somente a conta proprietária ou outra conta editorial pode decidir esta fonte.</p> : null}
                   {item.status === "approved" ? <OfficialDocumentDiscoveryControls sourceDocumentPublicId={item.publicId} /> : null}
                 </article>
               );
@@ -211,7 +232,7 @@ export default async function NoticeEnginePage() {
         {snapshot.documentSnapshots.length ? (
           <div className="mt-5 grid gap-4 xl:grid-cols-2">
             {snapshot.documentSnapshots.map((item) => {
-              const allowOwnerOverride = item.initiatedByUserId === user.id && isEditorialOwnerApprover(user.email);
+              const allowOwnerOverride = item.initiatedByUserId === user.id && isOwnerApprover;
               const canReview = item.status === "pending_review" && (item.initiatedByUserId !== user.id || allowOwnerOverride);
               return (
                 <article key={item.publicId} className="rounded-2xl border border-white/8 bg-black/10 p-4">
@@ -262,7 +283,9 @@ export default async function NoticeEnginePage() {
         {snapshot.requirements.length ? (
           <div className="mt-5 grid gap-4 xl:grid-cols-2">
             {snapshot.requirements.map((item) => {
-              const canReview = item.editorialStatus === "pending_review" && item.createdByUserId !== user.id;
+              const canReview =
+                item.editorialStatus === "pending_review" &&
+                (item.createdByUserId !== user.id || isOwnerApprover);
               const canGenerate = item.editorialStatus === "reviewed" && item.sourceDocumentStatus === "approved" && item.assignment;
               return (
                 <article key={item.id} className="rounded-2xl border border-white/8 bg-black/10 p-4">
@@ -293,7 +316,7 @@ export default async function NoticeEnginePage() {
                     />
                   ) : null}
                   {canReview ? <RequirementReviewControls requirementId={item.id} /> : null}
-                  {item.editorialStatus === "pending_review" && item.createdByUserId === user.id ? <p className="mt-3 text-xs text-amber-200/70">Outra pessoa deve revisar este requisito.</p> : null}
+                  {item.editorialStatus === "pending_review" && item.createdByUserId === user.id && !isOwnerApprover ? <p className="mt-3 text-xs text-amber-200/70">Somente a conta proprietária ou outra conta editorial pode revisar este requisito.</p> : null}
                   {canGenerate ? <GenerateRequirementButton requirementId={item.id} /> : null}
                   {item.editorialStatus === "reviewed" && !item.assignment ? <p className="mt-3 text-xs text-amber-200">A geração aguarda uma banca organizadora revisada.</p> : null}
                 </article>

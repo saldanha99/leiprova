@@ -103,12 +103,17 @@ export function NoticeSourceReviewControls({ publicId }: { publicId: string }) {
   return (
     <form action={action} className="mt-4 rounded-xl border border-white/8 bg-black/15 p-3">
       <input type="hidden" name="publicId" value={publicId} />
-      <textarea
-        name="notes"
-        maxLength={2000}
-        className={`${fieldClass} min-h-16 resize-y py-2`}
-        placeholder="Nota de revisão; obrigatória ao rejeitar."
-      />
+      <label className="text-[11px] font-semibold text-slate-400">
+        Nota da revisão humana
+        <textarea
+          name="notes"
+          required
+          minLength={10}
+          maxLength={2000}
+          className={`${fieldClass} mt-2 min-h-16 resize-y py-2`}
+          placeholder="Registre o que foi conferido na fonte oficial."
+        />
+      </label>
       <Feedback state={state} />
       <div className="mt-3 flex flex-wrap gap-2">
         <button
@@ -420,12 +425,17 @@ export function RequirementReviewControls({ requirementId }: { requirementId: nu
   return (
     <form action={action} className="mt-4 rounded-xl border border-white/8 bg-[#07111d] p-3">
       <input type="hidden" name="requirementId" value={requirementId} />
-      <textarea
-        name="notes"
-        maxLength={1500}
-        className={`${fieldClass} min-h-16 resize-y py-2`}
-        placeholder="Nota de revisão; obrigatória ao rejeitar."
-      />
+      <label className="text-[11px] font-semibold text-slate-400">
+        Nota da revisão humana
+        <textarea
+          name="notes"
+          required
+          minLength={10}
+          maxLength={1500}
+          className={`${fieldClass} mt-2 min-h-16 resize-y py-2`}
+          placeholder="Registre o que foi conferido no requisito."
+        />
+      </label>
       <Feedback state={state} />
       <div className="mt-3 flex flex-wrap gap-2">
         <button name="decision" value="approve" disabled={pending} className="min-h-9 rounded-lg bg-emerald-300 px-3 text-xs font-extrabold text-emerald-950 disabled:opacity-50">

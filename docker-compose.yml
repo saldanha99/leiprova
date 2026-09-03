@@ -213,6 +213,30 @@ services:
       - internal
       - edge
 
+  editorial-automation:
+    build:
+      context: .
+      target: migrator
+    container_name: leiprova-editorial-automation
+    restart: unless-stopped
+    cpus: 0.5
+    mem_limit: 768m
+    command: ["sh", "-c", "while true; do pnpm editorial:automation || true; sleep 21600; done"]
+    environment:
+      DATABASE_URL: postgresql://${APP_DB_USER:-leiprova_app}:${APP_DB_PASSWORD}@pooler:5432/${POSTGRES_DB:-leiprova}
+      EDITORIAL_OWNER_APPROVER_EMAIL: ${EDITORIAL_OWNER_APPROVER_EMAIL:-}
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 96
+    depends_on:
+      pooler:
+        condition: service_healthy
+    networks:
+      - internal
+      - edge
+
 volumes:
   leiprova_pgdata:
 

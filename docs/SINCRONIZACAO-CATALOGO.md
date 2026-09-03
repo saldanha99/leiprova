@@ -97,7 +97,7 @@ e não usa a publicação original como se fosse texto consolidado.
 ```text
 Portais oficiais das bancas -> metadados da edição -> carreira/edição/banca
 LexML + Dados Abertos Senado -> URN e identidade do ato -> monitor jurídico
-Publicação consolidada oficial -> fotografia/checksum -> revisão humana independente -> artigos vigentes
+Publicação consolidada oficial -> fotografia/checksum -> revisão humana auditada -> artigos vigentes
 ```
 
 O LexML não determina qual banca organizou um concurso. Essa informação deve vir do portal da
@@ -122,24 +122,26 @@ revisar:
 
 Sem essa decisão jurídica explícita, o material de prova permanece fora do motor. A captura de
 edital usa a política `official_document`, exige uma decisão humana registrada sobre a versão e
-produz apenas itens literais em `draft`. O padrão é revisão independente. A conta editorial do
-proprietário, designada na configuração do servidor, pode registrar uma exceção explícita,
-vinculando autorizador e aprovador na trilha de auditoria sem transformar a decisão em revisão
-independente. Matéria, assunto, artigo legal e
-aprovação dos requisitos continuam sendo decisões humanas separadas; somente depois o gerador
-autoral pode criar um rascunho de questão.
+produz apenas itens literais em `draft`. A conta editorial do proprietário, designada na
+configuração do servidor, pode capturar e revisar com o mesmo login; essa condição fica explícita
+na trilha de auditoria. Matéria, assunto, artigo legal e aprovação dos requisitos continuam
+sendo decisões humanas; somente depois o gerador autoral pode criar um rascunho de questão.
 
 ## Operação
 
-O verificador manual `pnpm legal:sources:check` confere a página oficial da norma e sua identidade
-LexML/Senado. O agendamento contínuo ainda não está ativo. Scripts `tsx` devem continuar usando
-`--env-file-if-exists=.env`, conforme `docs/OPERACAO.md`.
+O comando `pnpm legal:sources:check` confere a página oficial da norma e sua identidade
+LexML/Senado. Em produção, `leiprova-legal-monitor` o executa diariamente e, quando a fotografia
+atual está aprovada, captura a compilação consolidada para revisão. Scripts `tsx` devem
+continuar usando `--env-file-if-exists=.env`, conforme `docs/OPERACAO.md`.
 
 O verificador `pnpm opportunities:sources:check` executa apenas `HEAD` nas URLs oficiais
 permitidas, valida redirecionamento, host e caminho e devolve metadados de observação. Ele não
-baixa nem guarda HTML ou PDF. A captura integral é uma operação editorial separada na rota
-`/admin/motor-editais`, aplicada somente a uma fonte já aprovada. Respostas que bloqueiam `HEAD` viram alerta;
-URLs ausentes, redirecionamentos fora da allowlist e falhas de origem exigem investigação.
+baixa nem guarda HTML ou PDF. A captura integral é aplicada somente a fontes aprovadas. Em
+produção, `leiprova-editorial-automation` roda a cada seis horas, descobre documentos permitidos,
+limita tentativas e novas capturas, cria versões em `pending_review` e extrai apenas linhas
+literais de PDFs aprovados para `draft`. Ele registra uma execução auditável e nunca aprova nem
+publica. Respostas que bloqueiam `HEAD` viram alerta; URLs ausentes, redirecionamentos fora da
+allowlist e falhas de origem exigem investigação.
 
 Qualquer análise de até dez anos deve registrar janela, amostra, denominadores, metodologia,
 limitações e direitos do corpus. Frequência histórica é um sinal de prioridade, não uma

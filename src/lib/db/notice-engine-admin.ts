@@ -5,6 +5,7 @@ import { alias } from "drizzle-orm/pg-core";
 
 import { getDb } from "@/lib/db/client";
 import {
+  auditLogs,
   contestCategories,
   contestOpportunities,
   legalActs,
@@ -43,6 +44,7 @@ export async function getNoticeEngineSnapshot() {
     subjects,
     topics,
     linkedQuestions,
+    automationRuns,
   ] = await Promise.all([
     db
       .select({
@@ -253,6 +255,15 @@ export async function getNoticeEngineSnapshot() {
       .from(questionOpportunities)
       .innerJoin(questions, eq(questionOpportunities.questionId, questions.id))
       .where(eq(questionOpportunities.relationship, "direct_requirement")),
+    db
+      .select({
+        createdAt: auditLogs.createdAt,
+        metadata: auditLogs.metadata,
+      })
+      .from(auditLogs)
+      .where(eq(auditLogs.action, "automation.editorial.completed"))
+      .orderBy(desc(auditLogs.createdAt))
+      .limit(1),
   ]);
 
   const assignmentByOpportunity = new Map<number, (typeof assignments)[number]>();
@@ -283,6 +294,7 @@ export async function getNoticeEngineSnapshot() {
     articles,
     subjects,
     topics,
+    automationRun: automationRuns[0] ?? null,
     metrics: {
       opportunities: opportunities.length,
       approvedSources: sourceDocuments.filter((item) => item.status === "approved").length,

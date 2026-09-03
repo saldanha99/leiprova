@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 
@@ -9,9 +9,14 @@ import {
   examSourcePortals,
   legalActs,
   legalSourceSnapshots,
+  legalTextSnapshots,
   quizBanks,
 } from "../src/lib/db/schema";
-import { verifyOfficialExamUrl, fetchOfficialLegalDocument } from "../src/lib/official-sources/fetch";
+import {
+  fetchOfficialConsolidatedLegalText,
+  fetchOfficialLegalDocument,
+  verifyOfficialExamUrl,
+} from "../src/lib/official-sources/fetch";
 import {
   LegalCatalogLookupError,
   lookupLegalActMetadata,
@@ -49,6 +54,10 @@ async function checkLaws() {
   let checked = 0;
   let failed = 0;
   let catalogUnavailable = 0;
+  let corpusCaptured = 0;
+  let corpusUnchanged = 0;
+  let corpusDeferred = 0;
+  let corpusWarnings = 0;
 
   for (const act of acts) {
     const resolution = resolveOfficialLegalSource(act.slug, act.officialUrl);
@@ -106,7 +115,11 @@ async function checkLaws() {
           target: [legalSourceSnapshots.legalActId, legalSourceSnapshots.checksumSha256],
           set: { lastSeenAt: snapshot.fetchedAt, httpStatus: snapshot.httpStatus },
         })
-        .returning({ publicId: legalSourceSnapshots.publicId, status: legalSourceSnapshots.status });
+        .returning({
+          id: legalSourceSnapshots.id,
+          publicId: legalSourceSnapshots.publicId,
+          status: legalSourceSnapshots.status,
+        });
 
       await db.insert(auditLogs).values({
         action: "monitor.legal_source.checked",
@@ -123,6 +136,58 @@ async function checkLaws() {
         },
       });
       checked += 1;
+
+      if (saved.status !== "approved") {
+        corpusDeferred += 1;
+      } else {
+        try {
+          const captured = await fetchOfficialConsolidatedLegalText(registered.monitorUrl);
+          const [inserted] = await db
+            .insert(legalTextSnapshots)
+            .values({
+              publicId: randomUUID(),
+              legalActId: act.id,
+              monitorSnapshotId: saved.id,
+              ...captured,
+              status: "pending_review",
+              lastSeenAt: captured.fetchedAt,
+            })
+            .onConflictDoNothing({
+              target: [legalTextSnapshots.legalActId, legalTextSnapshots.checksumSha256],
+            })
+            .returning({ publicId: legalTextSnapshots.publicId });
+
+          if (inserted) {
+            corpusCaptured += 1;
+            await db.insert(auditLogs).values({
+              action: "automation.legal_text.captured",
+              entityType: "legal_text_snapshot",
+              entityId: inserted.publicId,
+              metadata: {
+                legalActSlug: act.slug,
+                checksum: captured.checksumSha256,
+                articleCount: captured.articleCount,
+                parserVersion: captured.parserVersion,
+                status: "pending_review",
+              },
+            });
+          } else {
+            corpusUnchanged += 1;
+            await db
+              .update(legalTextSnapshots)
+              .set({ lastSeenAt: captured.fetchedAt, updatedAt: captured.fetchedAt })
+              .where(
+                and(
+                  eq(legalTextSnapshots.legalActId, act.id),
+                  eq(legalTextSnapshots.checksumSha256, captured.checksumSha256),
+                ),
+              );
+          }
+        } catch (error) {
+          corpusWarnings += 1;
+          console.warn(`[corpus:${act.slug}]`, safeError(error));
+        }
+      }
     } catch (error) {
       failed += 1;
       console.error(`[lei:${act.slug}]`, safeError(error));
@@ -130,7 +195,17 @@ async function checkLaws() {
     await pause();
   }
 
-  return { checked, failed, catalogUnavailable };
+  return {
+    checked,
+    failed,
+    catalogUnavailable,
+    corpus: {
+      captured: corpusCaptured,
+      unchanged: corpusUnchanged,
+      deferred: corpusDeferred,
+      warnings: corpusWarnings,
+    },
+  };
 }
 
 async function checkExamPortals() {

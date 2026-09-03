@@ -21,7 +21,8 @@ A VPS é **compartilhada**: roda cerca de 28 contêineres de vários projetos
 builds grandes — a máquina é dividida com os outros projetos.
 
 Contêineres do projeto: `leiprova-app` (Next), `leiprova-pooler` (PgBouncer
-1.25.2), `leiprova-db` (postgres:17.10-alpine).
+1.25.2), `leiprova-db` (postgres:17.10-alpine), `leiprova-legal-monitor`
+(fontes jurídicas) e `leiprova-editorial-automation` (editais e fila).
 
 ## Publicar em produção
 
@@ -104,12 +105,10 @@ Tudo que é comercial fecha por padrão. Estado em produção na última verific
 | `STRIPE_CONNECT_BR_APPROVED` | `false` | Trava final. |
 
 `EDITORIAL_OWNER_APPROVER_EMAIL` identifica a única conta editorial proprietária. Ela pode
-registrar a exceção `owner_override` na aprovação de um PDF oficial e também concluir sozinha
-a captura e a revisão das fotografias e compilações em `/admin/fontes-oficiais`. Nesses dois
-fluxos jurídicos a nota humana continua obrigatória e a auditoria registra
-`owner_self_review`. Outras contas continuam impedidas de revisar o que elas mesmas iniciaram.
-Essa permissão não libera requisitos nem questões sem as revisões humanas exigidas por esses
-objetos.
+registrar a exceção `owner_override` na aprovação de um PDF oficial e concluir com a mesma
+conta as revisões de fontes, compilações e requisitos. A nota humana continua obrigatória e a
+auditoria registra `owner_self_review`. Outras contas continuam impedidas de revisar o que
+elas mesmas iniciaram. Essa permissão nunca publica questões automaticamente.
 
 O corpus jurídico integral é capturado em `/admin/fontes-oficiais` somente depois que a
 fotografia de monitoramento da norma foi aprovada. A captura encontra a compilação monovigente
@@ -117,6 +116,13 @@ da mesma norma no Senado e permanece pendente. A conta proprietária configurada
 aprovar a versão que ela própria capturou; a decisão exige nota, ativa os artigos em lote e fica
 registrada na auditoria. A ausência de uma compilação monovigente bloqueia a importação, em vez
 de promover texto original ou histórico.
+
+O `leiprova-legal-monitor` confere fontes diariamente. Quando a fotografia atual já está
+aprovada, ele também captura automaticamente uma nova compilação oficial para
+`pending_review`; não ativa artigos. O `leiprova-editorial-automation` roda a cada seis
+horas, procura PDFs elegíveis em fontes de concurso aprovadas, captura no máximo seis versões
+novas por execução e extrai itens literais de PDFs já aprovados para `draft`. Falhas são
+isoladas e auditadas; aprovação e publicação permanecem manuais.
 
 A divergência do Connect está contida em quatro camadas: modo `test`, chave
 `rk_test` (não live), `BR_APPROVED=false` e o único parceiro cadastrado em

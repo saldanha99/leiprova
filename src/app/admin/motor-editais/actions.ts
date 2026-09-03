@@ -35,7 +35,10 @@ import {
   findMostSimilarQuestion,
   ORIGINALITY_REJECTION_THRESHOLD_BPS,
 } from "@/lib/editorial/originality";
-import { isEditorialOwnerApprover } from "@/lib/editorial/owner-approval";
+import {
+  canReviewEditorialSubmission,
+  isEditorialOwnerApprover,
+} from "@/lib/editorial/owner-approval";
 import { parseSyllabusItems } from "@/lib/editorial/syllabus-parser";
 import { extractOfficialSyllabusCandidates } from "@/lib/editorial/official-syllabus-extractor";
 import type { InternalOpportunitySourceCandidate } from "@/lib/opportunities/official-candidates";
@@ -213,10 +216,6 @@ export async function reviewNoticeSourceAction(
     notes: formData.get("notes"),
   });
   if (!parsed.success) return errorState("Revise os dados da decisão.");
-  if (parsed.data.decision === "reject" && parsed.data.notes.length < 10) {
-    return errorState("Explique a rejeição em pelo menos 10 caracteres.");
-  }
-
   const db = getDb();
   const [source] = await db
     .select({
@@ -233,10 +232,21 @@ export async function reviewNoticeSourceAction(
   if (!source || source.status !== "pending_review") {
     return errorState("A fonte não está mais pendente de revisão.");
   }
-  if (source.initiatedByUserId === user.id) {
-    return errorState("Quem registrou a fonte não pode aprovar a própria conferência.");
+  if (
+    !canReviewEditorialSubmission({
+      initiatorUserId: source.initiatedByUserId,
+      reviewerUserId: user.id,
+      reviewerEmail: user.email,
+    })
+  ) {
+    return errorState("Somente a conta proprietária pode revisar a própria fonte.");
+  }
+  if (parsed.data.notes.length < 10) {
+    return errorState("Registre uma nota de revisão com pelo menos 10 caracteres.");
   }
   const approved = parsed.data.decision === "approve";
+  const approvalMode =
+    source.initiatedByUserId === user.id ? "owner_self_review" : "independent_review";
   if (approved && (source.httpStatus < 200 || source.httpStatus >= 400)) {
     return errorState("A fonte não pode ser aprovada porque a resposta HTTP não está saudável.");
   }
@@ -274,7 +284,7 @@ export async function reviewNoticeSourceAction(
           : "editorial.notice_source.rejected",
         entityType: "opportunity_source_document",
         entityId: parsed.data.publicId,
-        metadata: { notes: parsed.data.notes || null },
+        metadata: { notes: parsed.data.notes, approvalMode },
       });
     });
   } catch (error) {
@@ -492,10 +502,6 @@ export async function reviewNoticeDocumentAction(
     ownerOverride: formData.get("ownerOverride") || undefined,
   });
   if (!parsed.success) return errorState("Revise os dados da decisão do PDF.");
-  if (parsed.data.decision === "reject" && parsed.data.notes.length < 10) {
-    return errorState("Explique a rejeição em pelo menos 10 caracteres.");
-  }
-
   const db = getDb();
   const [snapshot] = await db
     .select({
@@ -971,8 +977,17 @@ export async function reviewRequirementAction(
   if (!requirement || requirement.status !== "pending_review") {
     return errorState("O requisito não está mais pendente.");
   }
-  if (requirement.createdByUserId === user.id) {
-    return errorState("Quem importou o requisito não pode aprovar o próprio item.");
+  if (
+    !canReviewEditorialSubmission({
+      initiatorUserId: requirement.createdByUserId,
+      reviewerUserId: user.id,
+      reviewerEmail: user.email,
+    })
+  ) {
+    return errorState("Somente a conta proprietária pode revisar o próprio requisito.");
+  }
+  if (parsed.data.notes.length < 10) {
+    return errorState("Registre uma nota de revisão com pelo menos 10 caracteres.");
   }
   if (parsed.data.decision === "approve" && requirement.sourceStatus !== "approved") {
     return errorState("A fonte oficial precisa continuar aprovada.");
@@ -995,6 +1010,8 @@ export async function reviewRequirementAction(
   }
 
   const approved = parsed.data.decision === "approve";
+  const approvalMode =
+    requirement.createdByUserId === user.id ? "owner_self_review" : "independent_review";
   const now = new Date();
   const updated = await db
     .update(opportunityRequirements)
@@ -1021,7 +1038,7 @@ export async function reviewRequirementAction(
       : "editorial.notice_requirement.rejected",
     entityType: "opportunity_requirement",
     entityId: String(requirement.id),
-    metadata: { notes: parsed.data.notes || null },
+    metadata: { notes: parsed.data.notes, approvalMode },
   });
   refreshNoticeEngine();
   return {

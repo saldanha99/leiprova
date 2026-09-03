@@ -950,12 +950,6 @@ export const opportunitySourceDocuments = pgTable(
       sql`${table.status} <> 'approved' or (${table.reviewedByUserId} is not null and ${table.reviewedAt} is not null)`,
     ),
     check(
-      "opportunity_source_documents_independent_review_check",
-      sql`${table.status} <> 'approved'
-        or ${table.initiatedByUserId} is null
-        or ${table.reviewedByUserId} <> ${table.initiatedByUserId}`,
-    ),
-    check(
       "opportunity_source_documents_review_notes_check",
       sql`${table.reviewNotes} is null or char_length(${table.reviewNotes}) <= 2000`,
     ),
@@ -1231,12 +1225,6 @@ export const opportunityRequirements = pgTable(
     check(
       "opportunity_requirements_review_check",
       sql`${table.editorialStatus} <> 'reviewed' or (${table.reviewedByUserId} is not null and ${table.reviewedAt} is not null)`,
-    ),
-    check(
-      "opportunity_requirements_independent_review_check",
-      sql`${table.editorialStatus} <> 'reviewed'
-        or ${table.createdByUserId} is null
-        or ${table.reviewedByUserId} <> ${table.createdByUserId}`,
     ),
     check(
       "opportunity_requirements_review_notes_check",

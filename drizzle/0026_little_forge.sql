@@ -1,0 +1,2 @@
+ALTER TABLE "opportunity_requirements" DROP CONSTRAINT "opportunity_requirements_independent_review_check";--> statement-breakpoint
+ALTER TABLE "opportunity_source_documents" DROP CONSTRAINT "opportunity_source_documents_independent_review_check";
