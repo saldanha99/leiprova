@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+
 import { describe, expect, it } from "vitest";
 
 import {
@@ -6,6 +8,8 @@ import {
 } from "@/lib/editorial/owner-approval";
 
 describe("aprovação editorial do proprietário", () => {
+  const compose = readFileSync(new URL("../docker-compose.yml", import.meta.url), "utf8");
+
   it("aceita somente a conta configurada, normalizando caixa e espaços", () => {
     expect(isEditorialOwnerApprover(" Proprietario@Exemplo.com ", "proprietario@exemplo.com")).toBe(true);
     expect(isEditorialOwnerApprover("editor@exemplo.com", "proprietario@exemplo.com")).toBe(false);
@@ -38,5 +42,12 @@ describe("aprovação editorial do proprietário", () => {
         "proprietario@exemplo.com",
       ),
     ).toBe(true);
+  });
+
+  it("entrega a conta proprietária ao processo da aplicação", () => {
+    const appService = compose.split("  app:")[1]?.split("\n  migrate:")[0];
+    expect(appService).toContain(
+      "EDITORIAL_OWNER_APPROVER_EMAIL: ${EDITORIAL_OWNER_APPROVER_EMAIL:-}",
+    );
   });
 });
