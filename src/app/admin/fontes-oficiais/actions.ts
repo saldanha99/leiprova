@@ -43,6 +43,21 @@ function safeLogDetail(error: unknown) {
   return `${typeof record.name === "string" ? record.name : "Error"}${typeof record.code === "string" ? ` (${record.code})` : ""}`;
 }
 
+function publicActionError(error: unknown, fallback: string) {
+  if (!(error instanceof Error)) return fallback;
+  const message = error.message.trim();
+  if (
+    !message ||
+    message.length > 500 ||
+    /(?:^Failed query:|\bparams:|permission denied|\bSQLSTATE\b|\bconstraint\b|\brelation\b|\bcolumn\b)/i.test(
+      message,
+    )
+  ) {
+    return fallback;
+  }
+  return message;
+}
+
 const slugSchema = z.string().trim().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
 
 export async function syncLegalSourceAction(
@@ -97,7 +112,7 @@ export async function syncLegalSourceAction(
     };
   } catch (error) {
     console.error("Falha ao sincronizar fonte jurídica.", safeLogDetail(error));
-    return errorState(error instanceof Error ? error.message : "Não foi possível consultar a fonte oficial.");
+    return errorState(publicActionError(error, "Não foi possível consultar a fonte oficial."));
   }
 }
 
@@ -164,7 +179,7 @@ export async function reviewLegalSnapshotAction(
       });
     });
   } catch (error) {
-    return errorState(error instanceof Error ? error.message : "Não foi possível registrar a decisão.");
+    return errorState(publicActionError(error, "Não foi possível registrar a decisão."));
   }
 
   revalidatePath("/admin/fontes-oficiais");
@@ -251,9 +266,7 @@ export async function captureLegalTextAction(
     };
   } catch (error) {
     console.error("Falha ao capturar texto jurídico consolidado.", safeLogDetail(error));
-    return errorState(
-      error instanceof Error ? error.message : "Não foi possível capturar a compilação oficial.",
-    );
+    return errorState(publicActionError(error, "Não foi possível capturar a compilação oficial."));
   }
 }
 
@@ -307,9 +320,7 @@ export async function reviewLegalTextAction(
     try {
       articles = parseConsolidatedLegalArticles(snapshot.normalizedContent);
     } catch (error) {
-      return errorState(
-        error instanceof Error ? error.message : "Não foi possível validar os artigos capturados.",
-      );
+      return errorState(publicActionError(error, "Não foi possível validar os artigos capturados."));
     }
     if (articles.length !== snapshot.articleCount) {
       return errorState("A contagem de artigos divergiu da captura original.");
@@ -429,9 +440,7 @@ export async function reviewLegalTextAction(
       });
     });
   } catch (error) {
-    return errorState(
-      error instanceof Error ? error.message : "Não foi possível registrar a decisão.",
-    );
+    return errorState(publicActionError(error, "Não foi possível registrar a decisão."));
   }
 
   revalidatePath("/admin/fontes-oficiais");
@@ -475,7 +484,7 @@ export async function verifyExamPortalAction(
     revalidatePath("/admin/fontes-oficiais");
     return { status: "success", message: `Portal oficial respondeu com HTTP ${checked.httpStatus}. Nenhum conteúdo de questão foi armazenado.` };
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Não foi possível verificar o portal.";
+    const message = publicActionError(error, "Não foi possível verificar o portal.");
     await db.update(examSourcePortals).set({ lastError: message, lastCheckedAt: new Date(), updatedAt: new Date() }).where(eq(examSourcePortals.id, portal.id));
     revalidatePath("/admin/fontes-oficiais");
     return errorState(message);
@@ -558,6 +567,6 @@ export async function createExamMetadataAction(
     revalidatePath("/admin/fontes-oficiais");
     return { status: "success", message: "Metadados registrados. Nenhum enunciado, alternativa ou gabarito foi copiado." };
   } catch (error) {
-    return errorState(error instanceof Error ? error.message : "Não foi possível validar a página oficial da prova.");
+    return errorState(publicActionError(error, "Não foi possível validar a página oficial da prova."));
   }
 }

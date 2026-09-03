@@ -50,13 +50,16 @@ describe("privilégios do app em produção", () => {
   it("limita a captura e ativação do corpus legal às colunas auditadas", () => {
     expect(grants).toMatch(/legal_text_snapshots,/);
     expect(grants).toMatch(
-      /grant insert \(\s*public_id,\s*legal_act_id,\s*monitor_snapshot_id,[\s\S]*?\) on legal_text_snapshots to :app_user;/,
+      /grant insert \(\s*id,\s*public_id,\s*legal_act_id,\s*monitor_snapshot_id,[\s\S]*?reviewed_by_user_id,[\s\S]*?created_at,\s*updated_at\s*\) on legal_text_snapshots to :app_user;/,
     );
     expect(grants).toMatch(
       /grant update \(\s*status,\s*reviewed_by_user_id,\s*review_notes,\s*last_seen_at,\s*reviewed_at,\s*updated_at\s*\) on legal_text_snapshots to :app_user;/,
     );
     expect(grants).toMatch(
-      /grant insert \(\s*legal_act_id,\s*source_url,\s*checksum_sha256,\s*verified_at,\s*status\s*\) on legal_versions to :app_user;/,
+      /grant insert \(\s*id,\s*legal_act_id,\s*source_url,\s*checksum_sha256,\s*published_at,\s*valid_from,\s*valid_until,\s*verified_at,\s*status,\s*created_at\s*\) on legal_versions to :app_user;/,
+    );
+    expect(grants).toMatch(
+      /grant insert \(\s*id,\s*legal_version_id,\s*article_ref,[\s\S]*?source_rights,\s*created_at,\s*updated_at\s*\) on legal_articles to :app_user;/,
     );
     expect(grants).toContain("legal_text_snapshots_id_seq");
     expect(grants).toContain("legal_versions_id_seq");

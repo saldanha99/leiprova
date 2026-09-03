@@ -161,6 +161,7 @@ grant insert (
 ) on legal_source_snapshots to :app_user;
 
 grant insert (
+  id,
   public_id,
   legal_act_id,
   monitor_snapshot_id,
@@ -172,8 +173,13 @@ grant insert (
   parser_version,
   status,
   initiated_by_user_id,
+  reviewed_by_user_id,
+  review_notes,
   fetched_at,
-  last_seen_at
+  last_seen_at,
+  reviewed_at,
+  created_at,
+  updated_at
 ) on legal_text_snapshots to :app_user;
 
 grant update (
@@ -186,11 +192,16 @@ grant update (
 ) on legal_text_snapshots to :app_user;
 
 grant insert (
+  id,
   legal_act_id,
   source_url,
   checksum_sha256,
+  published_at,
+  valid_from,
+  valid_until,
   verified_at,
-  status
+  status,
+  created_at
 ) on legal_versions to :app_user;
 
 grant update (
@@ -200,6 +211,7 @@ grant update (
 ) on legal_versions to :app_user;
 
 grant insert (
+  id,
   legal_version_id,
   article_ref,
   article_order,
@@ -207,7 +219,9 @@ grant insert (
   path,
   literal_text,
   editorial_status,
-  source_rights
+  source_rights,
+  created_at,
+  updated_at
 ) on legal_articles to :app_user;
 
 grant update (
