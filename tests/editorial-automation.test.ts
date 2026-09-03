@@ -12,6 +12,14 @@ const legalMonitor = readFileSync(
 );
 const packageJson = readFileSync(new URL("../package.json", import.meta.url), "utf8");
 const compose = readFileSync(new URL("../docker-compose.yml", import.meta.url), "utf8");
+const deployScript = readFileSync(
+  new URL("../deploy/deploy.sh", import.meta.url),
+  "utf8",
+);
+const draftService = readFileSync(
+  new URL("../src/lib/editorial/notice-draft-service.ts", import.meta.url),
+  "utf8",
+);
 
 describe("automação editorial segura", () => {
   it("executa periodicamente com conta proprietária e recursos limitados", () => {
@@ -28,6 +36,10 @@ describe("automação editorial segura", () => {
     expect(compose).toMatch(
       /editorial-automation:[\s\S]*?cap_drop:[\s\S]*?- ALL[\s\S]*?no-new-privileges:true/,
     );
+    expect(deployScript).toContain(
+      "docker compose up -d --wait --wait-timeout 180 app legal-monitor editorial-automation",
+    );
+    expect(draftService).not.toContain('import "server-only"');
   });
 
   it("automatiza apenas captura oficial e criação de rascunhos", () => {
