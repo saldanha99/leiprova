@@ -20,6 +20,10 @@ const draftService = readFileSync(
   new URL("../src/lib/editorial/notice-draft-service.ts", import.meta.url),
   "utf8",
 );
+const documentFetcher = readFileSync(
+  new URL("../src/lib/opportunities/official-document-fetch.ts", import.meta.url),
+  "utf8",
+);
 
 describe("automação editorial segura", () => {
   it("executa periodicamente com conta proprietária e recursos limitados", () => {
@@ -40,6 +44,7 @@ describe("automação editorial segura", () => {
       "docker compose up -d --wait --wait-timeout 180 app legal-monitor editorial-automation",
     );
     expect(draftService).not.toContain('import "server-only"');
+    expect(documentFetcher).not.toContain('import "server-only"');
   });
 
   it("automatiza apenas captura oficial e criação de rascunhos", () => {

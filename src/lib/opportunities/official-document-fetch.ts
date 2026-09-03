@@ -1,5 +1,3 @@
-import "server-only";
-
 import { createHash } from "node:crypto";
 import { lookup } from "node:dns/promises";
 import { isIP } from "node:net";
