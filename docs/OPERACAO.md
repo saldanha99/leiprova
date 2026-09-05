@@ -5,6 +5,12 @@ Descreve onde as coisas estão, como publicar e quais armadilhas já custaram te
 
 Última verificação completa: 2026-08-25.
 
+**Estado editorial verificado em 05/09/2026:** motor publicado, migrations até 0030,
+160 questões novas aprovadas (40 por perfil interno), acervo anterior preservado.
+Total: 232 revisadas e 12 pendentes. Backup verificado no servidor e no Mac.
+Veja o resultado em [operação do lote de 160](OPERACAO-LOTE-160.md); as seções históricas
+abaixo não devem ser usadas para inferir as contagens atuais.
+
 Continuação autorizada em 05/09/2026: [operação controlada do lote de 160 questões](OPERACAO-LOTE-160.md).
 Inclui compatibilidade explícita Planalto/Senado, confirmação humana vinculada ao conteúdo/mapeamento,
 operador interno com papel restrito e deploy sem seed para preservar o acervo revisado.

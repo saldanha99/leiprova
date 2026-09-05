@@ -1,5 +1,8 @@
 # Conferência da conta e preflight do lote de 160 questões
 
+Registro histórico anterior à implantação. A autorização posterior, compatibilidade e
+**liberação efetiva das 160 questões** estão em [operação do lote](OPERACAO-LOTE-160.md).
+
 Verificação em 05/09/2026. Escopo: somente LeiProva. As consultas à VPS foram executadas em transações `READ ONLY`, com limite de tempo e sem leitura de credenciais, sessões ou dados de outros usuários/projetos.
 
 ## Confirmação humana recebida

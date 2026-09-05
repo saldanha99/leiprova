@@ -65,4 +65,23 @@ Esta rodada não corrige genericamente o seed legado; evita sua execução. Não
 
 Lint, tipos, 424 testes em 59 arquivos (37 PostgreSQL sintéticos e 7 do corpus privado) e build passaram. Revisão independente Prism: risco de seed tratado com skip explícito; hash do mapeamento incluído na autorização e nas regressões. As confirmações e a autorização de deploy já foram recebidas; não solicitá-las novamente.
 
-O resultado efetivo da implantação e as contagens finais devem ser registrados após a execução, sem confundir preparação com conclusão.
+## Resultado da implantação em 05/09/2026
+
+Concluída na VPS. Código executável das imagens: `604818a4fe0339e22754b4f8a328ba8ad2910e0f` (motor em `b76d929`, seguido da exclusão de backups do contexto Docker). A primeira construção foi interrompida antes das migrations/importação para acrescentar essa exclusão. O app anterior continuou saudável durante a construção. A segunda construção terminou, migrations até 0030/grants foram aplicados e o seed foi explicitamente pulado.
+
+- **160 questões importadas e aprovadas:** 40 FGV, 40 FCC, 40 Vunesp e 40 Cebraspe. São questões constitucionais de treino geral pelos perfis internos, não uma cobertura completa de edital ou prova específica.
+- 680 alternativas novas. Em cada item foram confirmados fonte vigente/revisada, matéria/tópico e responsável/revisor da conta indicada.
+- Acervo anterior preservado byte a byte na comparação dos registros: 84 questões e 354 alternativas, com hashes iguais antes/depois. Os 12 pendentes antigos continuam pendentes. Total atual: 232 questões revisadas e 12 pendentes.
+- Auditoria contém 160 importações, 160 assunções editoriais e 160 aprovações deste lote. Reexecução da aprovação devolveu **0 novas aprovações / 160 reaproveitadas**, sem duplicação.
+- Impressão da importação: `ee86ea9c7080a25f94c43bf41780fb50a4cef532f6dbd725338365b0b50cee04`. Impressão da aprovação: `b3edc56d507a3b2388a48bfb25e05be51a3974a1450488efdd596846175161d9`.
+- Backup `leiprova-pre-editorial-b76d929-20260905.dump`: 8.042.431 bytes; SHA-256 `e892f9e3821a0b2a5f0eca1a3237ecee5b7d25d5642678975f2efad9b8ed5dfc`. Cópias protegidas no servidor e no Mac; ambas lidas integralmente pelo pg_restore sem restaurar nem expor conteúdo. Imagens anteriores do app/workers preservadas nas tags locais `pre-b76d929`.
+- O operador verificou que sua imagem não contém `/app/backups`, o diretório editorial privado nem o pacote de 160. A entrada só foi disponibilizada no volume read-only da operação.
+- App/banco/pooler saudáveis; os dois workers LeiProva retomados. Health público `status: ok`. Flags comparadas antes/depois e preservadas: checkout/cadastro continuam fechados; Connect continua no estado de teste anterior, sem liberação brasileira. Nenhuma cobrança ou API paga acionada.
+- Browser público: demonstração abre; `/app/quiz` exige login; login sem overflow em 390×844 e 768×1024. Não houve sessão autenticada de usuário real nem teste de treino completo em aparelho físico nesta rodada. Os fluxos autenticados anteriores foram verificados apenas em QA sintético, conforme relatório P0.
+- Lint, tipos, **424 testes/59 arquivos** e build passaram novamente após a correção Docker. No export limpo, sem `.env`, banco ou corpus privado, route types/typecheck e 380 testes passaram; 44 skips esperados (37 PostgreSQL +7 corpus privado). A construção Linux de produção também passou, sem o corpus privado na imagem.
+
+A conta editorial indicada ainda não tem assinatura de treino completo. Foi oferecida ao usuário uma liberação de teste de 30 dias, sem cobrança/renovação; **nenhum acesso comercial foi concedido sem a resposta específica**. O catálogo está liberado para contas com o acesso de estudo previsto nas regras existentes.
+
+Recibos detalhados, confirmações, mapeamento, evidências e backup permanecem somente em `.local/editorial/`. O pacote original e seu manifesto continuam imutáveis como retrato da autoria anterior à aprovação. A revisão humana efetiva fica na auditoria do banco e no recibo posterior, não é simulada pela troca de estado nos JSON originais.
+
+Continua pendente, fora desta publicação: produção contínua por sessões das assinaturas, integração dessas sessões à fila e instalação no servidor residencial. Os workers de fontes/fila existentes estão ativos, mas isso não equivale a um time de modelos gerando conteúdo 24h.
