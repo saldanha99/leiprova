@@ -11,3 +11,6 @@ README.md
 .local/editorial
 content/editorial/cf-direitos-fundamentais-2026-09-05
 content/editorial/*.zip
+backups
+*.dump
+*.dump.part
