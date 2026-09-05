@@ -5,6 +5,8 @@ Descreve onde as coisas estão, como publicar e quais armadilhas já custaram te
 
 Última verificação completa: 2026-08-25.
 
+**Publicação de catálogo em 05/09/2026:** menu premium, 75 páginas de planejamento e infraestrutura de compra avulsa publicados; migration 0031 aplicada. Cobranças permanecem fechadas: Stripe ainda em teste e nenhum conteúdo vinculado às edições. Acervo 232 revisadas + 12 pendentes preservado. Veja [publicação e pendências comerciais](PRODUCAO-CONCURSOS.md) antes de abrir vendas. As seções históricas abaixo não substituem essa conferência.
+
 **Estado editorial verificado em 05/09/2026:** motor publicado, migrations até 0030,
 160 questões novas aprovadas (40 por perfil interno), acervo anterior preservado.
 Total: 232 revisadas e 12 pendentes. Backup verificado no servidor e no Mac.

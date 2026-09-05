@@ -48,4 +48,15 @@ Lint, TypeScript, build de produção e 472 testes em 63 arquivos aprovados. Inc
 
 Publicar somente após backup verificável e com `LEIPROVA_SKIP_SEED=1`. A migration 0031 acrescenta três tabelas comerciais; reaplicar `deploy/grant-app-role.sql`. Não executar seed legado nem copiar contas/dados de QA para produção. Conferir saúde, catálogo, página de concurso, checkout bloqueado e preservação das contagens após deploy.
 
-Estado da execução será registrado abaixo depois da verificação da produção.
+## Resultado da execução
+
+- Publicação concluída em 05/09/2026, código `2732a9d2700dd057a7b80288fbdbfe4a9c5cf8fb`. Branch de funcionalidade integrada por fast-forward à main; deploy da ref exata, sem seed.
+- Backup anterior verificado por `pg_restore --list`, preservado na VPS e copiado para a área privada do Mac: `leiprova-before-contest-commerce-20260905T221153Z.dump`. SHA-256 `770bd21aa90ef5c2107eea4efd030de35319fdb11211a5a39f435974343f503b`. Nenhum backup anterior removido.
+- Migration 0031 aplicada (registro 32 no histórico), privilégios restritos reaplicados e serviços LeiProva saudáveis. Nenhum serviço de outro projeto reiniciado.
+- As 75 linhas comerciais foram cadastradas no banco de produção em `draft`, com modo de destino `live`, **sem IDs Stripe, vínculos editoriais ou liberação de venda**. Isso registra a preparação, não a criação de 75 produtos na Stripe.
+- Contagens preservadas: 232 questões revisadas, 12 pendentes e seis oportunidades revisadas. Zero pedidos, zero compras e zero contas QA na produção.
+- As 75 URLs do novo catálogo responderam HTTP 200, com uma H1, canonical própria e `noindex`; nenhuma falhou. Menu abriu no celular; catálogo em 390px sem rolagem horizontal.
+- Saúde pública HTTP 200. Endpoints de checkout Master e avulso retornaram HTTP 503 com as flags fechadas, sem gerar compra. Stripe live não configurada/aplicada; solicitação de configuração segura encaminhada ao proprietário.
+- Catálogo público: https://leiprova.2b.app.br/concursos. Checkout por edição publicado como prévia: https://leiprova.2b.app.br/checkout/concurso/pc-ba-delegado-2026.
+
+**Resultado parcial do objetivo:** páginas e infraestrutura publicadas; recebimento de pagamentos reais e liberação dos cursos continuam bloqueados pelas pendências acima. Não foi registrada aprovação editorial fictícia nem movido dinheiro.
