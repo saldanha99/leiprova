@@ -80,3 +80,24 @@ Publicar com `LEIPROVA_SKIP_SEED=1` para preservar o acervo existente.
 As pendências de conteúdo por edição, credenciais live, webhook e homologação
 continuam em [PRODUCAO-CONCURSOS.md](PRODUCAO-CONCURSOS.md). Não abrir venda de
 produtos vazios nem transformar autorização comercial em revisão editorial.
+
+## Resultado da publicação
+
+- Código `c4f70c391e5e6e63d45d5f8502281d08f992f195` publicado na VPS em
+  05/09/2026, por fast-forward e deploy da revisão exata, sem seed.
+- Aplicação, banco e pooler saudáveis; monitores do LeiProva em execução.
+  Banco e pooler não foram recriados. Nenhum serviço de outro projeto alterado.
+- Saúde pública `{"status":"ok"}`. As 75 URLs de planejamento responderam
+  HTTP 200 em produção, com nova imagem, uma H1, tour, canonical própria e
+  `noindex`; zero falhas na checagem.
+- Acervo preservado: 232 revisadas e 12 pendentes. Catálogo com 75 rascunhos
+  live sem IDs Stripe, zero vínculos questão–edição, pedidos e compras.
+- FAQ expandida no navegador; largura de tablet 768 sem overflow, além das
+  larguras móveis verificadas. Isso não equivale a teste em dispositivos físicos.
+- Chave restrita ainda não criada. Próxima etapa proposta: acesso dedicado
+  para catálogo, clientes, Checkout, portal e webhooks, com leitura da conta,
+  Payment Intents e Charges para conferência dos eventos. Sem gravação de
+  reembolsos, saques, transferências ou gerenciamento de acesso.
+  Chaves restritas limitam tipos de recurso, não isolam produtos dentro da
+  mesma conta; os filtros de identidade do LeiProva continuam obrigatórios.
+  Guardar credenciais somente no ambiente privado do LeiProva, nunca no Git/chat.

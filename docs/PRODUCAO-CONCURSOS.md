@@ -1,5 +1,12 @@
 # Publicação e abertura comercial — 05/09/2026
 
+**Atualização posterior:** redesenho dos cursos publicado em `c4f70c3`, com
+75 URLs verificadas e acervo preservado. A sessão autenticada da Stripe na
+aba original do perfil Vini está acessível, conta `acct_1TCQvlBkl6797u2u`.
+Formulário de chave restrita aberto, sem salvar. Não pedir novo login/CDP.
+Nenhuma configuração Stripe live criada; pendências de homologação e conteúdo
+abaixo continuam válidas. Ver [resultado editorial v2](DESIGN-CURSOS-V2.md).
+
 ## Autorização e escopo
 
 O proprietário solicitou preparar todos os checkouts para produção e autorizou as publicações. Os valores apresentados foram R$67/6 meses e R$87/12 meses por edição; Master R$297/mês e R$897/ano. A autorização comercial não é uma declaração de revisão individual de editais ou questões, nem licença para conteúdo de terceiros.
