@@ -1,4 +1,4 @@
-import { and, eq, gt, inArray, sql } from "drizzle-orm";
+import { and, eq, gt, inArray, or, sql } from "drizzle-orm";
 import { NextRequest } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { getDb } from "@/lib/db/client";
@@ -19,6 +19,11 @@ import {
   stripeKeyExpectsLivemode,
 } from "@/lib/stripe";
 import { getStudyEntitlement } from "@/lib/study/entitlement";
+import { getOrCreateStripeCustomer } from "@/lib/commerce/customer";
+import {
+  CONTEST_SUBSCRIPTION_COMMERCE,
+  contestRecurringPriceMatches,
+} from "@/lib/commerce/subscription-policy";
 
 export const runtime = "nodejs";
 export async function POST(request: NextRequest) {
@@ -32,7 +37,7 @@ export async function POST(request: NextRequest) {
   );
   if (!input.success)
     return error(
-      "Seleção inválida. Escolha até três concursos da mesma carreira, um período por concurso.",
+      "Seleção inválida. Escolha até três concursos da mesma carreira, todos mensais ou todos anuais.",
       400,
     );
   const user = await getCurrentUser();
@@ -58,7 +63,9 @@ export async function POST(request: NextRequest) {
         409,
       );
     const price =
-      item.accessKey === "6m" ? product.stripePrice6m : product.stripePrice12m;
+      item.accessKey === "monthly"
+        ? product.stripePriceMonthly
+        : product.stripePriceAnnual;
     if (
       !price ||
       expectedLive === null ||
@@ -108,7 +115,17 @@ export async function POST(request: NextRequest) {
       .where(
         and(
           eq(contestOrders.userId, user.id),
-          inArray(contestOrders.status, ["created", "pending"]),
+          or(
+            inArray(contestOrders.status, ["created", "pending"]),
+            inArray(contestOrders.subscriptionStatus, [
+              "active",
+              "past_due",
+              "unpaid",
+              "paused",
+              "trialing",
+              "incomplete",
+            ]),
+          ),
         ),
       );
     const overlapping = pendingOrders.find((item) =>
@@ -152,7 +169,7 @@ export async function POST(request: NextRequest) {
     );
   if (!["created", "pending"].includes(order.status))
     return error(
-      "Esta tentativa já foi encerrada. Consulte seus acessos.",
+      "Já existe uma assinatura ou tentativa encerrada para este concurso. Gerencie-a em Meus concursos.",
       409,
     );
   try {
@@ -182,11 +199,7 @@ export async function POST(request: NextRequest) {
       const price = await stripe.prices.retrieve(line.stripePriceId);
       const product = released.find((item) => item.slug === line.productSlug)!;
       if (
-        !price.active ||
-        price.recurring ||
-        price.unit_amount !== line.amountCents ||
-        price.currency !== "brl" ||
-        price.livemode !== expectedLive ||
+        !contestRecurringPriceMatches(price, line, expectedLive!) ||
         price.product !== product.stripeProductId
       )
         return error(
@@ -196,20 +209,26 @@ export async function POST(request: NextRequest) {
     }
     const metadata = {
       app: "leiprova",
-      commerce: "contest_v1",
+      commerce: CONTEST_SUBSCRIPTION_COMMERCE,
       order_id: order.id,
       user_public_id: user.publicId,
     };
+    const customerId = await getOrCreateStripeCustomer(stripe, user);
+    await db
+      .update(contestOrders)
+      .set({ stripeCustomerId: customerId, updatedAt: new Date() })
+      .where(eq(contestOrders.id, order.id));
     const origin = getPublicOrigin(request);
     const session = await stripe.checkout.sessions.create(
       {
-        mode: "payment",
+        mode: "subscription",
         ui_mode: "hosted",
-        customer_email: user.email,
+        customer: customerId,
+        payment_method_types: ["card"],
         client_reference_id: user.publicId,
         locale: "pt-BR",
         metadata,
-        payment_intent_data: { metadata },
+        subscription_data: { metadata },
         line_items: lines.map((line) => ({
           price: line.stripePriceId,
           quantity: 1,
@@ -218,7 +237,7 @@ export async function POST(request: NextRequest) {
         cancel_url: `${origin}/checkout/concurso/${lines[0].productSlug}?acesso=${lines[0].accessKey}`,
         expires_at: Math.floor(order.createdAt.getTime() / 1000) + 3600,
       },
-      { idempotencyKey: `contest-order:${order.id}` },
+      { idempotencyKey: `contest-subscription:${order.id}` },
     );
     await db
       .update(contestOrders)

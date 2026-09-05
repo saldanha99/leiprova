@@ -26,14 +26,17 @@ export default async function ContestCheckoutPage({
   const contest = getCatalogContest(slug);
   if (!contest) notFound();
   const access =
-    getContestAccessOption((await searchParams).acesso ?? "6m")?.key ?? "6m";
+    getContestAccessOption((await searchParams).acesso ?? "monthly")?.key ??
+    "monthly";
   const released =
     isDatabaseConfigured() && isContestCheckoutEnabled()
       ? await listReleasedContestProducts()
       : [];
   const product = released.find((item) => item.slug === slug);
   const priceId =
-    access === "6m" ? product?.stripePrice6m : product?.stripePrice12m;
+    access === "monthly"
+      ? product?.stripePriceMonthly
+      : product?.stripePriceAnnual;
   const available = Boolean(
     priceId &&
       getCheckoutAvailability(

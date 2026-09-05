@@ -3,9 +3,13 @@ import Link from "next/link";
 
 import { contestPlanCta } from "@/lib/opportunities/landing-presentation";
 import { PLANS, formatBRL, getMonthlyEquivalentCents } from "@/lib/plans";
-import { CONTEST_ACCESS_OPTIONS } from "@/lib/commerce/catalog";
+import {
+  CONTEST_ACCESS_OPTIONS,
+  CONTEST_ANNUAL_COMPARISON,
+} from "@/lib/commerce/catalog";
 
 import styles from "./contest-landing.module.css";
+import offer from "./contest-subscription-pricing.module.css";
 
 export function ContestPricing({
   commerceOpen,
@@ -37,7 +41,7 @@ export function ContestPricing({
             <em>O próximo passo é seu.</em>
           </h2>
           <p>
-            Escolha o acesso avulso a {contestName} ou o Master para explorar os
+            Escolha a assinatura de {contestName} ou o Master para explorar os
             concursos liberados da plataforma durante a assinatura. Cada edição
             é um produto independente.
           </p>
@@ -52,34 +56,72 @@ export function ContestPricing({
           {CONTEST_ACCESS_OPTIONS.map((option) => (
             <article
               key={option.key}
-              className={`${styles.priceCard} ${option.months === 12 ? styles.priceFeatured : ""}`}
+              className={`${offer.card} ${option.key === "annual" ? offer.annual : ""}`}
+              data-contest-plan={option.key}
             >
-              <div className={styles.priceTop}>
-                <span>COMPRA AVULSA · UM CONCURSO</span>
-                <span className={styles.priceBadge}>
-                  {option.months === 12
-                    ? "Mais tempo para estudar"
-                    : "6 meses de acesso"}
+              <div className={offer.top}>
+                <span className={offer.eyebrow}>ASSINATURA · UM CONCURSO</span>
+                <span className={offer.badge}>
+                  {option.key === "annual"
+                    ? `≈${CONTEST_ANNUAL_COMPARISON.approximateDiscountPercent}% de economia`
+                    : "Flexibilidade mensal"}
                 </span>
               </div>
               <h3>{option.label}</h3>
-              <p className={styles.priceEyebrow}>
-                Acesso exclusivo a {contestName}
+              <p className={offer.intro}>
+                {option.key === "annual"
+                  ? "Um ano para construir sua rotina, com o melhor custo."
+                  : "Um mês de cada vez, no ritmo do seu próximo objetivo."}
               </p>
-              <p className={styles.priceAmount}>
+              <p className={offer.price}>
                 <strong>{formatBRL(option.amountCents)}</strong>
-                <span>uma única vez</span>
+                <span>{option.billingLabel}</span>
               </p>
-              <p className={styles.priceBilling}>
-                Acesso por {option.months} meses a partir da confirmação. Sem
-                renovação automática.{" "}
-                {productAvailable
-                  ? ""
-                  : "Oferta prevista, em preparação editorial."}
+              <div className={offer.comparison}>
+                {option.key === "annual" ? (
+                  <>
+                    <span>
+                      12 mensalidades:{" "}
+                      <s>
+                        {formatBRL(CONTEST_ANNUAL_COMPARISON.monthlyYearCents)}
+                      </s>
+                    </span>
+                    <strong>
+                      Economize{" "}
+                      {formatBRL(CONTEST_ANNUAL_COMPARISON.savingsCents)} por
+                      ano
+                    </strong>
+                    <small>
+                      Equivale a{" "}
+                      {formatBRL(
+                        CONTEST_ANNUAL_COMPARISON.monthlyEquivalentCents,
+                      )}
+                      /mês. Não é parcelamento.
+                    </small>
+                  </>
+                ) : (
+                  <>
+                    <strong>Renovação a cada mês</strong>
+                    <span>
+                      12 mensalidades totalizam{" "}
+                      {formatBRL(CONTEST_ANNUAL_COMPARISON.monthlyYearCents)}.
+                    </span>
+                    <small>
+                      Prefere planejar o ano? Compare a economia ao lado.
+                    </small>
+                  </>
+                )}
+              </div>
+              <p className={offer.billing}>
+                {option.key === "annual"
+                  ? `${formatBRL(option.amountCents)} cobrados de uma vez por ano, com renovação anual automática.`
+                  : `${formatBRL(option.amountCents)} cobrados a cada mês, com renovação mensal automática.`}{" "}
+                Cancele a renovação na sua conta. Acesso até o fim do período
+                pago.
               </p>
-              <div className={styles.priceDivider} />
-              <ul>
+              <ul className={offer.features}>
                 {[
+                  `Acesso exclusivo a ${contestName}`,
                   "Questões autorais liberadas desta edição",
                   "Explicações e revisão do conteúdo incluído",
                   "Progresso do seu treino",
@@ -92,7 +134,7 @@ export function ContestPricing({
                 ))}
               </ul>
               <Link
-                className={`${styles.button} ${styles.buttonPrimary}`}
+                className={offer.action}
                 href={
                   commerceOpen && productAvailable && productSlug
                     ? `/checkout/concurso/${productSlug}?acesso=${option.key}`
@@ -102,12 +144,17 @@ export function ContestPricing({
                 }
               >
                 {commerceOpen && productAvailable
-                  ? "Escolher este concurso"
+                  ? `Escolher plano ${option.label.toLowerCase()}`
                   : contactOpen
                     ? "Consultar a abertura"
                     : "Conhecer a experiência"}
                 <ArrowRight size={17} aria-hidden="true" />
               </Link>
+              {!productAvailable && (
+                <p className={offer.availability}>
+                  Oferta em preparação editorial · vendas ainda não abertas
+                </p>
+              )}
             </article>
           ))}
         </div>

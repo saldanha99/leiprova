@@ -94,8 +94,8 @@ export default async function ProductCatalogAdminPage() {
                         Preço 6 / 12 meses:{" "}
                       </dt>
                       <dd className="inline break-all">
-                        {product?.stripePrice6m ?? "pendente"} /{" "}
-                        {product?.stripePrice12m ?? "pendente"}
+                        Mensal: {product?.stripePriceMonthly ?? "pendente"} /{" "}
+                        Anual: {product?.stripePriceAnnual ?? "pendente"}
                       </dd>
                     </div>
                   </dl>

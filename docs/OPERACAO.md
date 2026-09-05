@@ -5,6 +5,11 @@ Descreve onde as coisas estão, como publicar e quais armadilhas já custaram te
 
 Última verificação completa: 2026-08-25.
 
+**Nova regra comercial de 05/09/2026:** os 75 concursos individuais passam a
+R$67/mês ou R$347/ano, assinaturas recorrentes. Propostas antigas de 6/12 meses
+com pagamento único abaixo são históricas. Master inalterado. Veja
+[assinaturas por concurso e estado de publicação](ASSINATURAS-POR-CONCURSO.md).
+
 **Redesenho publicado em 05/09/2026:** páginas de curso com direção editorial própria, fotografia sem pessoas, método visual, tour computador/tablet/celular e ofertas mais claras. Código `c4f70c3`, 547 testes aprovados, 75 rotas conferidas em produção, backup preservado e deploy sem seed. A aba original da Stripe no Chrome Vini já está acessível; chave live e homologação ainda não concluídas, vendas fechadas. Veja [design e resultado da publicação](DESIGN-CURSOS-V2.md).
 
 **Publicação de catálogo em 05/09/2026:** menu premium, 75 páginas de planejamento e infraestrutura de compra avulsa publicados; migration 0031 aplicada. Cobranças permanecem fechadas: Stripe ainda em teste e nenhum conteúdo vinculado às edições. Acervo 232 revisadas + 12 pendentes preservado. Veja [publicação e pendências comerciais](PRODUCAO-CONCURSOS.md) antes de abrir vendas. As seções históricas abaixo não substituem essa conferência.

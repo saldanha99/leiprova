@@ -5,10 +5,37 @@ export type CatalogContest = (typeof planning)[number];
 // Pesquisa de mercado, não confirmação de edital nem liberação editorial.
 export const CONTEST_CATALOG: readonly CatalogContest[] = planning;
 export const CONTEST_ACCESS_OPTIONS = [
-  { key: "6m", months: 6, amountCents: 6700, label: "Essencial" },
-  { key: "12m", months: 12, amountCents: 8700, label: "Ciclo completo" },
+  {
+    key: "monthly",
+    months: 1,
+    interval: "month",
+    amountCents: 6700,
+    label: "Mensal",
+    billingLabel: "/mês",
+  },
+  {
+    key: "annual",
+    months: 12,
+    interval: "year",
+    amountCents: 34700,
+    label: "Anual",
+    billingLabel: "/ano",
+  },
 ] as const;
 export type ContestAccessKey = (typeof CONTEST_ACCESS_OPTIONS)[number]["key"];
+
+export const CONTEST_ANNUAL_COMPARISON = (() => {
+  const monthlyYearCents = CONTEST_ACCESS_OPTIONS[0].amountCents * 12;
+  const annualCents = CONTEST_ACCESS_OPTIONS[1].amountCents;
+  return {
+    monthlyYearCents,
+    savingsCents: monthlyYearCents - annualCents,
+    approximateDiscountPercent: Math.round(
+      (1 - annualCents / monthlyYearCents) * 100,
+    ),
+    monthlyEquivalentCents: Math.round(annualCents / 12),
+  };
+})();
 
 export function getCatalogContest(slug: string) {
   return CONTEST_CATALOG.find((contest) => contest.slug === slug) ?? null;
@@ -32,7 +59,7 @@ export function getContestAccessOption(key: string) {
 
 export function contestPriceLookupKey(slug: string, key: ContestAccessKey) {
   const option = getContestAccessOption(key)!;
-  return `leiprova_contest_${slug}_${key}_${option.amountCents}_v1`;
+  return `leiprova_contest_${slug}_${key}_${option.amountCents}_recurring_v2`;
 }
 
 export function accessEndsAt(start: Date, months: number) {

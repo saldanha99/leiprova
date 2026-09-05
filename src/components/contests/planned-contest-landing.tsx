@@ -50,7 +50,7 @@ export function PlannedContestLanding({
     ],
     [
       "O acesso tem renovação automática?",
-      "O avulso é pagamento único por 6 ou 12 meses, sem renovação automática. O Master tem cobrança recorrente mensal ou anual, conforme a opção contratada. Preço e prazo aparecem antes da confirmação.",
+      "Sim. O plano individual Mensal custa R$ 67 por mês e o Anual, R$ 347 cobrados de uma vez a cada ano. Ambos têm renovação automática. Você pode cancelar a renovação na sua conta e mantém acesso até o fim do período pago. O Master é uma assinatura separada, com seus próprios valores.",
     ],
     [
       "As questões são da banca do concurso?",

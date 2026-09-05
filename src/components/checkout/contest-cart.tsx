@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowRight, Check, LockKeyhole } from "lucide-react";
 import {
   CONTEST_ACCESS_OPTIONS,
+  CONTEST_ANNUAL_COMPARISON,
   contestTitle,
   type CatalogContest,
   type ContestAccessKey,
@@ -29,8 +30,11 @@ export function ContestCart({
   const attempt = useRef<{ signature: string; id: string } | null>(null);
   const items = [
     { productSlug: contest.slug, accessKey: access },
-    ...extras.map((slug) => ({ productSlug: slug, accessKey: "6m" as const })),
+    ...extras.map((slug) => ({ productSlug: slug, accessKey: access })),
   ];
+  const selectedOption = CONTEST_ACCESS_OPTIONS.find(
+    (option) => option.key === access,
+  )!;
   const total = contestCartTotal(items);
   async function checkout() {
     setError("");
@@ -70,15 +74,15 @@ export function ContestCart({
           {contestTitle(contest)}
         </h1>
         <p className="mt-3 text-sm leading-7 text-slate-400">
-          Escolha o prazo de acesso. Você compra somente esta edição, sem
-          renovação automática.
+          Escolha a assinatura desta edição. Renovação automática mensal ou
+          anual; cancele a renovação na sua conta e mantenha o período já pago.
         </p>
         <fieldset disabled={pending} className="mt-7 grid gap-3">
-          <legend className="sr-only">Prazo de acesso</legend>
+          <legend className="sr-only">Periodicidade da assinatura</legend>
           {CONTEST_ACCESS_OPTIONS.map((option) => (
             <label
               key={option.key}
-              className={`flex cursor-pointer items-center gap-4 rounded-2xl border p-5 ${access === option.key ? "border-amber-200/40 bg-amber-200/5" : "border-white/15 bg-white/3"}`}
+              className={`grid cursor-pointer grid-cols-[auto_1fr] items-center gap-4 rounded-2xl border p-5 sm:grid-cols-[auto_1fr_auto] ${access === option.key ? "border-amber-200/40 bg-amber-200/5" : "border-white/15 bg-white/3"}`}
             >
               <input
                 type="radio"
@@ -90,16 +94,18 @@ export function ContestCart({
               />
               <span className="flex-1">
                 <strong>
-                  {option.label} · {option.months} meses
+                  {option.label} · renovação{" "}
+                  {option.key === "annual" ? "anual" : "mensal"}
                 </strong>
                 <small className="mt-2 block text-slate-400">
-                  {option.key === "12m"
-                    ? `Mais ${option.months - CONTEST_ACCESS_OPTIONS[0].months} meses por ${formatBRL(option.amountCents - CONTEST_ACCESS_OPTIONS[0].amountCents)} adicionais no total.`
-                    : "Um ciclo de estudo dedicado ao seu objetivo."}
+                  {option.key === "annual"
+                    ? `Economize ${formatBRL(CONTEST_ANNUAL_COMPARISON.savingsCents)} (aproximadamente ${CONTEST_ANNUAL_COMPARISON.approximateDiscountPercent}%) em relação a 12 mensalidades.`
+                    : "Flexibilidade para renovar um mês de cada vez."}
                 </small>
               </span>
-              <strong className="text-xl text-amber-100">
+              <strong className="col-start-2 text-xl text-amber-100 sm:col-auto">
                 {formatBRL(option.amountCents)}
+                {option.billingLabel}
               </strong>
             </label>
           ))}
@@ -110,14 +116,15 @@ export function ContestCart({
               02 / Outros objetivos na mesma carreira
             </legend>
             <p className="my-3 text-sm leading-6 text-slate-400">
-              Opcional. Cada adicional é outro concurso, com 6 meses de acesso.
-              Nenhum vem marcado.
+              Opcional. Cada adicional é outro concurso, com a mesma
+              periodicidade escolhida acima. Nenhum vem marcado; mudar o plano
+              atualiza todos os valores.
             </p>
             <div className="space-y-3">
               {related.slice(0, 2).map((item) => (
                 <label
                   key={item.slug}
-                  className="flex cursor-pointer items-center gap-4 rounded-xl border border-white/15 p-5"
+                  className="grid cursor-pointer grid-cols-[auto_1fr] items-center gap-4 rounded-xl border border-white/15 p-5 sm:grid-cols-[auto_1fr_auto]"
                 >
                   <input
                     type="checkbox"
@@ -134,11 +141,12 @@ export function ContestCart({
                   <span className="flex-1 text-sm">
                     <strong>{contestTitle(item)}</strong>
                     <small className="mt-2 block text-slate-400">
-                      Pagamento único · 6 meses
+                      Assinatura {selectedOption.label.toLowerCase()}
                     </small>
                   </span>
-                  <strong className="text-sm text-amber-100">
-                    + {formatBRL(CONTEST_ACCESS_OPTIONS[0].amountCents)}
+                  <strong className="col-start-2 text-sm text-amber-100 sm:col-auto">
+                    + {formatBRL(selectedOption.amountCents)}
+                    {selectedOption.billingLabel}
                   </strong>
                 </label>
               ))}
@@ -189,29 +197,35 @@ export function ContestCart({
                       )!,
                     )}
                 <small className="mt-1 block text-slate-400">
-                  {item.accessKey === "6m" ? "6" : "12"} meses ·{" "}
+                  {selectedOption.label} ·{" "}
                   {formatBRL(
                     CONTEST_ACCESS_OPTIONS.find(
                       (option) => option.key === item.accessKey,
                     )!.amountCents,
                   )}
+                  {selectedOption.billingLabel}
                 </small>
               </span>
             </li>
           ))}
         </ul>
         <div className="mt-7 border-t border-white/15 pt-5">
-          <span className="text-sm text-slate-400">Total, pagamento único</span>
+          <span className="text-sm text-slate-400">
+            Total da assinatura {selectedOption.label.toLowerCase()}
+          </span>
           <strong
             className="mt-2 block text-4xl tracking-tight text-amber-100"
             aria-live="polite"
           >
             {formatBRL(total)}
+            {selectedOption.billingLabel}
           </strong>
           <p className="mt-3 text-xs leading-6 text-slate-400">
-            Sem assinatura ou cobrança recorrente. A vigência começa na
-            confirmação do pagamento. Sem promessa de aprovação ou de cobertura
-            integral do edital.
+            {access === "annual"
+              ? "Cobrança integral a cada ano; não é parcelamento."
+              : "Cobrança a cada mês."}{" "}
+            Renovação automática até o cancelamento. Acesso somente aos períodos
+            pagos. Sem promessa de aprovação ou cobertura integral do edital.
           </p>
         </div>
         {!available && (

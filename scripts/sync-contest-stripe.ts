@@ -26,6 +26,10 @@ async function main() {
         stripeMode: mode,
         contests: CONTEST_CATALOG.length,
         contestPrices: CONTEST_CATALOG.length * 2,
+        contestBilling: CONTEST_ACCESS_OPTIONS.map((option) => ({
+          interval: option.interval,
+          amountCents: option.amountCents,
+        })),
         masterPrices: PLANS.length,
         writes: false,
       }),
@@ -118,6 +122,7 @@ async function main() {
             {
               product: product.id,
               unit_amount: option.amountCents,
+              recurring: { interval: option.interval },
               currency: "brl",
               lookup_key: lookup,
               metadata: { ...metadata, access_months: String(option.months) },
@@ -126,7 +131,8 @@ async function main() {
           ));
         if (
           price.livemode !== (mode === "live") ||
-          price.recurring ||
+          price.recurring?.interval !== option.interval ||
+          price.recurring?.interval_count !== 1 ||
           price.product !== product.id ||
           price.unit_amount !== option.amountCents ||
           price.currency !== "brl" ||
@@ -135,9 +141,9 @@ async function main() {
           throw new Error("Preço existente incompatível.");
         ids.push(price.id);
       }
-      await db`insert into contest_store_products (slug,stripe_product_id,stripe_price_6m,stripe_price_12m,stripe_mode)
+      await db`insert into contest_store_products (slug,stripe_product_id,stripe_price_monthly,stripe_price_annual,stripe_mode)
         values (${contest.slug},${product.id},${ids[0]},${ids[1]},${mode})
-        on conflict(slug) do update set stripe_product_id=excluded.stripe_product_id,stripe_price_6m=excluded.stripe_price_6m,stripe_price_12m=excluded.stripe_price_12m,stripe_mode=excluded.stripe_mode,updated_at=now()
+        on conflict(slug) do update set stripe_product_id=excluded.stripe_product_id,stripe_price_monthly=excluded.stripe_price_monthly,stripe_price_annual=excluded.stripe_price_annual,stripe_mode=excluded.stripe_mode,updated_at=now()
         where contest_store_products.stripe_mode=excluded.stripe_mode or contest_store_products.stripe_product_id is null`;
     }
     for (const plan of PLANS) {

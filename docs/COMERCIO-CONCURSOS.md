@@ -2,6 +2,11 @@
 
 Data: 05/09/2026. Projeto LeiProva / marca Editalume. Branch `codex/concursos-premium`.
 
+> **Preços/periodicidade superados:** a regra vigente é R$67/mês ou R$347/ano
+> por concurso, com renovação recorrente e Master inalterado. Veja
+> [assinaturas por concurso](ASSINATURAS-POR-CONCURSO.md). O restante desta
+> página registra a implementação histórica de pagamento único.
+
 > Continuação autorizada para produção: [publicação e abertura comercial](PRODUCAO-CONCURSOS.md). O texto abaixo registra a entrega local anterior. O sincronizador agora também prepara modo live, com verificação explícita de conta/ambiente; isso não significa que tenha sido aplicado na Stripe.
 
 ## Entrega implementada

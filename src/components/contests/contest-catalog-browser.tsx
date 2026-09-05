@@ -96,8 +96,9 @@ export function ContestCatalogBrowser() {
         </label>
       </div>
       <p className={styles.catalogCount} aria-live="polite">
-        {matches.length} concursos em planejamento · compra avulsa prevista a
-        partir de {formatBRL(CONTEST_ACCESS_OPTIONS[0].amountCents)}
+        {matches.length} concursos em planejamento · assinatura individual
+        prevista a partir de {formatBRL(CONTEST_ACCESS_OPTIONS[0].amountCents)}
+        /mês
       </p>
       {contestCategories.map((item) => {
         const contests = matches.filter(

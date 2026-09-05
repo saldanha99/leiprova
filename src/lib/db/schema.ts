@@ -35,7 +35,8 @@ const timestamps = {
 
 export type ContestOrderLine = {
   productSlug: string;
-  accessKey: "6m" | "12m";
+  // Chaves antigas permanecem válidas somente para o histórico de pagamento único.
+  accessKey: "6m" | "12m" | "monthly" | "annual";
   months: number;
   amountCents: number;
   stripePriceId: string;
@@ -55,6 +56,8 @@ export const contestStoreProducts = pgTable(
     stripeProductId: text("stripe_product_id").unique(),
     stripePrice6m: text("stripe_price_6m").unique(),
     stripePrice12m: text("stripe_price_12m").unique(),
+    stripePriceMonthly: text("stripe_price_monthly").unique(),
+    stripePriceAnnual: text("stripe_price_annual").unique(),
     stripeMode: text("stripe_mode").notNull().default("test"),
     releasedAt: timestamp("released_at", { withTimezone: true }),
     releasedByUserId: bigint("released_by_user_id", {
@@ -93,6 +96,11 @@ export const contestOrders = pgTable(
     lines: jsonb("lines").$type<ContestOrderLine[]>().notNull(),
     stripeSessionId: text("stripe_session_id").unique(),
     stripePaymentIntentId: text("stripe_payment_intent_id").unique(),
+    stripeSubscriptionId: text("stripe_subscription_id").unique(),
+    stripeCustomerId: text("stripe_customer_id"),
+    subscriptionStatus: text("subscription_status"),
+    cancelAtPeriodEnd: boolean("cancel_at_period_end").notNull().default(false),
+    paidThrough: timestamp("paid_through", { withTimezone: true }),
     stripeMode: text("stripe_mode").notNull(),
     ...timestamps,
   },
@@ -155,6 +163,33 @@ export const contestPurchases = pgTable(
     check(
       "contest_purchases_period_check",
       sql`${table.accessEndsAt} > ${table.accessStartsAt}`,
+    ),
+  ],
+);
+
+// Cada ciclo pago tem sua própria referência: reembolso antigo não revoga um ciclo novo.
+export const contestBillingInvoices = pgTable(
+  "contest_billing_invoices",
+  {
+    invoiceId: text("invoice_id").primaryKey(),
+    orderId: text("order_id")
+      .notNull()
+      .references(() => contestOrders.id, { onDelete: "cascade" }),
+    paymentIntentId: text("payment_intent_id").notNull().unique(),
+    periodStart: timestamp("period_start", { withTimezone: true }).notNull(),
+    periodEnd: timestamp("period_end", { withTimezone: true }).notNull(),
+    status: text("status").notNull().default("paid"),
+    ...timestamps,
+  },
+  (table) => [
+    index("contest_billing_invoices_order_idx").on(table.orderId),
+    check(
+      "contest_billing_invoices_period_check",
+      sql`${table.periodEnd} > ${table.periodStart}`,
+    ),
+    check(
+      "contest_billing_invoices_status_check",
+      sql`${table.status} in ('paid','refunded','disputed')`,
     ),
   ],
 );

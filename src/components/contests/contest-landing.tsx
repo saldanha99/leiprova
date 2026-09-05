@@ -69,7 +69,7 @@ export function ContestLanding({
     {
       question: "A assinatura é exclusiva para este concurso?",
       answer:
-        "A compra avulsa é exclusiva para esta edição, pelo prazo escolhido e sem renovação automática. O Master é uma assinatura para todos os concursos efetivamente liberados durante a vigência. Nenhum plano transforma uma edição em preparação em curso pronto.",
+        "A assinatura individual é exclusiva para esta edição, com cobrança mensal de R$ 67 ou anual de R$ 347. O Master é uma assinatura separada para todos os concursos efetivamente liberados durante a vigência. Nenhum plano transforma uma edição em preparação em curso pronto.",
     },
     {
       question: "Consigo estudar pelo celular ou tablet?",
@@ -90,7 +90,7 @@ export function ContestLanding({
     {
       question: "Os valores incluem parcelamento ou teste gratuito?",
       answer:
-        "Não há promessa de parcelamento ou período gratuito nesta página. O valor mensal equivalente do Master Anual serve apenas para comparação: o total é cobrado por ciclo de 12 meses quando a contratação estiver aberta. O avulso é pagamento único, sem renovação automática. Confira as condições antes da compra.",
+        "Não há promessa de parcelamento ou período gratuito. O valor mensal equivalente do Anual serve apenas para comparação: R$ 347 são cobrados de uma vez por ano. Os planos individuais têm renovação automática mensal ou anual. Cancele a renovação na sua conta e mantenha o acesso até o fim do período pago. O Master tem preços próprios.",
     },
     {
       question: "Onde confiro as informações atualizadas do concurso?",

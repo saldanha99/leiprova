@@ -13,6 +13,7 @@ import {
 } from "@/lib/db/schema";
 import { getPlanByStripePriceId } from "@/lib/stripe";
 import { processContestStripeEvent } from "@/lib/commerce/webhook";
+import { processContestSubscriptionEvent } from "@/lib/commerce/subscription-webhook";
 
 import {
   isLeiProvaMetadata,
@@ -32,6 +33,7 @@ type BillingContext = {
 };
 
 export async function processStripeEvent(event: Stripe.Event) {
+  if (await processContestSubscriptionEvent(event)) return;
   if (await processContestStripeEvent(event)) return;
   switch (event.type) {
     case "checkout.session.completed":

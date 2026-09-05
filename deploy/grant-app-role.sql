@@ -45,7 +45,7 @@ grant select on
 to :app_user;
 
 -- Pedidos avulsos só são atendidos por rotas autenticadas e webhook assinado.
-grant select, insert, update on contest_orders, contest_purchases to :app_user;
+grant select, insert, update on contest_orders, contest_purchases, contest_billing_invoices to :app_user;
 
 grant select (
   id,

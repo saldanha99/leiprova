@@ -83,9 +83,10 @@ export function CourseHero({
             <div className={styles.heroOffer}>
               <span>ACESSO INDIVIDUAL {available ? "" : "PREVISTO"}</span>
               <strong>
-                A partir de {formatBRL(CONTEST_ACCESS_OPTIONS[0].amountCents)}
+                {formatBRL(CONTEST_ACCESS_OPTIONS[0].amountCents)}/mês ou{" "}
+                {formatBRL(CONTEST_ACCESS_OPTIONS[1].amountCents)}/ano
               </strong>
-              <small>Pagamento único · sem renovação automática</small>
+              <small>Um concurso · renovação mensal ou anual</small>
             </div>
             <p className={styles.availability}>
               <ShieldCheck size={15} aria-hidden="true" />

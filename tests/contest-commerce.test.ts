@@ -28,7 +28,7 @@ const police = CONTEST_CATALOG.filter(
 );
 const cart = () => ({
   attemptId: randomUUID(),
-  items: [{ productSlug: police[0].slug, accessKey: "6m" }],
+  items: [{ productSlug: police[0].slug, accessKey: "monthly" }],
 });
 describe("catálogo comercial por edição", () => {
   it("preserva as 75 ofertas e oito categorias sem duplicar produtos regionais", () => {
@@ -95,19 +95,30 @@ describe("catálogo comercial por edição", () => {
   });
 });
 describe("carrinho explícito e sem manipulação de preço", () => {
-  it("aceita um concurso e soma 67 ou 87 reais", () => {
+  it("aceita um concurso e soma 67 mensais ou 347 anuais", () => {
     expect(contestCartSchema.safeParse(cart()).success).toBe(true);
-    expect(contestCartTotal([{ accessKey: "6m" }])).toBe(6700);
-    expect(contestCartTotal([{ accessKey: "12m" }])).toBe(8700);
+    expect(contestCartTotal([{ accessKey: "monthly" }])).toBe(6700);
+    expect(contestCartTotal([{ accessKey: "annual" }])).toBe(34700);
   });
   it("soma adicionais sem descontos ou taxas escondidas", () => {
     expect(
       contestCartTotal([
-        { accessKey: "12m" },
-        { accessKey: "6m" },
-        { accessKey: "6m" },
+        { accessKey: "annual" },
+        { accessKey: "annual" },
+        { accessKey: "annual" },
       ]),
-    ).toBe(22100);
+    ).toBe(104100);
+  });
+  it("recusa misturar mensal e anual na mesma assinatura", () => {
+    expect(
+      contestCartSchema.safeParse({
+        ...cart(),
+        items: [
+          cart().items[0],
+          { productSlug: police[1].slug, accessKey: "annual" },
+        ],
+      }).success,
+    ).toBe(false);
   });
   it("rejeita preço e Stripe ID enviados pelo navegador", () => {
     expect(
@@ -124,7 +135,7 @@ describe("carrinho explícito e sem manipulação de preço", () => {
     expect(
       contestCartSchema.safeParse({
         ...cart(),
-        items: [cart().items[0], { ...cart().items[0], accessKey: "12m" }],
+        items: [cart().items[0], { ...cart().items[0], accessKey: "annual" }],
       }).success,
     ).toBe(false);
   });
@@ -133,9 +144,9 @@ describe("carrinho explícito e sem manipulação de preço", () => {
       [],
       Array.from({ length: 4 }, (_, i) => ({
         productSlug: police[i].slug,
-        accessKey: "6m",
+        accessKey: "monthly",
       })),
-      [{ productSlug: "nao-existe", accessKey: "6m" }],
+      [{ productSlug: "nao-existe", accessKey: "monthly" }],
     ])
       expect(contestCartSchema.safeParse({ ...cart(), items }).success).toBe(
         false,
@@ -147,7 +158,7 @@ describe("carrinho explícito e sem manipulação de preço", () => {
         ...cart(),
         items: [
           cart().items[0],
-          { productSlug: CONTEST_CATALOG[0].slug, accessKey: "6m" },
+          { productSlug: CONTEST_CATALOG[0].slug, accessKey: "monthly" },
         ],
       }).success,
     ).toBe(false);
@@ -157,7 +168,7 @@ describe("carrinho explícito e sem manipulação de preço", () => {
       createElement(ContestCart, {
         contest: police[0],
         related: [police[1], police[2]],
-        initialAccess: "6m",
+        initialAccess: "monthly",
         available: false,
       }),
     );

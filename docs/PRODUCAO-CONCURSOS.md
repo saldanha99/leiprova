@@ -1,5 +1,11 @@
 # Publicação e abertura comercial — 05/09/2026
 
+**Alteração comercial posterior:** R$67/mês ou R$347/ano recorrentes por
+concurso substituem os preços avulsos históricos abaixo. Master preservado.
+Leia [assinaturas por concurso](ASSINATURAS-POR-CONCURSO.md) para migration 0032,
+compatibilidade, verificação e resultado da nova publicação. Vendas reais
+permanecem condicionadas à homologação Stripe e à liberação editorial.
+
 **Atualização posterior:** redesenho dos cursos publicado em `c4f70c3`, com
 75 URLs verificadas e acervo preservado. A sessão autenticada da Stripe na
 aba original do perfil Vini está acessível, conta `acct_1TCQvlBkl6797u2u`.

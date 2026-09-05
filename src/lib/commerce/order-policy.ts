@@ -9,7 +9,7 @@ export const contestCartSchema = z
         z
           .object({
             productSlug: z.string().min(1).max(180),
-            accessKey: z.enum(["6m", "12m"]),
+            accessKey: z.enum(["monthly", "annual"]),
           })
           .strict(),
       )
@@ -18,6 +18,12 @@ export const contestCartSchema = z
   })
   .strict()
   .superRefine((cart, ctx) => {
+    if (new Set(cart.items.map((item) => item.accessKey)).size > 1)
+      ctx.addIssue({
+        code: "custom",
+        message:
+          "Todos os concursos da assinatura devem ter a mesma periodicidade.",
+      });
     if (
       new Set(cart.items.map((item) => item.productSlug)).size !==
       cart.items.length
