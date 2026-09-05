@@ -12,6 +12,7 @@ import {
   users,
 } from "@/lib/db/schema";
 import { getPlanByStripePriceId } from "@/lib/stripe";
+import { processContestStripeEvent } from "@/lib/commerce/webhook";
 
 import {
   isLeiProvaMetadata,
@@ -31,18 +32,25 @@ type BillingContext = {
 };
 
 export async function processStripeEvent(event: Stripe.Event) {
+  if (await processContestStripeEvent(event)) return;
   switch (event.type) {
     case "checkout.session.completed":
     case "checkout.session.async_payment_succeeded":
     case "checkout.session.async_payment_failed":
     case "checkout.session.expired":
-      await handleCheckoutSession(event.data.object as Stripe.Checkout.Session, event.type);
+      await handleCheckoutSession(
+        event.data.object as Stripe.Checkout.Session,
+        event.type,
+      );
       return;
 
     case "customer.subscription.created":
     case "customer.subscription.updated":
     case "customer.subscription.deleted":
-      await handleSubscription(event.data.object as Stripe.Subscription, event.type);
+      await handleSubscription(
+        event.data.object as Stripe.Subscription,
+        event.type,
+      );
       return;
 
     case "invoice.paid":
@@ -72,7 +80,8 @@ async function handleCheckoutSession(
     metadata,
     checkoutSessionId: session.id,
   });
-  if (!context || !attemptId) throw new Error("Checkout LeiProva sem tentativa correspondente.");
+  if (!context || !attemptId)
+    throw new Error("Checkout LeiProva sem tentativa correspondente.");
 
   const customerId = objectId(session.customer);
   if (customerId) await attachCustomerToUser(context.userId, customerId);
@@ -84,7 +93,13 @@ async function handleCheckoutSession(
     session.payment_status === "paid" ||
     session.payment_status === "no_payment_required";
 
-  const attemptStatus = failed ? "failed" : expired ? "expired" : paid ? "completed" : "session_created";
+  const attemptStatus = failed
+    ? "failed"
+    : expired
+      ? "expired"
+      : paid
+        ? "completed"
+        : "session_created";
 
   await getDb()
     .update(checkoutAttempts)
@@ -131,7 +146,10 @@ async function notifyPurchaseAccess(userId: number, checkoutAttemptId: string) {
     await sendPurchaseAccessEmail({ userId, checkoutAttemptId });
   } catch {
     // A liberação da compra não pode ser revertida por indisponibilidade do canal de e-mail.
-    console.error("purchase_access_notification_failed", { userId, checkoutAttemptId });
+    console.error("purchase_access_notification_failed", {
+      userId,
+      checkoutAttemptId,
+    });
   }
 }
 
@@ -151,13 +169,16 @@ async function handleSubscription(
     providerSubscriptionId: subscription.id,
     priceId: firstPriceId,
   });
-  if (!context) throw new Error("Assinatura LeiProva sem usuário ou plano correspondente.");
+  if (!context)
+    throw new Error("Assinatura LeiProva sem usuário ou plano correspondente.");
 
   const customerId = objectId(subscription.customer);
   if (customerId) await attachCustomerToUser(context.userId, customerId);
 
   const status =
-    eventType === "customer.subscription.deleted" ? "canceled" : normalizeSubscriptionStatus(subscription.status);
+    eventType === "customer.subscription.deleted"
+      ? "canceled"
+      : normalizeSubscriptionStatus(subscription.status);
   const periods = subscriptionPeriod(subscription);
 
   await upsertRecurringSubscription({
@@ -180,7 +201,10 @@ async function handleSubscription(
 
 async function handleInvoice(
   invoice: Stripe.Invoice,
-  eventType: "invoice.paid" | "invoice.payment_failed" | "invoice.payment_action_required",
+  eventType:
+    | "invoice.paid"
+    | "invoice.payment_failed"
+    | "invoice.payment_action_required",
 ) {
   const subscriptionDetails = invoice.parent?.subscription_details;
   const legacyInvoice = invoice as Stripe.Invoice & {
@@ -188,20 +212,25 @@ async function handleInvoice(
     subscription_details?: { metadata?: Stripe.Metadata | null } | null;
   };
   const metadata =
-    subscriptionDetails?.metadata ?? legacyInvoice.subscription_details?.metadata ?? invoice.metadata;
+    subscriptionDetails?.metadata ??
+    legacyInvoice.subscription_details?.metadata ??
+    invoice.metadata;
   if (!isLeiProvaMetadata(metadata)) return;
 
   const providerSubscriptionId =
-    objectId(subscriptionDetails?.subscription) ?? objectId(legacyInvoice.subscription);
+    objectId(subscriptionDetails?.subscription) ??
+    objectId(legacyInvoice.subscription);
   if (!providerSubscriptionId) return;
 
   const context = await resolveBillingContext({
     metadata,
     providerSubscriptionId,
   });
-  if (!context) throw new Error("Fatura LeiProva sem assinatura correspondente.");
+  if (!context)
+    throw new Error("Fatura LeiProva sem assinatura correspondente.");
 
-  const status: LocalSubscriptionStatus = eventType === "invoice.paid" ? "active" : "past_due";
+  const status: LocalSubscriptionStatus =
+    eventType === "invoice.paid" ? "active" : "past_due";
   await upsertRecurringSubscription({
     context,
     providerSubscriptionId,
@@ -284,10 +313,14 @@ async function resolveBillingContext({
   if (!userId) return null;
 
   const pricePlan = getPlanByStripePriceId(priceId);
-  const desiredPlanSlug = pricePlan?.slug ?? metadata?.plan_slug ?? attempt?.planSlug ?? null;
+  const desiredPlanSlug =
+    pricePlan?.slug ?? metadata?.plan_slug ?? attempt?.planSlug ?? null;
   let planId = existing?.planId ?? attempt?.planId ?? null;
 
-  if (desiredPlanSlug && (!attempt || desiredPlanSlug !== attempt.planSlug || !planId)) {
+  if (
+    desiredPlanSlug &&
+    (!attempt || desiredPlanSlug !== attempt.planSlug || !planId)
+  ) {
     const [storedPlan] = await db
       .select({ id: billingPlans.id })
       .from(billingPlans)
@@ -303,7 +336,10 @@ async function resolveBillingContext({
     planId,
     attemptId: attempt?.id ?? metadataAttemptId,
     checkoutSessionId:
-      checkoutSessionId ?? attempt?.providerSessionId ?? existing?.providerCheckoutSessionId ?? null,
+      checkoutSessionId ??
+      attempt?.providerSessionId ??
+      existing?.providerCheckoutSessionId ??
+      null,
   };
 }
 
@@ -335,12 +371,14 @@ async function upsertRecurringSubscription({
   if (context.checkoutSessionId) {
     updateValues.providerCheckoutSessionId = context.checkoutSessionId;
   }
-  if (currentPeriodStart !== undefined) updateValues.currentPeriodStart = currentPeriodStart;
+  if (currentPeriodStart !== undefined)
+    updateValues.currentPeriodStart = currentPeriodStart;
   if (currentPeriodEnd !== undefined) {
     updateValues.currentPeriodEnd = currentPeriodEnd;
     updateValues.accessEndsAt = currentPeriodEnd;
   }
-  if (cancelAtPeriodEnd !== undefined) updateValues.cancelAtPeriodEnd = cancelAtPeriodEnd;
+  if (cancelAtPeriodEnd !== undefined)
+    updateValues.cancelAtPeriodEnd = cancelAtPeriodEnd;
   if (canceledAt !== undefined) updateValues.canceledAt = canceledAt;
 
   await getDb()

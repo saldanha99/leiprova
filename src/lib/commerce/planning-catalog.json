@@ -1,0 +1,752 @@
+[
+  {
+    "slug": "sefaz-sc-auditor-area-direito-2026",
+    "categorySlug": "fiscal-e-controle",
+    "acronym": "SEFAZ-SC",
+    "role": "Auditor — Área Direito",
+    "editionLabel": "2026",
+    "jurisdictionCodes": ["SC"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/reta-final-auditor-sefaz-sc"
+  },
+  {
+    "slug": "enac-exame-nacional-dos-cartorios-2026-2",
+    "categorySlug": "cartorios",
+    "acronym": "ENAC",
+    "role": "Exame Nacional dos Cartórios",
+    "editionLabel": "2026.2",
+    "jurisdictionCodes": ["BR"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/retafinal/exame-nacional-dos-cartorios"
+  },
+  {
+    "slug": "tj-rs-juiz-de-direito-2026",
+    "categorySlug": "carreiras-juridicas",
+    "acronym": "TJ-RS",
+    "role": "Juiz de Direito",
+    "editionLabel": "2026",
+    "jurisdictionCodes": ["RS"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/retafinal/juiz-de-direito-tj-rs"
+  },
+  {
+    "slug": "sefaz-al-auditor-fiscal-2026",
+    "categorySlug": "fiscal-e-controle",
+    "acronym": "SEFAZ-AL",
+    "role": "Auditor Fiscal",
+    "editionLabel": "2026",
+    "jurisdictionCodes": ["AL"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/reta-final-sefaz-al"
+  },
+  {
+    "slug": "enam-exame-nacional-da-magistratura-2026-2",
+    "categorySlug": "carreiras-juridicas",
+    "acronym": "ENAM",
+    "role": "Exame Nacional da Magistratura",
+    "editionLabel": "2026.2",
+    "jurisdictionCodes": ["BR"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/retafinal/exame-nacional-da-magistratura"
+  },
+  {
+    "slug": "trf-5-juiz-federal-5-regiao",
+    "categorySlug": "carreiras-juridicas",
+    "acronym": "TRF-5",
+    "role": "Juiz Federal",
+    "editionLabel": "5ª Região",
+    "jurisdictionCodes": ["AL", "CE", "PB", "PE", "RN", "SE"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/reta-final/concurso-juiz-federal-trf-5"
+  },
+  {
+    "slug": "pc-ba-delegado-2026",
+    "categorySlug": "carreiras-policiais",
+    "acronym": "PC-BA",
+    "role": "Delegado",
+    "editionLabel": "2026",
+    "jurisdictionCodes": ["BA"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/reta-final/delegado-pc-ba"
+  },
+  {
+    "slug": "pc-ba-escrivao-e-investigador-2026",
+    "categorySlug": "carreiras-policiais",
+    "acronym": "PC-BA",
+    "role": "Escrivão e Investigador",
+    "editionLabel": "2026",
+    "jurisdictionCodes": ["BA"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/reta-final/escrivao-investigador-pc-ba"
+  },
+  {
+    "slug": "pc-ma-delegado-2026",
+    "categorySlug": "carreiras-policiais",
+    "acronym": "PC-MA",
+    "role": "Delegado",
+    "editionLabel": "2026",
+    "jurisdictionCodes": ["MA"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/reta-final/delegado-pc-ma"
+  },
+  {
+    "slug": "pc-ma-oficial-investigador-2026",
+    "categorySlug": "carreiras-policiais",
+    "acronym": "PC-MA",
+    "role": "Oficial Investigador",
+    "editionLabel": "2026",
+    "jurisdictionCodes": ["MA"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/reta-final/oficial-investigador-pc-ma"
+  },
+  {
+    "slug": "tc-df-analista-2026",
+    "categorySlug": "fiscal-e-controle",
+    "acronym": "TC-DF",
+    "role": "Analista",
+    "editionLabel": "2026",
+    "jurisdictionCodes": ["DF"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/reta-final/analista-tc-df"
+  },
+  {
+    "slug": "tce-ma-analista-e-tecnico-2026",
+    "categorySlug": "fiscal-e-controle",
+    "acronym": "TCE-MA",
+    "role": "Analista e Técnico",
+    "editionLabel": "2026",
+    "jurisdictionCodes": ["MA"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/reta-final/tce-ma"
+  },
+  {
+    "slug": "tce-sp-auditor-dipe-direito-2026",
+    "categorySlug": "fiscal-e-controle",
+    "acronym": "TCE-SP",
+    "role": "Auditor DIPE — Direito",
+    "editionLabel": "2026",
+    "jurisdictionCodes": ["SP"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/reta-final-auditor-tce-sp"
+  },
+  {
+    "slug": "pc-al-agente-e-escrivao-2026",
+    "categorySlug": "carreiras-policiais",
+    "acronym": "PC-AL",
+    "role": "Agente e Escrivão",
+    "editionLabel": "2026",
+    "jurisdictionCodes": ["AL"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/reta-final-pc-al"
+  },
+  {
+    "slug": "pgm-manaus-procurador-do-municipio-2026",
+    "categorySlug": "procuradorias",
+    "acronym": "PGM Manaus",
+    "role": "Procurador do Município",
+    "editionLabel": "2026",
+    "jurisdictionCodes": ["AM"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/reta-final-procurador-manaus"
+  },
+  {
+    "slug": "tj-pe-juiz-de-direito-2026",
+    "categorySlug": "carreiras-juridicas",
+    "acronym": "TJ-PE",
+    "role": "Juiz de Direito",
+    "editionLabel": "2026",
+    "jurisdictionCodes": ["PE"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/reta-final/juiz-de-direito-tj-pe"
+  },
+  {
+    "slug": "pge-al-procurador-do-estado-reta-final",
+    "categorySlug": "procuradorias",
+    "acronym": "PGE-AL",
+    "role": "Procurador do Estado",
+    "editionLabel": "Reta Final",
+    "jurisdictionCodes": ["AL"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/reta-final/procurador-do-estado-al"
+  },
+  {
+    "slug": "tj-dft-juiz-de-direito-reta-final",
+    "categorySlug": "carreiras-juridicas",
+    "acronym": "TJ-DFT",
+    "role": "Juiz de Direito",
+    "editionLabel": "Reta Final",
+    "jurisdictionCodes": ["DF"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/reta-final/curso-juiz-de-direito-tj-dft"
+  },
+  {
+    "slug": "pc-rj-delegado-2026",
+    "categorySlug": "carreiras-policiais",
+    "acronym": "PC-RJ",
+    "role": "Delegado",
+    "editionLabel": "2026",
+    "jurisdictionCodes": ["RJ"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/reta-final/delegado-pc-rj"
+  },
+  {
+    "slug": "pp-ma-inspetor-2026",
+    "categorySlug": "carreiras-policiais",
+    "acronym": "PP-MA",
+    "role": "Inspetor",
+    "editionLabel": "2026",
+    "jurisdictionCodes": ["MA"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/concurso-pc-ma-2026"
+  },
+  {
+    "slug": "pc-pr-delegado-2026",
+    "categorySlug": "carreiras-policiais",
+    "acronym": "PC-PR",
+    "role": "Delegado",
+    "editionLabel": "2026",
+    "jurisdictionCodes": ["PR"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/reta-final/delegado-pcpr"
+  },
+  {
+    "slug": "pc-pr-agente-2026",
+    "categorySlug": "carreiras-policiais",
+    "acronym": "PC-PR",
+    "role": "Agente",
+    "editionLabel": "2026",
+    "jurisdictionCodes": ["PR"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/reta-final/agente-pc-pr"
+  },
+  {
+    "slug": "pp-rn-policia-penal-2026",
+    "categorySlug": "carreiras-policiais",
+    "acronym": "PP-RN",
+    "role": "Polícia Penal",
+    "editionLabel": "2026",
+    "jurisdictionCodes": ["RN"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/concurso-policia-penal-rn"
+  },
+  {
+    "slug": "prf-policial-rodoviario-federal-2026",
+    "categorySlug": "carreiras-policiais",
+    "acronym": "PRF",
+    "role": "Policial Rodoviário Federal",
+    "editionLabel": "2026",
+    "jurisdictionCodes": ["BR"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/policial-rodoviario-federal-prf"
+  },
+  {
+    "slug": "tj-rs-cartorios-reta-final",
+    "categorySlug": "cartorios",
+    "acronym": "TJ-RS",
+    "role": "Cartórios",
+    "editionLabel": "Reta Final",
+    "jurisdictionCodes": ["RS"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/reta-final/cartorios-tj-rs"
+  },
+  {
+    "slug": "tj-pr-cartorios-reta-final",
+    "categorySlug": "cartorios",
+    "acronym": "TJ-PR",
+    "role": "Cartórios",
+    "editionLabel": "Reta Final",
+    "jurisdictionCodes": ["PR"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/retafinal/cartorios--tj-pr"
+  },
+  {
+    "slug": "tj-ce-cartorios-reta-final",
+    "categorySlug": "cartorios",
+    "acronym": "TJ-CE",
+    "role": "Cartórios",
+    "editionLabel": "Reta Final",
+    "jurisdictionCodes": ["CE"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/retafinal/concurso-cartorio-tj-ce"
+  },
+  {
+    "slug": "tj-mg-cartorios-reta-final",
+    "categorySlug": "cartorios",
+    "acronym": "TJ-MG",
+    "role": "Cartórios",
+    "editionLabel": "Reta Final",
+    "jurisdictionCodes": ["MG"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/reta-final/cartorio-tj-mg"
+  },
+  {
+    "slug": "tj-mt-cartorios-reta-final",
+    "categorySlug": "cartorios",
+    "acronym": "TJ-MT",
+    "role": "Cartórios",
+    "editionLabel": "Reta Final",
+    "jurisdictionCodes": ["MT"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/concurso-cartorio-tj-mt"
+  },
+  {
+    "slug": "agu-advocacia-geral-da-uniao-pre-edital",
+    "categorySlug": "procuradorias",
+    "acronym": "AGU",
+    "role": "Advocacia-Geral da União",
+    "editionLabel": "Pré-edital",
+    "jurisdictionCodes": ["BR"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/reta-final/reta-final-agu"
+  },
+  {
+    "slug": "mpt-procurador-do-trabalho-2024",
+    "categorySlug": "trabalhistas",
+    "acronym": "MPT",
+    "role": "Procurador do Trabalho",
+    "editionLabel": "2024",
+    "jurisdictionCodes": ["BR"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/reta-final/procurador-do-trabalho-mpt"
+  },
+  {
+    "slug": "tst-magistratura-do-trabalho-pre-edital",
+    "categorySlug": "trabalhistas",
+    "acronym": "TST",
+    "role": "Magistratura do Trabalho",
+    "editionLabel": "Pré-edital",
+    "jurisdictionCodes": ["BR"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/reta-final/juiz-do-trabalho-tst"
+  },
+  {
+    "slug": "pge-rj-procurador-do-estado-reta-final",
+    "categorySlug": "procuradorias",
+    "acronym": "PGE-RJ",
+    "role": "Procurador do Estado",
+    "editionLabel": "Reta Final",
+    "jurisdictionCodes": ["RJ"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/reta-final/procurador-do-estado-pge-rj"
+  },
+  {
+    "slug": "tj-ce-analista-e-tecnico-2026",
+    "categorySlug": "tribunais",
+    "acronym": "TJ-CE",
+    "role": "Analista e Técnico",
+    "editionLabel": "2026",
+    "jurisdictionCodes": ["CE"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/concurso-tj-ce"
+  },
+  {
+    "slug": "mpe-mt-promotor-de-justica-2026",
+    "categorySlug": "carreiras-juridicas",
+    "acronym": "MPE-MT",
+    "role": "Promotor de Justiça",
+    "editionLabel": "2026",
+    "jurisdictionCodes": ["MT"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/reta-final/promotor-mp-mt"
+  },
+  {
+    "slug": "mpe-rj-promotor-de-justica-2026",
+    "categorySlug": "carreiras-juridicas",
+    "acronym": "MPE-RJ",
+    "role": "Promotor de Justiça",
+    "editionLabel": "2026",
+    "jurisdictionCodes": ["RJ"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/reta-final/promotor-mp-rj"
+  },
+  {
+    "slug": "dpe-ba-defensor-publico-2026",
+    "categorySlug": "carreiras-juridicas",
+    "acronym": "DPE-BA",
+    "role": "Defensor Público",
+    "editionLabel": "2026",
+    "jurisdictionCodes": ["BA"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/retafinal/defensor-publico-dpe-ba"
+  },
+  {
+    "slug": "pc-df-delegado-de-policia-reta-final",
+    "categorySlug": "carreiras-policiais",
+    "acronym": "PC-DF",
+    "role": "Delegado de Polícia",
+    "editionLabel": "Reta Final",
+    "jurisdictionCodes": ["DF"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/reta-final/delegado-pc-df"
+  },
+  {
+    "slug": "tj-mg-juiz-de-direito-2026",
+    "categorySlug": "carreiras-juridicas",
+    "acronym": "TJ-MG",
+    "role": "Juiz de Direito",
+    "editionLabel": "2026",
+    "jurisdictionCodes": ["MG"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/retafinal/juiz-de-direito-tj-mg"
+  },
+  {
+    "slug": "dpe-ma-defensor-publico-2026",
+    "categorySlug": "carreiras-juridicas",
+    "acronym": "DPE-MA",
+    "role": "Defensor Público",
+    "editionLabel": "2026",
+    "jurisdictionCodes": ["MA"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/reta-final/defensor-publico-dpe-ma"
+  },
+  {
+    "slug": "sefa-pa-auditor-fiscal-e-analista-reta-final",
+    "categorySlug": "fiscal-e-controle",
+    "acronym": "SEFA-PA",
+    "role": "Auditor, Fiscal e Analista",
+    "editionLabel": "Reta Final",
+    "jurisdictionCodes": ["PA"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/concurso-sefa-pa"
+  },
+  {
+    "slug": "tj-go-juiz-de-direito-2026",
+    "categorySlug": "carreiras-juridicas",
+    "acronym": "TJ-GO",
+    "role": "Juiz de Direito",
+    "editionLabel": "2026",
+    "jurisdictionCodes": ["GO"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/retafinal/juiz-de-direito-tj-go"
+  },
+  {
+    "slug": "pc-sc-agente-e-escrivao-2025-2026",
+    "categorySlug": "carreiras-policiais",
+    "acronym": "PC-SC",
+    "role": "Agente e Escrivão",
+    "editionLabel": "2025/2026",
+    "jurisdictionCodes": ["SC"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/reta-final/agente-e-escrivao-pc-sc"
+  },
+  {
+    "slug": "mpe-sc-promotor-de-justica-2025-2026",
+    "categorySlug": "carreiras-juridicas",
+    "acronym": "MPE-SC",
+    "role": "Promotor de Justiça",
+    "editionLabel": "2025/2026",
+    "jurisdictionCodes": ["SC"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/reta-final/promotor-de-justica-sc"
+  },
+  {
+    "slug": "tj-pr-juiz-de-direito-2025-2026",
+    "categorySlug": "carreiras-juridicas",
+    "acronym": "TJ-PR",
+    "role": "Juiz de Direito",
+    "editionLabel": "2025/2026",
+    "jurisdictionCodes": ["PR"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/retafinal/juiz-tj-pr"
+  },
+  {
+    "slug": "alerj-assembleia-legislativa-do-rj-reta-final",
+    "categorySlug": "area-legislativa",
+    "acronym": "ALERJ",
+    "role": "Assembleia Legislativa do RJ",
+    "editionLabel": "Reta Final",
+    "jurisdictionCodes": ["RJ"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/reta-final/concurso-alerj"
+  },
+  {
+    "slug": "trt-sp-analista-e-tecnico-2-regiao",
+    "categorySlug": "trabalhistas",
+    "acronym": "TRT-SP",
+    "role": "Analista e Técnico",
+    "editionLabel": "2ª Região",
+    "jurisdictionCodes": ["SP"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/concurso-trt-2-regiao"
+  },
+  {
+    "slug": "trt-rj-analista-e-tecnico-2025",
+    "categorySlug": "trabalhistas",
+    "acronym": "TRT-RJ",
+    "role": "Analista e Técnico",
+    "editionLabel": "2025",
+    "jurisdictionCodes": ["RJ"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/curso/trt-rj"
+  },
+  {
+    "slug": "trt-10-analista-e-tecnico-df-to",
+    "categorySlug": "trabalhistas",
+    "acronym": "TRT-10",
+    "role": "Analista e Técnico",
+    "editionLabel": "DF/TO",
+    "jurisdictionCodes": ["DF", "TO"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/retafinal/concurso-trt-10"
+  },
+  {
+    "slug": "tj-ba-juiz-de-direito-2026",
+    "categorySlug": "carreiras-juridicas",
+    "acronym": "TJ-BA",
+    "role": "Juiz de Direito",
+    "editionLabel": "2026",
+    "jurisdictionCodes": ["BA"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/retafinal/concurso-juiz-tj-ba"
+  },
+  {
+    "slug": "mp-sp-promotor-de-justica-97-concurso",
+    "categorySlug": "carreiras-juridicas",
+    "acronym": "MP-SP",
+    "role": "Promotor de Justiça",
+    "editionLabel": "97º Concurso",
+    "jurisdictionCodes": ["SP"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/reta-final/promotor-de-justica-mp-sp"
+  },
+  {
+    "slug": "trf-2-juiz-federal-2-regiao",
+    "categorySlug": "carreiras-juridicas",
+    "acronym": "TRF-2",
+    "role": "Juiz Federal",
+    "editionLabel": "2ª Região",
+    "jurisdictionCodes": ["ES", "RJ"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/concurso-juiz-federal-trf-2"
+  },
+  {
+    "slug": "dpe-mt-defensor-publico-2026",
+    "categorySlug": "carreiras-juridicas",
+    "acronym": "DPE-MT",
+    "role": "Defensor Público",
+    "editionLabel": "2026",
+    "jurisdictionCodes": ["MT"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/reta-final/defensor-dpe-mt"
+  },
+  {
+    "slug": "mpe-go-promotor-de-justica-2025",
+    "categorySlug": "carreiras-juridicas",
+    "acronym": "MPE-GO",
+    "role": "Promotor de Justiça",
+    "editionLabel": "2025",
+    "jurisdictionCodes": ["GO"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/reta-final/promotor-de-justica-mp-go"
+  },
+  {
+    "slug": "mpe-ms-promotor-de-justica-2026",
+    "categorySlug": "carreiras-juridicas",
+    "acronym": "MPE-MS",
+    "role": "Promotor de Justiça",
+    "editionLabel": "2026",
+    "jurisdictionCodes": ["MS"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/reta-final/promotor-de-justica-mp-ms"
+  },
+  {
+    "slug": "pp-rs-policial-analista-e-tecnico-2026",
+    "categorySlug": "carreiras-policiais",
+    "acronym": "PP-RS",
+    "role": "Policial, Analista e Técnico",
+    "editionLabel": "2026",
+    "jurisdictionCodes": ["RS"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/concurso-pp-rs"
+  },
+  {
+    "slug": "tj-ms-cartorios-reta-final",
+    "categorySlug": "cartorios",
+    "acronym": "TJ-MS",
+    "role": "Cartórios",
+    "editionLabel": "Reta Final",
+    "jurisdictionCodes": ["MS"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/reta-final/cartorios-tj-ms"
+  },
+  {
+    "slug": "sefaz-ce-auditor-fiscal-2026",
+    "categorySlug": "fiscal-e-controle",
+    "acronym": "SEFAZ-CE",
+    "role": "Auditor Fiscal",
+    "editionLabel": "2026",
+    "jurisdictionCodes": ["CE"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/auditor-fiscal-sefaz-ce"
+  },
+  {
+    "slug": "sefaz-mt-fiscal-de-tributos-estaduais-reta-final",
+    "categorySlug": "fiscal-e-controle",
+    "acronym": "SEFAZ-MT",
+    "role": "Fiscal de Tributos Estaduais",
+    "editionLabel": "Reta Final",
+    "jurisdictionCodes": ["MT"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/reta-final-sefaz-mt"
+  },
+  {
+    "slug": "sefaz-rn-auditor-fiscal-reta-final",
+    "categorySlug": "fiscal-e-controle",
+    "acronym": "SEFAZ-RN",
+    "role": "Auditor Fiscal",
+    "editionLabel": "Reta Final",
+    "jurisdictionCodes": ["RN"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/concurso-sefaz-rn"
+  },
+  {
+    "slug": "sefaz-sp-auditor-fiscal-reta-final",
+    "categorySlug": "fiscal-e-controle",
+    "acronym": "SEFAZ-SP",
+    "role": "Auditor Fiscal",
+    "editionLabel": "Reta Final",
+    "jurisdictionCodes": ["SP"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/sefaz-sp"
+  },
+  {
+    "slug": "sefaz-go-auditor-fiscal-reta-final",
+    "categorySlug": "fiscal-e-controle",
+    "acronym": "SEFAZ-GO",
+    "role": "Auditor Fiscal",
+    "editionLabel": "Reta Final",
+    "jurisdictionCodes": ["GO"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/concurso-sefaz-go"
+  },
+  {
+    "slug": "tce-rn-auditor-2026",
+    "categorySlug": "fiscal-e-controle",
+    "acronym": "TCE-RN",
+    "role": "Auditor",
+    "editionLabel": "2026",
+    "jurisdictionCodes": ["RN"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/retafinal/concurso-tce-rn"
+  },
+  {
+    "slug": "pgm-rj-procurador-do-municipio-reta-final",
+    "categorySlug": "procuradorias",
+    "acronym": "PGM-RJ",
+    "role": "Procurador do Município",
+    "editionLabel": "Reta Final",
+    "jurisdictionCodes": ["RJ"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/pgm-rj---procurador"
+  },
+  {
+    "slug": "pge-ac-procurador-do-estado-reta-final",
+    "categorySlug": "procuradorias",
+    "acronym": "PGE-AC",
+    "role": "Procurador do Estado",
+    "editionLabel": "Reta Final",
+    "jurisdictionCodes": ["AC"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/procurador-do-estado-acre"
+  },
+  {
+    "slug": "trt-pe-analista-e-tecnico-2024-2025",
+    "categorySlug": "trabalhistas",
+    "acronym": "TRT-PE",
+    "role": "Analista e Técnico",
+    "editionLabel": "2024/2025",
+    "jurisdictionCodes": ["PE"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/retafinal/trt-pe-2024/2025"
+  },
+  {
+    "slug": "trt-ms-analista-e-tecnico-2024-2025",
+    "categorySlug": "trabalhistas",
+    "acronym": "TRT-MS",
+    "role": "Analista e Técnico",
+    "editionLabel": "2024/2025",
+    "jurisdictionCodes": ["MS"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/concurso-trt-ms"
+  },
+  {
+    "slug": "trt-15-analista-e-tecnico-campinas",
+    "categorySlug": "trabalhistas",
+    "acronym": "TRT-15",
+    "role": "Analista e Técnico",
+    "editionLabel": "Campinas",
+    "jurisdictionCodes": ["SP"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/retafinal/analista-e-tecnico-trt-15"
+  },
+  {
+    "slug": "tj-go-analista-judiciario-reta-final",
+    "categorySlug": "tribunais",
+    "acronym": "TJ-GO",
+    "role": "Analista Judiciário",
+    "editionLabel": "Reta Final",
+    "jurisdictionCodes": ["GO"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/retafinal/analista-judiciario-tj-go"
+  },
+  {
+    "slug": "tj-rj-analista-e-tecnico-2025",
+    "categorySlug": "tribunais",
+    "acronym": "TJ-RJ",
+    "role": "Analista e Técnico",
+    "editionLabel": "2025",
+    "jurisdictionCodes": ["RJ"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/reta-final/analista-e-tecnico-tj-rj"
+  },
+  {
+    "slug": "tj-ms-analista-judiciario-area-fim-reta-final",
+    "categorySlug": "tribunais",
+    "acronym": "TJ-MS",
+    "role": "Analista Judiciário — Área Fim",
+    "editionLabel": "Reta Final",
+    "jurisdictionCodes": ["MS"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/retafinal/analista-judiciario-tj-ms"
+  },
+  {
+    "slug": "camara-camara-dos-deputados-2026",
+    "categorySlug": "area-legislativa",
+    "acronym": "Câmara",
+    "role": "Câmara dos Deputados",
+    "editionLabel": "2026",
+    "jurisdictionCodes": ["BR"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/reta-final/camara-dos-deputados-2026"
+  },
+  {
+    "slug": "alems-assembleia-legislativa-do-ms-reta-final",
+    "categorySlug": "area-legislativa",
+    "acronym": "ALEMS",
+    "role": "Assembleia Legislativa do MS",
+    "editionLabel": "Reta Final",
+    "jurisdictionCodes": ["MS"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/reta-final/alems"
+  },
+  {
+    "slug": "alego-assembleia-legislativa-de-goias-reta-final",
+    "categorySlug": "area-legislativa",
+    "acronym": "ALEGO",
+    "role": "Assembleia Legislativa de Goiás",
+    "editionLabel": "Reta Final",
+    "jurisdictionCodes": ["GO"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/reta-final/concurso-alego"
+  },
+  {
+    "slug": "al-es-analista-consultor-e-policial-legislativo-2025",
+    "categorySlug": "area-legislativa",
+    "acronym": "AL-ES",
+    "role": "Analista, Consultor e Policial Legislativo",
+    "editionLabel": "2025",
+    "jurisdictionCodes": ["ES"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/reta-final/al-es"
+  }
+]

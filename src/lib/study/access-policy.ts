@@ -10,8 +10,25 @@ const freeQuestionIds = new Set<string>(FREE_STUDY_QUESTION_IDS);
 
 export type StudyEntitlement = {
   hasFullAccess: boolean;
+  questionPublicIds?: string[];
 };
 
-export function canStudyQuestion(entitlement: StudyEntitlement, questionPublicId: string) {
-  return entitlement.hasFullAccess || freeQuestionIds.has(questionPublicId);
+export function accessibleQuestionIds(entitlement: StudyEntitlement) {
+  return [
+    ...new Set([
+      ...FREE_STUDY_QUESTION_IDS,
+      ...(entitlement.questionPublicIds ?? []),
+    ]),
+  ];
+}
+
+export function canStudyQuestion(
+  entitlement: StudyEntitlement,
+  questionPublicId: string,
+) {
+  return (
+    entitlement.hasFullAccess ||
+    freeQuestionIds.has(questionPublicId) ||
+    Boolean(entitlement.questionPublicIds?.includes(questionPublicId))
+  );
 }

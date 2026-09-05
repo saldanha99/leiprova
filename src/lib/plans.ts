@@ -17,13 +17,14 @@ export type PlanDefinition = {
 export const PLANS: readonly PlanDefinition[] = [
   {
     slug: "ritmo",
-    name: "Ritmo Mensal",
+    name: "Master Mensal",
     eyebrow: "Comece sem compromisso longo",
     priceCents: 29700,
     billingLabel: "/mês",
     billingMonths: 1,
     stripePriceEnv: "STRIPE_PRICE_RITMO",
     features: [
+      "Concursos liberados durante a assinatura",
       "Treinos ilimitados de literalidade",
       "Fila de revisão espaçada",
       "Biblioteca de leis e progresso",
@@ -32,7 +33,7 @@ export const PLANS: readonly PlanDefinition[] = [
   },
   {
     slug: "foco",
-    name: "Foco Anual",
+    name: "Master Anual",
     eyebrow: "O melhor equilíbrio para o ciclo de estudos",
     priceCents: 89700,
     billingLabel: "/ano",
@@ -40,7 +41,7 @@ export const PLANS: readonly PlanDefinition[] = [
     stripePriceEnv: "STRIPE_PRICE_FOCO",
     featured: true,
     features: [
-      "Tudo do plano Ritmo",
+      "Tudo do Master Mensal",
       "Raio-X por banca e carreira",
       "Cronogramas e desafios guiados",
       "Cadernos, flashcards e simulados",

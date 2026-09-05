@@ -14,7 +14,7 @@ import {
   reviewQueue,
   userAttempts,
 } from "@/lib/db/schema";
-import { FREE_STUDY_QUESTION_IDS } from "@/lib/study/access-policy";
+import { accessibleQuestionIds } from "@/lib/study/access-policy";
 import { getStudyEntitlement } from "@/lib/study/entitlement";
 import { authorialStudyRightsConditions } from "@/lib/study/question-rights";
 import {
@@ -52,11 +52,17 @@ const questionSelection = {
 
 export async function GET(request: NextRequest) {
   const user = await getCurrentUser();
-  if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  if (!user)
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
-  const mode: StudyMode = request.nextUrl.searchParams.get("modo") === "revisao" ? "revisao" : "normal";
-  const topic = normalizeStudyTopic(request.nextUrl.searchParams.get("tema")) ?? null;
-  const legalActSlug = normalizeLegalActSlug(request.nextUrl.searchParams.get("lei")) ?? null;
+  const mode: StudyMode =
+    request.nextUrl.searchParams.get("modo") === "revisao"
+      ? "revisao"
+      : "normal";
+  const topic =
+    normalizeStudyTopic(request.nextUrl.searchParams.get("tema")) ?? null;
+  const legalActSlug =
+    normalizeLegalActSlug(request.nextUrl.searchParams.get("lei")) ?? null;
   const articleRange = normalizeArticleRange(
     request.nextUrl.searchParams.get("de"),
     request.nextUrl.searchParams.get("ate"),
@@ -64,13 +70,15 @@ export async function GET(request: NextRequest) {
   const articleStartOrder = articleRange.start ?? null;
   const articleEndOrder = articleRange.end ?? null;
   const sequential = request.nextUrl.searchParams.get("ordem") === "sequencial";
-  const notebookPublicId = normalizeNotebookPublicId(request.nextUrl.searchParams.get("caderno")) ?? null;
+  const notebookPublicId =
+    normalizeNotebookPublicId(request.nextUrl.searchParams.get("caderno")) ??
+    null;
   const now = new Date();
   const db = getDb();
   const entitlement = await getStudyEntitlement(user.id, now);
   const accessCondition = entitlement.hasFullAccess
     ? undefined
-    : inArray(questions.publicId, [...FREE_STUDY_QUESTION_IDS]);
+    : inArray(questions.publicId, accessibleQuestionIds(entitlement));
 
   let questionRows: QuestionRow[];
 
@@ -80,7 +88,10 @@ export async function GET(request: NextRequest) {
       .from(reviewQueue)
       .innerJoin(questions, eq(reviewQueue.questionId, questions.id))
       .innerJoin(legalArticles, eq(questions.legalArticleId, legalArticles.id))
-      .innerJoin(legalVersions, eq(legalArticles.legalVersionId, legalVersions.id))
+      .innerJoin(
+        legalVersions,
+        eq(legalArticles.legalVersionId, legalVersions.id),
+      )
       .innerJoin(legalActs, eq(legalVersions.legalActId, legalActs.id))
       .where(
         and(
@@ -93,8 +104,12 @@ export async function GET(request: NextRequest) {
           eq(legalActs.isActive, true),
           topic ? eq(questions.topic, topic) : undefined,
           legalActSlug ? eq(legalActs.slug, legalActSlug) : undefined,
-          articleStartOrder !== null ? gte(legalArticles.articleOrder, articleStartOrder) : undefined,
-          articleEndOrder !== null ? lte(legalArticles.articleOrder, articleEndOrder) : undefined,
+          articleStartOrder !== null
+            ? gte(legalArticles.articleOrder, articleStartOrder)
+            : undefined,
+          articleEndOrder !== null
+            ? lte(legalArticles.articleOrder, articleEndOrder)
+            : undefined,
           notebookCondition(notebookPublicId, user.id),
           accessCondition,
         ),
@@ -116,7 +131,10 @@ export async function GET(request: NextRequest) {
       .select(questionSelection)
       .from(questions)
       .innerJoin(legalArticles, eq(questions.legalArticleId, legalArticles.id))
-      .innerJoin(legalVersions, eq(legalArticles.legalVersionId, legalVersions.id))
+      .innerJoin(
+        legalVersions,
+        eq(legalArticles.legalVersionId, legalVersions.id),
+      )
       .innerJoin(legalActs, eq(legalVersions.legalActId, legalActs.id))
       .leftJoin(lastAttempts, eq(lastAttempts.questionId, questions.id))
       .where(
@@ -128,8 +146,12 @@ export async function GET(request: NextRequest) {
           eq(legalActs.isActive, true),
           topic ? eq(questions.topic, topic) : undefined,
           legalActSlug ? eq(legalActs.slug, legalActSlug) : undefined,
-          articleStartOrder !== null ? gte(legalArticles.articleOrder, articleStartOrder) : undefined,
-          articleEndOrder !== null ? lte(legalArticles.articleOrder, articleEndOrder) : undefined,
+          articleStartOrder !== null
+            ? gte(legalArticles.articleOrder, articleStartOrder)
+            : undefined,
+          articleEndOrder !== null
+            ? lte(legalArticles.articleOrder, articleEndOrder)
+            : undefined,
           notebookCondition(notebookPublicId, user.id),
           accessCondition,
         ),
@@ -142,7 +164,14 @@ export async function GET(request: NextRequest) {
       .limit(10);
   }
 
-  if (!questionRows.length) return NextResponse.json({ questions: [], mode, topic, legalActSlug, notebookPublicId });
+  if (!questionRows.length)
+    return NextResponse.json({
+      questions: [],
+      mode,
+      topic,
+      legalActSlug,
+      notebookPublicId,
+    });
 
   const options = await db
     .select({
@@ -151,7 +180,12 @@ export async function GET(request: NextRequest) {
       text: questionOptions.text,
     })
     .from(questionOptions)
-    .where(inArray(questionOptions.questionId, questionRows.map((question) => question.id)))
+    .where(
+      inArray(
+        questionOptions.questionId,
+        questionRows.map((question) => question.id),
+      ),
+    )
     .orderBy(asc(questionOptions.questionId), asc(questionOptions.sortOrder));
 
   return NextResponse.json({

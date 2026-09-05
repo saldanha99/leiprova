@@ -7,6 +7,7 @@ import { isDatabaseConfigured } from "@/lib/db/client";
 import { isSupplierIdentityComplete } from "@/lib/legal";
 import { PLANS, type PlanDefinition } from "@/lib/plans";
 import { getTransactionalEmailConfig } from "@/lib/transactional-email";
+import { stripeCredentialsMatchMode } from "@/lib/commerce/stripe-mode-policy";
 
 const STRIPE_API_VERSION: Stripe.LatestApiVersion = "2026-07-29.dahlia";
 
@@ -20,6 +21,13 @@ function readEnv(name: string) {
 
 export function isCheckoutEnabled() {
   return process.env.CHECKOUT_ENABLED?.trim().toLowerCase() === "true";
+}
+
+export function isContestCheckoutEnabled() {
+  return (
+    isCheckoutEnabled() &&
+    process.env.CONTEST_CHECKOUT_ENABLED?.trim().toLowerCase() === "true"
+  );
 }
 
 export type CheckoutAvailability =
@@ -37,54 +45,75 @@ export type CheckoutAvailability =
         | "transactional_email"
         | "publishable_key"
         | "secret_key"
+        | "mode"
         | "price"
         | "webhook";
     };
 
-export function getCheckoutAvailability(plan: PlanDefinition): CheckoutAvailability {
+export function getCheckoutAvailability(
+  plan: Pick<PlanDefinition, "stripePriceEnv">,
+  configuredPriceId?: string,
+): CheckoutAvailability {
   if (!isCheckoutEnabled()) return { available: false, reason: "disabled" };
 
   // Vender sem exibir nome empresarial, CNPJ e endereços viola o Decreto
   // 7.962/2013, art. 2º, I. A trava fica aqui, e não numa lista de tarefas,
   // para que seja impossível abrir o checkout com os documentos incompletos.
-  if (!isSupplierIdentityComplete()) return { available: false, reason: "supplier_identity" };
+  if (!isSupplierIdentityComplete())
+    return { available: false, reason: "supplier_identity" };
 
   if (!isDatabaseConfigured()) return { available: false, reason: "database" };
 
   // O comprador precisa conseguir criar a senha em outro dispositivo depois
   // da confirmação. Sem canal transacional validado, a venda permanece fechada.
-  if (!getTransactionalEmailConfig()) return { available: false, reason: "transactional_email" };
+  if (!getTransactionalEmailConfig())
+    return { available: false, reason: "transactional_email" };
 
   const publishableKey = readEnv("STRIPE_PUBLISHABLE_KEY");
   if (!publishableKey) return { available: false, reason: "publishable_key" };
 
-  if (!readEnv("STRIPE_SECRET_KEY")) return { available: false, reason: "secret_key" };
+  if (!readEnv("STRIPE_SECRET_KEY"))
+    return { available: false, reason: "secret_key" };
 
-  const priceId = readEnv(plan.stripePriceEnv);
+  if (
+    !stripeCredentialsMatchMode(
+      process.env,
+      readEnv("STRIPE_SECRET_KEY")!,
+      publishableKey,
+    )
+  )
+    return { available: false, reason: "mode" };
+
+  const priceId = configuredPriceId ?? readEnv(plan.stripePriceEnv);
   if (!priceId) return { available: false, reason: "price" };
 
-  if (!readEnv("STRIPE_WEBHOOK_SECRET")) return { available: false, reason: "webhook" };
+  if (!readEnv("STRIPE_WEBHOOK_SECRET"))
+    return { available: false, reason: "webhook" };
 
   return { available: true, publishableKey, priceId };
 }
 
 export function getStripeWebhookConfiguration() {
-  if (!isCheckoutEnabled() || !isDatabaseConfigured()) return null;
+  // Fechar novas vendas não pode interromper cancelamentos e reembolsos existentes.
+  if (!isDatabaseConfigured()) return null;
 
   const secretKey = readEnv("STRIPE_SECRET_KEY");
   const webhookSecret = readEnv("STRIPE_WEBHOOK_SECRET");
   if (!secretKey || !webhookSecret) return null;
+  if (!stripeCredentialsMatchMode(process.env, secretKey)) return null;
 
   return { secretKey, webhookSecret };
 }
 
 export function getStripePortalConfiguration() {
-  if (!isCheckoutEnabled() || !isDatabaseConfigured()) return null;
+  if (!isDatabaseConfigured()) return null;
 
   const secretKey = readEnv("STRIPE_SECRET_KEY");
   const webhookSecret = readEnv("STRIPE_WEBHOOK_SECRET");
   const publishableKey = readEnv("STRIPE_PUBLISHABLE_KEY");
   if (!secretKey || !webhookSecret || !publishableKey) return null;
+  if (!stripeCredentialsMatchMode(process.env, secretKey, publishableKey))
+    return null;
 
   return {
     secretKey,
@@ -135,10 +164,19 @@ export function getPublicOrigin(request: NextRequest) {
     throw new Error("APP_URL é obrigatória em produção.");
   }
 
-  const forwardedHost = request.headers.get("x-forwarded-host")?.split(",")[0]?.trim();
-  const forwardedProto = request.headers.get("x-forwarded-proto")?.split(",")[0]?.trim();
+  const forwardedHost = request.headers
+    .get("x-forwarded-host")
+    ?.split(",")[0]
+    ?.trim();
+  const forwardedProto = request.headers
+    .get("x-forwarded-proto")
+    ?.split(",")[0]
+    ?.trim();
 
-  if (forwardedHost && (forwardedProto === "http" || forwardedProto === "https")) {
+  if (
+    forwardedHost &&
+    (forwardedProto === "http" || forwardedProto === "https")
+  ) {
     return `${forwardedProto}://${forwardedHost}`;
   }
 
@@ -157,8 +195,10 @@ export function hasTrustedOrigin(request: NextRequest) {
 }
 
 export function stripeKeyExpectsLivemode(secretKey: string) {
-  if (secretKey.startsWith("rk_live_") || secretKey.startsWith("sk_live_")) return true;
-  if (secretKey.startsWith("rk_test_") || secretKey.startsWith("sk_test_")) return false;
+  if (secretKey.startsWith("rk_live_") || secretKey.startsWith("sk_live_"))
+    return true;
+  if (secretKey.startsWith("rk_test_") || secretKey.startsWith("sk_test_"))
+    return false;
   return null;
 }
 

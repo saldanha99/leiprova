@@ -25,9 +25,139 @@ const idColumn = () =>
   bigint("id", { mode: "number" }).primaryKey().generatedAlwaysAsIdentity();
 
 const timestamps = {
-  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 };
+
+export type ContestOrderLine = {
+  productSlug: string;
+  accessKey: "6m" | "12m";
+  months: number;
+  amountCents: number;
+  stripePriceId: string;
+  opportunityId: number;
+};
+
+// Comércio avulso: não usa subscriptions, que representa o acesso Master.
+export const contestStoreProducts = pgTable(
+  "contest_store_products",
+  {
+    slug: text("slug").primaryKey(),
+    opportunityId: bigint("opportunity_id", { mode: "number" }).references(
+      () => contestOpportunities.id,
+      { onDelete: "restrict" },
+    ),
+    status: text("status").notNull().default("draft"),
+    stripeProductId: text("stripe_product_id").unique(),
+    stripePrice6m: text("stripe_price_6m").unique(),
+    stripePrice12m: text("stripe_price_12m").unique(),
+    stripeMode: text("stripe_mode").notNull().default("test"),
+    releasedAt: timestamp("released_at", { withTimezone: true }),
+    releasedByUserId: bigint("released_by_user_id", {
+      mode: "number",
+    }).references(() => users.id, { onDelete: "restrict" }),
+    ...timestamps,
+  },
+  (table) => [
+    index("contest_store_opportunity_idx").on(table.opportunityId),
+    index("contest_store_released_by_idx").on(table.releasedByUserId),
+    check(
+      "contest_store_status_check",
+      sql`${table.status} in ('draft','released','retired')`,
+    ),
+    check(
+      "contest_store_mode_check",
+      sql`${table.stripeMode} in ('test','live')`,
+    ),
+    check(
+      "contest_store_release_check",
+      sql`${table.status} <> 'released' or (${table.opportunityId} is not null and ${table.releasedAt} is not null and ${table.releasedByUserId} is not null)`,
+    ),
+  ],
+);
+
+export const contestOrders = pgTable(
+  "contest_orders",
+  {
+    id: text("id").primaryKey(),
+    userId: bigint("user_id", { mode: "number" })
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    status: text("status").notNull().default("created"),
+    currency: text("currency").notNull().default("brl"),
+    amountCents: integer("amount_cents").notNull(),
+    lines: jsonb("lines").$type<ContestOrderLine[]>().notNull(),
+    stripeSessionId: text("stripe_session_id").unique(),
+    stripePaymentIntentId: text("stripe_payment_intent_id").unique(),
+    stripeMode: text("stripe_mode").notNull(),
+    ...timestamps,
+  },
+  (table) => [
+    index("contest_orders_user_idx").on(table.userId, table.createdAt),
+    check(
+      "contest_orders_status_check",
+      sql`${table.status} in ('created','pending','paid','failed','expired','refunded','disputed')`,
+    ),
+    check(
+      "contest_orders_amount_check",
+      sql`${table.amountCents} > 0 and ${table.currency} = 'brl'`,
+    ),
+    check(
+      "contest_orders_mode_check",
+      sql`${table.stripeMode} in ('test','live')`,
+    ),
+    check(
+      "contest_orders_lines_check",
+      sql`jsonb_typeof(${table.lines}) = 'array' and jsonb_array_length(${table.lines}) between 1 and 3`,
+    ),
+  ],
+);
+
+export const contestPurchases = pgTable(
+  "contest_purchases",
+  {
+    orderId: text("order_id")
+      .notNull()
+      .references(() => contestOrders.id, { onDelete: "cascade" }),
+    productSlug: text("product_slug")
+      .notNull()
+      .references(() => contestStoreProducts.slug, { onDelete: "restrict" }),
+    opportunityId: bigint("opportunity_id", { mode: "number" })
+      .notNull()
+      .references(() => contestOpportunities.id, { onDelete: "restrict" }),
+    userId: bigint("user_id", { mode: "number" })
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    status: text("status").notNull().default("active"),
+    accessStartsAt: timestamp("access_starts_at", {
+      withTimezone: true,
+    }).notNull(),
+    accessEndsAt: timestamp("access_ends_at", { withTimezone: true }).notNull(),
+    ...timestamps,
+  },
+  (table) => [
+    primaryKey({ columns: [table.orderId, table.productSlug] }),
+    index("contest_purchases_user_access_idx").on(
+      table.userId,
+      table.status,
+      table.accessEndsAt,
+    ),
+    index("contest_purchases_product_idx").on(table.productSlug),
+    index("contest_purchases_opportunity_idx").on(table.opportunityId),
+    check(
+      "contest_purchases_status_check",
+      sql`${table.status} in ('active','revoked')`,
+    ),
+    check(
+      "contest_purchases_period_check",
+      sql`${table.accessEndsAt} > ${table.accessStartsAt}`,
+    ),
+  ],
+);
 
 export const users = pgTable(
   "users",
@@ -49,7 +179,10 @@ export const users = pgTable(
   },
   (table) => [
     uniqueIndex("users_email_lower_uidx").on(sql`lower(${table.email})`),
-    check("users_role_check", sql`${table.role} in ('student', 'editor', 'admin')`),
+    check(
+      "users_role_check",
+      sql`${table.role} in ('student', 'editor', 'admin')`,
+    ),
   ],
 );
 
@@ -61,10 +194,14 @@ export const authSessions = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
-    lastUsedAt: timestamp("last_used_at", { withTimezone: true }).notNull().defaultNow(),
+    lastUsedAt: timestamp("last_used_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
     userAgent: text("user_agent"),
     ipHash: text("ip_hash"),
-    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   (table) => [
     index("auth_sessions_user_id_idx").on(table.userId),
@@ -77,10 +214,14 @@ export const rateLimitCounters = pgTable(
   {
     scope: text("scope").notNull(),
     subjectHash: text("subject_hash").notNull(),
-    windowStartedAt: timestamp("window_started_at", { withTimezone: true }).notNull(),
+    windowStartedAt: timestamp("window_started_at", {
+      withTimezone: true,
+    }).notNull(),
     requestCount: integer("request_count").notNull().default(1),
     expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   (table) => [
     primaryKey({
@@ -115,7 +256,10 @@ export const quizBanks = pgTable(
     ...timestamps,
   },
   (table) => [
-    check("quiz_banks_slug_check", sql`${table.slug} ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$'`),
+    check(
+      "quiz_banks_slug_check",
+      sql`${table.slug} ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$'`,
+    ),
   ],
 );
 
@@ -139,8 +283,14 @@ export const examSourcePortals = pgTable(
   },
   (table) => [
     index("exam_source_portals_active_idx").on(table.isActive),
-    check("exam_source_portals_url_check", sql`${table.officialUrl} ~ '^https://'`),
-    check("exam_source_portals_policy_check", sql`${table.sourcePolicy} = 'metadata_only'`),
+    check(
+      "exam_source_portals_url_check",
+      sql`${table.officialUrl} ~ '^https://'`,
+    ),
+    check(
+      "exam_source_portals_policy_check",
+      sql`${table.sourcePolicy} = 'metadata_only'`,
+    ),
     check(
       "exam_source_portals_http_status_check",
       sql`${table.lastHttpStatus} is null or ${table.lastHttpStatus} between 100 and 599`,
@@ -174,7 +324,9 @@ export const questionStyleProfiles = pgTable(
       .default(sql`'[]'::jsonb`),
     disclaimer: text("disclaimer").notNull(),
     isActive: boolean("is_active").notNull().default(true),
-    updatedByUserId: bigint("updated_by_user_id", { mode: "number" }).references(() => users.id, {
+    updatedByUserId: bigint("updated_by_user_id", {
+      mode: "number",
+    }).references(() => users.id, {
       onDelete: "set null",
     }),
     ...timestamps,
@@ -207,8 +359,14 @@ export const quizCareerTracks = pgTable(
     ...timestamps,
   },
   (table) => [
-    index("quiz_career_tracks_active_featured_idx").on(table.isActive, table.featured),
-    check("quiz_career_tracks_slug_check", sql`${table.slug} ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$'`),
+    index("quiz_career_tracks_active_featured_idx").on(
+      table.isActive,
+      table.featured,
+    ),
+    check(
+      "quiz_career_tracks_slug_check",
+      sql`${table.slug} ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$'`,
+    ),
   ],
 );
 
@@ -225,12 +383,18 @@ export const quizCareerSpecializations = pgTable(
     ...timestamps,
   },
   (table) => [
-    uniqueIndex("quiz_career_specializations_career_slug_uidx").on(table.careerTrackId, table.slug),
+    uniqueIndex("quiz_career_specializations_career_slug_uidx").on(
+      table.careerTrackId,
+      table.slug,
+    ),
     uniqueIndex("quiz_career_specializations_id_career_uidx").on(
       table.id,
       table.careerTrackId,
     ),
-    index("quiz_career_specializations_career_active_idx").on(table.careerTrackId, table.isActive),
+    index("quiz_career_specializations_career_active_idx").on(
+      table.careerTrackId,
+      table.isActive,
+    ),
     check(
       "quiz_career_specializations_slug_check",
       sql`${table.slug} ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$'`,
@@ -249,7 +413,10 @@ export const quizSubjects = pgTable(
     ...timestamps,
   },
   (table) => [
-    check("quiz_subjects_slug_check", sql`${table.slug} ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$'`),
+    check(
+      "quiz_subjects_slug_check",
+      sql`${table.slug} ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$'`,
+    ),
   ],
 );
 
@@ -266,9 +433,15 @@ export const quizTopics = pgTable(
     ...timestamps,
   },
   (table) => [
-    uniqueIndex("quiz_topics_subject_slug_uidx").on(table.subjectId, table.slug),
+    uniqueIndex("quiz_topics_subject_slug_uidx").on(
+      table.subjectId,
+      table.slug,
+    ),
     index("quiz_topics_subject_active_idx").on(table.subjectId, table.isActive),
-    check("quiz_topics_slug_check", sql`${table.slug} ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$'`),
+    check(
+      "quiz_topics_slug_check",
+      sql`${table.slug} ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$'`,
+    ),
   ],
 );
 
@@ -281,7 +454,9 @@ export const quizCareerSubjects = pgTable(
     subjectId: bigint("subject_id", { mode: "number" })
       .notNull()
       .references(() => quizSubjects.id, { onDelete: "cascade" }),
-    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   (table) => [
     primaryKey({
@@ -314,14 +489,20 @@ export const examEditions = pgTable(
     publishedAt: timestamp("published_at", { withTimezone: true }),
     status: text("status").notNull().default("draft"),
     sourcePolicy: text("source_policy").notNull().default("metadata_only"),
-    sourceContentStored: boolean("source_content_stored").notNull().default(false),
+    sourceContentStored: boolean("source_content_stored")
+      .notNull()
+      .default(false),
     sourcePageTitle: text("source_page_title"),
     sourceHttpStatus: integer("source_http_status"),
     sourceCheckedAt: timestamp("source_checked_at", { withTimezone: true }),
-    createdByUserId: bigint("created_by_user_id", { mode: "number" }).references(() => users.id, {
+    createdByUserId: bigint("created_by_user_id", {
+      mode: "number",
+    }).references(() => users.id, {
       onDelete: "set null",
     }),
-    updatedByUserId: bigint("updated_by_user_id", { mode: "number" }).references(() => users.id, {
+    updatedByUserId: bigint("updated_by_user_id", {
+      mode: "number",
+    }).references(() => users.id, {
       onDelete: "set null",
     }),
     ...timestamps,
@@ -329,7 +510,10 @@ export const examEditions = pgTable(
   (table) => [
     foreignKey({
       columns: [table.specializationId, table.careerTrackId],
-      foreignColumns: [quizCareerSpecializations.id, quizCareerSpecializations.careerTrackId],
+      foreignColumns: [
+        quizCareerSpecializations.id,
+        quizCareerSpecializations.careerTrackId,
+      ],
       name: "exam_editions_specialization_career_fk",
     }).onDelete("restrict"),
     uniqueIndex("exam_editions_bank_source_external_uidx")
@@ -341,15 +525,26 @@ export const examEditions = pgTable(
       table.examDate,
       table.id,
     ),
-    index("exam_editions_bank_status_date_idx").on(table.bankId, table.status, table.examDate, table.id),
+    index("exam_editions_bank_status_date_idx").on(
+      table.bankId,
+      table.status,
+      table.examDate,
+      table.id,
+    ),
     index("exam_editions_specialization_id_idx").on(table.specializationId),
     index("exam_editions_created_by_idx").on(table.createdByUserId),
-    index("exam_editions_source_policy_idx").on(table.sourcePolicy, table.examDate),
+    index("exam_editions_source_policy_idx").on(
+      table.sourcePolicy,
+      table.examDate,
+    ),
     check(
       "exam_editions_status_check",
       sql`${table.status} in ('draft', 'scheduled', 'held', 'published', 'canceled', 'archived')`,
     ),
-    check("exam_editions_public_id_check", sql`${table.publicId} ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$'`),
+    check(
+      "exam_editions_public_id_check",
+      sql`${table.publicId} ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$'`,
+    ),
     check(
       "exam_editions_source_external_id_check",
       sql`${table.sourceExternalId} is null or char_length(btrim(${table.sourceExternalId})) > 0`,
@@ -392,15 +587,24 @@ export const plans = pgTable(
     amountCents: integer("amount_cents").notNull(),
     currency: text("currency").notNull().default("brl"),
     stripePriceId: text("stripe_price_id").unique(),
-    features: jsonb("features").$type<string[]>().notNull().default(sql`'[]'::jsonb`),
+    features: jsonb("features")
+      .$type<string[]>()
+      .notNull()
+      .default(sql`'[]'::jsonb`),
     isActive: boolean("is_active").notNull().default(true),
     sortOrder: smallint("sort_order").notNull().default(0),
     ...timestamps,
   },
   (table) => [
-    check("plans_billing_type_check", sql`${table.billingType} in ('month', 'year', 'lifetime')`),
+    check(
+      "plans_billing_type_check",
+      sql`${table.billingType} in ('month', 'year', 'lifetime')`,
+    ),
     check("plans_amount_nonnegative_check", sql`${table.amountCents} >= 0`),
-    check("plans_currency_lowercase_check", sql`${table.currency} = lower(${table.currency})`),
+    check(
+      "plans_currency_lowercase_check",
+      sql`${table.currency} = lower(${table.currency})`,
+    ),
   ],
 );
 
@@ -418,7 +622,9 @@ export const subscriptions = pgTable(
     providerSubscriptionId: text("provider_subscription_id").unique(),
     providerCheckoutSessionId: text("provider_checkout_session_id").unique(),
     status: text("status").notNull(),
-    currentPeriodStart: timestamp("current_period_start", { withTimezone: true }),
+    currentPeriodStart: timestamp("current_period_start", {
+      withTimezone: true,
+    }),
     currentPeriodEnd: timestamp("current_period_end", { withTimezone: true }),
     accessEndsAt: timestamp("access_ends_at", { withTimezone: true }),
     cancelAtPeriodEnd: boolean("cancel_at_period_end").notNull().default(false),
@@ -456,7 +662,10 @@ export const legalActs = pgTable(
   },
   (table) => [
     index("legal_acts_title_idx").on(table.title),
-    check("legal_acts_year_check", sql`${table.actYear} is null or ${table.actYear} between 1800 and 2200`),
+    check(
+      "legal_acts_year_check",
+      sql`${table.actYear} is null or ${table.actYear} between 1800 and 2200`,
+    ),
   ],
 );
 
@@ -475,26 +684,41 @@ export const legalSourceSnapshots = pgTable(
     articleMarkerCount: integer("article_marker_count").notNull(),
     httpStatus: integer("http_status").notNull(),
     status: text("status").notNull().default("pending_review"),
-    initiatedByUserId: bigint("initiated_by_user_id", { mode: "number" }).references(() => users.id, {
+    initiatedByUserId: bigint("initiated_by_user_id", {
+      mode: "number",
+    }).references(() => users.id, {
       onDelete: "set null",
     }),
-    reviewedByUserId: bigint("reviewed_by_user_id", { mode: "number" }).references(() => users.id, {
+    reviewedByUserId: bigint("reviewed_by_user_id", {
+      mode: "number",
+    }).references(() => users.id, {
       onDelete: "set null",
     }),
     reviewNotes: text("review_notes"),
     fetchedAt: timestamp("fetched_at", { withTimezone: true }).notNull(),
     lastSeenAt: timestamp("last_seen_at", { withTimezone: true }).notNull(),
     reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
-    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   (table) => [
     uniqueIndex("legal_source_snapshots_act_checksum_uidx").on(
       table.legalActId,
       table.checksumSha256,
     ),
-    uniqueIndex("legal_source_snapshots_id_act_uidx").on(table.id, table.legalActId),
-    index("legal_source_snapshots_act_status_idx").on(table.legalActId, table.status, table.fetchedAt),
-    index("legal_source_snapshots_initiated_by_idx").on(table.initiatedByUserId),
+    uniqueIndex("legal_source_snapshots_id_act_uidx").on(
+      table.id,
+      table.legalActId,
+    ),
+    index("legal_source_snapshots_act_status_idx").on(
+      table.legalActId,
+      table.status,
+      table.fetchedAt,
+    ),
+    index("legal_source_snapshots_initiated_by_idx").on(
+      table.initiatedByUserId,
+    ),
     index("legal_source_snapshots_reviewed_by_idx").on(table.reviewedByUserId),
     check(
       "legal_source_snapshots_public_id_check",
@@ -504,10 +728,22 @@ export const legalSourceSnapshots = pgTable(
       "legal_source_snapshots_url_check",
       sql`${table.sourceUrl} ~ '^https://legis\\.senado\\.leg\\.br/norma/[0-9]+$'`,
     ),
-    check("legal_source_snapshots_checksum_check", sql`${table.checksumSha256} ~ '^[0-9a-f]{64}$'`),
-    check("legal_source_snapshots_content_check", sql`${table.contentLength} >= 1000`),
-    check("legal_source_snapshots_article_count_check", sql`${table.articleMarkerCount} >= 1`),
-    check("legal_source_snapshots_http_status_check", sql`${table.httpStatus} between 200 and 299`),
+    check(
+      "legal_source_snapshots_checksum_check",
+      sql`${table.checksumSha256} ~ '^[0-9a-f]{64}$'`,
+    ),
+    check(
+      "legal_source_snapshots_content_check",
+      sql`${table.contentLength} >= 1000`,
+    ),
+    check(
+      "legal_source_snapshots_article_count_check",
+      sql`${table.articleMarkerCount} >= 1`,
+    ),
+    check(
+      "legal_source_snapshots_http_status_check",
+      sql`${table.httpStatus} between 200 and 299`,
+    ),
     check(
       "legal_source_snapshots_status_check",
       sql`${table.status} in ('pending_review', 'approved', 'superseded', 'rejected')`,
@@ -531,7 +767,9 @@ export const legalTextSnapshots = pgTable(
     legalActId: bigint("legal_act_id", { mode: "number" })
       .notNull()
       .references(() => legalActs.id, { onDelete: "cascade" }),
-    monitorSnapshotId: bigint("monitor_snapshot_id", { mode: "number" }).notNull(),
+    monitorSnapshotId: bigint("monitor_snapshot_id", {
+      mode: "number",
+    }).notNull(),
     sourceUrl: text("source_url").notNull(),
     checksumSha256: text("checksum_sha256").notNull(),
     normalizedContent: text("normalized_content").notNull(),
@@ -539,14 +777,12 @@ export const legalTextSnapshots = pgTable(
     articleCount: integer("article_count").notNull(),
     parserVersion: text("parser_version").notNull(),
     status: text("status").notNull().default("pending_review"),
-    initiatedByUserId: bigint("initiated_by_user_id", { mode: "number" }).references(
-      () => users.id,
-      { onDelete: "set null" },
-    ),
-    reviewedByUserId: bigint("reviewed_by_user_id", { mode: "number" }).references(
-      () => users.id,
-      { onDelete: "set null" },
-    ),
+    initiatedByUserId: bigint("initiated_by_user_id", {
+      mode: "number",
+    }).references(() => users.id, { onDelete: "set null" }),
+    reviewedByUserId: bigint("reviewed_by_user_id", {
+      mode: "number",
+    }).references(() => users.id, { onDelete: "set null" }),
     reviewNotes: text("review_notes"),
     fetchedAt: timestamp("fetched_at", { withTimezone: true }).notNull(),
     lastSeenAt: timestamp("last_seen_at", { withTimezone: true }).notNull(),
@@ -560,7 +796,10 @@ export const legalTextSnapshots = pgTable(
     ),
     foreignKey({
       columns: [table.monitorSnapshotId, table.legalActId],
-      foreignColumns: [legalSourceSnapshots.id, legalSourceSnapshots.legalActId],
+      foreignColumns: [
+        legalSourceSnapshots.id,
+        legalSourceSnapshots.legalActId,
+      ],
       name: "legal_text_snapshots_monitor_act_fk",
     }).onDelete("restrict"),
     index("legal_text_snapshots_act_status_idx").on(
@@ -620,12 +859,20 @@ export const legalVersions = pgTable(
     validUntil: date("valid_until"),
     verifiedAt: timestamp("verified_at", { withTimezone: true }).notNull(),
     status: text("status").notNull().default("current"),
-    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   (table) => [
-    uniqueIndex("legal_versions_act_checksum_uidx").on(table.legalActId, table.checksumSha256),
+    uniqueIndex("legal_versions_act_checksum_uidx").on(
+      table.legalActId,
+      table.checksumSha256,
+    ),
     index("legal_versions_act_id_idx").on(table.legalActId),
-    check("legal_versions_status_check", sql`${table.status} in ('draft', 'current', 'superseded', 'revoked', 'pending_review')`),
+    check(
+      "legal_versions_status_check",
+      sql`${table.status} in ('draft', 'current', 'superseded', 'revoked', 'pending_review')`,
+    ),
     check(
       "legal_versions_date_range_check",
       sql`${table.validUntil} is null or ${table.validFrom} is null or ${table.validUntil} >= ${table.validFrom}`,
@@ -650,8 +897,14 @@ export const legalArticles = pgTable(
     ...timestamps,
   },
   (table) => [
-    uniqueIndex("legal_articles_version_path_uidx").on(table.legalVersionId, table.path),
-    index("legal_articles_version_order_idx").on(table.legalVersionId, table.articleOrder),
+    uniqueIndex("legal_articles_version_path_uidx").on(
+      table.legalVersionId,
+      table.path,
+    ),
+    index("legal_articles_version_order_idx").on(
+      table.legalVersionId,
+      table.articleOrder,
+    ),
     check(
       "legal_articles_editorial_status_check",
       sql`${table.editorialStatus} in ('draft', 'pending_review', 'reviewed', 'suspended')`,
@@ -675,7 +928,10 @@ export const contestCategories = pgTable(
     ...timestamps,
   },
   (table) => [
-    index("contest_categories_active_sort_idx").on(table.isActive, table.sortOrder),
+    index("contest_categories_active_sort_idx").on(
+      table.isActive,
+      table.sortOrder,
+    ),
     check(
       "contest_categories_slug_check",
       sql`${table.slug} ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$'`,
@@ -692,7 +948,9 @@ export const contestCategoryCareers = pgTable(
     careerTrackId: bigint("career_track_id", { mode: "number" })
       .notNull()
       .references(() => quizCareerTracks.id, { onDelete: "cascade" }),
-    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   (table) => [
     primaryKey({
@@ -740,13 +998,19 @@ export const contestOpportunities = pgTable(
     sourceCheckedAt: timestamp("source_checked_at", { withTimezone: true }),
     editorialStatus: text("editorial_status").notNull().default("draft"),
     publishedAt: timestamp("published_at", { withTimezone: true }),
-    createdByUserId: bigint("created_by_user_id", { mode: "number" }).references(() => users.id, {
+    createdByUserId: bigint("created_by_user_id", {
+      mode: "number",
+    }).references(() => users.id, {
       onDelete: "set null",
     }),
-    updatedByUserId: bigint("updated_by_user_id", { mode: "number" }).references(() => users.id, {
+    updatedByUserId: bigint("updated_by_user_id", {
+      mode: "number",
+    }).references(() => users.id, {
       onDelete: "set null",
     }),
-    reviewedByUserId: bigint("reviewed_by_user_id", { mode: "number" }).references(() => users.id, {
+    reviewedByUserId: bigint("reviewed_by_user_id", {
+      mode: "number",
+    }).references(() => users.id, {
       onDelete: "set null",
     }),
     reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
@@ -765,10 +1029,14 @@ export const contestOpportunities = pgTable(
     }).onDelete("restrict"),
     foreignKey({
       columns: [table.specializationId, table.careerTrackId],
-      foreignColumns: [quizCareerSpecializations.id, quizCareerSpecializations.careerTrackId],
+      foreignColumns: [
+        quizCareerSpecializations.id,
+        quizCareerSpecializations.careerTrackId,
+      ],
       name: "contest_opportunities_specialization_career_fk",
     }).onDelete("restrict"),
-    uniqueIndex("contest_opportunities_exam_edition_uidx").on(table.examEditionId)
+    uniqueIndex("contest_opportunities_exam_edition_uidx")
+      .on(table.examEditionId)
       .where(sql`${table.examEditionId} is not null`),
     uniqueIndex("contest_opportunities_identity_uidx")
       .on(
@@ -797,8 +1065,13 @@ export const contestOpportunities = pgTable(
       table.jurisdictionCode,
       table.lifecycleStatus,
     ),
-    index("contest_opportunities_career_idx").on(table.careerTrackId, table.cycleYear),
-    index("contest_opportunities_specialization_idx").on(table.specializationId),
+    index("contest_opportunities_career_idx").on(
+      table.careerTrackId,
+      table.cycleYear,
+    ),
+    index("contest_opportunities_specialization_idx").on(
+      table.specializationId,
+    ),
     index("contest_opportunities_created_by_idx").on(table.createdByUserId),
     index("contest_opportunities_updated_by_idx").on(table.updatedByUserId),
     index("contest_opportunities_reviewed_by_idx").on(table.reviewedByUserId),
@@ -886,18 +1159,26 @@ export const opportunitySourceDocuments = pgTable(
     httpStatus: integer("http_status").notNull(),
     contentType: text("content_type"),
     sourcePolicy: text("source_policy").notNull().default("metadata_only"),
-    sourceContentStored: boolean("source_content_stored").notNull().default(false),
+    sourceContentStored: boolean("source_content_stored")
+      .notNull()
+      .default(false),
     supersedesPublicId: text("supersedes_public_id"),
     status: text("status").notNull().default("pending_review"),
-    initiatedByUserId: bigint("initiated_by_user_id", { mode: "number" }).references(() => users.id, {
+    initiatedByUserId: bigint("initiated_by_user_id", {
+      mode: "number",
+    }).references(() => users.id, {
       onDelete: "set null",
     }),
-    reviewedByUserId: bigint("reviewed_by_user_id", { mode: "number" }).references(() => users.id, {
+    reviewedByUserId: bigint("reviewed_by_user_id", {
+      mode: "number",
+    }).references(() => users.id, {
       onDelete: "set null",
     }),
     reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
     reviewNotes: text("review_notes"),
-    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   (table) => [
     uniqueIndex("opportunity_source_documents_opportunity_url_uidx").on(
@@ -912,7 +1193,9 @@ export const opportunitySourceDocuments = pgTable(
       table.status,
       table.observedAt,
     ),
-    index("opportunity_source_documents_reviewed_by_idx").on(table.reviewedByUserId),
+    index("opportunity_source_documents_reviewed_by_idx").on(
+      table.reviewedByUserId,
+    ),
     check(
       "opportunity_source_documents_public_id_check",
       sql`${table.publicId} ~ '^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'`,
@@ -969,7 +1252,9 @@ export const opportunityDocumentSnapshots = pgTable(
     publicId: text("public_id").notNull().unique(),
     sourceDocumentId: bigint("source_document_id", { mode: "number" })
       .notNull()
-      .references(() => opportunitySourceDocuments.id, { onDelete: "restrict" }),
+      .references(() => opportunitySourceDocuments.id, {
+        onDelete: "restrict",
+      }),
     documentUrl: text("document_url").notNull(),
     sourceHost: text("source_host").notNull(),
     fileName: text("file_name").notNull(),
@@ -986,20 +1271,19 @@ export const opportunityDocumentSnapshots = pgTable(
     sourcePolicy: text("source_policy").notNull().default("official_document"),
     authorizationScope: text("authorization_scope").notNull(),
     authorizedAt: timestamp("authorized_at", { withTimezone: true }).notNull(),
-    authorizedByUserId: bigint("authorized_by_user_id", { mode: "number" }).references(
-      () => users.id,
-      { onDelete: "set null" },
-    ),
-    initiatedByUserId: bigint("initiated_by_user_id", { mode: "number" }).references(
-      () => users.id,
-      { onDelete: "set null" },
-    ),
+    authorizedByUserId: bigint("authorized_by_user_id", {
+      mode: "number",
+    }).references(() => users.id, { onDelete: "set null" }),
+    initiatedByUserId: bigint("initiated_by_user_id", {
+      mode: "number",
+    }).references(() => users.id, { onDelete: "set null" }),
     status: text("status").notNull().default("pending_review"),
-    approvalBasis: text("approval_basis").notNull().default("independent_review"),
-    reviewedByUserId: bigint("reviewed_by_user_id", { mode: "number" }).references(
-      () => users.id,
-      { onDelete: "set null" },
-    ),
+    approvalBasis: text("approval_basis")
+      .notNull()
+      .default("independent_review"),
+    reviewedByUserId: bigint("reviewed_by_user_id", {
+      mode: "number",
+    }).references(() => users.id, { onDelete: "set null" }),
     reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
     reviewNotes: text("review_notes"),
     ...timestamps,
@@ -1014,8 +1298,12 @@ export const opportunityDocumentSnapshots = pgTable(
       table.status,
       table.createdAt,
     ),
-    index("opportunity_document_snapshots_initiated_by_idx").on(table.initiatedByUserId),
-    index("opportunity_document_snapshots_reviewed_by_idx").on(table.reviewedByUserId),
+    index("opportunity_document_snapshots_initiated_by_idx").on(
+      table.initiatedByUserId,
+    ),
+    index("opportunity_document_snapshots_reviewed_by_idx").on(
+      table.reviewedByUserId,
+    ),
     check(
       "opportunity_document_snapshots_public_id_check",
       sql`${table.publicId} ~ '^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'`,
@@ -1090,12 +1378,17 @@ export const opportunityOrganizerAssignments = pgTable(
     opportunityId: bigint("opportunity_id", { mode: "number" })
       .notNull()
       .references(() => contestOpportunities.id, { onDelete: "cascade" }),
-    quizBankId: bigint("quiz_bank_id", { mode: "number" }).references(() => quizBanks.id, {
-      onDelete: "restrict",
-    }),
+    quizBankId: bigint("quiz_bank_id", { mode: "number" }).references(
+      () => quizBanks.id,
+      {
+        onDelete: "restrict",
+      },
+    ),
     sourceDocumentId: bigint("source_document_id", { mode: "number" })
       .notNull()
-      .references(() => opportunitySourceDocuments.id, { onDelete: "restrict" }),
+      .references(() => opportunitySourceDocuments.id, {
+        onDelete: "restrict",
+      }),
     responsibleType: text("responsible_type").notNull(),
     role: text("role").notNull().default("primary_responsible"),
     organizerSlug: text("organizer_slug").notNull(),
@@ -1103,7 +1396,9 @@ export const opportunityOrganizerAssignments = pgTable(
     validFrom: date("valid_from").notNull(),
     validUntil: date("valid_until"),
     status: text("status").notNull().default("pending_review"),
-    reviewedByUserId: bigint("reviewed_by_user_id", { mode: "number" }).references(() => users.id, {
+    reviewedByUserId: bigint("reviewed_by_user_id", {
+      mode: "number",
+    }).references(() => users.id, {
       onDelete: "set null",
     }),
     reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
@@ -1122,8 +1417,12 @@ export const opportunityOrganizerAssignments = pgTable(
         sql`${table.role} = 'examination_provider' and ${table.status} = 'reviewed' and ${table.validUntil} is null`,
       ),
     index("opportunity_organizer_assignments_bank_idx").on(table.quizBankId),
-    index("opportunity_organizer_assignments_source_idx").on(table.sourceDocumentId),
-    index("opportunity_organizer_assignments_reviewed_by_idx").on(table.reviewedByUserId),
+    index("opportunity_organizer_assignments_source_idx").on(
+      table.sourceDocumentId,
+    ),
+    index("opportunity_organizer_assignments_reviewed_by_idx").on(
+      table.reviewedByUserId,
+    ),
     check(
       "opportunity_organizer_assignments_type_check",
       sql`${table.responsibleType} in ('external_organizer', 'institutional_commission', 'hybrid')`,
@@ -1169,30 +1468,49 @@ export const opportunityRequirements = pgTable(
       .references(() => contestOpportunities.id, { onDelete: "cascade" }),
     sourceDocumentId: bigint("source_document_id", { mode: "number" })
       .notNull()
-      .references(() => opportunitySourceDocuments.id, { onDelete: "restrict" }),
-    sourceSnapshotId: bigint("source_snapshot_id", { mode: "number" }).references(
-      () => opportunityDocumentSnapshots.id,
-      { onDelete: "restrict" },
+      .references(() => opportunitySourceDocuments.id, {
+        onDelete: "restrict",
+      }),
+    sourceSnapshotId: bigint("source_snapshot_id", {
+      mode: "number",
+    }).references(() => opportunityDocumentSnapshots.id, {
+      onDelete: "restrict",
+    }),
+    subjectId: bigint("subject_id", { mode: "number" }).references(
+      () => quizSubjects.id,
+      {
+        onDelete: "restrict",
+      },
     ),
-    subjectId: bigint("subject_id", { mode: "number" }).references(() => quizSubjects.id, {
-      onDelete: "restrict",
-    }),
-    topicId: bigint("topic_id", { mode: "number" }).references(() => quizTopics.id, {
-      onDelete: "restrict",
-    }),
-    legalActId: bigint("legal_act_id", { mode: "number" }).references(() => legalActs.id, {
-      onDelete: "restrict",
-    }),
-    legalArticleId: bigint("legal_article_id", { mode: "number" }).references(() => legalArticles.id, {
-      onDelete: "restrict",
-    }),
+    topicId: bigint("topic_id", { mode: "number" }).references(
+      () => quizTopics.id,
+      {
+        onDelete: "restrict",
+      },
+    ),
+    legalActId: bigint("legal_act_id", { mode: "number" }).references(
+      () => legalActs.id,
+      {
+        onDelete: "restrict",
+      },
+    ),
+    legalArticleId: bigint("legal_article_id", { mode: "number" }).references(
+      () => legalArticles.id,
+      {
+        onDelete: "restrict",
+      },
+    ),
     requirementText: text("requirement_text").notNull(),
     sourceLocator: text("source_locator").notNull(),
     editorialStatus: text("editorial_status").notNull().default("draft"),
-    createdByUserId: bigint("created_by_user_id", { mode: "number" }).references(() => users.id, {
+    createdByUserId: bigint("created_by_user_id", {
+      mode: "number",
+    }).references(() => users.id, {
       onDelete: "set null",
     }),
-    reviewedByUserId: bigint("reviewed_by_user_id", { mode: "number" }).references(() => users.id, {
+    reviewedByUserId: bigint("reviewed_by_user_id", {
+      mode: "number",
+    }).references(() => users.id, {
       onDelete: "set null",
     }),
     reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
@@ -1213,9 +1531,13 @@ export const opportunityRequirements = pgTable(
     index("opportunity_requirements_snapshot_idx").on(table.sourceSnapshotId),
     index("opportunity_requirements_topic_idx").on(table.topicId),
     index("opportunity_requirements_legal_act_idx").on(table.legalActId),
-    index("opportunity_requirements_legal_article_idx").on(table.legalArticleId),
+    index("opportunity_requirements_legal_article_idx").on(
+      table.legalArticleId,
+    ),
     index("opportunity_requirements_created_by_idx").on(table.createdByUserId),
-    index("opportunity_requirements_reviewed_by_idx").on(table.reviewedByUserId),
+    index("opportunity_requirements_reviewed_by_idx").on(
+      table.reviewedByUserId,
+    ),
     check(
       "opportunity_requirements_status_check",
       sql`${table.editorialStatus} in ('draft', 'pending_review', 'reviewed', 'suspended')`,
@@ -1249,7 +1571,9 @@ export const opportunityAnalysisSnapshots = pgTable(
       .references(() => contestOpportunities.id, { onDelete: "cascade" }),
     organizerAssignmentId: bigint("organizer_assignment_id", { mode: "number" })
       .notNull()
-      .references(() => opportunityOrganizerAssignments.id, { onDelete: "restrict" }),
+      .references(() => opportunityOrganizerAssignments.id, {
+        onDelete: "restrict",
+      }),
     analysisKind: text("analysis_kind").notNull(),
     methodologyVersion: text("methodology_version").notNull(),
     lookbackYears: smallint("lookback_years").notNull().default(10),
@@ -1259,14 +1583,21 @@ export const opportunityAnalysisSnapshots = pgTable(
     corpusBasis: text("corpus_basis").notNull(),
     corpusRightsReference: text("corpus_rights_reference"),
     methodology: text("methodology").notNull(),
-    scores: jsonb("scores").$type<Record<string, unknown>>().notNull().default(sql`'{}'::jsonb`),
+    scores: jsonb("scores")
+      .$type<Record<string, unknown>>()
+      .notNull()
+      .default(sql`'{}'::jsonb`),
     confidenceBps: integer("confidence_bps").notNull().default(0),
     limitations: text("limitations").notNull(),
     status: text("status").notNull().default("draft"),
-    createdByUserId: bigint("created_by_user_id", { mode: "number" }).references(() => users.id, {
+    createdByUserId: bigint("created_by_user_id", {
+      mode: "number",
+    }).references(() => users.id, {
       onDelete: "set null",
     }),
-    reviewedByUserId: bigint("reviewed_by_user_id", { mode: "number" }).references(() => users.id, {
+    reviewedByUserId: bigint("reviewed_by_user_id", {
+      mode: "number",
+    }).references(() => users.id, {
       onDelete: "set null",
     }),
     reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
@@ -1278,9 +1609,15 @@ export const opportunityAnalysisSnapshots = pgTable(
       table.status,
       table.updatedAt,
     ),
-    index("opportunity_analysis_snapshots_assignment_idx").on(table.organizerAssignmentId),
-    index("opportunity_analysis_snapshots_created_by_idx").on(table.createdByUserId),
-    index("opportunity_analysis_snapshots_reviewed_by_idx").on(table.reviewedByUserId),
+    index("opportunity_analysis_snapshots_assignment_idx").on(
+      table.organizerAssignmentId,
+    ),
+    index("opportunity_analysis_snapshots_created_by_idx").on(
+      table.createdByUserId,
+    ),
+    index("opportunity_analysis_snapshots_reviewed_by_idx").on(
+      table.reviewedByUserId,
+    ),
     check(
       "opportunity_analysis_snapshots_public_id_check",
       sql`${table.publicId} ~ '^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'`,
@@ -1347,8 +1684,12 @@ export const contestOpportunityPlans = pgTable(
       .notNull()
       .references(() => plans.id, { onDelete: "restrict" }),
     availability: text("availability").notNull().default("planned"),
-    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   (table) => [
     primaryKey({
@@ -1368,22 +1709,37 @@ export const questions = pgTable(
   {
     id: idColumn(),
     publicId: text("public_id").notNull().unique(),
-    legalArticleId: bigint("legal_article_id", { mode: "number" }).references(() => legalArticles.id, {
-      onDelete: "restrict",
-    }),
-    subjectId: bigint("subject_id", { mode: "number" }).references(() => quizSubjects.id, {
-      onDelete: "restrict",
-    }),
-    topicId: bigint("topic_id", { mode: "number" }).references(() => quizTopics.id, {
-      onDelete: "restrict",
-    }),
+    legalArticleId: bigint("legal_article_id", { mode: "number" }).references(
+      () => legalArticles.id,
+      {
+        onDelete: "restrict",
+      },
+    ),
+    subjectId: bigint("subject_id", { mode: "number" }).references(
+      () => quizSubjects.id,
+      {
+        onDelete: "restrict",
+      },
+    ),
+    topicId: bigint("topic_id", { mode: "number" }).references(
+      () => quizTopics.id,
+      {
+        onDelete: "restrict",
+      },
+    ),
     quizMode: text("quiz_mode").notNull().default("dry_law"),
-    styleBankId: bigint("style_bank_id", { mode: "number" }).references(() => quizBanks.id, {
-      onDelete: "restrict",
-    }),
-    examEditionId: bigint("exam_edition_id", { mode: "number" }).references(() => examEditions.id, {
-      onDelete: "restrict",
-    }),
+    styleBankId: bigint("style_bank_id", { mode: "number" }).references(
+      () => quizBanks.id,
+      {
+        onDelete: "restrict",
+      },
+    ),
+    examEditionId: bigint("exam_edition_id", { mode: "number" }).references(
+      () => examEditions.id,
+      {
+        onDelete: "restrict",
+      },
+    ),
     type: text("type").notNull(),
     prompt: text("prompt").notNull(),
     explanation: text("explanation").notNull(),
@@ -1407,18 +1763,26 @@ export const questions = pgTable(
     authorshipMethod: text("authorship_method").notNull().default("human"),
     generatorModel: text("generator_model"),
     promptVersion: text("prompt_version"),
-    createdByUserId: bigint("created_by_user_id", { mode: "number" }).references(() => users.id, {
+    createdByUserId: bigint("created_by_user_id", {
+      mode: "number",
+    }).references(() => users.id, {
       onDelete: "set null",
     }),
-    reviewedByUserId: bigint("reviewed_by_user_id", { mode: "number" }).references(() => users.id, {
+    reviewedByUserId: bigint("reviewed_by_user_id", {
+      mode: "number",
+    }).references(() => users.id, {
       onDelete: "set null",
     }),
-    cleanRoomAttestedAt: timestamp("clean_room_attested_at", { withTimezone: true }),
+    cleanRoomAttestedAt: timestamp("clean_room_attested_at", {
+      withTimezone: true,
+    }),
     submittedAt: timestamp("submitted_at", { withTimezone: true }),
     reviewNotes: text("review_notes"),
     similarityMaxBps: integer("similarity_max_bps").notNull().default(0),
     similarityReferencePublicId: text("similarity_reference_public_id"),
-    originalityCheckedAt: timestamp("originality_checked_at", { withTimezone: true }),
+    originalityCheckedAt: timestamp("originality_checked_at", {
+      withTimezone: true,
+    }),
     verifiedAt: timestamp("verified_at", { withTimezone: true }).notNull(),
     ...timestamps,
   },
@@ -1444,8 +1808,13 @@ export const questions = pgTable(
     ),
     uniqueIndex("questions_exam_original_order_uidx")
       .on(table.examEditionId, table.originalQuestionOrder)
-      .where(sql`${table.examEditionId} is not null and ${table.originalQuestionOrder} is not null`),
-    check("questions_difficulty_check", sql`${table.difficulty} between 1 and 5`),
+      .where(
+        sql`${table.examEditionId} is not null and ${table.originalQuestionOrder} is not null`,
+      ),
+    check(
+      "questions_difficulty_check",
+      sql`${table.difficulty} between 1 and 5`,
+    ),
     check(
       "questions_type_check",
       sql`${table.type} in ('literal_exact', 'cloze', 'altered_word', 'deadline', 'competence', 'true_false', 'multiple_choice')`,
@@ -1561,7 +1930,9 @@ export const editorialAutomationJobs = pgTable(
     inputHash: text("input_hash").notNull(),
     status: text("status").notNull().default("pending"),
     attempts: integer("attempts").notNull().default(0),
-    nextAttemptAt: timestamp("next_attempt_at", { withTimezone: true }).notNull().defaultNow(),
+    nextAttemptAt: timestamp("next_attempt_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
     leaseToken: text("lease_token"),
     leaseExpiresAt: timestamp("lease_expires_at", { withTimezone: true }),
     lastErrorCode: text("last_error_code"),
@@ -1569,16 +1940,35 @@ export const editorialAutomationJobs = pgTable(
     ...timestamps,
   },
   (table) => [
-    index("editorial_jobs_due_idx").on(table.kind, table.status, table.nextAttemptAt),
-    check("editorial_jobs_kind_check", sql`${table.kind} in ('draft_generation', 'source_capture')`),
-    check("editorial_jobs_hash_check", sql`${table.inputHash} ~ '^[0-9a-f]{64}$'`),
-    check("editorial_jobs_status_check", sql`${table.status} in ('pending', 'running', 'retry', 'succeeded', 'blocked', 'failed')`),
-    check("editorial_jobs_attempts_check", sql`${table.attempts} between 0 and 5`),
+    index("editorial_jobs_due_idx").on(
+      table.kind,
+      table.status,
+      table.nextAttemptAt,
+    ),
+    check(
+      "editorial_jobs_kind_check",
+      sql`${table.kind} in ('draft_generation', 'source_capture')`,
+    ),
+    check(
+      "editorial_jobs_hash_check",
+      sql`${table.inputHash} ~ '^[0-9a-f]{64}$'`,
+    ),
+    check(
+      "editorial_jobs_status_check",
+      sql`${table.status} in ('pending', 'running', 'retry', 'succeeded', 'blocked', 'failed')`,
+    ),
+    check(
+      "editorial_jobs_attempts_check",
+      sql`${table.attempts} between 0 and 5`,
+    ),
     check("editorial_jobs_subject_check", sql`${table.subjectId} > 0`),
-    check("editorial_jobs_lease_check", sql`
+    check(
+      "editorial_jobs_lease_check",
+      sql`
       (${table.status} = 'running' and ${table.leaseToken} is not null and ${table.leaseExpiresAt} is not null)
       or (${table.status} <> 'running' and ${table.leaseToken} is null and ${table.leaseExpiresAt} is null)
-    `),
+    `,
+    ),
   ],
 );
 
@@ -1592,11 +1982,14 @@ export const questionOpportunities = pgTable(
       .notNull()
       .references(() => contestOpportunities.id, { onDelete: "cascade" }),
     relationship: text("relationship").notNull(),
-    analysisSnapshotId: bigint("analysis_snapshot_id", { mode: "number" }).references(
-      () => opportunityAnalysisSnapshots.id,
-      { onDelete: "set null" },
-    ),
-    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    analysisSnapshotId: bigint("analysis_snapshot_id", {
+      mode: "number",
+    }).references(() => opportunityAnalysisSnapshots.id, {
+      onDelete: "set null",
+    }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   (table) => [
     primaryKey({
@@ -1631,9 +2024,18 @@ export const questionOptions = pgTable(
     sortOrder: smallint("sort_order").notNull(),
   },
   (table) => [
-    uniqueIndex("question_options_question_key_uidx").on(table.questionId, table.optionKey),
-    uniqueIndex("question_options_question_order_uidx").on(table.questionId, table.sortOrder),
-    uniqueIndex("question_options_id_question_uidx").on(table.id, table.questionId),
+    uniqueIndex("question_options_question_key_uidx").on(
+      table.questionId,
+      table.optionKey,
+    ),
+    uniqueIndex("question_options_question_order_uidx").on(
+      table.questionId,
+      table.sortOrder,
+    ),
+    uniqueIndex("question_options_id_question_uidx").on(
+      table.id,
+      table.questionId,
+    ),
     uniqueIndex("question_options_one_correct_uidx")
       .on(table.questionId)
       .where(sql`${table.isCorrect}`),
@@ -1653,30 +2055,43 @@ export const quizSessions = pgTable(
       () => quizCareerTracks.id,
       { onDelete: "restrict" },
     ),
-    specializationId: bigint("specialization_id", { mode: "number" }).references(
-      () => quizCareerSpecializations.id,
-      { onDelete: "restrict" },
+    specializationId: bigint("specialization_id", {
+      mode: "number",
+    }).references(() => quizCareerSpecializations.id, { onDelete: "restrict" }),
+    bankId: bigint("bank_id", { mode: "number" }).references(
+      () => quizBanks.id,
+      {
+        onDelete: "restrict",
+      },
     ),
-    bankId: bigint("bank_id", { mode: "number" }).references(() => quizBanks.id, {
-      onDelete: "restrict",
-    }),
-    subjectId: bigint("subject_id", { mode: "number" }).references(() => quizSubjects.id, {
-      onDelete: "restrict",
-    }),
-    topicId: bigint("topic_id", { mode: "number" }).references(() => quizTopics.id, {
-      onDelete: "restrict",
-    }),
+    subjectId: bigint("subject_id", { mode: "number" }).references(
+      () => quizSubjects.id,
+      {
+        onDelete: "restrict",
+      },
+    ),
+    topicId: bigint("topic_id", { mode: "number" }).references(
+      () => quizTopics.id,
+      {
+        onDelete: "restrict",
+      },
+    ),
     mode: text("mode").notNull(),
     experience: text("experience").notNull().default("training"),
     timed: boolean("timed").notNull().default(false),
     examScope: text("exam_scope").notNull().default("latest"),
-    examEditionId: bigint("exam_edition_id", { mode: "number" }).references(() => examEditions.id, {
-      onDelete: "restrict",
-    }),
+    examEditionId: bigint("exam_edition_id", { mode: "number" }).references(
+      () => examEditions.id,
+      {
+        onDelete: "restrict",
+      },
+    ),
     requestedCount: smallint("requested_count").notNull(),
     questionCount: smallint("question_count").notNull().default(0),
     status: text("status").notNull().default("created"),
-    startedAt: timestamp("started_at", { withTimezone: true }).notNull().defaultNow(),
+    startedAt: timestamp("started_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
     deadlineAt: timestamp("deadline_at", { withTimezone: true }),
     expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
     completedAt: timestamp("completed_at", { withTimezone: true }),
@@ -1701,7 +2116,10 @@ export const quizSessions = pgTable(
       "quiz_sessions_specialization_check",
       sql`${table.specializationId} is null or ${table.careerTrackId} is not null`,
     ),
-    check("quiz_sessions_topic_check", sql`${table.topicId} is null or ${table.subjectId} is not null`),
+    check(
+      "quiz_sessions_topic_check",
+      sql`${table.topicId} is null or ${table.subjectId} is not null`,
+    ),
     check(
       "quiz_sessions_mode_check",
       sql`${table.mode} in ('dry_law', 'previous_exam', 'original_style')`,
@@ -1710,7 +2128,10 @@ export const quizSessions = pgTable(
       "quiz_sessions_experience_check",
       sql`${table.experience} in ('training', 'exam')`,
     ),
-    check("quiz_sessions_exam_scope_check", sql`${table.examScope} in ('latest', 'all')`),
+    check(
+      "quiz_sessions_exam_scope_check",
+      sql`${table.examScope} in ('latest', 'all')`,
+    ),
     check(
       "quiz_sessions_exam_edition_check",
       sql`${table.examEditionId} is null or (
@@ -1729,7 +2150,10 @@ export const quizSessions = pgTable(
       "quiz_sessions_status_check",
       sql`${table.status} in ('created', 'in_progress', 'completed', 'expired')`,
     ),
-    check("quiz_sessions_expiry_check", sql`${table.expiresAt} > ${table.startedAt}`),
+    check(
+      "quiz_sessions_expiry_check",
+      sql`${table.expiresAt} > ${table.startedAt}`,
+    ),
     check(
       "quiz_sessions_deadline_check",
       sql`(${table.timed} and ${table.deadlineAt} is not null
@@ -1750,11 +2174,19 @@ export const quizSessionQuestions = pgTable(
       .notNull()
       .references(() => questions.id, { onDelete: "restrict" }),
     position: smallint("position").notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   (table) => [
-    primaryKey({ columns: [table.sessionId, table.questionId], name: "quiz_session_questions_pkey" }),
-    uniqueIndex("quiz_session_questions_session_position_uidx").on(table.sessionId, table.position),
+    primaryKey({
+      columns: [table.sessionId, table.questionId],
+      name: "quiz_session_questions_pkey",
+    }),
+    uniqueIndex("quiz_session_questions_session_position_uidx").on(
+      table.sessionId,
+      table.position,
+    ),
     index("quiz_session_questions_question_id_idx").on(table.questionId),
     check("quiz_session_questions_position_check", sql`${table.position} >= 1`),
   ],
@@ -1765,16 +2197,26 @@ export const quizSessionAnswers = pgTable(
   {
     sessionId: text("session_id").notNull(),
     questionId: bigint("question_id", { mode: "number" }).notNull(),
-    selectedOptionId: bigint("selected_option_id", { mode: "number" }).notNull(),
+    selectedOptionId: bigint("selected_option_id", {
+      mode: "number",
+    }).notNull(),
     isCorrect: boolean("is_correct").notNull(),
     durationMs: integer("duration_ms"),
-    answeredAt: timestamp("answered_at", { withTimezone: true }).notNull().defaultNow(),
+    answeredAt: timestamp("answered_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   (table) => [
-    primaryKey({ columns: [table.sessionId, table.questionId], name: "quiz_session_answers_pkey" }),
+    primaryKey({
+      columns: [table.sessionId, table.questionId],
+      name: "quiz_session_answers_pkey",
+    }),
     foreignKey({
       columns: [table.sessionId, table.questionId],
-      foreignColumns: [quizSessionQuestions.sessionId, quizSessionQuestions.questionId],
+      foreignColumns: [
+        quizSessionQuestions.sessionId,
+        quizSessionQuestions.questionId,
+      ],
       name: "quiz_session_answers_session_question_fk",
     }).onDelete("cascade"),
     foreignKey({
@@ -1783,7 +2225,9 @@ export const quizSessionAnswers = pgTable(
       name: "quiz_session_answers_option_question_fk",
     }).onDelete("restrict"),
     index("quiz_session_answers_question_id_idx").on(table.questionId),
-    index("quiz_session_answers_selected_option_id_idx").on(table.selectedOptionId),
+    index("quiz_session_answers_selected_option_id_idx").on(
+      table.selectedOptionId,
+    ),
     check(
       "quiz_session_answers_duration_check",
       sql`${table.durationMs} is null or ${table.durationMs} between 0 and 3600000`,
@@ -1804,21 +2248,34 @@ export const userAttempts = pgTable(
     questionId: bigint("question_id", { mode: "number" })
       .notNull()
       .references(() => questions.id, { onDelete: "restrict" }),
-    selectedOptionId: bigint("selected_option_id", { mode: "number" }).references(() => questionOptions.id, {
+    selectedOptionId: bigint("selected_option_id", {
+      mode: "number",
+    }).references(() => questionOptions.id, {
       onDelete: "restrict",
     }),
     isCorrect: boolean("is_correct").notNull(),
     confidence: smallint("confidence"),
     durationMs: integer("duration_ms"),
-    answeredAt: timestamp("answered_at", { withTimezone: true }).notNull().defaultNow(),
+    answeredAt: timestamp("answered_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   (table) => [
-    uniqueIndex("user_attempts_quiz_session_question_uidx").on(table.quizSessionId, table.questionId),
+    uniqueIndex("user_attempts_quiz_session_question_uidx").on(
+      table.quizSessionId,
+      table.questionId,
+    ),
     index("user_attempts_user_answered_idx").on(table.userId, table.answeredAt),
     index("user_attempts_question_id_idx").on(table.questionId),
     index("user_attempts_selected_option_id_idx").on(table.selectedOptionId),
-    check("user_attempts_confidence_check", sql`${table.confidence} is null or ${table.confidence} between 1 and 3`),
-    check("user_attempts_duration_check", sql`${table.durationMs} is null or ${table.durationMs} >= 0`),
+    check(
+      "user_attempts_confidence_check",
+      sql`${table.confidence} is null or ${table.confidence} between 1 and 3`,
+    ),
+    check(
+      "user_attempts_duration_check",
+      sql`${table.durationMs} is null or ${table.durationMs} >= 0`,
+    ),
   ],
 );
 
@@ -1834,17 +2291,25 @@ export const reviewQueue = pgTable(
     stage: smallint("stage").notNull().default(0),
     repetitions: integer("repetitions").notNull().default(0),
     lapses: integer("lapses").notNull().default(0),
-    nextReviewAt: timestamp("next_review_at", { withTimezone: true }).notNull().defaultNow(),
+    nextReviewAt: timestamp("next_review_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
     lastReviewedAt: timestamp("last_reviewed_at", { withTimezone: true }),
     lastResult: text("last_result"),
     ...timestamps,
   },
   (table) => [
-    primaryKey({ columns: [table.userId, table.questionId], name: "review_queue_pkey" }),
+    primaryKey({
+      columns: [table.userId, table.questionId],
+      name: "review_queue_pkey",
+    }),
     index("review_queue_user_due_idx").on(table.userId, table.nextReviewAt),
     index("review_queue_question_id_idx").on(table.questionId),
     check("review_queue_stage_check", sql`${table.stage} between 0 and 6`),
-    check("review_queue_counts_check", sql`${table.repetitions} >= 0 and ${table.lapses} >= 0`),
+    check(
+      "review_queue_counts_check",
+      sql`${table.repetitions} >= 0 and ${table.lapses} >= 0`,
+    ),
   ],
 );
 
@@ -1864,10 +2329,19 @@ export const savedStudyFilters = pgTable(
     ...timestamps,
   },
   (table) => [
-    uniqueIndex("saved_study_filters_user_name_uidx").on(table.userId, sql`lower(${table.name})`),
-    index("saved_study_filters_user_updated_idx").on(table.userId, table.updatedAt),
+    uniqueIndex("saved_study_filters_user_name_uidx").on(
+      table.userId,
+      sql`lower(${table.name})`,
+    ),
+    index("saved_study_filters_user_updated_idx").on(
+      table.userId,
+      table.updatedAt,
+    ),
     index("saved_study_filters_legal_act_id_idx").on(table.legalActId),
-    check("saved_study_filters_name_check", sql`char_length(btrim(${table.name})) between 1 and 80`),
+    check(
+      "saved_study_filters_name_check",
+      sql`char_length(btrim(${table.name})) between 1 and 80`,
+    ),
     check(
       "saved_study_filters_article_range_check",
       sql`${table.articleStartOrder} >= 0 and ${table.articleEndOrder} >= ${table.articleStartOrder}`,
@@ -1888,9 +2362,18 @@ export const questionNotebooks = pgTable(
     ...timestamps,
   },
   (table) => [
-    uniqueIndex("question_notebooks_user_name_uidx").on(table.userId, sql`lower(${table.name})`),
-    index("question_notebooks_user_updated_idx").on(table.userId, table.updatedAt),
-    check("question_notebooks_name_check", sql`char_length(btrim(${table.name})) between 1 and 80`),
+    uniqueIndex("question_notebooks_user_name_uidx").on(
+      table.userId,
+      sql`lower(${table.name})`,
+    ),
+    index("question_notebooks_user_updated_idx").on(
+      table.userId,
+      table.updatedAt,
+    ),
+    check(
+      "question_notebooks_name_check",
+      sql`char_length(btrim(${table.name})) between 1 and 80`,
+    ),
     check(
       "question_notebooks_description_check",
       sql`${table.description} is null or char_length(${table.description}) <= 240`,
@@ -1907,7 +2390,9 @@ export const questionNotebookItems = pgTable(
     questionId: bigint("question_id", { mode: "number" })
       .notNull()
       .references(() => questions.id, { onDelete: "restrict" }),
-    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   (table) => [
     primaryKey({
@@ -1929,16 +2414,24 @@ export const studyDays = pgTable(
     correctCount: integer("correct_count").notNull().default(0),
     minutesStudied: integer("minutes_studied").notNull().default(0),
     xpEarned: integer("xp_earned").notNull().default(0),
-    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   (table) => [
-    primaryKey({ columns: [table.userId, table.studyDate], name: "study_days_pkey" }),
+    primaryKey({
+      columns: [table.userId, table.studyDate],
+      name: "study_days_pkey",
+    }),
     index("study_days_date_xp_idx").on(table.studyDate, table.xpEarned),
     check(
       "study_days_counts_check",
       sql`${table.answeredCount} >= 0 and ${table.correctCount} >= 0 and ${table.correctCount} <= ${table.answeredCount}`,
     ),
-    check("study_days_minutes_xp_check", sql`${table.minutesStudied} >= 0 and ${table.xpEarned} >= 0`),
+    check(
+      "study_days_minutes_xp_check",
+      sql`${table.minutesStudied} >= 0 and ${table.xpEarned} >= 0`,
+    ),
   ],
 );
 
@@ -1955,11 +2448,18 @@ export const checkoutAttempts = pgTable(
     providerSessionId: text("provider_session_id").unique(),
     status: text("status").notNull().default("created"),
     expiresAt: timestamp("expires_at", { withTimezone: true }),
-    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   (table) => [
-    index("checkout_attempts_user_created_idx").on(table.userId, table.createdAt),
+    index("checkout_attempts_user_created_idx").on(
+      table.userId,
+      table.createdAt,
+    ),
     index("checkout_attempts_plan_id_idx").on(table.planId),
     check(
       "checkout_attempts_status_check",
@@ -1975,9 +2475,12 @@ export const accountAccessTokens = pgTable(
     userId: bigint("user_id", { mode: "number" })
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    checkoutAttemptId: text("checkout_attempt_id").references(() => checkoutAttempts.id, {
-      onDelete: "set null",
-    }),
+    checkoutAttemptId: text("checkout_attempt_id").references(
+      () => checkoutAttempts.id,
+      {
+        onDelete: "set null",
+      },
+    ),
     purpose: text("purpose").notNull(),
     deliveryStatus: text("delivery_status").notNull().default("pending"),
     providerMessageId: text("provider_message_id"),
@@ -1991,9 +2494,15 @@ export const accountAccessTokens = pgTable(
     uniqueIndex("account_access_tokens_checkout_uidx")
       .on(table.checkoutAttemptId)
       .where(sql`${table.checkoutAttemptId} is not null`),
-    index("account_access_tokens_user_created_idx").on(table.userId, table.createdAt),
+    index("account_access_tokens_user_created_idx").on(
+      table.userId,
+      table.createdAt,
+    ),
     index("account_access_tokens_expires_idx").on(table.expiresAt),
-    check("account_access_tokens_id_check", sql`${table.id} ~ '^[0-9a-f]{64}$'`),
+    check(
+      "account_access_tokens_id_check",
+      sql`${table.id} ~ '^[0-9a-f]{64}$'`,
+    ),
     check(
       "account_access_tokens_purpose_check",
       sql`${table.purpose} in ('purchase_access', 'password_reset')`,
@@ -2022,14 +2531,22 @@ export const stripeEvents = pgTable(
     livemode: boolean("livemode").notNull(),
     status: text("status").notNull().default("received"),
     payload: jsonb("payload").$type<Record<string, unknown>>().notNull(),
-    receivedAt: timestamp("received_at", { withTimezone: true }).notNull().defaultNow(),
+    receivedAt: timestamp("received_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
     processedAt: timestamp("processed_at", { withTimezone: true }),
     errorMessage: text("error_message"),
   },
   (table) => [
-    index("stripe_events_status_received_idx").on(table.status, table.receivedAt),
+    index("stripe_events_status_received_idx").on(
+      table.status,
+      table.receivedAt,
+    ),
     index("stripe_events_type_idx").on(table.eventType),
-    check("stripe_events_status_check", sql`${table.status} in ('received', 'processing', 'processed', 'failed')`),
+    check(
+      "stripe_events_status_check",
+      sql`${table.status} in ('received', 'processing', 'processed', 'failed')`,
+    ),
   ],
 );
 
@@ -2057,10 +2574,14 @@ export const stripeConnectPartners = pgTable(
       .$type<string[]>()
       .notNull()
       .default(sql`'[]'::jsonb`),
-    createdByUserId: bigint("created_by_user_id", { mode: "number" }).references(() => users.id, {
+    createdByUserId: bigint("created_by_user_id", {
+      mode: "number",
+    }).references(() => users.id, {
       onDelete: "set null",
     }),
-    updatedByUserId: bigint("updated_by_user_id", { mode: "number" }).references(() => users.id, {
+    updatedByUserId: bigint("updated_by_user_id", {
+      mode: "number",
+    }).references(() => users.id, {
       onDelete: "set null",
     }),
     ...timestamps,
@@ -2073,13 +2594,22 @@ export const stripeConnectPartners = pgTable(
       "stripe_connect_partners_public_id_check",
       sql`${table.publicId} ~ '^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'`,
     ),
-    check("stripe_connect_partners_country_check", sql`${table.country} = upper(${table.country})`),
-    check("stripe_connect_partners_currency_check", sql`${table.currency} = lower(${table.currency})`),
+    check(
+      "stripe_connect_partners_country_check",
+      sql`${table.country} = upper(${table.country})`,
+    ),
+    check(
+      "stripe_connect_partners_currency_check",
+      sql`${table.currency} = lower(${table.currency})`,
+    ),
     check(
       "stripe_connect_partners_account_id_check",
       sql`${table.stripeAccountId} is null or ${table.stripeAccountId} ~ '^acct_[A-Za-z0-9]+$'`,
     ),
-    check("stripe_connect_partners_account_type_check", sql`${table.accountType} = 'express'`),
+    check(
+      "stripe_connect_partners_account_type_check",
+      sql`${table.accountType} = 'express'`,
+    ),
     check(
       "stripe_connect_partners_status_check",
       sql`${table.status} in ('draft', 'onboarding', 'restricted', 'enabled', 'paused', 'archived')`,
@@ -2094,16 +2624,22 @@ export const stripeConnectSplitRules = pgTable(
     publicId: text("public_id").notNull().unique(),
     name: text("name").notNull(),
     status: text("status").notNull().default("draft"),
-    chargeModel: text("charge_model").notNull().default("separate_charges_and_transfers"),
+    chargeModel: text("charge_model")
+      .notNull()
+      .default("separate_charges_and_transfers"),
     currency: text("currency").notNull().default("brl"),
     platformShareBps: integer("platform_share_bps").notNull().default(0),
     version: integer("version").notNull().default(1),
     effectiveFrom: timestamp("effective_from", { withTimezone: true }),
     effectiveUntil: timestamp("effective_until", { withTimezone: true }),
-    createdByUserId: bigint("created_by_user_id", { mode: "number" }).references(() => users.id, {
+    createdByUserId: bigint("created_by_user_id", {
+      mode: "number",
+    }).references(() => users.id, {
       onDelete: "set null",
     }),
-    updatedByUserId: bigint("updated_by_user_id", { mode: "number" }).references(() => users.id, {
+    updatedByUserId: bigint("updated_by_user_id", {
+      mode: "number",
+    }).references(() => users.id, {
       onDelete: "set null",
     }),
     ...timestamps,
@@ -2112,8 +2648,12 @@ export const stripeConnectSplitRules = pgTable(
     uniqueIndex("stripe_connect_split_rules_one_active_uidx")
       .on(table.status)
       .where(sql`${table.status} = 'active'`),
-    index("stripe_connect_split_rules_created_by_idx").on(table.createdByUserId),
-    index("stripe_connect_split_rules_updated_by_idx").on(table.updatedByUserId),
+    index("stripe_connect_split_rules_created_by_idx").on(
+      table.createdByUserId,
+    ),
+    index("stripe_connect_split_rules_updated_by_idx").on(
+      table.updatedByUserId,
+    ),
     check(
       "stripe_connect_split_rules_public_id_check",
       sql`${table.publicId} ~ '^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'`,
@@ -2126,12 +2666,18 @@ export const stripeConnectSplitRules = pgTable(
       "stripe_connect_split_rules_charge_model_check",
       sql`${table.chargeModel} = 'separate_charges_and_transfers'`,
     ),
-    check("stripe_connect_split_rules_currency_check", sql`${table.currency} = lower(${table.currency})`),
+    check(
+      "stripe_connect_split_rules_currency_check",
+      sql`${table.currency} = lower(${table.currency})`,
+    ),
     check(
       "stripe_connect_split_rules_platform_share_check",
       sql`${table.platformShareBps} between 0 and 10000`,
     ),
-    check("stripe_connect_split_rules_version_check", sql`${table.version} >= 1`),
+    check(
+      "stripe_connect_split_rules_version_check",
+      sql`${table.version} >= 1`,
+    ),
     check(
       "stripe_connect_split_rules_effective_period_check",
       sql`${table.effectiveUntil} is null or ${table.effectiveFrom} is null or ${table.effectiveUntil} > ${table.effectiveFrom}`,
@@ -2172,9 +2718,12 @@ export const stripeConnectTransferBatches = pgTable(
       .notNull()
       .unique()
       .references(() => stripeEvents.eventId, { onDelete: "restrict" }),
-    checkoutAttemptId: text("checkout_attempt_id").references(() => checkoutAttempts.id, {
-      onDelete: "restrict",
-    }),
+    checkoutAttemptId: text("checkout_attempt_id").references(
+      () => checkoutAttempts.id,
+      {
+        onDelete: "restrict",
+      },
+    ),
     ruleId: bigint("rule_id", { mode: "number" })
       .notNull()
       .references(() => stripeConnectSplitRules.id, { onDelete: "restrict" }),
@@ -2199,9 +2748,14 @@ export const stripeConnectTransferBatches = pgTable(
       table.ruleId,
       table.currency,
     ),
-    index("stripe_connect_transfer_batches_status_created_idx").on(table.status, table.createdAt),
+    index("stripe_connect_transfer_batches_status_created_idx").on(
+      table.status,
+      table.createdAt,
+    ),
     index("stripe_connect_transfer_batches_rule_idx").on(table.ruleId),
-    index("stripe_connect_transfer_batches_checkout_attempt_idx").on(table.checkoutAttemptId),
+    index("stripe_connect_transfer_batches_checkout_attempt_idx").on(
+      table.checkoutAttemptId,
+    ),
     check(
       "stripe_connect_transfer_batches_status_check",
       sql`${table.status} in ('planned', 'processing', 'completed', 'failed', 'partially_reversed', 'reversed')`,
@@ -2213,7 +2767,10 @@ export const stripeConnectTransferBatches = pgTable(
         and ${table.partnerAmountCents} >= 0
         and ${table.platformAmountCents} + ${table.partnerAmountCents} = ${table.grossAmountCents}`,
     ),
-    check("stripe_connect_transfer_batches_currency_check", sql`${table.currency} = lower(${table.currency})`),
+    check(
+      "stripe_connect_transfer_batches_currency_check",
+      sql`${table.currency} = lower(${table.currency})`,
+    ),
     check(
       "stripe_connect_transfer_batches_provider_reference_check",
       sql`${table.providerPaymentIntentId} is not null
@@ -2260,15 +2817,30 @@ export const stripeConnectTransfers = pgTable(
       ],
       name: "stripe_connect_transfers_rule_partner_fk",
     }).onDelete("restrict"),
-    uniqueIndex("stripe_connect_transfers_batch_partner_uidx").on(table.batchId, table.partnerId),
-    index("stripe_connect_transfers_rule_partner_idx").on(table.ruleId, table.partnerId),
-    index("stripe_connect_transfers_partner_status_idx").on(table.partnerId, table.status),
-    check("stripe_connect_transfers_amount_check", sql`${table.amountCents} > 0`),
+    uniqueIndex("stripe_connect_transfers_batch_partner_uidx").on(
+      table.batchId,
+      table.partnerId,
+    ),
+    index("stripe_connect_transfers_rule_partner_idx").on(
+      table.ruleId,
+      table.partnerId,
+    ),
+    index("stripe_connect_transfers_partner_status_idx").on(
+      table.partnerId,
+      table.status,
+    ),
+    check(
+      "stripe_connect_transfers_amount_check",
+      sql`${table.amountCents} > 0`,
+    ),
     check(
       "stripe_connect_transfers_reversed_amount_check",
       sql`${table.reversedAmountCents} between 0 and ${table.amountCents}`,
     ),
-    check("stripe_connect_transfers_currency_check", sql`${table.currency} = lower(${table.currency})`),
+    check(
+      "stripe_connect_transfers_currency_check",
+      sql`${table.currency} = lower(${table.currency})`,
+    ),
     check(
       "stripe_connect_transfers_status_check",
       sql`${table.status} in ('planned', 'pending', 'succeeded', 'failed', 'partially_reversed', 'reversed')`,
@@ -2289,14 +2861,21 @@ export const questionReports = pgTable(
     reason: text("reason").notNull(),
     notes: text("notes"),
     status: text("status").notNull().default("open"),
-    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
     resolvedAt: timestamp("resolved_at", { withTimezone: true }),
   },
   (table) => [
     index("question_reports_question_id_idx").on(table.questionId),
     index("question_reports_user_id_idx").on(table.userId),
-    index("question_reports_open_idx").on(table.createdAt).where(sql`${table.status} = 'open'`),
-    check("question_reports_status_check", sql`${table.status} in ('open', 'reviewing', 'resolved', 'dismissed')`),
+    index("question_reports_open_idx")
+      .on(table.createdAt)
+      .where(sql`${table.status} = 'open'`),
+    check(
+      "question_reports_status_check",
+      sql`${table.status} in ('open', 'reviewing', 'resolved', 'dismissed')`,
+    ),
   ],
 );
 
@@ -2304,14 +2883,22 @@ export const auditLogs = pgTable(
   "audit_logs",
   {
     id: idColumn(),
-    actorUserId: bigint("actor_user_id", { mode: "number" }).references(() => users.id, {
-      onDelete: "set null",
-    }),
+    actorUserId: bigint("actor_user_id", { mode: "number" }).references(
+      () => users.id,
+      {
+        onDelete: "set null",
+      },
+    ),
     action: text("action").notNull(),
     entityType: text("entity_type").notNull(),
     entityId: text("entity_id"),
-    metadata: jsonb("metadata").$type<Record<string, unknown>>().notNull().default(sql`'{}'::jsonb`),
-    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    metadata: jsonb("metadata")
+      .$type<Record<string, unknown>>()
+      .notNull()
+      .default(sql`'{}'::jsonb`),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   (table) => [
     index("audit_logs_actor_id_idx").on(table.actorUserId),
@@ -2324,20 +2911,30 @@ export const contactMessages = pgTable(
   "contact_messages",
   {
     id: idColumn(),
-    userId: bigint("user_id", { mode: "number" }).references(() => users.id, { onDelete: "set null" }),
+    userId: bigint("user_id", { mode: "number" }).references(() => users.id, {
+      onDelete: "set null",
+    }),
     name: text("name").notNull(),
     email: text("email").notNull(),
     subject: text("subject").notNull(),
     message: text("message").notNull(),
     ipHash: text("ip_hash"),
     status: text("status").notNull().default("open"),
-    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
     resolvedAt: timestamp("resolved_at", { withTimezone: true }),
   },
   (table) => [
-    index("contact_messages_status_created_idx").on(table.status, table.createdAt),
+    index("contact_messages_status_created_idx").on(
+      table.status,
+      table.createdAt,
+    ),
     index("contact_messages_user_id_idx").on(table.userId),
-    check("contact_messages_status_check", sql`${table.status} in ('open', 'reviewing', 'resolved', 'spam')`),
+    check(
+      "contact_messages_status_check",
+      sql`${table.status} in ('open', 'reviewing', 'resolved', 'spam')`,
+    ),
   ],
 );
 

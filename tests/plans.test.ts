@@ -16,7 +16,7 @@ describe("plans", () => {
   });
 
   it("não aceita um plano arbitrário enviado pelo navegador", () => {
-    expect(getPlan("foco")?.name).toBe("Foco Anual");
+    expect(getPlan("foco")?.name).toBe("Master Anual");
     expect(getPlan("plano-inventado")).toBeNull();
   });
 

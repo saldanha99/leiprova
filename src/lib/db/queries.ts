@@ -15,7 +15,10 @@ import {
   userAttempts,
   users,
 } from "@/lib/db/schema";
-import { FREE_STUDY_QUESTION_IDS, type StudyEntitlement } from "@/lib/study/access-policy";
+import {
+  accessibleQuestionIds,
+  type StudyEntitlement,
+} from "@/lib/study/access-policy";
 
 export async function getDashboardSnapshot(userId: number) {
   const db = getDb();
@@ -24,43 +27,55 @@ export async function getDashboardSnapshot(userId: number) {
   since.setUTCDate(since.getUTCDate() - 6);
   const sinceIso = since.toISOString().slice(0, 10);
 
-  const [[attemptStats], [dueStats], recentDays, [currentPlan]] = await Promise.all([
-    db
-      .select({
-        answered: sql<number>`count(*)::int`,
-        correct: sql<number>`count(*) filter (where ${userAttempts.isCorrect})::int`,
-        todayAnswered: sql<number>`count(*) filter (where (${userAttempts.answeredAt} at time zone 'America/Sao_Paulo')::date = (now() at time zone 'America/Sao_Paulo')::date)::int`,
-      })
-      .from(userAttempts)
-      .where(eq(userAttempts.userId, userId)),
-    db
-      .select({ due: sql<number>`count(*)::int` })
-      .from(reviewQueue)
-      .where(and(eq(reviewQueue.userId, userId), lte(reviewQueue.nextReviewAt, new Date()))),
-    db
-      .select({
-        date: studyDays.studyDate,
-        answered: studyDays.answeredCount,
-        correct: studyDays.correctCount,
-        minutes: studyDays.minutesStudied,
-        xp: studyDays.xpEarned,
-      })
-      .from(studyDays)
-      .where(and(eq(studyDays.userId, userId), gte(studyDays.studyDate, sinceIso)))
-      .orderBy(asc(studyDays.studyDate)),
-    db
-      .select({ name: plans.name, status: subscriptions.status, accessEndsAt: subscriptions.accessEndsAt })
-      .from(subscriptions)
-      .innerJoin(plans, eq(subscriptions.planId, plans.id))
-      .where(
-        and(
-          eq(subscriptions.userId, userId),
-          sql`${subscriptions.status} in ('active', 'trialing', 'past_due')`,
+  const [[attemptStats], [dueStats], recentDays, [currentPlan]] =
+    await Promise.all([
+      db
+        .select({
+          answered: sql<number>`count(*)::int`,
+          correct: sql<number>`count(*) filter (where ${userAttempts.isCorrect})::int`,
+          todayAnswered: sql<number>`count(*) filter (where (${userAttempts.answeredAt} at time zone 'America/Sao_Paulo')::date = (now() at time zone 'America/Sao_Paulo')::date)::int`,
+        })
+        .from(userAttempts)
+        .where(eq(userAttempts.userId, userId)),
+      db
+        .select({ due: sql<number>`count(*)::int` })
+        .from(reviewQueue)
+        .where(
+          and(
+            eq(reviewQueue.userId, userId),
+            lte(reviewQueue.nextReviewAt, new Date()),
+          ),
         ),
-      )
-      .orderBy(desc(subscriptions.updatedAt))
-      .limit(1),
-  ]);
+      db
+        .select({
+          date: studyDays.studyDate,
+          answered: studyDays.answeredCount,
+          correct: studyDays.correctCount,
+          minutes: studyDays.minutesStudied,
+          xp: studyDays.xpEarned,
+        })
+        .from(studyDays)
+        .where(
+          and(eq(studyDays.userId, userId), gte(studyDays.studyDate, sinceIso)),
+        )
+        .orderBy(asc(studyDays.studyDate)),
+      db
+        .select({
+          name: plans.name,
+          status: subscriptions.status,
+          accessEndsAt: subscriptions.accessEndsAt,
+        })
+        .from(subscriptions)
+        .innerJoin(plans, eq(subscriptions.planId, plans.id))
+        .where(
+          and(
+            eq(subscriptions.userId, userId),
+            sql`${subscriptions.status} in ('active', 'trialing', 'past_due')`,
+          ),
+        )
+        .orderBy(desc(subscriptions.updatedAt))
+        .limit(1),
+    ]);
 
   const daysByDate = new Map(recentDays.map((day) => [day.date, day]));
   const activity = Array.from({ length: 7 }, (_, index) => {
@@ -94,8 +109,13 @@ export async function getDashboardSnapshot(userId: number) {
   };
 }
 
-function calculateStreak(days: Array<{ date: string; answered: number }>, todayIso: string) {
-  const active = new Set(days.filter((day) => day.answered > 0).map((day) => day.date));
+function calculateStreak(
+  days: Array<{ date: string; answered: number }>,
+  todayIso: string,
+) {
+  const active = new Set(
+    days.filter((day) => day.answered > 0).map((day) => day.date),
+  );
   const cursor = new Date(`${todayIso}T12:00:00Z`);
   if (!active.has(todayIso)) cursor.setUTCDate(cursor.getUTCDate() - 1);
   let streak = 0;
@@ -120,7 +140,7 @@ function saoPauloDate(date = new Date()) {
 export async function listLegalLibrary(entitlement: StudyEntitlement) {
   const accessCondition = entitlement.hasFullAccess
     ? undefined
-    : inArray(questions.publicId, [...FREE_STUDY_QUESTION_IDS]);
+    : inArray(questions.publicId, accessibleQuestionIds(entitlement));
   return getDb()
     .select({
       id: legalActs.id,
@@ -136,7 +156,10 @@ export async function listLegalLibrary(entitlement: StudyEntitlement) {
     .from(legalActs)
     .leftJoin(
       legalVersions,
-      and(eq(legalVersions.legalActId, legalActs.id), eq(legalVersions.status, "current")),
+      and(
+        eq(legalVersions.legalActId, legalActs.id),
+        eq(legalVersions.status, "current"),
+      ),
     )
     .leftJoin(
       legalArticles,
@@ -167,7 +190,9 @@ export async function getMonthlyRanking(limit = 20) {
     })
     .from(studyDays)
     .innerJoin(users, eq(studyDays.userId, users.id))
-    .where(sql`${studyDays.studyDate} >= date_trunc('month', current_date)::date`)
+    .where(
+      sql`${studyDays.studyDate} >= date_trunc('month', current_date)::date`,
+    )
     .groupBy(users.id)
     .orderBy(desc(sql`sum(${studyDays.xpEarned})`), asc(users.publicId))
     .limit(limit);
@@ -195,7 +220,10 @@ export async function getInitialStudyFocuses(limit = 3) {
     })
     .from(questions)
     .innerJoin(legalArticles, eq(questions.legalArticleId, legalArticles.id))
-    .innerJoin(legalVersions, eq(legalArticles.legalVersionId, legalVersions.id))
+    .innerJoin(
+      legalVersions,
+      eq(legalArticles.legalVersionId, legalVersions.id),
+    )
     .innerJoin(legalActs, eq(legalVersions.legalActId, legalActs.id))
     .where(
       and(

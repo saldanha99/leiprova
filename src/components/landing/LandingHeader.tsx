@@ -2,10 +2,11 @@ import { ArrowUpRight, Menu } from "lucide-react";
 import Link from "next/link";
 
 import { BrandMark } from "@/components/brand/BrandMark";
+import { ContestMegaMenu } from "@/components/contests/contest-mega-menu";
+import catalogStyles from "@/components/contests/contest-catalog.module.css";
 import { LOGIN_HREF, primaryCta } from "@/lib/funnel";
 
 const NAV_ITEMS = [
-  { href: "/concursos", label: "Concursos" },
   { href: "/metodologia", label: "Método" },
   { href: "#laboratorio", label: "Laboratório" },
   { href: "#recursos", label: "Recursos" },
@@ -14,15 +15,22 @@ const NAV_ITEMS = [
 ] as const;
 
 export function LandingHeader({ commerceOpen }: { commerceOpen: boolean }) {
-  const { href: primaryHref, label: primaryLabel } = primaryCta(commerceOpen, "Começar agora", {
-    fromHome: true,
-    closedLabel: "Ver planos",
-  });
+  const { href: primaryHref, label: primaryLabel } = primaryCta(
+    commerceOpen,
+    "Começar agora",
+    {
+      fromHome: true,
+      closedLabel: "Ver planos",
+    },
+  );
 
   return (
     <header className="landing-header">
-      <div className="site-container landing-header__inner">
+      <div
+        className={`site-container landing-header__inner max-sm:!gap-2 ${catalogStyles.compactBrand}`}
+      >
         <BrandMark />
+        <ContestMegaMenu />
 
         <nav className="landing-header__nav" aria-label="Navegação principal">
           {NAV_ITEMS.map((item) => (
@@ -36,7 +44,10 @@ export function LandingHeader({ commerceOpen }: { commerceOpen: boolean }) {
           <Link className="header-login" href={LOGIN_HREF}>
             Entrar
           </Link>
-          <Link className="button button--small button--amber" href={primaryHref}>
+          <Link
+            className="button button--small button--amber"
+            href={primaryHref}
+          >
             {primaryLabel}
             <ArrowUpRight aria-hidden="true" size={16} />
           </Link>

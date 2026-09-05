@@ -17,7 +17,10 @@ import {
   questions,
   savedStudyFilters,
 } from "@/lib/db/schema";
-import { canStudyQuestion, FREE_STUDY_QUESTION_IDS } from "@/lib/study/access-policy";
+import {
+  canStudyQuestion,
+  accessibleQuestionIds,
+} from "@/lib/study/access-policy";
 import { getStudyEntitlement } from "@/lib/study/entitlement";
 
 export type StudyLibraryActionState = {
@@ -25,22 +28,36 @@ export type StudyLibraryActionState = {
   message?: string;
 };
 
-const slugSchema = z.string().trim().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/).max(120);
-const nameSchema = z.string().trim().min(1, "Informe um nome.").max(80, "Use no máximo 80 caracteres.");
+const slugSchema = z
+  .string()
+  .trim()
+  .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
+  .max(120);
+const nameSchema = z
+  .string()
+  .trim()
+  .min(1, "Informe um nome.")
+  .max(80, "Use no máximo 80 caracteres.");
 const idSchema = z.coerce.number().int().positive();
 
-const savedFilterSchema = z.object({
-  name: nameSchema,
-  legalActSlug: slugSchema,
-  articleStartOrder: z.coerce.number().int().min(0),
-  articleEndOrder: z.coerce.number().int().min(0),
-}).refine((value) => value.articleEndOrder >= value.articleStartOrder, {
-  message: "O artigo final deve vir depois do inicial.",
-});
+const savedFilterSchema = z
+  .object({
+    name: nameSchema,
+    legalActSlug: slugSchema,
+    articleStartOrder: z.coerce.number().int().min(0),
+    articleEndOrder: z.coerce.number().int().min(0),
+  })
+  .refine((value) => value.articleEndOrder >= value.articleStartOrder, {
+    message: "O artigo final deve vir depois do inicial.",
+  });
 
 const notebookSchema = z.object({
   name: nameSchema,
-  description: z.string().trim().max(240, "Use no máximo 240 caracteres.").optional(),
+  description: z
+    .string()
+    .trim()
+    .max(240, "Use no máximo 240 caracteres.")
+    .optional(),
 });
 
 const notebookItemSchema = z.object({
@@ -49,7 +66,9 @@ const notebookItemSchema = z.object({
 });
 
 function databaseCode(error: unknown) {
-  return typeof error === "object" && error && "code" in error ? String(error.code) : "";
+  return typeof error === "object" && error && "code" in error
+    ? String(error.code)
+    : "";
 }
 
 export async function saveStudyFilterAction(
@@ -59,7 +78,10 @@ export async function saveStudyFilterAction(
   const user = await requireUser("/app/leis");
   const parsed = savedFilterSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) {
-    return { status: "error", message: parsed.error.issues[0]?.message ?? "Filtro inválido." };
+    return {
+      status: "error",
+      message: parsed.error.issues[0]?.message ?? "Filtro inválido.",
+    };
   }
 
   const db = getDb();
@@ -76,7 +98,8 @@ export async function saveStudyFilterAction(
     )
     .limit(1);
 
-  if (!act) return { status: "error", message: "Lei indisponível para estudo." };
+  if (!act)
+    return { status: "error", message: "Lei indisponível para estudo." };
 
   const boundaryArticles = await db
     .select({ order: legalArticles.articleOrder })
@@ -89,8 +112,14 @@ export async function saveStudyFilterAction(
       ),
     );
   const validOrders = new Set(boundaryArticles.map((article) => article.order));
-  if (!validOrders.has(parsed.data.articleStartOrder) || !validOrders.has(parsed.data.articleEndOrder)) {
-    return { status: "error", message: "Selecione artigos disponíveis nesta versão da lei." };
+  if (
+    !validOrders.has(parsed.data.articleStartOrder) ||
+    !validOrders.has(parsed.data.articleEndOrder)
+  ) {
+    return {
+      status: "error",
+      message: "Selecione artigos disponíveis nesta versão da lei.",
+    };
   }
 
   const entitlement = await getStudyEntitlement(user.id);
@@ -107,11 +136,15 @@ export async function saveStudyFilterAction(
         lte(legalArticles.articleOrder, parsed.data.articleEndOrder),
         entitlement.hasFullAccess
           ? undefined
-          : inArray(questions.publicId, [...FREE_STUDY_QUESTION_IDS]),
+          : inArray(questions.publicId, accessibleQuestionIds(entitlement)),
       ),
     );
   if ((availableQuestions?.count ?? 0) === 0) {
-    return { status: "error", message: "Este recorte ainda não possui questões disponíveis para sua conta." };
+    return {
+      status: "error",
+      message:
+        "Este recorte ainda não possui questões disponíveis para sua conta.",
+    };
   }
 
   const [usage] = await db
@@ -119,7 +152,10 @@ export async function saveStudyFilterAction(
     .from(savedStudyFilters)
     .where(eq(savedStudyFilters.userId, user.id));
   if ((usage?.count ?? 0) >= 30) {
-    return { status: "error", message: "Você chegou ao limite de 30 filtros salvos." };
+    return {
+      status: "error",
+      message: "Você chegou ao limite de 30 filtros salvos.",
+    };
   }
 
   try {
@@ -135,7 +171,10 @@ export async function saveStudyFilterAction(
       return { status: "error", message: "Já existe um filtro com esse nome." };
     }
     console.error("save_study_filter_failed", { code: databaseCode(error) });
-    return { status: "error", message: "Não foi possível salvar o filtro agora." };
+    return {
+      status: "error",
+      message: "Não foi possível salvar o filtro agora.",
+    };
   }
 
   revalidatePath(`/app/leis/${parsed.data.legalActSlug}`);
@@ -150,7 +189,12 @@ export async function deleteStudyFilterAction(formData: FormData) {
 
   await getDb()
     .delete(savedStudyFilters)
-    .where(and(eq(savedStudyFilters.id, parsed.data), eq(savedStudyFilters.userId, user.id)));
+    .where(
+      and(
+        eq(savedStudyFilters.id, parsed.data),
+        eq(savedStudyFilters.userId, user.id),
+      ),
+    );
   if (slug.success) revalidatePath(`/app/leis/${slug.data}`);
 }
 
@@ -161,7 +205,10 @@ export async function createQuestionNotebookAction(
   const user = await requireUser("/app/materiais");
   const parsed = notebookSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) {
-    return { status: "error", message: parsed.error.issues[0]?.message ?? "Caderno inválido." };
+    return {
+      status: "error",
+      message: parsed.error.issues[0]?.message ?? "Caderno inválido.",
+    };
   }
 
   const db = getDb();
@@ -170,7 +217,10 @@ export async function createQuestionNotebookAction(
     .from(questionNotebooks)
     .where(eq(questionNotebooks.userId, user.id));
   if ((usage?.count ?? 0) >= 30) {
-    return { status: "error", message: "Você chegou ao limite de 30 cadernos." };
+    return {
+      status: "error",
+      message: "Você chegou ao limite de 30 cadernos.",
+    };
   }
 
   try {
@@ -182,10 +232,18 @@ export async function createQuestionNotebookAction(
     });
   } catch (error) {
     if (databaseCode(error) === "23505") {
-      return { status: "error", message: "Já existe um caderno com esse nome." };
+      return {
+        status: "error",
+        message: "Já existe um caderno com esse nome.",
+      };
     }
-    console.error("create_question_notebook_failed", { code: databaseCode(error) });
-    return { status: "error", message: "Não foi possível criar o caderno agora." };
+    console.error("create_question_notebook_failed", {
+      code: databaseCode(error),
+    });
+    return {
+      status: "error",
+      message: "Não foi possível criar o caderno agora.",
+    };
   }
 
   revalidatePath("/app/materiais");
@@ -199,7 +257,12 @@ export async function deleteQuestionNotebookAction(formData: FormData) {
 
   await getDb()
     .delete(questionNotebooks)
-    .where(and(eq(questionNotebooks.id, parsed.data), eq(questionNotebooks.userId, user.id)));
+    .where(
+      and(
+        eq(questionNotebooks.id, parsed.data),
+        eq(questionNotebooks.userId, user.id),
+      ),
+    );
   revalidatePath("/app/materiais");
 }
 
@@ -209,7 +272,8 @@ export async function addQuestionToNotebookAction(
 ): Promise<StudyLibraryActionState> {
   const user = await requireUser("/app/treinar");
   const parsed = notebookItemSchema.safeParse(Object.fromEntries(formData));
-  if (!parsed.success) return { status: "error", message: "Selecione um caderno válido." };
+  if (!parsed.success)
+    return { status: "error", message: "Selecione um caderno válido." };
 
   const entitlement = await getStudyEntitlement(user.id);
   if (!canStudyQuestion(entitlement, parsed.data.questionPublicId)) {
@@ -232,7 +296,10 @@ export async function addQuestionToNotebookAction(
       .select({ id: questions.id })
       .from(questions)
       .innerJoin(legalArticles, eq(questions.legalArticleId, legalArticles.id))
-      .innerJoin(legalVersions, eq(legalArticles.legalVersionId, legalVersions.id))
+      .innerJoin(
+        legalVersions,
+        eq(legalArticles.legalVersionId, legalVersions.id),
+      )
       .innerJoin(legalActs, eq(legalVersions.legalActId, legalActs.id))
       .where(
         and(
@@ -245,14 +312,18 @@ export async function addQuestionToNotebookAction(
       )
       .limit(1),
   ]);
-  if (!notebook || !question) return { status: "error", message: "Caderno ou questão não encontrado." };
+  if (!notebook || !question)
+    return { status: "error", message: "Caderno ou questão não encontrado." };
 
   const [usage] = await db
     .select({ count: sql<number>`count(*)::int` })
     .from(questionNotebookItems)
     .where(eq(questionNotebookItems.notebookId, notebook.id));
   if ((usage?.count ?? 0) >= 500) {
-    return { status: "error", message: "Este caderno chegou ao limite de 500 questões." };
+    return {
+      status: "error",
+      message: "Este caderno chegou ao limite de 500 questões.",
+    };
   }
 
   await db.transaction(async (tx) => {
@@ -260,7 +331,10 @@ export async function addQuestionToNotebookAction(
       .insert(questionNotebookItems)
       .values({ notebookId: notebook.id, questionId: question.id })
       .onConflictDoNothing();
-    await tx.update(questionNotebooks).set({ updatedAt: new Date() }).where(eq(questionNotebooks.id, notebook.id));
+    await tx
+      .update(questionNotebooks)
+      .set({ updatedAt: new Date() })
+      .where(eq(questionNotebooks.id, notebook.id));
   });
 
   revalidatePath("/app/materiais");
@@ -295,13 +369,18 @@ export async function removeQuestionFromNotebookAction(formData: FormData) {
   if (!ownedItem) return;
 
   await db.transaction(async (tx) => {
-    await tx.delete(questionNotebookItems).where(
-      and(
-        eq(questionNotebookItems.notebookId, ownedItem.notebookId),
-        eq(questionNotebookItems.questionId, ownedItem.questionId),
-      ),
-    );
-    await tx.update(questionNotebooks).set({ updatedAt: new Date() }).where(eq(questionNotebooks.id, ownedItem.notebookId));
+    await tx
+      .delete(questionNotebookItems)
+      .where(
+        and(
+          eq(questionNotebookItems.notebookId, ownedItem.notebookId),
+          eq(questionNotebookItems.questionId, ownedItem.questionId),
+        ),
+      );
+    await tx
+      .update(questionNotebooks)
+      .set({ updatedAt: new Date() })
+      .where(eq(questionNotebooks.id, ownedItem.notebookId));
   });
 
   revalidatePath("/app/materiais");

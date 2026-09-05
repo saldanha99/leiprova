@@ -19,20 +19,59 @@ import type { AuthUser } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 
 const adminNavItems = [
-  { href: "/admin", label: "Visão geral", icon: LayoutDashboard, adminOnly: true },
-  { href: "/admin/fabrica-autoral", label: "Fábrica autoral", icon: BookOpenCheck, adminOnly: false },
-  { href: "/admin/fontes-oficiais", label: "Fontes oficiais", icon: RefreshCcw, adminOnly: false },
-  { href: "/admin/motor-editais", label: "Motor de editais", icon: FileSearch, adminOnly: false },
-  { href: "/admin/stripe-connect", label: "Stripe Connect", icon: CreditCard, adminOnly: true },
+  {
+    href: "/admin",
+    label: "Visão geral",
+    icon: LayoutDashboard,
+    adminOnly: true,
+  },
+  {
+    href: "/admin/catalogo-produtos",
+    label: "Produtos e preços",
+    icon: CreditCard,
+    adminOnly: true,
+  },
+  {
+    href: "/admin/fabrica-autoral",
+    label: "Fábrica autoral",
+    icon: BookOpenCheck,
+    adminOnly: false,
+  },
+  {
+    href: "/admin/fontes-oficiais",
+    label: "Fontes oficiais",
+    icon: RefreshCcw,
+    adminOnly: false,
+  },
+  {
+    href: "/admin/motor-editais",
+    label: "Motor de editais",
+    icon: FileSearch,
+    adminOnly: false,
+  },
+  {
+    href: "/admin/stripe-connect",
+    label: "Stripe Connect",
+    icon: CreditCard,
+    adminOnly: true,
+  },
 ] as const;
 
 function isCurrentPath(pathname: string, href: string) {
   return href === "/admin" ? pathname === href : pathname.startsWith(href);
 }
 
-function NavigationLinks({ user, mobile = false }: { user: AuthUser; mobile?: boolean }) {
+function NavigationLinks({
+  user,
+  mobile = false,
+}: {
+  user: AuthUser;
+  mobile?: boolean;
+}) {
   const pathname = usePathname();
-  const items = adminNavItems.filter((item) => !item.adminOnly || user.role === "admin");
+  const items = adminNavItems.filter(
+    (item) => !item.adminOnly || user.role === "admin",
+  );
 
   return (
     <nav className="grid gap-1.5" aria-label="Navegação da operação">
@@ -56,7 +95,9 @@ function NavigationLinks({ user, mobile = false }: { user: AuthUser; mobile?: bo
               aria-hidden="true"
               className={cn(
                 "size-[18px] transition",
-                active ? "text-amber-300" : "text-slate-500 group-hover:text-amber-300",
+                active
+                  ? "text-amber-300"
+                  : "text-slate-500 group-hover:text-amber-300",
               )}
             />
             {label}
@@ -75,8 +116,12 @@ function AdminIdentity({ user }: { user: AuthUser }) {
           {user.name.slice(0, 1).toUpperCase()}
         </span>
         <span className="min-w-0 flex-1">
-          <strong className="block truncate text-sm text-slate-100">{user.name}</strong>
-          <span className="block truncate text-[11px] text-slate-500">{user.email}</span>
+          <strong className="block truncate text-sm text-slate-100">
+            {user.name}
+          </strong>
+          <span className="block truncate text-[11px] text-slate-500">
+            {user.email}
+          </span>
         </span>
       </div>
       <form action={logoutAction} className="mt-3">
@@ -134,7 +179,9 @@ export function MobileAdminHeader({ user }: { user: AuthUser }) {
         <div className="flex min-w-0 items-center gap-3">
           <LeiProvaMark href={homeHref} compact />
           <div className="min-w-0">
-            <p className="truncate text-sm font-semibold text-white">Editalume</p>
+            <p className="truncate text-sm font-semibold text-white">
+              Editalume
+            </p>
             <p className="text-[10px] font-bold uppercase tracking-[.13em] text-emerald-300">
               {roleLabel}
             </p>

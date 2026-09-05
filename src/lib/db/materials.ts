@@ -11,7 +11,7 @@ import {
   userAttempts,
 } from "@/lib/db/schema";
 import {
-  FREE_STUDY_QUESTION_IDS,
+  accessibleQuestionIds,
   type StudyEntitlement,
 } from "@/lib/study/access-policy";
 
@@ -25,7 +25,7 @@ const publishedQuestionConditions = [
 function accessCondition(entitlement: StudyEntitlement) {
   return entitlement.hasFullAccess
     ? undefined
-    : inArray(questions.publicId, [...FREE_STUDY_QUESTION_IDS]);
+    : inArray(questions.publicId, accessibleQuestionIds(entitlement));
 }
 
 export async function getMaterialsSnapshot(
@@ -42,10 +42,7 @@ export async function getMaterialsSnapshot(
     })
     .from(userAttempts)
     .where(
-      and(
-        eq(userAttempts.userId, userId),
-        eq(userAttempts.isCorrect, false),
-      ),
+      and(eq(userAttempts.userId, userId), eq(userAttempts.isCorrect, false)),
     )
     .orderBy(userAttempts.questionId, desc(userAttempts.answeredAt))
     .as("latest_wrong_attempt");
@@ -63,7 +60,10 @@ export async function getMaterialsSnapshot(
       .from(latestWrongAttempt)
       .innerJoin(questions, eq(latestWrongAttempt.questionId, questions.id))
       .innerJoin(legalArticles, eq(questions.legalArticleId, legalArticles.id))
-      .innerJoin(legalVersions, eq(legalArticles.legalVersionId, legalVersions.id))
+      .innerJoin(
+        legalVersions,
+        eq(legalArticles.legalVersionId, legalVersions.id),
+      )
       .innerJoin(legalActs, eq(legalVersions.legalActId, legalActs.id))
       .where(and(...publishedQuestionConditions, allowedQuestions))
       .orderBy(desc(latestWrongAttempt.answeredAt), asc(questions.id))
@@ -80,7 +80,10 @@ export async function getMaterialsSnapshot(
       })
       .from(questions)
       .innerJoin(legalArticles, eq(questions.legalArticleId, legalArticles.id))
-      .innerJoin(legalVersions, eq(legalArticles.legalVersionId, legalVersions.id))
+      .innerJoin(
+        legalVersions,
+        eq(legalArticles.legalVersionId, legalVersions.id),
+      )
       .innerJoin(legalActs, eq(legalVersions.legalActId, legalActs.id))
       .where(and(...publishedQuestionConditions, allowedQuestions))
       .orderBy(legalArticles.id, asc(questions.id))
@@ -93,7 +96,10 @@ export async function getMaterialsSnapshot(
       })
       .from(questions)
       .innerJoin(legalArticles, eq(questions.legalArticleId, legalArticles.id))
-      .innerJoin(legalVersions, eq(legalArticles.legalVersionId, legalVersions.id))
+      .innerJoin(
+        legalVersions,
+        eq(legalArticles.legalVersionId, legalVersions.id),
+      )
       .innerJoin(legalActs, eq(legalVersions.legalActId, legalActs.id))
       .where(and(...publishedQuestionConditions, allowedQuestions))
       .groupBy(questions.topic)
@@ -103,4 +109,6 @@ export async function getMaterialsSnapshot(
   return { recentErrors, flashcards, notebooks };
 }
 
-export type MaterialsSnapshot = Awaited<ReturnType<typeof getMaterialsSnapshot>>;
+export type MaterialsSnapshot = Awaited<
+  ReturnType<typeof getMaterialsSnapshot>
+>;

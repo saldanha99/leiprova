@@ -15,6 +15,7 @@ import {
   PublicGuideShell,
 } from "@/components/content/public-guide-shell";
 import { JsonLd } from "@/components/seo/json-ld";
+import { ContestCatalogBrowser } from "@/components/contests/contest-catalog-browser";
 import { isDatabaseConfigured } from "@/lib/db/client";
 import { listReviewedContestOpportunities } from "@/lib/db/contest-opportunities";
 import { contestCategories } from "@/lib/opportunities/categories";
@@ -103,23 +104,35 @@ export default async function ContestsPage() {
             <div className="mt-9 grid gap-10 lg:grid-cols-[1.2fr_.8fr] lg:items-end">
               <div>
                 <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-emerald-300">
-                  Publicação controlada por evidência
+                  Seu próximo capítulo
                 </p>
                 <h1 className="mt-4 max-w-4xl text-4xl font-semibold tracking-[-0.05em] text-white sm:text-6xl">
-                  {PAGE_TITLE}
+                  Seu próximo concurso começa aqui.
                 </h1>
                 <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-300">
-                  A Editalume está estruturando páginas específicas para editais abertos e pré-editais. Cada página só entra no catálogo público depois de confirmar a edição em fonte oficial, registrar se já existe responsável vigente e concluir revisão humana.
+                  Encontre sua carreira, escolha o estado e conheça a proposta
+                  para a edição que importa para você. As ofertas em preparação
+                  estão identificadas; edital, banca e conteúdo só são
+                  confirmados após revisão de fontes oficiais.
                 </p>
+                <a
+                  href="#catalogo-planejado"
+                  className="mt-6 inline-flex min-h-11 items-center gap-2 text-sm font-bold underline underline-offset-4"
+                >
+                  Explorar os concursos{" "}
+                  <ArrowRight size={16} aria-hidden="true" />
+                </a>
               </div>
 
               <aside className="rounded-[1.7rem] border border-amber-300/20 bg-amber-300/[0.055] p-6 text-sm leading-7 text-amber-100/80">
                 <p className="flex items-center gap-2 font-extrabold text-amber-200">
                   <BadgeCheck aria-hidden="true" className="size-5" />
-                  Situação desta área
+                  Um objetivo ou vários caminhos?
                 </p>
                 <p className="mt-3">
-                  As oito categorias já estão definidas. Uma página de concurso específico continua fora do sitemap enquanto suas evidências e revisão editorial não estiverem completas.
+                  Cada edição tem sua proposta de acesso avulso. O Master reúne
+                  os concursos liberados durante a assinatura. Compare abaixo:
+                  páginas em preparação ainda não estão disponíveis para compra.
                 </p>
               </aside>
             </div>
@@ -127,36 +140,59 @@ export default async function ContestsPage() {
         </header>
 
         <div className="mx-auto max-w-6xl space-y-20 px-5 py-16 sm:py-20">
+          <ContestCatalogBrowser />
           <section aria-labelledby="edicoes-publicas-title">
             <div className="max-w-3xl">
               <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-emerald-300">
                 Catálogo vivo
               </p>
-              <h2 id="edicoes-publicas-title" className="mt-3 text-3xl font-semibold tracking-[-0.045em] text-white sm:text-4xl">
+              <h2
+                id="edicoes-publicas-title"
+                className="mt-3 text-3xl font-semibold tracking-[-0.045em] text-white sm:text-4xl"
+              >
                 Edições públicas e revisadas
               </h2>
               <p className="mt-4 text-base leading-8 text-slate-400">
-                Esta lista é alimentada somente por registros que concluíram as travas editoriais. Candidatos detectados pelo robô não aparecem aqui enquanto estiverem em revisão.
+                Esta lista é alimentada somente por registros que concluíram as
+                travas editoriais. Candidatos detectados pelo robô não aparecem
+                aqui enquanto estiverem em revisão.
               </p>
             </div>
 
             {publicOpportunities.length > 0 ? (
               <div className="mt-9 grid gap-4 md:grid-cols-2">
                 {publicOpportunities.map((opportunity) => {
-                  const jurisdiction = getOpportunityJurisdictionByCode(opportunity.jurisdictionCode);
+                  const jurisdiction = getOpportunityJurisdictionByCode(
+                    opportunity.jurisdictionCode,
+                  );
                   if (!jurisdiction) return null;
                   return (
-                    <article key={opportunity.publicId} className="rounded-[1.6rem] border border-emerald-300/15 bg-emerald-300/[0.035] p-6">
+                    <article
+                      key={opportunity.publicId}
+                      className="rounded-[1.6rem] border border-emerald-300/15 bg-emerald-300/[0.035] p-6"
+                    >
                       <div className="flex flex-wrap items-center gap-2 text-xs font-extrabold uppercase tracking-[0.12em] text-emerald-300">
-                        <span>{getOpportunityLifecycleLabel(opportunity.lifecycleStatus)}</span>
+                        <span>
+                          {getOpportunityLifecycleLabel(
+                            opportunity.lifecycleStatus,
+                          )}
+                        </span>
                         <span aria-hidden="true">·</span>
                         <span>{jurisdiction.code}</span>
                       </div>
-                      <h3 className="mt-4 text-xl font-semibold text-white">{opportunity.title}</h3>
-                      <p className="mt-3 text-sm leading-7 text-slate-400">{opportunity.summary}</p>
+                      <h3 className="mt-4 text-xl font-semibold text-white">
+                        {opportunity.title}
+                      </h3>
+                      <p className="mt-3 text-sm leading-7 text-slate-400">
+                        {opportunity.summary}
+                      </p>
                       <p className="mt-4 text-sm font-semibold text-slate-300">
-                        Responsável: {opportunity.responsibleName ?? "ainda não definido em fonte oficial"}
-                        {opportunity.examinationProviderName && opportunity.examinationProviderName !== opportunity.responsibleName
+                        Responsável:{" "}
+                        {opportunity.responsibleName ??
+                          "ainda não definido em fonte oficial"}
+                        {opportunity.examinationProviderName &&
+                        opportunity.examinationProviderName !==
+                          opportunity.responsibleName
                           ? ` · prova: ${opportunity.examinationProviderName}`
                           : ""}
                       </p>
@@ -173,7 +209,9 @@ export default async function ContestsPage() {
               </div>
             ) : (
               <div className="mt-9 rounded-[1.6rem] border border-white/9 bg-[#0a1420] p-6 text-sm leading-7 text-slate-400">
-                Nenhuma edição específica foi liberada neste ambiente ainda. Os sinais oficiais já detectados permanecem privados até a conferência humana.
+                Nenhuma edição específica foi liberada neste ambiente ainda. Os
+                sinais oficiais já detectados permanecem privados até a
+                conferência humana.
               </div>
             )}
           </section>
@@ -183,17 +221,27 @@ export default async function ContestsPage() {
               <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-amber-300">
                 Oito frentes de acompanhamento
               </p>
-              <h2 id="categorias-title" className="mt-3 text-3xl font-semibold tracking-[-0.045em] text-white sm:text-4xl">
+              <h2
+                id="categorias-title"
+                className="mt-3 text-3xl font-semibold tracking-[-0.045em] text-white sm:text-4xl"
+              >
                 Categorias do catálogo
               </h2>
               <p className="mt-4 text-base leading-8 text-slate-400">
-                A categoria serve para navegação e planejamento editorial. Estado, ano, estágio do concurso e responsável pertencem à edição concreta — nunca são herdados automaticamente de outra prova.
+                A categoria serve para navegação e planejamento editorial.
+                Estado, ano, estágio do concurso e responsável pertencem à
+                edição concreta — nunca são herdados automaticamente de outra
+                prova.
               </p>
             </div>
 
             <div className="mt-10 grid gap-4 md:grid-cols-2">
               {contestCategories.map((category, index) => (
-                <article id={category.slug} key={category.slug} className="scroll-mt-6 rounded-[1.6rem] border border-white/9 bg-[#0a1420] p-6">
+                <article
+                  id={category.slug}
+                  key={category.slug}
+                  className="scroll-mt-6 rounded-[1.6rem] border border-white/9 bg-[#0a1420] p-6"
+                >
                   <div className="flex items-start justify-between gap-5">
                     <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-emerald-300/10 font-mono text-sm font-extrabold text-emerald-300">
                       {String(index + 1).padStart(2, "0")}
@@ -205,30 +253,51 @@ export default async function ContestsPage() {
                   <h3 className="mt-5 text-xl font-semibold tracking-[-0.025em] text-white">
                     {category.name}
                   </h3>
-                  <p className="mt-3 text-sm leading-7 text-slate-400">{category.description}</p>
+                  <p className="mt-3 text-sm leading-7 text-slate-400">
+                    {category.description}
+                  </p>
                 </article>
               ))}
             </div>
           </section>
 
-          <section aria-labelledby="recorte-title" className="rounded-[2rem] border border-white/9 bg-[#08111d] p-6 sm:p-10">
+          <section
+            aria-labelledby="recorte-title"
+            className="rounded-[2rem] border border-white/9 bg-[#08111d] p-6 sm:p-10"
+          >
             <div className="grid gap-9 lg:grid-cols-[.75fr_1.25fr] lg:items-center">
               <div>
                 <span className="grid size-14 place-items-center rounded-2xl bg-amber-300/10 text-amber-300">
                   <MapPinned aria-hidden="true" className="size-7" />
                 </span>
-                <h2 id="recorte-title" className="mt-6 text-3xl font-semibold tracking-[-0.045em] text-white">
+                <h2
+                  id="recorte-title"
+                  className="mt-6 text-3xl font-semibold tracking-[-0.045em] text-white"
+                >
                   Uma página para a edição certa
                 </h2>
                 <p className="mt-4 text-sm leading-7 text-slate-400">
-                  O recorte público planejado é específico o bastante para não misturar fatos de concursos diferentes.
+                  O recorte público planejado é específico o bastante para não
+                  misturar fatos de concursos diferentes.
                 </p>
               </div>
               <ol className="grid gap-3 sm:grid-cols-2">
-                {["Categoria e carreira", "Estado ou âmbito federal", "Órgão, cargo e ano", "Situação e responsável da edição"].map((item, index) => (
-                  <li key={item} className="flex min-h-24 items-center gap-4 rounded-2xl border border-white/8 bg-white/[0.025] p-5">
-                    <span className="font-mono text-sm font-extrabold text-amber-300">{index + 1}</span>
-                    <span className="text-sm font-semibold leading-6 text-slate-200">{item}</span>
+                {[
+                  "Categoria e carreira",
+                  "Estado ou âmbito federal",
+                  "Órgão, cargo e ano",
+                  "Situação e responsável da edição",
+                ].map((item, index) => (
+                  <li
+                    key={item}
+                    className="flex min-h-24 items-center gap-4 rounded-2xl border border-white/8 bg-white/[0.025] p-5"
+                  >
+                    <span className="font-mono text-sm font-extrabold text-amber-300">
+                      {index + 1}
+                    </span>
+                    <span className="text-sm font-semibold leading-6 text-slate-200">
+                      {item}
+                    </span>
                   </li>
                 ))}
               </ol>
@@ -240,7 +309,10 @@ export default async function ContestsPage() {
               <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-emerald-300">
                 Travas de publicação
               </p>
-              <h2 id="travas-title" className="mt-3 text-3xl font-semibold tracking-[-0.045em] text-white sm:text-4xl">
+              <h2
+                id="travas-title"
+                className="mt-3 text-3xl font-semibold tracking-[-0.045em] text-white sm:text-4xl"
+              >
                 O que precisa existir antes de um concurso aparecer
               </h2>
             </div>
@@ -248,10 +320,20 @@ export default async function ContestsPage() {
               {PUBLICATION_CHECKS.map((check) => {
                 const Icon = check.icon;
                 return (
-                  <article key={check.title} className="rounded-[1.5rem] border border-white/9 bg-[#0a1420] p-6">
-                    <Icon aria-hidden="true" className="size-6 text-emerald-300" />
-                    <h3 className="mt-5 text-lg font-semibold text-white">{check.title}</h3>
-                    <p className="mt-3 text-sm leading-7 text-slate-400">{check.text}</p>
+                  <article
+                    key={check.title}
+                    className="rounded-[1.5rem] border border-white/9 bg-[#0a1420] p-6"
+                  >
+                    <Icon
+                      aria-hidden="true"
+                      className="size-6 text-emerald-300"
+                    />
+                    <h3 className="mt-5 text-lg font-semibold text-white">
+                      {check.title}
+                    </h3>
+                    <p className="mt-3 text-sm leading-7 text-slate-400">
+                      {check.text}
+                    </p>
                   </article>
                 );
               })}
@@ -264,14 +346,23 @@ export default async function ContestsPage() {
               Transparência vem antes da pressa
             </h2>
             <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-400">
-              Uma página ausente é preferível a uma página que atribui banca, prazo ou conteúdo programático sem prova oficial. Veja como detecção, estatística e revisão devem funcionar antes da publicação.
+              Uma página ausente é preferível a uma página que atribui banca,
+              prazo ou conteúdo programático sem prova oficial. Veja como
+              detecção, estatística e revisão devem funcionar antes da
+              publicação.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
-              <Link className="inline-flex min-h-12 items-center gap-2 rounded-xl bg-amber-300 px-5 py-3 text-sm font-extrabold text-slate-950 transition hover:bg-amber-200" href="/metodologia">
+              <Link
+                className="inline-flex min-h-12 items-center gap-2 rounded-xl bg-amber-300 px-5 py-3 text-sm font-extrabold text-slate-950 transition hover:bg-amber-200"
+                href="/metodologia"
+              >
                 Conhecer a metodologia
                 <ArrowRight aria-hidden="true" className="size-4" />
               </Link>
-              <Link className="inline-flex min-h-12 items-center rounded-xl border border-white/10 px-5 py-3 text-sm font-bold text-slate-200 transition hover:border-white/20 hover:text-white" href="/fontes-e-atualizacao">
+              <Link
+                className="inline-flex min-h-12 items-center rounded-xl border border-white/10 px-5 py-3 text-sm font-bold text-slate-200 transition hover:border-white/20 hover:text-white"
+                href="/fontes-e-atualizacao"
+              >
                 Ver política de fontes
               </Link>
             </div>

@@ -14,14 +14,14 @@ import {
   userAttempts,
 } from "@/lib/db/schema";
 import {
-  FREE_STUDY_QUESTION_IDS,
+  accessibleQuestionIds,
   type StudyEntitlement,
 } from "@/lib/study/access-policy";
 
 function questionAccessCondition(entitlement: StudyEntitlement) {
   return entitlement.hasFullAccess
     ? undefined
-    : inArray(questions.publicId, [...FREE_STUDY_QUESTION_IDS]);
+    : inArray(questions.publicId, accessibleQuestionIds(entitlement));
 }
 
 export async function getLegalActStudyView(
@@ -80,7 +80,10 @@ export async function getLegalActStudyView(
     )
     .leftJoin(
       userAttempts,
-      and(eq(userAttempts.questionId, questions.id), eq(userAttempts.userId, userId)),
+      and(
+        eq(userAttempts.questionId, questions.id),
+        eq(userAttempts.userId, userId),
+      ),
     )
     .where(
       and(
@@ -103,7 +106,10 @@ export async function getLegalActStudyView(
   };
 }
 
-export async function listSavedStudyFilters(userId: number, legalActId?: number) {
+export async function listSavedStudyFilters(
+  userId: number,
+  legalActId?: number,
+) {
   return getDb()
     .select({
       id: savedStudyFilters.id,
@@ -136,7 +142,10 @@ export async function listQuestionNotebooks(userId: number) {
       updatedAt: questionNotebooks.updatedAt,
     })
     .from(questionNotebooks)
-    .leftJoin(questionNotebookItems, eq(questionNotebookItems.notebookId, questionNotebooks.id))
+    .leftJoin(
+      questionNotebookItems,
+      eq(questionNotebookItems.notebookId, questionNotebooks.id),
+    )
     .where(eq(questionNotebooks.userId, userId))
     .groupBy(questionNotebooks.id)
     .orderBy(desc(questionNotebooks.updatedAt), asc(questionNotebooks.name));
@@ -157,7 +166,12 @@ export async function getQuestionNotebook(
       updatedAt: questionNotebooks.updatedAt,
     })
     .from(questionNotebooks)
-    .where(and(eq(questionNotebooks.userId, userId), eq(questionNotebooks.publicId, publicId)))
+    .where(
+      and(
+        eq(questionNotebooks.userId, userId),
+        eq(questionNotebooks.publicId, publicId),
+      ),
+    )
     .limit(1);
 
   if (!notebook) return null;
@@ -176,7 +190,10 @@ export async function getQuestionNotebook(
     .from(questionNotebookItems)
     .innerJoin(questions, eq(questionNotebookItems.questionId, questions.id))
     .innerJoin(legalArticles, eq(questions.legalArticleId, legalArticles.id))
-    .innerJoin(legalVersions, eq(legalArticles.legalVersionId, legalVersions.id))
+    .innerJoin(
+      legalVersions,
+      eq(legalArticles.legalVersionId, legalVersions.id),
+    )
     .innerJoin(legalActs, eq(legalVersions.legalActId, legalActs.id))
     .where(
       and(
@@ -188,10 +205,17 @@ export async function getQuestionNotebook(
         accessCondition,
       ),
     )
-    .orderBy(asc(legalArticles.articleOrder), asc(questionNotebookItems.createdAt));
+    .orderBy(
+      asc(legalArticles.articleOrder),
+      asc(questionNotebookItems.createdAt),
+    );
 
   return { ...notebook, items };
 }
 
-export type LegalActStudyView = NonNullable<Awaited<ReturnType<typeof getLegalActStudyView>>>;
-export type QuestionNotebookSummary = Awaited<ReturnType<typeof listQuestionNotebooks>>[number];
+export type LegalActStudyView = NonNullable<
+  Awaited<ReturnType<typeof getLegalActStudyView>>
+>;
+export type QuestionNotebookSummary = Awaited<
+  ReturnType<typeof listQuestionNotebooks>
+>[number];

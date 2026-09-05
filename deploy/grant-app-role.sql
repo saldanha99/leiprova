@@ -31,6 +31,7 @@ grant select on
   contest_category_careers,
   contest_opportunities,
   contest_opportunity_plans,
+  contest_store_products,
   opportunity_source_documents,
   opportunity_organizer_assignments,
   opportunity_requirements,
@@ -42,6 +43,9 @@ grant select on
   stripe_connect_transfer_batches,
   stripe_connect_transfers
 to :app_user;
+
+-- Pedidos avulsos só são atendidos por rotas autenticadas e webhook assinado.
+grant select, insert, update on contest_orders, contest_purchases to :app_user;
 
 grant select (
   id,

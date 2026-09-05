@@ -53,8 +53,11 @@ import {
   resolveCatalogSelection,
   type QuizSessionQuestion,
 } from "@/lib/quiz/session-contract";
-import { editionHasOriginalTraining, originalStyleConditions } from "@/lib/quiz/original-style-query";
-import { FREE_STUDY_QUESTION_IDS } from "@/lib/study/access-policy";
+import {
+  editionHasOriginalTraining,
+  originalStyleConditions,
+} from "@/lib/quiz/original-style-query";
+import { accessibleQuestionIds } from "@/lib/study/access-policy";
 import { getStudyEntitlement } from "@/lib/study/entitlement";
 
 export const dynamic = "force-dynamic";
@@ -79,21 +82,36 @@ async function loadDbSelection(
       ? db
           .select({ id: quizCareerTracks.id })
           .from(quizCareerTracks)
-          .where(and(eq(quizCareerTracks.slug, resolved.career.slug), eq(quizCareerTracks.isActive, true)))
+          .where(
+            and(
+              eq(quizCareerTracks.slug, resolved.career.slug),
+              eq(quizCareerTracks.isActive, true),
+            ),
+          )
           .limit(1)
       : Promise.resolve([]),
     resolved.bank
       ? db
           .select({ id: quizBanks.id })
           .from(quizBanks)
-          .where(and(eq(quizBanks.slug, resolved.bank.slug), eq(quizBanks.isActive, true)))
+          .where(
+            and(
+              eq(quizBanks.slug, resolved.bank.slug),
+              eq(quizBanks.isActive, true),
+            ),
+          )
           .limit(1)
       : Promise.resolve([]),
     resolved.subject
       ? db
           .select({ id: quizSubjects.id })
           .from(quizSubjects)
-          .where(and(eq(quizSubjects.slug, resolved.subject.slug), eq(quizSubjects.isActive, true)))
+          .where(
+            and(
+              eq(quizSubjects.slug, resolved.subject.slug),
+              eq(quizSubjects.isActive, true),
+            ),
+          )
           .limit(1)
       : Promise.resolve([]),
   ]);
@@ -101,7 +119,11 @@ async function loadDbSelection(
   const careerTrackId = careerRows[0]?.id ?? null;
   const bankId = bankRows[0]?.id ?? null;
   const subjectId = subjectRows[0]?.id ?? null;
-  if ((resolved.career && !careerTrackId) || (resolved.bank && !bankId) || (resolved.subject && !subjectId)) {
+  if (
+    (resolved.career && !careerTrackId) ||
+    (resolved.bank && !bankId) ||
+    (resolved.subject && !subjectId)
+  ) {
     return null;
   }
 
@@ -142,8 +164,17 @@ async function loadDbSelection(
 
   const specializationId = specializationRows[0]?.id ?? null;
   const topicId = topicRows[0]?.id ?? null;
-  if ((resolved.specialization && !specializationId) || (resolved.topic && !topicId)) return null;
-  if (careerTrackId && subjectId && !careerSubjects.some((row) => row.subjectId === subjectId)) return null;
+  if (
+    (resolved.specialization && !specializationId) ||
+    (resolved.topic && !topicId)
+  )
+    return null;
+  if (
+    careerTrackId &&
+    subjectId &&
+    !careerSubjects.some((row) => row.subjectId === subjectId)
+  )
+    return null;
 
   return {
     careerTrackId,
@@ -173,21 +204,33 @@ function examEditionConditions(
 ) {
   return and(
     or(
-      and(inArray(examEditions.status, [...ELIGIBLE_QUIZ_EXAM_STATUSES]), lte(examEditions.examDate, todayIso)),
-      allowScheduled ? and(eq(examEditions.status, "scheduled"), isNotNull(examEditions.sourceCheckedAt),
-        sql`exists (select 1 from contest_opportunities o where o.exam_edition_id = ${examEditions.id}
-          and o.editorial_status = 'reviewed')`) : undefined,
+      and(
+        inArray(examEditions.status, [...ELIGIBLE_QUIZ_EXAM_STATUSES]),
+        lte(examEditions.examDate, todayIso),
+      ),
+      allowScheduled
+        ? and(
+            eq(examEditions.status, "scheduled"),
+            isNotNull(examEditions.sourceCheckedAt),
+            sql`exists (select 1 from contest_opportunities o where o.exam_edition_id = ${examEditions.id}
+          and o.editorial_status = 'reviewed')`,
+          )
+        : undefined,
     ),
     isNotNull(examEditions.officialUrl),
     sql`char_length(btrim(${examEditions.officialUrl})) > 0`,
-    selection.careerTrackId ? eq(examEditions.careerTrackId, selection.careerTrackId) : undefined,
+    selection.careerTrackId
+      ? eq(examEditions.careerTrackId, selection.careerTrackId)
+      : undefined,
     selection.careerTrackId
       ? selection.specializationId
         ? eq(examEditions.specializationId, selection.specializationId)
         : isNull(examEditions.specializationId)
       : undefined,
     selection.bankId ? eq(examEditions.bankId, selection.bankId) : undefined,
-    examEditionPublicId ? eq(examEditions.publicId, examEditionPublicId) : undefined,
+    examEditionPublicId
+      ? eq(examEditions.publicId, examEditionPublicId)
+      : undefined,
   );
 }
 
@@ -216,7 +259,10 @@ async function selectExamEdition(
   todayIso: string,
   request: ReturnType<typeof quizSessionRequestSchema.parse>,
 ) {
-  if (!request.examEditionId && (request.mode !== "previous_exam" || request.examScope === "all")) {
+  if (
+    !request.examEditionId &&
+    (request.mode !== "previous_exam" || request.examScope === "all")
+  ) {
     return null;
   }
 
@@ -236,13 +282,21 @@ async function selectExamEdition(
       bankName: quizBanks.name,
       bankIsActive: quizBanks.isActive,
       sourceCheckedAt: examEditions.sourceCheckedAt,
-      scheduledProgramReviewed: editionHasOriginalTraining(examEditions.id, examEditions.bankId),
+      scheduledProgramReviewed: editionHasOriginalTraining(
+        examEditions.id,
+        examEditions.bankId,
+      ),
     })
     .from(examEditions)
     .innerJoin(quizBanks, eq(examEditions.bankId, quizBanks.id))
     .where(
       and(
-        examEditionConditions(selection, todayIso, request.examEditionId, request.mode === "original_style"),
+        examEditionConditions(
+          selection,
+          todayIso,
+          request.examEditionId,
+          request.mode === "original_style",
+        ),
         eq(quizBanks.isActive, true),
       ),
     )
@@ -261,7 +315,6 @@ async function selectExamEdition(
     ? edition
     : null;
 }
-
 
 /**
  * Condições de elegibilidade da trilha autoral.
@@ -282,7 +335,8 @@ async function selectExamEdition(
  */
 export async function POST(request: Request) {
   const user = await getCurrentUser();
-  if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  if (!user)
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
   const contentLength = Number(request.headers.get("content-length") ?? 0);
   if (Number.isFinite(contentLength) && contentLength > MAX_BODY_BYTES) {
@@ -290,15 +344,33 @@ export async function POST(request: Request) {
   }
 
   const limited = await consumeRateLimits([
-    { policy: "quizSessionUserMinute", subject: { kind: "user", value: String(user.id) } },
-    { policy: "quizSessionIpMinute", subject: { kind: "ip", value: getRequestIp(request.headers) } },
+    {
+      policy: "quizSessionUserMinute",
+      subject: { kind: "user", value: String(user.id) },
+    },
+    {
+      policy: "quizSessionIpMinute",
+      subject: { kind: "ip", value: getRequestIp(request.headers) },
+    },
   ]);
-  if (limited) return rateLimitJsonResponse(limited, "Você criou muitos simulados em pouco tempo.");
+  if (limited)
+    return rateLimitJsonResponse(
+      limited,
+      "Você criou muitos simulados em pouco tempo.",
+    );
 
-  const parsed = quizSessionRequestSchema.safeParse(await request.json().catch(() => null));
+  const parsed = quizSessionRequestSchema.safeParse(
+    await request.json().catch(() => null),
+  );
   if (!parsed.success) {
     return NextResponse.json(
-      { error: "invalid_selection", issues: parsed.error.issues.map(({ path, message }) => ({ path, message })) },
+      {
+        error: "invalid_selection",
+        issues: parsed.error.issues.map(({ path, message }) => ({
+          path,
+          message,
+        })),
+      },
       { status: 400 },
     );
   }
@@ -306,15 +378,25 @@ export async function POST(request: Request) {
   const resolved = resolveCatalogSelection(parsed.data);
   const selection = await loadDbSelection(resolved);
   if (!selection) {
-    return NextResponse.json({ error: "catalog_not_available" }, { status: 409 });
+    return NextResponse.json(
+      { error: "catalog_not_available" },
+      { status: 409 },
+    );
   }
 
   const now = new Date();
   const todayIso = saoPauloDateIso(now);
   const entitlement = await getStudyEntitlement(user.id, now);
-  const selectedExamEdition = await selectExamEdition(selection, todayIso, parsed.data);
+  const selectedExamEdition = await selectExamEdition(
+    selection,
+    todayIso,
+    parsed.data,
+  );
   if (parsed.data.examEditionId && !selectedExamEdition) {
-    return NextResponse.json({ error: "exam_edition_not_available" }, { status: 400 });
+    return NextResponse.json(
+      { error: "exam_edition_not_available" },
+      { status: 400 },
+    );
   }
   const effectiveSelection =
     parsed.data.path === "career" && selectedExamEdition
@@ -331,10 +413,17 @@ export async function POST(request: Request) {
           eq(legalActs.isActive, true),
         )
       : parsed.data.mode === "original_style"
-        ? originalStyleConditions(effectiveSelection, selectedExamEdition?.id ?? null)
+        ? originalStyleConditions(
+            effectiveSelection,
+            selectedExamEdition?.id ?? null,
+          )
         : and(
             licensedPreviousQuestionConditions(effectiveSelection, now),
-            examEditionConditions(effectiveSelection, todayIso, parsed.data.examEditionId),
+            examEditionConditions(
+              effectiveSelection,
+              todayIso,
+              parsed.data.examEditionId,
+            ),
             parsed.data.examScope === "latest" || parsed.data.examEditionId
               ? selectedExamEdition
                 ? eq(questions.examEditionId, selectedExamEdition.id)
@@ -351,7 +440,9 @@ export async function POST(request: Request) {
         and eligible_correct_option.is_correct = true
     )`,
     subjectCondition(effectiveSelection),
-    effectiveSelection.topicId ? eq(questions.topicId, effectiveSelection.topicId) : undefined,
+    effectiveSelection.topicId
+      ? eq(questions.topicId, effectiveSelection.topicId)
+      : undefined,
     modeConditions,
   );
 
@@ -370,7 +461,11 @@ export async function POST(request: Request) {
   const questionOrdering =
     parsed.data.mode === "previous_exam"
       ? parsed.data.examScope === "all" && !parsed.data.examEditionId
-        ? [desc(examEditions.examDate), desc(examEditions.id), asc(questions.originalQuestionOrder)]
+        ? [
+            desc(examEditions.examDate),
+            desc(examEditions.id),
+            asc(questions.originalQuestionOrder),
+          ]
         : [asc(questions.originalQuestionOrder)]
       : [sql`random()`];
 
@@ -405,7 +500,7 @@ export async function POST(request: Request) {
         questionJoinsAndConditions,
         entitlement.hasFullAccess
           ? undefined
-          : inArray(questions.publicId, [...FREE_STUDY_QUESTION_IDS]),
+          : inArray(questions.publicId, accessibleQuestionIds(entitlement)),
       ),
     )
     .orderBy(...questionOrdering)
@@ -419,11 +514,22 @@ export async function POST(request: Request) {
           text: questionOptions.text,
         })
         .from(questionOptions)
-        .where(inArray(questionOptions.questionId, questionRows.map((question) => question.id)))
-        .orderBy(asc(questionOptions.questionId), asc(questionOptions.sortOrder))
+        .where(
+          inArray(
+            questionOptions.questionId,
+            questionRows.map((question) => question.id),
+          ),
+        )
+        .orderBy(
+          asc(questionOptions.questionId),
+          asc(questionOptions.sortOrder),
+        )
     : [];
 
-  const optionsByQuestion = new Map<number, Array<{ id: string; text: string }>>();
+  const optionsByQuestion = new Map<
+    number,
+    Array<{ id: string; text: string }>
+  >();
   for (const option of optionRows) {
     const options = optionsByQuestion.get(option.questionId) ?? [];
     options.push({ id: option.id, text: option.text });
@@ -435,7 +541,9 @@ export async function POST(request: Request) {
     timed: parsed.data.timed,
     count: questionRows.length || parsed.data.count,
     editionDurationMinutes:
-      parsed.data.mode === "previous_exam" ? selectedExamEdition?.durationMinutes : undefined,
+      parsed.data.mode === "previous_exam"
+        ? selectedExamEdition?.durationMinutes
+        : undefined,
   });
   const expiresAt = new Date(now.getTime() + 24 * 60 * 60 * 1_000);
   await getDb().transaction(async (tx) => {
@@ -473,43 +581,50 @@ export async function POST(request: Request) {
     }
   });
 
-  const responseQuestions: QuizSessionQuestion[] = questionRows.map((question) => ({
-    id: question.publicId,
-    prompt: question.prompt,
-    options: optionsByQuestion.get(question.id) ?? [],
-    difficulty: question.difficulty,
-    subject:
-      question.subjectSlug && question.subjectName
-        ? { slug: question.subjectSlug, name: question.subjectName }
-        : null,
-    topic:
-      question.topicSlug && question.topicName
-        ? { slug: question.topicSlug, name: question.topicName }
-        : null,
-    articleRef: question.articleRef,
-    legalAct: question.legalActTitle,
-    source: formatQuizQuestionSource({
-      mode: question.quizMode as "dry_law" | "previous_exam" | "original_style",
-      sourceTitle: question.sourceTitle,
-      sourceUrl: question.sourceUrl,
-      verifiedAt: question.verifiedAt,
-      legalActTitle: question.legalActTitle,
-      officialLegalUrl: question.officialLegalUrl,
-      styleBankName: selectedExamEdition?.bankName ?? resolved.bank?.name ?? null,
+  const responseQuestions: QuizSessionQuestion[] = questionRows.map(
+    (question) => ({
+      id: question.publicId,
+      prompt: question.prompt,
+      options: optionsByQuestion.get(question.id) ?? [],
+      difficulty: question.difficulty,
+      subject:
+        question.subjectSlug && question.subjectName
+          ? { slug: question.subjectSlug, name: question.subjectName }
+          : null,
+      topic:
+        question.topicSlug && question.topicName
+          ? { slug: question.topicSlug, name: question.topicName }
+          : null,
+      articleRef: question.articleRef,
+      legalAct: question.legalActTitle,
+      source: formatQuizQuestionSource({
+        mode: question.quizMode as
+          | "dry_law"
+          | "previous_exam"
+          | "original_style",
+        sourceTitle: question.sourceTitle,
+        sourceUrl: question.sourceUrl,
+        verifiedAt: question.verifiedAt,
+        legalActTitle: question.legalActTitle,
+        officialLegalUrl: question.officialLegalUrl,
+        styleBankName:
+          selectedExamEdition?.bankName ?? resolved.bank?.name ?? null,
+      }),
     }),
-  }));
+  );
 
   const availability = questionRows.length
     ? { status: "ready" as const, returnedCount: questionRows.length }
     : !matchingContent
       ? { status: "empty" as const, ...emptyQuizReason(parsed.data.mode) }
       : !entitlement.hasFullAccess
-      ? {
-          status: "empty" as const,
-          reason: "available_but_locked" as const,
-          message: "Este modo está disponível nos planos com acesso completo.",
-        }
-      : { status: "empty" as const, ...emptyQuizReason(parsed.data.mode) };
+        ? {
+            status: "empty" as const,
+            reason: "available_but_locked" as const,
+            message:
+              "Este modo está disponível nos planos com acesso completo.",
+          }
+        : { status: "empty" as const, ...emptyQuizReason(parsed.data.mode) };
 
   return NextResponse.json(
     {
@@ -518,14 +633,21 @@ export async function POST(request: Request) {
       deadlineAt: deadlineAt?.toISOString() ?? null,
       selection: {
         path: parsed.data.path,
-        career: resolved.career ? { slug: resolved.career.slug, name: resolved.career.name } : null,
+        career: resolved.career
+          ? { slug: resolved.career.slug, name: resolved.career.name }
+          : null,
         specialization: resolved.specialization,
         bank: selectedExamEdition
-          ? { slug: selectedExamEdition.bankSlug, name: selectedExamEdition.bankName }
+          ? {
+              slug: selectedExamEdition.bankSlug,
+              name: selectedExamEdition.bankName,
+            }
           : resolved.bank
             ? { slug: resolved.bank.slug, name: resolved.bank.name }
             : null,
-        subject: resolved.subject ? { slug: resolved.subject.slug, name: resolved.subject.name } : null,
+        subject: resolved.subject
+          ? { slug: resolved.subject.slug, name: resolved.subject.name }
+          : null,
         topic: resolved.topic,
         mode: { slug: resolved.mode.slug, name: resolved.mode.name },
         experience: parsed.data.experience,
@@ -538,7 +660,10 @@ export async function POST(request: Request) {
               examDate: selectedExamEdition.examDate,
               durationMinutes: selectedExamEdition.durationMinutes,
               status: selectedExamEdition.status,
-              bank: { slug: selectedExamEdition.bankSlug, name: selectedExamEdition.bankName },
+              bank: {
+                slug: selectedExamEdition.bankSlug,
+                name: selectedExamEdition.bankName,
+              },
             }
           : null,
         availability,
