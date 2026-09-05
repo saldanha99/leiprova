@@ -196,6 +196,7 @@ services:
       - edge
 
   legal-monitor:
+    # Serviço contínuo separado do operador editorial manual abaixo.
     build:
       context: .
       target: migrator
@@ -236,6 +237,32 @@ services:
     networks:
       - internal
       - edge
+
+  editorial-operator:
+    build:
+      context: .
+      target: migrator
+    profiles: ["tools"]
+    command: ["pnpm", "editorial:operate", "--phase=import-preview"]
+    environment:
+      NODE_ENV: production
+      APP_URL: https://leiprova.2b.app.br
+      LEIPROVA_EDITORIAL_OPERATION_DATABASE_URL: postgresql://${APP_DB_USER:-leiprova_app}:${APP_DB_PASSWORD}@leiprova-pooler:5432/${POSTGRES_DB:-leiprova}
+      LEIPROVA_EDITORIAL_OPERATION_APPROVED: ${LEIPROVA_EDITORIAL_OPERATION_APPROVED:-}
+    volumes:
+      - ./.local/editorial/input:/editorial-input:ro
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 64
+    cpus: 0.5
+    mem_limit: 768m
+    networks:
+      - internal
 
 volumes:
   leiprova_pgdata:

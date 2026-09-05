@@ -190,6 +190,34 @@
       "when": 1788462702535,
       "tag": "0026_little_forge",
       "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1788574020854,
+      "tag": "0027_editorial_durable_jobs",
+      "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "7",
+      "when": 1788574796243,
+      "tag": "0028_exact_opportunity_edition",
+      "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "7",
+      "when": 1788576555563,
+      "tag": "0029_editorial_context_locks",
+      "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "7",
+      "when": 1788613286440,
+      "tag": "0030_editorial_import_catalog_locks",
+      "breakpoints": true
     }
   ]
 }

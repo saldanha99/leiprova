@@ -234,7 +234,10 @@ export function QuizBuilder({
                     "rounded-2xl border p-4 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300",
                     selected ? "border-emerald-300/35 bg-emerald-300/7" : "border-white/8 bg-slate-950/25 hover:border-white/16",
                   )}
-                  onClick={() => update({ mode: mode.slug })}
+                  onClick={() => update({ mode: mode.slug,
+                    ...(mode.slug !== "original_style" && examEditions.find((item) => item.publicId === config.examEditionId)?.scheduled
+                      ? { examEditionId: undefined, examYear: undefined } : {}),
+                  })}
                   type="button"
                 >
                   <span className={cn("grid size-10 place-items-center rounded-xl", selected ? "bg-emerald-300 text-slate-950" : "bg-white/5 text-slate-500")}><Icon className="size-5" /></span>
@@ -329,6 +332,7 @@ function CareerPathSection({
   const matchingEditions = examEditions.filter(
     (edition) =>
       edition.careerSlug === config.careerSlug &&
+      (!edition.scheduled || config.mode === "original_style") &&
       (edition.specializationSlug ?? undefined) === (config.specializationSlug ?? undefined),
   );
   const years = [...new Set(matchingEditions.map((edition) => edition.examYear))].sort(
@@ -439,6 +443,7 @@ function CareerPathSection({
                           <span className="flex items-start justify-between gap-3">
                             <span>
                               <strong className="block text-sm text-slate-100">{edition.title}</strong>
+                              {edition.scheduled ? <span className="mt-1 block text-xs font-semibold text-emerald-200">Preparação para prova agendada · questões autorais</span> : null}
                               <span className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] text-slate-500">
                                 <span className="inline-flex items-center gap-1"><CalendarDays className="size-3" />{formatExamDate(edition.examDate)}</span>
                                 {(edition.organizer || edition.jurisdiction) && <span>{[edition.organizer, edition.jurisdiction].filter(Boolean).join(" · ")}</span>}

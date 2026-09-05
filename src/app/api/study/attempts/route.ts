@@ -16,6 +16,7 @@ import {
 } from "@/lib/db/schema";
 import { canStudyQuestion } from "@/lib/study/access-policy";
 import { getStudyEntitlement } from "@/lib/study/entitlement";
+import { authorialStudyRightsConditions } from "@/lib/study/question-rights";
 import { confidenceValue, scheduleReview } from "@/lib/study/review";
 import { consumeRateLimits, getRequestIp, rateLimitJsonResponse } from "@/lib/rate-limit";
 
@@ -78,6 +79,7 @@ export async function POST(request: Request) {
         eq(questions.publicId, parsed.data.questionId),
         eq(questionOptions.optionKey, parsed.data.optionId),
         eq(questions.editorialStatus, "reviewed"),
+        authorialStudyRightsConditions(),
         eq(legalArticles.editorialStatus, "reviewed"),
         eq(legalVersions.status, "current"),
         eq(legalActs.isActive, true),

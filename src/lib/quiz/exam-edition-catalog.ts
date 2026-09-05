@@ -2,7 +2,7 @@ import { isOfficialExamUrl } from "@/lib/official-sources/exam-registry";
 
 export const ELIGIBLE_QUIZ_EXAM_STATUSES = ["held", "published"] as const;
 
-export type EligibleQuizExamStatus = (typeof ELIGIBLE_QUIZ_EXAM_STATUSES)[number];
+export type EligibleQuizExamStatus = (typeof ELIGIBLE_QUIZ_EXAM_STATUSES)[number] | "scheduled";
 
 export type QuizExamEditionCatalogItem = Readonly<{
   publicId: string;
@@ -31,6 +31,7 @@ export type QuizExamEditionCatalogItem = Readonly<{
 }>;
 
 export type QuizExamEditionOption = Readonly<{
+  scheduled?: true;
   publicId: string;
   title: string;
   examDate: string;
@@ -46,6 +47,8 @@ export type QuizExamEditionOption = Readonly<{
 }>;
 
 export type QuizExamEditionCatalogRow = {
+  scheduledProgramReviewed?: boolean;
+  sourceCheckedAt?: Date | null;
   publicId: string;
   title: string;
   examDate: string | Date;
@@ -73,6 +76,8 @@ export type QuizExamEditionCatalogRow = {
 const eligibleStatuses = new Set<string>(ELIGIBLE_QUIZ_EXAM_STATUSES);
 
 export type QuizExamEditionSelectionCandidate = Readonly<{
+  scheduledProgramReviewed?: boolean;
+  sourceCheckedAt?: Date | null;
   publicId: string;
   careerTrackId: number;
   specializationId: number | null;
@@ -93,6 +98,7 @@ export function isQuizExamEditionAvailableForSelection(
   }>,
   todayIso: string,
   requestedPublicId?: string,
+  allowScheduled = false,
 ) {
   const normalizedToday = toIsoDate(todayIso);
   const examDate = toIsoDate(edition.examDate);
@@ -100,8 +106,9 @@ export function isQuizExamEditionAvailableForSelection(
   return Boolean(
     normalizedToday &&
       examDate &&
-      examDate <= normalizedToday &&
-      eligibleStatuses.has(edition.status) &&
+      ((examDate <= normalizedToday && eligibleStatuses.has(edition.status)) ||
+        (allowScheduled && edition.status === "scheduled" &&
+          edition.scheduledProgramReviewed === true && Boolean(edition.sourceCheckedAt))) &&
       edition.officialUrl?.trim() &&
       isOfficialExamUrl(edition.bankSlug, edition.officialUrl) &&
       edition.bankIsActive &&
@@ -120,6 +127,7 @@ export function isQuizExamEditionAvailableForSelection(
 export function buildQuizExamEditionCatalog(
   rows: readonly QuizExamEditionCatalogRow[],
   todayIso: string,
+  includeScheduled = false,
 ): QuizExamEditionCatalogItem[] {
   const normalizedToday = toIsoDate(todayIso);
   if (!normalizedToday) throw new Error("A data de referência do catálogo é inválida.");
@@ -131,8 +139,9 @@ export function buildQuizExamEditionCatalog(
 
       if (
         !examDate ||
-        examDate > normalizedToday ||
-        !eligibleStatuses.has(row.status) ||
+        !((examDate <= normalizedToday && eligibleStatuses.has(row.status)) ||
+          (includeScheduled && row.status === "scheduled" &&
+            row.scheduledProgramReviewed === true && Boolean(row.sourceCheckedAt))) ||
         !officialUrl ||
         !isOfficialExamUrl(row.bankSlug, officialUrl) ||
         !row.careerIsActive ||
@@ -202,6 +211,7 @@ export function toQuizExamEditionOptions(
   editions: readonly QuizExamEditionCatalogItem[],
 ): QuizExamEditionOption[] {
   return editions.map((edition) => ({
+    ...(edition.status === "scheduled" ? { scheduled: true as const } : {}),
     publicId: edition.publicId,
     title: edition.title,
     examDate: edition.examDate,

@@ -387,7 +387,7 @@ export default function SourcesAndUpdatesPage() {
 
           <GuideCta
             title="Confira a fonte dentro de uma questão real"
-            description="A demonstração pública usa cinco itens assistidos por IA do beta constitucional. Você responde, recebe a explicação e pode abrir a página oficial utilizada na conferência; a revisão humana independente continua pendente."
+            description="Enquanto a revisão humana estiver pendente, a demonstração pública apresenta somente o funcionamento do método, sem servir questões jurídicas. A liberação do treino exige revisão registrada e fonte oficial vigente."
           />
         </div>
       </article>

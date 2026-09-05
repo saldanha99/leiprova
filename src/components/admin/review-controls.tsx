@@ -10,7 +10,21 @@ import {
 
 const initialEditorialActionState: EditorialActionState = { status: "idle", message: "" };
 
-export function ReviewControls({ publicId }: { publicId: string }) {
+/**
+ * Decisão individual sobre uma questão autoral.
+ *
+ * `dossierFingerprint` é a impressão do dossiê exibido nesta página, calculada
+ * no servidor. Ela viaja junto da decisão para que a aprovação recuse conteúdo
+ * que tenha mudado depois da leitura do revisor. O componente não a calcula nem
+ * a deriva: apenas devolve o que recebeu.
+ */
+export function ReviewControls({
+  publicId,
+  dossierFingerprint,
+}: {
+  publicId: string;
+  dossierFingerprint: string;
+}) {
   const [state, formAction, pending] = useActionState(
     reviewOriginalQuestionAction,
     initialEditorialActionState,
@@ -19,6 +33,7 @@ export function ReviewControls({ publicId }: { publicId: string }) {
   return (
     <form action={formAction} className="mt-4 rounded-xl border border-white/8 bg-black/15 p-3">
       <input type="hidden" name="publicId" value={publicId} />
+      <input type="hidden" name="dossierFingerprint" value={dossierFingerprint} />
       <label htmlFor={`notes-${publicId}`} className="text-xs font-semibold text-slate-400">
         Nota da revisão
       </label>

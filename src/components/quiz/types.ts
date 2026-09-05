@@ -132,6 +132,7 @@ export function isQuizConfigReady(
     ? examEditions.find((edition) => edition.publicId === config.examEditionId)
     : undefined;
   if (config.examEditionId && !selectedEdition) return false;
+  if (selectedEdition?.scheduled && config.mode !== "original_style") return false;
   if (
     selectedEdition &&
     (selectedEdition.careerSlug !== career.slug ||

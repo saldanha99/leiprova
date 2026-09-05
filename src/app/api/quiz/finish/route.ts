@@ -20,6 +20,7 @@ import { calculateQuizResult, formatQuizQuestionSource } from "@/lib/quiz/respon
 import { quizFinishRequestSchema } from "@/lib/quiz/session-contract";
 import { canStudyQuestion } from "@/lib/study/access-policy";
 import { getStudyEntitlement } from "@/lib/study/entitlement";
+import { enqueueNewQuizMistakes } from "@/lib/study/quiz-review";
 
 export const dynamic = "force-dynamic";
 
@@ -94,7 +95,7 @@ export async function POST(request: Request) {
         .where(eq(quizSessions.id, session.id));
 
       if (metricAnswers.length) {
-        await tx
+        const newlyRecorded = await tx
           .insert(userAttempts)
           .values(
             metricAnswers.map((answer) => ({
@@ -109,7 +110,9 @@ export async function POST(request: Request) {
           )
           .onConflictDoNothing({
             target: [userAttempts.quizSessionId, userAttempts.questionId],
-          });
+          }).returning({ questionId: userAttempts.questionId, isCorrect: userAttempts.isCorrect });
+
+        await enqueueNewQuizMistakes(tx, user.id, newlyRecorded, now);
 
         const correctCount = metricAnswers.filter((answer) => answer.isCorrect).length;
         const durationMs = metricAnswers.reduce((total, answer) => total + (answer.durationMs ?? 0), 0);

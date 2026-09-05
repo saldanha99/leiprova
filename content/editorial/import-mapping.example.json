@@ -1,0 +1,326 @@
+{
+  "schemaVersion": 1,
+  "sourceBundleId": "cf-direitos-fundamentais-2026-09-05",
+  "bindings": [
+    {
+      "sourceId": "cf5-i",
+      "legalArticleId": null,
+      "legalVersionId": null,
+      "versionChecksum": "",
+      "subjectId": null,
+      "topicId": null
+    },
+    {
+      "sourceId": "cf5-ii",
+      "legalArticleId": null,
+      "legalVersionId": null,
+      "versionChecksum": "",
+      "subjectId": null,
+      "topicId": null
+    },
+    {
+      "sourceId": "cf5-iii",
+      "legalArticleId": null,
+      "legalVersionId": null,
+      "versionChecksum": "",
+      "subjectId": null,
+      "topicId": null
+    },
+    {
+      "sourceId": "cf5-v",
+      "legalArticleId": null,
+      "legalVersionId": null,
+      "versionChecksum": "",
+      "subjectId": null,
+      "topicId": null
+    },
+    {
+      "sourceId": "cf5-vi",
+      "legalArticleId": null,
+      "legalVersionId": null,
+      "versionChecksum": "",
+      "subjectId": null,
+      "topicId": null
+    },
+    {
+      "sourceId": "cf5-vii",
+      "legalArticleId": null,
+      "legalVersionId": null,
+      "versionChecksum": "",
+      "subjectId": null,
+      "topicId": null
+    },
+    {
+      "sourceId": "cf5-viii",
+      "legalArticleId": null,
+      "legalVersionId": null,
+      "versionChecksum": "",
+      "subjectId": null,
+      "topicId": null
+    },
+    {
+      "sourceId": "cf5-x",
+      "legalArticleId": null,
+      "legalVersionId": null,
+      "versionChecksum": "",
+      "subjectId": null,
+      "topicId": null
+    },
+    {
+      "sourceId": "cf5-xi",
+      "legalArticleId": null,
+      "legalVersionId": null,
+      "versionChecksum": "",
+      "subjectId": null,
+      "topicId": null
+    },
+    {
+      "sourceId": "cf5-xii",
+      "legalArticleId": null,
+      "legalVersionId": null,
+      "versionChecksum": "",
+      "subjectId": null,
+      "topicId": null
+    },
+    {
+      "sourceId": "cf5-xiii",
+      "legalArticleId": null,
+      "legalVersionId": null,
+      "versionChecksum": "",
+      "subjectId": null,
+      "topicId": null
+    },
+    {
+      "sourceId": "cf5-xiv",
+      "legalArticleId": null,
+      "legalVersionId": null,
+      "versionChecksum": "",
+      "subjectId": null,
+      "topicId": null
+    },
+    {
+      "sourceId": "cf5-xv",
+      "legalArticleId": null,
+      "legalVersionId": null,
+      "versionChecksum": "",
+      "subjectId": null,
+      "topicId": null
+    },
+    {
+      "sourceId": "cf5-xvi",
+      "legalArticleId": null,
+      "legalVersionId": null,
+      "versionChecksum": "",
+      "subjectId": null,
+      "topicId": null
+    },
+    {
+      "sourceId": "cf5-xvii",
+      "legalArticleId": null,
+      "legalVersionId": null,
+      "versionChecksum": "",
+      "subjectId": null,
+      "topicId": null
+    },
+    {
+      "sourceId": "cf5-xviii",
+      "legalArticleId": null,
+      "legalVersionId": null,
+      "versionChecksum": "",
+      "subjectId": null,
+      "topicId": null
+    },
+    {
+      "sourceId": "cf5-xix",
+      "legalArticleId": null,
+      "legalVersionId": null,
+      "versionChecksum": "",
+      "subjectId": null,
+      "topicId": null
+    },
+    {
+      "sourceId": "cf5-xx",
+      "legalArticleId": null,
+      "legalVersionId": null,
+      "versionChecksum": "",
+      "subjectId": null,
+      "topicId": null
+    },
+    {
+      "sourceId": "cf5-xxi",
+      "legalArticleId": null,
+      "legalVersionId": null,
+      "versionChecksum": "",
+      "subjectId": null,
+      "topicId": null
+    },
+    {
+      "sourceId": "cf5-xxii",
+      "legalArticleId": null,
+      "legalVersionId": null,
+      "versionChecksum": "",
+      "subjectId": null,
+      "topicId": null
+    },
+    {
+      "sourceId": "cf5-xxiii",
+      "legalArticleId": null,
+      "legalVersionId": null,
+      "versionChecksum": "",
+      "subjectId": null,
+      "topicId": null
+    },
+    {
+      "sourceId": "cf5-xxiv",
+      "legalArticleId": null,
+      "legalVersionId": null,
+      "versionChecksum": "",
+      "subjectId": null,
+      "topicId": null
+    },
+    {
+      "sourceId": "cf5-xxv",
+      "legalArticleId": null,
+      "legalVersionId": null,
+      "versionChecksum": "",
+      "subjectId": null,
+      "topicId": null
+    },
+    {
+      "sourceId": "cf5-xxvi",
+      "legalArticleId": null,
+      "legalVersionId": null,
+      "versionChecksum": "",
+      "subjectId": null,
+      "topicId": null
+    },
+    {
+      "sourceId": "cf5-xxvii",
+      "legalArticleId": null,
+      "legalVersionId": null,
+      "versionChecksum": "",
+      "subjectId": null,
+      "topicId": null
+    },
+    {
+      "sourceId": "cf5-xxviii",
+      "legalArticleId": null,
+      "legalVersionId": null,
+      "versionChecksum": "",
+      "subjectId": null,
+      "topicId": null
+    },
+    {
+      "sourceId": "cf5-xxix",
+      "legalArticleId": null,
+      "legalVersionId": null,
+      "versionChecksum": "",
+      "subjectId": null,
+      "topicId": null
+    },
+    {
+      "sourceId": "cf5-xxx",
+      "legalArticleId": null,
+      "legalVersionId": null,
+      "versionChecksum": "",
+      "subjectId": null,
+      "topicId": null
+    },
+    {
+      "sourceId": "cf5-xxxi",
+      "legalArticleId": null,
+      "legalVersionId": null,
+      "versionChecksum": "",
+      "subjectId": null,
+      "topicId": null
+    },
+    {
+      "sourceId": "cf5-xxxii",
+      "legalArticleId": null,
+      "legalVersionId": null,
+      "versionChecksum": "",
+      "subjectId": null,
+      "topicId": null
+    },
+    {
+      "sourceId": "cf5-xxxiii",
+      "legalArticleId": null,
+      "legalVersionId": null,
+      "versionChecksum": "",
+      "subjectId": null,
+      "topicId": null
+    },
+    {
+      "sourceId": "cf5-xxxiv",
+      "legalArticleId": null,
+      "legalVersionId": null,
+      "versionChecksum": "",
+      "subjectId": null,
+      "topicId": null
+    },
+    {
+      "sourceId": "cf5-xxxvi",
+      "legalArticleId": null,
+      "legalVersionId": null,
+      "versionChecksum": "",
+      "subjectId": null,
+      "topicId": null
+    },
+    {
+      "sourceId": "cf5-xxxvii",
+      "legalArticleId": null,
+      "legalVersionId": null,
+      "versionChecksum": "",
+      "subjectId": null,
+      "topicId": null
+    },
+    {
+      "sourceId": "cf5-xxxviii",
+      "legalArticleId": null,
+      "legalVersionId": null,
+      "versionChecksum": "",
+      "subjectId": null,
+      "topicId": null
+    },
+    {
+      "sourceId": "cf5-xxxix",
+      "legalArticleId": null,
+      "legalVersionId": null,
+      "versionChecksum": "",
+      "subjectId": null,
+      "topicId": null
+    },
+    {
+      "sourceId": "cf5-xl",
+      "legalArticleId": null,
+      "legalVersionId": null,
+      "versionChecksum": "",
+      "subjectId": null,
+      "topicId": null
+    },
+    {
+      "sourceId": "cf5-xli",
+      "legalArticleId": null,
+      "legalVersionId": null,
+      "versionChecksum": "",
+      "subjectId": null,
+      "topicId": null
+    },
+    {
+      "sourceId": "cf5-xlii",
+      "legalArticleId": null,
+      "legalVersionId": null,
+      "versionChecksum": "",
+      "subjectId": null,
+      "topicId": null
+    },
+    {
+      "sourceId": "cf5-xliii",
+      "legalArticleId": null,
+      "legalVersionId": null,
+      "versionChecksum": "",
+      "subjectId": null,
+      "topicId": null
+    }
+  ]
+}

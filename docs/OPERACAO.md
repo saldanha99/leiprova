@@ -5,6 +5,18 @@ Descreve onde as coisas estão, como publicar e quais armadilhas já custaram te
 
 Última verificação completa: 2026-08-25.
 
+Continuação autorizada em 05/09/2026: [operação controlada do lote de 160 questões](OPERACAO-LOTE-160.md).
+Inclui compatibilidade explícita Planalto/Senado, confirmação humana vinculada ao conteúdo/mapeamento,
+operador interno com papel restrito e deploy sem seed para preservar o acervo revisado.
+
+Atualização de desenvolvimento em 05/09/2026: veja [operação automatizada — P0](OPERACAO-AUTOMATIZADA-P0.md)
+para migrations, permissões e QA da nova fundação editorial. As mudanças foram validadas
+somente localmente; o estado de produção descrito abaixo é histórico, não uma nova checagem da VPS.
+
+Continuação local: [importação de rascunhos das assinaturas](IMPORTACAO-RASCUNHOS-LOCAIS.md),
+com migration 0030 para ampliar locks do catálogo. Validada apenas no banco sintético;
+sem aplicação na VPS ou aprovação/publicação das 160 questões do lote.
+
 ## Onde o projeto vive
 
 | Ambiente | Endereço | Observação |

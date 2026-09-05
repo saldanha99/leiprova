@@ -8,9 +8,13 @@ import {
   claimGeneratedDraftBatchAction,
   type EditorialActionState,
 } from "@/app/admin/fabrica-autoral/actions";
-import { EDITORIAL_BATCH_LIMIT } from "@/lib/editorial/clean-room";
 
 const initialState: EditorialActionState = { status: "idle", message: "" };
+
+/** Id compartilhado: as caixas de cada dossiê se ligam a este formulário pelo
+ * atributo `form`, sem aninhar `<form>` dentro dos cards da fila. É o que
+ * permite ter uma única interface de aprovação em vez de duas divergentes. */
+export const BATCH_APPROVAL_FORM_ID = "batch-approval-form";
 
 function Feedback({ state }: { state: EditorialActionState }) {
   if (!state.message) return null;
@@ -29,121 +33,126 @@ function Feedback({ state }: { state: EditorialActionState }) {
   );
 }
 
-export function BatchEditorialControls({
-  claimableCount,
-  reviewableCount,
-}: {
-  claimableCount: number;
-  reviewableCount: number;
-}) {
-  const [claimState, claimAction, claimPending] = useActionState(
-    claimGeneratedDraftBatchAction,
-    initialState,
-  );
-  const [reviewState, reviewAction, reviewPending] = useActionState(
-    approveOriginalQuestionBatchAction,
-    initialState,
-  );
-  const claimBatchSize = Math.min(claimableCount, EDITORIAL_BATCH_LIMIT);
-  const reviewBatchSize = Math.min(reviewableCount, EDITORIAL_BATCH_LIMIT);
-  const hasAction = claimBatchSize > 0 || reviewBatchSize > 0;
+/**
+ * Envio em lote para revisão.
+ *
+ * A atestação deixou de ser um campo oculto com valor fixo: quem envia precisa
+ * marcar a caixa.
+ */
+export function BatchClaimControls({ claimableCount }: { claimableCount: number }) {
+  const [state, action, pending] = useActionState(claimGeneratedDraftBatchAction, initialState);
+
+  if (claimableCount <= 0) return null;
 
   return (
     <section
-      className="mt-5 overflow-hidden rounded-[1.5rem] border border-sky-300/15 bg-[linear-gradient(135deg,rgba(56,189,248,.075),rgba(9,19,31,.98)_46%,rgba(52,211,153,.055))]"
-      aria-labelledby="batch-editorial-title"
+      className="mt-5 overflow-hidden rounded-[1.5rem] border border-sky-300/15 bg-[#09131f]/95"
+      aria-labelledby="batch-claim-title"
     >
-      <div className="border-b border-white/8 p-5 sm:p-6">
+      <form action={action} className="p-5 sm:p-6">
         <span className="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-[.14em] text-sky-300">
           <Files aria-hidden="true" className="size-4" />
-          Publicação rápida em lote
+          Enviar rascunhos à revisão
         </span>
-        <h2 id="batch-editorial-title" className="mt-2 text-xl font-semibold text-white sm:text-2xl">
-          Uma confirmação. O restante é automático.
+        <h2 id="batch-claim-title" className="mt-2 text-lg font-semibold text-white">
+          {claimableCount} {claimableCount === 1 ? "rascunho disponível" : "rascunhos disponíveis"}
         </h2>
-        <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-400">
-          A plataforma verifica fonte, formato, gabarito, originalidade, permissões e auditoria antes de concluir
-          cada lote.
-        </p>
-      </div>
 
-      {hasAction ? (
-        <div className={`grid gap-px bg-white/8 ${claimBatchSize && reviewBatchSize ? "lg:grid-cols-2" : ""}`}>
-          {claimBatchSize ? (
-            <form action={claimAction} className="bg-[#09131f]/95 p-5 sm:p-6">
-              <input type="hidden" name="cleanRoomAttestation" value="on" />
-              <div className="flex items-start gap-3">
-                <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-sky-300/10 text-sky-300">
-                  <Send aria-hidden="true" className="size-5" />
-                </span>
-                <div>
-                  <p className="text-xs font-extrabold uppercase tracking-[.11em] text-sky-300">Enviar</p>
-                  <h3 className="mt-1 text-base font-semibold text-white">
-                    Mandar {claimBatchSize} questões para revisão
-                  </h3>
-                  <p id="quick-claim-confirmation" className="mt-1 text-xs leading-5 text-slate-500">
-                    Ao clicar, você confirma a conferência do lote com base nas fontes oficiais indicadas.
-                  </p>
-                </div>
-              </div>
-
-              <Feedback state={claimState} />
-              <button
-                type="submit"
-                aria-describedby="quick-claim-confirmation"
-                disabled={claimPending}
-                className="mt-5 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-sky-300 px-4 text-sm font-extrabold text-sky-950 transition hover:bg-sky-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-200 disabled:cursor-not-allowed disabled:opacity-45"
-              >
-                <Send aria-hidden="true" className="size-4" />
-                {claimPending ? "Enviando lote..." : `Confirmar e enviar ${claimBatchSize}`}
-              </button>
-            </form>
-          ) : null}
-
-          {reviewBatchSize ? (
-            <form action={reviewAction} className="bg-[#09131f]/95 p-5 sm:p-6">
-              <input type="hidden" name="reviewAttestation" value="on" />
-              <div className="flex items-start gap-3">
-                <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-emerald-300/10 text-emerald-300">
-                  <UserRoundCheck aria-hidden="true" className="size-5" />
-                </span>
-                <div>
-                  <p className="text-xs font-extrabold uppercase tracking-[.11em] text-emerald-300">Publicar</p>
-                  <h3 className="mt-1 text-base font-semibold text-white">
-                    Liberar {reviewBatchSize} questões no catálogo
-                  </h3>
-                  <p id="quick-review-confirmation" className="mt-1 text-xs leading-5 text-slate-500">
-                    Ao clicar, você confirma a revisão humana dos itens pendentes deste lote.
-                  </p>
-                </div>
-              </div>
-
-              <Feedback state={reviewState} />
-              <button
-                type="submit"
-                aria-describedby="quick-review-confirmation"
-                disabled={reviewPending}
-                className="mt-5 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-emerald-300 px-4 text-sm font-extrabold text-emerald-950 transition hover:bg-emerald-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-200 disabled:cursor-not-allowed disabled:opacity-45"
-              >
-                <CheckCircle2 aria-hidden="true" className="size-4" />
-                {reviewPending ? "Publicando lote..." : `Confirmar e publicar ${reviewBatchSize}`}
-              </button>
-            </form>
-          ) : null}
-        </div>
-      ) : (
-        <div className="flex items-start gap-3 bg-[#09131f]/95 p-5 sm:p-6">
-          <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-emerald-300/10 text-emerald-300">
-            <CheckCircle2 aria-hidden="true" className="size-5" />
+        <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-xl border border-white/10 bg-black/20 p-3.5">
+          <input
+            type="checkbox"
+            name="cleanRoomAttestation"
+            value="on"
+            required
+            className="mt-0.5 size-5 shrink-0 accent-sky-300"
+          />
+          <span className="text-xs leading-5 text-slate-300">
+            Confiro que estes rascunhos nasceram apenas da fonte oficial indicada e do perfil editorial abstrato,
+            sem consultar questão de terceiros.
           </span>
-          <div>
-            <h3 className="text-base font-semibold text-white">Nenhuma ação pendente</h3>
-            <p className="mt-1 text-xs leading-5 text-slate-400">
-              Os lotes disponíveis aparecerão aqui com uma única ação.
-            </p>
-          </div>
-        </div>
-      )}
+        </label>
+
+        <Feedback state={state} />
+        <button
+          type="submit"
+          disabled={pending}
+          className="mt-4 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-sky-300 px-4 text-sm font-extrabold text-sky-950 transition hover:bg-sky-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-200 disabled:cursor-not-allowed disabled:opacity-45"
+        >
+          <Send aria-hidden="true" className="size-4" />
+          {pending ? "Enviando..." : `Enviar ${claimableCount} à revisão`}
+        </button>
+      </form>
     </section>
+  );
+}
+
+/**
+ * Aprovação em lote.
+ *
+ * O botão não aprova mais "os pendentes" de forma cega. O servidor recebe
+ * exatamente os itens marcados na fila, cada um acompanhado da impressão digital
+ * do dossiê exibido, e recusa qualquer divergência.
+ */
+export function BatchApprovalControls({ reviewableCount }: { reviewableCount: number }) {
+  const [state, action, pending] = useActionState(approveOriginalQuestionBatchAction, initialState);
+
+  return (
+    <form
+      id={BATCH_APPROVAL_FORM_ID}
+      action={action}
+      className="mt-5 rounded-[1.5rem] border border-emerald-300/15 bg-[#09131f]/95 p-5 sm:p-6"
+      aria-labelledby="batch-approval-title"
+    >
+      <span className="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-[.14em] text-emerald-300">
+        <UserRoundCheck aria-hidden="true" className="size-4" />
+        Aprovar o que você conferiu
+      </span>
+      <h2 id="batch-approval-title" className="mt-2 text-lg font-semibold text-white">
+        Publicar as questões marcadas na fila
+      </h2>
+      <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-400">
+        {reviewableCount > 0
+          ? `Há ${reviewableCount} ${reviewableCount === 1 ? "questão pendente" : "questões pendentes"}. Abra o dossiê de cada uma, confira enunciado, alternativas, gabarito, justificativas e fonte, e marque “Conferi este item”. Só os itens marcados são aprovados.`
+          : "Nenhuma questão pendente de revisão no momento."}
+      </p>
+
+      <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-xl border border-white/10 bg-black/20 p-3.5">
+        <input
+          type="checkbox"
+          name="reviewAttestation"
+          value="on"
+          required
+          disabled={reviewableCount <= 0}
+          className="mt-0.5 size-5 shrink-0 accent-emerald-300"
+        />
+        <span className="text-xs leading-5 text-slate-300">
+          Declaro que revisei pessoalmente cada item marcado acima, conferindo o texto contra a fonte oficial, e
+          respondo pela publicação.
+        </span>
+      </label>
+
+      <label className="mt-3 block">
+        <span className="text-[11px] font-bold uppercase tracking-[.1em] text-slate-500">
+          Nota da revisão (opcional)
+        </span>
+        <textarea
+          name="notes"
+          rows={2}
+          maxLength={1500}
+          disabled={reviewableCount <= 0}
+          className="mt-1.5 w-full rounded-xl border border-white/10 bg-black/20 p-3 text-xs leading-5 text-slate-200 outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/50"
+        />
+      </label>
+
+      <Feedback state={state} />
+      <button
+        type="submit"
+        disabled={pending || reviewableCount <= 0}
+        className="mt-4 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-emerald-300 px-4 text-sm font-extrabold text-emerald-950 transition hover:bg-emerald-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-200 disabled:cursor-not-allowed disabled:opacity-45"
+      >
+        <CheckCircle2 aria-hidden="true" className="size-4" />
+        {pending ? "Publicando..." : "Aprovar as questões marcadas"}
+      </button>
+    </form>
   );
 }

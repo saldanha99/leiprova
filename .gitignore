@@ -41,3 +41,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Registros editoriais privados: nunca publicar no repositório.
+/.local/editorial/
+# O repositório é público; o lote é um artefato editorial entregue separadamente.
+/content/editorial/cf-direitos-fundamentais-2026-09-05/
+/content/editorial/*.zip

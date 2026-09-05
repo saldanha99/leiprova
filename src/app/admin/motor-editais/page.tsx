@@ -23,6 +23,8 @@ import {
   RequirementMappingControls,
   RequirementReviewControls,
   SyllabusImportForm,
+  OpportunityEditionForm,
+  RetryEditorialJobButton,
 } from "@/components/admin/notice-engine-controls";
 import { requireAdmin } from "@/lib/auth";
 import { getNoticeEngineSnapshot } from "@/lib/db/notice-engine-admin";
@@ -42,6 +44,12 @@ const statusLabels: Record<string, string> = {
   reviewed: "Requisito revisado",
   suspended: "Suspenso",
   draft: "Aguardando mapeamento",
+  pending: "Na fila",
+  running: "Em execução",
+  retry: "Nova tentativa agendada",
+  succeeded: "Concluída",
+  blocked: "Aguardando correção editorial",
+  failed: "Tentativas esgotadas",
 };
 
 function statusClass(status: string) {
@@ -123,8 +131,8 @@ export default async function NoticeEnginePage() {
             <RefreshCcw aria-hidden="true" className="size-4" />
           </span>
           <div>
-            <h2 className="text-sm font-bold text-emerald-100">Coleta editorial automática a cada 6 horas</h2>
-            <p className="mt-1 max-w-3xl text-xs leading-5 text-slate-400">A rotina procura PDFs elegíveis nas fontes aprovadas, captura versões novas e extrai o conteúdo programático. Ela cria somente pendências e rascunhos; nenhuma aprovação ou publicação é automática.</p>
+            <h2 className="text-sm font-bold text-emerald-100">Automação editorial com execução rastreável</h2>
+            <p className="mt-1 max-w-3xl text-xs leading-5 text-slate-400">Quando o agendador estiver ativo, a rotina procura PDFs elegíveis nas fontes aprovadas e cria pendências e rascunhos. O agendamento sugerido é a cada 6 horas. Nenhuma aprovação ou publicação é automática.</p>
           </div>
         </div>
         <p className="shrink-0 text-xs font-semibold text-slate-500">
@@ -147,6 +155,28 @@ export default async function NoticeEnginePage() {
             <p className="mt-1 text-xs leading-5 text-slate-500">{detail}</p>
           </article>
         ))}
+      </section>
+
+      <section className="mt-5 rounded-[1.5rem] border border-amber-300/15 bg-[#09131f] p-5 sm:p-6" aria-labelledby="edition-mapping-title">
+        <span className="text-xs font-bold uppercase tracking-[.14em] text-amber-300">Precisão do programa</span>
+        <h2 id="edition-mapping-title" className="mt-2 text-xl font-semibold text-white">Cada edição, seu próprio programa</h2>
+        <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-400">Carreira, banca e ano não identificam um concurso sozinhos. Sem este vínculo explícito, o treino por edição não recebe questões deste programa. O treino geral da banca permanece separado.</p>
+        <OpportunityEditionForm opportunities={snapshot.opportunities} editions={snapshot.editions} />
+      </section>
+
+      <section className="mt-5 rounded-[1.5rem] border border-white/8 bg-[#09131f] p-5 sm:p-6" aria-labelledby="automation-queue-title">
+        <h2 id="automation-queue-title" className="text-xl font-semibold text-white">Fila de geração</h2>
+        <p className="mt-2 text-sm leading-6 text-slate-400">Até 100 trabalhos recentes. Falhas temporárias recebem novas tentativas; pendências editoriais exigem correção. Solicitar reavaliação não dispensa os critérios de revisão.</p>
+        {snapshot.automationJobs.length ? <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          {snapshot.automationJobs.map((job) => <article key={job.jobKey} className="min-w-0 rounded-xl border border-white/10 p-4">
+            <h3 className="text-sm font-bold text-slate-200">{job.kind === "draft_generation" ? "Requisito" : "Fonte"} #{job.subjectId}</h3>
+            <p className="mt-2 text-xs font-semibold text-amber-200">{statusLabels[job.status] ?? job.status}</p>
+            <p className="mt-2 text-xs text-slate-500">{job.attempts}/5 tentativas · {dateFormatter.format(job.updatedAt)}</p>
+            {job.status === "retry" ? <p className="mt-2 text-xs text-slate-400">Pode retomar a partir de {dateFormatter.format(job.nextAttemptAt)}</p> : null}
+            {job.lastErrorCode ? <p className="mt-2 break-words font-mono text-[10px] text-slate-500">{job.lastErrorCode}</p> : null}
+            {["blocked", "failed"].includes(job.status) ? <RetryEditorialJobButton jobKey={job.jobKey} /> : null}
+          </article>)}
+        </div> : <p className="mt-4 rounded-xl border border-dashed border-white/10 p-5 text-sm text-slate-500">Ainda não há trabalhos enfileirados. Requisitos revisados entram na próxima execução da rotina.</p>}
       </section>
 
       <section className="mt-5 grid gap-5 2xl:grid-cols-[.9fr_1.1fr]">

@@ -25,7 +25,6 @@ import {
   generatedDraftBatchClaimSchema,
   generatedDraftClaimSchema,
   isGeneratedAuthorshipMethod,
-  originalQuestionBatchReviewSchema,
   originalQuestionDraftSchema,
   validateHumanReview,
 } from "@/lib/editorial/clean-room";
@@ -33,6 +32,30 @@ import {
   findMostSimilarQuestion,
   ORIGINALITY_REJECTION_THRESHOLD_BPS,
 } from "@/lib/editorial/originality";
+import {
+  evaluateOriginalQuestionApproval,
+  matchConfirmedDossiers,
+  MISSING_ATTESTATION_REASON,
+  MISSING_REVIEWER_CONFIRMATION_REASON,
+  parseReviewerConfirmation,
+  UNEXPECTED_APPROVAL_FAILURE_REASON,
+} from "@/lib/editorial/approval-eligibility";
+import { buildDossierFingerprint } from "@/lib/editorial/dossier-fingerprint";
+import { toQuestionDossier } from "@/lib/db/editorial-admin";
+import { currentLegalSourceExists, lockApprovalScope } from "@/lib/editorial/approval-lock";
+
+
+
+/**
+ * Falha esperada e explicável ao revisor. Qualquer outro erro vira mensagem
+ * genérica, para não expor SQL, nome de restrição ou estrutura interna.
+ */
+class ExpectedActionError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "ExpectedActionError";
+  }
+}
 
 export type EditorialActionState = {
   status: "idle" | "success" | "error";
@@ -365,7 +388,7 @@ export async function claimGeneratedDraftAction(
         )
         .returning({ id: questions.id });
 
-      if (!updated[0]) throw new Error("O rascunho já foi assumido por outro editor.");
+      if (!updated[0]) throw new ExpectedActionError("O rascunho já foi assumido por outro editor.");
 
       await transaction.insert(auditLogs).values({
         actorUserId: user.id,
@@ -383,7 +406,9 @@ export async function claimGeneratedDraftAction(
     });
   } catch (error) {
     console.error("Falha ao assumir rascunho autoral.", error);
-    return errorState(error instanceof Error ? error.message : "Não foi possível assumir o rascunho.");
+    return errorState(
+      error instanceof ExpectedActionError ? error.message : UNEXPECTED_APPROVAL_FAILURE_REASON,
+    );
   }
 
   revalidatePath("/admin/fabrica-autoral");
@@ -551,7 +576,7 @@ export async function claimGeneratedDraftBatchAction(
           )
           .returning({ id: questions.id });
 
-        if (!updated[0]) throw new Error("O lote mudou enquanto era processado. Recarregue e tente novamente.");
+        if (!updated[0]) throw new ExpectedActionError("O lote mudou enquanto era processado. Recarregue e tente novamente.");
       }
 
       await transaction.insert(auditLogs).values(
@@ -574,7 +599,9 @@ export async function claimGeneratedDraftBatchAction(
     });
   } catch (error) {
     console.error("Falha ao assumir lote autoral.", error);
-    return errorState(error instanceof Error ? error.message : "Não foi possível assumir o lote.");
+    return errorState(
+      error instanceof ExpectedActionError ? error.message : UNEXPECTED_APPROVAL_FAILURE_REASON,
+    );
   }
 
   revalidatePath("/admin/fabrica-autoral");
@@ -607,31 +634,131 @@ export async function reviewOriginalQuestionAction(
   }
 
   const db = getDb();
-  const [question] = await db
-    .select({
-      id: questions.id,
-      status: questions.editorialStatus,
-      creatorUserId: questions.createdByUserId,
-      cleanRoomAttestedAt: questions.cleanRoomAttestedAt,
-    })
-    .from(questions)
-    .where(and(eq(questions.publicId, parsed.data.publicId), eq(questions.quizMode, "original_style")))
-    .limit(1);
-
-  if (!question) return errorState("Questão autoral não encontrada.");
-
-  const review = validateHumanReview({
-    status: question.status,
-    creatorUserId: question.creatorUserId,
-    cleanRoomAttestedAt: question.cleanRoomAttestedAt,
-  });
-  if (!review.allowed) return errorState(review.reason);
-
   const approved = parsed.data.decision === "approve";
   const now = new Date();
+  // Impressão do dossiê exibido. Obrigatória para aprovar: sem ela não há como
+  // saber se o conteúdo aprovado é o conteúdo que o revisor leu. Reprovar não a
+  // exige, para que um item defeituoso sempre possa sair da fila.
+  const submittedFingerprint = String(formData.get("dossierFingerprint") ?? "").trim();
+  if (approved && !submittedFingerprint) {
+    return errorState(
+      "Recarregue a tela antes de aprovar: a conferência precisa vir vinculada à versão exibida do dossiê.",
+    );
+  }
 
   try {
     await db.transaction(async (transaction) => {
+      // Leitura, validação e gravação na mesma transação, com a linha travada:
+      // antes a validação acontecia fora dela e a norma podia mudar no intervalo.
+      const [target] = await transaction
+        .select({
+          id: questions.id,
+          legalArticleId: questions.legalArticleId,
+          styleBankId: questions.styleBankId,
+        })
+        .from(questions)
+        .where(and(eq(questions.publicId, parsed.data.publicId), eq(questions.quizMode, "original_style")))
+        .limit(1);
+
+      if (!target) throw new ExpectedActionError("Questão autoral não encontrada.");
+
+      // Trava o escopo inteiro, não só a questão: alternativas, norma, banca e
+      // perfil precisam permanecer estáveis entre a validação e a gravação.
+      await lockApprovalScope(transaction, {
+        questionIds: [target.id],
+        legalArticleIds: target.legalArticleId === null ? [] : [target.legalArticleId],
+        styleBankIds: target.styleBankId === null ? [] : [target.styleBankId],
+      });
+
+      const locked = target;
+
+      const [question] = await transaction
+        .select({
+          id: questions.id,
+          publicId: questions.publicId,
+          status: questions.editorialStatus,
+          creatorUserId: questions.createdByUserId,
+          cleanRoomAttestedAt: questions.cleanRoomAttestedAt,
+          originalityCheckedAt: questions.originalityCheckedAt,
+          similarityMaxBps: questions.similarityMaxBps,
+          prompt: questions.prompt,
+          explanation: questions.explanation,
+          learningObjective: questions.learningObjective,
+          difficulty: questions.difficulty,
+          type: questions.type,
+          questionSourceRights: questions.sourceRights,
+          articleRef: legalArticles.articleRef,
+          literalText: legalArticles.literalText,
+          articleStatus: legalArticles.editorialStatus,
+          articleSourceRights: legalArticles.sourceRights,
+          versionStatus: legalVersions.status,
+          sourceUrl: legalVersions.sourceUrl,
+          sourceVerifiedAt: legalVersions.verifiedAt,
+          actIsActive: legalActs.isActive,
+          profileFormat: questionStyleProfiles.format,
+          profileIsActive: questionStyleProfiles.isActive,
+          bankIsActive: quizBanks.isActive,
+        })
+        .from(questions)
+        .leftJoin(legalArticles, eq(questions.legalArticleId, legalArticles.id))
+        .leftJoin(legalVersions, eq(legalArticles.legalVersionId, legalVersions.id))
+        .leftJoin(legalActs, eq(legalVersions.legalActId, legalActs.id))
+        .leftJoin(questionStyleProfiles, eq(questions.styleBankId, questionStyleProfiles.quizBankId))
+        .leftJoin(quizBanks, eq(questions.styleBankId, quizBanks.id))
+        .where(eq(questions.id, locked.id))
+        .limit(1);
+
+      if (!question) throw new ExpectedActionError("Questão autoral não encontrada.");
+
+      if (approved) {
+        const optionRows = await transaction
+          .select({
+            optionKey: questionOptions.optionKey,
+            text: questionOptions.text,
+            isCorrect: questionOptions.isCorrect,
+            rationale: questionOptions.rationale,
+          })
+          .from(questionOptions)
+          .where(eq(questionOptions.questionId, question.id));
+
+        const currentFingerprint = buildDossierFingerprint(toQuestionDossier(question, optionRows));
+        if (currentFingerprint !== submittedFingerprint) {
+          throw new ExpectedActionError(
+            "A questão mudou depois da sua conferência (enunciado, alternativas, gabarito ou fonte). Revise novamente antes de aprovar.",
+          );
+        }
+
+        const approval = evaluateOriginalQuestionApproval({
+          ...question,
+          optionTotal: optionRows.length,
+          optionCorrect: optionRows.filter((option) => option.isCorrect).length,
+        });
+        if (!approval.allowed) throw new ExpectedActionError(approval.reason);
+
+        const peers = await transaction
+          .select({ publicId: questions.publicId, prompt: questions.prompt })
+          .from(questions)
+          .where(
+            and(
+              eq(questions.sourceRights, "original_authorial"),
+              ne(questions.publicId, question.publicId),
+            ),
+          );
+        const similarity = findMostSimilarQuestion(question.prompt, peers);
+        if (similarity.scoreBps >= ORIGINALITY_REJECTION_THRESHOLD_BPS) {
+          throw new ExpectedActionError(
+            `A questão ${question.publicId} passou a conflitar com outro item interno (${Math.round(similarity.scoreBps / 100)}%).`,
+          );
+        }
+      } else {
+        const review = validateHumanReview({
+          status: question.status,
+          creatorUserId: question.creatorUserId,
+          cleanRoomAttestedAt: question.cleanRoomAttestedAt,
+        });
+        if (!review.allowed) throw new ExpectedActionError(review.reason);
+      }
+
       const updated = await transaction
         .update(questions)
         .set({
@@ -641,22 +768,41 @@ export async function reviewOriginalQuestionAction(
           verifiedAt: approved ? now : undefined,
           updatedAt: now,
         })
-        .where(and(eq(questions.id, question.id), eq(questions.editorialStatus, "pending_review")))
+        .where(
+          and(
+            eq(questions.id, question.id),
+            eq(questions.editorialStatus, "pending_review"),
+            approved ? currentLegalSourceExists() : undefined,
+          ),
+        )
         .returning({ id: questions.id });
 
-      if (!updated[0]) throw new Error("A questão já foi decidida por outro revisor.");
+      if (!updated[0]) {
+        throw new ExpectedActionError(
+          approved
+            ? "A questão já foi decidida por outro revisor ou a fonte legal deixou de estar vigente."
+            : "A questão já foi decidida por outro revisor.",
+        );
+      }
 
       await transaction.insert(auditLogs).values({
         actorUserId: user.id,
         action: approved ? "editorial.original_question.approved" : "editorial.original_question.rejected",
         entityType: "question",
         entityId: parsed.data.publicId,
-        metadata: { notes: parsed.data.notes || null },
+        metadata: {
+          notes: parsed.data.notes || null,
+          dossierFingerprint: approved ? submittedFingerprint : null,
+        },
       });
     });
   } catch (error) {
-    console.error("Falha ao revisar questão autoral.", error);
-    return errorState(error instanceof Error ? error.message : "Não foi possível concluir a revisão.");
+    if (!(error instanceof ExpectedActionError)) {
+      console.error("Falha ao revisar questão autoral.", error);
+    }
+    return errorState(
+      error instanceof ExpectedActionError ? error.message : UNEXPECTED_APPROVAL_FAILURE_REASON,
+    );
   }
 
   revalidatePath("/admin/fabrica-autoral");
@@ -672,129 +818,193 @@ export async function approveOriginalQuestionBatchAction(
   formData: FormData,
 ): Promise<EditorialActionState> {
   const user = await requireAdmin();
-  const parsed = originalQuestionBatchReviewSchema.safeParse({
-    reviewAttestation: formData.get("reviewAttestation") === "on",
-    notes: formData.get("notes") ?? "",
-  });
 
-  if (!parsed.success) {
-    return errorState(parsed.error.issues[0]?.message ?? "Confirme a revisão humana do lote.");
+  // A declaração de revisão precisa ser um ato do revisor. Antes vinha em campo
+  // oculto com valor fixo, o que a tornava automática.
+  if (formData.get("reviewAttestation") !== "on") {
+    return errorState(MISSING_ATTESTATION_REASON);
   }
 
-  const db = getDb();
-  const candidateRows = await db
-    .select({
-      id: questions.id,
-      publicId: questions.publicId,
-      status: questions.editorialStatus,
-      creatorUserId: questions.createdByUserId,
-      cleanRoomAttestedAt: questions.cleanRoomAttestedAt,
-      originalityCheckedAt: questions.originalityCheckedAt,
-      similarityMaxBps: questions.similarityMaxBps,
-      prompt: questions.prompt,
-      type: questions.type,
-      questionSourceRights: questions.sourceRights,
-      articleStatus: legalArticles.editorialStatus,
-      articleSourceRights: legalArticles.sourceRights,
-      versionStatus: legalVersions.status,
-      sourceUrl: legalVersions.sourceUrl,
-      actIsActive: legalActs.isActive,
-      profileFormat: questionStyleProfiles.format,
-      profileIsActive: questionStyleProfiles.isActive,
-      bankIsActive: quizBanks.isActive,
-    })
-    .from(questions)
-    .innerJoin(legalArticles, eq(questions.legalArticleId, legalArticles.id))
-    .innerJoin(legalVersions, eq(legalArticles.legalVersionId, legalVersions.id))
-    .innerJoin(legalActs, eq(legalVersions.legalActId, legalActs.id))
-    .innerJoin(questionStyleProfiles, eq(questions.styleBankId, questionStyleProfiles.quizBankId))
-    .innerJoin(quizBanks, eq(questions.styleBankId, quizBanks.id))
-    .where(
-      and(
-        eq(questions.quizMode, "original_style"),
-        eq(questions.editorialStatus, "pending_review"),
-        isNotNull(questions.createdByUserId),
-      ),
-    )
-    .orderBy(questions.submittedAt, questions.id)
-    .limit(EDITORIAL_BATCH_LIMIT);
-
-  if (!candidateRows.length) {
-    return errorState("Não há questões pendentes elegíveis para aprovação em lote.");
+  const notes = String(formData.get("notes") ?? "").trim();
+  if (notes.length > 1500) {
+    return errorState("A nota do lote deve ter no máximo 1.500 caracteres.");
   }
 
-  const [optionRows, existingQuestions] = await Promise.all([
-    db
-      .select({
-        questionId: questionOptions.questionId,
-        total: sql<number>`count(*)::int`,
-        correct: sql<number>`count(*) filter (where ${questionOptions.isCorrect})::int`,
-      })
-      .from(questionOptions)
-      .where(inArray(questionOptions.questionId, candidateRows.map((candidate) => candidate.id)))
-      .groupBy(questionOptions.questionId),
-    db
-      .select({ publicId: questions.publicId, prompt: questions.prompt })
-      .from(questions)
-      .where(eq(questions.sourceRights, "original_authorial")),
-  ]);
-  const optionStats = new Map(
-    optionRows.map((row) => [row.questionId, { total: row.total, correct: row.correct }]),
+  const confirmation = parseReviewerConfirmation(
+    formData.getAll("reviewedPublicIds"),
+    formData.getAll("reviewedFingerprints"),
   );
-
-  for (const candidate of candidateRows) {
-    const humanReview = validateHumanReview({
-      status: candidate.status,
-      creatorUserId: candidate.creatorUserId,
-      cleanRoomAttestedAt: candidate.cleanRoomAttestedAt,
-    });
-    if (!humanReview.allowed) return errorState(humanReview.reason);
-
-    if (
-      candidate.questionSourceRights !== "original_authorial" ||
-      candidate.articleStatus !== "reviewed" ||
-      candidate.articleSourceRights !== "official_text" ||
-      candidate.versionStatus !== "current" ||
-      !candidate.sourceUrl ||
-      !candidate.actIsActive
-    ) {
-      return errorState(`A fonte oficial da questão ${candidate.publicId} precisa ser revisada.`);
-    }
-    if (!candidate.profileIsActive || !candidate.bankIsActive || candidate.profileFormat !== candidate.type) {
-      return errorState(`O perfil editorial da questão ${candidate.publicId} não está elegível.`);
-    }
-    if (
-      !candidate.originalityCheckedAt ||
-      candidate.similarityMaxBps >= ORIGINALITY_REJECTION_THRESHOLD_BPS
-    ) {
-      return errorState(`A questão ${candidate.publicId} não possui verificação de originalidade válida.`);
-    }
-
-    const expectedOptionCount = candidate.type === "true_false" ? 2 : 5;
-    const stats = optionStats.get(candidate.id) ?? { total: 0, correct: 0 };
-    if (stats.total !== expectedOptionCount || stats.correct !== 1) {
-      return errorState(`A questão ${candidate.publicId} possui alternativas ou gabarito inválidos.`);
-    }
-
-    const similarity = findMostSimilarQuestion(
-      candidate.prompt,
-      existingQuestions.filter((question) => question.publicId !== candidate.publicId),
+  if (confirmation.mode !== "reviewer_confirmed") {
+    return errorState(
+      confirmation.mode === "invalid" ? confirmation.reason : MISSING_REVIEWER_CONFIRMATION_REASON,
     );
-    if (similarity.scoreBps >= ORIGINALITY_REJECTION_THRESHOLD_BPS) {
-      return errorState(
-        `A questão ${candidate.publicId} passou a conflitar com outro item interno (${Math.round(similarity.scoreBps / 100)}%).`,
-      );
-    }
+  }
+  if (confirmation.items.length > EDITORIAL_BATCH_LIMIT) {
+    return errorState(`Aprove no máximo ${EDITORIAL_BATCH_LIMIT} questões por vez.`);
   }
 
+  const selectedPublicIds = confirmation.items.map((item) => item.publicId);
+  const db = getDb();
   const now = new Date();
   const batchId = randomUUID();
-  const reviewNote =
-    parsed.data.notes || "Aprovação editorial em lote após revisão humana confirmada pelo revisor.";
-  const candidateIds = candidateRows.map((candidate) => candidate.id);
+  const reviewNote = notes || "Aprovação editorial após conferência item a item registrada pelo revisor.";
 
   try {
-    await db.transaction(async (transaction) => {
+    const approvedCount = await db.transaction(async (transaction) => {
+      // Identifica o escopo antes de travar: além da questão, é preciso travar
+      // alternativas, norma, banca e perfil. A linha da questão não cobre nada
+      // disso, e sem isso a conferência pode ser invalidada por uma transação
+      // concorrente entre a validação e a gravação.
+      const targetRows = await transaction
+        .select({
+          id: questions.id,
+          publicId: questions.publicId,
+          legalArticleId: questions.legalArticleId,
+          styleBankId: questions.styleBankId,
+        })
+        .from(questions)
+        .where(
+          and(
+            inArray(questions.publicId, selectedPublicIds),
+            eq(questions.quizMode, "original_style"),
+            eq(questions.editorialStatus, "pending_review"),
+            isNotNull(questions.createdByUserId),
+          ),
+        );
+
+      if (targetRows.length !== selectedPublicIds.length) {
+        throw new ExpectedActionError(
+          "Alguma questão selecionada deixou de estar pendente. Recarregue a tela e revise novamente.",
+        );
+      }
+
+      const lockedIds = targetRows.map((row) => row.id);
+
+      await lockApprovalScope(transaction, {
+        questionIds: lockedIds,
+        legalArticleIds: targetRows
+          .map((row) => row.legalArticleId)
+          .filter((value): value is number => value !== null),
+        styleBankIds: targetRows
+          .map((row) => row.styleBankId)
+          .filter((value): value is number => value !== null),
+      });
+
+      // Reconfere o estado depois do travamento: entre a identificação do
+      // escopo e o lock, outra transação pode ter decidido a questão.
+      const stillPending = await transaction
+        .select({ id: questions.id })
+        .from(questions)
+        .where(
+          and(
+            inArray(questions.id, lockedIds),
+            eq(questions.editorialStatus, "pending_review"),
+            isNotNull(questions.createdByUserId),
+          ),
+        );
+      if (stillPending.length !== lockedIds.length) {
+        throw new ExpectedActionError(
+          "Alguma questão selecionada deixou de estar pendente. Recarregue a tela e revise novamente.",
+        );
+      }
+
+      const candidateRows = await transaction
+        .select({
+          id: questions.id,
+          publicId: questions.publicId,
+          status: questions.editorialStatus,
+          creatorUserId: questions.createdByUserId,
+          cleanRoomAttestedAt: questions.cleanRoomAttestedAt,
+          originalityCheckedAt: questions.originalityCheckedAt,
+          similarityMaxBps: questions.similarityMaxBps,
+          prompt: questions.prompt,
+          explanation: questions.explanation,
+          learningObjective: questions.learningObjective,
+          difficulty: questions.difficulty,
+          type: questions.type,
+          questionSourceRights: questions.sourceRights,
+          articleRef: legalArticles.articleRef,
+          literalText: legalArticles.literalText,
+          articleStatus: legalArticles.editorialStatus,
+          articleSourceRights: legalArticles.sourceRights,
+          versionStatus: legalVersions.status,
+          sourceUrl: legalVersions.sourceUrl,
+          sourceVerifiedAt: legalVersions.verifiedAt,
+          actIsActive: legalActs.isActive,
+          profileFormat: questionStyleProfiles.format,
+          profileIsActive: questionStyleProfiles.isActive,
+          bankIsActive: quizBanks.isActive,
+        })
+        .from(questions)
+        .innerJoin(legalArticles, eq(questions.legalArticleId, legalArticles.id))
+        .innerJoin(legalVersions, eq(legalArticles.legalVersionId, legalVersions.id))
+        .innerJoin(legalActs, eq(legalVersions.legalActId, legalActs.id))
+        .innerJoin(questionStyleProfiles, eq(questions.styleBankId, questionStyleProfiles.quizBankId))
+        .innerJoin(quizBanks, eq(questions.styleBankId, quizBanks.id))
+        .where(inArray(questions.id, lockedIds));
+
+      if (candidateRows.length !== lockedIds.length) {
+        throw new ExpectedActionError(
+          "Alguma questão selecionada perdeu o vínculo com a fonte oficial ou com o perfil editorial.",
+        );
+      }
+
+      const optionRows = await transaction
+        .select({
+          questionId: questionOptions.questionId,
+          optionKey: questionOptions.optionKey,
+          text: questionOptions.text,
+          isCorrect: questionOptions.isCorrect,
+          rationale: questionOptions.rationale,
+        })
+        .from(questionOptions)
+        .where(inArray(questionOptions.questionId, lockedIds));
+
+      const optionsByQuestion = new Map<number, typeof optionRows>();
+      for (const option of optionRows) {
+        const current = optionsByQuestion.get(option.questionId) ?? [];
+        current.push(option);
+        optionsByQuestion.set(option.questionId, current);
+      }
+
+      // Impressão recalculada agora, sob a mesma transação que fará o UPDATE.
+      const currentFingerprints = new Map<string, string>();
+      for (const candidate of candidateRows) {
+        const options = optionsByQuestion.get(candidate.id) ?? [];
+        currentFingerprints.set(
+          candidate.publicId,
+          buildDossierFingerprint(toQuestionDossier(candidate, options)),
+        );
+      }
+
+      const dossierMatch = matchConfirmedDossiers(confirmation, currentFingerprints);
+      if (!dossierMatch.allowed) throw new ExpectedActionError(dossierMatch.reason);
+
+      const peers = await transaction
+        .select({ publicId: questions.publicId, prompt: questions.prompt })
+        .from(questions)
+        .where(eq(questions.sourceRights, "original_authorial"));
+
+      for (const candidate of candidateRows) {
+        const options = optionsByQuestion.get(candidate.id) ?? [];
+        const approval = evaluateOriginalQuestionApproval({
+          ...candidate,
+          optionTotal: options.length,
+          optionCorrect: options.filter((option) => option.isCorrect).length,
+        });
+        if (!approval.allowed) throw new ExpectedActionError(approval.reason);
+
+        const similarity = findMostSimilarQuestion(
+          candidate.prompt,
+          peers.filter((peer) => peer.publicId !== candidate.publicId),
+        );
+        if (similarity.scoreBps >= ORIGINALITY_REJECTION_THRESHOLD_BPS) {
+          throw new ExpectedActionError(
+            `A questão ${candidate.publicId} passou a conflitar com outro item interno (${Math.round(similarity.scoreBps / 100)}%).`,
+          );
+        }
+      }
+
       const updated = await transaction
         .update(questions)
         .set({
@@ -806,15 +1016,17 @@ export async function approveOriginalQuestionBatchAction(
         })
         .where(
           and(
-            inArray(questions.id, candidateIds),
+            inArray(questions.id, lockedIds),
             eq(questions.editorialStatus, "pending_review"),
-            isNotNull(questions.createdByUserId),
+            currentLegalSourceExists(),
           ),
         )
         .returning({ id: questions.id });
 
-      if (updated.length !== candidateRows.length) {
-        throw new Error("O lote mudou enquanto era processado. Recarregue e tente novamente.");
+      if (updated.length !== lockedIds.length) {
+        throw new ExpectedActionError(
+          "O lote mudou enquanto era processado. Recarregue a tela e revise novamente.",
+        );
       }
 
       await transaction.insert(auditLogs).values(
@@ -827,20 +1039,25 @@ export async function approveOriginalQuestionBatchAction(
             batchId,
             batchSize: candidateRows.length,
             reviewAttested: true,
+            itemBindingMode: "reviewer_confirmed_dossier",
+            dossierFingerprint: currentFingerprints.get(candidate.publicId) ?? null,
             notes: reviewNote,
           },
         })),
       );
-    });
-  } catch (error) {
-    console.error("Falha ao aprovar lote autoral.", error);
-    return errorState(error instanceof Error ? error.message : "Não foi possível aprovar o lote.");
-  }
 
-  revalidatePath("/admin/fabrica-autoral");
-  revalidatePath("/app/questoes");
-  return {
-    status: "success",
-    message: `${candidateRows.length} questões foram aprovadas e liberadas no catálogo.`,
-  };
+      return updated.length;
+    });
+
+    revalidatePath("/admin/fabrica-autoral");
+    revalidatePath("/app/questoes");
+    return {
+      status: "success",
+      message: `${approvedCount} ${approvedCount === 1 ? "questão conferida foi aprovada e liberada" : "questões conferidas foram aprovadas e liberadas"} no catálogo.`,
+    };
+  } catch (error) {
+    if (error instanceof ExpectedActionError) return errorState(error.message);
+    console.error("Falha ao aprovar lote autoral.", error);
+    return errorState(UNEXPECTED_APPROVAL_FAILURE_REASON);
+  }
 }

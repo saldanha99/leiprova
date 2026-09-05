@@ -23,6 +23,8 @@ import {
   quizSubjects,
   quizTopics,
   users,
+  editorialAutomationJobs,
+  examEditions,
 } from "@/lib/db/schema";
 
 export async function getNoticeEngineSnapshot() {
@@ -45,6 +47,8 @@ export async function getNoticeEngineSnapshot() {
     topics,
     linkedQuestions,
     automationRuns,
+    automationJobs,
+    editions,
   ] = await Promise.all([
     db
       .select({
@@ -55,6 +59,7 @@ export async function getNoticeEngineSnapshot() {
         roleName: contestOpportunities.roleName,
         lifecycleStatus: contestOpportunities.lifecycleStatus,
         editorialStatus: contestOpportunities.editorialStatus,
+        examEditionId: contestOpportunities.examEditionId,
         categoryName: contestCategories.name,
         careerName: quizCareerTracks.name,
       })
@@ -264,6 +269,12 @@ export async function getNoticeEngineSnapshot() {
       .where(eq(auditLogs.action, "automation.editorial.completed"))
       .orderBy(desc(auditLogs.createdAt))
       .limit(1),
+    db.select().from(editorialAutomationJobs)
+      .orderBy(desc(editorialAutomationJobs.updatedAt)).limit(100),
+    db.select({
+      id: examEditions.id, title: examEditions.title, examDate: examEditions.examDate,
+    }).from(examEditions).where(eq(examEditions.status, "scheduled"))
+      .orderBy(desc(examEditions.examDate)).limit(150),
   ]);
 
   const assignmentByOpportunity = new Map<number, (typeof assignments)[number]>();
@@ -295,6 +306,8 @@ export async function getNoticeEngineSnapshot() {
     subjects,
     topics,
     automationRun: automationRuns[0] ?? null,
+    automationJobs,
+    editions,
     metrics: {
       opportunities: opportunities.length,
       approvedSources: sourceDocuments.filter((item) => item.status === "approved").length,

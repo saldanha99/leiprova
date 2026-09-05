@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 };
 
 export default async function QuizPage() {
-  const examEditions = toQuizExamEditionOptions(await listEligibleQuizExamEditions());
+  const examEditions = toQuizExamEditionOptions(await listEligibleQuizExamEditions(new Date(), true));
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-7 sm:px-7 lg:px-9 lg:py-10">

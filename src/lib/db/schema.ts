@@ -708,6 +708,10 @@ export const contestOpportunities = pgTable(
   {
     id: idColumn(),
     publicId: text("public_id").notNull().unique(),
+    examEditionId: bigint("exam_edition_id", { mode: "number" }).references(
+      () => examEditions.id,
+      { onDelete: "restrict" },
+    ),
     slug: text("slug").notNull().unique(),
     categoryId: bigint("category_id", { mode: "number" })
       .notNull()
@@ -764,6 +768,8 @@ export const contestOpportunities = pgTable(
       foreignColumns: [quizCareerSpecializations.id, quizCareerSpecializations.careerTrackId],
       name: "contest_opportunities_specialization_career_fk",
     }).onDelete("restrict"),
+    uniqueIndex("contest_opportunities_exam_edition_uidx").on(table.examEditionId)
+      .where(sql`${table.examEditionId} is not null`),
     uniqueIndex("contest_opportunities_identity_uidx")
       .on(
         table.institutionAcronym,
@@ -1543,6 +1549,36 @@ export const questions = pgTable(
       "questions_originality_check",
       sql`${table.quizMode} <> 'original_style' or ${table.originalityCheckedAt} is not null`,
     ),
+  ],
+);
+
+export const editorialAutomationJobs = pgTable(
+  "editorial_automation_jobs",
+  {
+    jobKey: text("job_key").primaryKey(),
+    kind: text("kind").notNull(),
+    subjectId: bigint("subject_id", { mode: "number" }).notNull(),
+    inputHash: text("input_hash").notNull(),
+    status: text("status").notNull().default("pending"),
+    attempts: integer("attempts").notNull().default(0),
+    nextAttemptAt: timestamp("next_attempt_at", { withTimezone: true }).notNull().defaultNow(),
+    leaseToken: text("lease_token"),
+    leaseExpiresAt: timestamp("lease_expires_at", { withTimezone: true }),
+    lastErrorCode: text("last_error_code"),
+    result: jsonb("result").$type<Record<string, unknown>>(),
+    ...timestamps,
+  },
+  (table) => [
+    index("editorial_jobs_due_idx").on(table.kind, table.status, table.nextAttemptAt),
+    check("editorial_jobs_kind_check", sql`${table.kind} in ('draft_generation', 'source_capture')`),
+    check("editorial_jobs_hash_check", sql`${table.inputHash} ~ '^[0-9a-f]{64}$'`),
+    check("editorial_jobs_status_check", sql`${table.status} in ('pending', 'running', 'retry', 'succeeded', 'blocked', 'failed')`),
+    check("editorial_jobs_attempts_check", sql`${table.attempts} between 0 and 5`),
+    check("editorial_jobs_subject_check", sql`${table.subjectId} > 0`),
+    check("editorial_jobs_lease_check", sql`
+      (${table.status} = 'running' and ${table.leaseToken} is not null and ${table.leaseExpiresAt} is not null)
+      or (${table.status} <> 'running' and ${table.leaseToken} is null and ${table.leaseExpiresAt} is null)
+    `),
   ],
 );
 

@@ -3,6 +3,7 @@ import "server-only";
 import { and, asc, desc, eq, inArray, isNotNull, isNull, lte, or, sql } from "drizzle-orm";
 
 import { getDb } from "@/lib/db/client";
+import { editionHasOriginalTraining } from "@/lib/quiz/original-style-query";
 import {
   examEditions,
   quizBanks,
@@ -18,11 +19,14 @@ import {
 
 export async function listEligibleQuizExamEditions(
   referenceDate = new Date(),
+  includeScheduled = false,
 ): Promise<QuizExamEditionCatalogItem[]> {
   const todayIso = saoPauloDateIso(referenceDate);
   const rows = await getDb()
     .select({
       publicId: examEditions.publicId,
+      sourceCheckedAt: examEditions.sourceCheckedAt,
+      scheduledProgramReviewed: editionHasOriginalTraining(examEditions.id, examEditions.bankId),
       title: examEditions.title,
       examDate: examEditions.examDate,
       durationMinutes: examEditions.durationMinutes,
@@ -59,8 +63,11 @@ export async function listEligibleQuizExamEditions(
       and(
         eq(quizCareerTracks.isActive, true),
         eq(quizBanks.isActive, true),
-        inArray(examEditions.status, [...ELIGIBLE_QUIZ_EXAM_STATUSES]),
-        lte(examEditions.examDate, todayIso),
+        or(
+          and(inArray(examEditions.status, [...ELIGIBLE_QUIZ_EXAM_STATUSES]), lte(examEditions.examDate, todayIso)),
+          includeScheduled ? and(eq(examEditions.status, "scheduled"), isNotNull(examEditions.sourceCheckedAt),
+            editionHasOriginalTraining(examEditions.id, examEditions.bankId)) : undefined,
+        ),
         isNotNull(examEditions.officialUrl),
         sql<boolean>`char_length(btrim(${examEditions.officialUrl})) > 0`,
         or(
@@ -71,7 +78,7 @@ export async function listEligibleQuizExamEditions(
     )
     .orderBy(desc(examEditions.examDate), asc(examEditions.publicId));
 
-  return buildQuizExamEditionCatalog(rows, todayIso);
+  return buildQuizExamEditionCatalog(rows, todayIso, includeScheduled);
 }
 
 export type { QuizExamEditionCatalogItem } from "@/lib/quiz/exam-edition-catalog";

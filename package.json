@@ -18,6 +18,9 @@
     "opportunities:sources:check": "tsx --env-file-if-exists=.env scripts/check-open-opportunities.ts",
     "opportunities:approve": "tsx --env-file-if-exists=.env scripts/approve-official-opportunities.ts",
     "editorial:automation": "tsx --env-file-if-exists=.env scripts/run-editorial-automation.ts",
+    "editorial:local:verify": "tsx --env-file-if-exists=.env scripts/validate-local-authoring.ts",
+    "editorial:local:import": "tsx --env-file-if-exists=.env scripts/import-local-editorial-drafts.ts",
+    "editorial:operate": "tsx --env-file-if-exists=.env scripts/operate-editorial-package.ts",
     "db:seed": "tsx --env-file-if-exists=.env scripts/seed.ts",
     "admin:bootstrap": "tsx --env-file-if-exists=.env scripts/bootstrap-admin.ts"
   },

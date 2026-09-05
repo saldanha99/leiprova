@@ -2,6 +2,8 @@
 
 begin;
 
+grant execute on function public.lock_editorial_approval_context(bigint[]) to :app_user;
+
 alter default privileges in schema public revoke all privileges on tables from :app_user;
 alter default privileges in schema public revoke all privileges on sequences from :app_user;
 revoke all privileges on all tables in schema public from :app_user;
@@ -319,6 +321,7 @@ grant insert (
 grant update (
   title,
   summary,
+  exam_edition_id,
   lifecycle_status,
   status_as_of,
   official_url,
@@ -558,6 +561,8 @@ grant select, insert on
   audit_logs,
   contact_messages
 to :app_user;
+
+grant select, insert, update on editorial_automation_jobs to :app_user;
 
 grant select, insert on quiz_session_questions to :app_user;
 grant select, insert, update on quiz_session_answers to :app_user;

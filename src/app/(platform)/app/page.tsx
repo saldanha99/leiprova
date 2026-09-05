@@ -124,7 +124,7 @@ export default async function DashboardPage() {
           <p className="mt-1 text-xs text-slate-500">trilha inicial sugerida</p>
           <div className="mt-6 grid gap-3">
             {focuses.map(({ article, topic, count }, index) => (
-              <Link key={`${article}-${topic}`} href="/app/treinar" className="group flex items-center gap-3 rounded-xl border border-white/7 bg-white/[.025] p-3 transition hover:border-amber-300/20 hover:bg-white/[.045]">
+              <Link key={`${article}-${topic}-${index}`} href="/app/treinar" className="group flex items-center gap-3 rounded-xl border border-white/7 bg-white/[.025] p-3 transition hover:border-amber-300/20 hover:bg-white/[.045]">
                 <span className="grid size-9 place-items-center rounded-lg bg-amber-300/8 text-xs font-bold text-amber-200">{index + 1}</span>
                 <span className="min-w-0 flex-1"><strong className="block text-sm text-slate-200">{article}</strong><span className="block truncate text-xs text-slate-500">{topic}</span></span>
                 <span className="text-[11px] text-slate-600">{count} {count === 1 ? "item" : "itens"}</span>

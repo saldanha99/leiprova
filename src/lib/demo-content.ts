@@ -1,3 +1,5 @@
+import { resolvePublicDemoSurface } from "@/lib/editorial/public-demo-policy";
+
 export const CONSTITUTION_OFFICIAL_URL =
   "https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm";
 
@@ -520,3 +522,16 @@ export const DEMO_QUESTIONS = [
     suggestedReviewDays: [1, 2, 5, 10, 21, 45, 90],
   },
 ] as const satisfies readonly DemoQuestion[];
+
+/**
+ * Superfície pública da demonstração.
+ *
+ * O acervo acima permanece íntegro e continua alimentando `/fontes-e-atualizacao`
+ * e os testes. O que muda é o portão: enquanto `humanReviewRecorded` for falso,
+ * a página pública não serve estas questões como conteúdo de estudo. A decisão
+ * mora em `@/lib/editorial/public-demo-policy` para ser verificável sem UI.
+ */
+export const DEMO_PUBLIC_SURFACE = resolvePublicDemoSurface({
+  provenance: DEMO_CONTENT_PROVENANCE,
+  questions: DEMO_QUESTIONS,
+});

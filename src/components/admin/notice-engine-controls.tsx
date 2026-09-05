@@ -14,6 +14,8 @@ import {
   reviewNoticeDocumentAction,
   reviewNoticeSourceAction,
   reviewRequirementAction,
+  mapOpportunityEditionAction,
+  retryEditorialJobAction,
   type NoticeEngineActionState,
 } from "@/app/admin/motor-editais/actions";
 
@@ -31,6 +33,49 @@ function Feedback({ state }: { state: NoticeEngineActionState }) {
       {state.message}
     </p>
   );
+}
+
+export function OpportunityEditionForm({ opportunities, editions }: {
+  opportunities: readonly { publicId: string; title: string; examEditionId: number | null }[];
+  editions: readonly { id: number; title: string }[];
+}) {
+  const [state, action, pending] = useActionState(mapOpportunityEditionAction, initialState);
+  return (
+    <form action={action} className="mt-5 grid gap-4 sm:grid-cols-2">
+      <label className="text-xs font-semibold text-slate-400">Programa do concurso
+        <select name="opportunityPublicId" required className={fieldClass}>
+          <option value="">Selecione o programa</option>
+          {opportunities.map((item) => <option key={item.publicId} value={item.publicId}>{item.title}{item.examEditionId ? " · já vinculado" : " · sem vínculo"}</option>)}
+        </select>
+      </label>
+      <label className="text-xs font-semibold text-slate-400">Edição exata da prova
+        <select name="examEditionId" required className={fieldClass}>
+          <option value="">Selecione a edição</option>
+          {editions.map((item) => <option key={item.id} value={item.id}>{item.title}</option>)}
+        </select>
+      </label>
+      <label className="text-xs font-semibold text-slate-400 sm:col-span-2">Evidência conferida
+        <textarea name="notes" required minLength={20} maxLength={1500} className={`${fieldClass} min-h-20 py-3`} placeholder="Registre a fonte oficial, número e edição do edital que comprovam este vínculo." />
+      </label>
+      <label className="flex items-start gap-3 text-xs leading-5 text-slate-300 sm:col-span-2">
+        <input type="checkbox" name="confirmed" required className="mt-1 size-4 accent-amber-300" />
+        Conferi na fonte oficial que programa e edição correspondem ao mesmo concurso, cargo e banca.
+      </label>
+      <div className="sm:col-span-2">
+        <button disabled={pending} className="min-h-11 rounded-xl bg-amber-300 px-5 text-sm font-bold text-amber-950 disabled:opacity-50">{pending ? "Salvando vínculo…" : "Confirmar vínculo da edição"}</button>
+        <Feedback state={state} />
+      </div>
+    </form>
+  );
+}
+
+export function RetryEditorialJobButton({ jobKey }: { jobKey: string }) {
+  const [state, action, pending] = useActionState(retryEditorialJobAction, initialState);
+  return <form action={action} className="mt-3">
+    <input type="hidden" name="jobKey" value={jobKey} />
+    <button disabled={pending} className="min-h-11 rounded-lg border border-amber-300/20 px-3 text-xs font-bold text-amber-200 disabled:opacity-50">{pending ? "Enfileirando…" : "Solicitar reavaliação"}</button>
+    <Feedback state={state} />
+  </form>;
 }
 
 export function NoticeSourceForm({

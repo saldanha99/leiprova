@@ -1,0 +1,3 @@
+ALTER TABLE "contest_opportunities" ADD COLUMN "exam_edition_id" bigint;--> statement-breakpoint
+ALTER TABLE "contest_opportunities" ADD CONSTRAINT "contest_opportunities_exam_edition_id_exam_editions_id_fk" FOREIGN KEY ("exam_edition_id") REFERENCES "public"."exam_editions"("id") ON DELETE restrict ON UPDATE no action;--> statement-breakpoint
+CREATE UNIQUE INDEX "contest_opportunities_exam_edition_uidx" ON "contest_opportunities" USING btree ("exam_edition_id") WHERE "contest_opportunities"."exam_edition_id" is not null;

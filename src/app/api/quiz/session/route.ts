@@ -53,6 +53,7 @@ import {
   resolveCatalogSelection,
   type QuizSessionQuestion,
 } from "@/lib/quiz/session-contract";
+import { editionHasOriginalTraining, originalStyleConditions } from "@/lib/quiz/original-style-query";
 import { FREE_STUDY_QUESTION_IDS } from "@/lib/study/access-policy";
 import { getStudyEntitlement } from "@/lib/study/entitlement";
 
@@ -168,10 +169,15 @@ function examEditionConditions(
   selection: DbSelection,
   todayIso: string,
   examEditionPublicId?: string,
+  allowScheduled = false,
 ) {
   return and(
-    inArray(examEditions.status, [...ELIGIBLE_QUIZ_EXAM_STATUSES]),
-    lte(examEditions.examDate, todayIso),
+    or(
+      and(inArray(examEditions.status, [...ELIGIBLE_QUIZ_EXAM_STATUSES]), lte(examEditions.examDate, todayIso)),
+      allowScheduled ? and(eq(examEditions.status, "scheduled"), isNotNull(examEditions.sourceCheckedAt),
+        sql`exists (select 1 from contest_opportunities o where o.exam_edition_id = ${examEditions.id}
+          and o.editorial_status = 'reviewed')`) : undefined,
+    ),
     isNotNull(examEditions.officialUrl),
     sql`char_length(btrim(${examEditions.officialUrl})) > 0`,
     selection.careerTrackId ? eq(examEditions.careerTrackId, selection.careerTrackId) : undefined,
@@ -229,12 +235,14 @@ async function selectExamEdition(
       bankSlug: quizBanks.slug,
       bankName: quizBanks.name,
       bankIsActive: quizBanks.isActive,
+      sourceCheckedAt: examEditions.sourceCheckedAt,
+      scheduledProgramReviewed: editionHasOriginalTraining(examEditions.id, examEditions.bankId),
     })
     .from(examEditions)
     .innerJoin(quizBanks, eq(examEditions.bankId, quizBanks.id))
     .where(
       and(
-        examEditionConditions(selection, todayIso, request.examEditionId),
+        examEditionConditions(selection, todayIso, request.examEditionId, request.mode === "original_style"),
         eq(quizBanks.isActive, true),
       ),
     )
@@ -248,11 +256,30 @@ async function selectExamEdition(
       selection,
       todayIso,
       request.examEditionId,
+      request.mode === "original_style",
     )
     ? edition
     : null;
 }
 
+
+/**
+ * Condições de elegibilidade da trilha autoral.
+ *
+ * O lastro legal (artigo revisado, versão vigente, ato ativo) passa a ser
+ * exigido em todos os recortes, como já era no treino literal. Os joins de
+ * `legalArticles`, `legalVersions` e `legalActs` já existem na consulta.
+ *
+ * Quando o aluno escolhe uma edição, a questão precisa estar vinculada a uma
+ * oportunidade revisada cuja `exam_edition_id` seja exatamente aquela edição.
+ * Carreira, especialização e ano não identificam uma edição — duas edições da
+ * mesma carreira e banca podem coexistir no mesmo ano — por isso o vínculo é
+ * por identidade e não por heurística. Oportunidade sem mapeamento não casa, e
+ * o recorte falha fechado.
+ *
+ * Sem edição escolhida, o treino geral da banca continua valendo e não alega
+ * cobertura de concurso.
+ */
 export async function POST(request: Request) {
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
@@ -304,14 +331,7 @@ export async function POST(request: Request) {
           eq(legalActs.isActive, true),
         )
       : parsed.data.mode === "original_style"
-        ? and(
-            eq(questions.quizMode, "original_style"),
-            effectiveSelection.bankId
-              ? eq(questions.styleBankId, effectiveSelection.bankId)
-              : sql`false`,
-            eq(questions.sourceRights, "original_authorial"),
-            isNotNull(questions.reviewedByUserId),
-          )
+        ? originalStyleConditions(effectiveSelection, selectedExamEdition?.id ?? null)
         : and(
             licensedPreviousQuestionConditions(effectiveSelection, now),
             examEditionConditions(effectiveSelection, todayIso, parsed.data.examEditionId),

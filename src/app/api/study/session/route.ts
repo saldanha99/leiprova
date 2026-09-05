@@ -16,6 +16,7 @@ import {
 } from "@/lib/db/schema";
 import { FREE_STUDY_QUESTION_IDS } from "@/lib/study/access-policy";
 import { getStudyEntitlement } from "@/lib/study/entitlement";
+import { authorialStudyRightsConditions } from "@/lib/study/question-rights";
 import {
   normalizeArticleRange,
   normalizeLegalActSlug,
@@ -86,6 +87,7 @@ export async function GET(request: NextRequest) {
           eq(reviewQueue.userId, user.id),
           lte(reviewQueue.nextReviewAt, now),
           eq(questions.editorialStatus, "reviewed"),
+          authorialStudyRightsConditions(),
           eq(legalArticles.editorialStatus, "reviewed"),
           eq(legalVersions.status, "current"),
           eq(legalActs.isActive, true),
@@ -120,6 +122,7 @@ export async function GET(request: NextRequest) {
       .where(
         and(
           eq(questions.editorialStatus, "reviewed"),
+          authorialStudyRightsConditions(),
           eq(legalArticles.editorialStatus, "reviewed"),
           eq(legalVersions.status, "current"),
           eq(legalActs.isActive, true),

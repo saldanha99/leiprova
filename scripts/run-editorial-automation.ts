@@ -16,6 +16,13 @@ import {
 } from "../src/lib/db/schema";
 import { extractOfficialSyllabusCandidates } from "../src/lib/editorial/official-syllabus-extractor";
 import {
+  claimEditorialJob,
+  editorialQueueSummary,
+  enqueueReviewedRequirementJobs,
+  failEditorialJob,
+  finishEditorialJob,
+} from "../src/lib/editorial/automation-jobs";
+import {
   generateNoticeQuestionDraftForRequirement,
   NoticeDraftGenerationError,
 } from "../src/lib/editorial/notice-draft-service";
@@ -53,10 +60,7 @@ function safeError(error: unknown) {
   return JSON.stringify({
     name: typeof record.name === "string" ? record.name : "Error",
     code: typeof record.code === "string" ? record.code : undefined,
-    message:
-      typeof record.message === "string"
-        ? record.message.slice(0, 300)
-        : "Falha sem detalhe seguro.",
+    // Não registrar mensagem do driver: ela pode conter SQL, URLs ou parâmetros sensíveis.
   });
 }
 
@@ -326,52 +330,51 @@ async function extractApprovedSyllabi(ownerUserId: number) {
 }
 
 async function generateReviewedRequirementDrafts(ownerUserId: number) {
-  const requirements = await db
-    .select({ id: opportunityRequirements.id })
-    .from(opportunityRequirements)
-    .where(eq(opportunityRequirements.editorialStatus, "reviewed"))
-    .orderBy(opportunityRequirements.id);
+  const enqueued = await enqueueReviewedRequirementJobs(db);
 
   let attempts = 0;
   let created = 0;
   let unchanged = 0;
   let deferred = 0;
   let failures = 0;
+  let lostLeases = 0;
 
-  for (const requirement of requirements) {
-    if (
-      attempts >= MAX_DRAFT_ATTEMPTS_PER_RUN ||
-      created >= MAX_NEW_DRAFTS_PER_RUN
-    ) {
-      break;
-    }
+  while (attempts < MAX_DRAFT_ATTEMPTS_PER_RUN && created < MAX_NEW_DRAFTS_PER_RUN) {
+    const job = await claimEditorialJob(db, "draft_generation");
+    if (!job) break;
     attempts += 1;
     try {
       const result = await generateNoticeQuestionDraftForRequirement(
         db,
-        requirement.id,
+        job.subjectId,
         ownerUserId,
       );
-      if (result.created) created += 1;
+      if (!(await finishEditorialJob(db, job, result))) lostLeases += 1;
+      else if (result.created) created += 1;
       else unchanged += 1;
     } catch (error) {
-      if (error instanceof NoticeDraftGenerationError) {
+      const blocked = error instanceof NoticeDraftGenerationError;
+      if (!(await failEditorialJob(db, job, blocked))) lostLeases += 1;
+      if (blocked) {
         deferred += 1;
-        console.warn(`[rascunho:${requirement.id}] ${error.message}`);
+        console.warn(`[rascunho:${job.subjectId}] requisito editorial ou qualidade pendente.`);
       } else {
         failures += 1;
-        console.warn(`[rascunho:${requirement.id}]`, safeError(error));
+        console.warn(`[rascunho:${job.subjectId}]`, safeError(error));
       }
     }
     await pause();
   }
 
   return {
+    enqueued,
     attempts,
     created,
     unchanged,
     deferred,
     failures,
+    lostLeases,
+    queue: await editorialQueueSummary(db),
     limits: {
       attempts: MAX_DRAFT_ATTEMPTS_PER_RUN,
       newDrafts: MAX_NEW_DRAFTS_PER_RUN,
@@ -401,7 +404,7 @@ async function main() {
       metadata: summary,
     });
     console.log(JSON.stringify(summary));
-    if (documents.failures || syllabi.failures || drafts.failures) process.exitCode = 1;
+    if (documents.failures || syllabi.failures || drafts.failures || drafts.lostLeases) process.exitCode = 1;
   } finally {
     await client.end();
   }

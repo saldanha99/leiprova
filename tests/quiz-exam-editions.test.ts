@@ -34,6 +34,19 @@ const baseRow: QuizExamEditionCatalogRow = {
 };
 
 describe("catálogo de edições oficiais do quiz", () => {
+  it("permite edição agendada somente na preparação autoral com programa explicitamente revisado", () => {
+    const future = { ...baseRow, status: "scheduled", examDate: "2026-12-01",
+      scheduledProgramReviewed: true, sourceCheckedAt: new Date("2026-09-04") };
+    expect(buildQuizExamEditionCatalog([future], "2026-09-04")).toEqual([]);
+    expect(buildQuizExamEditionCatalog([future], "2026-09-04", true)).toHaveLength(1);
+    expect(buildQuizExamEditionCatalog([{ ...future, scheduledProgramReviewed: false }], "2026-09-04", true)).toEqual([]);
+    expect(buildQuizExamEditionCatalog([{ ...future, sourceCheckedAt: null }], "2026-09-04", true)).toEqual([]);
+    expect(buildQuizExamEditionCatalog([{ ...future, status: "canceled" }], "2026-09-04", true)).toEqual([]);
+    const candidate = { ...future, careerTrackId: 1, bankId: 1 };
+    const selection = { careerTrackId: 1, specializationId: null, bankId: null };
+    expect(isQuizExamEditionAvailableForSelection(candidate, selection, "2026-09-04", candidate.publicId)).toBe(false);
+    expect(isQuizExamEditionAvailableForSelection(candidate, selection, "2026-09-04", candidate.publicId, true)).toBe(true);
+  });
   it("serializa datas e entrega metadados aninhados prontos para a UI", () => {
     const [edition] = buildQuizExamEditionCatalog(
       [{ ...baseRow, examDate: new Date("2025-06-15T12:00:00.000Z"), officialUrl: ` ${baseRow.officialUrl} ` }],

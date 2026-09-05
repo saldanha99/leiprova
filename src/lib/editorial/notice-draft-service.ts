@@ -1,4 +1,4 @@
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq, isNull, ne } from "drizzle-orm";
 import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 
 import * as schema from "@/lib/db/schema";
@@ -9,6 +9,7 @@ import {
   legalArticles,
   legalVersions,
   opportunityOrganizerAssignments,
+  opportunityDocumentSnapshots,
   opportunityRequirements,
   opportunitySourceDocuments,
   questionOpportunities,
@@ -36,7 +37,7 @@ export async function generateNoticeQuestionDraftForRequirement(
   requirementId: number,
   actorUserId: number,
 ) {
-  const [requirementRows, assignmentRows, existingQuestions] = await Promise.all([
+  const [requirementRows, assignmentRows] = await Promise.all([
     db
       .select({
         id: opportunityRequirements.id,
@@ -47,6 +48,8 @@ export async function generateNoticeQuestionDraftForRequirement(
         opportunityPublicId: contestOpportunities.publicId,
         opportunityStatus: contestOpportunities.editorialStatus,
         sourceStatus: opportunitySourceDocuments.status,
+        sourceSnapshotId: opportunityRequirements.sourceSnapshotId,
+        snapshotStatus: opportunityDocumentSnapshots.status,
         subjectId: opportunityRequirements.subjectId,
         topicId: opportunityRequirements.topicId,
         topicName: quizTopics.name,
@@ -71,6 +74,7 @@ export async function generateNoticeQuestionDraftForRequirement(
         eq(opportunityRequirements.sourceDocumentId, opportunitySourceDocuments.id),
       )
       .innerJoin(quizSubjects, eq(opportunityRequirements.subjectId, quizSubjects.id))
+      .leftJoin(opportunityDocumentSnapshots, eq(opportunityRequirements.sourceSnapshotId, opportunityDocumentSnapshots.id))
       .innerJoin(quizTopics, eq(opportunityRequirements.topicId, quizTopics.id))
       .innerJoin(legalArticles, eq(opportunityRequirements.legalArticleId, legalArticles.id))
       .innerJoin(legalVersions, eq(legalArticles.legalVersionId, legalVersions.id))
@@ -94,15 +98,14 @@ export async function generateNoticeQuestionDraftForRequirement(
       .where(
         and(
           eq(opportunityOrganizerAssignments.status, "reviewed"),
+          eq(opportunityOrganizerAssignments.opportunityId,
+            db.select({ id: opportunityRequirements.opportunityId })
+              .from(opportunityRequirements).where(eq(opportunityRequirements.id, requirementId))),
           isNull(opportunityOrganizerAssignments.validUntil),
           eq(quizBanks.isActive, true),
           eq(questionStyleProfiles.isActive, true),
         ),
       ),
-    db
-      .select({ publicId: questions.publicId, prompt: questions.prompt })
-      .from(questions)
-      .where(eq(questions.sourceRights, "original_authorial")),
   ]);
 
   const requirement = requirementRows[0];
@@ -111,7 +114,8 @@ export async function generateNoticeQuestionDraftForRequirement(
   }
   if (
     requirement.sourceStatus !== "approved" ||
-    requirement.opportunityStatus !== "reviewed"
+    requirement.opportunityStatus !== "reviewed" ||
+    (requirement.sourceSnapshotId !== null && requirement.snapshotStatus !== "approved")
   ) {
     throw new NoticeDraftGenerationError(
       "O concurso e sua fonte oficial precisam estar aprovados.",
@@ -148,6 +152,20 @@ export async function generateNoticeQuestionDraftForRequirement(
     );
   }
 
+  // Identidade vem antes da similaridade: repetir não pode rejeitar o próprio rascunho.
+  const publicId = deterministicNoticeQuestionUuid(
+    [
+      NOTICE_QUESTION_GENERATOR_VERSION,
+      requirement.id,
+      requirement.requirementText,
+      requirement.literalText,
+      assignment.bankId,
+    ].join("|"),
+  );
+  const [existing] = await db.select({ publicId: questions.publicId }).from(questions)
+    .where(eq(questions.publicId, publicId)).limit(1);
+  if (existing) return { created: false, publicId };
+
   let generated: ReturnType<typeof buildNoticeQuestionDraft>;
   try {
     generated = buildNoticeQuestionDraft({
@@ -166,6 +184,10 @@ export async function generateNoticeQuestionDraftForRequirement(
     );
   }
 
+  const existingQuestions = await db
+    .select({ publicId: questions.publicId, prompt: questions.prompt })
+    .from(questions)
+    .where(and(eq(questions.sourceRights, "original_authorial"), ne(questions.publicId, publicId)));
   const similarity = findMostSimilarQuestion(generated.prompt, existingQuestions);
   if (similarity.scoreBps >= ORIGINALITY_REJECTION_THRESHOLD_BPS) {
     throw new NoticeDraftGenerationError(
@@ -173,15 +195,6 @@ export async function generateNoticeQuestionDraftForRequirement(
     );
   }
 
-  const publicId = deterministicNoticeQuestionUuid(
-    [
-      NOTICE_QUESTION_GENERATOR_VERSION,
-      requirement.id,
-      requirement.requirementText,
-      requirement.literalText,
-      assignment.bankId,
-    ].join("|"),
-  );
   const now = new Date();
   const created = await db.transaction(async (transaction) => {
     const [question] = await transaction

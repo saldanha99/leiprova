@@ -13,7 +13,11 @@ import {
 } from "lucide-react";
 
 import { AuthoringForm } from "@/components/admin/authoring-form";
-import { BatchEditorialControls } from "@/components/admin/batch-editorial-controls";
+import {
+  BATCH_APPROVAL_FORM_ID,
+  BatchApprovalControls,
+  BatchClaimControls,
+} from "@/components/admin/batch-editorial-controls";
 import { ClaimDraftControls } from "@/components/admin/claim-draft-controls";
 import { ReviewControls } from "@/components/admin/review-controls";
 import { requireAdmin } from "@/lib/auth";
@@ -114,10 +118,7 @@ export default async function EditorialFactoryPage() {
         </section>
       ) : null}
 
-      <BatchEditorialControls
-        claimableCount={snapshot.metrics.claimable}
-        reviewableCount={snapshot.metrics.reviewable}
-      />
+      <BatchClaimControls claimableCount={snapshot.metrics.claimable} />
 
       <section className="mt-5" aria-labelledby="profiles-title">
         <div className="mb-3">
@@ -339,8 +340,43 @@ export default async function EditorialFactoryPage() {
                     {item.similarityReferencePublicId ? " · comparação registrada" : " · primeiro item da base"}
                   </p>
                   {item.reviewNotes ? <p className="mt-2 rounded-lg bg-white/[.035] p-2 text-xs leading-5 text-slate-400">Nota: {item.reviewNotes}</p> : null}
+                  {canReview ? (
+                    <div className="mt-4 rounded-xl border border-emerald-300/20 bg-emerald-300/[.045] p-3.5">
+                      <label className="flex cursor-pointer items-start gap-3">
+                        <input
+                          type="checkbox"
+                          form={BATCH_APPROVAL_FORM_ID}
+                          name="reviewedPublicIds"
+                          value={item.publicId}
+                          className="mt-0.5 size-5 shrink-0 accent-emerald-300"
+                        />
+                        <span className="text-xs leading-5 text-slate-300">
+                          <strong className="font-bold text-emerald-200">Conferi este item.</strong> Li o enunciado,
+                          todas as alternativas, o gabarito, as justificativas e o texto oficial acima.
+                        </span>
+                      </label>
+                      {/* Impressão digital do dossiê exibido, calculada no servidor.
+                          A aprovação a recalcula sob transação e recusa se o conteúdo
+                          tiver mudado depois desta leitura. */}
+                      <input
+                        type="hidden"
+                        form={BATCH_APPROVAL_FORM_ID}
+                        name="reviewedFingerprints"
+                        value={`${item.publicId}:${item.dossierFingerprint}`}
+                      />
+                      <p className="mt-2 flex items-center gap-1.5 text-[10px] leading-4 text-slate-600">
+                        <Fingerprint aria-hidden="true" className="size-3" />
+                        Conferência vinculada a esta versão do dossiê ({item.dossierFingerprint.slice(0, 12)}).
+                      </p>
+                    </div>
+                  ) : null}
                   {canClaim ? <ClaimDraftControls publicId={item.publicId} /> : null}
-                  {canReview ? <ReviewControls publicId={item.publicId} /> : null}
+                  {canReview ? (
+                    <ReviewControls
+                      publicId={item.publicId}
+                      dossierFingerprint={item.dossierFingerprint}
+                    />
+                  ) : null}
                 </article>
               );
             })}
@@ -350,6 +386,8 @@ export default async function EditorialFactoryPage() {
             A fila está vazia. O primeiro rascunho ou envio editorial aparecerá aqui.
           </div>
         )}
+
+        <BatchApprovalControls reviewableCount={snapshot.metrics.reviewable} />
       </section>
     </main>
   );

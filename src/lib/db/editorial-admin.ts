@@ -17,6 +17,51 @@ import {
   users,
 } from "@/lib/db/schema";
 import { EDITORIAL_BATCH_LIMIT } from "@/lib/editorial/clean-room";
+import {
+  buildDossierFingerprint,
+  type DossierOption,
+  type QuestionDossier,
+} from "@/lib/editorial/dossier-fingerprint";
+
+/**
+ * Mapeador único de linha para dossiê.
+ *
+ * A tela de conferência e a transação de aprovação precisam produzir exatamente
+ * a mesma impressão digital. Se cada lado montasse o objeto por conta própria,
+ * um campo esquecido de um lado faria a comparação passar sem cobrir aquele
+ * conteúdo. Por isso as duas pontas passam por aqui.
+ */
+export type ApprovalDossierRow = {
+  publicId: string;
+  type: string;
+  prompt: string;
+  explanation: string;
+  learningObjective: string | null;
+  difficulty: number;
+  articleRef: string | null;
+  literalText: string | null;
+  sourceUrl: string | null;
+  sourceVerifiedAt: Date | string | null;
+};
+
+export function toQuestionDossier(
+  row: ApprovalDossierRow,
+  options: readonly DossierOption[],
+): QuestionDossier {
+  return {
+    publicId: row.publicId,
+    type: row.type,
+    prompt: row.prompt,
+    explanation: row.explanation,
+    learningObjective: row.learningObjective,
+    difficulty: row.difficulty,
+    articleRef: row.articleRef,
+    literalText: row.literalText,
+    sourceUrl: row.sourceUrl,
+    sourceVerifiedAt: row.sourceVerifiedAt,
+    options,
+  };
+}
 
 export async function getEditorialFactorySnapshot() {
   const db = getDb();
@@ -158,10 +203,16 @@ export async function getEditorialFactorySnapshot() {
     optionsByQuestion.set(option.questionPublicId, current);
   }
 
-  const queue = queueRows.map((item) => ({
-    ...item,
-    options: optionsByQuestion.get(item.publicId) ?? [],
-  }));
+  const queue = queueRows.map((item) => {
+    const options = optionsByQuestion.get(item.publicId) ?? [];
+    return {
+      ...item,
+      options,
+      // Calculada no servidor, no mesmo instante em que o dossiê é montado para
+      // a tela. É esta impressão que a aprovação vai reconferir sob transação.
+      dossierFingerprint: buildDossierFingerprint(toQuestionDossier(item, options)),
+    };
+  });
 
   return {
     profiles,
