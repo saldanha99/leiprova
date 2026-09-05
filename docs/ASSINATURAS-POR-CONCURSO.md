@@ -101,5 +101,21 @@ permissão 600. SHA-256 em ambas as cópias:
 `529de3c1313821ff23b1f2d56aaee28c41e0422558f31ca23d0bd187c114842d`.
 Nenhum backup anterior removido.
 
-Pendente de registrar o resultado do deploy. Somente `/opt/leiprova`, ref exata
-e `LEIPROVA_SKIP_SEED=1`. Não reiniciar serviços vizinhos.
+**Publicado em 05/09/2026**, código
+`70e76fbff938e28104d5fae9449f6aeedc0a793e`, feature branch integrada à main por
+fast-forward. Deploy da ref exata somente em `/opt/leiprova`, com
+`LEIPROVA_SKIP_SEED=1`. Migration 0032 aplicada (33 registros no journal),
+privilégios reaplicados e serviços LeiProva saudáveis. Serviços vizinhos não
+foram reiniciados.
+
+Conferência pós-publicação: **75 de 75 páginas HTTP 200**, com os dois preços,
+classes visuais distintas, economia, Master intacto, uma H1, canonical própria
+e `noindex`. Nenhuma dessas páginas manteve R$87 ou oferta de seis meses.
+Saúde pública HTTP 200. O teste das 75 rotas também passou na prévia local.
+
+Acervo preservado: 232 questões revisadas + 12 pendentes. 75 produtos draft,
+zero IDs de preço mensal/anual, zero pedidos/compras/faturas/assinaturas Master
+e zero vínculos questão-edição. Planos Master do banco inalterados.
+`REGISTRATION_ENABLED`, `CHECKOUT_ENABLED` e `CONTEST_CHECKOUT_ENABLED` seguem
+`false`; modo de destino Stripe `live`. **Publicar preços não habilitou vendas
+nem configurou as cobranças reais na Stripe.**
