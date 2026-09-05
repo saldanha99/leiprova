@@ -32,9 +32,9 @@ export function ContestPricing({
             UM CONCURSO OU TODOS OS SEUS OBJETIVOS
           </span>
           <h2 id="planos-title">
-            Uma rotina que cabe
+            Um objetivo. Um acesso.
             <br />
-            no seu próximo capítulo.
+            <em>O próximo passo é seu.</em>
           </h2>
           <p>
             Escolha o acesso avulso a {contestName} ou o Master para explorar os
@@ -50,10 +50,17 @@ export function ContestPricing({
         )}
         <div className={styles.priceGrid}>
           {CONTEST_ACCESS_OPTIONS.map((option) => (
-            <article key={option.key} className={styles.priceCard}>
+            <article
+              key={option.key}
+              className={`${styles.priceCard} ${option.months === 12 ? styles.priceFeatured : ""}`}
+            >
               <div className={styles.priceTop}>
                 <span>COMPRA AVULSA · UM CONCURSO</span>
-                <span className={styles.priceBadge}>{option.months} meses</span>
+                <span className={styles.priceBadge}>
+                  {option.months === 12
+                    ? "Mais tempo para estudar"
+                    : "6 meses de acesso"}
+                </span>
               </div>
               <h3>{option.label}</h3>
               <p className={styles.priceEyebrow}>
@@ -61,7 +68,7 @@ export function ContestPricing({
               </p>
               <p className={styles.priceAmount}>
                 <strong>{formatBRL(option.amountCents)}</strong>
-                <span>pagamento único</span>
+                <span>uma única vez</span>
               </p>
               <p className={styles.priceBilling}>
                 Acesso por {option.months} meses a partir da confirmação. Sem
@@ -109,9 +116,9 @@ export function ContestPricing({
             MASTER · AMPLIE SUAS POSSIBILIDADES
           </span>
           <h2>
-            Mais de um destino?
+            Seu horizonte vai além?
             <br />
-            Seu acesso pode acompanhar.
+            <em>Conheça o Master.</em>
           </h2>
           <p>
             Uma assinatura para os concursos efetivamente liberados durante a

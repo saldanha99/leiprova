@@ -1,22 +1,15 @@
 import {
-  ArrowDown,
   ArrowRight,
   ArrowUpRight,
-  BookOpenCheck,
   CalendarDays,
   ChevronDown,
   CircleCheck,
   ClipboardList,
   ExternalLink,
-  FileCheck2,
-  Fingerprint,
   MapPin,
-  RotateCcw,
   ShieldCheck,
-  Smartphone,
   Target,
 } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 
 import type { PublicContestOpportunity } from "@/lib/db/contest-opportunities";
@@ -28,7 +21,14 @@ import {
 } from "@/lib/opportunities/presentation";
 
 import { ContestPricing } from "./contest-pricing";
-import { ContestProductTour } from "./contest-product-tour";
+import {
+  CourseHero,
+  CourseMethod,
+  CourseNavigation,
+  CoursePrinciples,
+  CourseTourSection,
+} from "./course-experience";
+import premium from "./course-experience.module.css";
 import styles from "./contest-landing.module.css";
 
 type ContestLandingProps = {
@@ -100,252 +100,23 @@ export function ContestLanding({
   ];
 
   return (
-    <article className={styles.landing} data-theme={direction.theme}>
-      <section className={styles.hero} aria-labelledby="concurso-title">
-        <div className={styles.container}>
-          <nav aria-label="Navegação estrutural" className={styles.breadcrumb}>
-            <ol>
-              <li>
-                <Link href="/concursos">Concursos</Link>
-              </li>
-              <li aria-hidden="true">/</li>
-              <li>
-                <Link href={`/concursos#${opportunity.categorySlug}`}>
-                  {opportunity.categoryName}
-                </Link>
-              </li>
-              <li aria-hidden="true">/</li>
-              <li aria-current="page">
-                {opportunity.institutionAcronym} · {opportunity.cycleYear}
-              </li>
-            </ol>
-          </nav>
-          <div className={styles.heroGrid}>
-            <div className={styles.heroCopy}>
-              <div className={styles.heroKicker}>
-                <span className={styles.liveDot} />
-                {opportunity.categoryName}
-                <span className={styles.kickerLine} />
-                {jurisdictionName}
-              </div>
-              <h1 id="concurso-title">
-                <span>
-                  {`${opportunity.institutionAcronym} ${opportunity.cycleYear}`}
-                </span>
-                A lei seca no centro da sua <em>preparação.</em>
-              </h1>
-              <p className={styles.heroLead}>
-                {direction.focus} Conheça uma experiência que conecta leitura,
-                prática e revisão.
-              </p>
-              <div className={styles.heroActions}>
-                <a
-                  href="#planos"
-                  className={`${styles.button} ${styles.buttonPrimary}`}
-                >
-                  Conhecer planos e preços
-                  <ArrowRight size={18} aria-hidden="true" />
-                </a>
-                <a href="#por-dentro" className={styles.textButton}>
-                  Ver a plataforma por dentro
-                  <ArrowDown size={17} aria-hidden="true" />
-                </a>
-              </div>
-              <p className={styles.heroAvailability}>
-                <ShieldCheck size={18} aria-hidden="true" />
-                <span>
-                  {productAvailable
-                    ? "Conteúdo desta edição liberado."
-                    : "Plano desta edição em preparação editorial."}
-                  <br />
-                  Confira o que está disponível antes de contratar.
-                </span>
-              </p>
-            </div>
-            <figure className={styles.heroVisual}>
-              <div className={styles.heroImageFrame}>
-                <Image
-                  src="/assets/contests/study-ritual.webp"
-                  alt="Cena ilustrativa de uma estudante concentrada na leitura, com livro e tablet sobre a mesa."
-                  fill
-                  sizes="(max-width: 900px) 100vw, 48vw"
-                  loading="eager"
-                  fetchPriority="high"
-                  className={styles.heroImage}
-                />
-                <span className={styles.visualCorner}>
-                  EDITALUME / ESTUDO COM INTENÇÃO
-                </span>
-                <div className={styles.visualQuote}>
-                  <span>O seu futuro começa</span>
-                  <strong>na próxima página.</strong>
-                </div>
-              </div>
-              <div className={styles.heroFloatingCard}>
-                <span className={styles.floatingIcon}>
-                  <BookOpenCheck size={23} aria-hidden="true" />
-                </span>
-                <div>
-                  <span>O MÉTODO EM UM CICLO</span>
-                  <strong>Ler. Praticar. Revisar.</strong>
-                </div>
-                <ArrowUpRight size={21} aria-hidden="true" />
-              </div>
-              <figcaption className={styles.imageCaption}>
-                Imagem ilustrativa criada com IA.
-              </figcaption>
-            </figure>
-          </div>
-        </div>
-      </section>
-
-      <nav className={styles.sectionNav} aria-label="Nesta página">
-        <div className={styles.container}>
-          <a href="#beneficios">O método</a>
-          <a href="#por-dentro">Por dentro</a>
-          <a href="#edicao">O concurso</a>
-          <a href="#planos">Planos e preços</a>
-          <a href="#duvidas">Dúvidas</a>
-          <Link href="/entrar">
-            Área do aluno
-            <ArrowUpRight size={15} aria-hidden="true" />
-          </Link>
-        </div>
-      </nav>
-
-      <div className={`${styles.container} ${styles.trustStrip}`}>
-        {[
-          {
-            Icon: Fingerprint,
-            title: "Questões autorais",
-            detail: "Treino com identidade própria",
-          },
-          {
-            Icon: FileCheck2,
-            title: "Fontes verificáveis",
-            detail: "O dispositivo como referência",
-          },
-          {
-            Icon: RotateCcw,
-            title: "Revisão espaçada",
-            detail: "Retomar faz parte do método",
-          },
-          {
-            Icon: Smartphone,
-            title: "Do desktop ao celular",
-            detail: "Acesso pelo navegador",
-          },
-        ].map(({ Icon, title, detail }) => (
-          <div key={title}>
-            <Icon size={22} aria-hidden="true" />
-            <span>
-              <strong>{title}</strong>
-              <small>{detail}</small>
-            </span>
-          </div>
-        ))}
-      </div>
-
-      <section
-        id="beneficios"
-        className={`${styles.section} ${styles.methodSection}`}
-        aria-labelledby="metodo-title"
-      >
-        <div className={styles.container}>
-          <div className={styles.methodIntro}>
-            <span className={styles.eyebrow}>MENOS LEITURA NO AUTOMÁTICO</span>
-            <h2 id="metodo-title">
-              Não é só passar os olhos.
-              <br />É fazer a lei <em>ficar.</em>
-            </h2>
-            <p>
-              Entre ler um artigo e lembrar dele na hora de responder, existe
-              prática. A Editalume organiza esse caminho em três movimentos.
-            </p>
-          </div>
-          <div className={styles.methodGrid}>
-            {[
-              {
-                n: "01",
-                Icon: BookOpenCheck,
-                title: "Leia com atenção ao detalhe.",
-                description:
-                  "Prazos, competências e exceções merecem uma leitura consciente. Consulte o dispositivo e sua fonte, não apenas uma resposta solta.",
-                tag: "COMPREENDER",
-              },
-              {
-                n: "02",
-                Icon: Target,
-                title: "Transforme leitura em prática.",
-                description:
-                  "Teste a literalidade com questões autorais e entenda a explicação. O erro vira um ponto concreto para retomar, não só uma nota.",
-                tag: "PRATICAR",
-              },
-              {
-                n: "03",
-                Icon: RotateCcw,
-                title: "Dê uma segunda chance à memória.",
-                description:
-                  "Volte aos dispositivos na fila de revisão e acompanhe o histórico. Uma rotina de retomada dá continuidade ao estudo.",
-                tag: "CONSOLIDAR",
-              },
-            ].map(({ n, Icon, title, description, tag }) => (
-              <div key={n} className={styles.methodCard}>
-                <div>
-                  <span>{n}</span>
-                  <Icon size={26} aria-hidden="true" />
-                </div>
-                <h3>{title}</h3>
-                <p>{description}</p>
-                <span className={styles.methodTag}>
-                  {tag}
-                  <ArrowUpRight size={16} aria-hidden="true" />
-                </span>
-              </div>
-            ))}
-          </div>
-          <p className={styles.methodFootnote}>
-            Um método de estudo, não uma promessa de aprovação. A
-            disponibilidade de conteúdo depende da revisão editorial.
-          </p>
-        </div>
-      </section>
-
-      <section
-        id="por-dentro"
-        className={styles.section}
-        aria-labelledby="tour-title"
-      >
-        <div className={styles.container}>
-          <div className={styles.splitHeading}>
-            <div>
-              <span className={styles.eyebrow}>
-                ABRA A PORTA. CONHEÇA POR DENTRO.
-              </span>
-              <h2 id="tour-title">
-                Seu estudo,
-                <br />
-                <em>em um só lugar.</em>
-              </h2>
-            </div>
-            <p>
-              Uma visão clara do próximo passo, das revisões e do seu histórico.
-              Explore abaixo como a experiência é organizada.
-            </p>
-          </div>
-          <ContestProductTour />
-          <div className={styles.tourBottom}>
-            <span>
-              <Smartphone size={20} aria-hidden="true" />
-              No intervalo, à mesa ou no sofá. A rotina acompanha a sua tela.
-            </span>
-            <Link href="/entrar">
-              Já tem acesso? Entre aqui
-              <ArrowRight size={16} aria-hidden="true" />
-            </Link>
-          </div>
-        </div>
-      </section>
+    <article
+      className={`${styles.landing} ${premium.page}`}
+      data-theme={direction.theme}
+    >
+      <CourseHero
+        acronym={`${opportunity.institutionAcronym} ${opportunity.cycleYear}`}
+        role={opportunity.roleName}
+        category={opportunity.categoryName}
+        categorySlug={opportunity.categorySlug}
+        location={jurisdictionName}
+        edition={status}
+        available={productAvailable}
+      />
+      <CourseNavigation />
+      <CourseMethod />
+      <CourseTourSection />
+      <CoursePrinciples />
 
       <section
         id="edicao"
@@ -463,11 +234,15 @@ export function ContestLanding({
               )}
               <div className={styles.editorialStatus}>
                 <span>PLANO DESTA EDIÇÃO</span>
-                <strong>Em preparação editorial</strong>
+                <strong>
+                  {productAvailable
+                    ? "Conteúdo liberado"
+                    : "Em preparação editorial"}
+                </strong>
                 <p>
-                  O catálogo do concurso não representa um curso completo
-                  liberado. O programa e as questões precisam concluir a
-                  validação.
+                  {productAvailable
+                    ? "O acesso cobre o conteúdo efetivamente liberado desta edição, sem promessa de cobertura integral."
+                    : "O catálogo do concurso não representa um curso completo liberado. O programa e as questões precisam concluir a validação."}
                 </p>
                 <a href="#duvidas">
                   Entender a disponibilidade

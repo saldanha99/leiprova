@@ -93,8 +93,12 @@ export async function generateMetadata({
     };
   }
 
-  const product=result.productSlug?getCatalogContest(result.productSlug):null;
-  const path = product?catalogContestPath(product):`/concursos/${categoria}/${uf}/${slug}`;
+  const product = result.productSlug
+    ? getCatalogContest(result.productSlug)
+    : null;
+  const path = product
+    ? catalogContestPath(product)
+    : `/concursos/${categoria}/${uf}/${slug}`;
   return {
     title: `${result.opportunity.title} — lei seca, método e planos`,
     description: result.opportunity.summary,
@@ -109,7 +113,7 @@ export async function generateMetadata({
       locale: "pt_BR",
       images: [
         {
-          url: "/assets/contests/study-ritual.webp",
+          url: "/assets/contests/editorial-study-v2.webp",
           alt: "Editalume — uma rotina de leitura, prática e revisão de lei seca",
         },
       ],
@@ -118,7 +122,7 @@ export async function generateMetadata({
       card: "summary_large_image",
       title: result.opportunity.title,
       description: result.opportunity.summary,
-      images: ["/assets/contests/study-ritual.webp"],
+      images: ["/assets/contests/editorial-study-v2.webp"],
     },
   };
 }
@@ -136,7 +140,7 @@ export default async function ContestOpportunityPage({
     )
       notFound();
     return (
-      <PublicGuideShell>
+      <PublicGuideShell mobileActionBar>
         <PlannedContestLanding
           contest={planned}
           commerceOpen={isCommerceOpen()}
@@ -147,8 +151,12 @@ export default async function ContestOpportunityPage({
   }
 
   const { opportunity, jurisdiction } = result;
-  const product=result.productSlug?getCatalogContest(result.productSlug):null;
-  const path = product?catalogContestPath(product):`/concursos/${categoria}/${uf}/${slug}`;
+  const product = result.productSlug
+    ? getCatalogContest(result.productSlug)
+    : null;
+  const path = product
+    ? catalogContestPath(product)
+    : `/concursos/${categoria}/${uf}/${slug}`;
 
   const structuredData = {
     "@context": "https://schema.org",

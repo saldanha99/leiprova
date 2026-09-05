@@ -511,6 +511,8 @@
   border-color: #a9d2bf6b;
 }
 .tourChoiceNumber {
+  flex: none;
+  white-space: nowrap;
   font-size: 10px;
   color: #8ba297;
   margin-top: 4px;
@@ -546,9 +548,9 @@
 }
 .tourStage {
   min-width: 0;
-  padding: 20px;
+  padding: 24px;
   background:
-    radial-gradient(ellipse at 50% 100%, #21513d66, transparent), #10201d;
+    radial-gradient(ellipse at 50% 100%, #45604a70, transparent), #152e28;
   border: 1px solid #94b4a629;
   border-radius: 18px;
 }
@@ -591,6 +593,9 @@
   border: 6px solid #1f2e2c;
   border-radius: 12px;
   min-height: 471px;
+  transition:
+    max-width 0.35s ease,
+    border-radius 0.35s ease;
   max-width: 100%;
   margin-inline: auto;
   box-shadow: 0 22px 36px #0003;
@@ -599,6 +604,11 @@
   max-width: 315px;
   border-radius: 25px;
   border-width: 8px;
+}
+.previewTablet {
+  max-width: 470px;
+  border-radius: 21px;
+  border-width: 10px;
 }
 .previewHeader {
   display: flex;
@@ -982,7 +992,7 @@
 }
 .pricingSection {
   background:
-    radial-gradient(ellipse at 50% 50%, #183e2c59, transparent 65%), #071116;
+    radial-gradient(ellipse at 50% 50%, #25483159, transparent 65%), #081619;
 }
 .commerceNotice {
   display: flex;
@@ -1010,14 +1020,14 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  padding: 32px;
+  padding: 36px;
   border: 1px solid var(--line);
   border-radius: 13px;
-  background: #0d1b1e;
+  background: linear-gradient(145deg, #162f28, #0e221d);
 }
 .priceFeatured {
-  background: linear-gradient(145deg, #193e2e, #12291f);
-  border-color: #a4c99873;
+  background: linear-gradient(145deg, #334b31, #1b3527);
+  border-color: #c3d4a887;
 }
 .priceTop {
   display: flex;
@@ -1044,7 +1054,7 @@
 }
 .priceCard h3 {
   margin-top: 26px;
-  font-size: 27px;
+  font-size: 30px;
   letter-spacing: -0.05em;
   font-weight: 700;
 }
@@ -1061,7 +1071,7 @@
   margin-top: 27px;
 }
 .priceAmount strong {
-  font-size: clamp(36px, 4vw, 46px);
+  font-size: clamp(42px, 4.5vw, 54px);
   font-weight: 650;
   letter-spacing: -0.07em;
 }
@@ -1222,6 +1232,11 @@
 }
 .mobileDock {
   display: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .preview {
+    transition: none;
+  }
 }
 
 @media (prefers-reduced-motion: no-preference) {

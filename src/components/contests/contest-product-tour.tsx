@@ -9,6 +9,7 @@ import {
   Monitor,
   RotateCcw,
   Smartphone,
+  Tablet,
   Target,
 } from "lucide-react";
 import { useId, useState } from "react";
@@ -38,7 +39,9 @@ const VIEWS = [
 
 export function ContestProductTour() {
   const [view, setView] = useState<(typeof VIEWS)[number]["id"]>("rotina");
-  const [mobile, setMobile] = useState(false);
+  const [device, setDevice] = useState<"desktop" | "tablet" | "mobile">(
+    "desktop",
+  );
   const panelId = useId();
   const selected = VIEWS.find((item) => item.id === view) ?? VIEWS[0];
 
@@ -82,24 +85,33 @@ export function ContestProductTour() {
           <div role="group" aria-label="Tamanho da prévia">
             <button
               type="button"
-              aria-pressed={!mobile}
+              aria-pressed={device === "desktop"}
               aria-label="Prévia em computador"
-              onClick={() => setMobile(false)}
+              onClick={() => setDevice("desktop")}
             >
               <Monitor size={17} aria-hidden="true" />
             </button>
             <button
               type="button"
-              aria-pressed={mobile}
+              aria-pressed={device === "tablet"}
+              aria-label="Prévia em tablet"
+              onClick={() => setDevice("tablet")}
+            >
+              <Tablet size={17} aria-hidden="true" />
+            </button>
+            <button
+              type="button"
+              aria-pressed={device === "mobile"}
               aria-label="Prévia em celular"
-              onClick={() => setMobile(true)}
+              onClick={() => setDevice("mobile")}
             >
               <Smartphone size={17} aria-hidden="true" />
             </button>
           </div>
         </div>
         <div
-          className={`${styles.preview} ${mobile ? styles.previewMobile : ""}`}
+          className={`${styles.preview} ${device === "mobile" ? styles.previewMobile : device === "tablet" ? styles.previewTablet : ""}`}
+          data-device={device}
           id={panelId}
           role="region"
           aria-label={`Prévia: ${selected.name}`}

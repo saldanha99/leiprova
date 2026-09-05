@@ -168,11 +168,14 @@ describe("página premium compartilhada de concursos", () => {
   });
 
   it("inclui imagem local leve, com dimensões reservadas e carga prioritária", () => {
-    const asset = path.resolve("public/assets/contests/study-ritual.webp");
+    const asset = path.resolve(
+      "public/assets/contests/editorial-study-v2.webp",
+    );
     expect(existsSync(asset)).toBe(true);
     expect(statSync(asset).size).toBeLessThan(200_000);
     const html = render();
-    expect(html).toContain("study-ritual.webp");
+    expect(html).toContain("editorial-study-v2.webp");
+    expect(html).not.toContain("study-ritual.webp");
     expect(html).toContain('fetchPriority="high"');
   });
 
