@@ -213,9 +213,9 @@ export default async function ContestOpportunityPage({ params }: ContestOpportun
           </section>
 
           <section className="mt-6 flex flex-col items-start justify-between gap-6 rounded-3xl bg-emerald-300 p-7 text-[#06111e] sm:flex-row sm:items-center sm:p-9">
-            <div><p className="text-sm font-extrabold uppercase tracking-[0.16em]">Plano específico da edição</p><h2 className="mt-2 text-3xl font-black">Em preparação editorial</h2><p className="mt-2 max-w-2xl font-medium">Enquanto o plano específico não conclui a revisão humana, você pode testar o método sem contratar um conteúdo ainda indisponível.</p></div>
+            <div><p className="text-sm font-extrabold uppercase tracking-[0.16em]">Plano específico da edição</p><h2 className="mt-2 text-3xl font-black">Em preparação editorial</h2><p className="mt-2 max-w-2xl font-medium">Enquanto o plano específico não conclui a revisão humana, você pode ver como o treino funciona sem contratar um conteúdo ainda indisponível.</p></div>
             <Link className="shrink-0 rounded-2xl bg-[#071426] px-6 py-4 font-black text-white" href="/demo">
-              Testar demonstração
+              Ver como funciona
             </Link>
           </section>
         </div>

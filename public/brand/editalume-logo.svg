@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 426 321" width="426" height="321" role="img" aria-label="Editalume">
+  <g fill="#2dd4a4" stroke="#2dd4a4" stroke-width="12" stroke-linejoin="round">
+    <path d="M127 129 L106 100 L201 22 L382 22 Z"/>
+    <path d="M127 192 L106 221 L201 299 L382 299 Z"/>
+  </g>
+  <rect x="121" y="131" width="297" height="63" rx="31.5" fill="#ffbd43"/>
+  <rect x="200" y="5" width="218" height="63" rx="31.5" fill="#f6f8fc"/>
+  <rect x="200" y="253" width="218" height="63" rx="31.5" fill="#f6f8fc"/>
+  <path d="M90 96 A82 67.5 0 0 0 90 231 Z" fill="#f6f8fc"/>
+</svg>

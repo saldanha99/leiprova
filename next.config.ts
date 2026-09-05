@@ -1,8 +1,16 @@
 import type { NextConfig } from "next";
 
+const isDevelopment = process.env.NODE_ENV === "development";
+
+/**
+ * `upgrade-insecure-requests` e o HSTS não têm função no dev, que roda em
+ * http://localhost, e quebram pré-visualização em navegadores WebKit: eles
+ * reescrevem os assets para https://localhost e a página carrega sem CSS nem
+ * JS. Em produção continuam valendo.
+ */
 const contentSecurityPolicy = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : ""} https://js.stripe.com https://checkout.stripe.com`,
+  `script-src 'self' 'unsafe-inline'${isDevelopment ? " 'unsafe-eval'" : ""} https://js.stripe.com https://checkout.stripe.com`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https://*.stripe.com",
   "font-src 'self' data:",
@@ -13,7 +21,7 @@ const contentSecurityPolicy = [
   "base-uri 'self'",
   "form-action 'self'",
   "frame-ancestors 'self'",
-  "upgrade-insecure-requests",
+  ...(isDevelopment ? [] : ["upgrade-insecure-requests"]),
 ].join("; ");
 
 const nextConfig: NextConfig = {
@@ -35,7 +43,9 @@ const nextConfig: NextConfig = {
           { key: "X-Frame-Options", value: "SAMEORIGIN" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), browsing-topics=()" },
-          { key: "Strict-Transport-Security", value: "max-age=31536000" },
+          ...(isDevelopment
+            ? []
+            : [{ key: "Strict-Transport-Security", value: "max-age=31536000" }]),
           { key: "Cross-Origin-Opener-Policy", value: "same-origin-allow-popups" },
           { key: "Content-Security-Policy", value: contentSecurityPolicy },
         ],

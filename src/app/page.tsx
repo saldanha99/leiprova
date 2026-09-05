@@ -28,13 +28,14 @@ import {
 } from "lucide-react";
 
 import { BrandMark } from "@/components/brand/BrandMark";
+import { howItWorksCta, primaryCtaHref } from "@/lib/funnel";
 import { LandingHeader } from "@/components/landing/LandingHeader";
 import { LiteralLab } from "@/components/landing/LiteralLab";
 import { PricingPlans } from "@/components/landing/PricingPlans";
 import { ProductShowcase } from "@/components/landing/ProductShowcase";
 import { SectionHeading } from "@/components/landing/SectionHeading";
 import { JsonLd } from "@/components/seo/json-ld";
-import { isCommerceOpen } from "@/lib/launch";
+import { isCommerceOpen, isContactEnabled } from "@/lib/launch";
 import { getAnnualDiscountPercentage } from "@/lib/plans";
 import {
   ORGANIZATION_ID,
@@ -193,8 +194,9 @@ function ArrowCta() {
 
 export default function Home() {
   const commerceOpen = isCommerceOpen();
+  const contactOpen = isContactEnabled();
   const annualDiscountPercentage = getAnnualDiscountPercentage();
-  const primaryHref = commerceOpen ? "/cadastro?plano=foco" : "/demo";
+  const primaryHref = primaryCtaHref(commerceOpen, true);
 
   return (
     <div className="site-shell" id="inicio" lang="pt-BR">
@@ -232,11 +234,11 @@ export default function Home() {
 
               <div className="hero-actions">
                 <Link className="button button--amber button--large" href={primaryHref}>
-                  {commerceOpen ? "Quero treinar a lei" : "Testar o método agora"}
+                  {commerceOpen ? "Quero treinar a lei" : "Ver planos e preço"}
                   <ArrowCta />
                 </Link>
-                <Link className="button button--glass button--large" href="/demo">
-                  Experimentar uma questão
+                <Link className="button button--glass button--large" href={howItWorksCta.href}>
+                  {howItWorksCta.label}
                 </Link>
               </div>
 
@@ -577,7 +579,7 @@ export default function Home() {
               align="center"
             />
 
-            <PricingPlans commerceOpen={commerceOpen} />
+            <PricingPlans commerceOpen={commerceOpen} contactOpen={contactOpen} />
 
             <div className="pricing-note">
               <LockKeyhole aria-hidden="true" size={17} />
@@ -606,7 +608,7 @@ export default function Home() {
               </p>
             </div>
             <Link className="button button--amber" href={primaryHref}>
-              {commerceOpen ? "Começar com o plano Foco" : "Experimentar a demonstração"}
+              {commerceOpen ? "Começar com o plano Foco" : "Ver planos e preço"}
               <ArrowCta />
             </Link>
           </div>
@@ -663,15 +665,17 @@ export default function Home() {
               Leia. Escolha. Erre melhor. <span>Acerte quando valer ponto.</span>
             </h2>
             <p>
-              Comece com uma demonstração ou monte seu primeiro roteiro de literalidade na Editalume.
+              {commerceOpen
+                ? "Escolha o plano e monte seu primeiro roteiro de literalidade na Editalume."
+                : "Veja o plano, o preço e a mecânica do treino antes da abertura do checkout."}
             </p>
             <div>
               <Link className="button button--amber button--large" href={primaryHref}>
-                {commerceOpen ? "Criar meu roteiro" : "Testar o método"}
+                {commerceOpen ? "Criar meu roteiro" : "Ver planos e preço"}
                 <ArrowCta />
               </Link>
-              <Link className="button button--glass button--large" href="/demo">
-                Fazer uma questão grátis
+              <Link className="button button--glass button--large" href={howItWorksCta.href}>
+                {howItWorksCta.label}
               </Link>
             </div>
           </div>

@@ -3,12 +3,14 @@ import { BookOpenCheck, ExternalLink, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 
 import { JsonLd } from "@/components/seo/json-ld";
+import { LeiProvaMark } from "@/components/ui/leiprova-mark";
 import { DemoStudySession } from "@/components/study/demo-study-session";
 import { DEMO_CONTENT_PROVENANCE, DEMO_QUESTIONS, type DemoQuestion } from "@/lib/demo-content";
 import {
   describeDemoEditorialState,
   resolvePublicDemoSurface,
 } from "@/lib/editorial/public-demo-policy";
+import { LOGIN_HREF, PLANS_HREF } from "@/lib/funnel";
 import {
   ORGANIZATION_ID,
   SOCIAL_IMAGE,
@@ -92,6 +94,22 @@ export default function DemoPage() {
   return (
     <main className="bg-[#060b13] text-white">
       <JsonLd data={structuredData} />
+      <header className="border-b border-white/8 bg-[#07101b]">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-4">
+          <LeiProvaMark href="/" />
+          <div className="flex items-center gap-4 text-sm font-semibold">
+            <Link className="text-slate-400 hover:text-white" href={LOGIN_HREF}>
+              Entrar
+            </Link>
+            <Link
+              className="rounded-xl bg-amber-400 px-4 py-2.5 font-bold text-slate-950 hover:bg-amber-300"
+              href={PLANS_HREF}
+            >
+              Ver planos
+            </Link>
+          </div>
+        </div>
+      </header>
       <section className="border-b border-white/8 bg-[radial-gradient(circle_at_80%_0%,rgba(45,212,164,.12),transparent_34%),#07101b]">
         <div className="mx-auto grid max-w-6xl gap-8 px-5 py-12 lg:grid-cols-[1fr_.9fr] lg:items-center lg:py-16">
           <div>
@@ -204,6 +222,24 @@ export default function DemoPage() {
           </p>
         </section>
       )}
+      <section className="border-t border-white/8 bg-[#07101b]">
+        <div className="mx-auto flex max-w-6xl flex-col gap-5 px-5 py-10 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="text-xl font-semibold tracking-[-0.03em] text-white">
+              Quer o método completo?
+            </h2>
+            <p className="mt-2 max-w-xl text-sm leading-7 text-slate-400">
+              Veja o plano, o preço e o que entra no roteiro de literalidade.
+            </p>
+          </div>
+          <Link
+            className="inline-flex shrink-0 items-center gap-2 rounded-2xl bg-amber-400 px-6 py-4 text-sm font-bold text-slate-950 hover:bg-amber-300"
+            href={PLANS_HREF}
+          >
+            Ver planos e preço
+          </Link>
+        </div>
+      </section>
     </main>
   );
 }

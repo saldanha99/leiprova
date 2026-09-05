@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowRight, BadgePercent, Check } from "lucide-react";
 import { useState } from "react";
 
+import { planCardCta } from "@/lib/funnel";
 import {
   PLANS,
   formatBRL,
@@ -15,9 +16,10 @@ import {
 
 type PricingPlansProps = {
   commerceOpen: boolean;
+  contactOpen: boolean;
 };
 
-export function PricingPlans({ commerceOpen }: PricingPlansProps) {
+export function PricingPlans({ commerceOpen, contactOpen }: PricingPlansProps) {
   const [activeSlug, setActiveSlug] = useState<PlanSlug>("foco");
   const activePlan = getPlan(activeSlug) ?? PLANS[0];
 
@@ -26,6 +28,7 @@ export function PricingPlans({ commerceOpen }: PricingPlansProps) {
   const isAnnual = activePlan.slug === "foco";
   const monthlyEquivalent = formatBRL(getMonthlyEquivalentCents(activePlan));
   const annualDiscountPercentage = getAnnualDiscountPercentage();
+  const waitlistCta = planCardCta(commerceOpen, contactOpen);
 
   return (
     <>
@@ -96,19 +99,34 @@ export function PricingPlans({ commerceOpen }: PricingPlansProps) {
             ))}
           </ul>
 
-          <Link
-            className={`button button--full ${
-              activePlan.featured ? "button--amber" : "button--outline"
-            }`}
-            href={commerceOpen ? `/cadastro?plano=${activePlan.slug}` : "/demo"}
-          >
-            {commerceOpen
-              ? isAnnual
-                ? "Quero o plano anual"
-                : "Quero o plano mensal"
-              : "Testar a demonstração"}
-            <ArrowRight aria-hidden="true" size={16} />
-          </Link>
+          {commerceOpen ? (
+            <Link
+              className={`button button--full ${
+                activePlan.featured ? "button--amber" : "button--outline"
+              }`}
+              href={`/cadastro?plano=${activePlan.slug}`}
+            >
+              {isAnnual ? "Quero o plano anual" : "Quero o plano mensal"}
+              <ArrowRight aria-hidden="true" size={16} />
+            </Link>
+          ) : (
+            <>
+              {waitlistCta ? (
+                <Link
+                  className={`button button--full ${
+                    activePlan.featured ? "button--amber" : "button--outline"
+                  }`}
+                  href={waitlistCta.href}
+                >
+                  {waitlistCta.label}
+                  <ArrowRight aria-hidden="true" size={16} />
+                </Link>
+              ) : null}
+              <p className="pricing-card__closed">
+                O checkout ainda não está aberto: nenhuma cobrança pode ser feita agora.
+              </p>
+            </>
+          )}
         </article>
       </div>
     </>

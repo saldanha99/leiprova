@@ -18,7 +18,7 @@ export function LeiProvaMark({
       className={cn("inline-flex items-center", className)}
       aria-label="Editalume — página inicial"
     >
-      <EditalumeLogo compact={compact} eager />
+      <EditalumeLogo compact={compact} />
     </Link>
   );
 }

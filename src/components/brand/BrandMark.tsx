@@ -5,17 +5,16 @@ import { EditalumeLogo } from "@/components/brand/EditalumeLogo";
 type BrandMarkProps = {
   href?: string;
   compact?: boolean;
-  eager?: boolean;
 };
 
-export function BrandMark({ href = "#inicio", compact = false, eager = false }: BrandMarkProps) {
+export function BrandMark({ href = "#inicio", compact = false }: BrandMarkProps) {
   return (
     <Link
       className={`brand-mark${compact ? " brand-mark--compact" : ""}`}
       href={href}
       aria-label="Editalume — ir para o início"
     >
-      <EditalumeLogo compact={compact} eager={eager} />
+      <EditalumeLogo compact={compact} />
     </Link>
   );
 }

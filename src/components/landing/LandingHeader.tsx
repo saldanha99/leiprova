@@ -2,6 +2,7 @@ import { ArrowUpRight, Menu } from "lucide-react";
 import Link from "next/link";
 
 import { BrandMark } from "@/components/brand/BrandMark";
+import { LOGIN_HREF, primaryCta } from "@/lib/funnel";
 
 const NAV_ITEMS = [
   { href: "/concursos", label: "Concursos" },
@@ -13,13 +14,15 @@ const NAV_ITEMS = [
 ] as const;
 
 export function LandingHeader({ commerceOpen }: { commerceOpen: boolean }) {
-  const primaryHref = commerceOpen ? "/cadastro?plano=foco" : "/demo";
-  const primaryLabel = commerceOpen ? "Começar agora" : "Testar demonstração";
+  const { href: primaryHref, label: primaryLabel } = primaryCta(commerceOpen, "Começar agora", {
+    fromHome: true,
+    closedLabel: "Ver planos",
+  });
 
   return (
     <header className="landing-header">
       <div className="site-container landing-header__inner">
-        <BrandMark eager />
+        <BrandMark />
 
         <nav className="landing-header__nav" aria-label="Navegação principal">
           {NAV_ITEMS.map((item) => (
@@ -30,7 +33,7 @@ export function LandingHeader({ commerceOpen }: { commerceOpen: boolean }) {
         </nav>
 
         <div className="landing-header__actions">
-          <Link className="header-login" href="/entrar">
+          <Link className="header-login" href={LOGIN_HREF}>
             Entrar
           </Link>
           <Link className="button button--small button--amber" href={primaryHref}>
@@ -53,7 +56,7 @@ export function LandingHeader({ commerceOpen }: { commerceOpen: boolean }) {
               ))}
             </nav>
             <div className="mobile-menu__actions">
-              <Link href="/entrar">Entrar</Link>
+              <Link href={LOGIN_HREF}>Entrar</Link>
               <Link className="button button--amber" href={primaryHref}>
                 {primaryLabel}
               </Link>
