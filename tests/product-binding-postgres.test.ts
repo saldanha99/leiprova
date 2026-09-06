@@ -6,6 +6,7 @@ import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 import * as schema from "../src/lib/db/schema";
 import { importProductQuestionBindings } from "../src/lib/commerce/product-binding-service";
 import { bindSyntheticProductQuestions } from "../scripts/lib/synthetic-product-bindings";
+import { approvedProductQuestionCount, minimumCourseContentSatisfied } from "../src/lib/commerce/minimum-course-content";
 
 // Não lê .env e não aceita o banco compartilhado, homologação pública ou produção.
 const url = process.env.LEIPROVA_BINDING_TEST_DATABASE_URL;
@@ -84,6 +85,34 @@ async function syntheticApproval(f: Fixture, id: string) {
   // Exclusivamente neste sandbox e nesta fixture; não existe comando de aprovação no produto.
   await db!.update(schema.contestProductQuestionBindings).set({ status: "approved", reviewedByUserId: f.editor.id, reviewedAt: now,
     reviewNotes: "Aprovação SINTÉTICA de teste; sem validade editorial ou jurídica." }).where(eq(schema.contestProductQuestionBindings.id, id));
+}
+
+async function addSyntheticQuestions(f: Fixture, count: number) {
+  const template = f.questions[0];
+  // Apenas conteúdo fictício no banco explicitamente validado acima; não replica acervo jurídico.
+  for (let index = 0; index < count; index++) {
+    const [question] = await db!.insert(schema.questions).values({
+      publicId: `qa-minimum-${randomUUID()}`, legalArticleId: template.legalArticleId,
+      subjectId: template.subjectId, topicId: template.topicId, quizMode: "dry_law", type: "multiple_choice",
+      prompt: `Fixture inteiramente fictícia de contagem ${randomUUID()}: qual cartão vem primeiro?`,
+      explanation: template.explanation, learningObjective: template.learningObjective, topic: template.topic,
+      editorialStatus: "reviewed", sourceRights: "original_authorial", authorshipMethod: "rule_based",
+      generatorModel: "qa-fixture", promptVersion: "v1", createdByUserId: f.editor.id, reviewedByUserId: f.editor.id,
+      cleanRoomAttestedAt: now, submittedAt: now, verifiedAt: now, originalityCheckedAt: now,
+    }).returning();
+    await db!.insert(schema.questionOptions).values(["Azul", "Verde"].map((text, index) => ({
+      questionId: question.id, optionKey: index ? "B" : "A", text, isCorrect: !index, sortOrder: index,
+    })));
+  }
+}
+
+async function contentReadiness(f: Fixture, productIndex = 0, opportunityId = f.opportunity.id) {
+  const product = sql`${f.products[productIndex].slug}`;
+  const opportunity = sql`${opportunityId}`;
+  const [result] = await restrictedDb!.execute<{ count: number; ready: boolean }>(sql`select
+    ${approvedProductQuestionCount(product, opportunity)} as count,
+    ${minimumCourseContentSatisfied(product, opportunity)} as ready`);
+  return result;
 }
 describe.skipIf(!db)("curadoria e entitlement reais — PostgreSQL exclusivo com grants restritos", () => {
   let f: Fixture;
@@ -195,5 +224,47 @@ describe.skipIf(!db)("curadoria e entitlement reais — PostgreSQL exclusivo com
     expect((await getStudyEntitlement(f.user.id, now)).questionPublicIds).toEqual([f.questions[0].publicId]);
     expect(await bindSyntheticProductQuestions(client!, f.products[0].slug, f.questions[0].publicId)).toBe(1);
     expect(await db!.select().from(schema.contestProductQuestionBindings).where(eq(schema.contestProductQuestionBindings.productSlug, f.products[0].slug))).toHaveLength(1);
+  });
+  it("piso real por produto: 67 fecha, 68 e 69 permitem; vínculos repetidos não inflam a contagem", async () => {
+    expect(await contentReadiness(f)).toEqual({ count: 0, ready: false });
+    await addSyntheticQuestions(f, 65); // A fixture já contém duas questões distintas.
+    await bindSyntheticProductQuestions(client!, f.products[0].slug);
+    expect(await contentReadiness(f)).toEqual({ count: 67, ready: false });
+    await addSyntheticQuestions(f, 1);
+    await bindSyntheticProductQuestions(client!, f.products[0].slug);
+    expect(await contentReadiness(f)).toEqual({ count: 68, ready: true });
+    const [binding] = await db!.select().from(schema.contestProductQuestionBindings)
+      .where(eq(schema.contestProductQuestionBindings.productSlug, f.products[0].slug));
+    await db!.insert(schema.contestProductQuestionBindings).values({ ...binding, id: hash(`qa-repeated-${binding.id}`) });
+    expect(await contentReadiness(f)).toEqual({ count: 68, ready: true });
+    // Cargo Y compartilha a mesma oportunidade, não a curadoria comprada de X.
+    expect(await contentReadiness(f, 1)).toEqual({ count: 0, ready: false });
+    expect(await contentReadiness(f, 0, f.opportunity.id + 1)).toEqual({ count: 0, ready: false });
+    await addSyntheticQuestions(f, 1);
+    await bindSyntheticProductQuestions(client!, f.products[0].slug);
+    expect(await contentReadiness(f)).toEqual({ count: 69, ready: true });
+  });
+  it("evidência desatualizada reduz o piso, sem retirar as demais questões de uma compra vigente", async () => {
+    await addSyntheticQuestions(f, 66);
+    await bindSyntheticProductQuestions(client!, f.products[0].slug);
+    expect(await contentReadiness(f)).toEqual({ count: 68, ready: true });
+    await db!.update(schema.questions).set({ explanation: "Explicação fictícia editada após a revisão do vínculo." })
+      .where(eq(schema.questions.id, f.questions[0].id));
+    expect(await contentReadiness(f)).toEqual({ count: 67, ready: false });
+    expect((await getStudyEntitlement(f.user.id, now)).questionPublicIds).toHaveLength(67);
+    await db!.update(schema.legalVersions).set({ status: "revoked" }).where(eq(schema.legalVersions.id, f.version.id));
+    expect(await contentReadiness(f)).toEqual({ count: 0, ready: false });
+  });
+  it("68 propostas ou mapas com requisito pendente não satisfazem o piso editorial", async () => {
+    await addSyntheticQuestions(f, 66);
+    await bindSyntheticProductQuestions(client!, f.products[0].slug);
+    await db!.update(schema.contestProductQuestionBindings).set({ status: "pending_review", reviewedByUserId: null,
+      reviewedAt: null, reviewNotes: null }).where(eq(schema.contestProductQuestionBindings.productSlug, f.products[0].slug));
+    expect(await contentReadiness(f)).toEqual({ count: 0, ready: false });
+    await db!.update(schema.contestProductQuestionBindings).set({ status: "approved", reviewedByUserId: f.editor.id,
+      reviewedAt: now, reviewNotes: "Aprovação SINTÉTICA exclusiva deste teste de software." })
+      .where(eq(schema.contestProductQuestionBindings.productSlug, f.products[0].slug));
+    await db!.update(schema.opportunityRequirements).set({ editorialStatus: "draft" }).where(eq(schema.opportunityRequirements.id, f.requirement.id));
+    expect(await contentReadiness(f)).toEqual({ count: 0, ready: false });
   });
 });

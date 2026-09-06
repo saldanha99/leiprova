@@ -292,6 +292,28 @@ services:
     networks:
       - internal
 
+  editorial-review-80:
+    build:
+      context: .
+      target: migrator
+    profiles: ["tools"]
+    command: ["pnpm", "editorial:review:80", "--mode=preview"]
+    environment:
+      NODE_ENV: production
+      APP_URL: https://leiprova.2b.app.br
+      LEIPROVA_REVIEW_80_DATABASE_URL: postgresql://${APP_DB_USER:-leiprova_app}:${APP_DB_PASSWORD}@leiprova-pooler:5432/${POSTGRES_DB:-leiprova}
+      LEIPROVA_REVIEW_80_APPROVED: ${LEIPROVA_REVIEW_80_APPROVED:-}
+    volumes:
+      - ./.local/editorial/review-80-input:/review-80-input:ro
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    pids_limit: 64
+    cpus: 0.5
+    mem_limit: 768m
+    networks: [internal]
+
   editorial-binding-importer:
     build:
       context: .

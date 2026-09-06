@@ -1,19 +1,18 @@
 import "server-only";
 import { cache } from "react";
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { getDb } from "@/lib/db/client";
 import {
   contestStoreProducts,
   contestOpportunities,
-  questions,
 } from "@/lib/db/schema";
 import { listReviewedContestOpportunities } from "@/lib/db/contest-opportunities";
 import { getCatalogContest } from "./catalog";
-import { approvedProductQuestionExists } from "./product-binding-query";
+import { minimumCourseContentSatisfied } from "./minimum-course-content";
 
 export const listReleasedContestProducts = cache(
   async function listReleasedContestProducts() {
-    // Página revisada + liberação comercial explícita + questões revisadas.
+    // Página revisada + liberação explícita + pelo menos 68 questões válidas por produto.
     const publicOpportunities = await listReviewedContestOpportunities();
     const publicById = new Map(
       publicOpportunities.map((item) => [item.publicId, item]),
@@ -31,10 +30,7 @@ export const listReleasedContestProducts = cache(
       .where(
         and(
           eq(contestStoreProducts.status, "released"),
-          sql`exists (
-      select 1 from ${questions}
-      where ${approvedProductQuestionExists(contestStoreProducts.slug, questions.id, contestStoreProducts.opportunityId)}
-    )`,
+          minimumCourseContentSatisfied(contestStoreProducts.slug, contestStoreProducts.opportunityId),
         ),
       );
     return rows

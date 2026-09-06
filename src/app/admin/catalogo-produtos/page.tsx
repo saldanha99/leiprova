@@ -10,10 +10,24 @@ import {
 } from "@/lib/commerce/catalog";
 import { contestCategories } from "@/lib/opportunities/categories";
 import { formatBRL, PLANS } from "@/lib/plans";
+import {
+  approvedProductQuestionCount,
+  hasMinimumCourseQuestionCount,
+  MINIMUM_COURSE_QUESTION_COUNT,
+} from "@/lib/commerce/minimum-course-content";
 
 export default async function ProductCatalogAdminPage() {
   await requireSuperAdmin("/admin/catalogo-produtos");
-  const products = await getDb().select().from(contestStoreProducts);
+  const products = await getDb().select({
+    product: contestStoreProducts,
+    validQuestionCount: approvedProductQuestionCount(
+      contestStoreProducts.slug, contestStoreProducts.opportunityId,
+    ),
+  }).from(contestStoreProducts);
+  const catalogSlugs = new Set(CONTEST_CATALOG.map((contest) => contest.slug));
+  const productsAtMinimum = products.filter((row) =>
+    catalogSlugs.has(row.product.slug) && hasMinimumCourseQuestionCount(row.validQuestionCount),
+  ).length;
   return (
     <main className="mx-auto max-w-6xl px-5 py-10">
       <p className="text-xs font-bold uppercase tracking-widest text-emerald-300">
@@ -26,12 +40,17 @@ export default async function ProductCatalogAdminPage() {
         {CONTEST_CATALOG.length} concursos separados, oito carreiras, uma fonte
         de preços. Sincronizar preços não libera conteúdo nem abre vendas.
       </p>
+      <p className="mt-3 text-sm text-amber-100">
+        {productsAtMinimum} de {CONTEST_CATALOG.length} cursos com pelo menos{" "}
+        {MINIMUM_COURSE_QUESTION_COUNT} questões válidas. Rascunhos, propostas
+        pendentes e vínculos desatualizados não entram nessa contagem.
+      </p>
       <div className="my-8 grid gap-4 sm:grid-cols-3">
         <div className="rounded-2xl border border-white/15 p-5">
           <h2 className="font-bold">Avulsos</h2>
           {CONTEST_ACCESS_OPTIONS.map((option) => (
             <p className="mt-3 text-sm text-slate-400" key={option.key}>
-              {option.months} meses: {formatBRL(option.amountCents)} · único
+              {option.label}: {formatBRL(option.amountCents)}{option.billingLabel} · recorrente
             </p>
           ))}
         </div>
@@ -47,7 +66,8 @@ export default async function ProductCatalogAdminPage() {
         <div className="rounded-2xl border border-white/15 p-5">
           <h2 className="font-bold">Antes da liberação</h2>
           <p className="mt-3 text-sm leading-7 text-slate-400">
-            Vincular edição oficial, conferir escopo editorial, validar preços
+            Vincular edição oficial, aprovar pelo menos {MINIMUM_COURSE_QUESTION_COUNT}{" "}
+            questões distintas com aderência ao produto, conferir escopo editorial, validar preços
             Stripe e realizar compra de teste. Vendas fechadas até autorização.
           </p>
         </div>
@@ -59,9 +79,10 @@ export default async function ProductCatalogAdminPage() {
             {CONTEST_CATALOG.filter(
               (item) => item.categorySlug === category.slug,
             ).map((contest) => {
-              const product = products.find(
-                (item) => item.slug === contest.slug,
-              );
+              const row = products.find((item) => item.product.slug === contest.slug);
+              const product = row?.product;
+              const validQuestionCount = row?.validQuestionCount ?? 0;
+              const missingQuestionCount = Math.max(0, MINIMUM_COURSE_QUESTION_COUNT - validQuestionCount);
               return (
                 <article
                   key={contest.slug}
@@ -79,6 +100,15 @@ export default async function ProductCatalogAdminPage() {
                   </p>
                   <dl className="mt-4 space-y-2 text-xs">
                     <div>
+                      <dt className="inline text-slate-500">Questões válidas: </dt>
+                      <dd className="inline text-amber-100">
+                        {validQuestionCount} / {MINIMUM_COURSE_QUESTION_COUNT}{" "}
+                        — {missingQuestionCount > 0
+                          ? `faltam ${missingQuestionCount} para o mínimo`
+                          : "mínimo editorial atingido; demais liberações ainda necessárias"}
+                      </dd>
+                    </div>
+                    <div>
                       <dt className="inline text-slate-500">Editorial: </dt>
                       <dd className="inline">{product?.status ?? "draft"}</dd>
                     </div>
@@ -91,7 +121,7 @@ export default async function ProductCatalogAdminPage() {
                     </div>
                     <div>
                       <dt className="inline text-slate-500">
-                        Preço 6 / 12 meses:{" "}
+                        Preços mensal / anual:{" "}
                       </dt>
                       <dd className="inline break-all">
                         Mensal: {product?.stripePriceMonthly ?? "pendente"} /{" "}

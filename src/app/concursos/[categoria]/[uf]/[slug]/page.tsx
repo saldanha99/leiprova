@@ -17,6 +17,7 @@ import {
   listReviewedContestOpportunities,
 } from "@/lib/db/contest-opportunities";
 import { listReleasedContestProducts } from "@/lib/commerce/store";
+import { findExactProductForOpportunityPage } from "@/lib/commerce/product-page-association";
 import { isDatabaseConfigured } from "@/lib/db/client";
 import { getOpportunityJurisdictionBySlug } from "@/lib/opportunities/jurisdictions";
 import { WEBSITE_ID, absoluteUrl } from "@/lib/seo";
@@ -43,9 +44,12 @@ const getPageOpportunity = cache(
 
     const released = await listReleasedContestProducts();
     if (opportunity) {
-      const product = released.find(
-        (item) => item.opportunityPublicId === opportunity.publicId,
-      );
+      const product = findExactProductForOpportunityPage(released, {
+        productSlug: opportunitySlug,
+        categorySlug,
+        jurisdictionSlug,
+        opportunityPublicId: opportunity.publicId,
+      });
       return { opportunity, jurisdiction, productSlug: product?.slug };
     }
     const planned = getCatalogContest(opportunitySlug);
