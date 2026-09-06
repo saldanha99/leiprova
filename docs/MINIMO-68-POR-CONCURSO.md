@@ -113,6 +113,9 @@ Recibos privados em `.local/editorial/cf-garantias-processuais-2026-09-06/`:
 Os recibos `drafts-*` e `bindings-*` do novo complemento ficam em
 `.local/editorial/enam-complemento-68-2026-09-06/`, junto ao caderno de revisão.
 Nenhuma autorização, identidade pessoal ou conteúdo privado foi versionado.
+Recibos, relatório de cobertura, caderno de 22 e pesquisa de fontes também foram
+copiados para `/opt/leiprova/.local/editorial/records-minimum68-20260906/`, com
+acesso privado. Hashes do recibo final e do caderno foram conferidos entre Mac e VPS.
 
 O volume original de rascunhos foi preservado em
 `.local/editorial/draft-input-80-archive-20260906` na VPS. O arquivo das 46
