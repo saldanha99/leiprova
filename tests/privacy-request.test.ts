@@ -71,7 +71,7 @@ describe("privacy request email", () => {
     });
     expect(JSON.parse(String(init.body))).toEqual({
       to: "titular@example.com",
-      from: "LeiProva Privacidade <lgpd@example.com>",
+      from: "Editalume Privacidade <lgpd@example.com>",
       template: {
         id: "template-lgpd",
         variables: {

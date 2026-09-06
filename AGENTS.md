@@ -8,10 +8,19 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 <!-- END:nextjs-agent-rules -->
 
-# LeiProva
+# Editalume
 
 SaaS de memorização da literalidade da lei para concursos e OAB.
 Next.js 16, React 19, Tailwind 4, PostgreSQL 17 com Drizzle, Stripe, Docker + Traefik.
+
+**Marca atual: Editalume.** Use esse nome na comunicação, nos novos materiais e
+nas tarefas do time. Leia `docs/MARCA-EDITALUME.md` para distinguir a marca dos
+identificadores técnicos legados. `leiprova` continua sendo o nome do repositório,
+da pasta, do banco e dos recursos técnicos existentes; não os renomeie por uma
+troca de marca. Os domínios atuais continuam `leiprova.2b.app.br` e
+`homolog.leiprova.2b.app.br`. O domínio definitivo da Editalume ainda não foi
+comprado e sua extensão não está definida nesta orientação; não invente endereço
+nem altere DNS, redirecionamentos, e-mails ou webhooks para um domínio futuro.
 
 **Leia `docs/OPERACAO.md` antes de mexer em deploy, banco ou feature flags.**
 Ele cobre onde o projeto está hospedado, como publicar, como subir o ambiente
@@ -27,6 +36,10 @@ Regras que valem sempre:
 - Scripts novos que rodem por `tsx` precisam de `--env-file-if-exists=.env`;
   o projeto não tem `dotenv`.
 - Antes de entregar, rode `pnpm lint && pnpm typecheck && pnpm test && pnpm build`.
+- Maestro e auxiliares devem carregar a marca atual a partir deste arquivo e de
+  `docs/MARCA-EDITALUME.md`. Nomes antigos em notas, nós, registros ou relatórios
+  são históricos; não comprovam que o canvas tenha sido atualizado. Preserve IDs,
+  conexões e o isolamento do projeto ao planejar qualquer atualização de rótulos.
 
 ## Referências editoriais por banca e cargo
 
@@ -51,7 +64,8 @@ Regras que valem sempre:
 
 - **Cloudflare / DNS de `2b.app.br`: Google Chrome, perfil Daniel.** Use a aba
   autenticada desse perfil, não tente o perfil Vini. Zona autorizada para este
-  projeto: `2b.app.br`; limite mudanças aos registros do LeiProva.
+  projeto: `2b.app.br`; limite mudanças aos registros existentes deste projeto
+  (`leiprova` / `homolog.leiprova`).
 - **Stripe / conta 2timeWeb: Google Chrome, perfil Vini.** Não confundir os perfis.
 - Estes nomes indicam onde acessar, não concedem autorização permanente para
   mudar permissões, criar credenciais, cobrar ou alterar outros projetos.

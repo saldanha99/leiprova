@@ -1,4 +1,6 @@
-export const SITE_NAME = "Editalume";
+import { BRAND_NAME } from "@/lib/brand";
+
+export const SITE_NAME = BRAND_NAME;
 export const SITE_URL = (
   process.env.NEXT_PUBLIC_APP_URL ?? "https://leiprova.2b.app.br"
 ).replace(/\/$/, "");
@@ -10,7 +12,7 @@ export const SOCIAL_IMAGE = {
   url: SOCIAL_IMAGE_PATH,
   width: 1586,
   height: 992,
-  alt: "Interface de estudo da Editalume em notebook, tablet e celular",
+  alt: `Interface de estudo da ${BRAND_NAME} em notebook, tablet e celular`,
 } as const;
 
 export function absoluteUrl(path = "/") {

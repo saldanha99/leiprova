@@ -37,7 +37,7 @@ export function requireProductBindingTarget(connectionString: string | undefined
     ["leiprova-pooler", "pooler"].includes(target.hostname) && target.pathname === "/leiprova" &&
     target.username === "leiprova_app" && (!target.port || target.port === "5432");
   if (!["postgres:", "postgresql:"].includes(target.protocol) || target.search || target.hash || !target.username || (!local && !production)) {
-    throw new Error("Destino de curadoria não permitido; use o banco editorial local ou pooler restrito do LeiProva.");
+    throw new Error("Destino de curadoria não permitido; use o banco editorial local ou pooler restrito da Editalume.");
   }
   return { connectionString, database: target.pathname.slice(1), production };
 }

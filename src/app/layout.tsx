@@ -3,6 +3,7 @@ import { Manrope, Geist_Mono } from "next/font/google";
 
 import { JsonLd } from "@/components/seo/json-ld";
 import { QaEnvironmentNotice } from "@/components/qa-environment-notice";
+import { BRAND_NAME, BRAND_TAGLINE } from "@/lib/brand";
 import { SITE_URL, SOCIAL_IMAGE, SOCIAL_IMAGE_PATH, siteIdentityGraph } from "@/lib/seo";
 
 import "./globals.css";
@@ -21,15 +22,15 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Editalume — Lei seca guiada pelo edital",
-    template: "%s | Editalume",
+    default: `${BRAND_NAME} — ${BRAND_TAGLINE}`,
+    template: `%s | ${BRAND_NAME}`,
   },
   description:
     "Treine a literalidade da lei com questões originais, feedback imediato, fonte oficial e revisão espaçada para concursos públicos.",
-  applicationName: "Editalume",
+  applicationName: BRAND_NAME,
   category: "education",
-  creator: "Editalume",
-  publisher: "Editalume",
+  creator: BRAND_NAME,
+  publisher: BRAND_NAME,
   referrer: "origin-when-cross-origin",
   icons: {
     icon: [
@@ -44,14 +45,14 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "pt_BR",
-    siteName: "Editalume",
-    title: "Editalume — Lei seca guiada pelo edital",
+    siteName: BRAND_NAME,
+    title: `${BRAND_NAME} — ${BRAND_TAGLINE}`,
     description: "Treinos curtos para memorizar prazos, exceções e competências cobrados em concursos.",
     images: [SOCIAL_IMAGE],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Editalume — Lei seca guiada pelo edital",
+    title: `${BRAND_NAME} — ${BRAND_TAGLINE}`,
     description: "Treinos curtos para memorizar prazos, exceções e competências cobrados em concursos.",
     images: [SOCIAL_IMAGE_PATH],
   },

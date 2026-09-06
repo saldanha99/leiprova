@@ -1,3 +1,5 @@
+import { BRAND_NAME, BRAND_TAGLINE } from "@/lib/brand";
+
 const ESCAPE_LOOKUP: Record<string, string> = {
   "&": "&amp;",
   "<": "&lt;",
@@ -26,11 +28,11 @@ export function buildAccountAccessEmail({
     new URL("/brand/editalume-icon-180.png", accessUrl).toString(),
   );
   const intro = purchase
-    ? "Seu pagamento foi confirmado e o acesso à Editalume já está liberado."
-    : "Recebemos um pedido para criar ou atualizar a senha da sua conta Editalume.";
+    ? `Seu pagamento foi confirmado e o acesso à ${BRAND_NAME} já está liberado.`
+    : `Recebemos um pedido para criar ou atualizar a senha da sua conta ${BRAND_NAME}.`;
   const subject = purchase
-    ? "Seu acesso à Editalume está liberado"
-    : "Crie uma nova senha na Editalume";
+    ? `Seu acesso à ${BRAND_NAME} está liberado`
+    : `Crie uma nova senha na ${BRAND_NAME}`;
 
   return {
     subject,
@@ -54,10 +56,10 @@ export function buildAccountAccessEmail({
           <tr><td style="padding:28px 32px 12px">
             <table role="presentation" cellspacing="0" cellpadding="0">
               <tr>
-                <td style="padding-right:13px"><img src="${safeLogoUrl}" width="48" height="48" alt="Editalume" style="display:block;width:48px;height:48px;border:0;border-radius:12px" /></td>
+                <td style="padding-right:13px"><img src="${safeLogoUrl}" width="48" height="48" alt="${BRAND_NAME}" style="display:block;width:48px;height:48px;border:0;border-radius:12px" /></td>
                 <td>
-                  <strong style="display:block;color:#fbbf24;font-size:13px;letter-spacing:.12em;text-transform:uppercase">Editalume</strong>
-                  <span style="display:block;margin-top:4px;color:#7f8ea3;font-size:12px">Lei seca guiada pelo edital</span>
+                  <strong style="display:block;color:#fbbf24;font-size:13px;letter-spacing:.12em;text-transform:uppercase">${BRAND_NAME}</strong>
+                  <span style="display:block;margin-top:4px;color:#7f8ea3;font-size:12px">${BRAND_TAGLINE}</span>
                 </td>
               </tr>
             </table>

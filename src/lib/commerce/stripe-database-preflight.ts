@@ -74,7 +74,7 @@ function expectedDatabaseIdentity(databaseUrl: string, mode: "test" | "live") {
   if (!["postgres:", "postgresql:"].includes(url.protocol) || !user || !databaseName ||
     (mode === "live" ? databaseName !== "leiprova" : !/^leiprova(?:_[a-z0-9]+)*_(?:test|staging)$/.test(databaseName)) ||
     user.endsWith("_app")) {
-    throw new Error("Preflight exige banco LeiProva e usuário operacional explícito, não o usuário da aplicação.");
+    throw new Error("Preflight exige banco exclusivo da Editalume e usuário operacional explícito, não o usuário da aplicação.");
   }
   return { databaseName, user };
 }

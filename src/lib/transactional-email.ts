@@ -1,5 +1,7 @@
 import "server-only";
 
+import { normalizeBrandEmailSender } from "@/lib/brand";
+
 const RESEND_EMAIL_ENDPOINT = "https://api.resend.com/emails";
 const RETRYABLE_STATUSES = new Set([500, 502, 503, 504]);
 
@@ -57,7 +59,7 @@ export function getTransactionalEmailConfig(): TransactionalEmailConfig | null {
   const from = readEnv("TRANSACTIONAL_EMAIL_FROM");
 
   if (!apiToken || !from) return null;
-  return { apiToken, from };
+  return { apiToken, from: normalizeBrandEmailSender(from) };
 }
 
 function apiErrorCode(payload: ResendEmailResponse | null) {
@@ -99,7 +101,7 @@ export async function sendTransactionalEmail(
           "template" in message
             ? {
                 to: message.to,
-                from: message.from ?? config.from,
+                from: normalizeBrandEmailSender(message.from ?? config.from),
                 template: message.template,
               }
             : {

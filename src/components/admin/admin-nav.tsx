@@ -16,6 +16,7 @@ import {
 import { logoutAction } from "@/app/actions/auth";
 import { LeiProvaMark } from "@/components/ui/leiprova-mark";
 import type { AuthUser } from "@/lib/auth";
+import { BRAND_NAME } from "@/lib/brand";
 import { cn } from "@/lib/utils";
 
 const adminNavItems = [
@@ -180,7 +181,7 @@ export function MobileAdminHeader({ user }: { user: AuthUser }) {
           <LeiProvaMark href={homeHref} compact />
           <div className="min-w-0">
             <p className="truncate text-sm font-semibold text-white">
-              Editalume
+              {BRAND_NAME}
             </p>
             <p className="text-[10px] font-bold uppercase tracking-[.13em] text-emerald-300">
               {roleLabel}

@@ -65,14 +65,14 @@ export function requireReviewOperationTarget(connectionString: string | undefine
   if (!connectionString) throw new LocalImportError("Defina LEIPROVA_REVIEW_80_DATABASE_URL explicitamente.");
   if (environment.nodeEnv !== "production") return requireLocalImportTarget(connectionString);
   if (environment.appUrl !== "https://leiprova.2b.app.br" || environment.approval !== REVIEW_80_APPROVAL) {
-    throw new LocalImportError("Habilite explicitamente a revisão do pacote de 80 no LeiProva.");
+    throw new LocalImportError("Habilite explicitamente a revisão do pacote de 80 na Editalume.");
   }
   let target: URL;
   try { target = new URL(connectionString); } catch { throw new LocalImportError("Destino da revisão inválido."); }
   if (!["postgres:", "postgresql:"].includes(target.protocol) || !["leiprova-pooler", "pooler"].includes(target.hostname) ||
       (target.port && target.port !== "5432") || target.pathname !== "/leiprova" || target.username !== "leiprova_app" ||
       target.search || target.hash) {
-    throw new LocalImportError("A revisão exige pooler interno, banco LeiProva e papel restrito, sem redirecionamento.");
+    throw new LocalImportError("A revisão exige pooler interno, banco exclusivo da Editalume e papel restrito, sem redirecionamento.");
   }
   return { connectionString, database: "leiprova" };
 }

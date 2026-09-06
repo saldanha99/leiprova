@@ -7,8 +7,11 @@ O proprietário solicitou retirar os produtos e checkouts antigos da conta
 cancelar assinaturas, reembolsar clientes, apagar faturas ou alterar projetos
 vizinhos da VPS. Antes de qualquer retirada, identificar os objetos exatos.
 
-**Nenhum produto, preço, link, sessão, assinatura ou chave Stripe foi criado,
-removido ou alterado nesta rodada. Nenhuma sincronização remota foi executada.**
+**Uma chave restrita de catálogo Editalume foi emitida após as verificações
+concluídas pelo proprietário. Os 19 produtos antigos autorizados e seus 22 preços
+foram arquivados e conferidos. Histórico preservado; os quatro produtos que já
+estavam arquivados não foram alterados. A sincronização do novo catálogo está
+em execução; não declarar criação concluída antes da conferência final.**
 
 - Conta autorizada: `acct_1TCQvlBkl6797u2u`, Chrome **Vini** (`Profile 4`).
 - O Chrome estava em execução, sem conexão de depuração disponível para
@@ -28,13 +31,41 @@ removido ou alterado nesta rodada. Nenhuma sincronização remota foi executada.
   sessões Checkout abertas ou de histórico financeiro.
   Os 23 IDs distintos e status visíveis estão no registro privado
   `.local/commerce/stripe-ui-inventory-20260906.json` (permissão 600, fora de Git).
-- Formulário de chave restrita preparado, **não enviado**: nome
-  `LeiProva - catalogo e inventario live`; Products/Prices com gravação;
+- Chave restrita criada: nome `Editalume - catalogo e inventario live`;
+  Products/Prices com gravação;
   Accounts, Subscriptions, Checkout Sessions e Payment Links somente leitura.
-  As seis seleções foram conferidas no DOM. Nenhuma chave foi emitida ou salva.
-  A emissão aguarda confirmação no momento da criação de acesso sensível.
-  Resolver também se a retirada inclui todas as marcas antigas desta conta
-  compartilhada antes de arquivá-las.
+  As seis seleções foram conferidas no DOM. O proprietário concluiu a
+  verificação de e-mail e do autenticador diretamente no Chrome Vini.
+  A transferência foi concluída por formulário privado em loopback, usando a
+  aba autorizada sem expor o valor na conversa. Chave salva em arquivo `0600`
+  privado no Mac e na VPS, fora de Git e Docker; clipboard temporário limpo.
+  A API confirmou a conta própria e `charges_enabled`, `details_submitted` e
+  `payouts_enabled` verdadeiros. Nunca colocar o valor em logs, Git, canvas ou
+  conversa. Esta credencial de manutenção não atende
+  às permissões do checkout em execução e não deve substituir sua chave.
+- O proprietário confirmou expressamente o arquivamento dos **19 ativos**
+  antigos, incluindo as outras marcas observadas. Os quatro já arquivados,
+  assinaturas, histórico financeiro e novos produtos permanecem fora das
+  mutações. O operador dedicado fixa esse escopo; não derivá-lo de um filtro
+  móvel após criar o catálogo Editalume.
+- Conferência somente leitura do banco de produção: 75 produtos locais,
+  nenhum com `stripe_product_id`; nenhuma assinatura local encontrada.
+  Preflight operacional aprovado sem conceder privilégios ou alterar dados.
+  Backup do banco exclusivo concluído e verificado no Mac e na VPS:
+  `editalume-before-stripe-20260906T175337Z.dump`, SHA-256
+  `9f3b54a2147f4a5ef9bb1970cbc33cca69d7d8c4611d12b5808a635991bae0ba`.
+- Inventário API completo capturado antes de qualquer alteração: 23 produtos,
+  19 ativos, 26 preços de catálogo, zero links ativos, zero sessões abertas e
+  zero assinaturas. Arquivo privado `inventory-live-2026-09-06T18-03-24-355Z.json`,
+  SHA-256 `29bc824c2296b7341dc7440fa13fda790296a794479a9521311ef43c136b9aba`.
+  A prévia de arquivamento delimitou 19 produtos e 22 preços associados.
+  Leitura adicional confirmou ausência de `default_price` nos 19 ativos.
+- Arquivamento concluído com recibo privado incremental em
+  `.local/commerce/stripe-retirement/`. Inventário posterior, antes de criar os
+  novos produtos: 23 produtos, **zero ativos**, 26 preços, nenhum link ativo,
+  sessão aberta ou assinatura. Arquivo `inventory-live-2026-09-06T18-09-11-302Z.json`,
+  SHA-256 `b783eb77ff6648b648a8852b151d588732fb5f5d56fb1eb633e4e04d355a4171`.
+  Somente `active=false` foi aplicado; não houve DELETE, reembolso ou cobrança.
 
 ## Catálogo que será sincronizado
 
@@ -50,7 +81,7 @@ em produção (1536×1024). **É uma foto compartilhada do projeto, não 75 foto
 exclusivas.** O título, a edição e a URL distinguem cada concurso. O Master
 descreve acesso aos concursos liberados, não promete conteúdo ainda inexistente.
 
-IDs e metadata exatos identificam produtos do LeiProva. Arquivados compatíveis
+IDs e metadata legados identificam tecnicamente produtos da Editalume. Arquivados compatíveis
 só podem ser reativados com opção explícita `--reactivate`; incompatibilidades
 e duplicatas são bloqueadas. Preços históricos não são convertidos. A rotina
 não altera impostos, assinaturas, histórico de compras ou flags comerciais.
@@ -104,6 +135,12 @@ transacional da conta**. Os objetos podem mudar; conferir cada ID antes de agir.
 O operador de inventário **não implementa remoção em massa**. Não existe neste
 comando uma flag escondida de exclusão ou arquivamento.
 
+O operador separado `scripts/retire-stripe-catalog.ts` tem prévia sem rede e
+aplicação explícita, limitada aos 19 produtos confirmados. Exige o snapshot UI
+autorizado e inventário API privado recente; bloqueia links ativos ou sessões
+abertas. Registra cada intenção e confirmação em recibo privado durável.
+Ver [escopo e execução do arquivamento](STRIPE-ARQUIVAMENTO-ESCOPO-20260906.md).
+
 A Stripe limita a exclusão de produtos/preços conforme os vínculos e uso.
 Referências oficiais: [gerenciamento e arquivamento](https://docs.stripe.com/products-prices/manage-prices)
 e [API de produtos](https://docs.stripe.com/api/products/list). As assinaturas
@@ -112,12 +149,12 @@ existentes não são canceladas simplesmente pelo arquivamento do produto.
 ## Conexão e aplicação do catálogo
 
 1. Acessar a conta correta no Chrome Vini, conferir modo live e estado cadastral.
-2. Criar, se necessário, credencial restrita dedicada ao LeiProva. Não reutilizar
+2. Criar, se necessário, credencial restrita dedicada à Editalume. Não reutilizar
    chaves de outros projetos nem alterar segurança global por conveniência.
    Sincronização precisa conta/produtos/preços; inventário também precisa ler
    links, Checkout, assinaturas e itens. O runtime tem necessidades próprias de
    clientes, sessões, faturamento, portal e reconciliação.
-3. Fazer backup do banco exclusivo LeiProva antes de gravar vínculos e registrar
+3. Fazer backup do banco exclusivo da Editalume antes de gravar vínculos e registrar
    estado prévio da configuração. Não abrir novas permissões para `leiprova_app`
    só para executar manutenção: usar conexão operacional explícita e limitada.
 4. Conferir prévia `pnpm stripe:catalog --mode=live`. `--apply` exige conta, modo,
@@ -153,13 +190,15 @@ embutido: a página de seleção é própria, a etapa financeira continua na Str
 
 ## Verificação desta preparação
 
-Lint, typecheck, build e **1037 testes passaram**; 150 integrações opcionais
+Lint, typecheck e **1082 testes passaram**; 150 integrações opcionais
 não foram executadas. As prévias de inventário e catálogo funcionaram sem
 credencial e sem acesso à API. O inventário recebeu revisão independente,
 incluindo testes de paginação, modo e redirecionamento de pasta privada.
 O preflight do banco recebeu revisão independente; 49 testes focais novos
 passaram. Os testes de sincronização usam fakes: não são homologação Stripe
-live ou test. Nenhum deploy, escrita de banco, emissão de chave ou inventário
-pela API foi executado. Houve somente inspeção autenticada do painel e preparo
-de formulário não submetido. Código em branch de desenvolvimento; produção
-não atualizada.
+live ou test. A emissão da chave, os inventários API, o arquivamento e o início
+da sincronização controlada estão registrados acima. O novo operador de arquivamento passou em 26 testes
+focais; as alterações de marca passaram em 175 testes focais distintos, lint e
+typecheck. O build local da marca passou; a refatoração posterior do operador
+somente operacional passou novamente em lint, typecheck e suíte completa.
+Código em branch de desenvolvimento; aplicação de produção ainda não atualizada.

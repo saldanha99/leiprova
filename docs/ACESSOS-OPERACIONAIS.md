@@ -1,7 +1,12 @@
-# Acessos operacionais — LeiProva / Editalume
+# Acessos operacionais — Editalume
 
 Orientação do Vinícius confirmada em 05/09/2026. Documento sem segredos, destinado
 ao Maestro e aos agentes deste projeto.
+
+**Marca atual reafirmada em 06/09/2026: Editalume.** Os destinos e identificadores
+`leiprova` abaixo permanecem válidos e não devem ser renomeados pela troca de
+marca. O domínio definitivo ainda não foi comprado; não presumir novo endereço.
+Leia `MARCA-EDITALUME.md` antes de propor mudanças em links ou integrações.
 
 | Serviço | Navegador / perfil | Destino |
 | --- | --- | --- |
@@ -44,11 +49,33 @@ técnicas no arquivo privado
 
 ## Procedimento do Maestro
 
-1. Ler este documento e `OPERACAO.md` antes de operar infraestrutura.
+### Conexão Stripe de manutenção — verificada em 06/09/2026
+
+A credencial dedicada **Editalume - catalogo e inventario live** foi criada após
+as confirmações humanas, salva e validada pela API da conta 2timeWeb. Tem escrita
+apenas em Products/Prices e leitura de Accounts, Subscriptions, Checkout Sessions
+e Payment Links. Não permite cobranças, reembolsos, transferências ou cancelamento
+de assinaturas. Não confundir com a credencial de execução do checkout.
+
+Localização privada, relativa à raiz técnica do projeto no Mac e na VPS:
+`.local/commerce/stripe-rollout-20260906T175337Z/stripe-catalog-live.env`.
+Arquivo `0600`, pasta `0700`, excluídos de Git e da imagem Docker. Usar somente
+com operadores do catálogo explicitamente autorizados; nunca imprimir seu
+conteúdo, copiá-lo para notas ou substituir com ele o `.env` da aplicação.
+
+O arquivo operacional de banco na mesma pasta da VPS é separado e não deve ser
+transportado para o Mac ou usado pela aplicação. Manutenção não altera as
+credenciais ou permissões do papel `leiprova_app`.
+
+### Roteamento e isolamento
+
+1. Ler este documento, `MARCA-EDITALUME.md` e `OPERACAO.md` antes de operar
+   infraestrutura. Usar Editalume na comunicação e preservar a identidade
+   técnica dos recursos existentes.
 2. Identificar o perfil pelo nome e confirmar a conta e o domínio na página.
    Reutilizar a aba autenticada indicada pelo usuário. A Cloudflare está no
    **Daniel**, mesmo que o Stripe esteja no **Vini**.
-3. Limitar qualquer alteração a LeiProva: repositório `leiprova`, recursos
+3. Limitar qualquer alteração a Editalume: repositório `leiprova`, recursos
    próprios na VPS e registros DNS `leiprova` / `homolog.leiprova`.
 4. Não modificar os demais sites de `2b.app.br`, nem as configurações globais
    de cobrança, acesso, DNS ou segurança da conta por conveniência.
@@ -60,3 +87,5 @@ técnicas no arquivo privado
 O registro dos perfis não substitui as confirmações exigidas para ações
 sensíveis. Catálogo Stripe criado não significa checkout liberado: autenticação,
 pagamentos, webhooks e entrega do conteúdo precisam de validação própria.
+Consulte `STRIPE-CATALOGO-PRODUCAO.md` para as evidências e o progresso atuais;
+conexão de manutenção validada não significa vendas ou entrega homologadas.

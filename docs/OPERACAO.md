@@ -1,4 +1,4 @@
-# Operação do LeiProva
+# Operação da Editalume
 
 Documento de contexto para quem for continuar o projeto — pessoa ou assistente de IA.
 Descreve onde as coisas estão, como publicar e quais armadilhas já custaram tempo.
@@ -6,20 +6,33 @@ Descreve onde as coisas estão, como publicar e quais armadilhas já custaram te
 Última aplicação verificada: 06/09/2026, 13h11 BRT (16h11 UTC).
 As seções antigas abaixo são histórico; consulte os registros recentes antes de operar.
 
-**Stripe — preparação e inspeção do painel (06/09/2026, sem escrita remota):** pedido de
+**Stripe — preparação e emissão da chave (06/09/2026):** pedido de
 retirada do catálogo antigo e inclusão dos 75 cursos + Master registrado.
 Conexão com Chrome Vini via `agent-browser` indisponível; proprietário autorizou
 exceção para controle visual. Aba Vini/2timeWeb acessada: catálogo visual com
 23 produtos antigos (19 ativos, 4 arquivados), incluindo marcas de outros
 projetos; telas de assinaturas ativas e Payment Links vazias, sem inventário
-API ainda. Formulário de chave restrita preparado, não enviado, aguardando
-confirmação de emissão e escopo da retirada das outras marcas.
+API ainda naquela inspeção inicial. Proprietário confirmou o escopo dos 19 ativos, incluindo as outras
+marcas, e a criação da chave restrita. Após verificações de e-mail e autenticador,
+a chave `Editalume - catalogo e inventario live` foi emitida e salva com proteção
+no Mac/VPS por formulário local privado. Conta própria validada pela API, com
+pagamentos/cadastro/recebimentos habilitados. Inventário API: 23 produtos, 19
+ativos, 26 preços, zero links ativos, sessões abertas ou assinaturas.
+Não usar essa chave limitada de manutenção como credencial do checkout.
 Conferência anterior somente de presença/modo no app:
 chave secreta test, publicável ausente, segredo webhook presente, vendas fechadas.
-Nenhum objeto externo foi retirado/criado, nenhuma chave emitida ou flag alterada.
+Os 19 produtos antigos autorizados e seus 22 preços foram arquivados; os quatro
+já arquivados e todo o histórico foram preservados. Nenhuma flag alterada.
+Inventário após arquivamento confirmou zero produtos ativos. Sincronização dos
+75 cursos e Master iniciada em contêiner operacional separado; conferir
+conclusão e leitura final antes de afirmar catálogo criado.
+Backup exclusivo anterior às escritas verificado no Mac/VPS; 75 produtos locais
+ainda sem vínculo Stripe e 346 questões preservadas. A marca pública foi
+centralizada como Editalume no código e no contexto documental do time, sem
+mudar domínio ou identificadores técnicos. Isso não comprova alteração do canvas.
 Preparados inventário privado somente leitura, apresentação/retomada do
 sincronizador e preflight de identidade/permissões do banco antes da Stripe.
-1037 testes, lint, typecheck e build passaram; 150 integrações
+1082 testes, lint e typecheck passaram; build da marca aprovado; 150 integrações
 opcionais ignoradas. Sem deploy. Não confundir prévia de 76 produtos/152 preços com criação real.
 Ver [estado, acesso e execução do catálogo Stripe](STRIPE-CATALOGO-PRODUCAO.md).
 

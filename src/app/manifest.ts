@@ -1,9 +1,11 @@
 import type { MetadataRoute } from "next";
 
+import { BRAND_NAME } from "@/lib/brand";
+
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Editalume",
-    short_name: "Editalume",
+    name: BRAND_NAME,
+    short_name: BRAND_NAME,
     description: "Treino de literalidade da lei para concursos públicos.",
     start_url: "/app",
     display: "standalone",

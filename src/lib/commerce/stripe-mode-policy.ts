@@ -81,7 +81,7 @@ export function validateStripeSyncTarget(input: {
       !/^acct_[A-Za-z0-9]+$/.test(input.expectedAccount))
   )
     throw new Error(
-      "Produção exige ambiente, domínio, banco LeiProva e conta Stripe esperada explícitos.",
+      "Produção exige ambiente, domínio, banco exclusivo da Editalume e conta Stripe esperada explícitos.",
     );
   return {
     mode: input.mode,

@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { EditalumeLogo } from "@/components/brand/EditalumeLogo";
+import { BRAND_NAME } from "@/lib/brand";
 import { cn } from "@/lib/utils";
 
 export function LeiProvaMark({
@@ -16,7 +17,7 @@ export function LeiProvaMark({
     <Link
       href={href}
       className={cn("inline-flex items-center", className)}
-      aria-label="Editalume — página inicial"
+      aria-label={`${BRAND_NAME} — página inicial`}
     >
       <EditalumeLogo compact={compact} />
     </Link>

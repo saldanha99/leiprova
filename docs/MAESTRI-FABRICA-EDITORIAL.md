@@ -1,7 +1,25 @@
-# Fábrica editorial — configuração do time LeiProva
+# Fábrica editorial — configuração do time Editalume
 
 Pedido do Vinícius de 05/09/2026. Este plano configura responsabilidades; não
 atesta que o pipeline já está continuamente integrado ou que cursos estão prontos.
+
+## Marca atual do time — 06/09/2026
+
+O projeto se apresenta como **Editalume**. Maestro e auxiliares devem ler
+`AGENTS.md` e `docs/MARCA-EDITALUME.md` ao iniciar tarefas e usar esse nome nas
+novas entregas. Os nomes de nós e workspace descritos nas observações de
+05/09/2026 abaixo são evidências históricas, não uma orientação para manter a
+marca antiga nas interfaces.
+
+O rótulo lógico desejado do coordenador é **Maestro Editalume**. Antes de uma
+alteração futura de rótulo no canvas, identificar e reutilizar o nó existente;
+não criar outro Maestro, substituir sessões ou mudar conexões por causa do nome.
+Esta revisão dos documentos não acessou nem alterou o canvas.
+
+Preservar a raiz `leiprova`, os recursos técnicos e os domínios atuais. O domínio
+definitivo da Editalume ainda não foi comprado e não há novo endereço definido
+para o time utilizar. Mudança de marca não autoriza migração de dados, DNS,
+checkout ou webhooks, nem acesso a outros projetos.
 
 ## Configuração observada no canvas em 05/09/2026
 
@@ -62,10 +80,13 @@ papel e modelo e ficar ocioso. Reutilizar um nó compatível antes de criar dupl
 
 ## Espaço e memória
 
-- Workspace exclusivo: **LeiProva — Fábrica Editorial**.
+- Workspace exclusivo observado em 05/09/2026: **LeiProva — Fábrica Editorial**.
+  Nome histórico preservado para localizar o workspace, sem comprovação de
+  renomeação posterior. Marca atual do projeto: **Editalume**.
 - Raiz: `/Users/viniciussaldanharosario/DOCUMENTOS/PROJETOS/leiprova`.
 - Preservar integralmente o workspace antigo `My Workspace`.
-- Todos leem `AGENTS.md`, `docs/OPERACAO.md` e `docs/ACESSOS-OPERACIONAIS.md`.
+- Todos leem `AGENTS.md`, `docs/MARCA-EDITALUME.md`, `docs/OPERACAO.md` e
+  `docs/ACESSOS-OPERACIONAIS.md`.
 - Memória operacional: **Cloudflare no Chrome Daniel; Stripe no Chrome Vini**.
   Nunca compartilhar segredos no canvas, prompts, relatórios ou com o Relay.
 - Nenhum agente toca outro projeto, configuração global de conta, DNS de outro
@@ -78,7 +99,7 @@ papel e modelo e ficar ocioso. Reutilizar um nó compatível antes de criar dupl
 
 | Nó | Responsabilidade | Preferência de ferramenta |
 | --- | --- | --- |
-| Maestro LeiProva | Priorizar, reservar tarefas sem duplicação, consolidar evidências e autorizar passagem entre etapas | Claude Code, Opus 5 já configurado |
+| Maestro Editalume (nó histórico Maestro LeiProva) | Priorizar, reservar tarefas sem duplicação, consolidar evidências e autorizar passagem entre etapas | Claude Code, Opus 5 já configurado |
 | Forge — Engenharia | Aplicação, banco, pagamentos, testes e correções; branches e arquivos próprios por tarefa | Codex Sol 5.6, se disponível no CLI conectado |
 | Prism — Produto e QA | Design premium original, acessibilidade e validação desktop/tablet/mobile | Codex Astra, se disponível no CLI conectado |
 | Radar — Editais | Obter editais e retificações de fontes oficiais, com URL, data, versão/hash e organizadora confirmada | Preset local de pesquisa já instalado; sem nova API paga |
@@ -145,6 +166,11 @@ QUALITY-GATES e ACCESS-ROUTING. Resumir este documento e apontar para os arquivo
 como fonte atual. Não colar credenciais. Não atualizar estado para "concluído"
 sem observar o resultado real. Posicionar Maestro no topo, pesquisa/autoria na
 faixa central, engenharia/QA na inferior, notas laterais.
+
+Na próxima atualização autorizada dessas notas, PROJECT-CONTEXT e TEAM-CHARTER
+devem registrar “Marca atual: Editalume; identificadores técnicos: leiprova;
+domínio definitivo ainda não comprado” e apontar para `MARCA-EDITALUME.md`.
+Não registrar como concluída uma atualização que ocorreu somente nos documentos.
 
 ## Limites desta tarefa de configuração
 

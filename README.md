@@ -1,8 +1,28 @@
-# LeiProva
+# Editalume
 
 SaaS brasileiro para memorização da literalidade da lei, quizzes por carreira e banca, questões originais de múltipla escolha, revisão espaçada e acompanhamento de progresso.
 
 O repositório contém a primeira versão completa do produto: landing page, demonstração pública, autenticação própria, área do aluno, motor de treino, PostgreSQL, checkout personalizado com Stripe, webhook idempotente e publicação por Docker/Traefik.
+
+## Marca atual e infraestrutura preservada
+
+**Editalume** é o nome atual do produto. `LeiProva` em registros antigos e
+`leiprova` nos identificadores técnicos referem-se a este mesmo projeto, não a
+outro produto a ser criado. A mudança de marca não renomeia repositório, pastas,
+banco, serviços Docker, variáveis de ambiente ou identificadores Stripe.
+
+O endereço atual continua [leiprova.2b.app.br](https://leiprova.2b.app.br), com
+homologação separada em
+[homolog.leiprova.2b.app.br](https://homolog.leiprova.2b.app.br). O domínio
+definitivo da Editalume ainda não foi comprado; nenhum endereço futuro deve ser
+presumido ou usado em links, e-mails e webhooks. Consulte a
+[orientação de marca](docs/MARCA-EDITALUME.md).
+
+Os blocos abaixo documentam funcionalidades e procedimentos do projeto, não
+comprovam ativação comercial. O estado operacional está em
+[OPERACAO.md](docs/OPERACAO.md), e as evidências de catálogo e conexão Stripe em
+[STRIPE-CATALOGO-PRODUCAO.md](docs/STRIPE-CATALOGO-PRODUCAO.md). Autorização para
+emitir uma chave ou preparar produtos não é evidência de execução concluída.
 
 ## Estado da versão
 

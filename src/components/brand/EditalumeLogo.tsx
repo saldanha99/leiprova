@@ -1,3 +1,4 @@
+import { BRAND_TAGLINE } from "@/lib/brand";
 import { cn } from "@/lib/utils";
 
 type EditalumeLogoProps = {
@@ -46,7 +47,7 @@ export function EditalumeLogo({ compact = false, className }: EditalumeLogoProps
           <span className="editalume-logo__name">
             edita<em>lume</em>
           </span>
-          <span className="editalume-logo__tagline">lei seca guiada pelo edital</span>
+          <span className="editalume-logo__tagline">{BRAND_TAGLINE.toLowerCase()}</span>
         </span>
       ) : null}
     </span>
