@@ -27,6 +27,7 @@ function render(
         related,
         initialAccess: access,
         available,
+        publishableKey: available ? "pk_test_synthetic" : undefined,
         supplierIdentity: createElement(
           "div",
           { "data-supplier-identity": true },

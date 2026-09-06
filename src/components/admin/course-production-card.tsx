@@ -58,6 +58,7 @@ export function CourseProductionCard({ order }: { order: CourseProductionWorkOrd
           aproveitar uma questão comum a outro curso.
         </p>
         <div className="flex flex-wrap gap-x-5 gap-y-1">
+          <Link className="inline-flex min-h-11 items-center font-bold text-emerald-200" href={`/admin/catalogo-produtos/${order.productSlug}/vinculos`}>Revisar vínculos deste produto →</Link>
           <Link className="inline-flex min-h-11 items-center font-bold text-emerald-200" href="/admin/motor-editais">Conferir edital e requisitos →</Link>
           <Link className="inline-flex min-h-11 items-center font-bold text-emerald-200" href="/admin/fabrica-autoral">Revisar questões e dossiês →</Link>
         </div>

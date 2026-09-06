@@ -9,6 +9,7 @@ import { getStudyEntitlement } from "@/lib/study/entitlement";
 import { CancelContestOrder } from "@/components/checkout/cancel-contest-order";
 import { PortalButton } from "@/components/checkout/portal-button";
 import { CancelContestRenewal } from "@/components/checkout/cancel-contest-renewal";
+import { ResumeContestOrder } from "@/components/checkout/resume-contest-order";
 
 export default async function PurchasesPage() {
   const user = await requireUser("/app/compras");
@@ -127,9 +128,13 @@ export default async function PurchasesPage() {
                     "Confira o estado da assinatura na Stripe.")}
               </p>
             )}
-            {order.stripeSessionId &&
-              ["created", "pending"].includes(order.status) && (
+            {["created", "pending"].includes(order.status) && (
+              <>
+                {order.lines.every((line) => ["monthly", "annual"].includes(line.accessKey)) && <ResumeContestOrder
+                  orderId={order.id} totalCents={order.amountCents} publishableKey={process.env.STRIPE_PUBLISHABLE_KEY}
+                  items={order.lines.map(({ productSlug, accessKey }) => ({ productSlug, accessKey }))} />}
                 <CancelContestOrder orderId={order.id} />
+              </>
               )}
             {order.stripeSubscriptionId &&
               !order.cancelAtPeriodEnd &&

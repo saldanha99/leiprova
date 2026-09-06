@@ -2,6 +2,7 @@
 
 import { useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import {
   ArrowRight,
   Check,
@@ -22,23 +23,32 @@ import { formatBRL, PLANS } from "@/lib/plans";
 import { contestCartTotal } from "@/lib/commerce/order-policy";
 import styles from "./contest-cart.module.css";
 
+const ContestPayment = dynamic(() => import("./contest-payment").then((module) => module.ContestPayment), {
+  ssr: false,
+  loading: () => <p role="status" className={styles.paymentNote}>Carregando pagamento seguro…</p>,
+});
+
 export function ContestCart({
   contest,
   related,
   initialAccess,
   available,
+  publishableKey,
   supplierIdentity,
 }: {
   contest: CatalogContest;
   related: CatalogContest[];
   initialAccess: ContestAccessKey;
   available: boolean;
+  publishableKey?: string;
   supplierIdentity?: ReactNode;
 }) {
   const [access, setAccess] = useState(initialAccess);
   const [extras, setExtras] = useState<string[]>([]);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
+  const [payment, setPayment] = useState<{ clientSecret: string; orderId: string } | null>(null);
+  const requestInFlight = useRef(false);
   const attempt = useRef<{ signature: string; id: string } | null>(null);
   const selectedContests = [
     contest,
@@ -71,7 +81,8 @@ export function ContestCart({
   }
 
   async function checkout() {
-    if (!available || pending) return;
+    if (!available || !publishableKey || pending || requestInFlight.current) return;
+    requestInFlight.current = true;
     setError("");
     setPending(true);
     const signature = JSON.stringify(items);
@@ -83,9 +94,14 @@ export function ContestCart({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ attemptId: attempt.current.id, items }),
       });
-      const data: { url?: string; error?: string } = await response.json();
-      if (!response.ok || !data.url)
+      const data: { url?: string; error?: string; clientSecret?: string; orderId?: string } = await response.json();
+      if (!response.ok)
         throw new Error(data.error ?? "Não foi possível abrir o pagamento.");
+      if (data.clientSecret && data.orderId) {
+        setPayment({ clientSecret: data.clientSecret, orderId: data.orderId });
+        return;
+      }
+      if (!data.url) throw new Error("Não foi possível abrir o pagamento.");
       const url = new URL(data.url);
       if (url.protocol !== "https:" || url.hostname !== "checkout.stripe.com")
         throw new Error("Endereço de pagamento inválido.");
@@ -97,6 +113,7 @@ export function ContestCart({
           : "Falha ao iniciar o pagamento.",
       );
       setPending(false);
+      requestInFlight.current = false;
     }
   }
 
@@ -430,8 +447,8 @@ export function ContestCart({
               Nenhuma cobrança pode ser iniciada aqui.
             </p>
           )}
-          <button
-            disabled={!available || pending}
+          {!payment && <button
+            disabled={!available || !publishableKey || pending}
             onClick={checkout}
             type="button"
             className={styles.payButton}
@@ -443,7 +460,12 @@ export function ContestCart({
                 ? "Continuar para pagamento seguro"
                 : "Compra ainda não disponível"}
             <ArrowRight size={17} aria-hidden="true" />
-          </button>
+          </button>}
+          {payment && publishableKey && <>
+            <ContestPayment publishableKey={publishableKey} clientSecret={payment.clientSecret}
+              orderId={payment.orderId} totalCents={total} billingLabel={selectedOption.billingLabel} />
+            <p className={styles.paymentNote}>Seleção reservada para esta tentativa. Para alterar os itens, <Link href="/app/compras">cancele o pagamento pendente em Meus concursos</Link>.</p>
+          </>}
           {error && (
             <p role="alert" className={styles.error}>
               {error}
@@ -453,8 +475,8 @@ export function ContestCart({
             <ShieldCheck size={22} aria-hidden="true" />
             <p>
               <strong>Pagamento processado pela Stripe</strong>Na próxima etapa,
-              confirme o valor e informe os dados de pagamento no ambiente da
-              Stripe. A Editalume não recebe os dados completos do seu cartão.
+              confirme o valor e informe os dados nos campos protegidos da
+              Stripe, nesta página. A Editalume não recebe os dados completos do seu cartão.
             </p>
           </div>
           <p className={styles.terms}>

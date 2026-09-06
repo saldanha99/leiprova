@@ -74,8 +74,8 @@ async function loadDossiers(transaction: Transaction, input: ProductBindingRevie
 }
 
 async function lockContext(transaction: Transaction, input: ProductBindingReviewInput) {
-  // Estes locks exigem grants limitados futuros. Não há fallback para owner/URL de migração.
-  await transaction.execute(sql`select slug from contest_store_products where slug=${input.productSlug} for update`);
+  // EXECUTE restrito bloqueia uma linha, sem conceder UPDATE no catálogo ao app.
+  await transaction.execute(sql`select public.lock_product_binding_review_product(${input.productSlug})`);
   await transaction.execute(sql`select id from contest_opportunities where public_id=${input.opportunityPublicId} for update`);
   await transaction.execute(sql`select id from exam_editions where public_id=${input.examEditionPublicId} for share`);
   await transaction.execute(sql`select id from public.contest_product_question_bindings where id=any(${idsSql(input.bindingIds)}) order by id for update`);
@@ -99,7 +99,8 @@ async function lockContext(transaction: Transaction, input: ProductBindingReview
 
 /** Serviço interno: o chamador deve derivar actorPublicId da sessão autenticada, nunca do formulário.
  * Não é um endpoint, não concede privilégios, não publica produto e não abre checkout.
- * Sem os grants futuros a aplicação falha fechada; nenhum uso de MIGRATION_DATABASE_URL.
+ * A ação administrativa usa este serviço. Sem migration/grants versionados, falha fechado;
+ * não há conexão alternativa com MIGRATION_DATABASE_URL ou credenciais proprietárias.
  */
 export async function reviewProductQuestionBindings(db: Db, request: {
   input: unknown; actorPublicId: string; mode: "preview" | "apply"; expectedFingerprint?: string;
@@ -121,6 +122,10 @@ export async function reviewProductQuestionBindings(db: Db, request: {
     if (request.mode === "apply") await lockContext(transaction, input);
     const dossiers = await loadDossiers(transaction, input, actor.id);
     assertProductBindingReviewScope(input, dossiers);
+    if (input.decision === "reject" && dossiers.some((dossier) => {
+      const edition = dossier.snapshot.edition;
+      return !edition || typeof edition !== "object" || !("public_id" in edition) || edition.public_id !== input.examEditionPublicId;
+    })) throw new ProductBindingReviewError("A rejeição exige a edição exata do vínculo; não use uma edição presumida.");
     const includesOwnProposal = dossiers.some((d) => d.proposedByUserId === actor.id);
     const reviewerAllowed = dossiers.every((d) => canReviewEditorialSubmission({
       initiatorUserId: d.proposedByUserId, reviewerUserId: actor.id, reviewerEmail: actor.email,
@@ -136,32 +141,37 @@ export async function reviewProductQuestionBindings(db: Db, request: {
     if (!reviewerAllowed || (includesOwnProposal && input.ownerOverride !== true) || (!includesOwnProposal && input.ownerOverride === true)) {
       throw new ProductBindingReviewError("Proposta própria exige a conta proprietária configurada e exceção explícita; os demais casos exigem revisão independente.");
     }
+    const approved = input.decision === "approve";
     const updated = await transaction.execute<{ id: string }>(sql`
-      update public.contest_product_question_bindings set status='approved', reviewed_by_user_id=${actor.id},
+      update public.contest_product_question_bindings set status=${approved ? "approved" : "rejected"}, reviewed_by_user_id=${actor.id},
         reviewed_at=clock_timestamp(), review_notes=${input.notes}, updated_at=clock_timestamp()
       where id=any(${idsSql(input.bindingIds)}) and product_slug=${input.productSlug} and status='pending_review'
         and opportunity_id in (select id from contest_opportunities where public_id=${input.opportunityPublicId})
       returning id
     `);
     if (updated.length !== input.bindingIds.length) throw new ProductBindingReviewError("O lote mudou durante a decisão; a transação será revertida.");
-    const validations = await transaction.execute<{ id: string; valid: boolean }>(sql`${candidateCte(input, false, actor.id)}
+    const validations = approved ? await transaction.execute<{ id: string; valid: boolean }>(sql`${candidateCte(input, false, actor.id)}
       select candidate.id, ${approvedProductQuestionExists(sql`candidate.product_slug`, sql`candidate.question_id`, sql`candidate.opportunity_id`)} as valid
       from contest_product_question_bindings candidate order by candidate.id
+    `) : await transaction.execute<{ id: string; valid: boolean }>(sql`
+      select id, status='rejected' as valid from public.contest_product_question_bindings
+      where id=any(${idsSql(input.bindingIds)}) order by id
     `);
     if (validations.length !== input.bindingIds.length || validations.some((row) => !row.valid)) {
       throw new ProductBindingReviewError("A regra de acesso rejeitou o vínculo; nenhuma decisão será persistida.");
     }
     await transaction.insert(schema.auditLogs).values(dossiers.map((dossier) => ({
-      actorUserId: actor.id, action: "editorial.product_binding.approved", entityType: "contest_product_question_binding",
+      actorUserId: actor.id, action: approved ? "editorial.product_binding.approved" : "editorial.product_binding.rejected", entityType: "contest_product_question_binding",
       entityId: dossier.bindingId, metadata: { productSlug: input.productSlug, opportunityPublicId: input.opportunityPublicId,
         examEditionPublicId: input.examEditionPublicId,
-        dossierFingerprint: fingerprint, selectedBindingIds: [...input.bindingIds].sort(), notes: input.notes,
+        dossierFingerprint: fingerprint, selectedBindingIds: [...input.bindingIds].sort(), notes: input.notes, decision: input.decision,
         confirmations: input.confirmations, humanReviewRecorded: true,
         approvalBasis: dossier.proposedByUserId === actor.id ? "owner_self_review" : "independent_review",
         ownerOverride: dossier.proposedByUserId === actor.id && input.ownerOverride === true,
         productReleased: false, checkoutEnabled: false },
     })));
-    return { mode: "apply" as const, fingerprint, total: dossiers.length, approved: updated.length,
+    return { mode: "apply" as const, fingerprint, total: dossiers.length, approved: approved ? updated.length : 0,
+      rejected: approved ? 0 : updated.length,
       productReleased: false as const, checkoutEnabled: false as const };
   }, request.mode === "preview" ? { isolationLevel: "repeatable read", accessMode: "read only" } : { isolationLevel: "serializable" });
 }

@@ -1,0 +1,2 @@
+# O espaço em linhas vazias de contexto faz parte do formato unified diff.
+patches/*.patch whitespace=-blank-at-eol

@@ -3,6 +3,7 @@
 begin;
 
 grant execute on function public.lock_editorial_approval_context(bigint[]) to :app_user;
+grant execute on function public.lock_product_binding_review_product(text) to :app_user;
 
 alter default privileges in schema public revoke all privileges on tables from :app_user;
 alter default privileges in schema public revoke all privileges on sequences from :app_user;
@@ -47,8 +48,12 @@ to :app_user;
 -- Pedidos avulsos só são atendidos por rotas autenticadas e webhook assinado.
 grant select, insert, update on contest_orders, contest_purchases, contest_billing_invoices to :app_user;
 
--- O aplicativo/importador só propõe vínculos. Não possui grant para aprová-los,
--- modificar evidências ou apagar histórico. Uma futura decisão exige fluxo próprio.
+-- Confirmações de compra: fila mutável, histórico append-only e sem DELETE.
+grant select, insert, update on purchase_delivery_outbox to :app_user;
+grant select, insert on purchase_delivery_events to :app_user;
+
+-- O formulário administrativo registra apenas a decisão humana da proposta exata.
+-- Evidências e identidade do vínculo continuam imutáveis pelo papel do aplicativo.
 grant select on contest_product_question_bindings to :app_user;
 grant insert (
   id, product_slug, opportunity_id, requirement_id, question_id,
@@ -56,6 +61,9 @@ grant insert (
   legal_article_id, legal_version_id, legal_version_checksum, question_updated_at,
   requirement_text, source_locator, requirement_quote, legal_quote, scope_notes,
   evidence, proposed_by_user_id
+) on contest_product_question_bindings to :app_user;
+grant update (
+  status, reviewed_by_user_id, reviewed_at, review_notes, updated_at
 ) on contest_product_question_bindings to :app_user;
 
 grant select (

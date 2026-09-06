@@ -1,10 +1,10 @@
-import { and, eq, inArray } from "drizzle-orm";
 import { NextRequest } from "next/server";
 
 import { processStripeEvent } from "@/app/api/stripe/webhook/process";
 import { getDb } from "@/lib/db/client";
 import { stripeEvents } from "@/lib/db/schema";
 import { processMasterStripeEvent } from "@/lib/stripe/master-subscription";
+import { withTrackedContestStripeEvent } from "@/lib/commerce/webhook-transaction";
 import {
   getStripeClient,
   getStripeWebhookConfiguration,
@@ -74,8 +74,7 @@ export async function POST(request: NextRequest) {
     })
     .onConflictDoNothing();
 
-  // Master conclui evento e direitos na mesma transação. O claim legado abaixo
-  // permanece reservado aos concursos e não bloqueia recuperar um Master interrompido.
+  // O Master mantém sua unidade própria; não é executado dentro da tx dos concursos.
   try {
     if (await processMasterStripeEvent(event, { trackEvent: true })) {
       return Response.json({ received: true });
@@ -84,47 +83,12 @@ export async function POST(request: NextRequest) {
     return Response.json({ error: "Falha ao reconciliar o pagamento Master." }, { status: 500 });
   }
 
-  const [claimed] = await db
-    .update(stripeEvents)
-    .set({ status: "processing", errorMessage: null })
-    .where(
-      and(
-        eq(stripeEvents.eventId, event.id),
-        inArray(stripeEvents.status, ["received", "failed"]),
-      ),
-    )
-    .returning({ eventId: stripeEvents.eventId });
-
-  if (!claimed) {
-    const [storedEvent] = await db
-      .select({ status: stripeEvents.status })
-      .from(stripeEvents)
-      .where(eq(stripeEvents.eventId, event.id))
-      .limit(1);
-
-    if (storedEvent?.status === "processed") {
-      return Response.json({ received: true, duplicate: true });
-    }
-
-    return Response.json({ error: "Evento já está em processamento." }, { status: 409 });
-  }
-
   try {
-    await processStripeEvent(event);
-    await db
-      .update(stripeEvents)
-      .set({ status: "processed", processedAt: new Date(), errorMessage: null })
-      .where(eq(stripeEvents.eventId, event.id));
-
-    return Response.json({ received: true });
-  } catch (error) {
-    const message = error instanceof Error ? error.message.slice(0, 2_000) : "Falha desconhecida.";
-
-    await db
-      .update(stripeEvents)
-      .set({ status: "failed", errorMessage: message })
-      .where(eq(stripeEvents.eventId, event.id));
-
+    const result = await withTrackedContestStripeEvent(event, (tx) => processStripeEvent(event, tx));
+    return Response.json({ received: true, ...(result.duplicate ? { duplicate: true } : {}) });
+  } catch {
+    // Rollback preserva o estado anterior. Não gravar failed fora da tx: uma
+    // execução que perdeu a conexão não pode sobrescrever um retry já concluído.
     return Response.json({ error: "Falha ao processar o evento." }, { status: 500 });
   }
 }

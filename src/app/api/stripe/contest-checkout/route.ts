@@ -10,6 +10,7 @@ import {
 import { getContestAccessOption } from "@/lib/commerce/catalog";
 import { contestCartSchema } from "@/lib/commerce/order-policy";
 import { listReleasedContestProducts } from "@/lib/commerce/store";
+import { contestCheckoutSessionResponse } from "@/lib/commerce/checkout-session-response";
 import {
   getCheckoutAvailability,
   getPublicOrigin,
@@ -24,6 +25,10 @@ import {
   CONTEST_SUBSCRIPTION_COMMERCE,
   contestRecurringPriceMatches,
 } from "@/lib/commerce/subscription-policy";
+import {
+  expireContestCheckoutSnapshot, findRecoverableContestSession, markContestCreationStarted,
+  originalContestCheckoutExpiry, persistContestCheckoutSession, validateContestCheckoutSession,
+} from "@/lib/commerce/contest-checkout-recovery";
 
 export const runtime = "nodejs";
 export async function POST(request: NextRequest) {
@@ -142,6 +147,7 @@ export async function POST(request: NextRequest) {
         amountCents: total,
         lines,
         stripeMode: expectedLive ? "live" : "test",
+        checkoutUiMode: "elements",
       })
       .onConflictDoNothing();
     const [created] = await tx
@@ -174,27 +180,34 @@ export async function POST(request: NextRequest) {
     );
   try {
     const stripe = getStripeClient();
-    if (order.stripeSessionId) {
-      const session = await stripe.checkout.sessions.retrieve(
-        order.stripeSessionId,
-      );
-      if (session.status === "open" && session.url)
-        return Response.json({ url: session.url });
-      if (session.status === "expired")
-        await db
-          .update(contestOrders)
-          .set({ status: "expired", updatedAt: new Date() })
-          .where(
-            and(
-              eq(contestOrders.id, order.id),
-              inArray(contestOrders.status, ["created", "pending"]),
-            ),
-          );
-      return error(
-        "Esta sessão foi encerrada. Consulte seus acessos ou inicie outra tentativa.",
-        409,
-      );
+    if (order.stripeMode !== (expectedLive ? "live" : "test"))
+      return error("O ambiente do pedido diverge do pagamento configurado.", 409);
+    if (order.stripeSessionId || order.stripeCreationStartedAt) {
+      const session = await findRecoverableContestSession(stripe.checkout.sessions, order, user.publicId);
+      if (session) {
+        if (session.status === "complete")
+          return error("O pagamento já foi concluído. Aguarde a confirmação; não refaça a compra.", 409);
+        const continuation = contestCheckoutSessionResponse(session, order.id);
+        if (continuation) {
+          if (!await persistContestCheckoutSession(db, order, session.id))
+            return error("O estado do pedido mudou. Confira Meus concursos antes de continuar.", 409);
+          return Response.json(continuation, { headers: { "Cache-Control": "no-store" } });
+        }
+        if (session.status === "expired")
+          await expireContestCheckoutSnapshot(db, order, "stripe_expired");
+        return error(
+          "Esta sessão foi encerrada. Consulte seus acessos ou inicie outra tentativa.",
+          409,
+        );
+      }
+      if (Math.floor(Date.now() / 1000) >= originalContestCheckoutExpiry(order)) {
+        if (!await expireContestCheckoutSnapshot(db, order, "original_expiry"))
+          return error("O estado do pedido mudou. Confira Meus concursos antes de continuar.", 409);
+        return error("A tentativa original expirou. Confira Meus concursos e monte outra seleção.", 409);
+      }
     }
+    if (Math.floor(Date.now() / 1000) >= originalContestCheckoutExpiry(order))
+      return error("A tentativa original expirou. Cancele-a em Meus concursos antes de montar outra seleção.", 409);
     for (const line of lines) {
       const price = await stripe.prices.retrieve(line.stripePriceId);
       const product = released.find((item) => item.slug === line.productSlug)!;
@@ -213,16 +226,19 @@ export async function POST(request: NextRequest) {
       order_id: order.id,
       user_public_id: user.publicId,
     };
-    const customerId = await getOrCreateStripeCustomer(stripe, user);
-    await db
-      .update(contestOrders)
-      .set({ stripeCustomerId: customerId, updatedAt: new Date() })
-      .where(eq(contestOrders.id, order.id));
+    const customerId = order.stripeCustomerId ?? await getOrCreateStripeCustomer(stripe, user);
+    // Este CAS compete com o cancelamento sem sessão. Quem perdeu não chama sessions.create.
+    if (!await markContestCreationStarted(db, order, customerId))
+      return error("O estado do pedido mudou. Atualize Meus concursos antes de continuar.", 409);
     const origin = getPublicOrigin(request);
+    const urls = order.checkoutUiMode === "hosted" ? {
+      success_url: `${origin}/app/compras?pedido=${order.id}`,
+      cancel_url: `${origin}/checkout/concurso/${lines[0].productSlug}?acesso=${lines[0].accessKey}`,
+    } : { return_url: `${origin}/app/compras?pedido=${order.id}&session_id={CHECKOUT_SESSION_ID}` };
     const session = await stripe.checkout.sessions.create(
       {
         mode: "subscription",
-        ui_mode: "hosted",
+        ui_mode: order.checkoutUiMode as "hosted" | "elements",
         customer: customerId,
         payment_method_types: ["card"],
         client_reference_id: user.publicId,
@@ -233,27 +249,17 @@ export async function POST(request: NextRequest) {
           price: line.stripePriceId,
           quantity: 1,
         })),
-        success_url: `${origin}/app/compras?pedido=${order.id}`,
-        cancel_url: `${origin}/checkout/concurso/${lines[0].productSlug}?acesso=${lines[0].accessKey}`,
-        expires_at: Math.floor(order.createdAt.getTime() / 1000) + 3600,
+        ...urls,
+        expires_at: originalContestCheckoutExpiry(order),
       },
       { idempotencyKey: `contest-subscription:${order.id}` },
     );
-    await db
-      .update(contestOrders)
-      .set({
-        stripeSessionId: session.id,
-        status: "pending",
-        updatedAt: new Date(),
-      })
-      .where(
-        and(
-          eq(contestOrders.id, order.id),
-          eq(contestOrders.status, "created"),
-        ),
-      );
-    if (!session.url) return error("Não foi possível abrir o pagamento.", 502);
-    return Response.json({ url: session.url });
+    validateContestCheckoutSession({ ...order, stripeCustomerId: customerId }, user.publicId, session);
+    if (!await persistContestCheckoutSession(db, { ...order, stripeCustomerId: customerId }, session.id))
+      return error("O estado do pagamento mudou. Confira Meus concursos; não refaça a compra.", 409);
+    const continuation = contestCheckoutSessionResponse(session, order.id);
+    if (!continuation) return error("Não foi possível abrir o pagamento.", 502);
+    return Response.json(continuation, { headers: { "Cache-Control": "no-store" } });
   } catch {
     return error(
       "Não foi possível iniciar o pagamento. Tente novamente sem alterar a seleção.",

@@ -1,11 +1,12 @@
 "use server";
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requireUser } from "@/lib/auth";
 import { getDb } from "@/lib/db/client";
 import { contestOrders } from "@/lib/db/schema";
 import { getStripeClient } from "@/lib/stripe";
+import { cancelRecoverableContestOrder } from "@/lib/commerce/contest-checkout-recovery";
 
 export async function cancelContestOrderAction(
   previous: { message: string },
@@ -24,37 +25,18 @@ export async function cancelContestOrderAction(
     .limit(1);
   if (
     !order ||
-    !order.stripeSessionId ||
     !["created", "pending"].includes(order.status)
   )
     return { message: "Este pedido não tem pagamento pendente cancelável." };
   try {
-    const stripe = getStripeClient();
-    const session = await stripe.checkout.sessions.retrieve(
-      order.stripeSessionId,
-    );
-    if (
-      session.metadata?.order_id !== order.id ||
-      session.client_reference_id !== user.publicId
-    )
-      return { message: "Identidade do pedido divergente." };
-    if (session.status === "complete")
+    const result = await cancelRecoverableContestOrder(getDb(), () => getStripeClient().checkout.sessions, order, user.publicId);
+    if (result === "completed")
       return {
         message:
           "O pagamento já foi concluído. Aguarde a confirmação; não refaça a compra.",
       };
-    if (session.status === "open")
-      await stripe.checkout.sessions.expire(session.id);
-    await getDb()
-      .update(contestOrders)
-      .set({ status: "expired", updatedAt: new Date() })
-      .where(
-        and(
-          eq(contestOrders.id, order.id),
-          eq(contestOrders.userId, user.id),
-          inArray(contestOrders.status, ["created", "pending"]),
-        ),
-      );
+    if (result === "wait") return { message: "A criação do pagamento ainda está em recuperação. Retome a mesma seleção ou aguarde até uma hora da tentativa inicial; ainda não foi cancelada." };
+    if (result === "conflict") return { message: "O estado do pedido mudou. Atualize Meus concursos antes de tentar outra compra." };
     revalidatePath("/app/compras");
     return {
       message: "Pagamento pendente cancelado. Você pode montar outra seleção.",

@@ -239,6 +239,27 @@
       "when": 1788661476686,
       "tag": "0033_product_question_curation",
       "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1788719153099,
+      "tag": "0034_purchase_delivery_outbox",
+      "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "7",
+      "when": 1788719875354,
+      "tag": "0035_contest_checkout_recovery",
+      "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1788719945570,
+      "tag": "0036_product_binding_review_lock",
+      "breakpoints": true
     }
   ]
 }

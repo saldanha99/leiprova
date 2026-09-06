@@ -28,6 +28,7 @@
     "editorial:scoped:verify": "tsx --env-file-if-exists=.env scripts/validate-scoped-authoring.ts",
     "stripe:inventory": "tsx --env-file-if-exists=.env scripts/inventory-stripe-catalog.ts",
     "stripe:catalog": "tsx --env-file-if-exists=.env scripts/sync-contest-stripe.ts",
+    "delivery:run": "NODE_PATH=./node_modules/next/dist/compiled node --conditions=react-server --import tsx --env-file-if-exists=.env scripts/run-purchase-delivery.ts",
     "db:seed": "tsx --env-file-if-exists=.env scripts/seed.ts",
     "admin:bootstrap": "tsx --env-file-if-exists=.env scripts/bootstrap-admin.ts"
   },

@@ -599,6 +599,28 @@
   padding-top: 22px;
   border-top: 1px solid #d5d6c3;
 }
+.paymentSection {
+  margin-top: 26px;
+  padding-top: 23px;
+  border-top: 1px solid #d5d6c3;
+}
+.paymentSection h3 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 25px;
+  line-height: 1.2;
+  letter-spacing: -0.035em;
+}
+.paymentSection > p,
+.paymentNote {
+  margin: 12px 0 20px;
+  color: #586548;
+  font-size: 12px;
+  line-height: 1.8;
+}
+.paymentNote a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
 .paymentTrust svg {
   flex-shrink: 0;
   color: #49613c;

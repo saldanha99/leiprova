@@ -1,7 +1,6 @@
 import "server-only";
 import { eq, sql } from "drizzle-orm";
 import type Stripe from "stripe";
-import { getDb } from "@/lib/db/client";
 import {
   contestOrders,
   contestPurchases,
@@ -15,13 +14,20 @@ import {
   paidContestInvoicePeriod,
   validateContestSubscription,
 } from "./subscription-policy";
+import { readDuringCommerceTransaction, withCommerceTransaction, type CommerceTransaction } from "./webhook-transaction";
+import { enqueuePurchaseDelivery } from "./purchase-delivery";
+
+const requestOptions: Stripe.RequestOptions = { timeout: 8_000, maxNetworkRetries: 1 };
 
 // A data do evento nunca estende acesso. O período vem da fatura paga e da Stripe atual.
 export async function reconcileContestSubscription(
   subscriptionId: string,
   orderId: string,
+  transaction?: CommerceTransaction,
 ) {
-  await getDb().transaction(async (tx) => {
+  await withCommerceTransaction(transaction, async (tx) => {
+    await tx.execute(sql`set local idle_in_transaction_session_timeout = '60s'`);
+    await tx.execute(sql`set local lock_timeout = '8s'`);
     await tx.execute(
       sql`select id from ${contestOrders} where id=${orderId} for update`,
     );
@@ -34,7 +40,8 @@ export async function reconcileContestSubscription(
     const { order } = row;
     const stripe = getStripeClient();
     // Busca feita sob o lock: eventos antigos e concorrentes veem o estado atual.
-    const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+    const subscription = await readDuringCommerceTransaction(tx, () =>
+      stripe.subscriptions.retrieve(subscriptionId, {}, requestOptions));
     validateContestSubscription(
       {
         orderId,
@@ -70,15 +77,16 @@ export async function reconcileContestSubscription(
     if (subscription.status !== "active") return;
     const invoiceId = objectId(subscription.latest_invoice);
     if (!invoiceId) return;
-    const invoice = await stripe.invoices.retrieve(invoiceId);
+    const invoice = await readDuringCommerceTransaction(tx, () =>
+      stripe.invoices.retrieve(invoiceId, {}, requestOptions));
     const period = paidContestInvoicePeriod(invoice, subscription, order.lines);
     if (!period) return;
     if (order.paidThrough && period.end < order.paidThrough) return;
-    const payments = await stripe.invoicePayments.list({
+    const payments = await readDuringCommerceTransaction(tx, () => stripe.invoicePayments.list({
       invoice: invoice.id,
       status: "paid",
       limit: 10,
-    });
+    }, requestOptions));
     const payment = payments.data[0];
     const intentId =
       payment?.payment.type === "payment_intent"
@@ -96,9 +104,9 @@ export async function reconcileContestSubscription(
       throw new Error(
         "Confirmação financeira da fatura de concurso divergente.",
       );
-    const intent = await stripe.paymentIntents.retrieve(intentId, {
+    const intent = await readDuringCommerceTransaction(tx, () => stripe.paymentIntents.retrieve(intentId, {
       expand: ["latest_charge"],
-    });
+    }, requestOptions));
     const charge =
       typeof intent.latest_charge === "object" ? intent.latest_charge : null;
     if (
@@ -178,11 +186,17 @@ export async function reconcileContestSubscription(
             updatedAt: new Date(),
           },
         });
+      await enqueuePurchaseDelivery(tx, {
+        userId: order.userId,
+        scope: "contest",
+        purchaseId: order.id,
+        productSlug: line.productSlug,
+      });
     }
   });
 }
 
-async function processRecurringReversal(event: Stripe.Event) {
+async function processRecurringReversal(event: Stripe.Event, transaction: CommerceTransaction) {
   if (
     event.type !== "charge.refunded" &&
     event.type !== "charge.dispute.created"
@@ -190,12 +204,12 @@ async function processRecurringReversal(event: Stripe.Event) {
     return false;
   const intentId = objectId(event.data.object.payment_intent);
   if (!intentId) return false;
-  const [invoice] = await getDb()
+  const [invoice] = await transaction
     .select()
     .from(contestBillingInvoices)
     .where(eq(contestBillingInvoices.paymentIntentId, intentId));
   if (!invoice) return false;
-  await getDb().transaction(async (tx) => {
+  await withCommerceTransaction(transaction, async (tx) => {
     await tx.execute(
       sql`select id from ${contestOrders} where id=${invoice.orderId} for update`,
     );
@@ -227,14 +241,17 @@ async function processRecurringReversal(event: Stripe.Event) {
 
 export async function processContestSubscriptionEvent(
   event: Stripe.Event,
+  transaction?: CommerceTransaction,
 ): Promise<boolean> {
-  if (await processRecurringReversal(event)) return true;
+  if (event.account) return false;
+  if (!transaction) return withCommerceTransaction(undefined, (tx) => processContestSubscriptionEvent(event, tx));
+  if (await processRecurringReversal(event, transaction)) return true;
   if (event.type.startsWith("checkout.session.")) {
     const session = event.data.object as Stripe.Checkout.Session;
     if (!isContestSubscriptionMetadata(session.metadata)) return false;
     const orderId = session.metadata?.order_id;
     if (!orderId) throw new Error("Checkout recorrente sem pedido.");
-    await getDb().transaction(async (tx) => {
+    await withCommerceTransaction(transaction, async (tx) => {
       await tx.execute(
         sql`select id from ${contestOrders} where id=${orderId} for update`,
       );
@@ -273,7 +290,7 @@ export async function processContestSubscriptionEvent(
       }
     });
     const subId = objectId(session.subscription);
-    if (subId) await reconcileContestSubscription(subId, orderId);
+    if (subId) await reconcileContestSubscription(subId, orderId, transaction);
     return true;
   }
   let subscriptionId: string | null = null;
@@ -290,13 +307,13 @@ export async function processContestSubscriptionEvent(
     metadata = invoice.parent?.subscription_details?.metadata;
   } else return false;
   if (!subscriptionId) return false;
-  const [known] = await getDb()
+  const [known] = await transaction
     .select({ id: contestOrders.id })
     .from(contestOrders)
     .where(eq(contestOrders.stripeSubscriptionId, subscriptionId));
   if (!known && !isContestSubscriptionMetadata(metadata)) return false;
   const orderId = known?.id ?? metadata?.order_id;
   if (!orderId) throw new Error("Evento de assinatura sem pedido de concurso.");
-  await reconcileContestSubscription(subscriptionId, orderId);
+  await reconcileContestSubscription(subscriptionId, orderId, transaction);
   return true;
 }

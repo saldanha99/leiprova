@@ -3,7 +3,8 @@ import "server-only";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import type Stripe from "stripe";
 import { normalizeSubscriptionStatus, objectId, parsePositiveInteger } from "@/app/api/stripe/webhook/mapping";
-import { sendPurchaseAccessEmail } from "@/lib/account-access";
+import { enqueuePurchaseDelivery } from "@/lib/commerce/purchase-delivery";
+import { readDuringCommerceTransaction, withCommerceTransaction } from "@/lib/commerce/webhook-transaction";
 import { getDb } from "@/lib/db/client";
 import { checkoutAttempts, contestBillingInvoices, contestOrders, plans, stripeEvents, subscriptions, users } from "@/lib/db/schema";
 import { getStripeClient } from "@/lib/stripe";
@@ -46,7 +47,7 @@ async function reconcileMasterSubscription(subscriptionId: string, live: boolean
   event?: Stripe.Event;
 } = {}) {
   const stripe = getStripeClient();
-  const confirmation = await getDb().transaction(async (tx) => {
+  await withCommerceTransaction(undefined, async (tx) => {
     // Um único lock, sempre antes de ler a Stripe: eventos concorrentes não reaplicam snapshots antigos.
     // Todas as consultas locais abaixo usam tx, sem pedir outra conexão enquanto a primeira está ocupada.
     await tx.execute(sql`set local idle_in_transaction_session_timeout = '60s'`);
@@ -59,7 +60,7 @@ async function reconcileMasterSubscription(subscriptionId: string, live: boolean
       // Recuperação segura: todos os direitos e a conclusão usam a mesma transação.
       await tx.update(stripeEvents).set({ status: "processing", errorMessage: null }).where(eq(stripeEvents.eventId, options.event.id));
     }
-    const current = await stripe.subscriptions.retrieve(subscriptionId, {}, requestOptions);
+    const current = await readDuringCommerceTransaction(tx, () => stripe.subscriptions.retrieve(subscriptionId, {}, requestOptions));
     if (!isMasterMetadata(current.metadata) || !current.metadata.checkout_attempt_id) {
       throw new Error("Assinatura Master sem tentativa local; reconciliação assistida necessária.");
     }
@@ -83,7 +84,7 @@ async function reconcileMasterSubscription(subscriptionId: string, live: boolean
     const sessionId = context.attempt.providerSessionId ?? existing?.providerCheckoutSessionId ?? options.session?.id;
     if (!sessionId) throw new Error("Checkout Master ainda não persistido. Reenvie o evento.");
     // Reconsulta sob o lock; o snapshot recebido não pode trocar a titularidade.
-    const currentSession = await stripe.checkout.sessions.retrieve(sessionId, {}, requestOptions);
+    const currentSession = await readDuringCommerceTransaction(tx, () => stripe.checkout.sessions.retrieve(sessionId, {}, requestOptions));
     validateSession(currentSession, identity, sessionId);
     if (options.session) validateSession(options.session, identity, sessionId);
     if (options.reversedInvoice && (objectId(options.reversedInvoice.customer) !== identity.customerId ||
@@ -99,20 +100,20 @@ async function reconcileMasterSubscription(subscriptionId: string, live: boolean
     const invoiceId = objectId(current.latest_invoice);
     if (current.status === "active" && invoiceId) {
       {
-        const invoice = await stripe.invoices.retrieve(invoiceId, {}, requestOptions);
+        const invoice = await readDuringCommerceTransaction(tx, () => stripe.invoices.retrieve(invoiceId, {}, requestOptions));
         if (invoice.id !== invoiceId || invoice.livemode !== live || objectId(invoice.customer) !== identity.customerId ||
           objectId(invoice.parent?.subscription_details?.subscription) !== subscriptionId) {
           throw new Error("Vínculo da fatura Master divergente.");
         }
         if (invoice.status === "paid") {
-          const payments = await stripe.invoicePayments.list({ invoice: invoiceId, status: "paid", limit: 10 }, requestOptions);
+          const payments = await readDuringCommerceTransaction(tx, () => stripe.invoicePayments.list({ invoice: invoiceId, status: "paid", limit: 10 }, requestOptions));
           const intentId = masterInvoicePaymentIntent(payments, invoice, live);
-          const intent = await stripe.paymentIntents.retrieve(intentId, { expand: ["latest_charge"] }, requestOptions);
+          const intent = await readDuringCommerceTransaction(tx, () => stripe.paymentIntents.retrieve(intentId, { expand: ["latest_charge"] }, requestOptions));
           if (intent.id !== intentId) throw new Error("Pagamento Master divergente.");
           // Estorno é conferido antes dos valores: nota de crédito não pode impedir a revogação.
           let reversal = masterPaymentReversal(intent, invoice, identity);
           if (reversal === "disputed" || (options.disputeId && options.reversedInvoice?.id === invoiceId)) {
-            const disputes = await stripe.disputes.list({ charge: objectId(intent.latest_charge)!, limit: 100 }, requestOptions);
+            const disputes = await readDuringCommerceTransaction(tx, () => stripe.disputes.list({ charge: objectId(intent.latest_charge)!, limit: 100 }, requestOptions));
             const blocked = masterDisputesBlockAccess(disputes, intent, live);
             if (options.disputeId && options.reversedInvoice?.id === invoiceId && !disputes.data.some((row) => row.id === options.disputeId)) throw new Error("Disputa Master recebida não confere com a cobrança.");
             if (reversal !== "refunded") reversal = blocked ? "disputed" : null;
@@ -144,15 +145,11 @@ async function reconcileMasterSubscription(subscriptionId: string, live: boolean
     if (paid) await tx.update(checkoutAttempts).set({
       status: "completed", providerSessionId: sessionId, updatedAt: new Date(),
     }).where(eq(checkoutAttempts.id, context.attempt.id));
+    if (paid) await enqueuePurchaseDelivery(tx, {
+      userId: context.user.id, scope: "master", purchaseId: context.attempt.id, productSlug: context.plan.slug,
+    });
     if (options.event) await tx.update(stripeEvents).set({ status: "processed", processedAt: new Date(), errorMessage: null }).where(eq(stripeEvents.eventId, options.event.id));
-    return paid && context.attempt.status !== "completed" ? {
-      userId: context.user.id, checkoutAttemptId: context.attempt.id,
-    } : null;
   });
-  if (confirmation) {
-    try { await sendPurchaseAccessEmail(confirmation); }
-    catch { console.error("master_purchase_notification_failed", { checkoutAttemptId: confirmation.checkoutAttemptId }); }
-  }
 }
 
 async function processMasterReversal(event: Stripe.Event, trackEvent: boolean) {

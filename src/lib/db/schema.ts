@@ -95,6 +95,8 @@ export const contestOrders = pgTable(
     amountCents: integer("amount_cents").notNull(),
     lines: jsonb("lines").$type<ContestOrderLine[]>().notNull(),
     stripeSessionId: text("stripe_session_id").unique(),
+    checkoutUiMode: text("checkout_ui_mode").notNull().default("hosted"),
+    stripeCreationStartedAt: timestamp("stripe_creation_started_at", { withTimezone: true }),
     stripePaymentIntentId: text("stripe_payment_intent_id").unique(),
     stripeSubscriptionId: text("stripe_subscription_id").unique(),
     stripeCustomerId: text("stripe_customer_id"),
@@ -118,6 +120,7 @@ export const contestOrders = pgTable(
       "contest_orders_mode_check",
       sql`${table.stripeMode} in ('test','live')`,
     ),
+    check("contest_orders_ui_mode_check", sql`${table.checkoutUiMode} in ('hosted','elements')`),
     check(
       "contest_orders_lines_check",
       sql`jsonb_typeof(${table.lines}) = 'array' and jsonb_array_length(${table.lines}) between 1 and 3`,
@@ -3015,6 +3018,7 @@ export const contactMessages = pgTable(
 );
 
 export type User = typeof users.$inferSelect;
+export { purchaseDeliveryOutbox, purchaseDeliveryEvents } from "./purchase-delivery-schema";
 export type NewUser = typeof users.$inferInsert;
 export type Question = typeof questions.$inferSelect;
 export type QuestionOption = typeof questionOptions.$inferSelect;

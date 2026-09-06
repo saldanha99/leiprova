@@ -9,6 +9,7 @@ export const productBindingReviewSchema = z.object({
   examEditionPublicId: z.uuid(),
   bindingIds: z.array(sha).min(1).max(250),
   notes: z.string().trim().min(20).max(2_000),
+  decision: z.enum(["approve", "reject"]).default("approve"),
   confirmations: z.object({ edition: z.boolean(), program: z.boolean(), adherence: z.boolean() }).strict(),
   ownerOverride: z.boolean().optional(),
 }).strict().superRefine((value, context) => {
@@ -44,7 +45,7 @@ export function productBindingReviewFingerprint(input: ProductBindingReviewInput
     purpose: "product-binding-human-review-v1", productSlug: input.productSlug,
     opportunityPublicId: input.opportunityPublicId, examEditionPublicId: input.examEditionPublicId,
     bindingIds: [...input.bindingIds].sort(),
-    notes: input.notes, actor, dossiers: [...dossiers].sort((a, b) => a.bindingId.localeCompare(b.bindingId)),
+    notes: input.notes, decision: input.decision, actor, dossiers: [...dossiers].sort((a, b) => a.bindingId.localeCompare(b.bindingId)),
   }))).digest("hex");
 }
 
@@ -67,7 +68,7 @@ export function assertProductBindingReviewDecision(input: ProductBindingReviewIn
   if (!sha.safeParse(expectedFingerprint).success || expectedFingerprint !== fingerprint) {
     throw new ProductBindingReviewError("Dossiê, operador ou nota mudou; faça novo preview e confira sua impressão digital.");
   }
-  if (dossiers.some((d) => d.bindingStatus !== "pending_review" || !d.eligible)) {
+  if (dossiers.some((d) => d.bindingStatus !== "pending_review" || (input.decision === "approve" && !d.eligible))) {
     throw new ProductBindingReviewError("Há vínculo decidido, desatualizado ou contexto editorial incompatível. Nenhuma aprovação implícita é permitida.");
   }
 }

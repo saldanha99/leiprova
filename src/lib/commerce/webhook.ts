@@ -1,15 +1,21 @@
 import "server-only";
 import { eq, sql } from "drizzle-orm";
 import type Stripe from "stripe";
-import { getDb } from "@/lib/db/client";
 import { contestOrders, contestPurchases, users } from "@/lib/db/schema";
 import { getStripeClient } from "@/lib/stripe";
 import { accessEndsAt } from "./catalog";
 import { orderPaymentMatches } from "./order-policy";
+import { readDuringCommerceTransaction, withCommerceTransaction, type CommerceTransaction } from "./webhook-transaction";
+import { enqueuePurchaseDelivery } from "./purchase-delivery";
+
+const requestOptions: Stripe.RequestOptions = { timeout: 8_000, maxNetworkRetries: 1 };
 
 export async function processContestStripeEvent(
   event: Stripe.Event,
+  transaction?: CommerceTransaction,
 ): Promise<boolean> {
+  if (event.account) return false;
+  if (!transaction) return withCommerceTransaction(undefined, (tx) => processContestStripeEvent(event, tx));
   if (
     event.type === "charge.refunded" ||
     event.type === "charge.dispute.created"
@@ -21,7 +27,7 @@ export async function processContestStripeEvent(
       typeof paymentIntent === "string" ? paymentIntent : paymentIntent?.id;
     if (!id) return false;
     const status = event.type === "charge.refunded" ? "refunded" : "disputed";
-    const updated = await getDb().transaction(async (tx) => {
+    const updated = await withCommerceTransaction(transaction, async (tx) => {
       const orders = await tx
         .update(contestOrders)
         .set({ status, updatedAt: new Date() })
@@ -63,17 +69,18 @@ export async function processContestStripeEvent(
   // Confere o estado atual, inclusive se o reembolso chegou antes do webhook de compra.
   if (paid) {
     if (!paymentIntentId) throw new Error("Pedido pago sem transação.");
-    const intent = await getStripeClient().paymentIntents.retrieve(
+    const intent = await readDuringCommerceTransaction(transaction, () => getStripeClient().paymentIntents.retrieve(
       paymentIntentId,
       { expand: ["latest_charge"] },
-    );
+      requestOptions,
+    ));
     const charge =
       typeof intent.latest_charge === "object" ? intent.latest_charge : null;
     if (!charge) throw new Error("Transação paga sem confirmação da cobrança.");
     if (charge.amount_refunded > 0) revokedStatus = "refunded";
     else if (charge.disputed) revokedStatus = "disputed";
   }
-  await getDb().transaction(async (tx) => {
+  await withCommerceTransaction(transaction, async (tx) => {
     await tx.execute(
       sql`select id from ${contestOrders} where id = ${orderId} for update`,
     );
@@ -92,7 +99,19 @@ export async function processContestStripeEvent(
       throw new Error("Identidade do pedido avulso divergente.");
     const { order } = row;
     if (["refunded", "disputed"].includes(order.status)) return;
-    if (order.status === "paid" && !revokedStatus) return;
+    if (order.status === "paid" && !revokedStatus) {
+      // Um retry legado pode encontrar os direitos já persistidos. A outbox
+      // valida esses direitos e deduplica a confirmação sem ampliar o acesso.
+      for (const line of order.lines) {
+        await enqueuePurchaseDelivery(tx, {
+          userId: order.userId,
+          scope: "contest",
+          purchaseId: order.id,
+          productSlug: line.productSlug,
+        });
+      }
+      return;
+    }
     if (
       paid &&
       !orderPaymentMatches({
@@ -135,7 +154,7 @@ export async function processContestStripeEvent(
     }
     if (!paid) return;
     const start = new Date(event.created * 1000);
-    for (const line of order.lines)
+    for (const line of order.lines) {
       await tx
         .insert(contestPurchases)
         .values({
@@ -148,6 +167,13 @@ export async function processContestStripeEvent(
           status: "active",
         })
         .onConflictDoNothing();
+      await enqueuePurchaseDelivery(tx, {
+        userId: order.userId,
+        scope: "contest",
+        purchaseId: order.id,
+        productSlug: line.productSlug,
+      });
+    }
   });
   return true;
 }

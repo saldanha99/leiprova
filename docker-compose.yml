@@ -139,6 +139,45 @@ services:
       - internal
       - edge
 
+  purchase-delivery:
+    build:
+      context: .
+      target: migrator
+    container_name: leiprova-purchase-delivery
+    restart: unless-stopped
+    init: true
+    user: "1000:1000"
+    cpus: 0.35
+    mem_limit: 384m
+    pids_limit: 64
+    stop_grace_period: 60s
+    command:
+      - sh
+      - -ec
+      - exec env NODE_PATH=./node_modules/next/dist/compiled node --conditions=react-server --import tsx --env-file-if-exists=.env scripts/run-purchase-delivery.ts --run --loop --limit=10
+    environment:
+      NODE_ENV: production
+      APP_URL: https://leiprova.2b.app.br
+      DATABASE_URL: postgresql://${APP_DB_USER:-leiprova_app}:${APP_DB_PASSWORD}@pooler:5432/${POSTGRES_DB:-leiprova}
+      DATABASE_POOL_SIZE: 2
+      PURCHASE_DELIVERY_ENABLED: ${PURCHASE_DELIVERY_ENABLED:-false}
+      TRANSACTIONAL_EMAIL_ENABLED: ${TRANSACTIONAL_EMAIL_ENABLED:-false}
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      TRANSACTIONAL_EMAIL_FROM: ${TRANSACTIONAL_EMAIL_FROM:-}
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    depends_on:
+      pooler:
+        condition: service_healthy
+    networks:
+      - internal
+      - edge
+
   migrate:
     build:
       context: .

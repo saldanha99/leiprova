@@ -5,6 +5,15 @@ import { describe, expect, it } from "vitest";
 const grants = readFileSync(new URL("../deploy/grant-app-role.sql", import.meta.url), "utf8");
 
 describe("privilégios do app em produção", () => {
+  it("preserva fila de entrega e limita a revisão ao vínculo exato", () => {
+    expect(grants).toContain("grant select, insert, update on purchase_delivery_outbox to :app_user;");
+    expect(grants).toContain("grant select, insert on purchase_delivery_events to :app_user;");
+    expect(grants).toContain("grant execute on function public.lock_product_binding_review_product(text) to :app_user;");
+    expect(grants).toMatch(/grant update \(\s*status, reviewed_by_user_id, reviewed_at, review_notes, updated_at\s*\) on contest_product_question_bindings to :app_user;/);
+    expect(grants).not.toMatch(/grant update[^;]*on contest_store_products to :app_user;/);
+    expect(grants).not.toMatch(/grant[^;]*delete[^;]*on purchase_delivery_(?:outbox|events)/);
+  });
+
   it("reaplica revogações e concessões de forma atômica", () => {
     expect(grants).toMatch(/\\set ON_ERROR_STOP on\s+begin;/);
     expect(grants.trimEnd()).toMatch(/commit;$/);

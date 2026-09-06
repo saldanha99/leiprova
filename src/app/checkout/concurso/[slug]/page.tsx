@@ -70,6 +70,7 @@ export default async function ContestCheckoutPage({
           related={related}
           initialAccess={access}
           available={available}
+          publishableKey={available ? process.env.STRIPE_PUBLISHABLE_KEY : undefined}
           supplierIdentity={<SupplierIdentityBlock />}
         />
       </div>

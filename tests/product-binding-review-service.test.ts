@@ -26,6 +26,7 @@ function fixture() {
       if (statement.includes("as dossier")) return [{ dossier: structuredClone(dossier) }];
       if (/^\s*update public.contest_product_question_bindings/u.test(statement)) return Array.from({ length: updatedCount }, () => ({ id: input.bindingIds[0] }));
       if (statement.includes("from contest_product_question_bindings candidate order by candidate.id")) return [{ id: input.bindingIds[0], valid }];
+      if (statement.includes("status='rejected' as valid")) return [{ id: input.bindingIds[0], valid }];
       return [];
     }),
     insert: vi.fn(() => ({ values: auditValues })),
@@ -62,6 +63,8 @@ describe("revisão de vínculos — serviço transacional sem banco", () => {
     expect(result.approved).toBe(1); expect(result.productReleased).toBe(false); expect(result.checkoutEnabled).toBe(false);
     expect(f.transact.mock.calls[1][1]).toEqual({ isolationLevel: "serializable" });
     expect(f.statements.some((s) => s.includes("lock_editorial_approval_context"))).toBe(true);
+    expect(f.statements.some((s) => s.includes("public.lock_product_binding_review_product"))).toBe(true);
+    expect(f.statements.some((s) => /from contest_store_products .*for update/u.test(s))).toBe(false);
     const writes = f.statements.filter((s) => /^\s*update /u.test(s));
     expect(writes).toHaveLength(1); expect(writes[0]).toContain("status='pending_review'");
     expect(writes[0]).not.toMatch(/clean_room|authorship|update questions|update contest_store_products/u);
@@ -109,6 +112,34 @@ describe("revisão de vínculos — serviço transacional sem banco", () => {
     const preview = await reviewProductQuestionBindings(f.db, { input, actorPublicId, mode: "preview" });
     expect(preview.mode === "preview" && preview.eligible).toBe(0);
     await expect(reviewProductQuestionBindings(f.db, { input, actorPublicId, mode: "apply", expectedFingerprint: preview.fingerprint })).rejects.toThrow("incompatível");
+    expect(f.auditValues).not.toHaveBeenCalled();
+  });
+  it("rejeita proposta inelegível sem alterar questão global e revalida a rejeição", async () => {
+    const f = fixture(); f.dossier.eligible = false;
+    f.dossier.snapshot.edition = { public_id: input.examEditionPublicId };
+    const rejecting = { ...input, decision: "reject" };
+    const preview = await reviewProductQuestionBindings(f.db, { input: rejecting, actorPublicId, mode: "preview" });
+    const result = await reviewProductQuestionBindings(f.db, { input: rejecting, actorPublicId, mode: "apply", expectedFingerprint: preview.fingerprint });
+    expect(result.approved).toBe(0);
+    expect(result.mode === "apply" && result.rejected).toBe(1);
+    expect(f.auditValues).toHaveBeenCalledWith(expect.arrayContaining([expect.objectContaining({ action: "editorial.product_binding.rejected" })]));
+    expect(f.statements.filter(s => /^\s*update /u.test(s))).toHaveLength(1);
+    expect(f.statements.at(-1)).toContain("status='rejected' as valid");
+  });
+  it("não troca aprovação por rejeição mantendo fingerprint nem rejeita outra edição", async () => {
+    const f = fixture(); f.dossier.snapshot.edition = { public_id: input.examEditionPublicId };
+    const preview = await reviewProductQuestionBindings(f.db, { input, actorPublicId, mode: "preview" });
+    await expect(reviewProductQuestionBindings(f.db, { input: { ...input, decision: "reject" }, actorPublicId, mode: "apply", expectedFingerprint: preview.fingerprint })).rejects.toThrow("preview");
+    f.dossier.snapshot.edition = null;
+    await expect(reviewProductQuestionBindings(f.db, { input: { ...input, decision: "reject" }, actorPublicId, mode: "preview" })).rejects.toThrow("edição exata");
+    expect(f.statements.some(s => /^\s*update /u.test(s))).toBe(false);
+  });
+  it("falha de revalidação de rejeição impede auditoria", async () => {
+    const f = fixture(); f.dossier.snapshot.edition = { public_id: input.examEditionPublicId };
+    const rejecting = { ...input, decision: "reject" };
+    const preview = await reviewProductQuestionBindings(f.db, { input: rejecting, actorPublicId, mode: "preview" });
+    f.setValid(false);
+    await expect(reviewProductQuestionBindings(f.db, { input: rejecting, actorPublicId, mode: "apply", expectedFingerprint: preview.fingerprint })).rejects.toThrow("persistida");
     expect(f.auditValues).not.toHaveBeenCalled();
   });
 });

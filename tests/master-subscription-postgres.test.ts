@@ -27,7 +27,7 @@ vi.mock("@/lib/stripe", () => ({ getStripeWebhookConfiguration: () => ({ secretK
   subscriptions: { retrieve: mocks.subscription }, invoices: { retrieve: mocks.invoice },
   invoicePayments: { list: mocks.payments }, paymentIntents: { retrieve: mocks.intent }, checkout: { sessions: { retrieve: mocks.session } }, webhooks: { constructEvent: mocks.webhook }, disputes: { list: mocks.disputes },
 }) }));
-vi.mock("@/lib/account-access", () => ({ sendPurchaseAccessEmail: mocks.email }));
+vi.mock("@/lib/transactional-email", () => ({ getTransactionalEmailConfig: () => null, sendTransactionalEmail: mocks.email }));
 import { processMasterStripeEvent } from "@/lib/stripe/master-subscription";
 import { POST } from "@/app/api/stripe/webhook/route";
 
@@ -81,6 +81,7 @@ describe.skipIf(!db)("Master real handler — PostgreSQL sintético e Stripe sim
     return { id: `evt_qa_${randomUUID()}`, object: "event", type, livemode: false, created: 1, data: { object } } as Stripe.Event;
   }
   async function stored() { return (await db!.select().from(schema.subscriptions).where(eq(schema.subscriptions.userId, userId)))[0]; }
+  async function deliveries() { return db!.select().from(schema.purchaseDeliveryOutbox).where(eq(schema.purchaseDeliveryOutbox.userId, userId)); }
   async function tracked(e = event(), status = "received") {
     eventIds.push(e.id);
     await db!.insert(schema.stripeEvents).values({ eventId: e.id, eventType: e.type, livemode: e.livemode, status, payload: {} });
@@ -101,7 +102,9 @@ describe.skipIf(!db)("Master real handler — PostgreSQL sintético e Stripe sim
     expect(row).toMatchObject({ status: "active", userId, planId, providerSubscriptionId: f.subscription.id });
     expect(row.currentPeriodStart!.getTime()).toBe(f.start * 1000);
     expect(row.accessEndsAt!.getTime()).toBe(f.end * 1000);
-    expect(mocks.email).toHaveBeenCalledTimes(1);
+    expect(await deliveries()).toHaveLength(1);
+    expect((await deliveries())[0]).toMatchObject({ scope: "master", purchaseId: f.identity.attemptId, status: "pending" });
+    expect(mocks.email).not.toHaveBeenCalled();
   });
   it("plano anual persiste valor e vigência anual pagos", async () => {
     const end = f.start + 365 * 86400; const amount = 89700;
@@ -118,6 +121,7 @@ describe.skipIf(!db)("Master real handler — PostgreSQL sintético e Stripe sim
     await processMasterStripeEvent(event("checkout.session.completed", session));
     expect((await stored()).status).toBe("incomplete");
     expect(mocks.email).not.toHaveBeenCalled();
+    expect(await deliveries()).toHaveLength(0);
   });
   it.each(["trialing", "past_due", "canceled", "unpaid", "paused", "incomplete_expired"] as const)("não ativa status Stripe %s", async (status) => {
     f.subscription.status = status;
@@ -261,7 +265,8 @@ describe.skipIf(!db)("Master real handler — PostgreSQL sintético e Stripe sim
     await Promise.all(Array.from({ length: 5 }, () => processMasterStripeEvent(event())));
     const rows = await db!.select().from(schema.subscriptions).where(eq(schema.subscriptions.userId, userId));
     expect(rows).toHaveLength(1); expect(rows[0].status).toBe("active");
-    expect(mocks.email).toHaveBeenCalledTimes(1);
+    expect(await deliveries()).toHaveLength(1);
+    expect(mocks.email).not.toHaveBeenCalled();
   });
   it("recupera processing antigo e conclui evento/direito atomicamente", async () => {
     const e = await tracked(event(), "processing");
@@ -275,6 +280,7 @@ describe.skipIf(!db)("Master real handler — PostgreSQL sintético e Stripe sim
     mocks.intent.mockRejectedValueOnce(new Error("Queda simulada durante leitura"));
     await expect(processMasterStripeEvent(e, { trackEvent: true })).rejects.toThrow();
     expect(await stored()).toBeUndefined();
+    expect(await deliveries()).toHaveLength(0);
     expect((await db!.select().from(schema.stripeEvents).where(eq(schema.stripeEvents.eventId, e.id)))[0].status).toBe("received");
     await processMasterStripeEvent(e, { trackEvent: true });
     expect((await stored()).status).toBe("active");
@@ -282,7 +288,9 @@ describe.skipIf(!db)("Master real handler — PostgreSQL sintético e Stripe sim
   it("mesmo evento concorrente é concluído uma vez; duplicata não consulta Subscription", async () => {
     const e = await tracked();
     await Promise.all([processMasterStripeEvent(e, { trackEvent: true }), processMasterStripeEvent(e, { trackEvent: true })]);
-    expect(mocks.subscription).toHaveBeenCalledTimes(1); expect(mocks.email).toHaveBeenCalledTimes(1);
+    expect(mocks.subscription).toHaveBeenCalledTimes(1);
+    expect(await deliveries()).toHaveLength(1);
+    expect(mocks.email).not.toHaveBeenCalled();
   });
   it("ignora dados de outro projeto/conta sem chamada externa", async () => {
     const foreign = structuredClone(f.subscription); foreign.metadata.app = "other";

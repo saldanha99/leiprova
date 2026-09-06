@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
+import type Stripe from "stripe";
 import { NextRequest } from "next/server";
 import {
   afterAll,
@@ -153,11 +154,18 @@ describe.skipIf(!db)(
           },
         };
       });
-      mocked.create.mockResolvedValue({
+      mocked.create.mockImplementation(async (params: Stripe.Checkout.SessionCreateParams) => ({
         id: `cs_${randomUUID()}`,
+        metadata: params.metadata,
+        customer: params.customer,
+        client_reference_id: params.client_reference_id,
+        mode: params.mode,
+        livemode: false,
         url: "https://checkout.stripe.com/c/pay/qa",
+        client_secret: "cs_synthetic_secret",
+        ui_mode: "elements",
         status: "open",
-      });
+      }));
     });
     function request(accessKey: string, attemptId = randomUUID()) {
       ids.push(attemptId);
@@ -181,6 +189,8 @@ describe.skipIf(!db)(
         expect(mocked.create).toHaveBeenCalledWith(
           expect.objectContaining({
             mode: "subscription",
+            ui_mode: "elements",
+            return_url: expect.stringMatching(/^https:\/\/qa\.example\.invalid\/app\/compras\?pedido=.+&session_id=\{CHECKOUT_SESSION_ID\}$/),
             customer: "cus_qa",
             line_items: [{ price: `price_${key}`, quantity: 1 }],
             subscription_data: {
@@ -195,6 +205,10 @@ describe.skipIf(!db)(
         expect(mocked.create.mock.calls[0][0]).not.toHaveProperty(
           "payment_intent_data",
         );
+        expect(mocked.create.mock.calls[0][0]).not.toHaveProperty("success_url");
+        expect(mocked.create.mock.calls[0][0]).not.toHaveProperty("cancel_url");
+        expect(response.headers.get("Cache-Control")).toBe("no-store");
+        expect(await response.json()).toMatchObject({ clientSecret: "cs_synthetic_secret", orderId: expect.any(String) });
       },
     );
     it("rejeita seis meses e mantém as flags de venda", async () => {
@@ -226,8 +240,19 @@ describe.skipIf(!db)(
     it("reutiliza a mesma sessão numa repetição", async () => {
       const id = randomUUID();
       await POST(request("annual", id));
+      mocked.retrieve.mockResolvedValue(await mocked.create.mock.results[0].value);
+      const response = await POST(request("annual", id));
+      expect(response.status).toBe(200);
+      expect(await response.json()).toEqual({ clientSecret: "cs_synthetic_secret", orderId: id });
+      expect(mocked.create).toHaveBeenCalledTimes(1);
+    });
+    it("retoma checkout hospedado legado sem criar outra sessão", async () => {
+      const id = randomUUID();
+      await POST(request("annual", id));
+      await db!.update(schema.contestOrders).set({ checkoutUiMode: "hosted" }).where(eq(schema.contestOrders.id, id));
       mocked.retrieve.mockResolvedValue({
-        status: "open",
+        ...await mocked.create.mock.results[0].value,
+        ui_mode: "hosted",
         url: "https://checkout.stripe.com/c/pay/qa",
       });
       expect((await POST(request("annual", id))).status).toBe(200);
