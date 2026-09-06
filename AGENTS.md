@@ -28,6 +28,22 @@ Regras que valem sempre:
   o projeto não tem `dotenv`.
 - Antes de entregar, rode `pnpm lint && pnpm typecheck && pnpm test && pnpm build`.
 
+## Referências editoriais por banca e cargo
+
+- Antes de usar material de referência para inéditas, leia
+  `docs/REFERENCIAS-POR-BANCA-E-CARGO.md`.
+- Perfis devem distinguir banca, cargo/especialidade, edição, programa e demanda
+  cognitiva. Não transferir automaticamente o perfil de Analista Jurídico do MP
+  para Escrevente do TJ, Promotor ou outro cargo da mesma banca.
+- Simulados fornecidos para análise são referência secundária, não fonte oficial
+  da lei, da resposta ou da autoria da banca. Não incorporar suas questões ao acervo.
+- A análise privada recebida em 06/09/2026 fica em
+  `.local/editorial/vunesp-referencias-20260906/`. Não enviar PDFs, textos extraídos
+  ou dossiês privados ao Git, à imagem da aplicação ou a provedores pagos.
+- Autores de inéditas recebem somente o perfil abstrato e fontes oficiais
+  independentes. O material original fica separado para análise editorial e
+  comparação de originalidade; nenhuma revisão humana é presumida.
+
 ## Acessos operacionais do time (confirmados em 05/09/2026)
 
 - **Cloudflare / DNS de `2b.app.br`: Google Chrome, perfil Daniel.** Use a aba

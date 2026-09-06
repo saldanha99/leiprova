@@ -76,3 +76,23 @@ SHA-256: `d02eddfb81180b80ac2d1ba5f352d9af61d6c3ad33f0b647933531220e462d42`.
 
 Publicação desta etapa é apenas da aplicação administrativa, sem seed,
 migração, alteração de grants, abertura de checkout ou recriação da homologação.
+
+## Verificação da publicação
+
+- Código da aplicação: `9c7dd4e`; imagem ativa:
+  `sha256:e832ae507937d1c91cc7088ab9a1161e778c6cc7ec94734320dcc46ac01b983a`.
+- App saudável e `/api/health` retornando `ok`. Acesso anônimo ao catálogo admin
+  redireciona para login; o painel foi testado por renderização autenticada simulada,
+  não por login real em produção.
+- Auditoria após deploy às 16:11 UTC: mesmas contagens e hashes do acervo; flags de
+  checkout permanecem `false`. Não houve novos vínculos aprovados.
+- QA permaneceu saudável na imagem
+  `sha256:39cfe3b41fe971dacffce404424f5055656e036d251bbd86b3e25f7c7993a404`,
+  criada às 00:50 UTC. Não foi recriada.
+- Lint, typecheck, build e 889 testes aprovados; 150 integrações PostgreSQL
+  opcionais não executadas. A primeira execução geral encontrou dois timeouts
+  de 5s; reexecução completa com dois workers passou sem alterar testes/timeouts.
+- Prévia estática de componente em 1440px e 390px sem overflow; detalhes operáveis
+  por teclado e fontes distinguíveis. A prévia não usa banco nem sessão e não
+  equivale a teste ponta a ponta do admin. O build final inclui o ajuste de
+  espaçamento de âncoras mobile posterior à primeira prévia.

@@ -3,8 +3,29 @@
 Documento de contexto para quem for continuar o projeto — pessoa ou assistente de IA.
 Descreve onde as coisas estão, como publicar e quais armadilhas já custaram tempo.
 
-Última entrega verificada: 06/09/2026, 09h09 BRT (12h09 UTC).
+Última aplicação verificada: 06/09/2026, 13h11 BRT (16h11 UTC).
 As seções antigas abaixo são histórico; consulte os registros recentes antes de operar.
+
+**Preparação dos 75 cursos publicada (`9c7dd4e`):** caderno individual no catálogo
+administrativo, fontes e pendências por cargo/edição, plano exportável com piso de 68 questões.
+Não gerou/importou/aprovou novas questões. Auditoria após deploy: 312 revisadas,
+12 pendentes, 22 rascunhos; ENAM com 68 propostas distintas pendentes; zero produtos
+com oportunidade associada e zero cursos no piso válido. Hashes antigos iguais.
+Backup verificado no Mac/VPS; app-only, sem seed/migração/grants. Homologação
+permaneceu na mesma imagem e data de criação. Checkout continua fechado.
+889 testes passaram com concorrência reduzida; 150 integrações opcionais não
+executadas. Lint, typecheck e build passaram. QA visual de componente em 390/1440px,
+sem overflow; produção saudável e admin redirecionando visitante sem sessão.
+Serviço de revisão de vínculos preparado, mas sem rota/UI/privilégios: não está
+ativado. Ver [resultado e limites](EXPANSAO-EDITORIAL-75.md).
+
+**Referências por banca/cargo (06/09):** análise privada de três simulados únicos,
+300 questões, para parametrização específica de Analista Jurídico MP-SP. Não é
+corpus oficial VUNESP, não foi publicado nem alterou o perfil ativo da banca.
+Regras persistidas em `AGENTS.md` e
+[política de referências](REFERENCIAS-POR-BANCA-E-CARGO.md). PDFs/dossiês somente
+em `.local/editorial/vunesp-referencias-20260906/`; proibido incorporá-los a Git,
+Docker ou acervo de questões. O Simulado 1 já contém comentários; 2 e 3 não.
 
 **Piso de 68 questões e revisão dos 80 publicados (`9f58d5d`):** novas vendas
 exigem 68 questões distintas com vínculo válido ao produto exato, sem revogar
