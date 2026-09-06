@@ -80,6 +80,13 @@ inicializado pelo Maestri. Não forjar `MAESTRI_SOCKET`/identidade a partir do C
 O canvas observado contém oito terminais e cinco notas. Nomes históricos servem
 para localização; a marca atual é Editalume. Preservar IDs, conexões e sessões.
 
+**Passagem efetivada:** Maestro existente acionado pela interface do aplicativo.
+PROJECT-CONTEXT, TEAM-CHARTER, EDITORIAL-QUEUE, QUALITY-GATES e ACCESS-ROUTING
+foram atualizadas e conferidas visualmente. Nenhum valor de credencial foi
+transmitido; os arquivos privados conferidos continuam com permissão 0600.
+Documento inicial publicado no GitHub e na VPS no commit `5bbea9f`, sem recriar
+app, homologação ou workers. A atualização de notas não atesta geração contínua.
+
 - Maestro: manter fila e reservar uma tarefa por responsável; ler AGENTS.md,
   este relatório e OPERACAO.md antes de operar. Stripe em pausa, sem gastos em APIs.
 - Radar: inventariar cobertura e diagnosticar as sete falhas; fontes oficiais,

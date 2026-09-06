@@ -3,6 +3,23 @@
 Pedido do Vinícius de 05/09/2026. Este plano configura responsabilidades; não
 atesta que o pipeline já está continuamente integrado ou que cursos estão prontos.
 
+## Atualização efetiva do canvas — 06/09/2026
+
+O nó existente Maestro LeiProva recebeu, dentro do aplicativo Maestri, a passagem
+delimitada de `ESTADO-OPERACIONAL-2026-09-06.md`. As cinco notas existentes foram
+atualizadas pelo CLI do próprio terminal e os novos textos foram conferidos na
+interface: marca Editalume, Stripe pausada, publicação já realizada, cobertura e
+falhas dos workers, fila vazia e localização segura das credenciais (sem valores).
+Oito terminais preservados; sem novos agentes, mudança de permissões ou criação
+de rotina. ACCESS-ROUTING permanece somente com o Maestro. Isso atualiza a memória
+operacional, mas não corrige o coletor nem ativa geração contínua.
+
+Os estados antigos abaixo são históricos. A referência vigente de produção é
+`ESTADO-OPERACIONAL-2026-09-06.md`: nove fontes cadastradas, último ciclo de coleta
+com sete falhas, 134 requisitos sem artigos associados e zero rascunhos novos no
+ciclo. O monitor legislativo consulta dez normas e quatro portais, não toda a
+legislação brasileira. Vendas continuam fechadas e Stripe fica para outra etapa.
+
 ## Marca atual do time — 06/09/2026
 
 O projeto se apresenta como **Editalume**. Maestro e auxiliares devem ler
