@@ -3,8 +3,26 @@
 Documento de contexto para quem for continuar o projeto — pessoa ou assistente de IA.
 Descreve onde as coisas estão, como publicar e quais armadilhas já custaram tempo.
 
-Última aplicação verificada: 06/09/2026, 15h13 BRT (18h13 UTC).
+Última aplicação verificada: 06/09/2026, 15h49 BRT (18h49 UTC).
 As seções antigas abaixo são histórico; consulte os registros recentes antes de operar.
+
+**Checkout, entrega e curadoria publicados (`dff881c`, 06/09/2026):** pagamento
+por concurso preparado com Elements na página, retomada/cancelamento protegidos,
+Master sem tentativas concorrentes independentes, webhook transacional e fila
+durável de confirmação por compra/produto. Nova UI administrativa revisa apenas
+o vínculo exato, com decisão humana; não aprova questão nem publica produto.
+Migrations 0034–0036 e privilégios mínimos aplicados, sem seed. App saudável,
+conteúdo/catálogo/planos preservados por hashes, homologação e demais serviços
+preservados. 1.174 testes gerais, 139 PostgreSQL adicionais e 12 testes de lock
+com papel restrito aprovados; lint, typecheck e builds local/Docker passaram.
+Nova leitura Stripe confirmou 76 produtos ativos +152 preços Editalume.
+**Checkout continua fechado; chave runtime ainda test.** Worker de entrega
+publicado, mas `PURCHASE_DELIVERY_ENABLED=false`; fila vazia. Um e-mail operacional
+foi aceito pelo Resend, sem comprovação de entrega e sem compra. WhatsApp não
+integrado. Zero dos 75 cursos com o piso válido de 68. Chave de pagamentos só
+preparada no Chrome Vini, não criada. Sem canal Maestri disponível nesta sessão:
+documentação atualizada não comprova alteração do canvas. Ver
+[publicação, backup, imagens e limites](CHECKOUT-ENTREGA-2026-09-06.md).
 
 **Editalume e catálogo Stripe publicados (`66ad154`, 06/09/2026):** pedido de
 retirada do catálogo antigo e inclusão dos 75 cursos + Master registrado.

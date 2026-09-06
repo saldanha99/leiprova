@@ -68,4 +68,38 @@ acessos continua documentado (Stripe no Chrome Vini; Cloudflare no Chrome Daniel
 mas não há evidência de atualização do grafo ou de agentes externos em execução
 por esta etapa. Não confundir os auxiliares Codex de implementação com esses nós.
 
-Este registro será complementado após a conferência efetiva da implantação.
+## Resultado publicado
+
+Código `dff881c`, publicado em 06/09/2026 às 15h49 BRT. Build local e build Docker
+aprovados, incluindo instalação com lockfile congelado e confirmação do patch nos
+dois módulos postgres-js da imagem. Prévia do worker em contêiner sem rede retornou
+`sendsExecuted=false`. Produção respondeu `status=ok` após a recriação do app.
+
+Imagem do app:
+`sha256:186d30f42f4945e981e02440fdf50fcf888e4c960c628f1221eb9a1c603a22bd`.
+Worker:
+`sha256:0681f5dedf67a61e71b9b9bf212cb8c7fa653b3ba36b95a189706dfe36c0255a`.
+Migrations até 0036 aplicadas (37 registros); os dois complementos de privilégios
+foram aplicados e conferidos. Sem DELETE na fila, UPDATE no histórico, UPDATE nas
+evidências do vínculo ou UPDATE no catálogo pelo papel do aplicativo.
+
+Os hashes integrais de questões, alternativas, catálogo e planos Master permaneceram
+iguais. A homologação manteve exatamente sua imagem e criação anteriores; demais
+workers e projetos não foram recriados. Backup de 8.419.412 bytes verificado no Mac
+e na VPS, SHA-256
+`4a5ea596125a38f0b4dd90121901622520a9f08b400006f03f232df5e5095160`.
+Recibos privados: `.local/commerce/checkout-delivery-20260906/before.json` e `after.json`.
+
+Conferência visual pública mobile em 390px sem overflow; mensal/anual e adicionais
+mudam juntos. Nova rota de curadoria redireciona visitante não autenticado ao login.
+Isso não substitui um pagamento Stripe ponta a ponta nem uma revisão editorial humana.
+Nova leitura da API Stripe às 15h50 BRT validou 76 produtos ativos e 152 preços
+Editalume, mais quatro preços históricos preservados, com vínculos no banco corretos.
+
+**Vendas continuam fechadas:** `CHECKOUT_ENABLED=false`,
+`CONTEST_CHECKOUT_ENABLED=false`; segredo e chave publicável do runtime ainda são de
+teste. O novo worker está em execução com `PURCHASE_DELIVERY_ENABLED=false`, sem
+chave Stripe, sem trabalhos e sem envios. A chave restrita de pagamentos permanece
+apenas preparada no Chrome Vini, aguardando confirmação específica para emissão.
+Nenhuma nova aprovação/publicação de questões, cobrança, reembolso ou mensagem
+WhatsApp foi executada nesta publicação.

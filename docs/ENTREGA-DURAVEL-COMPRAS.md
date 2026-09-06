@@ -1,8 +1,9 @@
 # Entrega durável após compra — Editalume
 
-Fundação local da fila transacional, não declaração de envio real ou de vendas abertas.
-A migration `0034_purchase_delivery_outbox` foi gerada com snapshot/journal coerentes;
-sua existência no Git não comprova aplicação em produção.
+Fundação da fila transacional publicada em `dff881c`, com o worker ainda desativado
+para envios. A migration `0034_purchase_delivery_outbox` foi aplicada e seus grants
+conferidos. Isso não declara entrega real de compras nem vendas abertas; veja o
+[resultado verificado e os limites](CHECKOUT-ENTREGA-2026-09-06.md).
 
 ## Integração
 
