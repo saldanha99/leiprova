@@ -6,6 +6,15 @@ Descreve onde as coisas estão, como publicar e quais armadilhas já custaram te
 Última aplicação verificada: 06/09/2026, 15h49 BRT (18h49 UTC).
 As seções antigas abaixo são histórico; consulte os registros recentes antes de operar.
 
+**Auditoria operacional e pausa Stripe (06/09/2026, 16h10 BRT):** aplicação e
+fonte já publicadas e sincronizadas; nenhuma alteração de runtime pendente.
+Stripe pausada pelo proprietário, sem novas tentativas de credenciais. Monitor
+de 10 normas/4 portais ativo; coletor de 9 fontes cadastradas ativo, porém último
+ciclo com 7 falhas e zero capturas novas. 134 requisitos em rascunho, nenhum
+mapeado a artigo, fila de geração vazia. Não há operação nacional autônoma nem
+geração contínua pelo Maestri comprovada. Ver
+[estado auditado e passagem ao time](ESTADO-OPERACIONAL-2026-09-06.md).
+
 **Checkout, entrega e curadoria publicados (`dff881c`, 06/09/2026):** pagamento
 por concurso preparado com Elements na página, retomada/cancelamento protegidos,
 Master sem tentativas concorrentes independentes, webhook transacional e fila
