@@ -6,7 +6,7 @@ atesta que o pipeline já está continuamente integrado ou que cursos estão pro
 ## Configuração observada no canvas em 05/09/2026
 
 O workspace exclusivo foi criado pelo CLI do Maestro e preservou `My Workspace`.
-Foram observados sete nós: Maestro LeiProva, Forge, Prism, Radar, Guardião, Autor e
+Na montagem inicial foram observados sete nós: Maestro LeiProva, Forge, Prism, Radar, Guardião, Autor e
 Relay, com seis papéis especializados. Presets aplicados: Claude Code para Maestro
 e Radar; Codex para Forge, Prism, Guardião e Autor; OpenCode para Relay.
 
@@ -19,7 +19,38 @@ modelos pedidos e arranjo visual final. Ao menos um terminal Codex mostrou uma
 oferta de atualização durante a inspeção. O Mac foi bloqueado antes de finalizar
 os ajustes de interface. Não tratar nós desenhados como agentes em execução, nem
 esta montagem como ativação de geração contínua. Não houve instalação/compra de
-modelo, atualização de CLI ou geração de novo lote nesta configuração.
+modelo ou geração de novo lote nesta inspeção. Na retomada, o terminal do Maestro
+registrou autoatualização dos quatro Codex; esse relato não comprova que todos os
+modelos, MCPs ou sessões estejam configurados e saudáveis.
+
+## Adição solicitada — Antigravity / Gemini 3.8 Flash
+
+O usuário pediu manter OpenCode/Relay e incluir Antigravity no mesmo time.
+Verificação local somente de leitura: Antigravity 2.11.0 instalado; CLI
+`/Users/viniciussaldanharosario/.local/bin/agy` funcional. `agy models` lista
+`gemini-3.8-flash-high`, `gemini-3.8-flash-medium` e `gemini-3.8-flash-low`.
+O comando suportado para o nó solicitado é
+`/Users/viniciussaldanharosario/.local/bin/agy --model gemini-3.8-flash-high`.
+O nome do preset é **Antigravity**; o modelo é um argumento do CLI, não um preset
+Maestri separado. Isso corrige a limitação presumida anteriormente sobre Flash.
+
+**Estado observado:** o canvas passou de sete para **oito terminais** e mostrou
+**Vetor**, ícone Antigravity e papel **Vetor — Prototipação visual**. O Maestro
+confirmou o ID no catálogo e registrou recrutamento com o comando explícito acima.
+OpenCode/Relay permaneceu no canvas. A inicialização chegou à confirmação de
+confiança da pasta; o Mac voltou a bloquear antes da inspeção final dessa etapa,
+do modelo efetivamente iniciado e das conexões. Não marcar o agente como pronto
+para trabalhar sem verificar esses pontos. Não confundir catálogo de modelos com
+autenticação bem-sucedida, disponibilidade de cota ou geração em funcionamento.
+Não criar nova assinatura/API, comprar créditos ou trocar modelo ao atingir limite.
+
+Papel complementar: **Vetor — Prototipação visual**. Explorar referências públicas
+e produzir protótipos a partir de tarefas delimitadas do Maestro; Prism mantém a
+direção de produto/revisão, Forge a integração de engenharia. Vetor não acessa
+segredos, contas operacionais, dados privados ou outros projetos; não publica nem
+decide vigência jurídica. As conexões previstas são Maestro, Prism e Forge, com
+PROJECT-CONTEXT e TEAM-CHARTER; sem ACCESS-ROUTING. Na montagem, apenas confirmar
+papel e modelo e ficar ocioso. Reutilizar um nó compatível antes de criar duplicata.
 
 ## Espaço e memória
 
@@ -46,6 +77,7 @@ modelo, atualização de CLI ou geração de novo lote nesta configuração.
 | Guardião — Legislação | Vigência, redações, revogações e impactos nas questões; manter trilha de fonte oficial | Codex conectado; confirmar modelo disponível |
 | Autor — Inéditas | Questões novas a partir do edital mapeado e do perfil versionado da banca | Codex conectado; confirmar modelo disponível |
 | Relay — Apoio Sanitizado | Classificar e resumir apenas recortes públicos aprovados | OpenCode, somente modelo gratuito confirmado |
+| Vetor — Prototipação visual | Exploração multimodal e protótipos visuais delimitados; entregar ao Prism para revisão e Forge para integração | Antigravity, `gemini-3.8-flash-high`, catálogo local confirmado; início de sessão pendente |
 
 Primeiro listar agentes, papéis e presets pelo CLI suportado do Maestri. Reusar
 papéis/presets compatíveis; não inventar IDs de modelos. Se Gemini Flash solicitado
