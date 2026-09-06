@@ -26,6 +26,8 @@
     "editorial:bindings:import": "tsx --env-file-if-exists=.env scripts/import-product-question-bindings.ts",
     "editorial:courses:plan": "tsx --env-file-if-exists=.env scripts/plan-course-production.ts",
     "editorial:scoped:verify": "tsx --env-file-if-exists=.env scripts/validate-scoped-authoring.ts",
+    "stripe:inventory": "tsx --env-file-if-exists=.env scripts/inventory-stripe-catalog.ts",
+    "stripe:catalog": "tsx --env-file-if-exists=.env scripts/sync-contest-stripe.ts",
     "db:seed": "tsx --env-file-if-exists=.env scripts/seed.ts",
     "admin:bootstrap": "tsx --env-file-if-exists=.env scripts/bootstrap-admin.ts"
   },

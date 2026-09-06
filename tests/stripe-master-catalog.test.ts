@@ -21,6 +21,10 @@ function productFixture(overrides: Partial<Stripe.Product> = {}) {
     object: "product",
     active: true,
     livemode: true,
+    name: "Master antigo",
+    description: null,
+    url: null,
+    images: [],
     metadata: { app: "leiprova", commerce: MASTER_STRIPE_COMMERCE },
     ...overrides,
   } as Stripe.Product;
@@ -74,17 +78,26 @@ function fixture() {
           if (products.has(params.id!)) throw new Error("ID já existe.");
           const product = productFixture({
             id: params.id!,
+            name: params.name,
+            description: params.description ?? null,
+            url: params.url ?? null,
+            images: params.images ?? [],
             metadata: params.metadata as Stripe.Metadata,
           });
           products.set(product.id, product);
           return product;
         },
       ),
+      update: vi.fn(async (id: string, params: Stripe.ProductUpdateParams) => {
+        const product = { ...products.get(id)!, ...params } as Stripe.Product;
+        products.set(id, product);
+        return product;
+      }),
     },
     prices: {
       list: vi.fn(async (params: Stripe.PriceListParams) => ({
         data: [...prices.values()].filter((item) =>
-          params.lookup_keys?.includes(item.lookup_key!),
+          params.lookup_keys?.includes(item.lookup_key!) && item.active === params.active,
         ),
       })),
       create: vi.fn(
@@ -108,6 +121,16 @@ function fixture() {
           return price;
         },
       ),
+      retrieve: vi.fn(async (id: string) => {
+        const price = prices.get(id);
+        if (!price) throw { code: "resource_missing", statusCode: 404 };
+        return price;
+      }),
+      update: vi.fn(async (id: string, params: Stripe.PriceUpdateParams) => {
+        const price = { ...prices.get(id)!, ...params } as Stripe.Price;
+        prices.set(id, price);
+        return price;
+      }),
     },
   };
   return {
@@ -170,7 +193,7 @@ describe("catálogo Stripe Master único", () => {
       [MASTER_STRIPE_PRODUCT_ID, 89700, "year"],
     ]);
     expect(f.api.products.create.mock.calls[0][1]?.idempotencyKey).toBe(
-      "leiprova-master-product:v2",
+      "leiprova-master-product:v3",
     );
     expect(
       f.api.prices.create.mock.calls.map(
@@ -344,6 +367,58 @@ describe("catálogo Stripe Master único", () => {
     await expect(ensureMasterStripeCatalog(f.stripe, "live")).rejects.toThrow(
       "Preço Master unificado duplicado",
     );
+    expect(f.api.prices.create).not.toHaveBeenCalled();
+  });
+
+  it("reativação exige opção explícita e conserva IDs e preços do Master", async () => {
+    const f = fixture();
+    f.products.set(MASTER_STRIPE_PRODUCT_ID, productFixture({ active: false }));
+    for (let index = 0; index < 2; index += 1) {
+      const price = priceFixture(index, { active: false });
+      f.prices.set(price.id, price);
+    }
+    const result = await ensureMasterStripeCatalog(f.stripe, "live", { reactivate: true });
+    expect(result.productId).toBe(MASTER_STRIPE_PRODUCT_ID);
+    expect(f.api.products.create).not.toHaveBeenCalled();
+    expect(f.api.prices.create).not.toHaveBeenCalled();
+    expect(f.api.products.update).toHaveBeenCalledTimes(1);
+    expect(f.api.prices.update).toHaveBeenCalledTimes(2);
+    expect(f.api.prices.update.mock.calls.every(([, params]) => JSON.stringify(params) === '{"active":true}')).toBe(true);
+  });
+
+  it("atualiza apenas a apresentação do Master validado, com fotografia e escopo honesto", async () => {
+    const f = fixture();
+    f.products.set(MASTER_STRIPE_PRODUCT_ID, productFixture());
+    await ensureMasterStripeCatalog(f.stripe, "live");
+    const params = f.api.products.update.mock.calls[0][1];
+    expect(params.description).toContain("preparação editorial");
+    expect(params.url).toBe("https://leiprova.2b.app.br/#planos");
+    expect(params.images).toEqual(["https://leiprova.2b.app.br/assets/contests/editorial-study-v2.webp"]);
+    expect(params.metadata).toBeUndefined();
+    expect(params.active).toBeUndefined();
+  });
+
+  it("conflito entre ID determinístico e produto da busca bloqueia antes de atualizar", async () => {
+    const f = fixture();
+    f.products.set(MASTER_STRIPE_PRODUCT_ID, productFixture());
+    f.products.set("prod_other_master", productFixture({ id: "prod_other_master" }));
+    f.api.products.search.mockResolvedValue({ data: [f.products.get("prod_other_master")!] });
+    await expect(ensureMasterStripeCatalog(f.stripe, "live")).rejects.toThrow("IDs divergentes");
+    expect(f.api.products.update).not.toHaveBeenCalled();
+    expect(f.api.products.create).not.toHaveBeenCalled();
+  });
+
+  it("Master deriva produto antigo dos preços locais quando a busca está atrasada", async () => {
+    const f = fixture();
+    f.products.set("prod_original_master", productFixture({ id: "prod_original_master" }));
+    f.prices.set("price_master_ritmo", priceFixture(0, { product: "prod_original_master" }));
+    f.prices.set("price_master_foco", priceFixture(1, { product: "prod_original_master" }));
+    f.api.products.search.mockResolvedValue({ data: [] });
+    const result = await ensureMasterStripeCatalog(f.stripe, "live", {
+      knownPriceIds: { ritmo: "price_master_ritmo", foco: "price_master_foco" },
+    });
+    expect(result.productId).toBe("prod_original_master");
+    expect(f.api.products.create).not.toHaveBeenCalled();
     expect(f.api.prices.create).not.toHaveBeenCalled();
   });
 });

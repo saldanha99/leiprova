@@ -6,6 +6,17 @@ Descreve onde as coisas estão, como publicar e quais armadilhas já custaram te
 Última aplicação verificada: 06/09/2026, 13h11 BRT (16h11 UTC).
 As seções antigas abaixo são histórico; consulte os registros recentes antes de operar.
 
+**Stripe — nova preparação local (06/09/2026, sem operação remota):** pedido de
+retirada do catálogo antigo e inclusão dos 75 cursos + Master registrado.
+Conexão com Chrome Vini via `agent-browser` indisponível; exceção para controle
+visual solicitada, não presumida. Conferência somente de presença/modo no app:
+chave secreta test, publicável ausente, segredo webhook presente, vendas fechadas.
+Nenhum objeto externo foi retirado/criado, nenhuma chave emitida ou flag alterada.
+Preparados inventário privado somente leitura e apresentação/retomada do
+sincronizador. 988 testes, lint, typecheck e build passaram; 150 integrações
+opcionais ignoradas. Sem deploy. Não confundir prévia de 76 produtos/152 preços com criação real.
+Ver [estado, acesso e execução do catálogo Stripe](STRIPE-CATALOGO-PRODUCAO.md).
+
 **Autoria privada por cargo (06/09/2026, sem deploy):** 68 novos rascunhos para
 treino VUNESP / Analista Jurídico MP-SP, separados em 24 de Constitucional,
 22 de Processo Civil e 22 de Processo Penal. Todos com cinco alternativas,
