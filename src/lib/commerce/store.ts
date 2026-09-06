@@ -5,11 +5,11 @@ import { getDb } from "@/lib/db/client";
 import {
   contestStoreProducts,
   contestOpportunities,
-  questionOpportunities,
   questions,
 } from "@/lib/db/schema";
 import { listReviewedContestOpportunities } from "@/lib/db/contest-opportunities";
 import { getCatalogContest } from "./catalog";
+import { approvedProductQuestionExists } from "./product-binding-query";
 
 export const listReleasedContestProducts = cache(
   async function listReleasedContestProducts() {
@@ -32,10 +32,8 @@ export const listReleasedContestProducts = cache(
         and(
           eq(contestStoreProducts.status, "released"),
           sql`exists (
-      select 1 from ${questionOpportunities}
-      join ${questions} on ${questions.id} = ${questionOpportunities.questionId}
-      where ${questionOpportunities.opportunityId} = ${contestStoreProducts.opportunityId}
-      and ${questions.editorialStatus} = 'reviewed'
+      select 1 from ${questions}
+      where ${approvedProductQuestionExists(contestStoreProducts.slug, questions.id, contestStoreProducts.opportunityId)}
     )`,
         ),
       );

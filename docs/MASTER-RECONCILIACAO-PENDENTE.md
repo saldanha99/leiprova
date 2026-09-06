@@ -1,6 +1,58 @@
 # Master — contrato preparado, integração pendente
 
-Data: 05/09/2026. Este documento NÃO atesta prontidão de cobrança LIVE.
+Atualização local: 06/09/2026. Este documento NÃO atesta prontidão de cobrança LIVE.
+
+## Correção implementada e testada localmente
+
+O checkpoint histórico abaixo foi substituído, no código local, pelo reconciliador
+`src/lib/stripe/master-subscription.ts`. Ele está integrado a `process.ts` e à rota
+webhook; não é mais um conjunto de validadores desconectados. Não houve alteração
+de credenciais, flags, conta Stripe, cobrança ou reembolso externo nesta correção.
+
+- Consulta Subscription, checkout, Invoice, InvoicePayment e PaymentIntent/Charge
+  atuais. Confere tentativa persistida, usuário, Customer, plano, modo e vínculo
+  da sessão. Metadados isolados não criam usuário nem associam Customer ausente.
+- Somente fatura integralmente paga e período finito conferido podem gerar `active`.
+  `trialing` não é promoção automática a Master. Cancelamento imediato não é
+  desfeito por `invoice.paid` antigo; cancelamento agendado mantém apenas o ciclo pago.
+- Estorno/disputa do ciclo atual suspende o acesso Master; eventos do ciclo anterior
+  não retiram a renovação atual. Nenhum direito avulso ou de outro cliente é alterado.
+  A decisão comercial de reembolso parcial ainda deve ser confirmada pelo responsável
+  antes de abrir vendas; o comportamento local provisório conserva a suspensão.
+- Consulta disputas atuais por Charge, inclusive em replays. `charge.disputed` não
+  é tratado sozinho como prova de disputa ainda aberta. Todas precisam estar
+  encerradas favoravelmente (`won`, `warning_closed` ou `prevented`) para restaurar
+  o ciclo atual pago, sem reembolso; outra disputa aberta/perdida continua bloqueando.
+- O processamento financeiro Master e `stripe_events.processed` compartilham a
+  mesma transação/lock. Reentrega pode recuperar `processing` anterior; queda da
+  conexão impede commit dos efeitos do executor antigo. Timeout retorna falha/retry.
+  Isso NÃO corrige o claim legado dos avulsos.
+- E-mail permanece após commit. A janela entre commit e envio ainda não tem outbox
+  durável; portanto a correção não comprova entrega de e-mail ou WhatsApp.
+
+Evidências reproduzíveis: `tests/master-subscription-postgres.test.ts` executa o
+handler e a rota com PostgreSQL sintético em loopback, Stripe simulada e verificação
+HMAC do SDK sem rede. Inclui concorrência superior ao pool, duplicata, rollback,
+perda real somente da conexão marcada desta suíte, reentrega, cancelamento, mensal/
+anual, reembolso, disputa encerrada, divergências de titularidade e APIs indisponíveis.
+
+Para executar, definir explicitamente
+`LEIPROVA_TEST_DATABASE_URL=postgres://leiprova_test@127.0.0.1:55439/leiprova_automation_test`.
+Sem essa variável a suíte PostgreSQL é ignorada. Ela não lê `.env`, não acessa Stripe
+externa e remove exclusivamente os registros identificados por UUIDs da própria execução.
+
+Antes de LIVE: homologar assinatura/renovação/cancelamento/reembolso reais **em modo
+teste**, confirmar política parcial, conferir permissões de leitura de Disputes,
+assinatura dos webhooks e recuperação dos avulsos, concluir entrega transacional e
+conteúdo liberado por produto. O deploy deve substituir a versão antiga do processo;
+não manter o handler legado Master escrevendo paralelamente ao novo reconciliador.
+
+Fontes oficiais: [ordenação e duplicação de eventos](https://docs.stripe.com/webhooks),
+[Invoice Payments](https://docs.stripe.com/api/invoice-payment/list),
+[estados de disputas](https://docs.stripe.com/api/disputes/object),
+[múltiplas disputas por pagamento](https://docs.stripe.com/disputes/api).
+
+## Histórico de 05/09/2026 — não representa o código atual
 
 ## Estado deste checkpoint
 

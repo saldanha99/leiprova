@@ -2,6 +2,13 @@
 
 Verificação local: 05/09/2026. Escopo exclusivo LeiProva / Editalume.
 
+**Atualização local de 06/09:** o Master agora tem reconciliação integrada e uma
+unidade transacional própria na rota, com recuperação de `processing` testada em
+PostgreSQL sintético. Os itens de claim legado abaixo continuam pendentes para os
+**concursos avulsos**; não descrevem o novo caminho Master. Não houve abertura de
+vendas nem homologação externa de cobrança nesta correção. Veja o
+[estado atual e limites do Master](MASTER-RECONCILIACAO-PENDENTE.md).
+
 Este documento registra impedimentos técnicos à abertura comercial. Não comprova
 homologação de pagamentos, não autoriza publicar conteúdo jurídico e não altera
 flags, credenciais, produtos ou dados de produção. As vendas reais devem continuar

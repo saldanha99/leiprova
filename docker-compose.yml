@@ -266,6 +266,54 @@ services:
     networks:
       - internal
 
+  editorial-draft-importer:
+    build:
+      context: .
+      target: migrator
+    profiles: ["tools"]
+    command: ["pnpm", "editorial:drafts:import", "--mode=preview"]
+    environment:
+      NODE_ENV: production
+      APP_URL: https://leiprova.2b.app.br
+      LEIPROVA_DRAFT_IMPORT_DATABASE_URL: postgresql://${APP_DB_USER:-leiprova_app}:${APP_DB_PASSWORD}@leiprova-pooler:5432/${POSTGRES_DB:-leiprova}
+      LEIPROVA_DRAFT_IMPORT_APPROVED: ${LEIPROVA_DRAFT_IMPORT_APPROVED:-}
+    volumes:
+      - ./.local/editorial/draft-input:/draft-input:ro
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 64
+    cpus: 0.5
+    mem_limit: 768m
+    networks:
+      - internal
+
+  editorial-binding-importer:
+    build:
+      context: .
+      target: migrator
+    profiles: ["tools"]
+    command: ["pnpm", "editorial:bindings:import", "--mode=preview"]
+    environment:
+      NODE_ENV: production
+      APP_URL: https://leiprova.2b.app.br
+      LEIPROVA_BINDING_DATABASE_URL: postgresql://${APP_DB_USER:-leiprova_app}:${APP_DB_PASSWORD}@leiprova-pooler:5432/${POSTGRES_DB:-leiprova}
+      LEIPROVA_BINDING_IMPORT_APPROVED: ${LEIPROVA_BINDING_IMPORT_APPROVED:-}
+    volumes:
+      - ./.local/editorial/binding-input:/binding-input:ro
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    pids_limit: 64
+    cpus: 0.5
+    mem_limit: 768m
+    networks: [internal]
+
 volumes:
   leiprova_pgdata:
 

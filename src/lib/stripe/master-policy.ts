@@ -106,3 +106,13 @@ export function masterPaymentReversal(intent: Stripe.PaymentIntent, invoice: Str
   }
   return charge.refunded || charge.amount_refunded > 0 ? "refunded" : charge.disputed ? "disputed" : null;
 }
+
+// charge.disputed é histórico; somente a lista atual e integral resolve uma disputa encerrada.
+export function masterDisputesBlockAccess(disputes: Stripe.ApiList<Stripe.Dispute>, intent: Stripe.PaymentIntent, live: boolean) {
+  if (disputes.has_more || disputes.data.length === 0 || new Set(disputes.data.map((row) => row.id)).size !== disputes.data.length ||
+    disputes.data.some((row) => row.livemode !== live || row.currency !== "brl" || objectId(row.payment_intent) !== intent.id ||
+      objectId(row.charge) !== objectId(intent.latest_charge) || !Number.isSafeInteger(row.amount) || row.amount <= 0)) {
+    throw new Error("Titularidade ou completude das disputas Master divergente.");
+  }
+  return disputes.data.some((row) => !["won", "warning_closed", "prevented"].includes(row.status));
+}

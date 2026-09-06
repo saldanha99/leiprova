@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
 import postgres from "postgres";
 import { z } from "zod";
+import { bindSyntheticProductQuestions } from "./lib/synthetic-product-bindings";
 import {
   CONTEST_ACCESS_OPTIONS,
   CONTEST_CATALOG,
@@ -52,8 +53,10 @@ async function main() {
       join questions q on q.id=qo.question_id
       join legal_articles a on a.id=q.legal_article_id
       join legal_versions v on v.id=a.legal_version_id
+      join opportunity_requirements r on r.opportunity_id=o.id and r.legal_article_id=a.id
       where o.slug like 'teste-%' and v.source_url='https://example.invalid/test-fixture'
-      and q.editorial_status='reviewed' order by o.id limit 1`;
+      and q.editorial_status='reviewed' and r.editorial_status='reviewed' and a.editorial_status='reviewed'
+      and o.editorial_status='reviewed' and v.status='current' order by o.id limit 1`;
     if (!fixture)
       throw new Error("Prepare primeiro as questões sintéticas de QA.");
     for (const account of accounts) {
@@ -79,6 +82,8 @@ async function main() {
           (item) => item.acronym === "PC-BA" && item.role === "Delegado",
         )!.slug;
         const id = "qa-commerce-avulso-order";
+        await db`update contest_store_products set opportunity_id=${fixture.id} where slug=${slug}`;
+        await bindSyntheticProductQuestions(db, slug);
         const monthly = CONTEST_ACCESS_OPTIONS.find(
           (item) => item.key === "monthly",
         )!;
@@ -105,7 +110,7 @@ async function main() {
       }
       console.log(`${account.email}: ${account.access} (somente QA local)`);
     }
-    await db`grant select on contest_store_products to leiprova_automation_app`;
+    await db`grant select on contest_store_products,contest_product_question_bindings to leiprova_automation_app`;
     await db`grant select,insert,update on contest_orders,contest_purchases to leiprova_automation_app`;
   } finally {
     await db.end();

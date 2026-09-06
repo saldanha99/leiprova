@@ -2044,6 +2044,47 @@ export const questionOpportunities = pgTable(
   ],
 );
 
+// Curadoria comercial por produto: propostas nunca concedem acesso por si sós.
+// Não substitui a revisão da questão nem transforma afinidade em cobertura de edital.
+export const contestProductQuestionBindings = pgTable(
+  "contest_product_question_bindings",
+  {
+    id: text("id").primaryKey(),
+    productSlug: text("product_slug").notNull().references(() => contestStoreProducts.slug, { onDelete: "restrict" }),
+    opportunityId: bigint("opportunity_id", { mode: "number" }).notNull().references(() => contestOpportunities.id, { onDelete: "restrict" }),
+    requirementId: bigint("requirement_id", { mode: "number" }).notNull().references(() => opportunityRequirements.id, { onDelete: "restrict" }),
+    questionId: bigint("question_id", { mode: "number" }).notNull().references(() => questions.id, { onDelete: "restrict" }),
+    sourceDocumentId: bigint("source_document_id", { mode: "number" }).notNull().references(() => opportunitySourceDocuments.id, { onDelete: "restrict" }),
+    sourceSnapshotId: bigint("source_snapshot_id", { mode: "number" }).references(() => opportunityDocumentSnapshots.id, { onDelete: "restrict" }),
+    sourceSnapshotChecksum: text("source_snapshot_checksum"),
+    legalArticleId: bigint("legal_article_id", { mode: "number" }).notNull().references(() => legalArticles.id, { onDelete: "restrict" }),
+    legalVersionId: bigint("legal_version_id", { mode: "number" }).notNull().references(() => legalVersions.id, { onDelete: "restrict" }),
+    legalVersionChecksum: text("legal_version_checksum").notNull(),
+    questionUpdatedAt: timestamp("question_updated_at", { withTimezone: true }).notNull(),
+    requirementText: text("requirement_text").notNull(),
+    sourceLocator: text("source_locator").notNull(),
+    requirementQuote: text("requirement_quote").notNull(),
+    legalQuote: text("legal_quote").notNull(),
+    scopeNotes: text("scope_notes").notNull(),
+    evidence: jsonb("evidence").$type<Record<string, unknown>>().notNull(),
+    status: text("status").notNull().default("pending_review"),
+    proposedByUserId: bigint("proposed_by_user_id", { mode: "number" }).notNull().references(() => users.id, { onDelete: "restrict" }),
+    reviewedByUserId: bigint("reviewed_by_user_id", { mode: "number" }).references(() => users.id, { onDelete: "restrict" }),
+    reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+    reviewNotes: text("review_notes"),
+    ...timestamps,
+  },
+  (table) => [
+    index("contest_product_bindings_access_idx").on(table.productSlug, table.status, table.questionId),
+    index("contest_product_bindings_requirement_idx").on(table.requirementId),
+    check("contest_product_bindings_hash_check", sql`${table.id} ~ '^[a-f0-9]{64}$' and ${table.legalVersionChecksum} ~ '^[a-f0-9]{64}$'`),
+    check("contest_product_bindings_status_check", sql`${table.status} in ('pending_review','approved','rejected','suspended')`),
+    check("contest_product_bindings_snapshot_check", sql`(${table.sourceSnapshotId} is null and ${table.sourceSnapshotChecksum} is null) or (${table.sourceSnapshotId} is not null and ${table.sourceSnapshotChecksum} is not null and ${table.sourceSnapshotChecksum} ~ '^[a-f0-9]{64}$')`),
+    check("contest_product_bindings_evidence_check", sql`jsonb_typeof(${table.evidence}) = 'object' and char_length(${table.requirementQuote}) between 10 and 20000 and char_length(${table.legalQuote}) between 15 and 12000 and char_length(${table.scopeNotes}) between 30 and 2000`),
+    check("contest_product_bindings_review_check", sql`(${table.status} = 'pending_review' and ${table.reviewedByUserId} is null and ${table.reviewedAt} is null and ${table.reviewNotes} is null) or (${table.status} <> 'pending_review' and ${table.reviewedByUserId} is not null and ${table.reviewedAt} is not null and ${table.reviewNotes} is not null and char_length(btrim(${table.reviewNotes})) between 20 and 2000)`),
+  ],
+);
+
 export const questionOptions = pgTable(
   "question_options",
   {

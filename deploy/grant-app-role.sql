@@ -47,6 +47,17 @@ to :app_user;
 -- Pedidos avulsos só são atendidos por rotas autenticadas e webhook assinado.
 grant select, insert, update on contest_orders, contest_purchases, contest_billing_invoices to :app_user;
 
+-- O aplicativo/importador só propõe vínculos. Não possui grant para aprová-los,
+-- modificar evidências ou apagar histórico. Uma futura decisão exige fluxo próprio.
+grant select on contest_product_question_bindings to :app_user;
+grant insert (
+  id, product_slug, opportunity_id, requirement_id, question_id,
+  source_document_id, source_snapshot_id, source_snapshot_checksum,
+  legal_article_id, legal_version_id, legal_version_checksum, question_updated_at,
+  requirement_text, source_locator, requirement_quote, legal_quote, scope_notes,
+  evidence, proposed_by_user_id
+) on contest_product_question_bindings to :app_user;
+
 grant select (
   id,
   public_id,

@@ -39,9 +39,11 @@ async function main() {
       on conflict (lower(email)) do update set password_hash = excluded.password_hash
       returning id
     `;
-    await db`insert into subscriptions (user_id, plan_id, provider, status)
-      select ${student.id}, id, 'synthetic_test', 'active' from plans order by id limit 1
-      on conflict do nothing`;
+    await db`insert into subscriptions (user_id, plan_id, provider, status, current_period_start, current_period_end, access_ends_at)
+      select ${student.id}, id, 'synthetic_test', 'active', now(), now()+interval '30 days', now()+interval '30 days' from plans order by id limit 1
+      on conflict(user_id) where status in ('active','trialing','past_due') do update set
+      current_period_start=excluded.current_period_start,current_period_end=excluded.current_period_end,
+      access_ends_at=excluded.access_ends_at where subscriptions.provider='synthetic_test'`;
     await db`update users set email = 'qa-editor@example.invalid', password_hash = ${passwordHash}
       where id = ${fixtures[0].editor_id}`;
     for (const [index, f] of fixtures.entries()) {

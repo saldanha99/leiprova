@@ -52,6 +52,31 @@ describe("equivalência explícita CF/88 — inciso integral e caput", () => {
     expect(() => verifyOfficialClause(f)).toThrow("texto completo");
   });
 
+  it.each([
+    ["XLIV", "Estado democrático;", "Estado Democrático;"],
+    ["LV", "o contraditório e a ampla defesa,", "o contraditório e ampla defesa,"],
+  ])("v2 registra a variante exata %s sem ampliar v1", (inciso, from, to) => {
+    const f = fixture(inciso);
+    expect(f.source.text).toContain(from);
+    f.source.text = f.source.text.replace(from, to);
+    expect(() => verifyOfficialClause(f)).toThrow("texto completo");
+    f.equivalence.strategy = "cf88-art5-inciso-v2";
+    const evidence = verifyOfficialClause(f);
+    expect(evidence.typographicVariant).toBe(true);
+    expect(evidence.officialVariantRule).toBeTruthy();
+    expect(evidence.packageClauseSha256).not.toBe(evidence.targetClauseSha256);
+  });
+
+  it("v2 não remove artigos, negações ou qualificadores genericamente", () => {
+    for (const [inciso, from, to] of [["LV", "judicial ou administrativo", "judicial"],
+      ["XLIV", "civis ou militares", "militares"], ["XLIV", "inafiançável e imprescritível", "afiançável e prescritível"]]) {
+      const f = fixture(inciso);
+      f.equivalence.strategy = "cf88-art5-inciso-v2";
+      f.source.text = f.source.text.replace(from, to);
+      expect(() => verifyOfficialClause(f)).toThrow("texto completo");
+    }
+  });
+
   it("recusa contexto, hash, referência ou URL divergentes", () => {
     const mutations: ((f: ReturnType<typeof fixture>) => void)[] = [
       (f) => { f.bundle.articleContext += " Contexto alterado."; },

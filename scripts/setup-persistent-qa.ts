@@ -2,6 +2,7 @@ import { hash } from "@node-rs/argon2";
 import { createHash, randomUUID } from "node:crypto";
 import { readFileSync, statSync } from "node:fs";
 import postgres from "postgres";
+import { bindSyntheticProductQuestions } from "./lib/synthetic-product-bindings";
 import {
   CONTEST_ACCESS_OPTIONS,
   CONTEST_CATALOG,
@@ -99,6 +100,10 @@ async function main() {
         await tx`select t.id,t.subject_id from quiz_topics t join quiz_subjects s on s.id=t.subject_id
         where s.slug='direito-constitucional' order by t.id limit 1`;
       const [bank] = await tx`select id from quiz_banks where slug='fgv'`;
+      await tx`insert into question_style_profiles(quiz_bank_id,format,command_style,reasoning_demand,disclaimer)
+        values(${bank.id},'multiple_choice','Fixture sintética, sem avaliação de banca real',
+        'Exercício fictício de software','Perfil sintético usado apenas para validar a interface e o isolamento.')
+        on conflict(quiz_bank_id) do nothing`;
       const opportunityIds = new Map<string, number>();
       const sourceUrl =
         "https://example.invalid/leiprova-qa-sem-validade-juridica";
@@ -133,6 +138,11 @@ async function main() {
           published_at=now(),review_notes='Somente homologação: aprovação sintética, sem validade editorial.'
           where id=${opportunity.id} and editorial_status <> 'reviewed'`;
         await tx`insert into contest_store_products(slug,opportunity_id) values(${slug},${opportunity.id}) on conflict(slug) do nothing`;
+        await tx`insert into opportunity_organizer_assignments(opportunity_id,quiz_bank_id,source_document_id,
+          responsible_type,role,organizer_slug,organizer_name,valid_from,status,reviewed_by_user_id,reviewed_at,review_notes)
+          values(${opportunity.id},${bank.id},${sourceId},'external_organizer','examination_provider','fgv',
+          'Perfil em fixture sintética, sem concurso real',current_date,'reviewed',${adminId},now(),
+          'Vínculo sintético de software; não é aprovação editorial.') on conflict do nothing`;
         const [act] =
           await tx`insert into legal_acts(slug,title,short_title,act_type,act_year,official_url)
           values(${`qa-regra-${label}`},${`REGRA FICTÍCIA QA ${label.toUpperCase()} — NÃO É LEI`},
@@ -179,6 +189,7 @@ async function main() {
           await tx`insert into question_opportunities(question_id,opportunity_id,relationship)
             values(${question.id},${opportunity.id},'direct_requirement') on conflict do nothing`;
         }
+        await bindSyntheticProductQuestions(tx, slug);
       }
       const [plan] =
         await tx`insert into plans(slug,name,description,billing_type,amount_cents,is_active)

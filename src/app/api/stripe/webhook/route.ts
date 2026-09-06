@@ -4,6 +4,7 @@ import { NextRequest } from "next/server";
 import { processStripeEvent } from "@/app/api/stripe/webhook/process";
 import { getDb } from "@/lib/db/client";
 import { stripeEvents } from "@/lib/db/schema";
+import { processMasterStripeEvent } from "@/lib/stripe/master-subscription";
 import {
   getStripeClient,
   getStripeWebhookConfiguration,
@@ -72,6 +73,16 @@ export async function POST(request: NextRequest) {
       payload,
     })
     .onConflictDoNothing();
+
+  // Master conclui evento e direitos na mesma transação. O claim legado abaixo
+  // permanece reservado aos concursos e não bloqueia recuperar um Master interrompido.
+  try {
+    if (await processMasterStripeEvent(event, { trackEvent: true })) {
+      return Response.json({ received: true });
+    }
+  } catch {
+    return Response.json({ error: "Falha ao reconciliar o pagamento Master." }, { status: 500 });
+  }
 
   const [claimed] = await db
     .update(stripeEvents)

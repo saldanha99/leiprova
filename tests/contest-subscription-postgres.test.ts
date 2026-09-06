@@ -6,6 +6,7 @@ import type Stripe from "stripe";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import * as schema from "@/lib/db/schema";
 import { subscriptionFixture } from "./fixtures/contest-subscription";
+import { bindSyntheticProductQuestions } from "../scripts/lib/synthetic-product-bindings";
 
 const url = process.env.LEIPROVA_TEST_DATABASE_URL;
 if (url) {
@@ -51,15 +52,21 @@ describe.skipIf(!db)(
         )
         .returning();
       const rows =
-        await client!`select o.id from contest_opportunities o join question_opportunities qo on qo.opportunity_id=o.id join questions q on q.id=qo.question_id where o.slug like 'teste-%' and q.editorial_status='reviewed' limit 1`;
+        await client!`select o.id from contest_opportunities o join question_opportunities qo on qo.opportunity_id=o.id
+          join questions q on q.id=qo.question_id join opportunity_requirements r on r.opportunity_id=o.id and r.legal_article_id=q.legal_article_id
+          join legal_articles a on a.id=q.legal_article_id join legal_versions v on v.id=a.legal_version_id
+          where o.slug like 'teste-%' and o.editorial_status='reviewed' and q.editorial_status='reviewed' and r.editorial_status='reviewed'
+          and a.editorial_status='reviewed' and v.status='current' and v.source_url='https://example.invalid/test-fixture' order by q.id limit 1`;
       if (!rows.length) throw new Error("Fixture editorial de QA ausente.");
       opportunityId = Number(rows[0].id);
       await db!
         .insert(schema.contestStoreProducts)
         .values({ slug, opportunityId });
+      await bindSyntheticProductQuestions(client!, slug);
     });
     afterAll(async () => {
       if (db) {
+        await db.delete(schema.contestProductQuestionBindings).where(eq(schema.contestProductQuestionBindings.productSlug, slug));
         for (const id of orders)
           await db
             .delete(schema.contestOrders)

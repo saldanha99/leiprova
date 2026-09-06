@@ -7,7 +7,7 @@ type Fixture = ReturnType<typeof masterSubscriptionFixture>;
 function period(f: Fixture) { return paidMasterInvoicePeriod(f.invoice, f.subscription, f.identity); }
 function charge(f: Fixture) { return f.intent.latest_charge as Stripe.Charge; }
 
-describe("política Master isolada — ainda não integrada ao webhook", () => {
+describe("política Master — contrato utilizado pelo reconciliador", () => {
   it.each([false, true])("aceita período pago finito e plano exato; anual=%s", (annual) => {
     const f = masterSubscriptionFixture(annual);
     expect(period(f)).toEqual({ start: new Date(f.start * 1000), end: new Date(f.end * 1000), amountCents: f.amount });
