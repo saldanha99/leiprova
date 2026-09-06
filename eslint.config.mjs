@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Artefatos operacionais privados, fora do Git e da imagem da aplicação.
+    ".local/**",
   ]),
 ]);
 

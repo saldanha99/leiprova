@@ -72,28 +72,54 @@ zero novas tarefas, sem duplicar as 141 tarefas existentes. As mesmas cinco
 falhas de coleta permaneceram. O processo retorna erro no ciclo para sinalizá-las,
 mas o serviço contínuo mantém a próxima tentativa após o intervalo configurado.
 
-## Maestri — parte ainda não ativada
+## Maestri — ativação posterior às 19h42 BRT
 
 As skills Maestri foram usadas para coordenar os nós existentes. O Maestro
 registrou a autorização/ownership na TEAM-CHARTER. Guardião entregou o módulo
 conservador incorporado e testado; Radar entregou o diagnóstico privado de
 portais. O recibo do Forge ainda não confirmou a entrega final do fetch.
 
-**Não foram criadas as três rotinas recorrentes.** O Mac bloqueou a interação
-visual e a tentativa de desbloqueio automático falhou. O CLI precisa do terminal
-Maestro iniciado pelo aplicativo; não se deve forjar sua identidade/socket.
-Código e notas de contexto não são prova de ativação do canvas.
+Com o Mac desbloqueado, o terminal Maestro permitiu comandos locais apesar do
+limite semanal do Claude. Nenhuma identidade/socket foi copiada ou forjada.
 
-Quando o Mac for desbloqueado:
+- Lista inicial confirmou zero rotinas. Criadas e verificadas: Radar `6237b5`,
+  Guardião `cc6e9e`, Autor `56cefb`. Todas habilitadas, intervalo de 20 minutos,
+  pular terminal ocupado e sem notificação por disparo. Oito nós preservados.
+- PROJECT-CONTEXT, TEAM-CHARTER, EDITORIAL-QUEUE e QUALITY-GATES receberam bloco
+  vigente que supera restrições históricas de fila vazia/ponte inexistente.
+  Importação automática permite apenas rascunhos; publicação exige revisão humana.
+- Primeiro teste não reservou trabalho. Ajustado o preflight para Node absoluto,
+  PATH/diretório explícitos e argumento ASCII do Guardião. Adaptador privado
+  chama a mesma ponte, sem transportar credenciais.
+- Teste seguinte: Autor registrou `idle_or_budget` com fila autoral vazia;
+  Radar registrou `claude_limit_wait`; Guardião reservou `legal-change:643`
+  e iniciou leitura/análise no nó Codex. A resposta foi recolhida pela ponte às
+  19h49 BRT e persistida como `blocked`: snapshot pendente sem texto/comparação
+  e consulta ao robots do Senado retornando 403. Não afirmou mudança nem vigência.
+- Radar não reserva antes de 07/09/2026 às 03h BRT, reset indicado pelo Claude.
+  Maestro também está sem saldo. Nenhuma API paga usada para contornar o limite.
+- Forge estava parado pedindo navegação em `/concursos/` da FCC; pedido recusado
+  por política de acesso. Tarefa delimitada de erros seguros retomada, ainda
+  sem correção final integrada. As cinco falhas de coleta não estão resolvidas.
 
-1. Maestro lê `docs/MAESTRI-MOTORES-AUTOMATICOS.md` e lista nós/rotinas reais.
-2. Reutiliza Radar, Guardião e Autor; cria/atualiza `Editalume — Radar`,
-   `Editalume — Guardião`, `Editalume — Autor`, a cada 20 minutos, com os
-   preflights/contratos documentados. Sem duplicar agentes ou rotinas.
-3. Atualiza PROJECT-CONTEXT, TEAM-CHARTER, EDITORIAL-QUEUE e QUALITY-GATES,
-   preservando as regras e os acessos privados. Não copiar credenciais.
-4. Verifica uma execução real por papel e registra IDs/recibos. Confirma o
-   diagnóstico final do Forge e trata as cinco falhas de coleta.
+Recibos privados: `.local/maestri/ativacao-rotinas-20260906.json`,
+`preflight-config-20260906.json`, `automatic-result-handoff-20260906.json` e
+`preflight-events.jsonl`. Recolhimento de respostas (`--mode=settle`) incluído
+para o agendador concluir pela ponte, sem SSH iniciado pelos agentes; cinco
+testes locais específicos passaram. O teste real de recolhimento foi acionado
+pelo integrador, não por um disparo periódico: essa distinção permanece.
+As permissões restritas do terminal exigiram confirmações pontuais de navegador
+e escrita nessa primeira tarefa. Não foram ampliadas nem criada allowlist;
+novas confirmações podem impedir execução totalmente sem supervisão.
+Ativação comprovada
+não é comprovação de conclusão autoral nem de produto pronto.
+
+Verificação após a ativação: lint, typecheck e build passaram; 1.241 testes
+passaram e 230 opcionais foram pulados. Mudança nova é do operador local, sem
+necessidade de reconstruir/reiniciar a aplicação ou os workers publicados.
+Estado da fila: 134 mapeamentos pendentes; análises normativas com duas pendentes
+e uma bloqueada; descobertas com uma preparada, duas pendentes e uma bloqueada.
+Duas reservas utilizadas de 24/24h. Nenhuma questão nova importada/publicada.
 
 Mesmo ativadas, as etapas de IA só executam com Maestri/workspace/terminais
 disponíveis. Ainda não houve migração para o servidor doméstico 24/7.

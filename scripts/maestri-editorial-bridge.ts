@@ -5,6 +5,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { z } from "zod";
 import { agentWorkKindSchema, validateAgentWorkResult, workPayloadSchema, AGENT_FOR_WORK } from "../src/lib/editorial/agent-work-contract";
+import { settleLocalAgentResults } from "../src/lib/editorial/local-agent-results";
 
 const root=fileURLToPath(new URL("../",import.meta.url));
 const queueRoot=path.join(root,".local/maestri/queue");
@@ -33,6 +34,16 @@ async function readPrivateJson(file:string) {
     return JSON.parse(await handle.readFile("utf8")) as unknown;
   }finally{await handle.close();}
 }
+async function completePacket(packet:string) {
+  if(path.basename(packet)!=="packet.json") throw new Error("Use o packet.json reservado.");
+  const claim=claimSchema.parse(await readPrivateJson(packet));
+  const result=validateAgentWorkResult(claim.job.kind,claim.job.payload,
+    await readPrivateJson(path.join(path.dirname(packet),"response.json")));
+  const receipt=remote("complete",{jobKey:claim.job.jobKey,inputHash:claim.job.inputHash,
+    leaseToken:claim.job.leaseToken,result});
+  await writeFile(path.join(path.dirname(packet),"receipt.json"),JSON.stringify(receipt,null,2),{mode:0o600});
+  return receipt;
+}
 async function main() {
   const mode=process.argv[2];
   if(mode==="--mode=poll" && (process.argv.length===3 || (process.argv.length===4 && process.argv[3].startsWith("--agent=")))) {
@@ -53,14 +64,9 @@ async function main() {
       instruction:"Leia docs/MAESTRI-MOTORES-AUTOMATICOS.md. Execute somente esta tarefa e salve response.json no contrato indicado. Não publicar, não modificar banco, não compartilhar segredos."}));
   } else if(mode==="--mode=complete" && process.argv.length===4) {
     const packet=path.resolve(process.argv[3]);
-    if(path.basename(packet)!=="packet.json") throw new Error("Use o packet.json reservado.");
-    const claim=claimSchema.parse(await readPrivateJson(packet));
-    const result=validateAgentWorkResult(claim.job.kind,claim.job.payload,
-      await readPrivateJson(path.join(path.dirname(packet),"response.json")));
-    const receipt=remote("complete",{jobKey:claim.job.jobKey,inputHash:claim.job.inputHash,
-      leaseToken:claim.job.leaseToken,result});
-    await writeFile(path.join(path.dirname(packet),"receipt.json"),JSON.stringify(receipt,null,2),{mode:0o600});
-    console.log(JSON.stringify(receipt));
+    console.log(JSON.stringify(await completePacket(packet)));
+  } else if(mode==="--mode=settle" && process.argv.length===4 && process.argv[3].startsWith("--agent=")) {
+    console.log(JSON.stringify(await settleLocalAgentResults(queueRoot,process.argv[3].slice(8),completePacket)));
   } else if(mode==="--mode=status" && process.argv.length===3) console.log(JSON.stringify(remote("status")));
   else throw new Error("Use --mode=poll, --mode=status ou --mode=complete CAMINHO_PACKET.");
 }

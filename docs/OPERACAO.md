@@ -4,15 +4,30 @@ Documento de contexto para quem for continuar o projeto — pessoa ou assistente
 Descreve onde as coisas estão, como publicar e quais armadilhas já custaram tempo.
 
 Última aplicação verificada: 06/09/2026, 17h43 BRT (20h43 UTC).
+Ativação local Maestri: 06/09/2026, 19h42 BRT, sem novo deploy da aplicação.
 As seções antigas abaixo são histórico; consulte os registros recentes antes de operar.
+
+**Maestri ativado (19h42 BRT):** três rotinas reais, a cada 20 minutos, nos nós
+existentes: Radar `6237b5`, Guardião `cc6e9e`, Autor `56cefb`. As quatro notas
+editoriais receberam a atualização vigente, preservando acessos e histórico.
+Guardião concluiu `legal-change:643` como bloqueada por evidência insuficiente e
+403 do Senado; resposta registrada pela ponte. Autor pulou por fila vazia.
+Radar aguarda o reset do Claude de 07/09 às 03h BRT, sem reservar até lá.
+Maestro também está sem saldo. Recolhimento local de respostas adicionado para
+reduzir o uso de SSH pelos agentes. Lint, typecheck, 1.241 testes e build passaram
+(230 testes opcionais pulados). Sem novo deploy: alterações executam no Mac;
+VPS recebe somente a sincronização da fonte. Isso ainda não comprova geração
+autoral concluída nem ausência de confirmações de ferramenta nos terminais.
+Ver configuração/limites em `docs/MAESTRI-MOTORES-AUTOMATICOS.md`.
 
 **Motores publicados (06/09/2026, 17h42 BRT):** fila/ponte e painel `/admin/motores`
 publicados (`46adce0`, worker ajustado em `2951940`), migração 0037 e privilégios
 aplicados sem seed. Monitor consultou dez normas sem falha; a coleta ainda teve
 cinco falhas e uma suspensão por política. 134 análises de requisitos e três
 análises legislativas na fila. Uma descoberta Cebraspe foi confirmada manualmente
-pela ponte, com repetição idempotente validada. **Rotinas recorrentes no Maestri
-ainda não ativadas: Mac bloqueado.** Nenhuma questão nova publicada/importada;
+pela ponte, com repetição idempotente validada. Naquela verificação, as rotinas
+do Maestri aguardavam o desbloqueio do Mac; ativação posterior registrada acima.
+Nenhuma questão nova publicada/importada naquela rodada;
 Stripe pausada, conteúdo e catálogo preservados. Ver
 [publicação, evidências e pendências](MOTORES-PUBLICACAO-2026-09-06.md) e
 [contrato operacional do time](MAESTRI-MOTORES-AUTOMATICOS.md).

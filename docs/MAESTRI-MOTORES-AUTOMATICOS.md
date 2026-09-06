@@ -66,6 +66,21 @@ projeto. Fila vazia ou teto atingido devolve saída 3 e a rotina não chama a IA
 O preflight imprime JSON com `packet`, `responsePath`, `agent` e `jobKey`, nunca
 credenciais do banco. O pacote privado guarda a reserva necessária ao protocolo.
 
+Na configuração local atual, o preflight primeiro executa
+`--mode=settle --agent=NOME` pela mesma ponte: recolhe até três respostas prontas
+do papel, valida-as pelo contrato completo e grava recibo. Não segue links
+simbólicos de entrada, não repete arquivos com recibo e limita falhas a três
+tentativas por hash de resposta. Assim, nas próximas rodadas o agente só escreve
+`response.json` e termina; não precisa iniciar SSH para concluir. O prompt
+efetivo da rotina usa esse modo, em lugar da conclusão manual exemplificada
+abaixo. Importação continua exclusivamente em rascunho.
+
+Guardião e Autor trabalham com o corpus oficial versionado recebido; informação
+insuficiente vira `blocked`, não consulta improvisada nem afirmação de vigência.
+Radar ainda precisa navegar nas fontes oficiais permitidas. As permissões dos
+terminais não foram ampliadas: se uma escrita/leitura exigir confirmação local,
+a tarefa fica pendente. Rotina habilitada não elimina esse requisito.
+
 Comando/prompt da rotina, com o placeholder oficial `{{output}}`:
 
 > Execute a única tarefa reservada descrita a seguir: {{output}}. Leia
@@ -143,6 +158,34 @@ Objeto JSON estrito, sem cerca Markdown. Campos comuns:
 
 O estado `prepared` indica resultado técnico aceito, nunca revisão humana. Veja
 `src/lib/editorial/agent-work-contract.ts` para limites e validações exatos.
+
+## Configuração local ativada em 06/09/2026
+
+As três rotinas foram criadas no workspace existente pelo terminal Maestro,
+usando o modo de comandos locais, sem depender de uma resposta do Claude:
+Radar `6237b5`, Guardião `cc6e9e`, Autor `56cefb`. Intervalo de 20 minutos,
+habilitadas, pular terminal ocupado, sem notificação por disparo.
+
+O agendador gráfico não herdou corretamente o ambiente do terminal na primeira
+tentativa. A configuração efetiva usa o caminho absoluto do Node instalado e o
+adaptador privado `.local/maestri/preflight.cjs`, que chama a ponte documentada
+com diretório e PATH explícitos. O argumento local do Guardião é `Guardiao`
+(ASCII), convertido no adaptador para o nome exato do protocolo. Não alterar
+o nome do nó. Eventos seguros, sem pacote ou reserva, ficam em
+`.local/maestri/preflight-events.jsonl`.
+
+Claude/Maestro e Radar atingiram limite semanal observado no terminal. O
+preflight do Radar pula sem reservar até 07/09/2026 às 03h BRT (06h UTC), o
+reset exibido. Isso não garante disponibilidade após esse horário: novos
+limites devem virar pendência, nunca API paga alternativa. Guardião e Autor
+continuam nos nós Codex existentes. Não aguardar resposta síncrona do Maestro
+para finalizar um trabalho: salvar o recibo e encerrar evita espera circular.
+
+Configuração exata e IDs: `.local/maestri/ativacao-rotinas-20260906.json` e
+`.local/maestri/preflight-config-20260906.json`. Esses arquivos não contêm chaves,
+mas permanecem privados. Ao migrar para outro host, recriar a configuração pelo
+CLI oficial no workspace correto, conferir caminhos/SSH e testar novamente;
+não copiar socket, cookies ou identidade de terminal.
 
 ## Inspeção
 
