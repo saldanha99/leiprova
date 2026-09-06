@@ -49,6 +49,8 @@ next-env.d.ts
 /.local/commerce/
 # Estado local do orquestrador. O contrato reproduzível está em docs/MAESTRI-FABRICA-EDITORIAL.md.
 /.maestri/
+# Recibos privados de sincronização do canvas e inventário operacional.
+/.local/maestri/
 # O repositório é público; o lote é um artefato editorial entregue separadamente.
 /content/editorial/cf-direitos-fundamentais-2026-09-05/
 /content/editorial/*.zip

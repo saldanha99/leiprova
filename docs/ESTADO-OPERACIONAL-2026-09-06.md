@@ -86,6 +86,11 @@ foram atualizadas e conferidas visualmente. Nenhum valor de credencial foi
 transmitido; os arquivos privados conferidos continuam com permissão 0600.
 Documento inicial publicado no GitHub e na VPS no commit `5bbea9f`, sem recriar
 app, homologação ou workers. A atualização de notas não atesta geração contínua.
+Radar, Guardião e Autor confirmaram a leitura e permaneceram ociosos, sem gerar
+ou publicar conteúdo. Recibo privado em
+`.local/maestri/recibo-contexto-20260906.json`, excluído do Git. O inventário também
+registrou MCPs Codex e Neon sem login nos terminais Codex; não foram reconectados
+nesta passagem. Isso é uma pendência do time, distinta dos serviços da VPS.
 
 - Maestro: manter fila e reservar uma tarefa por responsável; ler AGENTS.md,
   este relatório e OPERACAO.md antes de operar. Stripe em pausa, sem gastos em APIs.
