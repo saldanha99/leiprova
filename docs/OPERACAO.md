@@ -3,10 +3,10 @@
 Documento de contexto para quem for continuar o projeto — pessoa ou assistente de IA.
 Descreve onde as coisas estão, como publicar e quais armadilhas já custaram tempo.
 
-Última aplicação verificada: 06/09/2026, 13h11 BRT (16h11 UTC).
+Última aplicação verificada: 06/09/2026, 15h13 BRT (18h13 UTC).
 As seções antigas abaixo são histórico; consulte os registros recentes antes de operar.
 
-**Stripe — preparação e emissão da chave (06/09/2026):** pedido de
+**Editalume e catálogo Stripe publicados (`66ad154`, 06/09/2026):** pedido de
 retirada do catálogo antigo e inclusão dos 75 cursos + Master registrado.
 Conexão com Chrome Vini via `agent-browser` indisponível; proprietário autorizou
 exceção para controle visual. Aba Vini/2timeWeb acessada: catálogo visual com
@@ -19,21 +19,32 @@ no Mac/VPS por formulário local privado. Conta própria validada pela API, com
 pagamentos/cadastro/recebimentos habilitados. Inventário API: 23 produtos, 19
 ativos, 26 preços, zero links ativos, sessões abertas ou assinaturas.
 Não usar essa chave limitada de manutenção como credencial do checkout.
-Conferência anterior somente de presença/modo no app:
-chave secreta test, publicável ausente, segredo webhook presente, vendas fechadas.
+Conferência final das variáveis corretas do app: chave secreta test, publicável
+test, segredo webhook presente, vendas fechadas. A chave live de manutenção é
+separada do runtime; não concluir que pagamento/entrega estejam operacionais.
 Os 19 produtos antigos autorizados e seus 22 preços foram arquivados; os quatro
 já arquivados e todo o histórico foram preservados. Nenhuma flag alterada.
 Inventário após arquivamento confirmou zero produtos ativos. Sincronização dos
-75 cursos e Master iniciada em contêiner operacional separado; conferir
-conclusão e leitura final antes de afirmar catálogo criado.
+75 cursos e Master concluída em contêiner operacional separado; leitura final
+validou **76 produtos ativos e 152 novos preços**, valores/recorrência, imagem,
+URL e todos os vínculos no banco. Quatro preços históricos dos quatro produtos
+já arquivados continuam preservados, fora do catálogo Editalume. Total na conta:
+99 produtos (76 ativos/23 arquivados), 178 preços; sem sessões, links ativos ou
+assinaturas. Os dois preços Master também foram configurados no app.
 Backup exclusivo anterior às escritas verificado no Mac/VPS; 75 produtos locais
-ainda sem vínculo Stripe e 346 questões preservadas. A marca pública foi
+com os vínculos Stripe completos e 346 questões preservadas por hash integral.
+A marca pública foi
 centralizada como Editalume no código e no contexto documental do time, sem
 mudar domínio ou identificadores técnicos. Isso não comprova alteração do canvas.
 Preparados inventário privado somente leitura, apresentação/retomada do
 sincronizador e preflight de identidade/permissões do banco antes da Stripe.
 1082 testes, lint e typecheck passaram; build da marca aprovado; 150 integrações
-opcionais ignoradas. Sem deploy. Não confundir prévia de 76 produtos/152 preços com criação real.
+opcionais ignoradas. Deploy app-only aprovado, saúde `ok`, página PGM-RJ
+conferida no navegador. Homologação não recriada; sem seed, migração, grants,
+e-mail ou WhatsApp de entrega, cobrança ou liberação editorial. Imagem:
+`sha256:871d54266b4b09a8c3b132b2e1c185487ccf832ad5ac19338f0afad2c1dd7182`.
+Catálogo LIVE criado não significa checkout aberto: faltam runtime, homologação
+de pagamentos/entrega e o mínimo válido de conteúdo por concurso.
 Ver [estado, acesso e execução do catálogo Stripe](STRIPE-CATALOGO-PRODUCAO.md).
 
 **Autoria privada por cargo (06/09/2026, sem deploy):** 68 novos rascunhos para

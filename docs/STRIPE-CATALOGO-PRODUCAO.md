@@ -1,4 +1,4 @@
-# Catálogo Stripe — preparação de produção
+# Catálogo Stripe — aplicação de produção
 
 ## Estado verificado em 06/09/2026
 
@@ -10,8 +10,9 @@ vizinhos da VPS. Antes de qualquer retirada, identificar os objetos exatos.
 **Uma chave restrita de catálogo Editalume foi emitida após as verificações
 concluídas pelo proprietário. Os 19 produtos antigos autorizados e seus 22 preços
 foram arquivados e conferidos. Histórico preservado; os quatro produtos que já
-estavam arquivados não foram alterados. A sincronização do novo catálogo está
-em execução; não declarar criação concluída antes da conferência final.**
+estavam arquivados não foram alterados. Os 75 concursos + Master foram criados
+em LIVE, com 152 novos preços e vínculos no banco de produção. Verificação
+independente do catálogo passou. A aplicação da marca foi publicada.**
 
 - Conta autorizada: `acct_1TCQvlBkl6797u2u`, Chrome **Vini** (`Profile 4`).
 - O Chrome estava em execução, sem conexão de depuração disponível para
@@ -20,9 +21,12 @@ em execução; não declarar criação concluída antes da conferência final.**
   operação. A aba autenticada do perfil **Vini** foi acessada e a conta
   **2timeWeb** conferida. Não copiar perfil/cookies; a exceção não autoriza
   contornar confirmações de criação de acesso sensível.
-- No aplicativo de produção, a presença e o modo foram conferidos sem exibir
-  valores: chave secreta **test**, chave publicável ausente, segredo de webhook
-  presente. A presença de segredo não prova que o endpoint esteja homologado.
+- No aplicativo de produção, a conferência final das variáveis efetivamente
+  usadas confirmou chave secreta **test**, `STRIPE_PUBLISHABLE_KEY` **test** e
+  segredo de webhook presente. A anotação anterior de publicável ausente não
+  descrevia essa variável correta. A presença de segredo não prova que o endpoint
+  esteja homologado. A chave LIVE de manutenção é separada e não foi instalada
+  como chave de execução de pagamentos.
 - `CHECKOUT_ENABLED=false` e `CONTEST_CHECKOUT_ENABLED=false` confirmados.
 - A listagem visual do catálogo mostrou **23 produtos, 19 ativos e 4 arquivados**,
   em duas páginas. São produtos antigos de outras marcas, não os 75 concursos.
@@ -48,7 +52,7 @@ em execução; não declarar criação concluída antes da conferência final.**
   assinaturas, histórico financeiro e novos produtos permanecem fora das
   mutações. O operador dedicado fixa esse escopo; não derivá-lo de um filtro
   móvel após criar o catálogo Editalume.
-- Conferência somente leitura do banco de produção: 75 produtos locais,
+- Conferência somente leitura do banco de produção **antes da operação**: 75 produtos locais,
   nenhum com `stripe_product_id`; nenhuma assinatura local encontrada.
   Preflight operacional aprovado sem conceder privilégios ou alterar dados.
   Backup do banco exclusivo concluído e verificado no Mac e na VPS:
@@ -66,8 +70,27 @@ em execução; não declarar criação concluída antes da conferência final.**
   sessão aberta ou assinatura. Arquivo `inventory-live-2026-09-06T18-09-11-302Z.json`,
   SHA-256 `b783eb77ff6648b648a8852b151d588732fb5f5d56fb1eb633e4e04d355a4171`.
   Somente `active=false` foi aplicado; não houve DELETE, reembolso ou cobrança.
+- Sincronizador `a98ce92` executado em contêiner efêmero separado, com banco
+  interno direto e saída HTTPS, sem portas publicadas. Concluiu com código 0;
+  contêiner removido após preservar recibo. Nenhum seed, migração ou grant.
+  Todos os 75 vínculos e os dois planos Master foram persistidos. Os dois IDs
+  Master também foram instalados nas variáveis próprias da aplicação, com
+  backup do `.env`; demais valores e flags preservados.
+- Conferência independente de todos os vínculos, modo, preços, periodicidade,
+  identidade, imagem e URL: **75 cursos / 76 produtos ativos / 152 preços
+  Editalume ativos**, sem divergências. Há quatro preços ativos históricos dos
+  quatro produtos já arquivados e preservados. Foram comparados com os snapshots
+  anteriores por hash; não são preços novos nem vínculos da Editalume.
+  A conta tem, portanto, 99 produtos totais (76 ativos, 23 arquivados), 178 preços
+  totais (152 ativos da Editalume + 4 ativos legados), zero links ativos, sessões
+  abertas ou assinaturas. Criar catálogo não cria automaticamente sessões de compra.
+- Inventário final: `inventory-live-2026-09-06T18-15-08-320Z.json`, SHA-256
+  `d0f47e100df0ab6aecab9b54d24d16204eb1acd9aa9780c3db1f4584f115fe72`.
+  Verificação independente: `verification-live-2026-09-06T18-14-53-218Z-f9568c5e.json`,
+  SHA-256 `a8567a117bc4e04effcd2c89620a37cc9aa9e3adf2ed8758fc4e4da5c950363d`.
+  Painel Chrome Vini também mostrou 76 ativos e 23 arquivados; aba deixada aberta.
 
-## Catálogo que será sincronizado
+## Catálogo sincronizado e verificado
 
 | Escopo | Produtos | Preços | Valores recorrentes |
 |---|---:|---:|---|
@@ -173,7 +196,10 @@ existentes não são canceladas simplesmente pelo arquivamento do produto.
 
 ## Antes de abrir vendas
 
-Permanece necessária homologação externa: pagamento inicial, renovação,
+Permanece necessária a credencial LIVE própria do runtime, com permissões
+adequadas de checkout/faturamento e chave publicável do mesmo modo. A chave
+restrita de manutenção não pode ser ampliada ou reutilizada silenciosamente.
+Depois, homologação externa: pagamento inicial, renovação,
 inadimplência, cancelamento, reembolso, eventos repetidos/fora de ordem, perda
 de execução e recuperação. O webhook de concursos ainda tem pendências de
 recuperação de `processing`; entrega durável de mensagens também não foi
@@ -196,9 +222,15 @@ credencial e sem acesso à API. O inventário recebeu revisão independente,
 incluindo testes de paginação, modo e redirecionamento de pasta privada.
 O preflight do banco recebeu revisão independente; 49 testes focais novos
 passaram. Os testes de sincronização usam fakes: não são homologação Stripe
-live ou test. A emissão da chave, os inventários API, o arquivamento e o início
-da sincronização controlada estão registrados acima. O novo operador de arquivamento passou em 26 testes
+live ou test. A emissão da chave, os inventários API, o arquivamento e a
+sincronização controlada estão registrados acima. O novo operador de arquivamento passou em 26 testes
 focais; as alterações de marca passaram em 175 testes focais distintos, lint e
 typecheck. O build local da marca passou; a refatoração posterior do operador
 somente operacional passou novamente em lint, typecheck e suíte completa.
-Código em branch de desenvolvimento; aplicação de produção ainda não atualizada.
+Publicação app-only de `66ad154` em 06/09/2026, 15h13 BRT, após o build na VPS.
+Imagem da aplicação: `sha256:871d54266b4b09a8c3b132b2e1c185487ccf832ad5ac19338f0afad2c1dd7182`.
+Saúde aprovada, `/api/health` retornando `ok`, página PGM-RJ conferida no navegador
+com Editalume e ofertas R$67/mês / R$347/ano, mostrando vendas ainda não abertas.
+As 346 questões mantiveram o hash integral `639ad91749f2714f4dd3d8672666d95e`.
+Homologação permaneceu na mesma imagem e data de criação; não foi recriada.
+Nenhum e-mail, WhatsApp, pagamento, reembolso ou liberação editorial foi realizado.
