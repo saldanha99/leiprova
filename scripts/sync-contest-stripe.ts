@@ -8,6 +8,10 @@ import {
 } from "../src/lib/commerce/catalog";
 import { PLANS } from "../src/lib/plans";
 import { validateStripeSyncTarget } from "../src/lib/commerce/stripe-mode-policy";
+import {
+  ensureMasterStripeCatalog,
+  stripeCatalogSyncPreview,
+} from "../src/lib/commerce/stripe-master-catalog";
 
 // Nenhuma escrita sem --apply; live exige destino e conta explicitamente identificados.
 async function main() {
@@ -20,20 +24,7 @@ async function main() {
     throw new Error("Escolha somente um modo.");
   const mode = args.includes("--mode=live") ? "live" : "test";
   if (!process.argv.includes("--apply")) {
-    console.log(
-      JSON.stringify({
-        mode: "dry-run",
-        stripeMode: mode,
-        contests: CONTEST_CATALOG.length,
-        contestPrices: CONTEST_CATALOG.length * 2,
-        contestBilling: CONTEST_ACCESS_OPTIONS.map((option) => ({
-          interval: option.interval,
-          amountCents: option.amountCents,
-        })),
-        masterPrices: PLANS.length,
-        writes: false,
-      }),
-    );
+    console.log(JSON.stringify(stripeCatalogSyncPreview(mode)));
     return;
   }
   const key = process.env.STRIPE_SECRET_KEY ?? "";
@@ -146,71 +137,16 @@ async function main() {
         on conflict(slug) do update set stripe_product_id=excluded.stripe_product_id,stripe_price_monthly=excluded.stripe_price_monthly,stripe_price_annual=excluded.stripe_price_annual,stripe_mode=excluded.stripe_mode,updated_at=now()
         where contest_store_products.stripe_mode=excluded.stripe_mode or contest_store_products.stripe_product_id is null`;
     }
-    for (const plan of PLANS) {
-      const lookup = `leiprova_master_${plan.slug}_${plan.priceCents}_v1`;
-      const found = await stripe.prices.list({
-        lookup_keys: [lookup],
-        limit: 2,
-      });
-      let price = found.data[0];
-      if (!price) {
-        const products = await stripe.products.search({
-          query: `metadata['app']:'leiprova' AND metadata['plan_slug']:'${plan.slug}'`,
-          limit: 2,
-        });
-        if (products.data.length > 1)
-          throw new Error(
-            "Produto Master duplicado. Revise antes de continuar.",
-          );
-        const product =
-          products.data[0] ??
-          (await stripe.products.create(
-            {
-              name: `Editalume Master · ${plan.name}`,
-              metadata: { app: "leiprova", plan_slug: plan.slug },
-            },
-            { idempotencyKey: `master-product:${plan.slug}:v1` },
-          ));
-        price = await stripe.prices.create(
-          {
-            product: product.id,
-            currency: "brl",
-            unit_amount: plan.priceCents,
-            recurring: {
-              interval: plan.billingMonths === 12 ? "year" : "month",
-            },
-            lookup_key: lookup,
-          },
-          { idempotencyKey: lookup },
-        );
-      }
-      if (
-        price.livemode !== (mode === "live") ||
-        !price.active ||
-        price.currency !== "brl" ||
-        price.unit_amount !== plan.priceCents ||
-        price.recurring?.interval !==
-          (plan.billingMonths === 12 ? "year" : "month") ||
-        price.recurring?.interval_count !== 1
-      )
-        throw new Error("Preço Master divergente.");
-      const product = await stripe.products.retrieve(
-        typeof price.product === "string" ? price.product : price.product.id,
-      );
-      if (
-        product.deleted ||
-        product.metadata.app !== "leiprova" ||
-        product.metadata.plan_slug !== plan.slug
-      )
-        throw new Error("Identidade do produto Master divergente.");
+    const master = await ensureMasterStripeCatalog(stripe, mode);
+    for (const { plan, priceId } of master.prices) {
       // IDs do banco e da configuração precisam apontar para o mesmo preço.
       const updated =
-        await db`update plans set stripe_price_id=${price.id}, name=${plan.name}, updated_at=now() where slug=${plan.slug} and amount_cents=${plan.priceCents} and currency='brl' and billing_type=${plan.billingMonths === 12 ? "year" : "month"} returning id`;
+        await db`update plans set stripe_price_id=${priceId}, name=${plan.name}, updated_at=now() where slug=${plan.slug} and amount_cents=${plan.priceCents} and currency='brl' and billing_type=${plan.billingMonths === 12 ? "year" : "month"} returning id`;
       if (updated.length !== 1)
         throw new Error(
           "Plano Master ausente ou valor divergente no banco. Nenhum seed foi executado.",
         );
-      console.log(`${plan.stripePriceEnv}=${price.id}`); // Identificador público, nunca segredo.
+      console.log(`${plan.stripePriceEnv}=${priceId}`); // Identificador público, nunca segredo.
     }
     console.log(
       `Catálogo sincronizado em ${mode.toUpperCase()}. Nenhuma liberação editorial, cobrança ou flag de venda alterada.`,

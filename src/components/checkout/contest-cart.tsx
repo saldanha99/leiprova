@@ -1,7 +1,16 @@
 "use client";
-import { useRef, useState } from "react";
+
+import { useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
-import { ArrowRight, Check, LockKeyhole } from "lucide-react";
+import {
+  ArrowRight,
+  Check,
+  ChevronDown,
+  Layers3,
+  LockKeyhole,
+  Minus,
+  ShieldCheck,
+} from "lucide-react";
 import {
   CONTEST_ACCESS_OPTIONS,
   CONTEST_ANNUAL_COMPARISON,
@@ -11,32 +20,58 @@ import {
 } from "@/lib/commerce/catalog";
 import { formatBRL, PLANS } from "@/lib/plans";
 import { contestCartTotal } from "@/lib/commerce/order-policy";
+import styles from "./contest-cart.module.css";
 
 export function ContestCart({
   contest,
   related,
   initialAccess,
   available,
+  supplierIdentity,
 }: {
   contest: CatalogContest;
   related: CatalogContest[];
   initialAccess: ContestAccessKey;
   available: boolean;
+  supplierIdentity?: ReactNode;
 }) {
   const [access, setAccess] = useState(initialAccess);
   const [extras, setExtras] = useState<string[]>([]);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
   const attempt = useRef<{ signature: string; id: string } | null>(null);
-  const items = [
-    { productSlug: contest.slug, accessKey: access },
-    ...extras.map((slug) => ({ productSlug: slug, accessKey: access })),
+  const selectedContests = [
+    contest,
+    ...related.filter((item) => extras.includes(item.slug)),
   ];
+  const items = selectedContests.map((item) => ({
+    productSlug: item.slug,
+    accessKey: access,
+  }));
   const selectedOption = CONTEST_ACCESS_OPTIONS.find(
     (option) => option.key === access,
   )!;
   const total = contestCartTotal(items);
+  const annualSavings =
+    CONTEST_ANNUAL_COMPARISON.savingsCents * selectedContests.length;
+  const comparableMaster = PLANS.find(
+    (plan) => plan.billingMonths === selectedOption.months,
+  );
+  const masterSavings = comparableMaster
+    ? Math.max(0, total - comparableMaster.priceCents)
+    : 0;
+
+  function chooseAccess(next: ContestAccessKey) {
+    setAccess(next);
+    setError("");
+  }
+  function removeExtra(slug: string) {
+    setExtras((current) => current.filter((item) => item !== slug));
+    setError("");
+  }
+
   async function checkout() {
+    if (!available || pending) return;
     setError("");
     setPending(true);
     const signature = JSON.stringify(items);
@@ -64,205 +99,433 @@ export function ContestCart({
       setPending(false);
     }
   }
+
   return (
-    <div className="grid items-start gap-8 lg:grid-cols-[1fr_.8fr]">
-      <div>
-        <span className="text-xs font-extrabold uppercase tracking-widest text-emerald-300">
-          01 / Seu concurso
-        </span>
-        <h1 className="mt-4 text-3xl font-semibold tracking-tight">
-          {contestTitle(contest)}
+    <div className={styles.checkout}>
+      <div className={styles.intro}>
+        <p className={styles.eyebrow}>Seu estudo. Do seu jeito.</p>
+        <h1>
+          Um objetivo claro.
+          <br />
+          <em>Uma escolha sua.</em>
         </h1>
-        <p className="mt-3 text-sm leading-7 text-slate-400">
-          Escolha a assinatura desta edição. Renovação automática mensal ou
-          anual; cancele a renovação na sua conta e mantenha o período já pago.
+        <p>
+          Personalize sua assinatura, confira cada valor e só então continue
+          para o pagamento.
         </p>
-        <fieldset disabled={pending} className="mt-7 grid gap-3">
-          <legend className="sr-only">Periodicidade da assinatura</legend>
-          {CONTEST_ACCESS_OPTIONS.map((option) => (
-            <label
-              key={option.key}
-              className={`grid cursor-pointer grid-cols-[auto_1fr] items-center gap-4 rounded-2xl border p-5 sm:grid-cols-[auto_1fr_auto] ${access === option.key ? "border-amber-200/40 bg-amber-200/5" : "border-white/15 bg-white/3"}`}
-            >
-              <input
-                type="radio"
-                name="acesso"
-                value={option.key}
-                checked={access === option.key}
-                onChange={() => setAccess(option.key)}
-                className="size-5 accent-amber-200"
-              />
-              <span className="flex-1">
-                <strong>
-                  {option.label} · renovação{" "}
-                  {option.key === "annual" ? "anual" : "mensal"}
-                </strong>
-                <small className="mt-2 block text-slate-400">
-                  {option.key === "annual"
-                    ? `Economize ${formatBRL(CONTEST_ANNUAL_COMPARISON.savingsCents)} (aproximadamente ${CONTEST_ANNUAL_COMPARISON.approximateDiscountPercent}%) em relação a 12 mensalidades.`
-                    : "Flexibilidade para renovar um mês de cada vez."}
-                </small>
-              </span>
-              <strong className="col-start-2 text-xl text-amber-100 sm:col-auto">
-                {formatBRL(option.amountCents)}
-                {option.billingLabel}
-              </strong>
-            </label>
-          ))}
-        </fieldset>
-        {related.length > 0 && (
-          <fieldset disabled={pending} className="mt-10">
-            <legend className="text-lg font-semibold">
-              02 / Outros objetivos na mesma carreira
+      </div>
+      <div className={styles.layout}>
+        <div className={styles.configuration}>
+          <section
+            className={styles.courseIdentity}
+            aria-labelledby="checkout-course-title"
+          >
+            <span className={styles.courseIcon}>
+              <Layers3 size={22} aria-hidden="true" />
+            </span>
+            <div>
+              <p className={styles.eyebrow}>Concurso escolhido</p>
+              <h2 id="checkout-course-title">{contestTitle(contest)}</h2>
+              <p>Uma assinatura individual para esta edição.</p>
+            </div>
+          </section>
+          <fieldset disabled={pending} className={styles.planSection}>
+            <legend className={styles.sectionTitle}>
+              <span>01</span> Escolha seu ritmo
             </legend>
-            <p className="my-3 text-sm leading-6 text-slate-400">
-              Opcional. Cada adicional é outro concurso, com a mesma
-              periodicidade escolhida acima. Nenhum vem marcado; mudar o plano
-              atualiza todos os valores.
+            <p className={styles.sectionDescription}>
+              O mesmo concurso, duas formas de assinar. Sem taxa de adesão.
             </p>
-            <div className="space-y-3">
-              {related.slice(0, 2).map((item) => (
+            <div className={styles.planGrid}>
+              {CONTEST_ACCESS_OPTIONS.map((option) => (
                 <label
-                  key={item.slug}
-                  className="grid cursor-pointer grid-cols-[auto_1fr] items-center gap-4 rounded-xl border border-white/15 p-5 sm:grid-cols-[auto_1fr_auto]"
+                  key={option.key}
+                  className={`${styles.plan} ${option.key === "annual" ? styles.annualPlan : styles.monthlyPlan}`}
+                  data-checkout-plan={option.key}
+                  data-selected={access === option.key}
                 >
-                  <input
-                    type="checkbox"
-                    checked={extras.includes(item.slug)}
-                    onChange={(event) =>
-                      setExtras(
-                        event.target.checked
-                          ? [...extras, item.slug]
-                          : extras.filter((slug) => slug !== item.slug),
-                      )
-                    }
-                    className="size-5 accent-amber-200"
-                  />
-                  <span className="flex-1 text-sm">
-                    <strong>{contestTitle(item)}</strong>
-                    <small className="mt-2 block text-slate-400">
-                      Assinatura {selectedOption.label.toLowerCase()}
-                    </small>
+                  <div className={styles.planTop}>
+                    <input
+                      type="radio"
+                      name="acesso"
+                      value={option.key}
+                      aria-label={`Plano ${option.label.toLowerCase()}`}
+                      aria-describedby={`checkout-plan-price-${option.key} checkout-plan-terms-${option.key}`}
+                      checked={access === option.key}
+                      onChange={() => chooseAccess(option.key)}
+                    />
+                    <span className={styles.planBadge}>
+                      {option.key === "annual"
+                        ? `≈${CONTEST_ANNUAL_COMPARISON.approximateDiscountPercent}% de economia`
+                        : "Mais flexibilidade"}
+                    </span>
+                  </div>
+                  <strong className={styles.planName}>{option.label}</strong>
+                  <span
+                    id={`checkout-plan-price-${option.key}`}
+                    className={styles.planPrice}
+                  >
+                    {formatBRL(option.amountCents)}
+                    <small>{option.billingLabel}</small>
                   </span>
-                  <strong className="col-start-2 text-sm text-amber-100 sm:col-auto">
-                    + {formatBRL(selectedOption.amountCents)}
-                    {selectedOption.billingLabel}
-                  </strong>
+                  {option.key === "annual" ? (
+                    <>
+                      <p className={styles.comparison}>
+                        <s>
+                          {formatBRL(
+                            CONTEST_ANNUAL_COMPARISON.monthlyYearCents,
+                          )}
+                        </s>{" "}
+                        em 12 mensalidades
+                      </p>
+                      <p className={styles.planBenefit}>
+                        Economize{" "}
+                        {formatBRL(CONTEST_ANNUAL_COMPARISON.savingsCents)} por
+                        concurso em um ano.
+                      </p>
+                      <small
+                        id={`checkout-plan-terms-${option.key}`}
+                        className={styles.planFinePrint}
+                      >
+                        Equivale a{" "}
+                        {formatBRL(
+                          CONTEST_ANNUAL_COMPARISON.monthlyEquivalentCents,
+                        )}
+                        /mês. Cobrança anual integral, não parcelada. Renovação
+                        anual automática.
+                      </small>
+                    </>
+                  ) : (
+                    <>
+                      <p className={styles.comparison}>Um mês de cada vez.</p>
+                      <p className={styles.planBenefit}>
+                        Um compromisso menor para o seu momento de estudo.
+                      </p>
+                      <small
+                        id={`checkout-plan-terms-${option.key}`}
+                        className={styles.planFinePrint}
+                      >
+                        Cobrança e renovação mensal automática. Cancele a
+                        próxima renovação na sua conta.
+                      </small>
+                    </>
+                  )}
+                  <span className={styles.planSelection}>
+                    <Check size={15} aria-hidden="true" />
+                    {access === option.key
+                      ? "Plano selecionado"
+                      : `Escolher ${option.label.toLowerCase()}`}
+                  </span>
                 </label>
               ))}
             </div>
+            <p id="checkout-renewal-note" className={styles.renewalNote}>
+              Renovação automática {access === "annual" ? "anual" : "mensal"}.
+              Ao cancelar a renovação, você mantém o acesso até o fim do período
+              já pago.
+            </p>
           </fieldset>
-        )}
-        <aside className="mt-8 rounded-2xl border border-emerald-200/20 bg-emerald-200/5 p-6">
-          <h2 className="text-lg font-semibold">
-            Vai estudar para vários concursos?
-          </h2>
-          <p className="mt-3 text-sm leading-7 text-slate-400">
-            O Master inclui os concursos liberados durante a assinatura. Compare
-            antes de comprar avulsos:{" "}
-            {PLANS.map(
-              (plan) => `${formatBRL(plan.priceCents)}${plan.billingLabel}`,
-            ).join(" ou ")}
-            . A assinatura substitui a seleção avulsa; não é adicionada
-            automaticamente.
-          </p>
-          <Link
-            href="/#planos"
-            className="mt-4 inline-flex min-h-11 items-center gap-2 text-sm font-bold text-emerald-200"
+          {related.length > 0 && (
+            <fieldset disabled={pending} className={styles.extrasSection}>
+              <legend className={styles.sectionTitle}>
+                <span>02</span> Amplie seus objetivos <small>Opcional</small>
+              </legend>
+              <p className={styles.sectionDescription}>
+                Outros concursos da mesma carreira. Nada é incluído sem sua
+                escolha; os adicionais acompanham a periodicidade acima.
+              </p>
+              <div className={styles.extrasList}>
+                {related.slice(0, 2).map((item) => (
+                  <label
+                    key={item.slug}
+                    className={styles.extra}
+                    data-selected={extras.includes(item.slug)}
+                  >
+                    <input
+                      type="checkbox"
+                      aria-label={`Adicionar ${contestTitle(item)}`}
+                      aria-describedby={`checkout-extra-price-${item.slug} checkout-extra-terms-${item.slug} checkout-renewal-note`}
+                      checked={extras.includes(item.slug)}
+                      onChange={(event) => {
+                        const checked = event.target.checked;
+                        setExtras((current) =>
+                          checked
+                            ? [...current, item.slug]
+                            : current.filter((slug) => slug !== item.slug),
+                        );
+                        setError("");
+                      }}
+                    />
+                    <span>
+                      <strong>{contestTitle(item)}</strong>
+                      <small id={`checkout-extra-terms-${item.slug}`}>
+                        Concurso adicional · assinatura{" "}
+                        {selectedOption.label.toLowerCase()}
+                      </small>
+                    </span>
+                    <span
+                      id={`checkout-extra-price-${item.slug}`}
+                      className={styles.extraPrice}
+                    >
+                      + {formatBRL(selectedOption.amountCents)}
+                      <small>{selectedOption.billingLabel}</small>
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+          )}
+          <section
+            className={styles.master}
+            aria-labelledby="checkout-master-title"
           >
-            Comparar com o Master
-            <ArrowRight size={16} aria-hidden="true" />
+            <p className={styles.eyebrow}>Uma alternativa, não um adicional</p>
+            <h2 id="checkout-master-title">
+              Mais de um destino?
+              <br />
+              Conheça o Master.
+            </h2>
+            <p>
+              Uma assinatura para acessar todos os concursos liberados durante
+              sua vigência. Edições em preparação só entram quando forem
+              liberadas.
+            </p>
+            {masterSavings > 0 && (
+              <p className={styles.masterComparison}>
+                Com sua seleção atual, o {comparableMaster!.name} custa{" "}
+                {formatBRL(masterSavings)} a menos{" "}
+                {access === "annual" ? "por ano" : "por mês"}. Compare antes de
+                decidir.
+              </p>
+            )}
+            <div className={styles.masterPlans}>
+              {PLANS.map((plan) => (
+                <Link
+                  key={plan.slug}
+                  href={`/checkout/${plan.slug}`}
+                  aria-label={`Comparar ${plan.name} por ${formatBRL(plan.priceCents)}${plan.billingLabel}`}
+                >
+                  <span>
+                    <small>{plan.name}</small>
+                    <strong>
+                      {formatBRL(plan.priceCents)}
+                      <small>{plan.billingLabel}</small>
+                    </strong>
+                  </span>
+                  <ArrowRight size={18} aria-hidden="true" />
+                </Link>
+              ))}
+            </div>
+            <small>
+              Abre uma contratação separada para você conferir. Seu carrinho de
+              concursos não é cobrado nem convertido automaticamente.
+            </small>
+          </section>
+        </div>
+        <aside
+          className={styles.summary}
+          aria-labelledby="checkout-summary-title"
+        >
+          <div className={styles.summaryHeader}>
+            <span className={styles.eyebrow}>Tudo às claras</span>
+            <LockKeyhole size={18} aria-hidden="true" />
+          </div>
+          <h2 id="checkout-summary-title">
+            Sua escolha,
+            <br />
+            <em>sem surpresas.</em>
+          </h2>
+          <p className={styles.summaryCount}>
+            {selectedContests.length}{" "}
+            {selectedContests.length === 1
+              ? "concurso selecionado"
+              : "concursos selecionados"}{" "}
+            · plano {selectedOption.label.toLowerCase()}
+          </p>
+          <ul className={styles.summaryItems}>
+            {selectedContests.map((item, index) => (
+              <li key={item.slug}>
+                <span className={styles.itemIndex}>
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <div>
+                  <strong>{contestTitle(item)}</strong>
+                  <small>
+                    {formatBRL(selectedOption.amountCents)}
+                    {selectedOption.billingLabel}
+                  </small>
+                  {index > 0 && (
+                    <button
+                      disabled={pending}
+                      type="button"
+                      onClick={() => removeExtra(item.slug)}
+                      aria-label={`Remover ${contestTitle(item)}`}
+                      className={styles.removeExtra}
+                    >
+                      <Minus size={12} aria-hidden="true" /> Remover adicional
+                    </button>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+          <div className={styles.total} aria-live="polite" aria-atomic="true">
+            <span>Total {selectedOption.label.toLowerCase()}</span>
+            <strong data-checkout-total>
+              {formatBRL(total)}
+              <small>{selectedOption.billingLabel}</small>
+            </strong>
+            <p>
+              {access === "annual"
+                ? "Cobrança integral a cada ano. Não é parcelamento."
+                : "Cobrança a cada mês."}{" "}
+              Renovação automática até o cancelamento.
+            </p>
+            {access === "annual" && (
+              <span className={styles.savings}>
+                Você economiza {formatBRL(annualSavings)} por ano em relação aos
+                mesmos concursos em 12 mensalidades.
+              </span>
+            )}
+          </div>
+          <div className={styles.adjustments}>
+            {access === "monthly" ? (
+              <button
+                type="button"
+                disabled={pending}
+                onClick={() => chooseAccess("annual")}
+              >
+                <ArrowRight size={15} aria-hidden="true" />
+                <span>
+                  Preferir o anual e economizar {formatBRL(annualSavings)} por
+                  ano
+                </span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                disabled={pending}
+                onClick={() => chooseAccess("monthly")}
+              >
+                <span>Prefere um compromisso menor? Trocar para mensal.</span>
+              </button>
+            )}
+            {extras.length > 0 && (
+              <button
+                type="button"
+                disabled={pending}
+                onClick={() => {
+                  setExtras([]);
+                  setError("");
+                }}
+              >
+                <Minus size={15} aria-hidden="true" />
+                <span>Ficar somente com meu concurso principal</span>
+              </button>
+            )}
+          </div>
+          {!available && (
+            <p className={styles.unavailable}>
+              Prévia da oferta. Produto ou pagamentos ainda não liberados.
+              Nenhuma cobrança pode ser iniciada aqui.
+            </p>
+          )}
+          <button
+            disabled={!available || pending}
+            onClick={checkout}
+            type="button"
+            className={styles.payButton}
+          >
+            <LockKeyhole size={17} aria-hidden="true" />
+            {pending
+              ? "Preparando pagamento…"
+              : available
+                ? "Continuar para pagamento seguro"
+                : "Compra ainda não disponível"}
+            <ArrowRight size={17} aria-hidden="true" />
+          </button>
+          {error && (
+            <p role="alert" className={styles.error}>
+              {error}
+            </p>
+          )}
+          <div className={styles.paymentTrust}>
+            <ShieldCheck size={22} aria-hidden="true" />
+            <p>
+              <strong>Pagamento processado pela Stripe</strong>Na próxima etapa,
+              confirme o valor e informe os dados de pagamento no ambiente da
+              Stripe. A Editalume não recebe os dados completos do seu cartão.
+            </p>
+          </div>
+          <p className={styles.terms}>
+            Leia os <Link href="/termos">termos de uso e cancelamento</Link> e a{" "}
+            <Link href="/privacidade">política de privacidade</Link> antes de
+            confirmar. Acesso somente aos períodos pagos. Não há promessa de
+            aprovação ou cobertura integral do edital.
+          </p>
+          <Link href="/contato" className={styles.support}>
+            Precisa de ajuda antes de assinar?{" "}
+            <ArrowRight size={14} aria-hidden="true" />
           </Link>
         </aside>
       </div>
-      <aside className="rounded-[1.5rem] border border-white/15 bg-[#101d2d] p-6 lg:sticky lg:top-8">
-        <p className="text-xs font-bold uppercase tracking-widest text-slate-400">
-          Resumo transparente
-        </p>
-        <h2 className="mt-4 text-2xl font-semibold">Seu próximo passo</h2>
-        <ul className="mt-6 space-y-4 text-sm">
-          {items.map((item) => (
-            <li key={item.productSlug} className="flex gap-3">
-              <Check
-                size={16}
-                className="mt-1 shrink-0 text-emerald-300"
-                aria-hidden="true"
-              />
-              <span>
-                {item.productSlug === contest.slug
-                  ? contestTitle(contest)
-                  : contestTitle(
-                      related.find(
-                        (candidate) => candidate.slug === item.productSlug,
-                      )!,
-                    )}
-                <small className="mt-1 block text-slate-400">
-                  {selectedOption.label} ·{" "}
-                  {formatBRL(
-                    CONTEST_ACCESS_OPTIONS.find(
-                      (option) => option.key === item.accessKey,
-                    )!.amountCents,
-                  )}
-                  {selectedOption.billingLabel}
-                </small>
-              </span>
-            </li>
-          ))}
-        </ul>
-        <div className="mt-7 border-t border-white/15 pt-5">
-          <span className="text-sm text-slate-400">
-            Total da assinatura {selectedOption.label.toLowerCase()}
-          </span>
-          <strong
-            className="mt-2 block text-4xl tracking-tight text-amber-100"
-            aria-live="polite"
-          >
-            {formatBRL(total)}
-            {selectedOption.billingLabel}
-          </strong>
-          <p className="mt-3 text-xs leading-6 text-slate-400">
-            {access === "annual"
-              ? "Cobrança integral a cada ano; não é parcelamento."
-              : "Cobrança a cada mês."}{" "}
-            Renovação automática até o cancelamento. Acesso somente aos períodos
-            pagos. Sem promessa de aprovação ou cobertura integral do edital.
-          </p>
+      <section
+        className={styles.clarity}
+        aria-labelledby="checkout-clarity-title"
+      >
+        <div>
+          <p className={styles.eyebrow}>Antes de continuar</p>
+          <h2 id="checkout-clarity-title">
+            Comprar com clareza
+            <br />
+            também faz parte.
+          </h2>
         </div>
-        {!available && (
-          <p className="mt-5 rounded-lg border border-amber-200/20 p-4 text-xs leading-6 text-amber-100">
-            Prévia da oferta. Produto ou pagamentos ainda não liberados. Nenhuma
-            cobrança pode ser iniciada aqui.
-          </p>
-        )}
-        <button
-          disabled={!available || pending}
-          onClick={checkout}
-          className="mt-5 flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-amber-200 p-3 text-sm font-extrabold text-slate-950 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          <LockKeyhole size={16} aria-hidden="true" />
-          {pending
-            ? "Preparando pagamento…"
-            : available
-              ? "Continuar para a Stripe"
-              : "Compra ainda não disponível"}
-        </button>
-        {error && (
-          <p role="alert" className="mt-4 text-sm text-rose-200">
-            {error}
-          </p>
-        )}
-        <p className="mt-5 text-xs leading-6 text-slate-400">
-          Confira os{" "}
-          <Link href="/termos" className="underline">
-            termos
-          </Link>{" "}
-          e a{" "}
-          <Link href="/privacidade" className="underline">
-            política de privacidade
-          </Link>{" "}
-          antes da confirmação.
-        </p>
-      </aside>
+        <div className={styles.questions}>
+          <details>
+            <summary>
+              Quando começa o acesso?
+              <ChevronDown size={16} aria-hidden="true" />
+            </summary>
+            <p>
+              Depois da confirmação do pagamento pela Stripe. A assinatura
+              individual libera os concursos escolhidos, com o conteúdo revisado
+              e vinculado a cada edição. Ela não é uma assinatura Master.
+            </p>
+          </details>
+          <details>
+            <summary>
+              Como funciona a renovação?
+              <ChevronDown size={16} aria-hidden="true" />
+            </summary>
+            <p>
+              O mensal renova a cada mês; o anual, a cada ano. Você pode
+              cancelar a próxima renovação na sua conta e manter o período já
+              pago. Consulte as condições de cancelamento e reembolso nos{" "}
+              <Link href="/termos">termos</Link>.
+            </p>
+          </details>
+          <details>
+            <summary>
+              Posso escolher só um concurso?
+              <ChevronDown size={16} aria-hidden="true" />
+            </summary>
+            <p>
+              Sim. Os adicionais são opcionais e começam desmarcados. Você
+              também pode removê-los no resumo, antes de continuar. Escolher o
+              Master abre outra contratação; nada é acrescentado
+              automaticamente.
+            </p>
+          </details>
+        </div>
+      </section>
+      {supplierIdentity && (
+        <footer className={styles.supplier}>
+          <p className={styles.eyebrow}>Quem está por trás da sua assinatura</p>
+          <h2>Identificação e atendimento</h2>
+          {supplierIdentity}
+        </footer>
+      )}
     </div>
   );
 }

@@ -1,6 +1,9 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { ContestCart } from "@/components/checkout/contest-cart";
+import styles from "@/components/checkout/contest-cart.module.css";
+import { SupplierIdentityBlock } from "@/components/legal/supplier-identity";
 import { LeiProvaMark } from "@/components/ui/leiprova-mark";
 import { requireUser } from "@/lib/auth";
 import {
@@ -53,11 +56,12 @@ export default async function ContestCheckoutPage({
       (!available || released.some((product) => product.slug === item.slug)),
   );
   return (
-    <main className="min-h-screen bg-[#060e18] px-5 py-7 text-white">
-      <div className="mx-auto max-w-6xl">
-        <header className="mb-12 flex items-center justify-between gap-5">
+    <main className={styles.page}>
+      <div className={styles.shell}>
+        <header className={styles.header}>
           <LeiProvaMark />
-          <Link href="/concursos" className="text-sm text-slate-400">
+          <Link href="/concursos">
+            <ArrowLeft size={14} aria-hidden="true" />
             Voltar ao catálogo
           </Link>
         </header>
@@ -66,6 +70,7 @@ export default async function ContestCheckoutPage({
           related={related}
           initialAccess={access}
           available={available}
+          supplierIdentity={<SupplierIdentityBlock />}
         />
       </div>
     </main>

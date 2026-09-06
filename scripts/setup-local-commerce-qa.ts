@@ -3,7 +3,10 @@ import { randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
 import postgres from "postgres";
 import { z } from "zod";
-import { CONTEST_CATALOG } from "../src/lib/commerce/catalog";
+import {
+  CONTEST_ACCESS_OPTIONS,
+  CONTEST_CATALOG,
+} from "../src/lib/commerce/catalog";
 
 const accountSchema = z.object({
   environment: z.literal("synthetic-local-only"),
@@ -66,27 +69,39 @@ async function main() {
         on conflict(lower(email)) do update set password_hash=excluded.password_hash,role=excluded.role returning id`;
       if (account.access === "master") {
         await db`insert into subscriptions(user_id,plan_id,provider,status,access_ends_at)
-          values(${user.id},${plan.id},'synthetic_test','active',now()+interval '14 days') on conflict do nothing`;
+          values(${user.id},${plan.id},'synthetic_test','active',now()+interval '30 days')
+          on conflict(user_id) where status in ('active','trialing','past_due')
+          do update set access_ends_at=excluded.access_ends_at,status='active',updated_at=now()
+          where subscriptions.provider='synthetic_test'`;
       }
       if (account.access === "contest") {
         const slug = CONTEST_CATALOG.find(
           (item) => item.acronym === "PC-BA" && item.role === "Delegado",
         )!.slug;
         const id = "qa-commerce-avulso-order";
+        const monthly = CONTEST_ACCESS_OPTIONS.find(
+          (item) => item.key === "monthly",
+        )!;
         const lines = [
           {
             productSlug: slug,
-            accessKey: "6m",
-            months: 6,
-            amountCents: 6700,
+            accessKey: monthly.key,
+            months: monthly.months,
+            amountCents: monthly.amountCents,
             stripePriceId: "synthetic-no-stripe",
             opportunityId: Number(fixture.id),
           },
         ];
         await db`insert into contest_orders(id,user_id,status,amount_cents,lines,stripe_mode)
-          values(${id},${user.id},'paid',6700,${db.json(lines)},'test') on conflict do nothing`;
+          values(${id},${user.id},'paid',${monthly.amountCents},${db.json(lines)},'test')
+          on conflict(id) do update set lines=excluded.lines,amount_cents=excluded.amount_cents,updated_at=now()
+          where contest_orders.user_id=excluded.user_id and contest_orders.stripe_mode='test'
+          and contest_orders.stripe_session_id is null and contest_orders.stripe_subscription_id is null`;
         await db`insert into contest_purchases(order_id,product_slug,opportunity_id,user_id,status,access_starts_at,access_ends_at)
-          values(${id},${slug},${fixture.id},${user.id},'active',now(),now()+interval '6 months') on conflict do nothing`;
+          values(${id},${slug},${fixture.id},${user.id},'active',now(),now()+interval '1 month')
+          on conflict(order_id,product_slug) do update set status='active',
+          access_starts_at=excluded.access_starts_at,access_ends_at=excluded.access_ends_at,updated_at=now()
+          where contest_purchases.user_id=excluded.user_id`;
       }
       console.log(`${account.email}: ${account.access} (somente QA local)`);
     }

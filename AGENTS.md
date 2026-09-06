@@ -27,3 +27,15 @@ Regras que valem sempre:
 - Scripts novos que rodem por `tsx` precisam de `--env-file-if-exists=.env`;
   o projeto não tem `dotenv`.
 - Antes de entregar, rode `pnpm lint && pnpm typecheck && pnpm test && pnpm build`.
+
+## Acessos operacionais do time (confirmados em 05/09/2026)
+
+- **Cloudflare / DNS de `2b.app.br`: Google Chrome, perfil Daniel.** Use a aba
+  autenticada desse perfil, não tente o perfil Vini. Zona autorizada para este
+  projeto: `2b.app.br`; limite mudanças aos registros do LeiProva.
+- **Stripe / conta 2timeWeb: Google Chrome, perfil Vini.** Não confundir os perfis.
+- Estes nomes indicam onde acessar, não concedem autorização permanente para
+  mudar permissões, criar credenciais, cobrar ou alterar outros projetos.
+- Nunca salve cookies, senhas ou chaves em notas do Maestri, prompts ou Git.
+  Se a sessão expirar, solicite que o usuário faça o login no perfil correto.
+- Consulte `docs/ACESSOS-OPERACIONAIS.md` para os endereços e escopo.

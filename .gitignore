@@ -47,6 +47,8 @@ next-env.d.ts
 # Evidências locais de QA visual, sem publicação no repositório.
 /.local/premium-concursos/
 /.local/commerce/
+# Estado local do orquestrador. O contrato reproduzível está em docs/MAESTRI-FABRICA-EDITORIAL.md.
+/.maestri/
 # O repositório é público; o lote é um artefato editorial entregue separadamente.
 /content/editorial/cf-direitos-fundamentais-2026-09-05/
 /content/editorial/*.zip

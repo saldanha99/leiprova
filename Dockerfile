@@ -12,8 +12,15 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 
 FROM deps AS builder
 WORKDIR /app
+ARG LEIPROVA_BUILD_PROFILE=production
 COPY . .
-RUN pnpm build
+RUN case "$LEIPROVA_BUILD_PROFILE" in \
+      production) pnpm build ;; \
+      qa) LEIPROVA_QA_ENVIRONMENT=synthetic \
+          APP_URL=https://homolog.leiprova.2b.app.br \
+          NEXT_PUBLIC_APP_URL=https://homolog.leiprova.2b.app.br pnpm build ;; \
+      *) echo "Perfil de build inválido" >&2; exit 1 ;; \
+    esac
 
 FROM deps AS migrator
 WORKDIR /app
@@ -22,6 +29,8 @@ CMD ["pnpm", "db:migrate"]
 
 FROM node:22.22-alpine AS runner
 WORKDIR /app
+ARG LEIPROVA_BUILD_PROFILE=production
+LABEL io.leiprova.build-profile=$LEIPROVA_BUILD_PROFILE
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000

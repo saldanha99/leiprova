@@ -1,0 +1,141 @@
+name: leiprova-qa
+
+# Homologação independente. Nunca combine este arquivo com docker-compose.yml.
+# Os IDs de imagem são fixados no arquivo privado .local/commerce/qa-persistente/.env.
+# App exige imagem própria com build profile qa; só a imagem migrator é reutilizada.
+services:
+  db:
+    image: postgres:17.10-alpine
+    container_name: leiprova-qa-db
+    restart: unless-stopped
+    cpus: 0.5
+    mem_limit: 384m
+    environment:
+      POSTGRES_DB: leiprova_qa
+      POSTGRES_USER: leiprova_qa_owner
+      POSTGRES_PASSWORD: ${LEIPROVA_QA_OWNER_PASSWORD:?Configure o arquivo privado de QA}
+      POSTGRES_INITDB_ARGS: --auth-host=scram-sha-256
+      APP_DB_USER: leiprova_qa_app
+      APP_DB_PASSWORD: ${LEIPROVA_QA_APP_PASSWORD:?Configure o arquivo privado de QA}
+    command:
+      [
+        postgres,
+        -c,
+        max_connections=30,
+        -c,
+        shared_buffers=64MB,
+        -c,
+        statement_timeout=30s,
+      ]
+    volumes:
+      - qa_pgdata:/var/lib/postgresql/data
+      - ./postgres-init.sh:/docker-entrypoint-initdb.d/01-app-role.sh:ro
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U leiprova_qa_owner -d leiprova_qa]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    networks: [internal]
+
+  app:
+    image: ${LEIPROVA_QA_APP_IMAGE:?Informe o ID imutável da imagem compilada com profile qa}
+    container_name: leiprova-qa-app
+    restart: unless-stopped
+    cpus: 0.75
+    mem_limit: 640m
+    environment:
+      NODE_ENV: production
+      APP_URL: https://homolog.leiprova.2b.app.br
+      NEXT_PUBLIC_APP_URL: https://homolog.leiprova.2b.app.br
+      DATABASE_URL: postgresql://leiprova_qa_app:${LEIPROVA_QA_APP_PASSWORD}@leiprova-qa-db:5432/leiprova_qa
+      DATABASE_POOL_SIZE: 4
+      AUTH_COOKIE_NAME: leiprova_qa_session
+      AUTH_SESSION_DAYS: 7
+      IP_HASH_SECRET: ${LEIPROVA_QA_IP_HASH_SECRET:?Configure o arquivo privado de QA}
+      LEIPROVA_QA_ENVIRONMENT: synthetic
+      REGISTRATION_ENABLED: "false"
+      CONTACT_ENABLED: "false"
+      PRIVACY_REQUESTS_ENABLED: "false"
+      TRANSACTIONAL_EMAIL_ENABLED: "false"
+      CHECKOUT_ENABLED: "false"
+      CONTEST_CHECKOUT_ENABLED: "false"
+      STRIPE_PAYMENTS_MODE: test
+      STRIPE_CONNECT_ENABLED: "false"
+      STRIPE_CONNECT_ONBOARDING_ENABLED: "false"
+    depends_on:
+      db:
+        condition: service_healthy
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    pids_limit: 128
+    healthcheck:
+      test:
+        [
+          CMD-SHELL,
+          "wget -qO- http://127.0.0.1:3000/api/health >/dev/null || exit 1",
+        ]
+      interval: 20s
+      timeout: 5s
+      retries: 8
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.leiprova-qa.rule=Host(`homolog.leiprova.2b.app.br`)
+      - traefik.http.routers.leiprova-qa.entrypoints=websecure
+      - traefik.http.routers.leiprova-qa.tls.certresolver=le
+      - traefik.http.routers.leiprova-qa.middlewares=leiprova-qa-headers@docker,leiprova-qa-body-limit@docker
+      - traefik.http.services.leiprova-qa.loadbalancer.server.port=3000
+      - traefik.docker.network=forza
+      - traefik.http.middlewares.leiprova-qa-headers.headers.customresponseheaders.X-Robots-Tag=noindex, nofollow, noarchive
+      - traefik.http.middlewares.leiprova-qa-headers.headers.customresponseheaders.X-LeiProva-Environment=synthetic-qa
+      - traefik.http.middlewares.leiprova-qa-headers.headers.customresponseheaders.Cache-Control=private, no-store
+      - traefik.http.middlewares.leiprova-qa-body-limit.buffering.maxRequestBodyBytes=1048576
+    networks: [internal, edge]
+
+  migrate:
+    image: ${LEIPROVA_QA_TOOLS_IMAGE:?Informe o ID imutável da imagem de ferramentas}
+    profiles: [tools]
+    command: [pnpm, db:migrate]
+    environment:
+      MIGRATION_DATABASE_URL: postgresql://leiprova_qa_owner:${LEIPROVA_QA_OWNER_PASSWORD}@leiprova-qa-db:5432/leiprova_qa
+    volumes:
+      - ../drizzle:/app/drizzle:ro
+    depends_on:
+      db:
+        condition: service_healthy
+    mem_limit: 512m
+    networks: [internal]
+
+  fixtures:
+    image: ${LEIPROVA_QA_TOOLS_IMAGE:?Informe o ID imutável da imagem de ferramentas}
+    profiles: [tools]
+    command:
+      [
+        pnpm,
+        exec,
+        tsx,
+        --env-file-if-exists=.env,
+        scripts/setup-persistent-qa.ts,
+      ]
+    environment:
+      LEIPROVA_QA_ENVIRONMENT: synthetic
+      LEIPROVA_QA_DATABASE_URL: postgresql://leiprova_qa_owner:${LEIPROVA_QA_OWNER_PASSWORD}@leiprova-qa-db:5432/leiprova_qa
+      LEIPROVA_QA_ACCOUNT_FILE: /run/qa/accounts.json
+    volumes:
+      - ../scripts:/app/scripts:ro
+      - ../.local/commerce/qa-persistente/accounts.json:/run/qa/accounts.json:ro
+    depends_on:
+      db:
+        condition: service_healthy
+    mem_limit: 512m
+    networks: [internal]
+
+volumes:
+  qa_pgdata:
+    name: leiprova_qa_pgdata
+networks:
+  internal:
+    name: leiprova_qa_internal
+    internal: true
+  edge:
+    name: forza
+    external: true
