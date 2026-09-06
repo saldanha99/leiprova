@@ -3,8 +3,21 @@
 Documento de contexto para quem for continuar o projeto — pessoa ou assistente de IA.
 Descreve onde as coisas estão, como publicar e quais armadilhas já custaram tempo.
 
-Última entrega verificada: 06/09/2026, 00h05 BRT (03h05 UTC).
+Última entrega verificada: 06/09/2026, 09h09 BRT (12h09 UTC).
 As seções antigas abaixo são histórico; consulte os registros recentes antes de operar.
+
+**Piso de 68 questões e revisão dos 80 publicados (`9f58d5d`):** novas vendas
+exigem 68 questões distintas com vínculo válido ao produto exato, sem revogar
+em bloco o acesso de quem já comprou. Painel administrativo mostra meta/déficit.
+As 80 receberam revisão e declaração humana específicas; 22 novas FGV foram
+importadas apenas como rascunhos. Total: 346 questões, sendo 312 revisadas,
+12 pendentes e 22 rascunhos. ENAM tem 68 candidatas distintas, nenhuma com vínculo
+aprovado; as 79 linhas pendentes incluem 11 versões históricas. **Zero dos 75
+cursos já cumpre o mínimo válido.** Produtos/edital, requisitos e curadoria ainda
+precisam de revisão. Acervo antigo preservado, backup verificado, deploy sem seed,
+nenhuma nova migração nem escrita no banco local, homologação não alterada.
+Stripe continua sem produtos/preços dos concursos vinculados e vendas fechadas.
+Ver [resultado, recibos e próximos passos](MINIMO-68-POR-CONCURSO.md).
 
 **Conteúdo por produto e reembolsos publicados (`b55327a`):** reconciliador Master
 integrado, migration 0033 e isolamento por produto. 80 questões novas importadas
