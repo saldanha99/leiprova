@@ -8,6 +8,7 @@ import {
   stripeCatalogSyncPreview,
 } from "../src/lib/commerce/stripe-master-catalog";
 import { ensureContestStripeCatalog } from "../src/lib/commerce/stripe-contest-catalog";
+import { STRIPE_COMMERCE_DATABASE_PREFLIGHT_QUERY, withStripeCommerceDatabasePreflight } from "../src/lib/commerce/stripe-database-preflight";
 
 // Nenhuma escrita sem --apply; live exige destino e conta explicitamente identificados.
 async function main() {
@@ -39,79 +40,90 @@ async function main() {
   });
   const db = postgres(target.databaseUrl, { max: 1 });
   try {
-    if (mode === "live" || target.expectedAccount) {
-      const account = await stripe.accounts.retrieve(null);
-      if (account.id !== target.expectedAccount)
-        throw new Error("Conta Stripe divergente do destino autorizado.");
-      if (
-        mode === "live" &&
-        (!account.charges_enabled || !account.details_submitted)
-      )
-        throw new Error(
-          "Conta Stripe ainda não habilitada para aceitar pagamentos.",
-        );
-    }
-    const foreignMode =
-      await db`select slug from contest_store_products where stripe_mode <> ${mode} and stripe_product_id is not null limit 1`;
-    if (foreignMode.length)
-      throw new Error(
-        "Banco contém produtos de outro modo Stripe. Não misture homologação e produção.",
-      );
-    const pendingBilling =
-      await db`select id from subscriptions where status in ('active','trialing','past_due') limit 1`;
-    if (mode === "live" && pendingBilling.length)
-      throw new Error(
-        "Há assinaturas existentes. A troca do catálogo Master exige reconciliação específica antes de continuar.",
-      );
-    const knownMasterPrices: Record<string, string | null> = {};
-    for (const plan of PLANS) {
-      const rows =
-        await db`select id, stripe_price_id from plans where slug=${plan.slug} and amount_cents=${plan.priceCents} and currency='brl' and billing_type=${plan.billingMonths === 12 ? "year" : "month"}`;
-      if (rows.length !== 1)
-        throw new Error(
-          "Plano Master ausente ou divergente no banco. Revise antes de sincronizar.",
-        );
-      knownMasterPrices[plan.slug] = rows[0].stripe_price_id;
-    }
-    for (const contest of CONTEST_CATALOG) {
-      const [known] = await db`select stripe_product_id, stripe_price_monthly, stripe_price_annual from contest_store_products where slug=${contest.slug}`;
-      const catalog = await ensureContestStripeCatalog(stripe, mode, contest, {
-        reactivate,
-        knownProductId: known?.stripe_product_id,
-        knownPriceIds: { monthly: known?.stripe_price_monthly, annual: known?.stripe_price_annual },
-      });
-      const monthly = catalog.prices.find((price) => price.key === "monthly")!.priceId;
-      const annual = catalog.prices.find((price) => price.key === "annual")!.priceId;
-      const updated = await db`insert into contest_store_products (slug,stripe_product_id,stripe_price_monthly,stripe_price_annual,stripe_mode)
-        values (${contest.slug},${catalog.productId},${monthly},${annual},${mode})
-        on conflict(slug) do update set stripe_product_id=excluded.stripe_product_id,stripe_price_monthly=excluded.stripe_price_monthly,stripe_price_annual=excluded.stripe_price_annual,stripe_mode=excluded.stripe_mode,updated_at=now()
-        where (contest_store_products.stripe_mode=excluded.stripe_mode or contest_store_products.stripe_product_id is null)
-          and (contest_store_products.stripe_product_id is null or contest_store_products.stripe_product_id=excluded.stripe_product_id)
-          and (contest_store_products.stripe_price_monthly is null or contest_store_products.stripe_price_monthly=excluded.stripe_price_monthly)
-          and (contest_store_products.stripe_price_annual is null or contest_store_products.stripe_price_annual=excluded.stripe_price_annual)
-        returning slug,stripe_product_id,stripe_price_monthly,stripe_price_annual,stripe_mode`;
-      if (updated.length !== 1 || updated[0].slug !== contest.slug ||
-        updated[0].stripe_product_id !== catalog.productId || updated[0].stripe_price_monthly !== monthly ||
-        updated[0].stripe_price_annual !== annual || updated[0].stripe_mode !== mode) {
-        throw new Error("Vínculo local do concurso divergiu durante a sincronização. Revise os IDs antes de retomar.");
+    await withStripeCommerceDatabasePreflight({
+      databaseUrl: target.databaseUrl,
+      mode,
+      inspect: async () => db.begin("read only", async (tx) => {
+        await tx`set local statement_timeout = '5s'`;
+        const rows = await tx.unsafe(STRIPE_COMMERCE_DATABASE_PREFLIGHT_QUERY);
+        if (rows.length !== 1) throw new Error("Preflight do banco não retornou uma identidade única.");
+        return rows[0];
+      }),
+    }, async () => {
+      if (mode === "live" || target.expectedAccount) {
+        const account = await stripe.accounts.retrieve(null);
+        if (account.id !== target.expectedAccount)
+          throw new Error("Conta Stripe divergente do destino autorizado.");
+        if (
+          mode === "live" &&
+          (!account.charges_enabled || !account.details_submitted)
+        )
+          throw new Error(
+            "Conta Stripe ainda não habilitada para aceitar pagamentos.",
+          );
       }
-    }
-    const master = await ensureMasterStripeCatalog(stripe, mode, { reactivate, knownPriceIds: knownMasterPrices });
-    for (const { plan, priceId } of master.prices) {
-      // IDs do banco e da configuração precisam apontar para o mesmo preço.
-      const updated =
-        await db`update plans set stripe_price_id=${priceId}, name=${plan.name}, updated_at=now() where slug=${plan.slug} and amount_cents=${plan.priceCents} and currency='brl' and billing_type=${plan.billingMonths === 12 ? "year" : "month"}
-          and stripe_price_id is not distinct from ${knownMasterPrices[plan.slug]}
-          returning id,stripe_price_id`;
-      if (updated.length !== 1 || updated[0].stripe_price_id !== priceId)
+      const foreignMode =
+        await db`select slug from contest_store_products where stripe_mode <> ${mode} and stripe_product_id is not null limit 1`;
+      if (foreignMode.length)
         throw new Error(
-          "Plano Master ausente, valor ou vínculo alterado no banco. Nenhum seed foi executado.",
+          "Banco contém produtos de outro modo Stripe. Não misture homologação e produção.",
         );
-      console.log(`${plan.stripePriceEnv}=${priceId}`); // Identificador público, nunca segredo.
-    }
-    console.log(
-      `Catálogo sincronizado em ${mode.toUpperCase()}. Nenhuma liberação editorial, cobrança ou flag de venda alterada.`,
-    );
+      const pendingBilling =
+        await db`select id from subscriptions where status in ('active','trialing','past_due') limit 1`;
+      if (mode === "live" && pendingBilling.length)
+        throw new Error(
+          "Há assinaturas existentes. A troca do catálogo Master exige reconciliação específica antes de continuar.",
+        );
+      const knownMasterPrices: Record<string, string | null> = {};
+      for (const plan of PLANS) {
+        const rows =
+          await db`select id, stripe_price_id from plans where slug=${plan.slug} and amount_cents=${plan.priceCents} and currency='brl' and billing_type=${plan.billingMonths === 12 ? "year" : "month"}`;
+        if (rows.length !== 1)
+          throw new Error(
+            "Plano Master ausente ou divergente no banco. Revise antes de sincronizar.",
+          );
+        knownMasterPrices[plan.slug] = rows[0].stripe_price_id;
+      }
+      for (const contest of CONTEST_CATALOG) {
+        const [known] = await db`select stripe_product_id, stripe_price_monthly, stripe_price_annual from contest_store_products where slug=${contest.slug}`;
+        const catalog = await ensureContestStripeCatalog(stripe, mode, contest, {
+          reactivate,
+          knownProductId: known?.stripe_product_id,
+          knownPriceIds: { monthly: known?.stripe_price_monthly, annual: known?.stripe_price_annual },
+        });
+        const monthly = catalog.prices.find((price) => price.key === "monthly")!.priceId;
+        const annual = catalog.prices.find((price) => price.key === "annual")!.priceId;
+        const updated = await db`insert into contest_store_products (slug,stripe_product_id,stripe_price_monthly,stripe_price_annual,stripe_mode)
+          values (${contest.slug},${catalog.productId},${monthly},${annual},${mode})
+          on conflict(slug) do update set stripe_product_id=excluded.stripe_product_id,stripe_price_monthly=excluded.stripe_price_monthly,stripe_price_annual=excluded.stripe_price_annual,stripe_mode=excluded.stripe_mode,updated_at=now()
+          where (contest_store_products.stripe_mode=excluded.stripe_mode or contest_store_products.stripe_product_id is null)
+            and (contest_store_products.stripe_product_id is null or contest_store_products.stripe_product_id=excluded.stripe_product_id)
+            and (contest_store_products.stripe_price_monthly is null or contest_store_products.stripe_price_monthly=excluded.stripe_price_monthly)
+            and (contest_store_products.stripe_price_annual is null or contest_store_products.stripe_price_annual=excluded.stripe_price_annual)
+          returning slug,stripe_product_id,stripe_price_monthly,stripe_price_annual,stripe_mode`;
+        if (updated.length !== 1 || updated[0].slug !== contest.slug ||
+          updated[0].stripe_product_id !== catalog.productId || updated[0].stripe_price_monthly !== monthly ||
+          updated[0].stripe_price_annual !== annual || updated[0].stripe_mode !== mode) {
+          throw new Error("Vínculo local do concurso divergiu durante a sincronização. Revise os IDs antes de retomar.");
+        }
+      }
+      const master = await ensureMasterStripeCatalog(stripe, mode, { reactivate, knownPriceIds: knownMasterPrices });
+      for (const { plan, priceId } of master.prices) {
+        // IDs do banco e da configuração precisam apontar para o mesmo preço.
+        const updated =
+          await db`update plans set stripe_price_id=${priceId}, name=${plan.name}, updated_at=now() where slug=${plan.slug} and amount_cents=${plan.priceCents} and currency='brl' and billing_type=${plan.billingMonths === 12 ? "year" : "month"}
+            and stripe_price_id is not distinct from ${knownMasterPrices[plan.slug]}
+            returning id,stripe_price_id`;
+        if (updated.length !== 1 || updated[0].stripe_price_id !== priceId)
+          throw new Error(
+            "Plano Master ausente, valor ou vínculo alterado no banco. Nenhum seed foi executado.",
+          );
+        console.log(`${plan.stripePriceEnv}=${priceId}`); // Identificador público, nunca segredo.
+      }
+      console.log(
+        `Catálogo sincronizado em ${mode.toUpperCase()}. Nenhuma liberação editorial, cobrança ou flag de venda alterada.`,
+      );
+    });
   } finally {
     await db.end();
   }

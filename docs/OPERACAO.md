@@ -6,14 +6,20 @@ Descreve onde as coisas estão, como publicar e quais armadilhas já custaram te
 Última aplicação verificada: 06/09/2026, 13h11 BRT (16h11 UTC).
 As seções antigas abaixo são histórico; consulte os registros recentes antes de operar.
 
-**Stripe — nova preparação local (06/09/2026, sem operação remota):** pedido de
+**Stripe — preparação e inspeção do painel (06/09/2026, sem escrita remota):** pedido de
 retirada do catálogo antigo e inclusão dos 75 cursos + Master registrado.
-Conexão com Chrome Vini via `agent-browser` indisponível; exceção para controle
-visual solicitada, não presumida. Conferência somente de presença/modo no app:
+Conexão com Chrome Vini via `agent-browser` indisponível; proprietário autorizou
+exceção para controle visual. Aba Vini/2timeWeb acessada: catálogo visual com
+23 produtos antigos (19 ativos, 4 arquivados), incluindo marcas de outros
+projetos; telas de assinaturas ativas e Payment Links vazias, sem inventário
+API ainda. Formulário de chave restrita preparado, não enviado, aguardando
+confirmação de emissão e escopo da retirada das outras marcas.
+Conferência anterior somente de presença/modo no app:
 chave secreta test, publicável ausente, segredo webhook presente, vendas fechadas.
 Nenhum objeto externo foi retirado/criado, nenhuma chave emitida ou flag alterada.
-Preparados inventário privado somente leitura e apresentação/retomada do
-sincronizador. 988 testes, lint, typecheck e build passaram; 150 integrações
+Preparados inventário privado somente leitura, apresentação/retomada do
+sincronizador e preflight de identidade/permissões do banco antes da Stripe.
+1037 testes, lint, typecheck e build passaram; 150 integrações
 opcionais ignoradas. Sem deploy. Não confundir prévia de 76 produtos/152 preços com criação real.
 Ver [estado, acesso e execução do catálogo Stripe](STRIPE-CATALOGO-PRODUCAO.md).
 

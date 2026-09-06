@@ -13,14 +13,28 @@ removido ou alterado nesta rodada. Nenhuma sincronização remota foi executada.
 - Conta autorizada: `acct_1TCQvlBkl6797u2u`, Chrome **Vini** (`Profile 4`).
 - O Chrome estava em execução, sem conexão de depuração disponível para
   `agent-browser --auto-connect`. Uma sessão anterior também não conectou.
-- Foi solicitada exceção ao proprietário para controle visual do Chrome;
-  não presumir que a exceção já foi concedida. Não copiar perfil/cookies.
+- O proprietário confirmou a exceção para controle visual do Chrome nesta
+  operação. A aba autenticada do perfil **Vini** foi acessada e a conta
+  **2timeWeb** conferida. Não copiar perfil/cookies; a exceção não autoriza
+  contornar confirmações de criação de acesso sensível.
 - No aplicativo de produção, a presença e o modo foram conferidos sem exibir
   valores: chave secreta **test**, chave publicável ausente, segredo de webhook
   presente. A presença de segredo não prova que o endpoint esteja homologado.
 - `CHECKOUT_ENABLED=false` e `CONTEST_CHECKOUT_ENABLED=false` confirmados.
-- O catálogo externo atual ainda não foi inventariado; não afirmar quantidades
-  de produtos antigos, links removidos ou clientes afetados.
+- A listagem visual do catálogo mostrou **23 produtos, 19 ativos e 4 arquivados**,
+  em duas páginas. São produtos antigos de outras marcas, não os 75 concursos.
+  As telas de assinaturas ativas e Payment Links apresentaram estado vazio.
+  Isso não substitui o inventário paginado da API nem comprova ausência de
+  sessões Checkout abertas ou de histórico financeiro.
+  Os 23 IDs distintos e status visíveis estão no registro privado
+  `.local/commerce/stripe-ui-inventory-20260906.json` (permissão 600, fora de Git).
+- Formulário de chave restrita preparado, **não enviado**: nome
+  `LeiProva - catalogo e inventario live`; Products/Prices com gravação;
+  Accounts, Subscriptions, Checkout Sessions e Payment Links somente leitura.
+  As seis seleções foram conferidas no DOM. Nenhuma chave foi emitida ou salva.
+  A emissão aguarda confirmação no momento da criação de acesso sensível.
+  Resolver também se a retirada inclui todas as marcas antigas desta conta
+  compartilhada antes de arquivá-las.
 
 ## Catálogo que será sincronizado
 
@@ -108,6 +122,12 @@ existentes não são canceladas simplesmente pelo arquivamento do produto.
    só para executar manutenção: usar conexão operacional explícita e limitada.
 4. Conferir prévia `pnpm stripe:catalog --mode=live`. `--apply` exige conta, modo,
    domínio, ambiente e banco explícitos; nada deve apontar para homologação.
+   Antes de chamar Stripe, o sincronizador confere identidade real do banco,
+   usuário atual/de sessão, schema, RLS e os 26 privilégios de coluna usados.
+   A inspeção termina em transação somente leitura curta e não concede grants.
+   Usuários `*_app`, réplica e destino somente leitura são recusados. Ainda é
+   necessário usar a rota SSH/VPS autorizada; o preflight não autentica por si
+   só a máquina nem garante disponibilidade/permissões futuras.
 5. Persistir IDs retornados, inclusive `STRIPE_PRICE_RITMO` e `STRIPE_PRICE_FOCO`,
    apenas na configuração do ambiente correspondente. Nunca executar seed.
 6. Conferir os 76 produtos e 152 preços por leitura da API, apresentação e IDs
@@ -133,10 +153,13 @@ embutido: a página de seleção é própria, a etapa financeira continua na Str
 
 ## Verificação desta preparação
 
-Lint, typecheck, build e **988 testes passaram**; 150 integrações opcionais
+Lint, typecheck, build e **1037 testes passaram**; 150 integrações opcionais
 não foram executadas. As prévias de inventário e catálogo funcionaram sem
 credencial e sem acesso à API. O inventário recebeu revisão independente,
 incluindo testes de paginação, modo e redirecionamento de pasta privada.
-Os testes de sincronização usam fakes: não são homologação Stripe live ou test.
-Nenhum deploy, escrita de banco, emissão de chave ou captura autenticada foi
-executado. Código salvo em branch de desenvolvimento; produção não atualizada.
+O preflight do banco recebeu revisão independente; 49 testes focais novos
+passaram. Os testes de sincronização usam fakes: não são homologação Stripe
+live ou test. Nenhum deploy, escrita de banco, emissão de chave ou inventário
+pela API foi executado. Houve somente inspeção autenticada do painel e preparo
+de formulário não submetido. Código em branch de desenvolvimento; produção
+não atualizada.
