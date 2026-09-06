@@ -1,0 +1,2520 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-09-06T15:44:25Z",
+  "items": [
+    {
+      "productSlug": "sefaz-sc-auditor-area-direito-2026",
+      "status": "needs_identity_review",
+      "editionDescription": "Edital 01/2026 — Auditor Estadual de Finanças Públicas, Direito E05",
+      "examStage": "Abertura publicada em setembro de 2026",
+      "bankNames": [
+        "FCC"
+      ],
+      "officialUrls": [
+        "https://www.concursosfcc.com.br/concursos/sefsc126/index.html",
+        "https://www.concursosfcc.com.br/concursos/sefsc126/sefsc126_edital_de_abertura_final_publicar.pdf"
+      ],
+      "syllabusNotes": "Anexo III; específicos de Direito. Constitucional, Administrativo, Financeiro/Orçamentário, Previdenciário, Civil e Penal.",
+      "requirementLocator": "Anexo III, pp. 24–32; Direito pp. 31–32",
+      "constraints": [
+        "Normalizar o cargo: finanças públicas, não Auditor Fiscal da Receita.",
+        "Conferência reaproveita pesquisa oficial realizada em 06/09/2026 no pacote fontes-5; nenhuma aprovação humana registrada."
+      ],
+      "evidence": [
+        {
+          "url": "https://www.concursosfcc.com.br/concursos/sefsc126/index.html",
+          "title": "Edital 01/2026 — Auditor Estadual de Finanças Públicas, Direito E05",
+          "kind": "organizer",
+          "observedFacts": "Abertura publicada em setembro de 2026. Anexo III; específicos de Direito. Constitucional, Administrativo, Financeiro/Orçamentário, Previdenciário, Civil e Penal.",
+          "checkedAt": "2026-09-06T15:44:25Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "enac-exame-nacional-dos-cartorios-2026-2",
+      "status": "not_confirmed",
+      "editionDescription": "Pista oficial para 4º ENAC, 2026.2; texto integral ainda não conferido.",
+      "examStage": "Notícia indexada anuncia inscrições em 31/08/2026; edital e calendário não conferidos.",
+      "bankNames": [],
+      "officialUrls": [
+        "https://www.cnj.jus.br/4o-exame-nacional-dos-cartorios-abre-inscricoes-nesta-segunda-feira-31-8/"
+      ],
+      "syllabusNotes": "Não foi conferido o programa desta edição. Não herdar o programa de outra edição do ENAC.",
+      "requirementLocator": null,
+      "constraints": [
+        "A navegação agent-browser da notícia do CNJ retornou 504 Gateway Time-out; não foi contornado o bloqueio.",
+        "Confirmar edição, organizador, edital, retificações e natureza habilitatória antes de vincular questões.",
+        "Pesquisa de identidade e programa não equivale a revisão editorial nem libera publicação ou comprova 68 questões. Conferir versão integral vigente e alterações antes de criar vínculos."
+      ],
+      "evidence": [
+        {
+          "url": "https://www.cnj.jus.br/4o-exame-nacional-dos-cartorios-abre-inscricoes-nesta-segunda-feira-31-8/",
+          "title": "4º Exame Nacional dos Cartórios abre inscrições nesta segunda-feira (31/8)",
+          "kind": "organ",
+          "observedFacts": "URL e anúncio de 4ª edição localizados na pesquisa oficial; navegação não exibiu conteúdo, retornou 504. A manchete não substitui edital.",
+          "checkedAt": "2026-09-06T15:40:29Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "tj-rs-juiz-de-direito-2026",
+      "status": "official_edition_found",
+      "editionDescription": "TJRS, Juiz de Direito Substituto, Edital 0031/2026-DMAG.",
+      "examStage": "Objetiva prevista para 13/12/2026, conforme edital consultado.",
+      "bankNames": [
+        "FGV"
+      ],
+      "officialUrls": [
+        "https://conhecimento.fgv.br/concursos/tjrsjuiz26",
+        "https://conhecimento.fgv.br/sites/default/files/concursos/edital-de-abertura-0031-2026-dmag.pdf"
+      ],
+      "syllabusNotes": "Anexo II contém programa de Direito Constitucional. O recorte por assunto ainda exige vínculo explícito ao subitem, não somente à banca.",
+      "requirementLocator": "Edital 0031/2026-DMAG, Anexo II, a partir da página 37 do PDF; bloco II de disciplinas.",
+      "constraints": [
+        "Normalizar cargo do catálogo para Juiz de Direito Substituto.",
+        "Objetiva com 100 questões de cinco alternativas e uma correta (§§ 12.2 e 12.4); não extrapolar este formato às etapas seguintes.",
+        "Pesquisa de identidade e programa não equivale a revisão editorial nem libera publicação ou comprova 68 questões. Conferir versão integral vigente e alterações antes de criar vínculos."
+      ],
+      "evidence": [
+        {
+          "url": "https://conhecimento.fgv.br/concursos/tjrsjuiz26",
+          "title": "Concurso para Juiz de Direito Substituto do TJRS",
+          "kind": "organizer",
+          "observedFacts": "Página navegada e conferida: edital publicado em 28/08/2026.",
+          "checkedAt": "2026-09-06T15:40:29Z"
+        },
+        {
+          "url": "https://conhecimento.fgv.br/sites/default/files/concursos/edital-de-abertura-0031-2026-dmag.pdf",
+          "title": "Edital 0031/2026-DMAG",
+          "kind": "notice",
+          "observedFacts": "Edital oficial previamente lido, 53 páginas; TJRS com apoio técnico da FGV; programa no Anexo II e previsão da objetiva em dezembro de 2026.",
+          "checkedAt": "2026-09-06T15:40:29Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "sefaz-al-auditor-fiscal-2026",
+      "status": "official_edition_found",
+      "editionDescription": "Edital 1 de 24/08/2026 — Auditor Fiscal da Administração Tributária Estadual",
+      "examStage": "Abertura publicada; conferir retificações antes de produzir",
+      "bankNames": [
+        "Cebraspe"
+      ],
+      "officialUrls": [
+        "https://www.cebraspe.org.br/concursos/sefaz_al_26",
+        "https://cdn.cebraspe.org.br/concursos/SEFAZ_AL_26/arquivos/DD4C3A2730B25BBF2A25E18515B454A52ECF7512DFB31A68C1D03E512779123F.html"
+      ],
+      "syllabusNotes": "Programa e formato C/E com discursiva localizados na pesquisa oficial de 06/09/2026; inclui legislação tributária estadual.",
+      "requirementLocator": "§§14.2.3–14.2.4; formato §8.2",
+      "constraints": [
+        "Referência 11.462/2013 no programa exige conferir norma e eventual retificação.",
+        "A captura oficial anterior foi reaproveitada; mapear artigos e corte normativo antes da autoria."
+      ],
+      "evidence": [
+        {
+          "url": "https://www.cebraspe.org.br/concursos/sefaz_al_26",
+          "title": "Edital 1 de 24/08/2026 — Auditor Fiscal da Administração Tributária Estadual",
+          "kind": "organizer",
+          "observedFacts": "Abertura publicada; conferir retificações antes de produzir. Programa e formato C/E com discursiva localizados na pesquisa oficial de 06/09/2026; inclui legislação tributária estadual.",
+          "checkedAt": "2026-09-06T15:44:25Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "enam-exame-nacional-da-magistratura-2026-2",
+      "status": "official_edition_found",
+      "editionDescription": "ENAM, 6ª edição, 2026.2, Edital 2 de 21/08/2026.",
+      "examStage": "Portal normativo informa inscrições abertas.",
+      "bankNames": [],
+      "officialUrls": [
+        "https://www.enfam.jus.br/enam/normativos/",
+        "https://hdl.handle.net/20.500.14782/629"
+      ],
+      "syllabusNotes": "A identidade da edição está confirmada; o programa específico do edital 2/2026 ainda precisa ser lido integralmente para escolher os subitens de Constitucional.",
+      "requirementLocator": null,
+      "constraints": [
+        "ENAM é exame de habilitação nacional, não concurso de provimento de um tribunal.",
+        "Não presumir que a validação de questões de edição anterior cobre esta edição; organizador e formato dependem do edital atual.",
+        "Pesquisa de identidade e programa não equivale a revisão editorial nem libera publicação ou comprova 68 questões. Conferir versão integral vigente e alterações antes de criar vínculos."
+      ],
+      "evidence": [
+        {
+          "url": "https://www.enfam.jus.br/enam/normativos/",
+          "title": "Normativos do Exame Nacional da Magistratura",
+          "kind": "organ",
+          "observedFacts": "Navegação confirmou seção 6ª edição 2026.2, Edital 2 de 21/08/2026 e indicação de inscrições abertas.",
+          "checkedAt": "2026-09-06T15:40:29Z"
+        },
+        {
+          "url": "https://hdl.handle.net/20.500.14782/629",
+          "title": "Registro institucional do Edital ENAM 2/2026",
+          "kind": "notice",
+          "observedFacts": "Link institucional observado no portal da ENFAM; o documento de destino e os subitens não foram conferidos nesta etapa.",
+          "checkedAt": "2026-09-06T15:40:29Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "trf-5-juiz-federal-5-regiao",
+      "status": "official_edition_found",
+      "editionDescription": "TRF5, XVI Concurso, Juiz Federal Substituto, Edital 01/2026.",
+      "examStage": "Objetiva prevista para 20/12/2026; escritas previstas para 04 e 05/04/2027 no documento retificado.",
+      "bankNames": [
+        "FGV"
+      ],
+      "officialUrls": [
+        "https://conhecimento.fgv.br/concursos/trf5juiz26",
+        "https://conhecimento.fgv.br/sites/default/files/concursos/edital-01-de-2026-xvi-concurso-juiz-federal-retificado-em-01.09.26.pdf",
+        "https://conhecimento.fgv.br/sites/default/files/concursos/trf5-1a-retificacao.pdf"
+      ],
+      "syllabusNotes": "Anexo I contém programa; Direito Constitucional inicia na página 54 do PDF. Exigir subitem preciso para reutilização temática.",
+      "requirementLocator": "Edital 01/2026 consolidado, Anexo I, páginas 53 e seguintes; Constitucional na página 54.",
+      "constraints": [
+        "O produto não especifica ano; confirmar formalmente associação ao XVI Concurso de 2026.",
+        "Retificação altera datas: não usar notícias antigas com objetiva em 29/11.",
+        "Cabeçalho da primeira retificação contém referência a 2025, enquanto o corpo trata do XVI/01/2026: requer conferência humana.",
+        "Estados: AL, CE, PB, PE, RN e SE; não são seis produtos ou seis programas independentes.",
+        "Pesquisa de identidade e programa não equivale a revisão editorial nem libera publicação ou comprova 68 questões. Conferir versão integral vigente e alterações antes de criar vínculos."
+      ],
+      "evidence": [
+        {
+          "url": "https://conhecimento.fgv.br/concursos/trf5juiz26",
+          "title": "XVI Concurso Público para Juiz Federal Substituto da 5ª Região",
+          "kind": "organizer",
+          "observedFacts": "Página navegada confirma edição XVI/2026 e edital consolidado publicado em 01/09/2026.",
+          "checkedAt": "2026-09-06T15:40:29Z"
+        },
+        {
+          "url": "https://conhecimento.fgv.br/sites/default/files/concursos/edital-01-de-2026-xvi-concurso-juiz-federal-retificado-em-01.09.26.pdf",
+          "title": "Edital 01/2026 retificado em 01/09/2026",
+          "kind": "notice",
+          "observedFacts": "Documento oficial previamente conferido, 75 páginas, programa no Anexo I e calendário retificado.",
+          "checkedAt": "2026-09-06T15:40:29Z"
+        },
+        {
+          "url": "https://conhecimento.fgv.br/sites/default/files/concursos/trf5-1a-retificacao.pdf",
+          "title": "Primeira retificação TRF5",
+          "kind": "amendment",
+          "observedFacts": "Retificação datada de 31/08 e listada em 01/09; divergência de ano no cabeçalho registrada para revisão.",
+          "checkedAt": "2026-09-06T15:40:29Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "pc-ba-delegado-2026",
+      "status": "official_edition_found",
+      "editionDescription": "PC-BA 2026 — Delegado; abertura confirmada por notícia oficial da organizadora, edital integral ainda pendente.",
+      "examStage": "Inscrições até 8/9; objetiva e discursiva anunciadas para 6/12/2026, sujeitas à conferência do edital e retificações.",
+      "bankNames": [
+        "Instituto AOCP"
+      ],
+      "officialUrls": [
+        "https://noticias.institutoaocp.org.br/blog/pcba-divulga-edital-do-concurso-publico-para-delegado-escrivao-e-investigador/",
+        "https://www.institutoaocp.org.br/concursos/706",
+        "https://www.ba.gov.br/policiacivil/editais"
+      ],
+      "syllabusNotes": "A notícia confirma bacharelado em Direito, mas requisito de escolaridade não substitui conteúdo programático. Não selecionar automaticamente um lote FGV/Cebraspe: a organizadora confirmada é AOCP.",
+      "requirementLocator": null,
+      "constraints": [
+        "Acesso ao portal ba.gov.br e à listagem principal AOCP apresentou bloqueio de segurança; não houve tentativa de contornar o bloqueio.",
+        "Recuperar edital do evento 706 e todas as retificações; confirmar número/data completos e anexo de programa.",
+        "Qualificar perfil da banca AOCP antes de gerar inéditas.",
+        "Dossiê de pesquisa: não equivale a curadoria de questões nem autoriza publicação. A meta de 68 exige questões distintas, pertinentes ao cargo/edição/programa e revisão humana."
+      ],
+      "evidence": [
+        {
+          "url": "https://noticias.institutoaocp.org.br/blog/pcba-divulga-edital-do-concurso-publico-para-delegado-escrivao-e-investigador/",
+          "title": "PCBA divulga edital da seleção para Delegado, Escrivão e Investigador",
+          "kind": "organizer",
+          "observedFacts": "Conferido em agent-browser: notícia da AOCP informa abertura no dia 30, 750 vagas (100 Delegado, 150 Escrivão, 500 Investigador), inscrições de 7/8 a 8/9 e provas objetiva/discursiva em 6/12, com resultados previstos para janeiro/maio de 2027. Link do texto remete ao concurso AOCP 706. O corpo lido não exibiu data completa de publicação nem número do edital.",
+          "checkedAt": "2026-09-06T15:39:53Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "pc-ba-escrivao-e-investigador-2026",
+      "status": "official_edition_found",
+      "editionDescription": "PC-BA 2026 — produto reúne Escrivão e Investigador, dois cargos da seleção AOCP.",
+      "examStage": "Inscrições até 8/9; objetiva e discursiva anunciadas para 6/12/2026.",
+      "bankNames": [
+        "Instituto AOCP"
+      ],
+      "officialUrls": [
+        "https://noticias.institutoaocp.org.br/blog/pcba-divulga-edital-do-concurso-publico-para-delegado-escrivao-e-investigador/",
+        "https://www.institutoaocp.org.br/concursos/706"
+      ],
+      "syllabusNotes": "Notícia confirma os dois cargos e vagas separadas; não prova que conteúdos e pesos sejam iguais. Separar trilhas por cargo e só compartilhar o núcleo explicitamente comum depois de ler o programa.",
+      "requirementLocator": null,
+      "constraints": [
+        "Escrivão e Investigador juntos no anúncio não implicam mesmo syllabus.",
+        "Edital/anexos/retificações não conferidos integralmente; portal de documentos apresentou bloqueio de segurança.",
+        "Revisar a modelagem do produto para escolha explícita do cargo e banca AOCP.",
+        "Dossiê de pesquisa: não equivale a curadoria de questões nem autoriza publicação. A meta de 68 exige questões distintas, pertinentes ao cargo/edição/programa e revisão humana."
+      ],
+      "evidence": [
+        {
+          "url": "https://noticias.institutoaocp.org.br/blog/pcba-divulga-edital-do-concurso-publico-para-delegado-escrivao-e-investigador/",
+          "title": "PCBA divulga edital da seleção para Delegado, Escrivão e Investigador",
+          "kind": "organizer",
+          "observedFacts": "Conferido em agent-browser: notícia da AOCP informa abertura no dia 30, 750 vagas (100 Delegado, 150 Escrivão, 500 Investigador), inscrições de 7/8 a 8/9 e provas objetiva/discursiva em 6/12, com resultados previstos para janeiro/maio de 2027. Link do texto remete ao concurso AOCP 706. O corpo lido não exibiu data completa de publicação nem número do edital.",
+          "checkedAt": "2026-09-06T15:39:53Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "pc-ma-delegado-2026",
+      "status": "official_edition_found",
+      "editionDescription": "Edital nº 1 PCMA — Delegado, de 13/7/2026; Delegado de Polícia Civil de 3ª Classe.",
+      "examStage": "Inscrições de 20/7 a 13/8/2026 encerradas; seleção em andamento, com objetiva e discursiva como fases distintas.",
+      "bankNames": [
+        "Cebraspe"
+      ],
+      "officialUrls": [
+        "https://www.cebraspe.org.br/concursos/pc_ma_26_delegado",
+        "https://cdn.cebraspe.org.br/concursos/pc_ma_26_delegado/arquivos/AB818CC95FF2CDD3D7B243BD813B3B0D7B3E753FB3E6E7CF61FC9697022B3F26.html"
+      ],
+      "syllabusNotes": "Programa localizado no item 23.2: Constitucional, Penal, Processual Penal e demais ramos. Constitucional contém teoria constitucional e poder constituinte; Penal inclui princípios e aplicação da lei; Processo Penal inclui inquérito e sistemas. É necessário mapear subitens, não apenas a disciplina.",
+      "requirementLocator": "Edital nº 1 de 13/7/2026, item 23 — Objetos de avaliação; 23.2 Conhecimentos.",
+      "constraints": [
+        "Não reutilizar programa de Oficial Investigador; são editais e profundidades diferentes.",
+        "A página consultada mostrou abertura e comunicado de arrecadação de 5/8; rechecagem de novos atos permanece necessária antes de publicação.",
+        "Dossiê de pesquisa: não equivale a curadoria de questões nem autoriza publicação. A meta de 68 exige questões distintas, pertinentes ao cargo/edição/programa e revisão humana."
+      ],
+      "evidence": [
+        {
+          "url": "https://www.cebraspe.org.br/concursos/pc_ma_26_delegado",
+          "title": "PC-MA 2026 — Delegado",
+          "kind": "organizer",
+          "observedFacts": "Página conferida em agent-browser: 58 vagas, cargo Delegado de Polícia Civil — 3ª Classe, abertura listada em 13/7/2026 e inscrições de 20/7 a 13/8.",
+          "checkedAt": "2026-09-06T15:39:53Z"
+        },
+        {
+          "url": "https://cdn.cebraspe.org.br/concursos/pc_ma_26_delegado/arquivos/AB818CC95FF2CDD3D7B243BD813B3B0D7B3E753FB3E6E7CF61FC9697022B3F26.html",
+          "title": "Edital nº 1 PCMA — Delegado, 13/7/2026",
+          "kind": "notice",
+          "observedFacts": "HTML oficial conferido em agent-browser: identidade do cargo/edital e item 23.2 do programa; ramos jurídicos separados. Não foram consultadas questões de prova.",
+          "checkedAt": "2026-09-06T15:39:53Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "pc-ma-oficial-investigador-2026",
+      "status": "official_edition_found",
+      "editionDescription": "Edital nº 1 PCMA — Investigador, de 13/7/2026; Oficial Investigador de Polícia.",
+      "examStage": "Inscrições de 24/7 a 24/8/2026 encerradas; Anexo I prevê objetiva e discursiva em 6/12/2026.",
+      "bankNames": [
+        "Cebraspe"
+      ],
+      "officialUrls": [
+        "https://www.cebraspe.org.br/concursos/pc_ma_26_investigador",
+        "https://cdn.cebraspe.org.br/concursos/pc_ma_26_investigador/arquivos/38200FCDA341E52A4B5E097905117D05D883EACE39D88CDA9FFF72F4287EBA65.html"
+      ],
+      "syllabusNotes": "Item 20.2.3 contém conhecimentos específicos do Grupo II: Penal, Processual Penal, Constitucional, Administrativo e Legislação Especial. Constitucional explicita direitos/garantias e remédios constitucionais; legislação especial lista leis penais próprias. Não significa cobertura integral pelo lote constitucional existente.",
+      "requirementLocator": "Edital nº 1 de 13/7/2026, item 20.2.3 — Conhecimentos específicos (Grupo II); Direito Constitucional, tópicos 3 e 4.",
+      "constraints": [
+        "O cargo oficial é Oficial Investigador, não transplantar automaticamente nomenclatura/programa de concursos anteriores.",
+        "Definir blueprint com proporção das disciplinas e validar legislação especial atual.",
+        "Não presumir mesma matriz do edital de Delegado.",
+        "Dossiê de pesquisa: não equivale a curadoria de questões nem autoriza publicação. A meta de 68 exige questões distintas, pertinentes ao cargo/edição/programa e revisão humana."
+      ],
+      "evidence": [
+        {
+          "url": "https://www.cebraspe.org.br/concursos/pc_ma_26_investigador",
+          "title": "PC-MA 2026 — Oficial Investigador",
+          "kind": "organizer",
+          "observedFacts": "Página conferida em agent-browser: 357 vagas; inscrições 24/7 a 24/8/2026; abertura em 13/7.",
+          "checkedAt": "2026-09-06T15:39:53Z"
+        },
+        {
+          "url": "https://cdn.cebraspe.org.br/concursos/pc_ma_26_investigador/arquivos/38200FCDA341E52A4B5E097905117D05D883EACE39D88CDA9FFF72F4287EBA65.html",
+          "title": "Edital nº 1 PCMA — Investigador, 13/7/2026",
+          "kind": "notice",
+          "observedFacts": "HTML oficial conferido em agent-browser: item 20 de programa; conhecimentos específicos 20.2.3, direitos e garantias fundamentais e remédios constitucionais expressos; calendário traz aplicação em 6/12/2026.",
+          "checkedAt": "2026-09-06T15:39:53Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "tc-df-analista-2026",
+      "status": "official_edition_found",
+      "editionDescription": "Edital 1/2026 — Analista Administrativo de Controle Externo, Gestão, Serviços Técnico-Administrativos",
+      "examStage": "Inscrições de 26/08 a 17/09/2026, conforme página consultada",
+      "bankNames": [
+        "Cebraspe"
+      ],
+      "officialUrls": [
+        "https://www.cebraspe.org.br/concursos/tc_df_26_analista",
+        "https://cdn.cebraspe.org.br/concursos/tc_df_26_analista/arquivos/54FBB0AE18A245586A808B4DC3568C6D9070ADFA0584420F0DB9DC4198DBC0C6.html"
+      ],
+      "syllabusNotes": "Página oficial identifica cargo e edital consolidado; retificação de 30/07 renumera tópicos de Direito Previdenciário.",
+      "requirementLocator": null,
+      "constraints": [
+        "Ler integralmente o programa consolidado e mapear artigos antes de elaborar questões."
+      ],
+      "evidence": [
+        {
+          "url": "https://www.cebraspe.org.br/concursos/tc_df_26_analista",
+          "title": "Edital 1/2026 — Analista Administrativo de Controle Externo, Gestão, Serviços Técnico-Administrativos",
+          "kind": "organizer",
+          "observedFacts": "Inscrições de 26/08 a 17/09/2026, conforme página consultada. Página oficial identifica cargo e edital consolidado; retificação de 30/07 renumera tópicos de Direito Previdenciário.",
+          "checkedAt": "2026-09-06T15:44:25Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "tce-ma-analista-e-tecnico-2026",
+      "status": "needs_identity_review",
+      "editionDescription": "TCE/MA 2026 — cargos de Analista, Auditor e Técnico distintos",
+      "examStage": "Página lista abertura e retificação programática de 17/08/2026",
+      "bankNames": [
+        "Cebraspe"
+      ],
+      "officialUrls": [
+        "https://www.cebraspe.org.br/concursos/tce_ma_26",
+        "https://cdn.cebraspe.org.br/concursos/tce_ma_26/arquivos/E867B85716A4556E230312DF75FB29C313C96E135A23E21A665C46D2D4F25BCF.html"
+      ],
+      "syllabusNotes": "Analista/Direito é cargo 3; Técnico Administrativo é cargo 16. Não tratar programas de cargos diferentes como um só.",
+      "requirementLocator": null,
+      "constraints": [
+        "Definir recortes separados de Analista e Técnico.",
+        "Conferir integralmente o edital consolidado e a retificação programática."
+      ],
+      "evidence": [
+        {
+          "url": "https://www.cebraspe.org.br/concursos/tce_ma_26",
+          "title": "TCE/MA 2026 — cargos de Analista, Auditor e Técnico distintos",
+          "kind": "organizer",
+          "observedFacts": "Página lista abertura e retificação programática de 17/08/2026. Analista/Direito é cargo 3; Técnico Administrativo é cargo 16. Não tratar programas de cargos diferentes como um só.",
+          "checkedAt": "2026-09-06T15:44:25Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "tce-sp-auditor-dipe-direito-2026",
+      "status": "official_edition_found",
+      "editionDescription": "Edital 001/2026 — Auditor de Controle Externo DIPE, Direito",
+      "examStage": "Notícia oficial informa objetiva e estudo de caso em 11/10/2026",
+      "bankNames": [
+        "Vunesp"
+      ],
+      "officialUrls": [
+        "https://www.tce.sp.gov.br/6524-tcesp-abre-concurso-publico-para-auditor-controle-externo-com-oferta-50-vagas"
+      ],
+      "syllabusNotes": "Órgão confirma especialidade Direito, prova objetiva e estudo de caso; programa integral ainda não conferido.",
+      "requirementLocator": null,
+      "constraints": [
+        "Notícia não substitui a íntegra do edital e suas retificações.",
+        "Não confundir com concurso geral de Auditor de outro ano."
+      ],
+      "evidence": [
+        {
+          "url": "https://www.tce.sp.gov.br/6524-tcesp-abre-concurso-publico-para-auditor-controle-externo-com-oferta-50-vagas",
+          "title": "Edital 001/2026 — Auditor de Controle Externo DIPE, Direito",
+          "kind": "organ",
+          "observedFacts": "Notícia oficial informa objetiva e estudo de caso em 11/10/2026. Órgão confirma especialidade Direito, prova objetiva e estudo de caso; programa integral ainda não conferido.",
+          "checkedAt": "2026-09-06T15:44:25Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "pc-al-agente-e-escrivao-2026",
+      "status": "official_edition_found",
+      "editionDescription": "PC-AL 2026 — Edital nº 1, abertura listada em 3/7/2026; Agente e Escrivão de Polícia Civil.",
+      "examStage": "Inscrições de 3/8 a 11/9/2026; seleção em andamento.",
+      "bankNames": [
+        "Cebraspe"
+      ],
+      "officialUrls": [
+        "https://www.cebraspe.org.br/concursos/pc_al_26",
+        "https://cdn.cebraspe.org.br/concursos/pc_al_26/arquivos/0E6F3DBC0AC9DD8B05D3678A31D9BEABC74E074436B39867AA05C00949130215.html"
+      ],
+      "syllabusNotes": "Item 20 contém os objetos de avaliação. Quadro 7.1 traz 50 itens básicos e 70 específicos, incluindo Penal, Processual Penal, Constitucional, Administrativo e legislação institucional/penal especial. O produto deve manter a identificação dos cargos mesmo com quadro de disciplinas compartilhado.",
+      "requirementLocator": "Edital de abertura PC-AL 2026: item 20 (objetos de avaliação), quadro 7.1 (disciplinas/itens) e itens 2.1/2.2 (cargos).",
+      "constraints": [
+        "Agente e Escrivão não se tornam o mesmo cargo por constarem do mesmo edital; revisar requisitos, atribuições, etapas práticas e critérios por cargo.",
+        "O edital nº 2 de 26/8 listado na página refere-se à isenção; não confundir com retificação integral de programa.",
+        "Respostas às impugnações de 30/7 precisam ser conferidas antes de fechar a versão editorial.",
+        "Dossiê de pesquisa: não equivale a curadoria de questões nem autoriza publicação. A meta de 68 exige questões distintas, pertinentes ao cargo/edição/programa e revisão humana."
+      ],
+      "evidence": [
+        {
+          "url": "https://www.cebraspe.org.br/concursos/pc_al_26",
+          "title": "PC-AL 2026",
+          "kind": "organizer",
+          "observedFacts": "Conferido em agent-browser: 150 vagas, Agente e Escrivão, abertura listada em 3/7/2026, inscrições 3/8 a 11/9.",
+          "checkedAt": "2026-09-06T15:39:53Z"
+        },
+        {
+          "url": "https://cdn.cebraspe.org.br/concursos/pc_al_26/arquivos/0E6F3DBC0AC9DD8B05D3678A31D9BEABC74E074436B39867AA05C00949130215.html",
+          "title": "Edital de abertura PC-AL 2026 — versão HTML",
+          "kind": "notice",
+          "observedFacts": "Conferido em agent-browser: itens 2.1 e 2.2 separam cargos; quadro 7.1 identifica conhecimentos básicos/específicos e item 8.1 remete ao programa do item 20; prova objetiva em itens certo/errado e prova discursiva de Atualidades.",
+          "checkedAt": "2026-09-06T15:39:53Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "pgm-manaus-procurador-do-municipio-2026",
+      "status": "official_edition_found",
+      "editionDescription": "PGM Manaus 2026 — Procurador do Município de 3ª Classe; edital publicado no DOM de 2/7/2026.",
+      "examStage": "Inscrições anunciadas para 6/7 a 4/8/2026 já encerradas; notícia informa quatro fases, calendário atualizado ainda pendente.",
+      "bankNames": [
+        "FCC"
+      ],
+      "officialUrls": [
+        "https://www.manaus.am.gov.br/noticia/edital/concurso-publico-com-vagas-para-procurador-do-municipio/"
+      ],
+      "syllabusNotes": "Notícia confirma carreira jurídica e quatro fases, mas não reproduz o programa. Localizar edital FCC/DOM e programa próprio municipal, incluindo leis locais, antes de escolher tópicos.",
+      "requirementLocator": "Notícia oficial remete ao edital no DOM de 2/7/2026; anexo programático ainda não localizado nesta conferência.",
+      "constraints": [
+        "Não usar o requisito de graduação em Direito como prova de pertinência de todo conteúdo jurídico.",
+        "Página FCC do evento, edital integral e retificações ainda pendentes.",
+        "Dossiê de pesquisa: não equivale a curadoria de questões nem autoriza publicação. A meta de 68 exige questões distintas, pertinentes ao cargo/edição/programa e revisão humana."
+      ],
+      "evidence": [
+        {
+          "url": "https://www.manaus.am.gov.br/noticia/edital/concurso-publico-com-vagas-para-procurador-do-municipio/",
+          "title": "Prefeitura de Manaus abre concurso público com vagas para Procurador do Município",
+          "kind": "organ",
+          "observedFacts": "Conferido em agent-browser: notícia de 3/7/2026 relata edital no DOM de 2/7, organização FCC, cargo de 3ª Classe, seis vagas, inscrições 6/7 a 4/8 e quatro fases em Manaus.",
+          "checkedAt": "2026-09-06T15:39:53Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "tj-pe-juiz-de-direito-2026",
+      "status": "official_edition_found",
+      "editionDescription": "TJPE, Juiz Substituto, Edital 01/2026.",
+      "examStage": "Objetiva prevista para 27/09/2026; página já publica atos de inscrições e atendimento.",
+      "bankNames": [
+        "FGV"
+      ],
+      "officialUrls": [
+        "https://conhecimento.fgv.br/concursos/tjpe26",
+        "https://conhecimento.fgv.br/sites/default/files/concursos/tjpe_edital-31.07.2026-retificado.pdf",
+        "https://conhecimento.fgv.br/sites/default/files/concursos/tjpe-juiz-1-retificacao-31.07.2026-1.pdf"
+      ],
+      "syllabusNotes": "Anexo I contém Direito Constitucional, incluindo teoria constitucional, democracia, interpretação, aplicabilidade, controle e organização de poderes.",
+      "requirementLocator": "Edital retificado em 31/07/2026, Anexo I, Direito Constitucional, página 60 do PDF.",
+      "constraints": [
+        "Usar versão retificada de 31/07, não somente o edital de maio.",
+        "Objetiva tem 100 questões de cinco alternativas (§10.4); formatos das fases seguintes precisam ser tratados separadamente.",
+        "Pesquisa de identidade e programa não equivale a revisão editorial nem libera publicação ou comprova 68 questões. Conferir versão integral vigente e alterações antes de criar vínculos."
+      ],
+      "evidence": [
+        {
+          "url": "https://conhecimento.fgv.br/concursos/tjpe26",
+          "title": "Concurso para Juiz Substituto TJPE 2026",
+          "kind": "organizer",
+          "observedFacts": "Página navegada, consolidado e primeira retificação de 31/07 identificados; atos posteriores de inscrições publicados.",
+          "checkedAt": "2026-09-06T15:40:29Z"
+        },
+        {
+          "url": "https://conhecimento.fgv.br/sites/default/files/concursos/tjpe_edital-31.07.2026-retificado.pdf",
+          "title": "Edital TJPE retificado 31/07/2026",
+          "kind": "notice",
+          "observedFacts": "PDF oficial consultado: Edital 01/2026; objetiva 27/09/2026 (§10.1); programa de Constitucional no Anexo I.",
+          "checkedAt": "2026-09-06T15:40:29Z"
+        },
+        {
+          "url": "https://conhecimento.fgv.br/sites/default/files/concursos/tjpe-juiz-1-retificacao-31.07.2026-1.pdf",
+          "title": "Primeira retificação TJPE",
+          "kind": "amendment",
+          "observedFacts": "Documento de alteração vinculado pela página oficial; precisa integrar o pacote editorial.",
+          "checkedAt": "2026-09-06T15:40:29Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "pge-al-procurador-do-estado-reta-final",
+      "status": "official_edition_found",
+      "editionDescription": "Edital nº 1 PGE/AL de 31/3/2026 — Procurador do Estado de Alagoas de 1ª Classe; versão consolidada até edital nº 10.",
+      "examStage": "Provas objetiva/discursiva em preparação na página: locais disponíveis desde 28/8; última retificação listada em 31/8/2026. Data exata de aplicação não consolidada nesta etapa.",
+      "bankNames": [
+        "Cebraspe"
+      ],
+      "officialUrls": [
+        "https://www.cebraspe.org.br/concursos/pge_al_26",
+        "https://cdn.cebraspe.org.br/concursos/pge_al_26/arquivos/3D20E474BDDB7F385FC188D2E20C3998E5608C14EC8E39DB541669EED2DBC915.html"
+      ],
+      "syllabusNotes": "Programa no item 17.2; Administrativo, Constitucional e Tributário explicitamente localizados. Tributário inclui reforma, EC 132/2023 e LC 214/2025; leis alagoanas são próprias. Não converter a amplitude do programa em permissão para vínculos genéricos.",
+      "requirementLocator": "Edital nº 1 de 31/3/2026 consolidado até a retificação nº 10: item 17.2 — Conhecimentos.",
+      "constraints": [
+        "Revalidar a data exata e o significado comercial de 'reta final' antes de anunciar.",
+        "Retificação nº 10 altera critérios 8.11.6.1, 9.7.5 e item do edital nº 5; cronograma teve reaberturas e não deve ser copiado do edital original.",
+        "Revisão humana precisa considerar jurisprudência e legislação estadual por subitem.",
+        "Dossiê de pesquisa: não equivale a curadoria de questões nem autoriza publicação. A meta de 68 exige questões distintas, pertinentes ao cargo/edição/programa e revisão humana."
+      ],
+      "evidence": [
+        {
+          "url": "https://www.cebraspe.org.br/concursos/pge_al_26",
+          "title": "PGE-AL 2026 — acompanhamento",
+          "kind": "organizer",
+          "observedFacts": "Página conferida em agent-browser: 10 vagas, Procurador de 1ª Classe; atos até 31/8/2026; edital nº 10, edital nº 9 de locais e versão de abertura atualizada identificados.",
+          "checkedAt": "2026-09-06T15:39:53Z"
+        },
+        {
+          "url": "https://cdn.cebraspe.org.br/concursos/pge_al_26/arquivos/3D20E474BDDB7F385FC188D2E20C3998E5608C14EC8E39DB541669EED2DBC915.html",
+          "title": "Edital nº 1 PGE/AL — consolidado até retificação nº 10",
+          "kind": "notice",
+          "observedFacts": "HTML oficial conferido em agent-browser: abertura de 31/3/2026, programa item 17.2, ramos Administrativo/Constitucional/Tributário e leis específicas da reforma tributária. A página contém cronograma em Anexo I, mas as datas de aplicação não foram extraídas nesta rodada.",
+          "checkedAt": "2026-09-06T15:39:53Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "tj-dft-juiz-de-direito-reta-final",
+      "status": "pre_notice_only",
+      "editionDescription": "Identidade atual de 'Reta Final' não resolvida; fontes históricas do XLIV e planejamento do XLV.",
+      "examStage": "Abertura vigente do XLV não confirmada; planejamento histórico não é edital atual.",
+      "bankNames": [],
+      "officialUrls": [
+        "https://www.tjdft.jus.br/informacoes/concursos/juiz-de-direito-substituto",
+        "https://www.tjdft.jus.br/institucional/imprensa/noticias/2024/setembro/100-dias-da-gestao-2024-2026-tjdft-promove-acoes-com-foco-nas-pessoas",
+        "https://www.tjdft.jus.br/publicacoes/publicacoes-oficiais/editais-de-concurso-para-juiz-de-direito-substituto/2023/xliv-concurso-para-o-cargo-de-juiz-de-direito-substituto-do-df-edital-24-2023"
+      ],
+      "syllabusNotes": "Nenhum programa de edição atual conferido. Não usar programa do XLIV como se fosse abertura atual.",
+      "requirementLocator": null,
+      "constraints": [
+        "Página de concursos retornou 403 no agent-browser.",
+        "Referências a Cebraspe e 20 vagas encontradas em planejamento histórico não comprovam contratação/edital vigente.",
+        "Data de atualização de uma página histórica não determina ano de um concurso.",
+        "Pesquisa de identidade e programa não equivale a revisão editorial nem libera publicação ou comprova 68 questões. Conferir versão integral vigente e alterações antes de criar vínculos."
+      ],
+      "evidence": [
+        {
+          "url": "https://www.tjdft.jus.br/informacoes/concursos/juiz-de-direito-substituto",
+          "title": "Concursos para Juiz de Direito Substituto TJDFT",
+          "kind": "organ",
+          "observedFacts": "Navegação tentada; resposta 403 impediu leitura atual.",
+          "checkedAt": "2026-09-06T15:40:29Z"
+        },
+        {
+          "url": "https://www.tjdft.jus.br/institucional/imprensa/noticias/2024/setembro/100-dias-da-gestao-2024-2026-tjdft-promove-acoes-com-foco-nas-pessoas",
+          "title": "100 dias da gestão 2024–2026 do TJDFT",
+          "kind": "organ",
+          "observedFacts": "Resultado de busca oficial histórico menciona preparação de concurso; não foi conferido edital novo.",
+          "checkedAt": "2026-09-06T15:40:29Z"
+        },
+        {
+          "url": "https://www.tjdft.jus.br/publicacoes/publicacoes-oficiais/editais-de-concurso-para-juiz-de-direito-substituto/2023/xliv-concurso-para-o-cargo-de-juiz-de-direito-substituto-do-df-edital-24-2023",
+          "title": "XLIV Concurso, Edital 24/2023",
+          "kind": "notice",
+          "observedFacts": "Fonte histórica localizada; não corresponde a prova de abertura vigente do produto sem ano.",
+          "checkedAt": "2026-09-06T15:40:29Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "pc-rj-delegado-2026",
+      "status": "not_confirmed",
+      "editionDescription": "PC-RJ Delegado 2026 — identidade de edital de abertura não confirmada em fonte primária nesta etapa.",
+      "examStage": "Há pista secundária de contratação de Cebraspe em 2026, não suficiente para comprovar abertura, programa ou calendário.",
+      "bankNames": [],
+      "officialUrls": [
+        "https://www.policiacivil.rj.gov.br/"
+      ],
+      "syllabusNotes": "Nenhum programa de edição 2026 validado. Não reutilizar edital 2021 como se fosse 2026.",
+      "requirementLocator": null,
+      "constraints": [
+        "Pesquisa primária não localizou ato de abertura atual; portal oficial foi descoberto, mas não conferido em navegador antes do encerramento.",
+        "Contrato de banca, mesmo que confirmado posteriormente, não equivale a edital de abertura.",
+        "Confirmar ato, cargo, número, data, programa e retificações antes de geração.",
+        "Dossiê de pesquisa: não equivale a curadoria de questões nem autoriza publicação. A meta de 68 exige questões distintas, pertinentes ao cargo/edição/programa e revisão humana."
+      ],
+      "evidence": [],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "pp-ma-inspetor-2026",
+      "status": "official_edition_found",
+      "editionDescription": "Edital nº 1 SEAP/MA — Inspetor e Monitor, de 21/7/2026; produto restrito ao cargo 1, Inspetor de Polícia Penal.",
+      "examStage": "Inscrições de 30/7 a 31/8/2026 encerradas; objetiva e discursiva previstas no calendário do edital.",
+      "bankNames": [
+        "Cebraspe"
+      ],
+      "officialUrls": [
+        "https://www.cebraspe.org.br/concursos/seap_ma_26_inspetor_monitor",
+        "https://cdn.cebraspe.org.br/concursos/seap_ma_26_inspetor_monitor/arquivos/0B420FD266CEE857D612CBA1F1E458ED792C1AB7CAE3019E9198BB6976D9B7DC.html"
+      ],
+      "syllabusNotes": "Item 22 traz programa; conhecimentos gerais em 22.2.3 e bloco específico aparece numerado 20.2.4 no HTML, apesar da seção 22. Bloco cargo 1 inclui Constitucional e Direitos Humanos; CF arts. 5º a 15 e Programa Nacional de Direitos Humanos aparecem expressamente. Monitor tem bloco próprio, não deve entrar neste produto.",
+      "requirementLocator": "Edital de 21/7/2026: seção 22; bloco impresso '20.2.4 CONHECIMENTOS ESPECÍFICOS' → CARGO 1: INSPETOR DE POLÍCIA PENAL.",
+      "constraints": [
+        "Preservar a divergência de numeração do documento e confirmar eventual correção oficial; não corrigir silenciosamente o locator.",
+        "O concurso também tem Monitor; vagas totais de 755 não são todas de Inspetor.",
+        "Recorte por cargo obrigatório; não misturar programa de Monitor.",
+        "Dossiê de pesquisa: não equivale a curadoria de questões nem autoriza publicação. A meta de 68 exige questões distintas, pertinentes ao cargo/edição/programa e revisão humana."
+      ],
+      "evidence": [
+        {
+          "url": "https://www.cebraspe.org.br/concursos/seap_ma_26_inspetor_monitor",
+          "title": "SEAP-MA 2026 — Inspetor e Monitor",
+          "kind": "organizer",
+          "observedFacts": "Conferido em agent-browser: abertura em 21/7/2026, 755 vagas somadas, dois cargos, inscrições 30/7 a 31/8.",
+          "checkedAt": "2026-09-06T15:39:53Z"
+        },
+        {
+          "url": "https://cdn.cebraspe.org.br/concursos/seap_ma_26_inspetor_monitor/arquivos/0B420FD266CEE857D612CBA1F1E458ED792C1AB7CAE3019E9198BB6976D9B7DC.html",
+          "title": "Edital nº 1 SEAP/MA — Inspetor e Monitor",
+          "kind": "notice",
+          "observedFacts": "HTML conferido em agent-browser: cargo 1 Inspetor, cargo 2 Monitor; programas separados; seção 22 com subtítulo específico numerado 20.2.4. Constitucional e Direitos Humanos identificados no bloco Inspetor.",
+          "checkedAt": "2026-09-06T15:39:53Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "pc-pr-delegado-2026",
+      "status": "official_edition_found",
+      "editionDescription": "PCPR 2026 — Delegado de Polícia; Edital nº 01/2026, versão retificada em 31/7/2026.",
+      "examStage": "Concurso em andamento; homologação preliminar das inscrições em 27/8 e recursos em 28/8/2026.",
+      "bankNames": [
+        "FGV"
+      ],
+      "officialUrls": [
+        "https://conhecimento.fgv.br/concursos/pcpr26",
+        "https://conhecimento.fgv.br/sites/default/files/concursos/copia-1-de-edital-01-2026-pcpr-publicacao.docx.pdf",
+        "https://conhecimento.fgv.br/sites/default/files/concursos/edital-02-2026-pcpr-retificacao.docx-1.pdf"
+      ],
+      "syllabusNotes": "Página confirma cargo e edital consolidado. Programa de Delegado no PDF precisa ser lido e separado dos demais cargos; não há locator programático validado nesta rodada.",
+      "requirementLocator": null,
+      "constraints": [
+        "Concurso reúne também Agente e Papiloscopista; produto aqui é somente Delegado.",
+        "Edital integral e primeira retificação não foram lidos integralmente; confirmar quadro de provas, programa e datas antes de fechar blueprint.",
+        "Dossiê de pesquisa: não equivale a curadoria de questões nem autoriza publicação. A meta de 68 exige questões distintas, pertinentes ao cargo/edição/programa e revisão humana."
+      ],
+      "evidence": [
+        {
+          "url": "https://conhecimento.fgv.br/concursos/pcpr26",
+          "title": "Concurso Público para a Polícia Civil do Estado do Paraná",
+          "kind": "organizer",
+          "observedFacts": "Conferido em agent-browser: página FGV iniciada em 6/7/2026, concurso em andamento para cadastro de reserva de Delegado, Agente de Polícia Judiciária e Papiloscopista; edital consolidado marcado retificado em 31/7/2026; homologação preliminar em 27/8 e recurso em 28/8. Links de edital e primeira retificação foram identificados, mas o PDF não foi lido integralmente nesta rodada.",
+          "checkedAt": "2026-09-06T15:39:53Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "pc-pr-agente-2026",
+      "status": "official_edition_found",
+      "editionDescription": "PCPR 2026 — Agente de Polícia Judiciária, nomenclatura oficial identificada; Edital nº 01/2026 retificado em 31/7/2026.",
+      "examStage": "Concurso em andamento; fase de homologação das inscrições observada no fim de agosto.",
+      "bankNames": [
+        "FGV"
+      ],
+      "officialUrls": [
+        "https://conhecimento.fgv.br/concursos/pcpr26",
+        "https://conhecimento.fgv.br/sites/default/files/concursos/copia-1-de-edital-01-2026-pcpr-publicacao.docx.pdf",
+        "https://conhecimento.fgv.br/sites/default/files/concursos/edital-02-2026-pcpr-retificacao.docx-1.pdf"
+      ],
+      "syllabusNotes": "O cargo correto é Agente de Polícia Judiciária. Não herdar automaticamente o programa de Delegado ou Papiloscopista. PDF consolidado localizado, programa integral pendente.",
+      "requirementLocator": null,
+      "constraints": [
+        "Ajuste editorial de nomenclatura deve ser validado antes de publicar.",
+        "Validar programa, pesos e retificação de 31/7; nenhuma equivalência entre cargos presumida.",
+        "Dossiê de pesquisa: não equivale a curadoria de questões nem autoriza publicação. A meta de 68 exige questões distintas, pertinentes ao cargo/edição/programa e revisão humana."
+      ],
+      "evidence": [
+        {
+          "url": "https://conhecimento.fgv.br/concursos/pcpr26",
+          "title": "Concurso Público para a Polícia Civil do Estado do Paraná",
+          "kind": "organizer",
+          "observedFacts": "Conferido em agent-browser: página FGV iniciada em 6/7/2026, concurso em andamento para cadastro de reserva de Delegado, Agente de Polícia Judiciária e Papiloscopista; edital consolidado marcado retificado em 31/7/2026; homologação preliminar em 27/8 e recurso em 28/8. Links de edital e primeira retificação foram identificados, mas o PDF não foi lido integralmente nesta rodada.",
+          "checkedAt": "2026-09-06T15:39:53Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "pp-rn-policia-penal-2026",
+      "status": "not_confirmed",
+      "editionDescription": "Pista oficial de seleção SEAD/SEAPP-RN 2026 para Polícia Penal; edição integral ainda não conferida pelo navegador.",
+      "examStage": "Descoberta em notícia da organizadora indica prorrogação das inscrições até 5/8/2026; calendário atual e aplicação pendentes.",
+      "bankNames": [
+        "Instituto Avalia"
+      ],
+      "officialUrls": [
+        "https://social.avalia.org.br/blog/inscricoes-do-concurso-publico-da-seadrn-sao-prorrogadas-ate-05-de-agosto/",
+        "https://webdisk.diariooficial.rn.gov.br/Jornal/12026-06-19.pdf"
+      ],
+      "syllabusNotes": "Diário Oficial de 19/6/2026 localizado na descoberta indica Edital de Abertura 002/2026 e Anexo II de conteúdo programático; esses dados são pistas, não validação integral. Isolar Policial Penal dos especialistas.",
+      "requirementLocator": null,
+      "constraints": [
+        "Fonte localizada na descoberta de URLs, mas a conferência obrigatória em agent-browser não foi concluída antes do fechamento desta etapa; não tratar como programa/edição validado para produção.",
+        "Conferir republicação de 19/6, edital 002/2026, Anexo II e cronograma retificado; não vincular questões ainda.",
+        "Instituto Avalia precisa de perfil editorial próprio; não substituir por AOCP ou Cebraspe por semelhança.",
+        "Dossiê de pesquisa: não equivale a curadoria de questões nem autoriza publicação. A meta de 68 exige questões distintas, pertinentes ao cargo/edição/programa e revisão humana."
+      ],
+      "evidence": [
+        {
+          "url": "https://social.avalia.org.br/blog/inscricoes-do-concurso-publico-da-seadrn-sao-prorrogadas-ate-05-de-agosto/",
+          "title": "Inscrições do Concurso Público da SEAD/RN são prorrogadas até 05 de agosto",
+          "kind": "organizer",
+          "observedFacts": "Descoberta em busca de fonte oficial: notícia do Instituto Avalia menciona Polícia Penal do RN e prorrogação até 5/8/2026. Não houve conferência em agent-browser antes do fechamento.",
+          "checkedAt": "2026-09-06T15:39:53Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "prf-policial-rodoviario-federal-2026",
+      "status": "historical_edition",
+      "editionDescription": "A fonte oficial localizada para formação em 2026 refere-se a aprovados no concurso PRF de 2021, não a novo edital 2026.",
+      "examStage": "Formação complementar/ingresso de aprovados de 2021; novo edital de entrada 2026 não confirmado.",
+      "bankNames": [],
+      "officialUrls": [
+        "https://www.gov.br/prf/pt-br/noticias/nacionais/2026/marco/prf-conclui-formacao-de-novos-policiais-rodoviarios-federais"
+      ],
+      "syllabusNotes": "Não selecionar programa 2021 como edital vigente de abertura 2026. Uma trilha pré-edital precisaria ser explicitamente rotulada e juridicamente atualizada, sem afirmar banca futura.",
+      "requirementLocator": null,
+      "constraints": [
+        "Fonte localizada na descoberta de URLs, mas a conferência obrigatória em agent-browser não foi concluída antes do fechamento desta etapa; não tratar como programa/edição validado para produção.",
+        "Edição histórica não comprova inscrições abertas ou concurso novo em 2026.",
+        "Não confundir PRF com PF, concurso de remoção, formação complementar ou licitações.",
+        "É necessário resolver o rótulo do produto e eventual base pré-edital.",
+        "Dossiê de pesquisa: não equivale a curadoria de questões nem autoriza publicação. A meta de 68 exige questões distintas, pertinentes ao cargo/edição/programa e revisão humana."
+      ],
+      "evidence": [
+        {
+          "url": "https://www.gov.br/prf/pt-br/noticias/nacionais/2026/marco/prf-conclui-formacao-de-novos-policiais-rodoviarios-federais",
+          "title": "PRF conclui formação de novos policiais rodoviários federais",
+          "kind": "organ",
+          "observedFacts": "Descoberta em busca primária: notícia de 25/3/2026 diz que 285 formandos foram aprovados no concurso de 2021 e fizeram CFP 2025. Conferência em agent-browser pendente; nenhuma abertura de novo concurso foi confirmada.",
+          "checkedAt": "2026-09-06T15:39:53Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "tj-rs-cartorios-reta-final",
+      "status": "needs_identity_review",
+      "editionDescription": "Concurso de outorga de delegações do RS listado no índice oficial FGV; edição exata ainda pendente.",
+      "examStage": "Não confirmado.",
+      "bankNames": [
+        "FGV"
+      ],
+      "officialUrls": [
+        "https://conhecimento.fgv.br/concursos?page=1"
+      ],
+      "syllabusNotes": "Programa de cartórios não conferido; não herdar o programa do concurso de juiz TJRS.",
+      "requirementLocator": null,
+      "constraints": [
+        "Índice oficial foi navegado, mas página específica e edital do concurso não foram abertos nesta etapa.",
+        "Produto 'Reta Final' sem ano exige número da edição e confirmação de fase.",
+        "Pesquisa de identidade e programa não equivale a revisão editorial nem libera publicação ou comprova 68 questões. Conferir versão integral vigente e alterações antes de criar vínculos."
+      ],
+      "evidence": [
+        {
+          "url": "https://conhecimento.fgv.br/concursos?page=1",
+          "title": "Índice de concursos FGV, página 1",
+          "kind": "organizer",
+          "observedFacts": "Página navegada contém título 'Concurso Público de Provas e Títulos para Outorga de Delegações de Notas e Registro do Estado do Rio Grande do Sul'; edição e programa não extraídos.",
+          "checkedAt": "2026-09-06T15:40:29Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "tj-pr-cartorios-reta-final",
+      "status": "not_confirmed",
+      "editionDescription": "Edição de cartórios do TJPR não confirmada nesta etapa.",
+      "examStage": "Não confirmado.",
+      "bankNames": [],
+      "officialUrls": [],
+      "syllabusNotes": "Nenhum programa oficial conferido.",
+      "requirementLocator": null,
+      "constraints": [
+        "Pesquisa interrompida para consolidação; não foi localizada/conferida fonte oficial específica suficiente.",
+        "Não confundir com o concurso de Juiz Substituto TJPR 2025/2026.",
+        "Pesquisa de identidade e programa não equivale a revisão editorial nem libera publicação ou comprova 68 questões. Conferir versão integral vigente e alterações antes de criar vínculos."
+      ],
+      "evidence": [],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "tj-ce-cartorios-reta-final",
+      "status": "needs_identity_review",
+      "editionDescription": "Pista oficial: abertura de concurso para cartórios anunciada pelo TJCE em 28/05/2025.",
+      "examStage": "Calendário atual e retificações não conferidos.",
+      "bankNames": [],
+      "officialUrls": [
+        "https://www.tjce.jus.br/noticias/tribunal-de-justica-do-ceara-lanca-edital-de-concurso-com-44-vagas-para-cartorios/",
+        "https://portal.tjce.jus.br/uploads/2026/05/8-TJ_CE_Notarios_Respostas_Impugnacoes-em-libras-1779455736.pdf"
+      ],
+      "syllabusNotes": "Programa oficial e repartição entre provimento/remoção ainda não conferidos.",
+      "requirementLocator": null,
+      "constraints": [
+        "URL oficial descoberta em pesquisa, mas página específica não foi navegada antes da consolidação.",
+        "Há atos/impugnações oficiais de 2026: notícia de 2025 não comprova calendário vigente.",
+        "Não inferir que 'Reta Final' significa nova edição 2026.",
+        "Pesquisa de identidade e programa não equivale a revisão editorial nem libera publicação ou comprova 68 questões. Conferir versão integral vigente e alterações antes de criar vínculos."
+      ],
+      "evidence": [
+        {
+          "url": "https://www.tjce.jus.br/noticias/tribunal-de-justica-do-ceara-lanca-edital-de-concurso-com-44-vagas-para-cartorios/",
+          "title": "TJCE lança edital de concurso com 44 vagas para cartórios",
+          "kind": "organ",
+          "observedFacts": "Resultado oficial localizado, notícia de 28/05/2025; texto integral e documentos atuais não conferidos.",
+          "checkedAt": "2026-09-06T15:40:29Z"
+        },
+        {
+          "url": "https://portal.tjce.jus.br/uploads/2026/05/8-TJ_CE_Notarios_Respostas_Impugnacoes-em-libras-1779455736.pdf",
+          "title": "Respostas a impugnações, TJCE Notários",
+          "kind": "amendment",
+          "observedFacts": "PDF oficial localizado na pesquisa; precisa ser lido e relacionado ao edital exato, não foi usado como programa.",
+          "checkedAt": "2026-09-06T15:40:29Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "tj-mg-cartorios-reta-final",
+      "status": "needs_identity_review",
+      "editionDescription": "Cadastro oficial do CNJ aponta concurso TJMG de outorga, Edital 1/2024.",
+      "examStage": "Fase atual não confirmada.",
+      "bankNames": [],
+      "officialUrls": [
+        "https://concursos-serventias.cloud.cnj.jus.br/concurso/concurso-publico-de-provas-e-titulos-para-a-outorga-de-delegacoes-de-notas-e-de-registro-do-estado-de-minas-gerais-edital-no-12024/NDY%3D/MjAwOA%3D%3D"
+      ],
+      "syllabusNotes": "Programa e alterações ainda não conferidos.",
+      "requirementLocator": null,
+      "constraints": [
+        "URL oficial descoberta em pesquisa, sem navegação/leitura integral antes da consolidação.",
+        "Identidade do produto sem ano precisa ser vinculada a uma edição específica, não a concursos de magistratura.",
+        "Pesquisa de identidade e programa não equivale a revisão editorial nem libera publicação ou comprova 68 questões. Conferir versão integral vigente e alterações antes de criar vínculos."
+      ],
+      "evidence": [
+        {
+          "url": "https://concursos-serventias.cloud.cnj.jus.br/concurso/concurso-publico-de-provas-e-titulos-para-a-outorga-de-delegacoes-de-notas-e-de-registro-do-estado-de-minas-gerais-edital-no-12024/NDY%3D/MjAwOA%3D%3D",
+          "title": "CNJ — Concurso de outorga TJMG, Edital 1/2024",
+          "kind": "organ",
+          "observedFacts": "Registro oficial localizado por busca com identificação Edital 1/2024; fase, organizador e programa ainda não conferidos.",
+          "checkedAt": "2026-09-06T15:40:29Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "tj-mt-cartorios-reta-final",
+      "status": "needs_identity_review",
+      "editionDescription": "TJMT, cartórios, pista oficial do Edital 48/2025, com alterações de calendário em 2026.",
+      "examStage": "Inscrições e provas tiveram alterações; calendário vigente não concluído nesta etapa.",
+      "bankNames": [
+        "Cebraspe"
+      ],
+      "officialUrls": [
+        "https://www.tjmt.jus.br/noticias/2026/1/inscricoes-para-concurso-provas-e-titulos-cartorios-seguem-ate-13-fevereiro",
+        "https://dje-api.tjmt.jus.br/api/diarioOficial/documento/12156-2026_CADERNO_ADMINISTRATIVO_DO_PODER_JUDICIARIO.pdf",
+        "https://www.cebraspe.org.br/concursos/tj_mt_25_notarios"
+      ],
+      "syllabusNotes": "Programa não conferido. Distinguir modalidades de provimento/remoção e requisitos ENAC.",
+      "requirementLocator": null,
+      "constraints": [
+        "Página específica ainda não foi navegada antes da consolidação; evidência nesta etapa é descoberta em fontes oficiais.",
+        "Notícia de janeiro tem calendário anterior a retificação; não anunciar datas antigas.",
+        "Confirmar edição 48/2025 e requisitos atuais antes de vincular produto.",
+        "Pesquisa de identidade e programa não equivale a revisão editorial nem libera publicação ou comprova 68 questões. Conferir versão integral vigente e alterações antes de criar vínculos."
+      ],
+      "evidence": [
+        {
+          "url": "https://www.tjmt.jus.br/noticias/2026/1/inscricoes-para-concurso-provas-e-titulos-cartorios-seguem-ate-13-fevereiro",
+          "title": "TJMT — inscrições para concurso de cartórios",
+          "kind": "organ",
+          "observedFacts": "Resultado de busca oficial de 23/01/2026 associa o concurso ao Cebraspe; calendário desta notícia não deve ser tomado como atual.",
+          "checkedAt": "2026-09-06T15:40:29Z"
+        },
+        {
+          "url": "https://dje-api.tjmt.jus.br/api/diarioOficial/documento/12156-2026_CADERNO_ADMINISTRATIVO_DO_PODER_JUDICIARIO.pdf",
+          "title": "Diário de Justiça TJMT, caderno administrativo 12156/2026",
+          "kind": "amendment",
+          "observedFacts": "Resultado oficial localizado com alterações referentes ao Edital 48/2025 e referência ao portal Cebraspe; leitura integral da alteração ainda pendente.",
+          "checkedAt": "2026-09-06T15:40:29Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "agu-advocacia-geral-da-uniao-pre-edital",
+      "status": "pre_notice_only",
+      "editionDescription": "Pré-edital AGU: notícia oficial de 4/9/2026 anuncia novo modelo ENAP e autorização de 170 vagas, não edital de abertura das carreiras.",
+      "examStage": "Preparação/autorizações; notícia prevê abertura ainda em 2026. Enap será habilitação prévia, distinta dos concursos de ingresso.",
+      "bankNames": [],
+      "officialUrls": [
+        "https://www.gov.br/agu/pt-br/comunicacao/noticias/agu-moderniza-concurso-para-carreiras-juridicas-e-passa-a-adotar-o-exame-nacional-da-advocacia-publica/"
+      ],
+      "syllabusNotes": "AGU não é um único cargo: Advogado da União, Procurador Federal, Procurador da Fazenda Nacional e Procurador do Banco Central têm escolhas e programas a definir. Não misturar CPNU de servidores administrativos com carreiras jurídicas.",
+      "requirementLocator": null,
+      "constraints": [
+        "Fonte localizada na descoberta de URLs, mas a conferência obrigatória em agent-browser não foi concluída antes do fechamento desta etapa; não tratar como programa/edição validado para produção.",
+        "Escolher carreira/trilha e separar Exame Nacional da Advocacia Pública de prova de ingresso.",
+        "Notícia de modernização/autorização não define programa detalhado nem confirma organizadora; bankNames vazio intencional.",
+        "Não anunciar edital aberto ou criar questões como se houvesse programa atual confirmado.",
+        "Dossiê de pesquisa: não equivale a curadoria de questões nem autoriza publicação. A meta de 68 exige questões distintas, pertinentes ao cargo/edição/programa e revisão humana."
+      ],
+      "evidence": [
+        {
+          "url": "https://www.gov.br/agu/pt-br/comunicacao/noticias/agu-moderniza-concurso-para-carreiras-juridicas-e-passa-a-adotar-o-exame-nacional-da-advocacia-publica/",
+          "title": "AGU moderniza concurso para carreiras jurídicas e passa a adotar o Exame Nacional da Advocacia Pública",
+          "kind": "organ",
+          "observedFacts": "Descoberta em busca primária: notícia publicada em 4/9/2026, 170 vagas autorizadas (50 AU, 50 PF, 50 PFN, 20 Banco Central); Enap eliminatório e habilitador, concursos específicos futuros. O conteúdo foi localizado na busca, não conferido em agent-browser nesta rodada.",
+          "checkedAt": "2026-09-06T15:39:53Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "mpt-procurador-do-trabalho-2024",
+      "status": "not_confirmed",
+      "editionDescription": "Candidato de identidade: 23º concurso do MPT, Edital 169/2023, com etapas em 2024 e 2025. A descoberta em índice de busca oficial não substitui a leitura do edital.",
+      "examStage": "Não validada nesta coleta; índice oficial menciona provas orais em julho de 2025, portanto não há evidência de nova abertura em 2026.",
+      "bankNames": [],
+      "officialUrls": [
+        "https://mpt.mp.br/pgt/trabalho-mpt/procurador",
+        "https://mpt.mp.br/pgt/trabalho-mpt/procurador/23o-concurso/edital-de-abertura-das-inscricoes/edital-169-2023.pdf",
+        "https://prt3.mpt.mp.br/procuradorias/prt-belohorizonte/3642-mpt-realiza-provas-orais-do-23-concurso-publico-para-procuradora-e-procurador-do-trabalho"
+      ],
+      "syllabusNotes": "Nenhum programa liberado. Leitura do edital e organização do concurso pendentes; não presumir FGV/FCC nem adotar automaticamente CF, CLT ou Lei 8.112.",
+      "requirementLocator": null,
+      "constraints": [
+        "O navegador recebeu página de bloqueio WAF tanto no portal do MPT quanto na notícia da PRT3; não houve contorno do bloqueio.",
+        "O PDF foi descoberto em busca oficial, mas seu conteúdo não foi conferido no navegador.",
+        "Confirmar identidade da edição histórica e programa consolidado antes de qualquer vínculo editorial."
+      ],
+      "evidence": [
+        {
+          "url": "https://mpt.mp.br/pgt/trabalho-mpt/procurador",
+          "title": "Sua requisição foi bloqueada",
+          "kind": "organ",
+          "observedFacts": "Tentativa de acesso no navegador resultou em bloqueio WAF. Não foi possível validar conteúdo normativo ou fase atual.",
+          "checkedAt": "2026-09-06T15:40:09Z"
+        },
+        {
+          "url": "https://prt3.mpt.mp.br/procuradorias/prt-belohorizonte/3642-mpt-realiza-provas-orais-do-23-concurso-publico-para-procuradora-e-procurador-do-trabalho",
+          "title": "Sua requisição foi bloqueada",
+          "kind": "organ",
+          "observedFacts": "A notícia oficial localizada por busca também foi bloqueada no navegador. A referência à edição 23 é pista de pesquisa, não edital validado.",
+          "checkedAt": "2026-09-06T15:40:09Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "tst-magistratura-do-trabalho-pre-edital",
+      "status": "pre_notice_only",
+      "editionDescription": "Produto pré-edital sem nova edição identificada. Referência histórica encontrada: concurso nacional de magistratura do trabalho de 2023, promovido no âmbito do CSJT.",
+      "examStage": "Referência de 2023 classificada como realizada, com resultado final em 28/06/2024. Não é prova de edital novo.",
+      "bankNames": [],
+      "officialUrls": [
+        "https://conhecimento.fgv.br/concursos/csjt23"
+      ],
+      "syllabusNotes": "FGV está confirmada apenas para a edição histórica de 2023. Não há programa nem banca confirmados para uma futura edição neste produto pré-edital.",
+      "requirementLocator": null,
+      "constraints": [
+        "O status pré-edital descreve o produto, não confirma autorização formal de novo concurso.",
+        "Não confundir concurso de servidores do TST, ENAM e concurso para juiz do trabalho.",
+        "Não copiar programa histórico para uma edição futura como se fosse definitivo."
+      ],
+      "evidence": [
+        {
+          "url": "https://conhecimento.fgv.br/concursos/csjt23",
+          "title": "Concurso Público para o Conselho Superior da Justiça do Trabalho",
+          "kind": "organizer",
+          "observedFacts": "Página oficial da FGV identifica o concurso para juiz do trabalho substituto, iniciado em janeiro de 2023, como realizado; lista resultado final em 28/06/2024 e resultado definitivo da prova oral em 19/06/2024.",
+          "checkedAt": "2026-09-06T15:40:09Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "pge-rj-procurador-do-estado-reta-final",
+      "status": "needs_identity_review",
+      "editionDescription": "Pista oficial do 19º concurso PGE-RJ, edição 2026; rótulo comercial 'reta final' precisa escolher a fase real.",
+      "examStage": "A descoberta oficial mostra prova escrita geral já realizada, barema de 2/9 e retificação do barema em 4/9/2026; conferência de fase em navegador pendente.",
+      "bankNames": [],
+      "officialUrls": [
+        "https://pge.rj.gov.br/concurso/19o-concurso-para-ingresso-na-carreira-de-procurador-do-estado"
+      ],
+      "syllabusNotes": "Não presumir FGV: a página oficial aponta comissões examinadoras da PGE-RJ. Regulamento, edital, programa e formato escrito devem ser conferidos sem acessar cadernos de questões de terceiros.",
+      "requirementLocator": null,
+      "constraints": [
+        "Fonte localizada na descoberta de URLs, mas a conferência obrigatória em agent-browser não foi concluída antes do fechamento desta etapa; não tratar como programa/edição validado para produção.",
+        "Definir se produto corresponde ao 19º concurso e à etapa escrita/específica/oral pertinente; não anunciar objetiva genérica.",
+        "Página lista regulamento de 3/2, abertura de 18/5, prorrogação em junho e alteração em 6/8/2026; ler atos consolidados.",
+        "BankNames vazio até validar a composição/organização no documento; não forçar uma das bancas cadastradas.",
+        "Dossiê de pesquisa: não equivale a curadoria de questões nem autoriza publicação. A meta de 68 exige questões distintas, pertinentes ao cargo/edição/programa e revisão humana."
+      ],
+      "evidence": [
+        {
+          "url": "https://pge.rj.gov.br/concurso/19o-concurso-para-ingresso-na-carreira-de-procurador-do-estado",
+          "title": "19º Concurso para ingresso na carreira de Procurador do Estado",
+          "kind": "organ",
+          "observedFacts": "Descoberta em busca primária identificou página oficial do 19º concurso, edital 2026, comissões e movimentações até retificação de barema em 4/9. Navegação de conferência e leitura integral do edital não realizadas antes do fechamento.",
+          "checkedAt": "2026-09-06T15:39:53Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "tj-ce-analista-e-tecnico-2026",
+      "status": "official_edition_found",
+      "editionDescription": "TJCE, Edital 01/2026, analista judiciário, oficial de justiça e técnico judiciário; organização FCC.",
+      "examStage": "Inscrições encerradas em junho de 2026; notícia de 02/06/2026 previa provas para 09/08/2026, data já decorrida. Resultado e efetiva realização não foram conferidos nesta coleta.",
+      "bankNames": [
+        "FCC"
+      ],
+      "officialUrls": [
+        "https://www.tjce.jus.br/institucional/concursos-selecoes/",
+        "https://www.tjce.jus.br/noticias/tjce-altera-edital-do-concurso-publico-para-servidoras-e-servidores/"
+      ],
+      "syllabusNotes": "O órgão informa retificação do conteúdo programático em 29/05/2026. Exige leitura do anexo consolidado por cargo; a notícia não permite afirmar quais dispositivos de CF, CLT ou Lei 8.112 são exigidos.",
+      "requirementLocator": null,
+      "constraints": [
+        "Recortar cargo e especialidade: o edital também inclui oficial de justiça e áreas técnicas distintas.",
+        "Não apresentar a data de prova já decorrida como evento futuro.",
+        "Conferir edital consolidado e todas as retificações de programa antes de gerar questões."
+      ],
+      "evidence": [
+        {
+          "url": "https://www.tjce.jus.br/institucional/concursos-selecoes/",
+          "title": "Concursos e Seleções — TJCE",
+          "kind": "organ",
+          "observedFacts": "A listagem oficial identifica Edital 1/2026 e cargos de analista, oficial de justiça e técnico, com 24 vagas imediatas e várias especialidades.",
+          "checkedAt": "2026-09-06T15:40:09Z"
+        },
+        {
+          "url": "https://www.tjce.jus.br/noticias/tjce-altera-edital-do-concurso-publico-para-servidoras-e-servidores/",
+          "title": "TJCE altera edital do concurso público para servidoras e servidores",
+          "kind": "amendment",
+          "observedFacts": "Notícia de 02/06/2026 informa FCC, retificação de 29/05 que alcança conteúdo programático e cronograma, inscrições até 22/06 e provas previstas para 09/08/2026.",
+          "checkedAt": "2026-09-06T15:40:09Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "mpe-mt-promotor-de-justica-2026",
+      "status": "official_edition_found",
+      "editionDescription": "MPMT, Promotor de Justiça Substituto, Edital 01/2026 de 17/03/2026.",
+      "examStage": "Objetiva já realizada; atos de provas discursivas publicados até 01/09/2026.",
+      "bankNames": [
+        "FGV"
+      ],
+      "officialUrls": [
+        "https://conhecimento.fgv.br/concursos/mpmt",
+        "https://conhecimento.fgv.br/sites/default/files/concursos/edital_n_01_2026_compilado_ate_a_1_a_retificacao_de_20_07_2026-1.pdf"
+      ],
+      "syllabusNotes": "Anexo I, Grupo 1: Constitucional; item 1(b) abrange direitos fundamentais, direitos individuais/coletivos/difusos, proteção de dados, nacionalidade, cidadania e direitos políticos.",
+      "requirementLocator": "Edital compilado até a primeira retificação de 20/07/2026, Anexo I, página 33, Grupo 1, itens 1(a) e 1(b).",
+      "constraints": [
+        "Usar versão consolidada de 20/07/2026.",
+        "Objetiva com 100 questões de cinco alternativas (§9.1); fase discursiva exige modelagem própria.",
+        "Constituição de Mato Grosso também integra o programa; não restringir toda a cobertura à CF federal.",
+        "Pesquisa de identidade e programa não equivale a revisão editorial nem libera publicação ou comprova 68 questões. Conferir versão integral vigente e alterações antes de criar vínculos."
+      ],
+      "evidence": [
+        {
+          "url": "https://conhecimento.fgv.br/concursos/mpmt",
+          "title": "Concurso MPMT — Promotor de Justiça Substituto",
+          "kind": "organizer",
+          "observedFacts": "Página navegada confirma abertura em 17/03/2026 e etapa discursiva com atos recentes.",
+          "checkedAt": "2026-09-06T15:40:29Z"
+        },
+        {
+          "url": "https://conhecimento.fgv.br/sites/default/files/concursos/edital_n_01_2026_compilado_ate_a_1_a_retificacao_de_20_07_2026-1.pdf",
+          "title": "Edital MPMT 01/2026 consolidado em 20/07",
+          "kind": "notice",
+          "observedFacts": "PDF oficial de 66 páginas consultado; Anexo I e Grupo 1 de Direito Constitucional identificados.",
+          "checkedAt": "2026-09-06T15:40:29Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "mpe-rj-promotor-de-justica-2026",
+      "status": "official_edition_found",
+      "editionDescription": "MPRJ, XXXIX Concurso, Promotor de Justiça Substituto, abertura em março de 2026.",
+      "examStage": "Resultados preliminares das quatro provas discursivas publicados em 04/09/2026.",
+      "bankNames": [
+        "FGV"
+      ],
+      "officialUrls": [
+        "https://conhecimento.fgv.br/concursos/mprjpromotor2026",
+        "https://conhecimento.fgv.br/sites/default/files/concursos/edital-xxxix-concurso.pdf",
+        "https://conhecimento.fgv.br/sites/default/files/concursos/deliberacao-csmp-no-86-regulamento-do-xxxix-concurso-da-carreira.pdf",
+        "https://conhecimento.fgv.br/sites/default/files/concursos/cronograma-apos-as-provas-discursivas-especializadas.pdf"
+      ],
+      "syllabusNotes": "Página separa edital, regulamento e avisos de conteúdo programático. Constitucional aparece associado à discursiva com Administrativo, Eleitoral e Financeiro/Tributário; o subitem exato depende dos avisos republicados.",
+      "requirementLocator": null,
+      "constraints": [
+        "Há aviso de conteúdo programático em 17/03 e republicações/inclusões em abril; não usar apenas o edital inicial.",
+        "FGV na objetiva não autoriza tratar todas as fases como múltipla escolha.",
+        "Conferir avisos de republicação por incorreção antes de mapear questões.",
+        "Pesquisa de identidade e programa não equivale a revisão editorial nem libera publicação ou comprova 68 questões. Conferir versão integral vigente e alterações antes de criar vínculos."
+      ],
+      "evidence": [
+        {
+          "url": "https://conhecimento.fgv.br/concursos/mprjpromotor2026",
+          "title": "XXXIX Concurso MPRJ",
+          "kind": "organizer",
+          "observedFacts": "Página navegada: XXXIX, Promotor Substituto, avisos de programa e resultados discursivos de 04/09/2026.",
+          "checkedAt": "2026-09-06T15:40:29Z"
+        },
+        {
+          "url": "https://conhecimento.fgv.br/sites/default/files/concursos/edital-xxxix-concurso.pdf",
+          "title": "Edital do XXXIX Concurso MPRJ",
+          "kind": "notice",
+          "observedFacts": "Link de abertura identificado na página oficial; não substitui os avisos de programa republicados.",
+          "checkedAt": "2026-09-06T15:40:29Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "dpe-ba-defensor-publico-2026",
+      "status": "official_edition_found",
+      "editionDescription": "DPEBA, Defensor Público, Edital 01/2026, abertura em 23/02/2026.",
+      "examStage": "Resultado definitivo das discursivas e convocação de heteroidentificação, Edital 13; página atualizada em 03/09/2026.",
+      "bankNames": [
+        "FCC"
+      ],
+      "officialUrls": [
+        "https://www.concursosfcc.com.br/concursos/dpeba125/index.html",
+        "https://www.concursosfcc.com.br/concursos/dpeba125/edital_de_abertura_dpeba_23_02_2026.pdf",
+        "https://www.concursosfcc.com.br/concursos/dpeba125/edital_de_retificacao_dpeba125.pdf"
+      ],
+      "syllabusNotes": "Edital atual localizado, mas programa de Constitucional ainda não conferido nesta etapa.",
+      "requirementLocator": null,
+      "constraints": [
+        "Não confundir o código de pasta dpeba125 com ano do edital; o edital observado é de 2026.",
+        "Não reutilizar automaticamente o programa de concurso VIII/2025 encontrado em pesquisas históricas.",
+        "Consolidar retificação antes de produzir questões.",
+        "Pesquisa de identidade e programa não equivale a revisão editorial nem libera publicação ou comprova 68 questões. Conferir versão integral vigente e alterações antes de criar vínculos."
+      ],
+      "evidence": [
+        {
+          "url": "https://www.concursosfcc.com.br/concursos/dpeba125/index.html",
+          "title": "FCC — Concurso Defensoria Pública da Bahia",
+          "kind": "organizer",
+          "observedFacts": "Página navegada confirma Edital 01/2026 e resultado definitivo das discursivas em setembro.",
+          "checkedAt": "2026-09-06T15:40:29Z"
+        },
+        {
+          "url": "https://www.concursosfcc.com.br/concursos/dpeba125/edital_de_abertura_dpeba_23_02_2026.pdf",
+          "title": "DPEBA, edital de abertura de 23/02/2026",
+          "kind": "notice",
+          "observedFacts": "Link público do edital identificado pela navegação oficial; programa integral ainda pendente.",
+          "checkedAt": "2026-09-06T15:40:29Z"
+        },
+        {
+          "url": "https://www.concursosfcc.com.br/concursos/dpeba125/edital_de_retificacao_dpeba125.pdf",
+          "title": "Retificação DPEBA",
+          "kind": "amendment",
+          "observedFacts": "Link de retificação encontrado no portal FCC; consolidar conteúdo antes de mapear.",
+          "checkedAt": "2026-09-06T15:40:29Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "pc-df-delegado-de-policia-reta-final",
+      "status": "needs_identity_review",
+      "editionDescription": "Edital nº 1 PCDF — Delegado, de 3/2/2026; consolidado até edital nº 7 de 10/7/2026. Rótulo 'reta final' não identifica a etapa.",
+      "examStage": "Objetiva já tem resultado final; discursivas com resultado provisório em 2/9 e recursos em 3/9/2026.",
+      "bankNames": [
+        "Cebraspe"
+      ],
+      "officialUrls": [
+        "https://www.cebraspe.org.br/concursos/pc_df_26_delegado",
+        "https://cdn.cebraspe.org.br/concursos/pc_df_26_delegado/arquivos/6EED00494ECF8F0FBFFC8DE4D77C0825927108FF44F23557F6788FA808B61EC4.html"
+      ],
+      "syllabusNotes": "Item 22.2 do consolidado contém Constitucional e legislação complementar, Penal e legislação complementar, Processual Penal e legislação complementar, além de conteúdo distrital. Programa real localizado, mas objetivo comercial deve refletir etapa pós-provas.",
+      "requirementLocator": "Edital nº 1 PCDF de 3/2/2026, consolidado até edital nº 7 de 10/7: item 22.2.",
+      "constraints": [
+        "Não anunciar preparação para uma objetiva futura desta edição: resultado final já foi publicado.",
+        "Versão HTML tem título de arquivo '2025', mas cabeçalho oficial é de 3/2/2026; usar identidade documental, não nome de arquivo.",
+        "Retificações nº 2, 3, 4 e 7 devem ser preservadas na referência; o consolidado lido declara até nº 7.",
+        "Dossiê de pesquisa: não equivale a curadoria de questões nem autoriza publicação. A meta de 68 exige questões distintas, pertinentes ao cargo/edição/programa e revisão humana."
+      ],
+      "evidence": [
+        {
+          "url": "https://www.cebraspe.org.br/concursos/pc_df_26_delegado",
+          "title": "PCDF 2026 — Delegado",
+          "kind": "organizer",
+          "observedFacts": "Conferido em agent-browser: cargo Delegado de Polícia do DF, 50 vagas; edital nº 9 publicado em 2/9/2026 com resultado final objetivo e provisório discursivo; recurso em 3/9. Não foram abertos cadernos ou gabaritos.",
+          "checkedAt": "2026-09-06T15:39:53Z"
+        },
+        {
+          "url": "https://cdn.cebraspe.org.br/concursos/pc_df_26_delegado/arquivos/6EED00494ECF8F0FBFFC8DE4D77C0825927108FF44F23557F6788FA808B61EC4.html",
+          "title": "Edital nº 1 PCDF — Delegado, consolidado até nº 7",
+          "kind": "notice",
+          "observedFacts": "HTML oficial conferido em agent-browser: cabeçalho de 3/2/2026, versão até edital nº 7 de 10/7, programa item 22.2 com ramos jurídicos e legislação complementar.",
+          "checkedAt": "2026-09-06T15:39:53Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "tj-mg-juiz-de-direito-2026",
+      "status": "official_edition_found",
+      "editionDescription": "TJMG, Juiz de Direito Substituto, Edital 1/2026, documento de 16/01/2026.",
+      "examStage": "Atos de inscrições preliminares localizados; etapa atual não foi integralmente confirmada.",
+      "bankNames": [
+        "Instituto Consulplan"
+      ],
+      "officialUrls": [
+        "https://cdnsite.institutoconsulplan.org.br/concursos/1284/1_392329.pdf",
+        "https://portal-hml.tjmg.jus.br/portal-tjmg/concursos-e-selecoes/concurso-juiz-de-direito-substituto-edital-1-2026.htm"
+      ],
+      "syllabusNotes": "PDF oficial de abertura localizado; programa de Constitucional ainda não lido para esta consolidação.",
+      "requirementLocator": null,
+      "constraints": [
+        "Portal de homologação do TJMG retornou 503; não foi contornado.",
+        "Identidade encontrada em fontes oficiais indexadas; falta completar navegação do PDF/portal de produção e retificações.",
+        "Banca operacional é Instituto Consulplan, com TJMG/EJEF; não usar o padrão FGV por associação à carreira.",
+        "Pesquisa de identidade e programa não equivale a revisão editorial nem libera publicação ou comprova 68 questões. Conferir versão integral vigente e alterações antes de criar vínculos."
+      ],
+      "evidence": [
+        {
+          "url": "https://cdnsite.institutoconsulplan.org.br/concursos/1284/1_392329.pdf",
+          "title": "TJMG — Edital 1/2026, Juiz de Direito Substituto",
+          "kind": "notice",
+          "observedFacts": "PDF oficial indexado identifica Edital 1/2026, data 16/01/2026, SEI 25139738 e apoio operacional Instituto Consulplan; leitura integral do programa pendente.",
+          "checkedAt": "2026-09-06T15:40:29Z"
+        },
+        {
+          "url": "https://portal-hml.tjmg.jus.br/portal-tjmg/concursos-e-selecoes/concurso-juiz-de-direito-substituto-edital-1-2026.htm",
+          "title": "TJMG — página do concurso, ambiente homologado do portal",
+          "kind": "organ",
+          "observedFacts": "Tentativa de navegação retornou 503; não utilizada para confirmar estágio atual.",
+          "checkedAt": "2026-09-06T15:40:29Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "dpe-ma-defensor-publico-2026",
+      "status": "official_edition_found",
+      "editionDescription": "DPEMA, VII Concurso, Defensor Público de Classe Inicial, Edital 01/2026.",
+      "examStage": "Edital 14: resultado definitivo da inscrição definitiva, convocação para prova oral e títulos; página de 04/09/2026.",
+      "bankNames": [
+        "FCC"
+      ],
+      "officialUrls": [
+        "https://www.concursosfcc.com.br/concursos/dpema125/index.html",
+        "https://www.concursosfcc.com.br/concursos/dpema125/edital_n0_14-2026_-_resultado_definitivo_da_inscricao_definitiva_e_convocacao_para_a_prova_oral_e_apresentacao_de_titulos.pdf",
+        "https://defensoria.ma.def.br/dpema/portal/concursos/9"
+      ],
+      "syllabusNotes": "Programa oficial de abertura ainda precisa ser extraído; não usar a convocação de prova oral como programa.",
+      "requirementLocator": null,
+      "constraints": [
+        "Fases objetiva e discursiva já superadas; formato de conteúdo deve corresponder à fase oferecida.",
+        "Código dpema125 não prova abertura em 2025.",
+        "Pesquisa de identidade e programa não equivale a revisão editorial nem libera publicação ou comprova 68 questões. Conferir versão integral vigente e alterações antes de criar vínculos."
+      ],
+      "evidence": [
+        {
+          "url": "https://www.concursosfcc.com.br/concursos/dpema125/index.html",
+          "title": "FCC — VII Concurso DPEMA",
+          "kind": "organizer",
+          "observedFacts": "Página navegada confirma VII Concurso e convocação oral/títulos em 04/09/2026.",
+          "checkedAt": "2026-09-06T15:40:29Z"
+        },
+        {
+          "url": "https://www.concursosfcc.com.br/concursos/dpema125/edital_n0_14-2026_-_resultado_definitivo_da_inscricao_definitiva_e_convocacao_para_a_prova_oral_e_apresentacao_de_titulos.pdf",
+          "title": "DPEMA — Edital 14/2026",
+          "kind": "notice",
+          "observedFacts": "Link de ato atual identificado no portal FCC; não contém evidência suficiente de subitem programático nesta pesquisa.",
+          "checkedAt": "2026-09-06T15:40:29Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "sefa-pa-auditor-fiscal-e-analista-reta-final",
+      "status": "historical_edition",
+      "editionDescription": "Edital 01/2025 SEPLAD/SEFA, consolidado de 14/01/2026",
+      "examStage": "Página oficial lista homologação em 11/06/2026 e atos posteriores sub judice",
+      "bankNames": [
+        "FADESP"
+      ],
+      "officialUrls": [
+        "https://portalfadesp.org.br/?page_id=53106"
+      ],
+      "syllabusNotes": "Programas dependem de cargo e área; página aponta Anexo I para cargos e Anexo III para cronograma.",
+      "requirementLocator": null,
+      "constraints": [
+        "Não apresentar como reta final de objetiva futura.",
+        "Definir estudo continuado ou edição histórica e separar Auditor/Analista antes de vincular questões.",
+        "Rótulo de um resultado final tem data futura de 09/09/2026; não usado para determinar fase."
+      ],
+      "evidence": [
+        {
+          "url": "https://portalfadesp.org.br/?page_id=53106",
+          "title": "Edital 01/2025 SEPLAD/SEFA, consolidado de 14/01/2026",
+          "kind": "organizer",
+          "observedFacts": "Página oficial lista homologação em 11/06/2026 e atos posteriores sub judice. Programas dependem de cargo e área; página aponta Anexo I para cargos e Anexo III para cronograma.",
+          "checkedAt": "2026-09-06T15:44:25Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "tj-go-juiz-de-direito-2026",
+      "status": "needs_identity_review",
+      "editionDescription": "TJGO, 59º Concurso, Juiz Substituto, abertura Edital 01/2025, com execução em 2026.",
+      "examStage": "Resultado definitivo da discursiva publicado em 01/09/2026.",
+      "bankNames": [
+        "FGV"
+      ],
+      "officialUrls": [
+        "https://conhecimento.fgv.br/concursos/tjgo2025",
+        "https://conhecimento.fgv.br/sites/default/files/concursos/59_juiz_edital_abertura_consolidado_13-01-2026.pdf"
+      ],
+      "syllabusNotes": "Edital consolidado identificado; programa constitucional integral ainda pendente.",
+      "requirementLocator": null,
+      "constraints": [
+        "Catálogo rotula 2026, mas abertura é de 2025: resolver identidade da edição antes de geração/vínculo.",
+        "Objetiva já realizada em março de 2026; não vender como reta final da objetiva sem adequação.",
+        "Pesquisa de identidade e programa não equivale a revisão editorial nem libera publicação ou comprova 68 questões. Conferir versão integral vigente e alterações antes de criar vínculos."
+      ],
+      "evidence": [
+        {
+          "url": "https://conhecimento.fgv.br/concursos/tjgo2025",
+          "title": "FGV — 59º Concurso TJGO",
+          "kind": "organizer",
+          "observedFacts": "Página navegada confirma concurso iniciado em 18/12/2025 e atos da discursiva em setembro de 2026.",
+          "checkedAt": "2026-09-06T15:40:29Z"
+        },
+        {
+          "url": "https://conhecimento.fgv.br/sites/default/files/concursos/59_juiz_edital_abertura_consolidado_13-01-2026.pdf",
+          "title": "59º Concurso TJGO — edital consolidado 13/01/2026",
+          "kind": "notice",
+          "observedFacts": "Link consolidado observado no portal oficial; numeração 01/2025 não deve ser substituída pelo ano da retificação.",
+          "checkedAt": "2026-09-06T15:40:29Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "pc-sc-agente-e-escrivao-2025-2026",
+      "status": "needs_identity_review",
+      "editionDescription": "Produto combina Agente e Escrivão PC-SC 2025/2026; descoberta aponta editais separados, ainda não conferidos em navegador.",
+      "examStage": "Pista de prova em março/2026 já transcorrida; fase atual não confirmada.",
+      "bankNames": [],
+      "officialUrls": [
+        "https://pc.sc.gov.br/?page_id=77"
+      ],
+      "syllabusNotes": "Página oficial de concursos localizada. Editais 01 e 02/2025 e IDECAN foram pistas de descoberta, mas precisam de conferência primária integral. Não presumir syllabus compartilhado.",
+      "requirementLocator": null,
+      "constraints": [
+        "Fonte localizada na descoberta de URLs, mas a conferência obrigatória em agent-browser não foi concluída antes do fechamento desta etapa; não tratar como programa/edição validado para produção.",
+        "Resolver dois cargos/duas trilhas e edição/etapa antes de geração; o título combinado não autoriza mesclar programas.",
+        "Confirmar organizadora, edital de cada cargo, alterações e fase atual na página oficial; não usar prova passada como material de questões.",
+        "Dossiê de pesquisa: não equivale a curadoria de questões nem autoriza publicação. A meta de 68 exige questões distintas, pertinentes ao cargo/edição/programa e revisão humana."
+      ],
+      "evidence": [],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "mpe-sc-promotor-de-justica-2025-2026",
+      "status": "historical_edition",
+      "editionDescription": "MPSC, 45º Concurso de ingresso na carreira de Promotor de Justiça.",
+      "examStage": "Classificação final divulgada e convocação de posse publicada; edição já em provimento.",
+      "bankNames": [
+        "Vunesp",
+        "Comissão do MPSC"
+      ],
+      "officialUrls": [
+        "https://www.mpsc.mp.br/concurso-promotor-de-justica",
+        "https://www.mpsc.mp.br/documents/d/guest/edital-45-concurso-adequacoes-cronograma-comunicados-28-e-29-",
+        "https://www.mpsc.mp.br/documents/d/guest/edital-de-convocacao-n-1-posse"
+      ],
+      "syllabusNotes": "Programa do 45º concurso ainda precisa ser conferido integralmente para uso histórico; não presumir identidade com o próximo edital.",
+      "requirementLocator": null,
+      "constraints": [
+        "Concurso possui etapas iniciais pela Vunesp e etapas próprias do MPSC; não atribuir FGV nem Cebraspe por edições antigas.",
+        "Uma edição com classificação final e posse não comprova concurso novo aberto.",
+        "Cronogramas anteriores foram alterados por comunicados 28 e 29.",
+        "Pesquisa de identidade e programa não equivale a revisão editorial nem libera publicação ou comprova 68 questões. Conferir versão integral vigente e alterações antes de criar vínculos."
+      ],
+      "evidence": [
+        {
+          "url": "https://www.mpsc.mp.br/concurso-promotor-de-justica",
+          "title": "MPSC — Concurso de Promotor de Justiça",
+          "kind": "organ",
+          "observedFacts": "Página navegada: 45º Concurso, classificação final/Comunicado 38 e Edital de Convocação 1 para posse.",
+          "checkedAt": "2026-09-06T15:40:29Z"
+        },
+        {
+          "url": "https://www.mpsc.mp.br/documents/d/guest/edital-45-concurso-adequacoes-cronograma-comunicados-28-e-29-",
+          "title": "Edital do 45º Concurso com adequações de cronograma",
+          "kind": "amendment",
+          "observedFacts": "Link consolidado identificado na página oficial; conteúdo programático não foi extraído nesta etapa.",
+          "checkedAt": "2026-09-06T15:40:29Z"
+        },
+        {
+          "url": "https://www.mpsc.mp.br/documents/d/guest/edital-de-convocacao-n-1-posse",
+          "title": "MPSC — Edital de Convocação 1, posse",
+          "kind": "notice",
+          "observedFacts": "Link oficial de convocação de posse observado, evidenciando fase final/encerramento das provas.",
+          "checkedAt": "2026-09-06T15:40:29Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "tj-pr-juiz-de-direito-2025-2026",
+      "status": "official_edition_found",
+      "editionDescription": "TJPR, Juiz Substituto, Edital 001/2025, execução 2025/2026.",
+      "examStage": "Atos de terceira etapa, comissões de heteroidentificação/multiprofissional e resultados de sentença publicados em setembro.",
+      "bankNames": [
+        "FGV"
+      ],
+      "officialUrls": [
+        "https://conhecimento.fgv.br/concursos/tjpr25",
+        "https://conhecimento.fgv.br/sites/default/files/concursos/tjpr-minuta-edital-de-abertura-cnper-ccicm-fgv-12.12.pdf"
+      ],
+      "syllabusNotes": "Edital consolidado localizado; subitens de Constitucional ainda não extraídos.",
+      "requirementLocator": null,
+      "constraints": [
+        "Usar versão de 12/12/2025 e atos posteriores; concurso já ultrapassou a objetiva.",
+        "Não confundir este produto com cartórios TJPR.",
+        "Pesquisa de identidade e programa não equivale a revisão editorial nem libera publicação ou comprova 68 questões. Conferir versão integral vigente e alterações antes de criar vínculos."
+      ],
+      "evidence": [
+        {
+          "url": "https://conhecimento.fgv.br/concursos/tjpr25",
+          "title": "FGV — Concurso Juiz Substituto TJPR 2025/2026",
+          "kind": "organizer",
+          "observedFacts": "Página navegada confirma abertura em 24/11/2025 e atos da terceira etapa em 03/09/2026.",
+          "checkedAt": "2026-09-06T15:40:29Z"
+        },
+        {
+          "url": "https://conhecimento.fgv.br/sites/default/files/concursos/tjpr-minuta-edital-de-abertura-cnper-ccicm-fgv-12.12.pdf",
+          "title": "TJPR — edital de abertura consolidado",
+          "kind": "notice",
+          "observedFacts": "Documento de abertura consolidado de 12/12/2025 vinculado na página oficial; falta programa integral nesta pesquisa.",
+          "checkedAt": "2026-09-06T15:40:29Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "alerj-assembleia-legislativa-do-rj-reta-final",
+      "status": "needs_identity_review",
+      "editionDescription": "ALERJ 2025 possui páginas e editais distintos para especialista legislativo e procurador legislativo. O produto genérico não escolhe qual deles.",
+      "examStage": "Especialista já apresenta resultados objetivos e discursivos em 2026 e resultado definitivo de heteroidentificação em julho; não é abertura nova de inscrições.",
+      "bankNames": [
+        "FGV"
+      ],
+      "officialUrls": [
+        "https://conhecimento.fgv.br/concursos/alerj2025",
+        "https://conhecimento.fgv.br/concursos/alerj2025/1",
+        "https://conhecimento.fgv.br/concursos/alerj2025/2",
+        "https://conhecimento.fgv.br/sites/default/files/concursos/edital-abertura-2-retificacao-alerj-especialista-04.02.26.pdf"
+      ],
+      "syllabusNotes": "Necessário selecionar especialista nível III/IV e respectiva área, ou procurador. PDF retificado de especialista em 04/02/2026 foi localizado por link, mas seu programa não foi lido nesta coleta.",
+      "requirementLocator": null,
+      "constraints": [
+        "Os dois concursos não podem receber um único programa indistinto.",
+        "Não derivar conteúdo programático das referências constitucionais introdutórias da página.",
+        "A página de procurador foi identificada pelo portal, mas não teve sua fase detalhada auditada."
+      ],
+      "evidence": [
+        {
+          "url": "https://conhecimento.fgv.br/concursos/alerj2025",
+          "title": "Concurso Público para a Assembleia Legislativa do Estado do Rio de Janeiro",
+          "kind": "organizer",
+          "observedFacts": "Portal da FGV oferece caminhos separados para especialista legislativo e procurador legislativo.",
+          "checkedAt": "2026-09-06T15:40:09Z"
+        },
+        {
+          "url": "https://conhecimento.fgv.br/concursos/alerj2025/1",
+          "title": "ALERJ — Especialista Legislativo",
+          "kind": "organizer",
+          "observedFacts": "Página de especialista lista níveis III e IV, edital retificado de 04/02/2026, resultado objetivo após recursos de 26/03, discursivo definitivo de 08/05 e heteroidentificação definitiva de 08/07/2026.",
+          "checkedAt": "2026-09-06T15:40:09Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "trt-sp-analista-e-tecnico-2-regiao",
+      "status": "historical_edition",
+      "editionDescription": "TRT-2, concurso de servidores 2025 identificado na FCC; o rótulo do produto omite a edição e especialidades.",
+      "examStage": "Página da organizadora apresenta atos de inclusão sub judice no resultado final em 2026; não comprova nova abertura de concurso.",
+      "bankNames": [
+        "FCC"
+      ],
+      "officialUrls": [
+        "https://www.concursosfcc.com.br/concursos/trt2r124/index.html",
+        "https://www.concursosfcc.com.br/concursos/trt2r124/trt2r124_edital_de_abertura.pdf"
+      ],
+      "syllabusNotes": "Há áreas distintas de analista e técnico, inclusive polícia judicial e TI. O arquivo de abertura foi localizado, mas o anexo de programa por cargo e suas retificações não foram auditados.",
+      "requirementLocator": null,
+      "constraints": [
+        "Portal do tribunal respondeu com bloqueio; conferência realizada na organizadora oficial FCC.",
+        "Selecionar edição 2025 e código do cargo antes de vincular questões.",
+        "CF, CLT e Lei 8.112 não estão validadas como bloco comum apenas pela identificação do órgão."
+      ],
+      "evidence": [
+        {
+          "url": "https://www.concursosfcc.com.br/concursos/trt2r124/index.html",
+          "title": "FCC — Tribunal Regional do Trabalho da 2ª Região (São Paulo/SP)",
+          "kind": "organizer",
+          "observedFacts": "Página oficial confirma organizadora e múltiplos cargos; lista Edital 31/2026 relativo à inclusão de candidata sub judice no resultado final. O código de página trt2r124 não deve ser usado isoladamente para inferir ano do edital.",
+          "checkedAt": "2026-09-06T15:40:09Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "trt-rj-analista-e-tecnico-2025",
+      "status": "historical_edition",
+      "editionDescription": "TRT-1/RJ, Edital 01/2025, servidores, organização FCC.",
+      "examStage": "Resultados finais publicados em 11/09/2025 para os demais cargos e 29/10/2025 para S19; homologação de S19 em novembro de 2025. Atos sub judice continuam em 2026.",
+      "bankNames": [
+        "FCC"
+      ],
+      "officialUrls": [
+        "https://www.concursosfcc.com.br/concursos/trt1r124/index.html",
+        "https://www.concursosfcc.com.br/concursos/trt1r124/trt1r124_edital_de_abertura_2025_final.pdf"
+      ],
+      "syllabusNotes": "Anexo do programa não auditado; escolher cargo, área e especialidade e conferir retificações. Não há liberação automática de conteúdo de CF, CLT ou Lei 8.112.",
+      "requirementLocator": null,
+      "constraints": [
+        "O identificador de página termina em 124, mas o edital exibido é de 2025.",
+        "Atos de candidatos sub judice não tornam esta edição um concurso novo de 2026.",
+        "Página institucional bloqueada; utilizada a organizadora oficial."
+      ],
+      "evidence": [
+        {
+          "url": "https://www.concursosfcc.com.br/concursos/trt1r124/index.html",
+          "title": "FCC — Tribunal Regional do Trabalho da 1ª Região (Rio de Janeiro)",
+          "kind": "organizer",
+          "observedFacts": "A seção de publicações lista abertura 01/2025, Edital 11/2025 com resultado final em 11/09, Edital 15/2025 com resultado final S19 em 29/10 e RA 33/2025 de homologação S19 em 19/11; há ato sub judice publicado em junho de 2026.",
+          "checkedAt": "2026-09-06T15:40:09Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "trt-10-analista-e-tecnico-df-to",
+      "status": "historical_edition",
+      "editionDescription": "TRT-10, Edital 1 de 20/12/2024, com provas e resultados em 2025; organização Cebraspe.",
+      "examStage": "Resultado final dos cargos exceto 15 em 01/08/2025; cargo 15 em 27/08/2025. Convocações individuais sub judice persistem em 2026.",
+      "bankNames": [
+        "Cebraspe"
+      ],
+      "officialUrls": [
+        "https://www.cebraspe.org.br/concursos/TRT10_24",
+        "https://cdn.cebraspe.org.br/concursos/TRT10_24/arquivos/Ed_1_2024_TRT_10_Abertura_atualizado_at%C3%A9_ret_6.pdf"
+      ],
+      "syllabusNotes": "A página distingue 15 cargos, incluindo analista judiciário, oficial de justiça, técnico administrativo e agente de polícia. Foi localizado edital atualizado até retificação 6, cujo programa ainda requer leitura por cargo.",
+      "requirementLocator": null,
+      "constraints": [
+        "Usar versão consolidada, não apenas o primeiro PDF de 2024.",
+        "Não unificar disciplinas de todas as especialidades.",
+        "Nenhum dispositivo de CF, CLT ou Lei 8.112 foi admitido para geração a partir desta pesquisa de identidade."
+      ],
+      "evidence": [
+        {
+          "url": "https://www.cebraspe.org.br/concursos/TRT10_24",
+          "title": "Cebraspe — TRT 10 2024",
+          "kind": "organizer",
+          "observedFacts": "Página oficial lista Edital 1 de 20/12/2024, arquivo atualizado até retificação 6, Edital 11 de resultado final em 01/08/2025 e Edital 13 de resultado final cargo 15 em 27/08/2025; atos de 2026 são sub judice.",
+          "checkedAt": "2026-09-06T15:40:09Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "tj-ba-juiz-de-direito-2026",
+      "status": "official_edition_found",
+      "editionDescription": "TJBA, Juiz Substituto, abertura em 30/01/2026.",
+      "examStage": "Atos e publicações de provas escritas em agosto de 2026; objetiva já ultrapassada.",
+      "bankNames": [
+        "FGV"
+      ],
+      "officialUrls": [
+        "https://conhecimento.fgv.br/juiztjba",
+        "https://conhecimento.fgv.br/sites/default/files/concursos/edital-concurso-juiz-substituto-tjba-retificado-2.pdf",
+        "https://conhecimento.fgv.br/sites/default/files/concursos/retificacao-2-tjba-versao-final.pdf"
+      ],
+      "syllabusNotes": "Programa ainda precisa ser extraído da segunda versão retificada.",
+      "requirementLocator": null,
+      "constraints": [
+        "Não confundir Juiz Substituto com Juiz Leigo.",
+        "Usar edital retificado em 07/04/2026 e retificações posteriores se existentes; não extrapolar MC para provas escritas.",
+        "Pesquisa de identidade e programa não equivale a revisão editorial nem libera publicação ou comprova 68 questões. Conferir versão integral vigente e alterações antes de criar vínculos."
+      ],
+      "evidence": [
+        {
+          "url": "https://conhecimento.fgv.br/juiztjba",
+          "title": "FGV — Concurso Juiz Substituto TJBA",
+          "kind": "organizer",
+          "observedFacts": "Página navegada confirma abertura 2026 e publicações de fase escrita em agosto.",
+          "checkedAt": "2026-09-06T15:40:29Z"
+        },
+        {
+          "url": "https://conhecimento.fgv.br/sites/default/files/concursos/edital-concurso-juiz-substituto-tjba-retificado-2.pdf",
+          "title": "Edital TJBA retificado 2",
+          "kind": "notice",
+          "observedFacts": "Link do consolidado de 07/04/2026 identificado na página oficial.",
+          "checkedAt": "2026-09-06T15:40:29Z"
+        },
+        {
+          "url": "https://conhecimento.fgv.br/sites/default/files/concursos/retificacao-2-tjba-versao-final.pdf",
+          "title": "Segunda retificação TJBA",
+          "kind": "amendment",
+          "observedFacts": "Documento de alteração localizado na página oficial; precisa acompanhar o programa.",
+          "checkedAt": "2026-09-06T15:40:29Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "mp-sp-promotor-de-justica-97-concurso",
+      "status": "not_confirmed",
+      "editionDescription": "Rota oficial do 97º Concurso de Ingresso do MPSP localizada; conteúdo não acessível nesta etapa.",
+      "examStage": "Não confirmado em fonte oficial acessível.",
+      "bankNames": [],
+      "officialUrls": [
+        "https://www.mpsp.mp.br/w/97-cimp"
+      ],
+      "syllabusNotes": "Programa, banca, calendário e eventual retificação ainda não conferidos.",
+      "requirementLocator": null,
+      "constraints": [
+        "Navegação agent-browser exibiu desafio 'Um momento'; não foi contornado.",
+        "Leitura web também falhou (402); informações de cursinhos não foram usadas como prova.",
+        "Não publicar datas nem atribuir organizador com base em fontes secundárias.",
+        "Pesquisa de identidade e programa não equivale a revisão editorial nem libera publicação ou comprova 68 questões. Conferir versão integral vigente e alterações antes de criar vínculos."
+      ],
+      "evidence": [
+        {
+          "url": "https://www.mpsp.mp.br/w/97-cimp",
+          "title": "MPSP — 97º Concurso de Ingresso",
+          "kind": "organ",
+          "observedFacts": "Rota oficial tentada no navegador, mas desafio de acesso impediu confirmar o conteúdo.",
+          "checkedAt": "2026-09-06T15:40:29Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "trf-2-juiz-federal-2-regiao",
+      "status": "needs_identity_review",
+      "editionDescription": "TRF2, Juiz Federal Substituto, abertura publicada em 17/12/2025; produto não define edição.",
+      "examStage": "Portal FGV publica resultado definitivo da objetiva em 20/05/2026; estágio posterior requer conferência no TRF2.",
+      "bankNames": [
+        "FGV"
+      ],
+      "officialUrls": [
+        "https://conhecimento.fgv.br/concursos/trf2juiz",
+        "https://conhecimento.fgv.br/sites/default/files/concursos/sei_1438979_edital_154_retificado.pdf",
+        "https://conhecimento.fgv.br/sites/default/files/concursos/sei_1445946_edital_157.pdf"
+      ],
+      "syllabusNotes": "Consolidado localizado; número exato da edição e subitens de Constitucional ainda precisam de leitura integral.",
+      "requirementLocator": null,
+      "constraints": [
+        "Produto genérico '2ª Região' precisa ser associado à edição determinada, não a qualquer concurso do TRF2.",
+        "FGV pode executar apenas parte das etapas; verificar atos posteriores do tribunal.",
+        "Cobertura ES/RJ não significa dois programas distintos.",
+        "Pesquisa de identidade e programa não equivale a revisão editorial nem libera publicação ou comprova 68 questões. Conferir versão integral vigente e alterações antes de criar vínculos."
+      ],
+      "evidence": [
+        {
+          "url": "https://conhecimento.fgv.br/concursos/trf2juiz",
+          "title": "FGV — Concurso Juiz Federal Substituto TRF2",
+          "kind": "organizer",
+          "observedFacts": "Página navegada confirma abertura em dezembro de 2025 e resultado objetivo em maio de 2026.",
+          "checkedAt": "2026-09-06T15:40:29Z"
+        },
+        {
+          "url": "https://conhecimento.fgv.br/sites/default/files/concursos/sei_1438979_edital_154_retificado.pdf",
+          "title": "TRF2 — Edital 154 retificado",
+          "kind": "notice",
+          "observedFacts": "Consolidado observado no portal oficial; número ordinal do concurso não foi inferido.",
+          "checkedAt": "2026-09-06T15:40:29Z"
+        },
+        {
+          "url": "https://conhecimento.fgv.br/sites/default/files/concursos/sei_1445946_edital_157.pdf",
+          "title": "TRF2 — Edital 157, retificação",
+          "kind": "amendment",
+          "observedFacts": "Primeira retificação vinculada na página oficial.",
+          "checkedAt": "2026-09-06T15:40:29Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "dpe-mt-defensor-publico-2026",
+      "status": "needs_identity_review",
+      "editionDescription": "DPEMT, VII Concurso, Defensor Público de Primeira Classe, Edital 01/2025; execução em 2026.",
+      "examStage": "Edital 36/2026, resultado preliminar da prova oral, publicado em 04/09/2026.",
+      "bankNames": [
+        "FCC"
+      ],
+      "officialUrls": [
+        "https://www.concursosfcc.com.br/concursos/dpemt125/index.html",
+        "https://www.concursosfcc.com.br/concursos/dpemt125/dpemt125_edital_de_abertura_final_publicar.pdf",
+        "https://www.concursosfcc.com.br/concursos/dpemt125/edital_n0_28-2026_-_de_retificacao_do_cronograma.pdf",
+        "https://www.defensoria.mt.def.br/dpmt/noticias/fcc-divulga-resultado-preliminar-da-prova-objetiva-para-defensor-publico-de-mt"
+      ],
+      "syllabusNotes": "Programa ainda precisa ser conferido no edital 01/2025 e retificações, não em suposto edital novo de 2026.",
+      "requirementLocator": null,
+      "constraints": [
+        "Catálogo rotula 2026, mas abertura é 2025: resolver identidade antes do vínculo.",
+        "Múltiplas retificações de cronograma; concurso já alcançou prova oral.",
+        "Pesquisa de identidade e programa não equivale a revisão editorial nem libera publicação ou comprova 68 questões. Conferir versão integral vigente e alterações antes de criar vínculos."
+      ],
+      "evidence": [
+        {
+          "url": "https://www.concursosfcc.com.br/concursos/dpemt125/index.html",
+          "title": "FCC — VII Concurso DPEMT",
+          "kind": "organizer",
+          "observedFacts": "Página navegada confirma VII Concurso, Edital 01/2025 e resultado preliminar oral em 04/09/2026.",
+          "checkedAt": "2026-09-06T15:40:29Z"
+        },
+        {
+          "url": "https://www.concursosfcc.com.br/concursos/dpemt125/dpemt125_edital_de_abertura_final_publicar.pdf",
+          "title": "DPEMT — edital de abertura",
+          "kind": "notice",
+          "observedFacts": "Link oficial de abertura identificado; programa integral ainda pendente.",
+          "checkedAt": "2026-09-06T15:40:29Z"
+        },
+        {
+          "url": "https://www.concursosfcc.com.br/concursos/dpemt125/edital_n0_28-2026_-_de_retificacao_do_cronograma.pdf",
+          "title": "DPEMT — Edital 28/2026, retificação do cronograma",
+          "kind": "amendment",
+          "observedFacts": "Ato de retificação observado no portal FCC.",
+          "checkedAt": "2026-09-06T15:40:29Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "mpe-go-promotor-de-justica-2025",
+      "status": "official_edition_found",
+      "editionDescription": "MPGO, Promotora/Promotor de Justiça Substituto, edição de abertura em setembro de 2025.",
+      "examStage": "Atos FGV até 31/03/2026, após etapa objetiva; fases posteriores precisam ser conferidas no MPGO.",
+      "bankNames": [
+        "FGV"
+      ],
+      "officialUrls": [
+        "https://conhecimento.fgv.br/concursos/mpgo25",
+        "https://conhecimento.fgv.br/sites/default/files/concursos/edital-retificado-publicado.pdf",
+        "https://conhecimento.fgv.br/sites/default/files/concursos/1a-retificacao-publicada.pdf"
+      ],
+      "syllabusNotes": "Edital retificado localizado; subitens de Constitucional ainda não extraídos.",
+      "requirementLocator": null,
+      "constraints": [
+        "Confirmar numeração integral da edição diretamente no edital; não inferir número de documento de snippets divergentes.",
+        "Não presumir que o calendário da primeira etapa descreve o estágio atual do concurso.",
+        "Pesquisa de identidade e programa não equivale a revisão editorial nem libera publicação ou comprova 68 questões. Conferir versão integral vigente e alterações antes de criar vínculos."
+      ],
+      "evidence": [
+        {
+          "url": "https://conhecimento.fgv.br/concursos/mpgo25",
+          "title": "FGV — Concurso Promotor Substituto MPGO",
+          "kind": "organizer",
+          "observedFacts": "Página navegada confirma abertura em 22/09/2025, consolidado de 26/09 e atos da etapa objetiva em março de 2026.",
+          "checkedAt": "2026-09-06T15:40:29Z"
+        },
+        {
+          "url": "https://conhecimento.fgv.br/sites/default/files/concursos/edital-retificado-publicado.pdf",
+          "title": "MPGO — Edital retificado publicado",
+          "kind": "notice",
+          "observedFacts": "Consolidado identificado na página oficial; programa integral ainda pendente.",
+          "checkedAt": "2026-09-06T15:40:29Z"
+        },
+        {
+          "url": "https://conhecimento.fgv.br/sites/default/files/concursos/1a-retificacao-publicada.pdf",
+          "title": "MPGO — Primeira retificação",
+          "kind": "amendment",
+          "observedFacts": "Retificação oficial observada no portal FGV.",
+          "checkedAt": "2026-09-06T15:40:29Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "mpe-ms-promotor-de-justica-2026",
+      "status": "official_edition_found",
+      "editionDescription": "MPMS, XXXI Concurso, Promotor de Justiça Substituto, Edital 1/2026/COC/MPMS de 01/04/2026.",
+      "examStage": "Preambular concluída; atos de provas escritas e examinadores publicados em julho; etapa posterior não confirmada.",
+      "bankNames": [],
+      "officialUrls": [
+        "https://www.mpms.mp.br/concursos/49",
+        "https://www.mpms.mp.br/concursos/49/andamentos/4448",
+        "https://www.mpms.mp.br/concursos/49/andamentos/4533",
+        "https://www.mpms.mp.br/concursos/49/andamentos/4451",
+        "https://www.mpms.mp.br/concursos/49/andamentos/4453"
+      ],
+      "syllabusNotes": "Edital de abertura foi localizado no portal; programa e responsabilidade organizadora por etapa ainda precisam de leitura integral.",
+      "requirementLocator": null,
+      "constraints": [
+        "Não atribuir FGV por padrão: o portal publica atos de comissão própria e a responsabilidade exata depende do edital.",
+        "Edital 13 alterou período de escritas; não usar calendário anterior.",
+        "Não foram abertas nem reproduzidas questões de provas.",
+        "Pesquisa de identidade e programa não equivale a revisão editorial nem libera publicação ou comprova 68 questões. Conferir versão integral vigente e alterações antes de criar vínculos."
+      ],
+      "evidence": [
+        {
+          "url": "https://www.mpms.mp.br/concursos/49",
+          "title": "MPMS — XXXI Concurso para Promotor Substituto",
+          "kind": "organ",
+          "observedFacts": "Página navegada: Edital 1/2026, resultado definitivo preambular em julho e atos de escritas.",
+          "checkedAt": "2026-09-06T15:40:29Z"
+        },
+        {
+          "url": "https://www.mpms.mp.br/concursos/49/andamentos/4448",
+          "title": "MPMS — Edital 1/2026/COC/MPMS",
+          "kind": "notice",
+          "observedFacts": "Ato de abertura identificado na página oficial; leitura do anexo programático pendente.",
+          "checkedAt": "2026-09-06T15:40:29Z"
+        },
+        {
+          "url": "https://www.mpms.mp.br/concursos/49/andamentos/4533",
+          "title": "MPMS — alteração do período das provas escritas",
+          "kind": "amendment",
+          "observedFacts": "Ato de alteração do calendário identificado; impede usar datas anteriores sem consolidação.",
+          "checkedAt": "2026-09-06T15:40:29Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "pp-rs-policial-analista-e-tecnico-2026",
+      "status": "needs_identity_review",
+      "editionDescription": "Pista de concurso Polícia Penal RS 01/2026, com Policial Penal, Analista Penal e Técnico Administrativo; produto excessivamente agregado.",
+      "examStage": "Descoberta indica objetiva em 9/8/2026, já passada; fase atual e alterações de cargos precisam ser verificadas.",
+      "bankNames": [
+        "Fundatec"
+      ],
+      "officialUrls": [
+        "https://www.policiapenal.rs.gov.br/concursos-6a07201952b85",
+        "https://www.diariooficial.rs.gov.br/materia?id=1423145",
+        "https://www.fundatec.org.br/portal/concursos/index_concursos.php?concurso=1092"
+      ],
+      "syllabusNotes": "Seleção inclui cargos e especialidades diferentes, com programas próprios. É preciso escolher se o produto é para Policial Penal ou oferecer trilhas explícitas por especialidade. Um núcleo jurídico não cobre automaticamente funções técnicas.",
+      "requirementLocator": null,
+      "constraints": [
+        "Fonte localizada na descoberta de URLs, mas a conferência obrigatória em agent-browser não foi concluída antes do fechamento desta etapa; não tratar como programa/edição validado para produção.",
+        "Página oficial e Diário Oficial localizados; documentos ainda não conferidos em agent-browser.",
+        "Confirmar exclusões/retificações de cargos e preservar programa por especialidade; não assumir um só syllabus.",
+        "Qualificar Fundatec como perfil próprio; não forçar banca já existente no sistema.",
+        "Dossiê de pesquisa: não equivale a curadoria de questões nem autoriza publicação. A meta de 68 exige questões distintas, pertinentes ao cargo/edição/programa e revisão humana."
+      ],
+      "evidence": [
+        {
+          "url": "https://www.policiapenal.rs.gov.br/concursos-6a07201952b85",
+          "title": "Polícia Penal RS — Concursos",
+          "kind": "organ",
+          "observedFacts": "Descoberta em busca primária: portal do órgão possui entrada do concurso 2026 com ligação para Fundatec. A conferência no navegador não foi concluída nesta rodada.",
+          "checkedAt": "2026-09-06T15:39:53Z"
+        },
+        {
+          "url": "https://www.diariooficial.rs.gov.br/materia?id=1423145",
+          "title": "Diário Oficial RS — matéria do concurso Polícia Penal 2026",
+          "kind": "notice",
+          "observedFacts": "Documento oficial localizado na descoberta para edital, calendário e programas. Não lido integralmente em agent-browser; dados de cargo/fase permanecem pendentes de validação.",
+          "checkedAt": "2026-09-06T15:39:53Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "tj-ms-cartorios-reta-final",
+      "status": "not_confirmed",
+      "editionDescription": "Edição de cartórios TJMS não confirmada nesta etapa.",
+      "examStage": "Não confirmado.",
+      "bankNames": [],
+      "officialUrls": [],
+      "syllabusNotes": "Nenhum programa oficial conferido.",
+      "requirementLocator": null,
+      "constraints": [
+        "Pesquisa interrompida para consolidação; fonte oficial específica suficiente ainda não foi localizada/conferida.",
+        "Não confundir com MPMS Promotor, outro órgão e outro cargo.",
+        "Pesquisa de identidade e programa não equivale a revisão editorial nem libera publicação ou comprova 68 questões. Conferir versão integral vigente e alterações antes de criar vínculos."
+      ],
+      "evidence": [],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "sefaz-ce-auditor-fiscal-2026",
+      "status": "not_confirmed",
+      "editionDescription": "Edição e recorte ainda não confirmados nesta rodada",
+      "examStage": "Pendente de conferência documental",
+      "bankNames": [],
+      "officialUrls": [],
+      "syllabusNotes": "Não há programa validado nesta pesquisa.",
+      "requirementLocator": null,
+      "constraints": [
+        "Localizar fonte oficial específica e confirmar banca, especialidade e programa; não usar notícias de cursinhos como edital."
+      ],
+      "evidence": [],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "sefaz-mt-fiscal-de-tributos-estaduais-reta-final",
+      "status": "not_confirmed",
+      "editionDescription": "Descoberta de edital 001/2025 ainda sem conferência integral no navegador",
+      "examStage": "Fase atual não confirmada",
+      "bankNames": [],
+      "officialUrls": [
+        "https://app1.sefaz.mt.gov.br/Sistema/legislacao/legislacaotribut.nsf/173e6c0d2202fdcb03258b1700659f1e/06dcf3e95f49fc8c03258d680053628e"
+      ],
+      "syllabusNotes": "Referência oficial descoberta por busca; leitura integral e cronograma atual pendentes.",
+      "requirementLocator": null,
+      "constraints": [
+        "A URL é uma pista de pesquisa, não evidência documental aprovada.",
+        "Conferir DOE, banca, Anexo II e fase antes de usar o rótulo reta final."
+      ],
+      "evidence": [],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "sefaz-rn-auditor-fiscal-reta-final",
+      "status": "historical_edition",
+      "editionDescription": "SEFAZ/RN 2025 — Auditor Fiscal de Receitas Estaduais",
+      "examStage": "Página oficial lista homologação em 03/06/2026",
+      "bankNames": [
+        "Cebraspe"
+      ],
+      "officialUrls": [
+        "https://www.cebraspe.org.br/concursos/sefaz_rn_25_auditor"
+      ],
+      "syllabusNotes": "Abertura de dezembro de 2025 identificada; programa completo ainda exige conferência.",
+      "requirementLocator": null,
+      "constraints": [
+        "Não apresentar como reta final de objetiva futura.",
+        "Decidir edição histórica ou preparação continuada antes da vinculação."
+      ],
+      "evidence": [
+        {
+          "url": "https://www.cebraspe.org.br/concursos/sefaz_rn_25_auditor",
+          "title": "SEFAZ/RN 2025 — Auditor Fiscal de Receitas Estaduais",
+          "kind": "organizer",
+          "observedFacts": "Página oficial lista homologação em 03/06/2026. Abertura de dezembro de 2025 identificada; programa completo ainda exige conferência.",
+          "checkedAt": "2026-09-06T15:44:25Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "sefaz-sp-auditor-fiscal-reta-final",
+      "status": "historical_edition",
+      "editionDescription": "AFRE — abertura Edital 02/2025, atos em 2026",
+      "examStage": "Portal oficial lista homologação, nomeação e escolha de vagas",
+      "bankNames": [],
+      "officialUrls": [
+        "https://portal.fazenda.sp.gov.br/servicos/concursos/Paginas/Editais-AFRE.aspx"
+      ],
+      "syllabusNotes": "Índice oficial de editais consultado; programa integral e especialidade ainda não conferidos.",
+      "requirementLocator": null,
+      "constraints": [
+        "Confirmar banca e recorte na abertura, sem inferir pelo catálogo.",
+        "Não apresentar como reta final de objetiva futura; atos posteriores não significam nova abertura."
+      ],
+      "evidence": [
+        {
+          "url": "https://portal.fazenda.sp.gov.br/servicos/concursos/Paginas/Editais-AFRE.aspx",
+          "title": "AFRE — abertura Edital 02/2025, atos em 2026",
+          "kind": "organizer",
+          "observedFacts": "Portal oficial lista homologação, nomeação e escolha de vagas. Índice oficial de editais consultado; programa integral e especialidade ainda não conferidos.",
+          "checkedAt": "2026-09-06T15:44:25Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "sefaz-go-auditor-fiscal-reta-final",
+      "status": "not_confirmed",
+      "editionDescription": "Edição ainda não confirmada nesta rodada",
+      "examStage": "Pendente de fonte oficial específica",
+      "bankNames": [],
+      "officialUrls": [],
+      "syllabusNotes": "Não há programa validado nesta pesquisa.",
+      "requirementLocator": null,
+      "constraints": [
+        "Localizar concurso oficial e fase atual; não criar banca ou cronograma presumidos."
+      ],
+      "evidence": [],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "tce-rn-auditor-2026",
+      "status": "historical_edition",
+      "editionDescription": "TCE/RN — abertura de 29/12/2025, atos em 2026",
+      "examStage": "Edital 13 lista resultado final de nível superior em 12/08/2026",
+      "bankNames": [
+        "Cebraspe"
+      ],
+      "officialUrls": [
+        "https://www.cebraspe.org.br/concursos/TCE_RN_25"
+      ],
+      "syllabusNotes": "Portal oficial reúne múltiplos cargos e especialidades; recortar o cargo de Auditor antes de mapear o programa.",
+      "requirementLocator": null,
+      "constraints": [
+        "Não confundir resultado de nível superior com novo edital.",
+        "Definir especialidade e edição histórica/preparação continuada antes de vincular."
+      ],
+      "evidence": [
+        {
+          "url": "https://www.cebraspe.org.br/concursos/TCE_RN_25",
+          "title": "TCE/RN — abertura de 29/12/2025, atos em 2026",
+          "kind": "organizer",
+          "observedFacts": "Edital 13 lista resultado final de nível superior em 12/08/2026. Portal oficial reúne múltiplos cargos e especialidades; recortar o cargo de Auditor antes de mapear o programa.",
+          "checkedAt": "2026-09-06T15:44:25Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "pgm-rj-procurador-do-municipio-reta-final",
+      "status": "needs_identity_review",
+      "editionDescription": "Concurso conjunto PGM/CM Rio aberto em 2025 e em andamento em 2026; produto deve apontar somente Procurador do Município, não Câmara.",
+      "examStage": "Página mostra resultado preliminar da escrita específica em 24/8 e recurso em 25/8/2026; calendário retificado em 27/7. Etapa comercial da 'reta final' precisa ser resolvida.",
+      "bankNames": [
+        "FGV"
+      ],
+      "officialUrls": [
+        "https://conhecimento.fgv.br/concursos/concursopgmcmrioproc",
+        "https://conhecimento.fgv.br/sites/default/files/concursos/minuta-edital-pgm-cm-procurador-06.04.2026_0.pdf",
+        "https://conhecimento.fgv.br/sites/default/files/concursos/cronograma-previsto-pgm-cm-procurador-24.07.pdf"
+      ],
+      "syllabusNotes": "Relatório anterior RELATORIO-FONTES-5.md já identifica provas escritas/dissertativas e oral e programa por pontos no Anexo I. Nesta rodada foi revalidada a página do concurso, não o PDF integral. Processo Legislativo Municipal exclusivo da Câmara não deve ser transplantado para PGM.",
+      "requirementLocator": "Edital consolidado retificado em 8/4/2026, Anexo I — programas por pontos; locator herdado do relatório anterior, PDF integral a reconferir.",
+      "constraints": [
+        "Dois cargos no mesmo concurso: Procurador do Município e Procurador da Câmara. São produtos/programas diferentes.",
+        "Não apresentar lote objetivo genérico como simulado fiel de prova escrita/dissertativa/oral.",
+        "Revalidar edital de 8/4 e cronograma retificado em 27/7; relatório anterior não substitui rechecagem das novas movimentações.",
+        "Dossiê de pesquisa: não equivale a curadoria de questões nem autoriza publicação. A meta de 68 exige questões distintas, pertinentes ao cargo/edição/programa e revisão humana."
+      ],
+      "evidence": [
+        {
+          "url": "https://conhecimento.fgv.br/concursos/concursopgmcmrioproc",
+          "title": "Concurso Público para a PGM e Câmara Municipal do Rio de Janeiro — Procurador",
+          "kind": "organizer",
+          "observedFacts": "Conferido em agent-browser: página iniciada em 12/11/2025, dois cargos distintos, versão do edital retificada em 8/4/2026, cronograma retificado em 27/7, resultado preliminar da prova escrita específica em 24/8 e recurso em 25/8.",
+          "checkedAt": "2026-09-06T15:39:53Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "pge-ac-procurador-do-estado-reta-final",
+      "status": "needs_identity_review",
+      "editionDescription": "Pista oficial do 8º concurso PGE-AC 2026; rótulo 'reta final' requer confirmação de fase.",
+      "examStage": "Descoberta oficial anuncia inscrições de março/abril e objetiva em maio/2026; fase atual ainda não conferida.",
+      "bankNames": [
+        "FGV"
+      ],
+      "officialUrls": [
+        "https://agencia.ac.gov.br/procuradoria-geral-do-estado-lanca-edital-do-8o-concurso-para-procurador-do-estado/",
+        "https://conhecimento.fgv.br/sites/default/files/concursos/pge-ac-edital-26.02.v.final_.pdf",
+        "https://conhecimento.fgv.br/concursos/pgeac"
+      ],
+      "syllabusNotes": "Notícia e edital inicial oficiais localizados. Programa/anexo e consolidação das alterações não foram conferidos em navegador nesta rodada; nenhum recorte curricular aprovado.",
+      "requirementLocator": null,
+      "constraints": [
+        "Fonte localizada na descoberta de URLs, mas a conferência obrigatória em agent-browser não foi concluída antes do fechamento desta etapa; não tratar como programa/edição validado para produção.",
+        "Confirmar edital retificado em março/2026 e fase posterior à objetiva de maio antes de anunciar reta final.",
+        "Não converter edição anterior ou etapa encerrada em concurso com objetiva futura.",
+        "Dossiê de pesquisa: não equivale a curadoria de questões nem autoriza publicação. A meta de 68 exige questões distintas, pertinentes ao cargo/edição/programa e revisão humana."
+      ],
+      "evidence": [
+        {
+          "url": "https://agencia.ac.gov.br/procuradoria-geral-do-estado-lanca-edital-do-8o-concurso-para-procurador-do-estado/",
+          "title": "Procuradoria-Geral do Estado lança edital do 8º concurso para procurador do Estado",
+          "kind": "organ",
+          "observedFacts": "Descoberta em busca primária: notícia do Governo do Acre identifica 8º concurso, FGV e inscrições de 2/3 a 2/4/2026. Conferência em agent-browser pendente.",
+          "checkedAt": "2026-09-06T15:39:53Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "trt-pe-analista-e-tecnico-2024-2025",
+      "status": "historical_edition",
+      "editionDescription": "TRT-6/PE, Edital 01/2024, concurso de servidores com etapas em 2025; organização FCC.",
+      "examStage": "Página institucional está na fase de nomeações, com atualização em 17/07/2026.",
+      "bankNames": [
+        "FCC"
+      ],
+      "officialUrls": [
+        "https://www.trt6.jus.br/portal/concurso-servidores-e-servidoras-2024",
+        "https://www.concursosfcc.com.br/concursos/trt6r124/index.html",
+        "https://www.concursosfcc.com.br/concursos/trt6r124/trt6r124_edital_de_abertura_28_10_24__1_.pdf"
+      ],
+      "syllabusNotes": "O órgão fornece o vínculo para a organizadora e abertura. Falta leitura do anexo programático consolidado e escolha de área de analista/técnico; não presumir matérias comuns a todas.",
+      "requirementLocator": null,
+      "constraints": [
+        "Não anunciar inscrições novas ou reta final de prova objetiva em 2026.",
+        "Conferir o programa específico e possíveis retificações antes de produzir inéditas.",
+        "CF, CLT e Lei 8.112 permanecem candidatas não validadas."
+      ],
+      "evidence": [
+        {
+          "url": "https://www.trt6.jus.br/portal/concurso-servidores-e-servidoras-2024",
+          "title": "Concurso Servidores e Servidoras 2024 — TRT6",
+          "kind": "organ",
+          "observedFacts": "Página institucional identifica a edição de 2024, remete à FCC e contém acompanhamento de nomeações atualizado em 17/07/2026.",
+          "checkedAt": "2026-09-06T15:40:09Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "trt-ms-analista-e-tecnico-2024-2025",
+      "status": "historical_edition",
+      "editionDescription": "TRT-24/MS, concurso iniciado em 31/10/2024, etapas em 2025; organização FGV.",
+      "examStage": "Resultado final de aprovados em 21/11/2025, retificado em 26/02/2026; ainda existem atos de candidatos sub judice em agosto de 2026.",
+      "bankNames": [
+        "FGV"
+      ],
+      "officialUrls": [
+        "https://conhecimento.fgv.br/concursos/trt24",
+        "https://conhecimento.fgv.br/sites/default/files/concursos/edital-trt-24-em-31.10.pdf",
+        "https://conhecimento.fgv.br/sites/default/files/concursos/edital-concurso-trt-24-1a-retificacao.pdf",
+        "https://conhecimento.fgv.br/sites/default/files/concursos/retificacao-13.02.pdf"
+      ],
+      "syllabusNotes": "Página registra retificações e reaplicação de provas. É indispensável reconstruir a versão aplicável do edital por cargo. PDFs foram localizados, não utilizados como programa validado.",
+      "requirementLocator": null,
+      "constraints": [
+        "Não usar PDF inicial isolado, ignorando retificações e reaplicação.",
+        "Cargos de analista e técnico e suas especialidades têm recortes próprios.",
+        "Atos sub judice e suspensão de convocação individual de TAF não significam nova abertura de concurso."
+      ],
+      "evidence": [
+        {
+          "url": "https://conhecimento.fgv.br/concursos/trt24",
+          "title": "Concurso Público para o Tribunal Regional do Trabalho da 24ª Região",
+          "kind": "organizer",
+          "observedFacts": "Página FGV exibe abertura de 31/10/2024, retificações, resultados de reaplicação de junho de 2025, final de aprovados de 21/11/2025 retificado em 26/02/2026 e atos sub judice em 18/08/2026.",
+          "checkedAt": "2026-09-06T15:40:09Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "trt-15-analista-e-tecnico-campinas",
+      "status": "historical_edition",
+      "editionDescription": "TRT-15/Campinas, Edital 01/2024, concurso 2024/2025; organização FCC.",
+      "examStage": "Homologação do resultado final publicada em 24/11/2025; atos de 2026 incluem candidatos sub judice, com publicação em 01/09/2026.",
+      "bankNames": [
+        "FCC"
+      ],
+      "officialUrls": [
+        "https://www.concursosfcc.com.br/concursos/trt15124/index.html",
+        "https://www.concursosfcc.com.br/concursos/trt15124/edital_01-2024_-_versao_final_03-12-2024.pdf"
+      ],
+      "syllabusNotes": "Áreas, especialidades e modalidades de prova são distintas. Edital de abertura localizado; não foi feita leitura programática de CF, CLT ou Lei 8.112 nesta fase.",
+      "requirementLocator": null,
+      "constraints": [
+        "Recortar cargo e especialidade, além de edição.",
+        "A indicação comercial Campinas não substitui a definição dos polos e do cargo do edital.",
+        "Página do órgão bloqueada; fatos de fase conferidos na FCC."
+      ],
+      "evidence": [
+        {
+          "url": "https://www.concursosfcc.com.br/concursos/trt15124/index.html",
+          "title": "FCC — Tribunal Regional do Trabalho da 15ª Região (Campinas/SP)",
+          "kind": "organizer",
+          "observedFacts": "Publicações listam resultado final sem prática em 10/09/2025, com prática em 21/10/2025 e Edital 22/2025 de homologação em 24/11/2025. Edital 29/2026, publicado em 01/09/2026, trata de sub judice.",
+          "checkedAt": "2026-09-06T15:40:09Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "tj-go-analista-judiciario-reta-final",
+      "status": "not_confirmed",
+      "editionDescription": "Rótulo sem ano ou especialidade. Busca oficial apontou o 3º concurso unificado do TJGO de 2024 como candidato, mas a conferência no navegador não foi concluída.",
+      "examStage": "Não validada para o produto; não presumir abertura nem reta final atual.",
+      "bankNames": [],
+      "officialUrls": [
+        "https://www.tjgo.jus.br/index.php/agencia-de-noticias/noticias-ccs/20-destaque/30140-presidencia-do-tjgo-divulga-edital-do-3-concurso-unificado",
+        "https://sistemas.institutoverbena.ufg.br/2024/concurso-tj-go/"
+      ],
+      "syllabusNotes": "A descoberta aponta oficial de justiça, sistemas e contador, com trajetórias distintas. Organizadora Instituto Verbena/UFG é candidata encontrada em busca oficial, ainda não validada para o rótulo do produto nesta coleta.",
+      "requirementLocator": null,
+      "constraints": [
+        "URLs são pistas oficiais de descoberta, não prova de edital lido no navegador.",
+        "Escolher edição e especialidade; não confundir concurso de analista com magistratura.",
+        "Conferir eventual reabertura para contador e respectivas retificações; nenhum programa foi autorizado."
+      ],
+      "evidence": [],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "tj-rj-analista-e-tecnico-2025",
+      "status": "historical_edition",
+      "editionDescription": "TJRJ servidores 2025; portal institucional confirma o LXII concurso de analista. O produto agrega também técnico, cujo percurso precisa ser auditado separadamente.",
+      "examStage": "Analista com resultado final e homologação em 12/06/2026, nomeações em julho e convocação em agosto. Não extrapolar a fase de analista para técnico sem conferência.",
+      "bankNames": [
+        "FGV"
+      ],
+      "officialUrls": [
+        "https://www.tjrj.jus.br/concurso-de-provimento-efetivo/lxii-analista-judiciario-sem-e-com-especialidade-2025",
+        "https://conhecimento.fgv.br/concursos/tjrjservidores25"
+      ],
+      "syllabusNotes": "Analista inclui diferentes especialidades e técnico tem edital próprio. Nenhum anexo de programa consolidado foi validado nesta coleta; não importar regime federal de servidores para o tribunal estadual por analogia.",
+      "requirementLocator": null,
+      "constraints": [
+        "Separar cargos/edições e confirmar os links da organizadora para cada um.",
+        "O resultado de analista não comprova a situação de todos os técnicos.",
+        "Necessária conferência dos diplomas estaduais e das retificações, sem supor aplicável a Lei 8.112."
+      ],
+      "evidence": [
+        {
+          "url": "https://www.tjrj.jus.br/concurso-de-provimento-efetivo/lxii-analista-judiciario-sem-e-com-especialidade-2025",
+          "title": "LXII — Analista Judiciário, sem e com especialidade — 2025 — TJRJ",
+          "kind": "organ",
+          "observedFacts": "Página institucional do concurso vigente lista Aviso 198/2026 de resultado final e homologação em 12/06, portarias de nomeação 1902 e 1903 em 29/07 e convocação 23 de 21/08/2026. Organizadora FGV identificada no percurso oficial do certame.",
+          "checkedAt": "2026-09-06T15:40:09Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "tj-ms-analista-judiciario-area-fim-reta-final",
+      "status": "not_confirmed",
+      "editionDescription": "Produto genérico sem edição. A busca oficial encontrou concursos TJMS 2024 e 2025 envolvendo área-fim, portanto a identidade não está resolvida.",
+      "examStage": "Não validada para a edição do produto.",
+      "bankNames": [],
+      "officialUrls": [
+        "https://conhecimento.fgv.br/concursos/tjms24",
+        "https://conhecimento.fgv.br/sites/default/files/concursos/edital-tjms-_2025_.pdf"
+      ],
+      "syllabusNotes": "Nenhum programa foi conferido no navegador. FGV é pista de organizadora das edições encontradas, não vínculo já homologado para este produto sem ano.",
+      "requirementLocator": null,
+      "constraints": [
+        "URLs foram descobertas em fonte oficial por busca, mas não abertas para validação nesta etapa encerrada.",
+        "Resolver se o produto representa 2024 ou 2025 antes de mapear área-fim.",
+        "Não tratar edital de 2025 como abertura de 2026 nem substituir silenciosamente a edição."
+      ],
+      "evidence": [],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "camara-camara-dos-deputados-2026",
+      "status": "needs_identity_review",
+      "editionDescription": "Câmara dos Deputados 2026 apresenta dois concursos distintos: analista/técnico e policial legislativo. O produto genérico não define qual trilha atende.",
+      "examStage": "Portal institucional mantém páginas separadas para os dois concursos. Fases detalhadas e programas de cada edição não foram auditados nesta coleta.",
+      "bankNames": [],
+      "officialUrls": [
+        "https://www2.camara.leg.br/transparencia/recursos-humanos/concursos",
+        "https://www2.camara.leg.br/transparencia/recursos-humanos/concursos/concurso-para-analista-e-tecnico",
+        "https://www2.camara.leg.br/transparencia/recursos-humanos/concursos/concurso-para-policial-legislativo"
+      ],
+      "syllabusNotes": "Necessário selecionar um dos dois concursos e respectivo cargo. CF e Lei 8.112 podem ser candidatas à pesquisa, mas não foram conferidas no programa e não estão liberadas para vínculo.",
+      "requirementLocator": null,
+      "constraints": [
+        "Uma página comercial genérica não deve fundir os dois editais.",
+        "O órgão diferencia outros cargos autorizados em 11/09/2025, ainda sem projeto básico e contratação de organizadora, dos dois concursos publicados.",
+        "Não atribuir banca dos concursos existentes a outros cargos futuros não contratados."
+      ],
+      "evidence": [
+        {
+          "url": "https://www2.camara.leg.br/transparencia/recursos-humanos/concursos",
+          "title": "Concursos — Portal da Câmara dos Deputados",
+          "kind": "organ",
+          "observedFacts": "Portal oficial apresenta links separados para concurso 2026 de analista/técnico e para policial legislativo; informa que outros cargos autorizados em setembro de 2025 ainda não possuem projeto básico elaborado nem banca contratada.",
+          "checkedAt": "2026-09-06T15:40:09Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "alems-assembleia-legislativa-do-ms-reta-final",
+      "status": "needs_identity_review",
+      "editionDescription": "II concurso ALEMS, Edital 01/2025 publicado em 18/12/2025, inscrições e provas em 2026; organização FCC. Produto sem ano/cargo definido.",
+      "examStage": "Resultado final dos cargos sem prova prática publicado em 22/06/2026; para cargos com prática há heteroidentificação preliminar em 31/08/2026.",
+      "bankNames": [
+        "FCC"
+      ],
+      "officialUrls": [
+        "https://www.recursoshumanos.al.ms.gov.br/noticias/ler/ii-concurso-alems-publicado-resultado-preliminar-da-prova-objetiva",
+        "https://www.concursosfcc.com.br/concursos/alems125/index.html",
+        "https://www.concursosfcc.com.br/concursos/alems125/2996_diario_oficial_alms_fc_18_12_2025_-_assinado.pdf.pdf"
+      ],
+      "syllabusNotes": "Concurso reúne 33 códigos/áreas de analista e técnico. Foram localizados abertura e retificações, mas não lido o anexo programático. Não existe programa único inferível do nome ALEMS.",
+      "requirementLocator": null,
+      "constraints": [
+        "Escolher nível, cargo e área; polícia legislativa e Libras têm etapas próprias.",
+        "Não confundir com concurso ALEMS de 2016.",
+        "Não divulgar como reta final da prova objetiva: há resultados finais para parte dos cargos.",
+        "Programa e legislação estadual exigem conferência; não presumir Lei 8.112."
+      ],
+      "evidence": [
+        {
+          "url": "https://www.recursoshumanos.al.ms.gov.br/noticias/ler/ii-concurso-alems-publicado-resultado-preliminar-da-prova-objetiva",
+          "title": "II Concurso ALEMS: publicado resultado preliminar da prova objetiva",
+          "kind": "organ",
+          "observedFacts": "Notícia de 29/04/2026 identifica FCC, Edital 01/2025, 80 vagas imediatas e cargos de analista e técnico; aponta a página oficial da organizadora.",
+          "checkedAt": "2026-09-06T15:40:09Z"
+        },
+        {
+          "url": "https://www.concursosfcc.com.br/concursos/alems125/index.html",
+          "title": "FCC — Assembleia Legislativa de Mato Grosso do Sul",
+          "kind": "organizer",
+          "observedFacts": "Página atualizada em 01/09/2026 lista abertura publicada em 18/12/2025, Edital 16/2026 com resultado final dos cargos sem prática em 22/06, Edital 18 com resultados definitivos de TAF/Libras em 16/07 e Edital 19 com heteroidentificação preliminar de cargos com prática em 31/08.",
+          "checkedAt": "2026-09-06T15:40:09Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "alego-assembleia-legislativa-de-goias-reta-final",
+      "status": "needs_identity_review",
+      "editionDescription": "ALEGO, concurso iniciado em 28/10/2025, FGV, com cargos de assistente, analista e policial legislativo. Produto não define o cargo.",
+      "examStage": "Resultado final publicado em 01/07/2026 e retificado em 08/07; há atos sub judice em agosto. Não é uma nova abertura de 2026.",
+      "bankNames": [
+        "FGV"
+      ],
+      "officialUrls": [
+        "https://conhecimento.fgv.br/alego25",
+        "https://conhecimento.fgv.br/sites/default/files/concursos/edital-alego-versao-final-retificacao-26.01_.pdf"
+      ],
+      "syllabusNotes": "PDF do edital retificado em 26/01/2026 localizado, mas ainda não lido para mapear programa. Exige seleção de cargo/especialidade e diplomas estaduais pertinentes.",
+      "requirementLocator": null,
+      "constraints": [
+        "Recortar cargo antes de vincular questões.",
+        "Rótulo reta final está defasado em relação à etapa objetiva e resultados já publicados.",
+        "Não extrapolar legislação federal de servidores para cargos estaduais sem previsão expressa."
+      ],
+      "evidence": [
+        {
+          "url": "https://conhecimento.fgv.br/alego25",
+          "title": "Concurso Público para a Assembleia Legislativa do Estado de Goiás",
+          "kind": "organizer",
+          "observedFacts": "Página FGV lista assistente, analista e policial legislativo, edital retificado em 26/01/2026, resultado final em 01/07 retificado em 08/07, e ato sub judice de 03/08 retificado em 17/08/2026.",
+          "checkedAt": "2026-09-06T15:40:09Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
+      "productSlug": "al-es-analista-consultor-e-policial-legislativo-2025",
+      "status": "not_confirmed",
+      "editionDescription": "Produto ALES 2025 agrega analista, consultor e policial legislativo. Não foi concluída a localização e validação dos editais oficiais correspondentes no navegador.",
+      "examStage": "Não confirmada nesta coleta.",
+      "bankNames": [],
+      "officialUrls": [
+        "https://www.al.es.gov.br"
+      ],
+      "syllabusNotes": "Nenhum programa validado. A identificação de organizadora encontrada em resultados secundários não foi promovida a evidência oficial. Exige separar cargos/editais e verificar regime estadual.",
+      "requirementLocator": null,
+      "constraints": [
+        "A abertura da página inicial do órgão não comprova edital nem banca.",
+        "Falta localizar concurso no portal oficial ou organizadora oficialmente vinculada.",
+        "Nenhum conteúdo de CF, CLT ou Lei 8.112 pode ser liberado com a evidência disponível."
+      ],
+      "evidence": [
+        {
+          "url": "https://www.al.es.gov.br",
+          "title": "Assembleia Legislativa do Espírito Santo",
+          "kind": "organ",
+          "observedFacts": "Página inicial oficial acessível no navegador. Nesta coleta não foi localizado vínculo suficiente para validar edição, organizadora, etapa ou programa do produto agregado.",
+          "checkedAt": "2026-09-06T15:40:09Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    }
+  ]
+}

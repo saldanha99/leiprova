@@ -52,3 +52,5 @@ next-env.d.ts
 # O repositório é público; o lote é um artefato editorial entregue separadamente.
 /content/editorial/cf-direitos-fundamentais-2026-09-05/
 /content/editorial/*.zip
+# Extrações e páginas de PDFs fornecidos para análise privada.
+/tmp/pdfs/

@@ -17,3 +17,4 @@ content/editorial/*.zip
 backups
 *.dump
 *.dump.part
+tmp/pdfs

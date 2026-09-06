@@ -24,6 +24,15 @@ describe("progresso editorial no catálogo administrativo", () => {
     expect(html).toContain("Rascunhos, propostas pendentes e vínculos desatualizados não entram");
     expect(html).toContain("Preços mensal / anual");
     expect(html).not.toContain("· único");
+    expect(html).toContain("CADERNO DE PRODUÇÃO · 75 CURSOS");
+    expect(html).toContain("5.100");
+    expect(html).toContain("não representa questões geradas nem agentes executando");
+    expect(html.match(/Preparação editorial ·/g)).toHaveLength(75);
+    expect(html).toContain("Fontes e pistas oficiais");
+    expect(html).toContain("Leitura e localização do programa pendentes");
+    expect(html).toContain("/admin/motor-editais");
+    expect(html).toContain("/admin/fabrica-autoral");
+    expect(html).toContain("rel=\"noopener noreferrer\"");
   });
   it("confere administrador antes de consultar contagens", async () => {
     mocks.authorize.mockRejectedValueOnce(new Error("Sem autorização"));
