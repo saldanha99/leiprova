@@ -10,9 +10,9 @@ type Requirement = { id:number; opportunityId:number; text:string; locator:strin
   role:string; year:number; jurisdiction:string; documentUrl:string; bank:string|null;
   checksum:string; verifiedOn:string; };
 
-export async function prepareAgentWork(db:AgentDatabase, now=new Date()) {
+export async function prepareAgentWork(db:AgentDatabase, now=new Date(), options:{followupsOnly?:boolean}={}) {
   let mappings=0, authoring=0, discovery=0, legalChanges=0;
-  const requirements=await db.execute<Requirement>(sql`
+  const requirements=options.followupsOnly ? [] : await db.execute<Requirement>(sql`
     select r.id::int id,r.opportunity_id::int as "opportunityId",r.requirement_text text,r.source_locator locator,
       o.title,o.role_name role,o.cycle_year as "year",o.jurisdiction_code jurisdiction,s.document_url as "documentUrl",
       s.checksum_sha256 checksum,s.updated_at::date::text as "verifiedOn",
@@ -88,6 +88,9 @@ export async function prepareAgentWork(db:AgentDatabase, now=new Date()) {
       instructions:"Crie até cinco questões originais de literalidade/aplicação da lei, por banca E cargo deste pacote, com resposta única e justificativa de cada alternativa. Fundamento somente nos artigos versionados fornecidos. Não consultar simulados/provas. Perfil interno, não material oficial da banca. São propostas para revisão humana: publicationAllowed false. Não altere banco ou conteúdo público.",
       context:{...payload.context,mappingProposals:result.mappings,humanReviewRequired:true}})) authoring++;
   }
+  // A confirmação de uma resposta não deve repetir a busca completa no corpus.
+  // A preparação integral continua no ciclo de seis horas da VPS.
+  if(options.followupsOnly) return {mappings,authoring,discovery,legalChanges,humanReviewRequired:true,publicationAllowed:false};
   const portals=await db.execute<{bank:string; url:string}>(sql`
     select b.slug bank,p.official_url url from exam_source_portals p join quiz_banks b on b.id=p.quiz_bank_id
     where p.is_active and b.is_active order by b.slug

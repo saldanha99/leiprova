@@ -35,7 +35,7 @@ async function main() {
         inputHash:z.string().regex(/^[a-f0-9]{64}$/),leaseToken:z.uuid(),result:z.unknown()}).strict().parse(JSON.parse(text));
       result=await completeAgentWork(db,request);
       // A saída do Guardião abastece automaticamente a próxima etapa, sem revisar/publicar.
-      await prepareAgentWork(db);
+      await prepareAgentWork(db,new Date(),{followupsOnly:true});
     }
     console.log(JSON.stringify(result));
   } finally {await client.end();}
