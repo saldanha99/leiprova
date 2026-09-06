@@ -15,6 +15,7 @@ import {
   text,
   timestamp,
   uniqueIndex,
+  uuid,
 } from "drizzle-orm/pg-core";
 
 const bytea = customType<{ data: Buffer; driverData: Buffer }>({
@@ -2009,6 +2010,36 @@ export const editorialAutomationJobs = pgTable(
     ),
   ],
 );
+
+// A ponte recebe apenas propostas; aprovação editorial nunca é um estado de job.
+export const editorialAgentWork = pgTable("editorial_agent_work", {
+  jobKey: text("job_key").primaryKey(),
+  kind: text("kind").notNull(),
+  inputHash: text("input_hash").notNull(),
+  payload: jsonb("payload").$type<Record<string, unknown>>().notNull(),
+  status: text("status").notNull().default("pending"),
+  attempts: integer("attempts").notNull().default(0),
+  leaseToken: uuid("lease_token"),
+  leaseExpiresAt: timestamp("lease_expires_at", {withTimezone:true}),
+  result: jsonb("result").$type<Record<string, unknown>>(),
+  lastErrorCode: text("last_error_code"),
+  ...timestamps,
+}, table => [
+  index("editorial_agent_work_due_idx").on(table.status,table.createdAt),
+  check("editorial_agent_work_kind_check",sql`${table.kind} in ('discovery','legal_mapping','authoring','legal_change')`),
+  check("editorial_agent_work_input_hash_check",sql`${table.inputHash} ~ '^[a-f0-9]{64}$'`),
+  check("editorial_agent_work_payload_check",sql`octet_length(${table.payload}::text)<=524288`),
+  check("editorial_agent_work_status_check",sql`${table.status} in ('pending','running','prepared','blocked','failed','superseded')`),
+  check("editorial_agent_work_attempts_check",sql`${table.attempts} between 0 and 3`),
+  check("editorial_agent_work_result_check",sql`${table.result} is null or (octet_length(${table.result}::text)<=262144 and coalesce(${table.result}->>'publicationAllowed'='false',false))`),
+  check("editorial_agent_work_check",sql`(${table.status}='running' and ${table.leaseToken} is not null and ${table.leaseExpiresAt} is not null) or (${table.status}<>'running' and ${table.leaseToken} is null and ${table.leaseExpiresAt} is null)`),
+]);
+
+export const editorialAgentRuns = pgTable("editorial_agent_runs", {
+  leaseToken: uuid("lease_token").primaryKey(),
+  jobKey: text("job_key").notNull().references(()=>editorialAgentWork.jobKey),
+  startedAt: timestamp("started_at",{withTimezone:true}).notNull().defaultNow(),
+},table=>[index("editorial_agent_runs_started_idx").on(table.startedAt)]);
 
 export const questionOpportunities = pgTable(
   "question_opportunities",

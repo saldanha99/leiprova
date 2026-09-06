@@ -15,6 +15,9 @@ import {
   users,
 } from "../src/lib/db/schema";
 import { extractOfficialSyllabusCandidates } from "../src/lib/editorial/official-syllabus-extractor";
+import { prepareAgentWork } from "../src/lib/editorial/agent-work-preparation";
+import { discoveryPathBlocked } from "../src/lib/editorial/discovery-policy";
+import { safeEditorialError as safeError } from "../src/lib/editorial/safe-error";
 import {
   claimEditorialJob,
   editorialQueueSummary,
@@ -52,17 +55,6 @@ if (!ownerEmail) {
 const client = postgres(databaseUrl, { max: 1, prepare: false });
 const db = drizzle(client, { schema });
 const pause = () => new Promise((resolve) => setTimeout(resolve, 400));
-
-function safeError(error: unknown) {
-  const cause = error instanceof Error && "cause" in error ? error.cause : error;
-  if (!cause || typeof cause !== "object") return "Falha sem detalhe seguro.";
-  const record = cause as { code?: unknown; message?: unknown; name?: unknown };
-  return JSON.stringify({
-    name: typeof record.name === "string" ? record.name : "Error",
-    code: typeof record.code === "string" ? record.code : undefined,
-    // Não registrar mensagem do driver: ela pode conter SQL, URLs ou parâmetros sensíveis.
-  });
-}
 
 async function requireOwner() {
   const [owner] = await db
@@ -103,9 +95,15 @@ async function capturePendingOfficialDocuments(ownerUserId: number) {
   let capturedCount = 0;
   let unchanged = 0;
   let failures = 0;
+  let policyBlocked = 0;
 
   sourceLoop: for (const source of sources) {
     try {
+      if (discoveryPathBlocked(source.sourceUrl)) {
+        policyBlocked += 1;
+        console.warn(`[fonte:${source.publicId}]`, JSON.stringify({code:"robots_path_disallowed"}));
+        continue;
+      }
       const official = parseOfficialOpportunitySourceUrl(source.sourceUrl);
       const [candidates, storedRows] = await Promise.all([
         discoverOfficialDocumentCandidates(official.url, official.sourceId, source.title),
@@ -125,6 +123,7 @@ async function capturePendingOfficialDocuments(ownerUserId: number) {
       }
 
       for (const candidate of selected) {
+        if (discoveryPathBlocked(candidate.url)) { policyBlocked += 1; continue; }
         if (
           attempts >= MAX_DOCUMENT_ATTEMPTS_PER_RUN ||
           capturedCount >= MAX_NEW_DOCUMENTS_PER_RUN
@@ -218,6 +217,7 @@ async function capturePendingOfficialDocuments(ownerUserId: number) {
     captured: capturedCount,
     unchanged,
     failures,
+    policyBlocked,
     limits: {
       attempts: MAX_DOCUMENT_ATTEMPTS_PER_RUN,
       newDocuments: MAX_NEW_DOCUMENTS_PER_RUN,
@@ -388,6 +388,7 @@ async function main() {
     const documents = await capturePendingOfficialDocuments(owner.id);
     const syllabi = await extractApprovedSyllabi(owner.id);
     const drafts = await generateReviewedRequirementDrafts(owner.id);
+    const agents = process.env.EDITORIAL_AGENT_BRIDGE_ENABLED === "true" ? await prepareAgentWork(db) : { enabled: false };
     const summary = {
       completedAt: new Date().toISOString(),
       policy: "official_documents_to_draft_queue",
@@ -396,6 +397,7 @@ async function main() {
       documents,
       syllabi,
       drafts,
+      agents,
     };
     await db.insert(auditLogs).values({
       actorUserId: owner.id,

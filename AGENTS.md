@@ -60,6 +60,19 @@ Regras que valem sempre:
   `docs/AUTORIA-ISOLADA-POR-CARGO.md`. Quantidade em rascunho não é quantidade
   publicada por produto; não converter treino atual em simulado histórico.
 
+## Motores editoriais e Maestri
+
+- Leia `docs/MAESTRI-MOTORES-AUTOMATICOS.md` antes de executar trabalhos da fila.
+  Radar descobre fontes, Guardião propõe vínculos/analisa normas, Autor cria
+  rascunhos. O Maestro coordena os nós existentes, sem duplicá-los.
+- Use a ponte delimitada por SSH existente; nunca copie credenciais para agentes
+  ou notas. `.local/maestri/queue` é privada e não entra em Git ou Docker.
+- Resultado `prepared` não é aprovação. Publicação e vínculo comercial continuam
+  exigindo revisão humana efetiva. Stripe permanece pausada por decisão atual.
+- Documentação, nós conectados ou fila pendente não comprovam execução: registrar
+  IDs reais de rotinas e recibos. Maestri fechado/host indisponível deixa a fila
+  aguardando; não prometer autoria 24/7 nem recorrer a APIs pagas.
+
 ## Acessos operacionais do time (confirmados em 05/09/2026)
 
 - **Cloudflare / DNS de `2b.app.br`: Google Chrome, perfil Daniel.** Use a aba

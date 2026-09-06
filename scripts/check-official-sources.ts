@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 import { and, eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
+import { discoveryPortalPolicy } from "../src/lib/editorial/discovery-policy";
 
 import {
   auditLogs,
@@ -216,10 +217,18 @@ async function checkExamPortals() {
     .where(eq(examSourcePortals.isActive, true));
   let checked = 0;
   let failed = 0;
+  let policyBlocked = 0;
 
   for (const portal of portals) {
     try {
-      const result = await verifyOfficialExamUrl(portal.bankSlug, portal.officialUrl);
+      const policy=discoveryPortalPolicy(portal.bankSlug,portal.officialUrl);
+      if(policy.blocked) {
+        policyBlocked++;
+        await db.update(examSourcePortals).set({lastHttpStatus:null,lastError:policy.blocked,
+          lastCheckedAt:new Date(),updatedAt:new Date()}).where(eq(examSourcePortals.id,portal.id));
+        continue;
+      }
+      const result = await verifyOfficialExamUrl(portal.bankSlug, policy.urls[0]);
       await db
         .update(examSourcePortals)
         .set({
@@ -244,13 +253,15 @@ async function checkExamPortals() {
     await pause();
   }
 
-  return { checked, failed };
+  return { checked, failed, policyBlocked };
 }
 
 async function main() {
   try {
     const [laws, portals] = await Promise.all([checkLaws(), checkExamPortals()]);
-    console.log(JSON.stringify({ completedAt: new Date().toISOString(), laws, portals }));
+    const summary = { completedAt: new Date().toISOString(), laws, portals };
+    await db.insert(auditLogs).values({action:"monitor.legal.completed",entityType:"legal_monitor",metadata:summary});
+    console.log(JSON.stringify(summary));
     if (officialSourceMonitorHasHardFailures(laws, portals)) process.exitCode = 1;
   } finally {
     await client.end();

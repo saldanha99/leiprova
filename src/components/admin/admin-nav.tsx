@@ -21,6 +21,12 @@ import { cn } from "@/lib/utils";
 
 const adminNavItems = [
   {
+    href: "/admin/motores",
+    label: "Motores e agentes",
+    icon: RefreshCcw,
+    adminOnly: false,
+  },
+  {
     href: "/admin",
     label: "Visão geral",
     icon: LayoutDashboard,

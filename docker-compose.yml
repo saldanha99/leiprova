@@ -267,6 +267,7 @@ services:
     environment:
       DATABASE_URL: postgresql://${APP_DB_USER:-leiprova_app}:${APP_DB_PASSWORD}@pooler:5432/${POSTGRES_DB:-leiprova}
       EDITORIAL_OWNER_APPROVER_EMAIL: ${EDITORIAL_OWNER_APPROVER_EMAIL:-}
+      EDITORIAL_AGENT_BRIDGE_ENABLED: ${EDITORIAL_AGENT_BRIDGE_ENABLED:-true}
     cap_drop:
       - ALL
     security_opt:

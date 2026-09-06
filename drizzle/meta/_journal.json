@@ -260,6 +260,13 @@
       "when": 1788719945570,
       "tag": "0036_product_binding_review_lock",
       "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "7",
+      "when": 1788732000000,
+      "tag": "0037_editorial_agent_work",
+      "breakpoints": true
     }
   ]
 }

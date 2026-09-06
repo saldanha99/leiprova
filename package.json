@@ -18,6 +18,8 @@
     "opportunities:sources:check": "tsx --env-file-if-exists=.env scripts/check-open-opportunities.ts",
     "opportunities:approve": "tsx --env-file-if-exists=.env scripts/approve-official-opportunities.ts",
     "editorial:automation": "tsx --env-file-if-exists=.env scripts/run-editorial-automation.ts",
+    "editorial:agents": "tsx --env-file-if-exists=.env scripts/editorial-agent-work.ts",
+    "editorial:bridge": "tsx --env-file-if-exists=.env scripts/maestri-editorial-bridge.ts",
     "editorial:local:verify": "tsx --env-file-if-exists=.env scripts/validate-local-authoring.ts",
     "editorial:local:import": "tsx --env-file-if-exists=.env scripts/import-local-editorial-drafts.ts",
     "editorial:operate": "tsx --env-file-if-exists=.env scripts/operate-editorial-package.ts",

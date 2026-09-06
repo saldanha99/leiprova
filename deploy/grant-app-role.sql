@@ -4,6 +4,7 @@ begin;
 
 grant execute on function public.lock_editorial_approval_context(bigint[]) to :app_user;
 grant execute on function public.lock_product_binding_review_product(text) to :app_user;
+grant execute on function public.lock_editorial_agent_context(bigint,bigint[]) to :app_user;
 
 alter default privileges in schema public revoke all privileges on tables from :app_user;
 alter default privileges in schema public revoke all privileges on sequences from :app_user;
@@ -586,6 +587,8 @@ grant select, insert on
 to :app_user;
 
 grant select, insert, update on editorial_automation_jobs to :app_user;
+grant select, insert, update on editorial_agent_work to :app_user;
+grant select, insert on editorial_agent_runs to :app_user;
 
 grant select, insert on quiz_session_questions to :app_user;
 grant select, insert, update on quiz_session_answers to :app_user;
