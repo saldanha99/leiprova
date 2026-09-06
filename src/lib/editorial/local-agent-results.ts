@@ -7,6 +7,7 @@ export async function settleLocalAgentResults(
   queueRoot: string,
   agent: string,
   complete: (packetPath: string) => Promise<unknown>,
+  limit = 3,
 ) {
   if (!["Radar", "Guardião", "Autor"].includes(agent)) throw new Error("Papel incompatível.");
   const summary = { attempted: 0, completed: 0, failed: 0 };
@@ -15,7 +16,7 @@ export async function settleLocalAgentResults(
     throw error;
   });
   for (const entry of entries.sort((a, b) => a.name.localeCompare(b.name))) {
-    if (summary.attempted >= 3) break;
+    if (summary.attempted >= Math.max(0, Math.min(3, limit))) break;
     if (!entry.isDirectory() || !/^[0-9a-f-]{36}$/.test(entry.name)) continue;
     const directory = path.join(queueRoot, entry.name);
     const packet = path.join(directory, "packet.json");

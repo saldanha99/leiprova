@@ -1,5 +1,8 @@
 import { load } from "cheerio";
 
+import { discoveryPathBlocked } from "@/lib/editorial/discovery-policy";
+import { OfficialDocumentFetchError } from "@/lib/opportunities/official-document-fetch-error";
+
 import {
   parseOfficialOpportunityDocumentUrl,
   type OfficialOpportunitySourceId,
@@ -48,18 +51,31 @@ function rankDocument(label: string, url: string) {
   return score;
 }
 
+/** Aplica a política verificada também fora do runner, inclusive nos redirects. */
+export function assertOfficialDocumentAccess(url: string, sourceId: OfficialOpportunitySourceId) {
+  if (discoveryPathBlocked(url)) {
+    throw new OfficialDocumentFetchError("robots_path_disallowed", "policy", sourceId);
+  }
+}
+
 export function buildDirectOfficialDocumentCandidate(
   url: string,
   sourceId: OfficialOpportunitySourceId,
   label: string,
 ) {
-  const official = parseOfficialOpportunityDocumentUrl(url, sourceId);
+  let official;
+  try {
+    official = parseOfficialOpportunityDocumentUrl(url, sourceId);
+  } catch {
+    throw new OfficialDocumentFetchError("invalid_document_url", "policy", sourceId);
+  }
+  assertOfficialDocumentAccess(official.url, sourceId);
   const normalizedLabel = normalizeLabel(label || "Documento oficial");
   if (isProhibitedExamMaterial(`${normalizedLabel} ${official.url}`)) {
-    throw new Error("Cadernos, questões, respostas e gabaritos de terceiros não podem ser capturados.");
+    throw new OfficialDocumentFetchError("prohibited_exam_material", "policy", sourceId);
   }
   if (!DESIRED_DOCUMENT.test(`${normalizedLabel} ${official.url}`)) {
-    throw new Error("O arquivo não foi identificado como edital ou anexo de conteúdo programático.");
+    throw new OfficialDocumentFetchError("document_not_eligible", "policy", sourceId);
   }
   return Object.freeze({
     url: official.url,
@@ -74,12 +90,19 @@ export function discoverOfficialDocumentCandidatesFromHtml(
   pageUrl: string,
   sourceId: OfficialOpportunitySourceId,
 ) {
+  let page;
+  try {
+    page = parseOfficialOpportunityDocumentUrl(pageUrl, sourceId);
+  } catch {
+    throw new OfficialDocumentFetchError("invalid_document_url", "policy", sourceId);
+  }
+  assertOfficialDocumentAccess(page.url, sourceId);
   const $ = load(html);
   const candidates = new Map<string, OfficialDocumentCandidate>();
 
   $("a[href]").each((_, element) => {
     const href = $(element).attr("href");
-    if (!href) return;
+    if (!href || !href.trim() || href.trim().startsWith("#")) return;
 
     let absolute: string;
     try {
@@ -97,9 +120,13 @@ export function discoverOfficialDocumentCandidatesFromHtml(
     let official;
     try {
       official = parseOfficialOpportunityDocumentUrl(absolute, sourceId);
+      assertOfficialDocumentAccess(official.url, sourceId);
     } catch {
       return;
     }
+
+    // Menus/âncoras da notícia não são um arquivo: o fragmento já foi removido.
+    if (official.url === page.url) return;
 
     const candidate: OfficialDocumentCandidate = Object.freeze({
       url: official.url,

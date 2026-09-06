@@ -81,6 +81,15 @@ Radar ainda precisa navegar nas fontes oficiais permitidas. As permissões dos
 terminais não foram ampliadas: se uma escrita/leitura exigir confirmação local,
 a tarefa fica pendente. Rotina habilitada não elimina esse requisito.
 
+Para respeitar a pasta gravável de cada papel, a instalação local usa o mapa
+privado `.local/maestri/agent-queue-roles.json` (somente IDs de papéis). Novos
+pacotes ficam em `.maestri/roles/ID/UUID-DA-RESERVA/`, dentro da pasta do próprio
+agente, com permissões restritas. Não é expansão de sandbox. A ponte confere
+UUIDs e caminhos canônicos dentro do projeto, aceita apenas `packet.json` e
+`response.json` dessas reservas, e continua recolhendo a fila legada `.local`.
+Ambas as árvores estão excluídas de Git e Docker. Em outro host, resolver os IDs
+reais do workspace; nunca reaproveitar cegamente o mapa local.
+
 Comando/prompt da rotina, com o placeholder oficial `{{output}}`:
 
 > Execute a única tarefa reservada descrita a seguir: {{output}}. Leia

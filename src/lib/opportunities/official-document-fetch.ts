@@ -5,6 +5,7 @@ import { isIP } from "node:net";
 import { extractText, getDocumentProxy } from "unpdf";
 
 import {
+  assertOfficialDocumentAccess,
   buildDirectOfficialDocumentCandidate,
   discoverOfficialDocumentCandidatesFromHtml,
   isProhibitedExamMaterial,
@@ -20,6 +21,11 @@ import {
   resolveOfficialOpportunityDocumentRedirect,
   type OfficialOpportunitySourceId,
 } from "@/lib/opportunities/source-monitor-policy";
+
+import {
+  OfficialDocumentFetchError,
+  normalizeOfficialDocumentFetchError,
+} from "@/lib/opportunities/official-document-fetch-error";
 
 const MAX_DISCOVERY_BYTES = 2 * 1024 * 1024;
 const MAX_REDIRECTS = 4;
@@ -56,19 +62,34 @@ function isPrivateAddress(address: string) {
   );
 }
 
-async function assertPublicOfficialHost(hostname: string) {
-  const addresses = await lookup(hostname, { all: true, verbatim: true });
-  if (!addresses.length || addresses.some(({ address }) => isPrivateAddress(address))) {
-    throw new Error("A origem oficial não resolveu para um endereço público seguro.");
+async function assertPublicOfficialHost(hostname: string, sourceId: OfficialOpportunitySourceId) {
+  try {
+    const addresses = await lookup(hostname, { all: true, verbatim: true });
+    if (!addresses.length || addresses.some(({ address }) => isPrivateAddress(address))) {
+      throw new OfficialDocumentFetchError("unsafe_source_address", "dns", sourceId);
+    }
+  } catch (error) {
+    throw normalizeOfficialDocumentFetchError(error, "official_dns_failed", "dns", sourceId);
   }
 }
 
-async function readLimitedBody(response: Response, limit: number) {
+// Não deixa uma falha secundária de cancelamento ocultar o erro que impediu a captura.
+async function discardBody(response: Response) {
+  try { await response.body?.cancel(); } catch { /* O erro primário é preservado. */ }
+}
+
+async function readLimitedBody(
+  response: Response,
+  limit: number,
+  sourceId: OfficialOpportunitySourceId,
+) {
+  const sizeCode = limit === MAX_DISCOVERY_BYTES ? "discovery_size_limit" : "document_size_limit";
   const declaredLength = Number(response.headers.get("content-length"));
   if (Number.isFinite(declaredLength) && declaredLength > limit) {
-    throw new Error(`O documento excede o limite de ${Math.round(limit / 1024 / 1024)} MB.`);
+    await discardBody(response);
+    throw new OfficialDocumentFetchError(sizeCode, "body", sourceId);
   }
-  if (!response.body) throw new Error("A origem oficial respondeu sem conteúdo.");
+  if (!response.body) throw new OfficialDocumentFetchError("empty_source_body", "body", sourceId);
 
   const reader = response.body.getReader();
   const chunks: Uint8Array[] = [];
@@ -79,14 +100,17 @@ async function readLimitedBody(response: Response, limit: number) {
       if (done) break;
       total += value.byteLength;
       if (total > limit) {
-        await reader.cancel();
-        throw new Error(`O documento excede o limite de ${Math.round(limit / 1024 / 1024)} MB.`);
+        throw new OfficialDocumentFetchError(sizeCode, "body", sourceId);
       }
       chunks.push(value);
     }
+  } catch (error) {
+    try { await reader.cancel(); } catch { /* Preserva limite/erro de leitura. */ }
+    throw normalizeOfficialDocumentFetchError(error, "official_body_read_failed", "body", sourceId);
   } finally {
     reader.releaseLock();
   }
+  if (!total) throw new OfficialDocumentFetchError("empty_source_body", "body", sourceId);
 
   const body = new Uint8Array(total);
   let offset = 0;
@@ -102,28 +126,48 @@ async function fetchOfficialResource(
   sourceId: OfficialOpportunitySourceId,
   fetchImpl: FetchLike = fetch,
 ) {
-  let current = parseOfficialOpportunityDocumentUrl(initialUrl, sourceId);
+  let current;
+  try {
+    current = parseOfficialOpportunityDocumentUrl(initialUrl, sourceId);
+  } catch {
+    throw new OfficialDocumentFetchError("invalid_document_url", "policy", sourceId);
+  }
   for (let redirectCount = 0; redirectCount <= MAX_REDIRECTS; redirectCount += 1) {
-    await assertPublicOfficialHost(current.hostname);
-    const response = await fetchImpl(current.url, {
-      method: "GET",
-      redirect: "manual",
-      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
-      headers: {
-        Accept: "application/pdf,text/html;q=0.9,*/*;q=0.5",
-        "User-Agent": "LeiProva-Official-Notice-Importer/1.0 (+https://leiprova.2b.app.br/fontes-e-atualizacao)",
-      },
-    });
+    assertOfficialDocumentAccess(current.url, sourceId);
+    await assertPublicOfficialHost(current.hostname, sourceId);
+    let response: Response;
+    try {
+      response = await fetchImpl(current.url, {
+        method: "GET",
+        redirect: "manual",
+        signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+        headers: {
+          Accept: "application/pdf,text/html;q=0.9,*/*;q=0.5",
+          "User-Agent": "LeiProva-Official-Notice-Importer/1.0 (+https://leiprova.2b.app.br/fontes-e-atualizacao)",
+        },
+      });
+    } catch (error) {
+      throw normalizeOfficialDocumentFetchError(error, "official_request_failed", "request", sourceId);
+    }
     if (response.status >= 300 && response.status < 400) {
       const location = response.headers.get("location");
-      if (!location) throw new Error("A origem oficial redirecionou sem informar o destino.");
-      current = resolveOfficialOpportunityDocumentRedirect(current.url, location, sourceId);
+      await discardBody(response);
+      if (!location) throw new OfficialDocumentFetchError("redirect_missing_location", "redirect", sourceId);
+      try {
+        current = resolveOfficialOpportunityDocumentRedirect(current.url, location, sourceId);
+      } catch {
+        throw new OfficialDocumentFetchError("redirect_disallowed", "redirect", sourceId);
+      }
+      assertOfficialDocumentAccess(current.url, sourceId);
       continue;
     }
-    if (!response.ok) throw new Error(`A origem oficial respondeu com HTTP ${response.status}.`);
+    if (!response.ok) {
+      await discardBody(response);
+      throw new OfficialDocumentFetchError(`official_http_${response.status}`, "request", sourceId);
+    }
     return { response, finalUrl: current.url };
   }
-  throw new Error("A origem oficial excedeu o limite seguro de redirecionamentos.");
+  throw new OfficialDocumentFetchError("redirect_limit", "redirect", sourceId);
 }
 
 export async function discoverOfficialDocumentCandidates(
@@ -131,33 +175,38 @@ export async function discoverOfficialDocumentCandidates(
   sourceId?: OfficialOpportunitySourceId,
   sourceTitle = "Edital oficial",
 ) {
-  const officialSource = parseOfficialOpportunitySourceUrl(sourceUrl, sourceId);
+  let officialSource;
+  try {
+    officialSource = parseOfficialOpportunitySourceUrl(sourceUrl, sourceId);
+  } catch {
+    throw new OfficialDocumentFetchError("invalid_source_url", "policy", sourceId);
+  }
+  const id = officialSource.sourceId;
+  assertOfficialDocumentAccess(officialSource.url, id);
   if (/\.pdf(?:$|[?#])/i.test(officialSource.url)) {
     return Object.freeze([
-      buildDirectOfficialDocumentCandidate(officialSource.url, officialSource.sourceId, sourceTitle),
+      buildDirectOfficialDocumentCandidate(officialSource.url, id, sourceTitle),
     ]);
   }
 
-  const { response, finalUrl } = await fetchOfficialResource(
-    officialSource.url,
-    officialSource.sourceId,
-  );
+  const { response, finalUrl } = await fetchOfficialResource(officialSource.url, id);
   const contentType = response.headers.get("content-type")?.toLowerCase() ?? "";
   if (contentType.includes("application/pdf")) {
-    return Object.freeze([
-      buildDirectOfficialDocumentCandidate(finalUrl, officialSource.sourceId, sourceTitle),
-    ]);
+    // A descoberta registra só o candidato; a captura fará a leitura limitada do PDF.
+    await discardBody(response);
+    return Object.freeze([buildDirectOfficialDocumentCandidate(finalUrl, id, sourceTitle)]);
   }
   if (contentType && !contentType.includes("text/html") && !contentType.includes("text/plain")) {
-    throw new Error("A fonte não retornou uma página HTML nem um PDF oficial.");
+    await discardBody(response);
+    throw new OfficialDocumentFetchError("unsupported_source_type", "discovery", id);
   }
-  const body = await readLimitedBody(response, MAX_DISCOVERY_BYTES);
+  const body = await readLimitedBody(response, MAX_DISCOVERY_BYTES, id);
   const html = new TextDecoder("utf-8", { fatal: false }).decode(body);
-  return discoverOfficialDocumentCandidatesFromHtml(
-    html,
-    finalUrl,
-    officialSource.sourceId,
-  );
+  try {
+    return discoverOfficialDocumentCandidatesFromHtml(html, finalUrl, id);
+  } catch (error) {
+    throw normalizeOfficialDocumentFetchError(error, "official_discovery_failed", "discovery", id);
+  }
 }
 
 function safeFileName(response: Response, finalUrl: string) {
@@ -202,23 +251,29 @@ export async function captureOfficialPdf(
 ): Promise<CapturedOfficialDocument> {
   buildDirectOfficialDocumentCandidate(candidate.url, sourceId, candidate.label);
   const { response, finalUrl } = await fetchOfficialResource(candidate.url, sourceId);
-  const bytes = await readLimitedBody(response, MAX_OFFICIAL_DOCUMENT_BYTES);
+  const bytes = await readLimitedBody(response, MAX_OFFICIAL_DOCUMENT_BYTES, sourceId);
   if (bytes.byteLength < 5 || new TextDecoder("ascii").decode(bytes.slice(0, 5)) !== "%PDF-") {
-    throw new Error("O arquivo selecionado não possui a assinatura de um PDF válido.");
+    throw new OfficialDocumentFetchError("invalid_pdf_signature", "pdf_signature", sourceId);
   }
 
   const fileName = safeFileName(response, finalUrl);
   if (isProhibitedExamMaterial(`${candidate.label} ${fileName} ${finalUrl}`)) {
-    throw new Error("Cadernos, questões, respostas e gabaritos de terceiros não podem ser capturados.");
+    throw new OfficialDocumentFetchError("prohibited_exam_material", "policy", sourceId);
   }
 
   // PDF.js may transfer/detach the input ArrayBuffer. Keep an independent copy
   // for persistence and give the parser another copy that it may consume.
   const documentBytes = Buffer.from(bytes);
-  const pdf = await getDocumentProxy(new Uint8Array(documentBytes));
+  let pdf;
+  try {
+    pdf = await getDocumentProxy(new Uint8Array(documentBytes));
+  } catch (error) {
+    throw normalizeOfficialDocumentFetchError(error, "pdf_parse_failed", "pdf_parse", sourceId);
+  }
+  let failed = false;
   try {
     if (pdf.numPages < 1 || pdf.numPages > MAX_OFFICIAL_DOCUMENT_PAGES) {
-      throw new Error(`O PDF precisa ter entre 1 e ${MAX_OFFICIAL_DOCUMENT_PAGES} páginas.`);
+      throw new OfficialDocumentFetchError("pdf_page_limit", "pdf_extract", sourceId);
     }
     const result = await extractText(pdf, { mergePages: false });
     const pageTexts = (Array.isArray(result.text) ? result.text : [result.text]).map((page) =>
@@ -226,10 +281,10 @@ export async function captureOfficialPdf(
     );
     const extractedText = pageTexts.join("\n\n").trim();
     if (extractedText.length < 100) {
-      throw new Error("O PDF não contém texto pesquisável suficiente; OCR ainda não está habilitado.");
+      throw new OfficialDocumentFetchError("pdf_needs_ocr", "pdf_extract", sourceId);
     }
     if (extractedText.length > MAX_OFFICIAL_DOCUMENT_TEXT_LENGTH) {
-      throw new Error("O texto extraído excede o limite operacional de 2 milhões de caracteres.");
+      throw new OfficialDocumentFetchError("pdf_text_limit", "pdf_extract", sourceId);
     }
 
     const official = parseOfficialOpportunityDocumentUrl(finalUrl, sourceId);
@@ -247,7 +302,16 @@ export async function captureOfficialPdf(
       textLength: extractedText.length,
       parserVersion: OFFICIAL_DOCUMENT_PARSER_VERSION,
     });
+  } catch (error) {
+    failed = true;
+    throw normalizeOfficialDocumentFetchError(error, "pdf_extract_failed", "pdf_extract", sourceId);
   } finally {
-    await pdf.cleanup();
+    try {
+      await pdf.cleanup();
+    } catch (error) {
+      if (!failed) {
+        throw normalizeOfficialDocumentFetchError(error, "pdf_cleanup_failed", "pdf_cleanup", sourceId);
+      }
+    }
   }
 }

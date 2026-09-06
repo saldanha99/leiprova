@@ -126,6 +126,15 @@ disponíveis. Ainda não houve migração para o servidor doméstico 24/7.
 
 ## Limites editoriais e de cobertura
 
+Correção posterior do fetch recebida do Forge e integrada pelo Codex desktop:
+erros tipados seguros de política/DNS/TLS/HTTP/corpo/PDF, política de acesso
+também no fetch e em redirects, exclusão de âncoras/links da própria notícia.
+72 testes específicos passaram, incluindo PDF sintético com parser real.
+SSP-BA: cadastro aponta para relatório de gestão, rejeitado antes de HTTP;
+não atribuir essa falha ao WAF. Manaus ainda sem diagnóstico conclusivo.
+HTTP 404/503 e indisponibilidade externa não foram resolvidos pelo patch.
+Publicação dessa correção deve ser confirmada em registro posterior.
+
 - FGV e Cebraspe: descoberta dos portais cadastrados. FCC: somente índices
   permitidos na raiz; não coletar `/concursos/`, `/rss/` ou PDFs proibidos pelo robots.
 - VUNESP: coleta suspensa por bloqueio de acesso; usar fonte oficial alternativa
