@@ -135,7 +135,7 @@ Objeto JSON estrito, sem cerca Markdown. Campos comuns:
   uma correta, sem duplicatas. Citar a fonte do pacote e justificar cada opção.
 - **discovery:** `discoveries` contém até vinte objetos `{title,url,kind,role,
   bank,jurisdiction,observedAt,evidence}`. `kind`: `notice|rectification|announcement`;
-  `bank: null` se não comprovada; data ISO com fuso. Diferenciar notícia e edital.
+  `bank: null` se não comprovada; data ISO UTC terminada em `Z`. Diferenciar notícia e edital.
   Sem novidades, prepared com lista vazia e resumo de cobertura. Se acesso falhar,
   blocked e limitação explícita, sem fabricar dados.
 - **legal_change:** análise no resumo, evidências e limitações, listas vazias.

@@ -3,8 +3,19 @@
 Documento de contexto para quem for continuar o projeto — pessoa ou assistente de IA.
 Descreve onde as coisas estão, como publicar e quais armadilhas já custaram tempo.
 
-Última aplicação verificada: 06/09/2026, 15h49 BRT (18h49 UTC).
+Última aplicação verificada: 06/09/2026, 17h43 BRT (20h43 UTC).
 As seções antigas abaixo são histórico; consulte os registros recentes antes de operar.
+
+**Motores publicados (06/09/2026, 17h42 BRT):** fila/ponte e painel `/admin/motores`
+publicados (`46adce0`, worker ajustado em `2951940`), migração 0037 e privilégios
+aplicados sem seed. Monitor consultou dez normas sem falha; a coleta ainda teve
+cinco falhas e uma suspensão por política. 134 análises de requisitos e três
+análises legislativas na fila. Uma descoberta Cebraspe foi confirmada manualmente
+pela ponte, com repetição idempotente validada. **Rotinas recorrentes no Maestri
+ainda não ativadas: Mac bloqueado.** Nenhuma questão nova publicada/importada;
+Stripe pausada, conteúdo e catálogo preservados. Ver
+[publicação, evidências e pendências](MOTORES-PUBLICACAO-2026-09-06.md) e
+[contrato operacional do time](MAESTRI-MOTORES-AUTOMATICOS.md).
 
 **Auditoria operacional e pausa Stripe (06/09/2026, 16h10 BRT):** aplicação e
 fonte já publicadas e sincronizadas; nenhuma alteração de runtime pendente.
