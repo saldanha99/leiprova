@@ -3,9 +3,28 @@
 Documento de contexto para quem for continuar o projeto — pessoa ou assistente de IA.
 Descreve onde as coisas estão, como publicar e quais armadilhas já custaram tempo.
 
-Última aplicação verificada: 06/09/2026, 17h43 BRT (20h43 UTC).
+Última aplicação verificada: 06/09/2026, 20h03 BRT (23h03 UTC).
 Ativação local Maestri: 06/09/2026, 19h42 BRT, sem novo deploy da aplicação.
 As seções antigas abaixo são histórico; consulte os registros recentes antes de operar.
+
+**Coletor corrigido e publicado (`798c404`, 20h00 BRT):** app/worker saudáveis,
+1.313 testes e build aprovados, backup validado. Ciclo real reduziu cinco falhas
+para quatro e agora identifica Manaus acima do limite de página, relatório SSP-BA
+inelegível, CNJ 403 e ENFAM 404; FCC suspensa por robots. Zero novas capturas.
+Três rotinas Maestri salvas/ativas; três análises normativas bloqueadas sem
+inventar vigência, primeiro mapeamento aceito e tarefa encaminhada ao Autor.
+Pacotes ficam na pasta gravável de cada papel; preflight recolhe respostas,
+sem ampliar permissões ou exigir SSH do agente. Radar espera o reset do Claude.
+Mac bloqueou novamente a edição visual. Evidências e estado autoral em
+`docs/MOTORES-PUBLICACAO-2026-09-06.md`. Stripe continua pausada.
+
+**Primeiro fluxo autoral real validado (20h09 BRT):** `mapping:1` alimentou
+`author:1`; cinco questões geradas pelo Autor e importadas pela ponte somente
+em rascunho, com vínculo ao edital do pacote. Total 351 (312 revisadas, 12
+pendentes, 27 rascunhos); 75 produtos preservados. Nenhuma aprovação humana
+presumida ou publicação. O último recolhimento foi acionado pelo integrador,
+usando o mesmo comando configurado no preflight periódico. Pacotes e recibos
+privados permanecem na pasta do respectivo papel no Maestri.
 
 **Maestri ativado (19h42 BRT):** três rotinas reais, a cada 20 minutos, nos nós
 existentes: Radar `6237b5`, Guardião `cc6e9e`, Autor `56cefb`. As quatro notas

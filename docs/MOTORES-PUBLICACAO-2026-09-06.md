@@ -2,6 +2,62 @@
 
 Verificação de 06/09/2026, aproximadamente 17h43 BRT. Stripe permanece pausada.
 
+## Atualização final de infraestrutura — 20h03 BRT
+
+Aplicação e worker editorial reconstruídos e publicados em `798c404`, iniciados
+às 23:00:51 UTC. Saúde pública `ok`; 346 questões e 75 produtos preservados em
+contagem. Sem migração, seed, alteração de credenciais, flags ou outros serviços.
+Homologação, monitor de normas e entrega comercial não foram recriados.
+
+- Imagem app: `sha256:d64dfea5a6d4ab016891ad882db94ae448b7a02dcd7056fcc58f4d997390b7df`.
+- Imagem coletor: `sha256:5e88909c3f6fb58794ef3234c157f7a71a0350a40a80234e24bc41864e5429fe`.
+- Backup validado: `/opt/leiprova/backups/leiprova-before-fetch-20260906T2258Z.dump`,
+  10.475.077 bytes; imagens anteriores com tag `rollback-fetch-20260906`.
+- Lint, typecheck, build e 1.313 testes passaram; 230 opcionais pulados.
+
+Ciclo concluído às 23:03:12 UTC: cinco fontes verificadas, cinco candidatos,
+quatro tentativas, três documentos inalterados, zero capturas novas, quatro
+falhas (antes eram cinco) e uma suspensão por política. Sem novos requisitos,
+rascunhos determinísticos ou tarefas duplicadas. As falhas atuais são:
+
+| Fonte | Resultado comprovado |
+| --- | --- |
+| Prefeitura de Manaus | `discovery_size_limit`: página acima de 2 MB; limite mantido |
+| SSP-BA | `document_not_eligible`: relatório de gestão não é edital elegível |
+| CNJ / ENAC | `official_http_403`: acesso negado; antes houve 503 |
+| ENFAM / ENAM | `official_http_404`: um documento ausente |
+| FCC | `robots_path_disallowed`, contabilizada separadamente como suspensão |
+
+O ciclo ainda retorna erro para tornar as quatro falhas visíveis. Não declarar
+coleta nacional saudável ou bloqueios externos resolvidos.
+
+Maestri: três análises normativas terminaram bloqueadas por falta de versões
+comparáveis; a primeira teve confirmação manual e replay idempotente, as duas
+seguintes salvaram respostas dentro das pastas dos próprios papéis, sem ampliar
+permissões. O preflight recolheu as respostas e avançou a fila. `mapping:1` foi
+aceita como proposta com um artigo e gerou automaticamente `author:1`, entregue
+ao Autor. Isso não aprovou requisito ou publicação. O teste acionou as rotinas
+manualmente, exercitando o mesmo preflight e comando do agendamento de 20 minutos.
+
+O Mac voltou a bloquear o controle visual antes da conferência final do Autor.
+Rotinas/configuração permanecem salvas; o acompanhamento usa recibos privados e
+`/admin/motores`. Apesar do bloqueio visual, o Autor concluiu `author:1`: cinco
+questões. O integrador acionou `--mode=settle --agent=Autor` (a mesma operação
+do preflight); recibo confirmou `prepared`, cinco IDs importados,
+`publicationAllowed: false` e `humanReviewRequired: true`. No banco, as cinco
+estão como `draft`, assistidas por IA, sem revisor ou atestado humano; cinco
+vínculos apontam exclusivamente para a oportunidade do pacote. Total passou
+de 346 para **351 questões**: 312 revisadas, 12 pendentes e 27 rascunhos.
+75 produtos preservados. Isso não satisfaz o piso de 68 válidas por produto.
+
+Ficou demonstrado um percurso real até rascunho: reserva do requisito → resposta
+do Guardião → recolhimento pelo preflight → trabalho do Autor → resposta local
+→ validação e importação pela ponte. Não foi demonstrada publicação automática,
+nem se pretende dispensar revisão humana. O último recolhimento foi manual pelo
+integrador, pois a próxima rodada periódica ainda não havia ocorrido.
+
+Os registros abaixo são históricos das etapas anteriores desta mesma entrega.
+
 ## Publicado
 
 - `46adce0`: fila durável, contratos de Radar/Guardião/Autor, painel
@@ -133,7 +189,7 @@ também no fetch e em redirects, exclusão de âncoras/links da própria notíci
 SSP-BA: cadastro aponta para relatório de gestão, rejeitado antes de HTTP;
 não atribuir essa falha ao WAF. Manaus ainda sem diagnóstico conclusivo.
 HTTP 404/503 e indisponibilidade externa não foram resolvidos pelo patch.
-Publicação dessa correção deve ser confirmada em registro posterior.
+Publicação confirmada no registro de 20h03 BRT no início deste documento.
 
 - FGV e Cebraspe: descoberta dos portais cadastrados. FCC: somente índices
   permitidos na raiz; não coletar `/concursos/`, `/rss/` ou PDFs proibidos pelo robots.
