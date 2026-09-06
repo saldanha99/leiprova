@@ -3,7 +3,48 @@
 Documento de contexto para quem for continuar o projeto — pessoa ou assistente de IA.
 Descreve onde as coisas estão, como publicar e quais armadilhas já custaram tempo.
 
-Última verificação completa: 2026-08-25.
+Última entrega verificada: 05/09/2026, 22h03 BRT (06/09/2026, 01h03 UTC).
+As seções antigas abaixo são histórico; consulte os registros recentes antes de operar.
+
+**Homologação persistente e checkout premium publicados (`282474b`):**
+
+- [Homologação](https://homolog.leiprova.2b.app.br/entrar) com três perfis
+  sintéticos validados: administrador, Master e cliente de um concurso. Banco,
+  volume, rede interna e imagens separados da produção; HTTPS válido, aviso
+  visível e bloqueio de indexação. Senhas apenas no arquivo privado indicado em
+  [acessos operacionais](ACESSOS-OPERACIONAIS.md).
+- Cloudflare acessada no **Chrome Daniel**; registro A `homolog.leiprova`
+  criado para `187.127.46.251`, DNS only, TTL Auto. Os demais registros foram
+  preservados. Stripe permanece no **Chrome Vini**. Informação também salva
+  em `AGENTS.md` e na nota ACCESS-ROUTING do workspace exclusivo do Maestri.
+- Produção recompilada e publicada sem seed, após backup verificado. App
+  saudável, `/api/health` retornando `ok`, checkout público PGM-RJ conferido
+  no navegador e em viewport mobile. Acervo preservado: 232 revisadas e 12
+  pendentes. A homologação permaneceu saudável e sem recriação neste deploy.
+- Checkout por concurso com cartões mensal/anual distintos, economia anual
+  de R$457 (aproximadamente 57%), adicionais opcionais desmarcados e alternativa
+  Master. A finalização de pagamento continua hospedada pela Stripe; esta entrega
+  personaliza a página de escolha, não implementa um formulário próprio de cartão.
+- `CHECKOUT_ENABLED=false` e `CONTEST_CHECKOUT_ENABLED=false` confirmados no
+  app publicado. Botão de compra desabilitado. Nenhuma cobrança, chave Stripe
+  ou produto externo foi criado nesta entrega. O catálogo preparado prevê
+  75 produtos de concurso + um Master, total de 76 produtos e 152 preços.
+- Sete nós e cinco notas observados no workspace **LeiProva — Fábrica Editorial**.
+  Inicialização/modelos e layout final ainda precisam ser conferidos; o Mac foi
+  bloqueado durante a interface. Não há geração contínua de questões ativada por
+  essa montagem. Veja [estado do time](MAESTRI-FABRICA-EDITORIAL.md).
+- Verificação local final: lint, typecheck e build aprovados; 702 testes passaram
+  e 63 testes de integração foram ignorados por falta de seus ambientes opcionais.
+  Esse total inclui preparação não integrada do contrato Master, posterior à
+  imagem publicada. Os bloqueios reais de eventos antigos, estornos Master e
+  recuperação de webhook continuam descritos em
+  [Master pendente](MASTER-RECONCILIACAO-PENDENTE.md) e
+  [homologação Stripe pendente](STRIPE-PENDENCIAS-HOMOLOGACAO.md).
+
+Imagem de produção desta entrega:
+`sha256:30c651a071a6fb4049db64bc8313c39e60cd91587f87b871c96440dbab4a9e0c`.
+Backup anterior no Mac e na VPS: `leiprova-before-qa-checkout-20260906.dump`,
+SHA-256 `6698dc48b448b3aabdbf53a28092f7066b1889909bf20bd0c6af23a1c5ce6628`.
 
 **Nova regra comercial publicada em 05/09/2026 (`70e76fb`):** os 75 concursos individuais passam a
 R$67/mês ou R$347/ano, assinaturas recorrentes. Propostas antigas de 6/12 meses
@@ -57,13 +98,15 @@ Contêineres do projeto: `leiprova-app` (Next), `leiprova-pooler` (PgBouncer
 
 ```bash
 git push origin main
-ssh wisewolf-vps 'cd /opt/leiprova && ./deploy/pull-deploy.sh'
+ssh wisewolf-vps 'cd /opt/leiprova && LEIPROVA_SKIP_SEED=1 ./deploy/pull-deploy.sh'
 ```
 
 O `pull-deploy.sh` traz a ref por fast-forward e encadeia o `deploy.sh`, que
-compila as imagens, sobe banco e pool, roda migrations, reaplica privilégios,
-executa o seed idempotente e recria o app. Só o `leiprova-app` é recriado; banco
-e pooler continuam de pé. A janela de indisponibilidade é de poucos segundos.
+compila as imagens, sobe banco e pool, roda migrations, reaplica privilégios e
+recria app e workers quando necessário. Banco e pooler permanecem de pé.
+Use `LEIPROVA_SKIP_SEED=1` em atualizações para preservar o acervo; sem essa
+variável o script também executa o seed. Homologação usa seu compose e suas
+imagens fixadas, não o comando de produção. Há uma breve janela de reinício do app.
 
 O script **aborta** se encontrar alteração local não commitada em
 `/opt/leiprova`. Isso é proposital: até 2026-08-23 o deploy era cópia manual de

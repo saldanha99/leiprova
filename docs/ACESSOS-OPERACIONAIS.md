@@ -8,7 +8,39 @@ ao Maestro e aos agentes deste projeto.
 | Cloudflare, DNS de 2b.app.br | Google Chrome — **Daniel** | https://dash.cloudflare.com/d5c9228c69707c2a00b5a0f9fbaac942/2b.app.br/dns/records |
 | Stripe, conta 2timeWeb | Google Chrome — **Vini** | https://dashboard.stripe.com/acct_1TCQvlBkl6797u2u |
 | Aplicação em produção | Qualquer navegador | https://leiprova.2b.app.br |
-| Homologação dedicada | Em preparação; só declarar disponível após teste HTTPS e dos 3 perfis | https://homolog.leiprova.2b.app.br |
+| Homologação dedicada | **PUBLICADA E VALIDADA em 05/09/2026**; qualquer navegador | https://homolog.leiprova.2b.app.br/entrar |
+
+## Perfis de teste — homologação persistente
+
+Os três logins abaixo foram validados por HTTPS. O ambiente é persistente na
+VPS, independente do Mac, e separado do site de produção.
+
+| Perfil | Login | Permissão verificada |
+| --- | --- | --- |
+| Administrador QA | `qa-admin@example.invalid` | Painel `/admin` |
+| Cliente Master QA | `qa-master@example.invalid` | Área `/app`, cursos fictícios Alfa e Beta; sem acesso a `/admin` |
+| Cliente individual QA | `qa-avulso@example.invalid` | Área `/app`, somente Alfa; Beta e `/admin` bloqueados |
+
+**Senhas somente no arquivo privado**
+`.local/commerce/qa-persistente/ACESSOS-HOMOLOGACAO.md` (permissão 600, fora de
+Git e Docker). Não usar as senhas dos antigos testes em `127.0.0.1:3098`: os
+nomes de login coincidem, mas os bancos e as credenciais são distintos. Essas
+contas não são contas de produção. A vigência sintética de Master e individual
+vai até 05/10/2026, no horário de São Paulo.
+
+O ambiente tem banco, volume, cookies e segredos exclusivos, sem cópia de dados
+reais: 3 perfis, 2 cursos e 8 exercícios sem validade jurídica. Foram conferidos
+HTTPS válido, saúde 200, banner de QA e cabeçalhos de não indexação/sem cache.
+O Master recebe Alfa e Beta; o individual recebe apenas Alfa, inclusive com
+bloqueio de resposta forçada a Beta na API. Ambos os checkouts retornam 503:
+não há cobrança real nem referências Stripe. Cadastro, contato, e-mails e
+Connect permanecem fechados, sem workers de publicação neste ambiente.
+
+Histórico: inicialmente a homologação estava apenas preparada; DNS, publicação,
+certificado e validação dos três perfis foram concluídos em 05/09/2026.
+Detalhes e procedimento de atualização em `HOMOLOGACAO-ISOLADA.md`; evidências
+técnicas no arquivo privado
+`.local/commerce/qa-persistente/VERIFICACAO-PUBLICACAO.md`.
 
 ## Procedimento do Maestro
 

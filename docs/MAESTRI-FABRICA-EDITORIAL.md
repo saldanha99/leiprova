@@ -3,6 +3,24 @@
 Pedido do Vinícius de 05/09/2026. Este plano configura responsabilidades; não
 atesta que o pipeline já está continuamente integrado ou que cursos estão prontos.
 
+## Configuração observada no canvas em 05/09/2026
+
+O workspace exclusivo foi criado pelo CLI do Maestro e preservou `My Workspace`.
+Foram observados sete nós: Maestro LeiProva, Forge, Prism, Radar, Guardião, Autor e
+Relay, com seis papéis especializados. Presets aplicados: Claude Code para Maestro
+e Radar; Codex para Forge, Prism, Guardião e Autor; OpenCode para Relay.
+
+As cinco notas abaixo foram criadas. ACCESS-ROUTING registra Cloudflare no Chrome
+Daniel e Stripe no Chrome Vini; não é compartilhada com Relay. O Maestro registrou
+seis ligações com auxiliares e a cadeia Radar → Guardião → Autor → Prism.
+
+**Pendente de verificação final:** inicialização de cada CLI, seleção efetiva dos
+modelos pedidos e arranjo visual final. Ao menos um terminal Codex mostrou uma
+oferta de atualização durante a inspeção. O Mac foi bloqueado antes de finalizar
+os ajustes de interface. Não tratar nós desenhados como agentes em execução, nem
+esta montagem como ativação de geração contínua. Não houve instalação/compra de
+modelo, atualização de CLI ou geração de novo lote nesta configuração.
+
 ## Espaço e memória
 
 - Workspace exclusivo: **LeiProva — Fábrica Editorial**.

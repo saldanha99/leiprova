@@ -1,5 +1,49 @@
 # Acessos e homologação isolada
 
+## Status atual — PUBLICADA E VALIDADA
+
+Em **05/09/2026**, a homologação dedicada foi publicada e validada em
+**https://homolog.leiprova.2b.app.br/entrar**, com o código aprovado `282474b`.
+Ela é persistente na VPS e **não depende de o Mac permanecer ligado**.
+Este ambiente não é produção: contém apenas cursos, exercícios e acessos
+sintéticos para testar a plataforma, sem validade jurídica ou cobrança real.
+
+| Perfil | Login | Acesso validado |
+| --- | --- | --- |
+| Administrador QA | `qa-admin@example.invalid` | Painel `/admin` |
+| Cliente Master QA | `qa-master@example.invalid` | Área `/app`, cursos fictícios Alfa e Beta; sem painel administrativo |
+| Cliente individual QA | `qa-avulso@example.invalid` | Área `/app`, somente o curso fictício Alfa; sem painel administrativo |
+
+Para consultar as senhas, use
+`.local/commerce/qa-persistente/ACESSOS-HOMOLOGACAO.md`, arquivo privado com
+permissão 600, fora de Git e Docker. Não colar seu conteúdo em documentos,
+conversas ou no canvas. As identidades têm os mesmos nomes dos testes antigos,
+mas **as senhas da homologação persistente são diferentes das locais**.
+Os acessos sintéticos Master e individual têm vigência até **05/10/2026**,
+no horário de São Paulo; a renovação exige execução explícita do bootstrap.
+
+Evidências da validação pública, realizada sem ignorar erros de certificado:
+
+- HTTPS com certificado Let's Encrypt válido e `/api/health` retornando 200.
+- Três logins concluídos; clientes redirecionados para `/app` ao tentar `/admin`.
+- Master recebeu 4 exercícios Alfa e 4 Beta. Individual recebeu 4 Alfa e nenhum
+  Beta; tentativa forçada de responder a Beta retornou 404, sem gravar tentativa.
+- Checkout individual e Master retornaram 503, sem criar checkout, eventos ou
+  referências Stripe. Cadastro, contato, e-mails e Connect continuam fechados;
+  não há workers de geração ou publicação neste ambiente.
+- Banner de homologação visível em desktop e mobile; cabeçalhos
+  `X-Robots-Tag: noindex, nofollow, noarchive`, `Cache-Control: private, no-store`
+  e `X-LeiProva-Environment: synthetic-qa` conferidos. A página estática de
+  memorização usa o domínio de homologação em seu canonical.
+- Banco novo com exatamente 3 perfis, 2 cursos e 8 exercícios sintéticos;
+  nenhum dado de produção copiado. Contêineres, banco, volume e segredos próprios.
+- Durante esta publicação de QA, a imagem, o contêiner e o horário de início
+  da aplicação de produção permaneceram inalterados. Essa evidência se refere
+  à operação de QA, não a deploys de produção posteriores e independentes.
+
+O relatório técnico detalhado, sem senhas, está no arquivo privado
+`.local/commerce/qa-persistente/VERIFICACAO-PUBLICACAO.md`.
+
 ## Por que os acessos antigos não funcionavam no site público
 
 As contas `qa-admin@example.invalid`, `qa-master@example.invalid` e
@@ -17,9 +61,9 @@ uma única compra sintética PC-BA, não uma assinatura Master.
 `setup-local-commerce-qa.ts` agora usa o plano mensal atual, renova a vigência de
 homologação e atualiza a fixture de maneira idempotente. Não aceita conexão remota.
 
-## Ambiente persistente preparado, ainda não publicado
+## Arquitetura do ambiente persistente publicado
 
-Destino: `https://homolog.leiprova.2b.app.br/entrar`.
+Endereço validado: `https://homolog.leiprova.2b.app.br/entrar`.
 
 - `deploy/docker-compose.qa.yml`: contêineres `leiprova-qa-app` e `leiprova-qa-db`;
   banco `leiprova_qa`, volume `leiprova_qa_pgdata`, rede `leiprova_qa_internal`.
@@ -31,8 +75,8 @@ Destino: `https://homolog.leiprova.2b.app.br/entrar`.
   domínio e o aviso de QA são definidos também no build, preservando a geração
   estática e a performance das páginas reais. A imagem `migrator` aprovada pode
   ser reutilizada. Ambas são referenciadas por ID imutável.
-- O build adicional de QA acontece depois do build de produção, reutilizando
-  cache, com um processo de build por vez e teto de 2 GiB no ambiente do builder.
+- O build de QA é sequencial em relação a qualquer build de produção, reutilizando
+  cache quando disponível, com um processo por vez e teto de 2 GiB no builder.
   Os limites dos contêineres permanentes abaixo não limitam o processo de build.
 - Limites permanentes: app 640 MiB e banco 384 MiB, total 1 GiB. Ferramenta
   temporária de migration/fixture tem teto de 512 MiB e termina após o preparo.
@@ -50,14 +94,21 @@ Destino: `https://homolog.leiprova.2b.app.br/entrar`.
 Em 05/09/2026, o registro A de `homolog.leiprova.2b.app.br` foi criado no
 Cloudflare pelo acesso do perfil Daniel, com TTL automático e destino
 `187.127.46.251`. A resolução IPv4 já foi confirmada. Isso **não significa que
-o aplicativo de homologação esteja publicado**: a imagem aprovada, os
-contêineres, o certificado HTTPS e os três logins ainda precisam ser validados.
+o DNS sozinho publique a aplicação**: inicialmente o ambiente ainda estava
+pendente. Na sequência, a imagem própria de QA foi aprovada, os contêineres
+foram iniciados, o certificado foi emitido e os três logins foram validados,
+concluindo a publicação descrita acima.
 
 Na conferência inicial, a VPS tinha aproximadamente 12 GiB de RAM disponível e
-33 GB de disco livre. Esses números precisam ser conferidos novamente antes
-da publicação.
+33 GB de disco livre. Após os builds, havia aproximadamente 29 GB livres e o
+consumo observado era de 90 MiB no app e 52 MiB no banco. Ambos os contêineres
+estavam saudáveis, com reinício automático; o builder exclusivo foi parado ao
+final. São medições pontuais, que precisam ser repetidas antes de nova publicação.
 
-## Publicar após configurar DNS e aprovar a imagem
+## Procedimento preservado para novas publicações autorizadas
+
+A primeira publicação já foi concluída. Os passos abaixo são o procedimento
+operacional para uma atualização futura, não pendências do acesso atual.
 
 1. Confirmar o registro DNS já criado: **A `homolog.leiprova.2b.app.br` →
    `187.127.46.251`**, TTL automático, somente DNS. Não deixar AAAA apontando para
@@ -71,7 +122,7 @@ da publicação.
 3. Compilar e aprovar a imagem própria de QA usando o `Dockerfile` do projeto,
    target `runner`, argumento `--build-arg LEIPROVA_BUILD_PROFILE=qa` e tag
    exclusiva `leiprova-qa-app`. Não substituir a tag/imagem do app de produção.
-   Executar o build sequencialmente após produção, com builder limitado a 2 GiB.
+   Não executar em paralelo com produção; usar builder limitado a 2 GiB.
    A imagem resultante deve conter o label `io.leiprova.build-profile=qa`.
 4. Revisar o arquivo privado `.local/commerce/qa-persistente/.env`. Fixar
    `LEIPROVA_QA_APP_IMAGE` e `LEIPROVA_QA_TOOLS_IMAGE` com os IDs completos
