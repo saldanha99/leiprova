@@ -6,6 +6,22 @@ Descreve onde as coisas estão, como publicar e quais armadilhas já custaram te
 Última aplicação verificada: 06/09/2026, 13h11 BRT (16h11 UTC).
 As seções antigas abaixo são histórico; consulte os registros recentes antes de operar.
 
+**Autoria privada por cargo (06/09/2026, sem deploy):** 68 novos rascunhos para
+treino VUNESP / Analista Jurídico MP-SP, separados em 24 de Constitucional,
+22 de Processo Civil e 22 de Processo Penal. Todos com cinco alternativas,
+justificativas e fontes oficiais. Autores sem acesso aos simulados de terceiros;
+revisão assistida separada e cotejo dos 68 recortes com o Planalto concluídos.
+O operador privado gera caderno e recibo, mas não importa, aprova nem publica.
+Comparação mecânica com 346 enunciados capturados por transação somente leitura;
+nenhuma escrita no banco local/produção. Não há produto Analista MP-SP confirmado
+no catálogo; não vincular ao Promotor MP-SP por compartilhar o órgão.
+Revisão humana, programa e vínculos continuam pendentes. O piso válido dos
+75 cursos não mudou. 932 testes passaram, 150 integrações opcionais ignoradas;
+lint, typecheck e build passaram. Sem deploy, alteração de flags, homologação,
+Stripe ou gasto OpenRouter. Sem CLI Maestri disponível: agentes Codex executaram
+a rodada, não houve alteração de grafos. Ver
+[autoria por cargo e caderno privado](AUTORIA-ISOLADA-POR-CARGO.md).
+
 **Preparação dos 75 cursos publicada (`9c7dd4e`):** caderno individual no catálogo
 administrativo, fontes e pendências por cargo/edição, plano exportável com piso de 68 questões.
 Não gerou/importou/aprovou novas questões. Auditoria após deploy: 312 revisadas,

@@ -43,6 +43,9 @@ Regras que valem sempre:
 - Autores de inéditas recebem somente o perfil abstrato e fontes oficiais
   independentes. O material original fica separado para análise editorial e
   comparação de originalidade; nenhuma revisão humana é presumida.
+- Novas rodadas privadas por cargo devem usar o contrato e as verificações de
+  `docs/AUTORIA-ISOLADA-POR-CARGO.md`. Quantidade em rascunho não é quantidade
+  publicada por produto; não converter treino atual em simulado histórico.
 
 ## Acessos operacionais do time (confirmados em 05/09/2026)
 
