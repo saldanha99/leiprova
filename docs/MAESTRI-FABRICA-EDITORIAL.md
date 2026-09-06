@@ -37,18 +37,26 @@ Maestri separado. Isso corrige a limitação presumida anteriormente sobre Flash
 **Estado observado:** o canvas passou de sete para **oito terminais** e mostrou
 **Vetor**, ícone Antigravity e papel **Vetor — Prototipação visual**. O Maestro
 confirmou o ID no catálogo e registrou recrutamento com o comando explícito acima.
-OpenCode/Relay permaneceu no canvas. A inicialização chegou à confirmação de
-confiança da pasta; o Mac voltou a bloquear antes da inspeção final dessa etapa,
-do modelo efetivamente iniciado e das conexões. Não marcar o agente como pronto
-para trabalhar sem verificar esses pontos. Não confundir catálogo de modelos com
-autenticação bem-sucedida, disponibilidade de cota ou geração em funcionamento.
+OpenCode/Relay permaneceu no canvas. Após a autorização explícita do usuário,
+a confiança da pasta foi confirmada. O terminal iniciou autenticado, mostrou
+**Gemini 3.8 Flash (High)** e respondeu ao teste de inicialização. Também leu o
+`AGENTS.md` da raiz e executou `maestri list` com sucesso. Foram conferidas na
+interface e na resposta as conexões Maestro LeiProva, Prism, Forge,
+PROJECT-CONTEXT e TEAM-CHARTER; ACCESS-ROUTING não aparece entre elas.
+A nota TEAM-CHARTER foi atualizada pelo próprio Vetor e conferida na interface:
+oito nós, sete auxiliares, papel/modelo do Vetor e suas cinco conexões. O aviso
+antigo de indisponibilidade do Gemini Flash foi corrigido, preservando Relay e
+os limites de custo e de escopo.
+O agente ficou ocioso após o teste, sem alterar a aplicação ou iniciar conteúdo.
+A inicialização foi validada; não constitui prova de execução contínua, de cota
+ilimitada ou de prontidão da operação comercial.
 Não criar nova assinatura/API, comprar créditos ou trocar modelo ao atingir limite.
 
 Papel complementar: **Vetor — Prototipação visual**. Explorar referências públicas
 e produzir protótipos a partir de tarefas delimitadas do Maestro; Prism mantém a
 direção de produto/revisão, Forge a integração de engenharia. Vetor não acessa
 segredos, contas operacionais, dados privados ou outros projetos; não publica nem
-decide vigência jurídica. As conexões previstas são Maestro, Prism e Forge, com
+decide vigência jurídica. As conexões verificadas são Maestro, Prism e Forge, com
 PROJECT-CONTEXT e TEAM-CHARTER; sem ACCESS-ROUTING. Na montagem, apenas confirmar
 papel e modelo e ficar ocioso. Reutilizar um nó compatível antes de criar duplicata.
 
@@ -77,7 +85,7 @@ papel e modelo e ficar ocioso. Reutilizar um nó compatível antes de criar dupl
 | Guardião — Legislação | Vigência, redações, revogações e impactos nas questões; manter trilha de fonte oficial | Codex conectado; confirmar modelo disponível |
 | Autor — Inéditas | Questões novas a partir do edital mapeado e do perfil versionado da banca | Codex conectado; confirmar modelo disponível |
 | Relay — Apoio Sanitizado | Classificar e resumir apenas recortes públicos aprovados | OpenCode, somente modelo gratuito confirmado |
-| Vetor — Prototipação visual | Exploração multimodal e protótipos visuais delimitados; entregar ao Prism para revisão e Forge para integração | Antigravity, `gemini-3.8-flash-high`, catálogo local confirmado; início de sessão pendente |
+| Vetor — Prototipação visual | Exploração multimodal e protótipos visuais delimitados; entregar ao Prism para revisão e Forge para integração | Antigravity, `gemini-3.8-flash-high`, inicialização e resposta verificadas |
 
 Primeiro listar agentes, papéis e presets pelo CLI suportado do Maestri. Reusar
 papéis/presets compatíveis; não inventar IDs de modelos. Se Gemini Flash solicitado
