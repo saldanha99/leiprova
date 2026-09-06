@@ -3,8 +3,19 @@
 Documento de contexto para quem for continuar o projeto — pessoa ou assistente de IA.
 Descreve onde as coisas estão, como publicar e quais armadilhas já custaram tempo.
 
-Última entrega verificada: 05/09/2026, 22h03 BRT (06/09/2026, 01h03 UTC).
+Última entrega verificada: 06/09/2026, 00h05 BRT (03h05 UTC).
 As seções antigas abaixo são histórico; consulte os registros recentes antes de operar.
+
+**Conteúdo por produto e reembolsos publicados (`b55327a`):** reconciliador Master
+integrado, migration 0033 e isolamento por produto. 80 questões novas importadas
+somente como rascunhos, 46 propostas ENAM pendentes e 14 bloqueadas por divergência
+de disciplina. Total 324 questões: 232 revisadas, 12 pendentes e 80 rascunhos.
+Acervo anterior preservado por comparação de hashes; deploy sem seed, backup no
+Mac e VPS, app saudável e homologação não alterada. Os 75 produtos ainda não têm
+preços/produtos Stripe vinculados; vendas permanecem fechadas. Revisão humana,
+homologação Stripe e entrega transacional continuam pendentes. Houve também um
+desvio de migração no banco local, separado da produção, informado ao responsável.
+Veja o [resultado completo e limites](OPERACAO-CONTEUDO-REEMBOLSOS-2026-09-06.md).
 
 **Homologação persistente e checkout premium publicados (`282474b`):**
 

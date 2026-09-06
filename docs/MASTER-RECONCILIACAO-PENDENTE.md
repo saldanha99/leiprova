@@ -1,6 +1,7 @@
-# Master — contrato preparado, integração pendente
+# Master — reconciliação integrada, homologação Stripe pendente
 
-Atualização local: 06/09/2026. Este documento NÃO atesta prontidão de cobrança LIVE.
+Atualização: 06/09/2026. Reconciliador implantado em `b55327a`; este documento NÃO
+atesta prontidão de cobrança LIVE. Veja [resultado da operação](OPERACAO-CONTEUDO-REEMBOLSOS-2026-09-06.md).
 
 ## Correção implementada e testada localmente
 

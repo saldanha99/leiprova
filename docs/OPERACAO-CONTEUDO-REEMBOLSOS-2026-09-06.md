@@ -1,8 +1,8 @@
 # Conteúdo por produto e tratamento de reembolsos
 
 Operação de 06/09/2026 UTC, exclusiva do LeiProva. Este registro não autoriza
-publicação editorial nem abertura de vendas. Estado inicial: implementação
-validada localmente, aguardando implantação e importações conferidas abaixo.
+publicação editorial nem abertura de vendas. Código `b55327a` implantado e
+importações conferidas em 06/09/2026, 03h05 UTC (00h05 BRT).
 
 ## Entrega preparada
 
@@ -10,10 +10,12 @@ validada localmente, aguardando implantação e importações conferidas abaixo.
   Vunesp e Cebraspe, cobrindo os incisos XLIV–LXIII do art. 5º da Constituição.
   Todas `draft`, revisão humana pendente. Perfil interno de estilo não significa
   questão oficial da banca, parceria nem fidelidade estatística comprovada.
-- 60 propostas de curadoria para o produto ENAM 2026.2: 40 questões FGV
-  anteriormente revisadas e 20 novos rascunhos FGV. Não representam cobertura
-  integral do edital; requisitos, mapeamentos e vínculos precisam de revisão.
-  Não há distribuição indiscriminada do mesmo acervo pelos 75 produtos.
+- 60 propostas planejadas para o produto ENAM 2026.2: 40 questões FGV
+  anteriormente revisadas e 20 novos rascunhos FGV. **46 foram importadas
+  pendentes** (35 questões revisadas e 11 rascunhos); 14 ficaram bloqueadas.
+  Não representam cobertura integral do edital; requisitos, mapeamentos e
+  vínculos precisam de revisão. Não há distribuição indiscriminada do mesmo
+  acervo pelos 75 produtos.
 - Operador novo importa somente rascunhos, sem reutilizar a aprovação do lote
   anterior de 160. Prévia e aplicação vinculam conteúdo, operador e manifesto.
   Produção exige banco/papel restritos e volume privado fixo, sem fallback de URL.
@@ -74,8 +76,47 @@ O desvio, impactos conhecidos e contenção estão registrados no
 
 ## Resultado da operação
 
-A preencher com a revisão implantada, saúde dos serviços, contagens e fingerprints
-das importações. Preparação local não constitui evidência de alteração em produção.
+- Código `b55327a`, migration 0033 e grants publicados sem seed. Imagem:
+  `sha256:81d14ab54083ab4904047fa2d30ce151f06bcd09b3e5991a939742e3e871af55`.
+  App saudável; `/api/health` respondeu `ok` no navegador. Homologação continuou
+  saudável, sem recriação ou alteração de seu banco/imagens.
+- 80 questões importadas como `draft`: 20 por banca. Nenhum revisor, submissão
+  ou atestado de autoria humana foi preenchido. Reexecução criou zero e reutilizou
+  80; existem exatamente 80 novos registros de auditoria de importação.
+- 46 vínculos `pending_review` e 46 auditorias, nenhum aprovado. Reexecução
+  criou zero e reutilizou 46. O papel do app foi conferido: SELECT permitido,
+  UPDATE/DELETE e INSERT na coluna de status proibidos.
+- As 14 propostas do requisito 115 foram recusadas na prévia: o requisito está
+  em Direito Penal (disciplina 5), mas as questões estão em Constitucional
+  (disciplina 1). Não se remapeou o acervo nem o edital para contornar essa regra.
+  Pacote original de 60 preservado; somente a seleção explícita de requisitos
+  6 (33 propostas) e 7 (13 propostas) foi enviada ao importador.
+- Acervo final: **324 questões = 232 revisadas + 12 pendentes + 80 rascunhos**.
+  As 244 anteriores e suas 1.034 alternativas mantiveram hashes idênticos aos
+  capturados antes da implantação. `question_opportunities` permanece vazio.
+- Fingerprint operacional dos rascunhos:
+  `3432742ff99e85d36b0d297dd1baa31043bd707dc3d3f2248409c5e53aabd23e`.
+  Fingerprint das 46 propostas:
+  `62466f775686816a1b15b62f8b505665426dcf193977a35b95b075947853ff73`.
+- Uma prévia inicial parou por permissão de leitura, sem escrita no banco:
+  transferência do Mac preservara UID 501 dos arquivos. Corrigido somente o
+  proprietário dos oito arquivos privados para root no servidor; modos 600,
+  volumes somente leitura e `cap_drop: ALL` foram preservados.
+- Conferência final comercial: 75 produtos locais, zero produtos/preços Stripe
+  vinculados por concurso, zero liberados, zero pedidos/compras/assinaturas/eventos.
+  Três registros de planos, nenhum preço Stripe no banco. Flags de checkout e
+  cadastro `false`. Modo solicitado `live`, mas credencial ainda de teste; não
+  houve ativação de cobrança. Checkout ENAM conferido com compra desabilitada.
+- Validação geral: lint, typecheck, build e 723 testes aprovados; 147 testes
+  opcionais ignorados nessa execução. Bateria adicional explícita: **150 testes
+  aprovados**, incluindo 54 integrações PostgreSQL Master e 25 de curadoria.
+  Essa bateria sobrepõe testes unitários da geral; não somar como casos distintos.
+  PostgreSQL usa dados sintéticos e Stripe simulada/HMAC offline, não prova LIVE.
+
+Recibos privados: `drafts-preview.json`, `drafts-applied.json`, `drafts-replay.json`,
+`bindings-preview.json`, `bindings-applied.json` e `bindings-replay.json` no pacote.
+Falta revisão humana do conteúdo, requisitos e aderência, além de fluxo de aprovação
+da curadoria e liberação comercial; nenhuma questão nova está liberada ao aluno.
 
 Detalhes: [curadoria por produto](CURADORIA-POR-PRODUTO.md),
 [reconciliador Master e limites](MASTER-RECONCILIACAO-PENDENTE.md),

@@ -1,6 +1,7 @@
 # Curadoria editorial por produto
 
-Implementação local de 06/09/2026. Este documento não declara publicação ou aprovação em produção.
+Implementação de 06/09/2026, implantada em `b55327a`. Foram importadas 46 propostas
+pendentes, nenhuma aprovada. Veja [resultado e limites da operação](OPERACAO-CONTEUDO-REEMBOLSOS-2026-09-06.md).
 
 ## Regra de acesso
 
