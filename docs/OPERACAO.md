@@ -22,6 +22,13 @@ Backup validado: `backups/leiprova-before-course-intake-20260907.dump`,
 10.623.341 bytes, permissão 600; rollback do worker `rollback-intake-20260907`.
 Recibo privado da memória: `.local/maestri/course-intake-handoff-20260907.json`.
 
+Ciclo periódico completo concluído às 00h55min16s BRT: a nova entrada conferiu
+novamente os 75 produtos e criou zero duplicatas. Coleta: seis fontes verificadas,
+três arquivos inalterados, zero novas capturas, três falhas (Manaus, SSP-BA,
+ENFAM) e uma suspensão por política. CNJ não falhou neste ciclo; isso não garante
+disponibilidade futura. Zero requisitos ou questões novas; quatro descobertas
+diárias preparadas. O ciclo retorna erro pelas três falhas, com o laço ativo.
+
 **Memória Maestri aplicada (07/09, 00h33 BRT):** PROJECT-CONTEXT, TEAM-CHARTER,
 EDITORIAL-QUEUE e QUALITY-GATES atualizadas pelo CLI oficial no Maestro e relidas
 para confirmar a gravação. Histórico e ACCESS-ROUTING preservados. Três rotinas
