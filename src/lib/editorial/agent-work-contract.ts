@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { z } from "zod";
 import { parseOfficialOpportunitySourceUrl } from "@/lib/opportunities/source-monitor-policy";
 import { discoveryPathBlocked } from "./discovery-policy";
+import { isVerifiedCourseDiscoveryUrl } from "./course-discovery-sources";
 
 export const AGENT_WORK_VERSION = "editalume-agents-v1";
 export const AGENT_WORK_LEASE_MINUTES = 45;
@@ -72,7 +73,7 @@ export function validateDiscoveryUrl(input: string) {
     throw new Error("Origem ou material não autorizado para descoberta.");
   }
   const bankHosts=["www.vunesp.com.br","www.cebraspe.org.br","www.concursosfcc.com.br","conhecimento.fgv.br"];
-  if (!bankHosts.includes(url.hostname)) parseOfficialOpportunitySourceUrl(input);
+  if (!bankHosts.includes(url.hostname) && !isVerifiedCourseDiscoveryUrl(input)) parseOfficialOpportunitySourceUrl(input);
   url.hash="";
   return url.toString();
 }

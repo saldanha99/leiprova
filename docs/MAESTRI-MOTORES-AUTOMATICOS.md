@@ -21,6 +21,10 @@ ordens de descoberta pendentes são encerradas quando associados ou retirados.
 O Radar deve confirmar edital/retificações, cargo, banca, UF, programa e corte
 normativo antes de encaminhar a revisão. A hipótese da pesquisa não é banca
 confirmada. As ordens não usam URLs do concorrente nem ampliam a lista de fontes.
+Em 07/09, a política de descoberta recebeu páginas delimitadas do TCE-SP, TJCE,
+MPMS e Câmara, após navegação e robots conferidos. Isso é só permissão de pesquisa
+do Radar: não amplia o coletor de PDFs ou aprova fonte no banco. Ver
+`docs/FONTES-CURSOS-2026-09-07.md`. FCC/VUNESP continuam com suas restrições.
 Editais históricos e pré-editais não viram ofertas atuais automaticamente.
 A mesma entrada/identidade não recria tarefas a cada ciclo; mudança de insumo
 invalida a reserva anterior. A preparação não gasta reservas nem chama API paga.

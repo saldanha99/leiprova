@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "checkedAt": "2026-09-06T15:44:25Z",
+  "checkedAt": "2026-09-07T05:50:31Z",
   "items": [
     {
       "productSlug": "sefaz-sc-auditor-area-direito-2026",
@@ -435,8 +435,8 @@
           "url": "https://www.tce.sp.gov.br/6524-tcesp-abre-concurso-publico-para-auditor-controle-externo-com-oferta-50-vagas",
           "title": "Edital 001/2026 — Auditor de Controle Externo DIPE, Direito",
           "kind": "organ",
-          "observedFacts": "Notícia oficial informa objetiva e estudo de caso em 11/10/2026. Órgão confirma especialidade Direito, prova objetiva e estudo de caso; programa integral ainda não conferido.",
-          "checkedAt": "2026-09-06T15:44:25Z"
+          "observedFacts": "Notícia oficial reconferida com agent-browser: identifica VUNESP, especialidade Direito do DIPE e previsão de objetiva e estudo de caso em 11/10/2026. Programa integral e retificações ainda não conferidos. Robots não proíbe esta página; portal VUNESP não foi acessado.",
+          "checkedAt": "2026-09-07T05:50:31Z"
         }
       ],
       "humanReview": "pending",
@@ -1136,8 +1136,8 @@
           "url": "https://www.tjce.jus.br/noticias/tjce-altera-edital-do-concurso-publico-para-servidoras-e-servidores/",
           "title": "TJCE altera edital do concurso público para servidoras e servidores",
           "kind": "amendment",
-          "observedFacts": "Notícia de 02/06/2026 informa FCC, retificação de 29/05 que alcança conteúdo programático e cronograma, inscrições até 22/06 e provas previstas para 09/08/2026.",
-          "checkedAt": "2026-09-06T15:40:09Z"
+          "observedFacts": "Notícia de 02/06/2026 reconferida com agent-browser: informa FCC, retificação de 29/05 que alcança conteúdo programático e cronograma, inscrições até 22/06 e provas previstas para 09/08/2026, data já decorrida. Notícia não substitui edital consolidado. Robots permite esta página, não autoriza os caminhos DJE proibidos.",
+          "checkedAt": "2026-09-07T05:50:31Z"
         }
       ],
       "humanReview": "pending",
@@ -1936,8 +1936,8 @@
           "url": "https://www.mpms.mp.br/concursos/49",
           "title": "MPMS — XXXI Concurso para Promotor Substituto",
           "kind": "organ",
-          "observedFacts": "Página navegada: Edital 1/2026, resultado definitivo preambular em julho e atos de escritas.",
-          "checkedAt": "2026-09-06T15:40:29Z"
+          "observedFacts": "Página reconferida com agent-browser: XXXI Concurso de Promotor Substituto, Edital 1/2026 e atos distintos de composição das bancas preambular e escrita. Não atribuir FGV ou VUNESP por padrão. Robots sem proibição; não foram abertos cadernos ou gabaritos.",
+          "checkedAt": "2026-09-07T05:50:31Z"
         },
         {
           "url": "https://www.mpms.mp.br/concursos/49/andamentos/4448",
@@ -2391,8 +2391,8 @@
       "productSlug": "camara-camara-dos-deputados-2026",
       "status": "needs_identity_review",
       "editionDescription": "Câmara dos Deputados 2026 apresenta dois concursos distintos: analista/técnico e policial legislativo. O produto genérico não define qual trilha atende.",
-      "examStage": "Portal institucional mantém páginas separadas para os dois concursos. Fases detalhadas e programas de cada edição não foram auditados nesta coleta.",
-      "bankNames": [],
+      "examStage": "Páginas institucionais conferidas separadamente: analista/técnico lista resultado final no Edital 9; policial legislativo lista convocação para avaliação psicológica no Edital 14. Íntegra dos atos e programas ainda não auditada.",
+      "bankNames": ["Cebraspe"],
       "officialUrls": [
         "https://www2.camara.leg.br/transparencia/recursos-humanos/concursos",
         "https://www2.camara.leg.br/transparencia/recursos-humanos/concursos/concurso-para-analista-e-tecnico",
@@ -2410,8 +2410,22 @@
           "url": "https://www2.camara.leg.br/transparencia/recursos-humanos/concursos",
           "title": "Concursos — Portal da Câmara dos Deputados",
           "kind": "organ",
-          "observedFacts": "Portal oficial apresenta links separados para concurso 2026 de analista/técnico e para policial legislativo; informa que outros cargos autorizados em setembro de 2025 ainda não possuem projeto básico elaborado nem banca contratada.",
-          "checkedAt": "2026-09-06T15:40:09Z"
+          "observedFacts": "Portal reconferido com agent-browser: links separados para analista/técnico e policial legislativo. Outros cargos autorizados ainda não têm projeto básico nem banca contratada. Robots permite estas páginas públicas, não login ou áreas restritas.",
+          "checkedAt": "2026-09-07T05:50:31Z"
+        },
+        {
+          "url": "https://www2.camara.leg.br/transparencia/recursos-humanos/concursos/concurso-para-analista-e-tecnico",
+          "title": "Câmara — concurso para analista e técnico",
+          "kind": "organ",
+          "observedFacts": "Página lida com agent-browser: Cebraspe; Analista Legislativo, Processo Legislativo e Gestão, e Técnico Legislativo, Assistente Legislativo e Administrativo. Lista abertura, retificação e resultado final. Programa integral pendente; não fundir os cargos.",
+          "checkedAt": "2026-09-07T05:50:31Z"
+        },
+        {
+          "url": "https://www2.camara.leg.br/transparencia/recursos-humanos/concursos/concurso-para-policial-legislativo",
+          "title": "Câmara — concurso para policial legislativo federal",
+          "kind": "organ",
+          "observedFacts": "Página lida com agent-browser: Cebraspe, Técnico Legislativo, especialidade Policial Legislativo Federal; lista retificações, TAF e avaliação psicológica. Calendário inicial já decorrido. Programa integral pendente; não usar o programa de analista/técnico administrativo.",
+          "checkedAt": "2026-09-07T05:50:31Z"
         }
       ],
       "humanReview": "pending",
