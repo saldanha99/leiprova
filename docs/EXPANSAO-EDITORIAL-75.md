@@ -3,6 +3,30 @@
 Conferência em 06/09/2026. O plano cobre todos os produtos do catálogo, mas **não
 representa 75 cursos publicados nem 5.100 questões prontas**.
 
+## Atualização de 07/09/2026 — entrada automática publicada
+
+O worker `26e6359` agora cria uma ordem individual de descoberta/preparação para
+cada produto não retirado e ainda sem edição associada. SQL confirmou 75 ordens
+distintas, todas com meta 68: 38 pendentes de investigação e 37 bloqueadas por
+falta de fonte admitida pela política atual. Esses 38 ainda NÃO são editais
+validados ou cursos prontos para autoria. Os 37 não serão preenchidos com
+questões genéricas ou fontes de terceiros. A lista restrita de origens não foi
+ampliada; uma pesquisa pública pode apontar uma origem que o coletor ainda não
+tem permissão técnica verificada para usar.
+
+Rodadas repetidas não duplicam as ordens. Novos produtos entram no próximo ciclo
+completo, inclusive quando ainda falta pesquisa: nesse caso, recebem bloqueio
+explícito. Produto já associado segue o fluxo da edição/requisitos; produto
+retirado não recebe nova investigação. Conexões e rotinas existentes do Maestri
+preservadas, quatro notas atualizadas com recibos. O teto de 24 reservas por 24h
+continua limitando a execução; a preparação da fila não chama provedor pago.
+
+Nenhuma nova questão ou aprovação nesta etapa. Acervo 383 (312 revisadas, 12
+pendentes e 59 rascunhos), 75 produtos preservados por hash integral. Nenhum dos
+75 possui 68 vínculos válidos liberados. Ainda faltam confirmar as edições,
+aprovar fontes/programas, redigir e revisar o conteúdo e aprovar a aderência ao
+produto exato. Detalhes e backup em `docs/OPERACAO.md`.
+
 ## Resultado desta etapa
 
 - Pesquisa individualizada de 75 produtos, com fontes, limitações, banca, edição,

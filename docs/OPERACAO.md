@@ -3,6 +3,25 @@
 Documento de contexto para quem for continuar o projeto — pessoa ou assistente de IA.
 Descreve onde as coisas estão, como publicar e quais armadilhas já custaram tempo.
 
+**Entrada editorial dos 75 cursos publicada (07/09, 00h54 BRT):** worker
+editorial atualizado para `26e6359`, imagem
+`sha256:21607c80b892adb92815f8dfd2159f9cd38b4b9339c943458e74d72237dffdaf`.
+Foram gravadas 75 ordens individuais, 38 pendentes de pesquisa e 37 bloqueadas
+por falta de fonte admitida na política atual; todas carregam meta 68. Rodada
+repetida criou zero duplicatas. Produto novo não retirado e sem edição associada
+entra no próximo ciclo completo, com pendência explícita se faltar pesquisa.
+Isso NÃO equivale a edital confirmado, questões geradas ou 75 cursos liberados.
+Mapeamento/geração continuam vinculados aos dados validados por banca E cargo.
+As quatro notas do Maestri foram atualizadas e relidas, três rotinas preservadas.
+Limite 24/24 continua vigente. Sem API paga, fonte ampliada ou aprovação humana
+presumida. Hashes integrais das 383 questões e dos 75 produtos preservados.
+App, homologação, monitor de leis e entrega não recriados; Stripe pausada.
+Lint, typecheck, 1.328 testes e build passaram, mais 11 testes PostgreSQL em
+banco isolado (232 opcionais pulados na suíte geral). Banco sintético removido.
+Backup validado: `backups/leiprova-before-course-intake-20260907.dump`,
+10.623.341 bytes, permissão 600; rollback do worker `rollback-intake-20260907`.
+Recibo privado da memória: `.local/maestri/course-intake-handoff-20260907.json`.
+
 **Memória Maestri aplicada (07/09, 00h33 BRT):** PROJECT-CONTEXT, TEAM-CHARTER,
 EDITORIAL-QUEUE e QUALITY-GATES atualizadas pelo CLI oficial no Maestro e relidas
 para confirmar a gravação. Histórico e ACCESS-ROUTING preservados. Três rotinas
