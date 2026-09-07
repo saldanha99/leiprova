@@ -3,6 +3,19 @@
 Documento de contexto para quem for continuar o projeto — pessoa ou assistente de IA.
 Descreve onde as coisas estão, como publicar e quais armadilhas já custaram tempo.
 
+**Memória Maestri aplicada (07/09, 00h33 BRT):** PROJECT-CONTEXT, TEAM-CHARTER,
+EDITORIAL-QUEUE e QUALITY-GATES atualizadas pelo CLI oficial no Maestro e relidas
+para confirmar a gravação. Histórico e ACCESS-ROUTING preservados. Três rotinas
+habilitadas, sem duplicatas. Oito autorias preparadas, 37 questões novas em
+rascunho (32 recolhidas automaticamente após o piloto); total 383 questões:
+312 revisadas, 12 pendentes e 59 rascunhos. Todas as 37 novas sem revisão ou
+declaração humana presumida. Nove mapeamentos preparados; nenhuma reserva ativa.
+Teto interno 24/24 atingido, sem aumento ou fallback pago. A primeira reserva
+sai da janela móvel em 07/09 às 17h39min57s BRT; execução depende do ciclo e da
+disponibilidade do terminal. Reset Claude às 03h não libera esse teto interno.
+Recibo privado: `.local/maestri/steady-state-20260906.json`. Sem alteração de
+código, runtime, banco, credenciais, Stripe ou publicação editorial nesta rodada.
+
 **Execução periódica comprovada (06/09, 22h53 BRT):** cinco tarefas autorais
 concluídas e 22 inéditas importadas em rascunho, sendo 17 recolhidas nas rotinas
 após o piloto. Banco: 368 questões (312 revisadas, 12 pendentes, 44 rascunhos),

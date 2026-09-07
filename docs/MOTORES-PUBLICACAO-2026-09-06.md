@@ -2,6 +2,27 @@
 
 Verificação de 06/09/2026, aproximadamente 17h43 BRT. Stripe permanece pausada.
 
+## Memória do time confirmada — 07/09, 00h33 BRT
+
+As quatro notas editoriais foram atualizadas e relidas pelo CLI oficial do
+Maestri no terminal Maestro. ACCESS-ROUTING e histórico preservados; três rotinas
+habilitadas. Recibo privado `.local/maestri/steady-state-20260906.json` com quatro
+confirmações de leitura posterior e inspeção dos nós, sem segredos.
+
+Consulta confirmou oito autorias preparadas e **37 novas questões em rascunho**,
+32 posteriores ao piloto. Total 383 (312 revisadas, 12 pendentes, 59 rascunhos).
+Todas as novas permanecem sem revisor humano ou declaração humana presumida.
+Nove mapeamentos preparados, dois bloqueados, três análises normativas bloqueadas;
+123 mapeamentos e uma autoria pendentes, nenhuma reserva ativa. `author:8`,
+`author:9` e `author:10` foram recolhidas pelo ciclo periódico.
+
+O limite interno chegou a 24/24 reservas: não é erro nem saldo da assinatura
+Codex. A primeira reserva sai da janela em 07/09 às 17h39min57s BRT; retomada
+depende do ciclo e dos terminais disponíveis. Reset Claude às 03h não libera o
+teto interno. Sem aumento de limite, fallback pago, aprovação ou publicação.
+Quatro falhas de coleta permanecem pendentes; Stripe continua pausada.
+Nesta rodada houve somente leitura operacional e atualização de memória/documentos.
+
 ## Execução periódica — 22h53 BRT
 
 Inspeção real pelo terminal Maestro confirmou apenas três rotinas habilitadas,
