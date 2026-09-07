@@ -2,6 +2,36 @@
 
 Verificação de 06/09/2026, aproximadamente 17h43 BRT. Stripe permanece pausada.
 
+## Execução periódica — 22h53 BRT
+
+Inspeção real pelo terminal Maestro confirmou apenas três rotinas habilitadas,
+sem duplicatas. O histórico do preflight registra execução periódica e
+recolhimento: cinco trabalhos autorais concluídos (`author:1`, `author:5`,
+`author:3`, `author:6`, `author:7`) importaram respectivamente 5, 5, 4, 3 e 5
+questões. Total **22 novas em rascunho**, 17 posteriores ao piloto inicial.
+SQL confirmou todas as 22 sem revisor humano ou declaração humana presumida.
+Acervo: 368 questões, sendo 312 revisadas, 12 pendentes e 44 rascunhos; 75 produtos.
+
+Às 22h45, dois disparos quase simultâneos do Autor reservaram trabalhos distintos
+(`author:8` e `author:9`). O agente confirmou estar concluindo ambos. A ponte
+local foi reforçada com exclusão por papel entre processos e recusa de reserva
+enquanto houver pacote ativo sem recibo. Um teste real de `poll --agent=Autor`
+retornou `agent_has_active_lease`, saída 3, sem reservar nem chamar IA. As reservas
+antigas foram preservadas; nenhuma interrupção do Autor ou edição de sua resposta.
+
+Validação final: lint, typecheck, 1.319 testes e build aprovados (230 testes
+opcionais pulados). A correção é da ponte executada no Mac; runtime da aplicação
+e coletor permanece `798c404`, sem necessidade de rebuild/restart em produção.
+O teto observado era 22/24 reservas por 24 horas; não foi aumentado. A trava é
+local e não autoriza operar outro host simultaneamente sem coordenação adicional.
+
+Sete mapeamentos preparados, dois bloqueados, três análises normativas bloqueadas;
+124 mapeamentos pendentes e um em execução no instante consultado. Quatro falhas
+de captura permanecem conforme seção abaixo. Radar ainda aguarda o reset Claude.
+Stripe pausada; nenhuma publicação ou liberação de produto. As quatro notas do
+canvas ainda não receberam esta atualização: o Mac bloqueou antes do comando.
+Script privado `.local/maestri/update-steady-state.cjs` preparado, não executado.
+
 ## Atualização final de infraestrutura — 20h03 BRT
 
 Aplicação e worker editorial reconstruídos e publicados em `798c404`, iniciados

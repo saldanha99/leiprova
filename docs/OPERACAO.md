@@ -3,6 +3,20 @@
 Documento de contexto para quem for continuar o projeto — pessoa ou assistente de IA.
 Descreve onde as coisas estão, como publicar e quais armadilhas já custaram tempo.
 
+**Execução periódica comprovada (06/09, 22h53 BRT):** cinco tarefas autorais
+concluídas e 22 inéditas importadas em rascunho, sendo 17 recolhidas nas rotinas
+após o piloto. Banco: 368 questões (312 revisadas, 12 pendentes, 44 rascunhos),
+75 produtos preservados. Nenhuma publicação/revisão humana presumida. Inspeção
+pelo Maestro confirmou somente três rotinas habilitadas. Dois disparos quase
+simultâneos do Autor reservaram tarefas distintas (`author:8`/`author:9`); o nó
+estava concluindo ambas, sem interrupção. Ponte local agora serializa operações
+por papel e recusa nova reserva com pacote ativo sem recibo. Teste real recusou
+nova reserva sem consumir orçamento. Lint, typecheck, 1.319 testes e build
+aprovados; 230 testes opcionais pulados. Mudança executa no Mac: não é necessário
+recriar app ou worker. Quatro falhas de captura continuam pendentes, Radar espera
+reset Claude, Stripe permanece pausada. As notas visuais ainda estão antigas:
+Mac bloqueou antes da atualização; script privado preparado, NÃO executado.
+
 Última aplicação verificada: 06/09/2026, 20h03 BRT (23h03 UTC).
 Ativação local Maestri: 06/09/2026, 19h42 BRT, sem novo deploy da aplicação.
 As seções antigas abaixo são histórico; consulte os registros recentes antes de operar.

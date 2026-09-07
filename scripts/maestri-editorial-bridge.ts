@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 import { z } from "zod";
 import { agentWorkKindSchema, validateAgentWorkResult, workPayloadSchema, AGENT_FOR_WORK } from "../src/lib/editorial/agent-work-contract";
 import { settleLocalAgentResults } from "../src/lib/editorial/local-agent-results";
+import { hasPendingLocalAgentLease, withLocalAgentLock } from "../src/lib/editorial/local-agent-dispatch";
 
 const root=fileURLToPath(new URL("../",import.meta.url));
 const queueRoot=path.join(root,".local/maestri/queue");
@@ -65,7 +66,13 @@ async function main() {
   const mode=process.argv[2];
   if(mode==="--mode=poll" && (process.argv.length===3 || (process.argv.length===4 && process.argv[3].startsWith("--agent=")))) {
     const queues=await roleQueues();
-    const response=remote("claim",undefined,process.argv[3]?.replace(/^--agent=/,""));
+    const agent=z.enum(["Radar","Guardião","Autor"]).parse(process.argv[3]?.replace(/^--agent=/,""));
+    const dispatch=await withLocalAgentLock(queueRoot,agent,async()=>{
+    const directories=[queueRoot,queues[agent]].filter((value):value is string=>Boolean(value));
+    if(await hasPendingLocalAgentLease(directories,agent)) {
+      console.log(JSON.stringify({state:"idle",reason:"agent_has_active_lease"}));process.exitCode=3;return;
+    }
+    const response=remote("claim",undefined,agent);
     const parsed=claimSchema.safeParse(response);
     if(!parsed.success) {
       const idle=z.object({state:z.enum(["idle","budget_exhausted"])}).parse(response);
@@ -80,11 +87,14 @@ async function main() {
     const responsePath=path.join(directory,"response.json");
     console.log(JSON.stringify({agent:claim.agent,jobKey:claim.job.jobKey,packet,responsePath,
       instruction:"Leia docs/MAESTRI-MOTORES-AUTOMATICOS.md. Execute somente esta tarefa e salve response.json no contrato indicado. Não publicar, não modificar banco, não compartilhar segredos."}));
+    });
+    if(!dispatch.acquired){console.log(JSON.stringify({state:"idle",reason:"agent_dispatch_locked"}));process.exitCode=3;}
   } else if(mode==="--mode=complete" && process.argv.length===4) {
     const packet=path.resolve(process.argv[3]);
     console.log(JSON.stringify(await completePacket(packet)));
   } else if(mode==="--mode=settle" && process.argv.length===4 && process.argv[3].startsWith("--agent=")) {
     const agent=z.enum(["Radar","Guardião","Autor"]).parse(process.argv[3].slice(8));
+    const settlement=await withLocalAgentLock(queueRoot,agent,async()=>{
     const queues=[queueRoot,(await roleQueues())[agent]].filter((value):value is string=>Boolean(value));
     const summary={attempted:0,completed:0,failed:0};
     for(const directory of queues) {
@@ -92,7 +102,9 @@ async function main() {
       summary.attempted+=next.attempted;summary.completed+=next.completed;summary.failed+=next.failed;
     }
     console.log(JSON.stringify(summary));
+    });
+    if(!settlement.acquired)console.log(JSON.stringify({attempted:0,completed:0,failed:0,reason:"agent_dispatch_locked"}));
   } else if(mode==="--mode=status" && process.argv.length===3) console.log(JSON.stringify(remote("status")));
-  else throw new Error("Use --mode=poll, --mode=status ou --mode=complete CAMINHO_PACKET.");
+  else throw new Error("Use --mode=poll --agent=NOME, --mode=settle --agent=NOME, --mode=status ou --mode=complete CAMINHO_PACKET.");
 }
 main().catch((error:unknown)=>{console.error(error instanceof Error && /^(Ponte indisponível|Use |Arquivo |Papel |Fundamento |Reserva )/.test(error.message)?error.message:"Falha segura na ponte editorial; nenhum conteúdo foi publicado.");process.exitCode=1;});

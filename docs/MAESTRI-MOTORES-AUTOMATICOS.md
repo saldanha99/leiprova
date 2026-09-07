@@ -30,6 +30,14 @@ Uma confirmação idêntica pode ser repetida após perda da resposta de rede: o
 recibo já aplicado é devolvido, sem reinserir questões. Resposta alterada é recusada.
 Sem saldo de assinatura: registrar bloqueio e parar, sem API paga alternativa.
 
+Após dois disparos simultâneos observados em 06/09 às 22h45 BRT, a ponte local
+passou a serializar reserva/recolhimento por papel e recusar nova reserva enquanto
+existe pacote local sem recibo com prazo ativo. O papel é obrigatório no `poll`.
+A proteção é por instalação local, não substitui coordenação entre dois hosts.
+Travas privadas `.local/maestri/queue/.dispatch-NOME.lock` são removidas ao
+terminar normalmente; após queda abrupta, inspecionar processos e reservas antes
+de remover uma trava abandonada. Não há tomada automática por timeout.
+
 O resultado do Guardião alimenta automaticamente uma tarefa do Autor. A entrega
 do Autor é validada contra o corpus recebido e, se válida, importada **somente
 como rascunho**, com alternativas e relação ao concurso exato. Não muda o status
