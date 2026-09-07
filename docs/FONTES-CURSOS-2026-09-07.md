@@ -1,5 +1,23 @@
 # Fontes individuais — 07/09/2026
 
+**Estado final: SOMENTE LOCAL, commit de código `6882945`.** Publicação bloqueada
+por autenticação GitHub inválida no Mac; acesso SSH GitHub também recusado e
+conector alternativo com `push: false`. Não houve contorno nem troca de conta.
+GitHub e fonte VPS permanecem `af24bbc`; worker segue `26e6359`. A tentativa de
+build isolado foi encerrada antes da conclusão; nenhum serviço foi recriado.
+Em produção continuam **38 entradas pendentes + 37 bloqueadas**, não 43/32.
+As quatro notas do Maestri receberam esse estado e foram relidas pelo CLI oficial;
+três rotinas existentes permanecem habilitadas. Recibo privado:
+`.local/maestri/pending-discovery-handoff-20260907.json`.
+
+Backup adicional validado na VPS:
+`backups/leiprova-before-discovery-sources-20260907.dump`, 10.650.937 bytes,
+modo 600, SHA-256
+`f51ba63cc50ebfab9301b289e67bf303609d39f2895a2c03a040257e8f41e1d1`.
+Nenhuma escrita de conteúdo ou produto no banco. A retomada depende de restaurar
+a autenticação GitHub do proprietário; depois conferir divergências, sincronizar
+por fast-forward e publicar somente o worker, verificando entrada idempotente.
+
 ## Conferência e mudança
 
 Navegação com a skill `agent-browser`, sessão exclusiva, páginas públicas e

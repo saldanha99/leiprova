@@ -3,6 +3,19 @@
 Documento de contexto para quem for continuar o projeto — pessoa ou assistente de IA.
 Descreve onde as coisas estão, como publicar e quais armadilhas já custaram tempo.
 
+**Correção de fontes preparada, NÃO publicada (07/09, ~02h57 BRT):** código
+`6882945` admite páginas públicas delimitadas de quatro órgãos para pesquisa do
+Radar, após navegação/robots conferidos; cinco cursos destravados no ensaio local
+(43 pendentes/32 bloqueados). GitHub CLI perdeu autenticação; SSH GitHub recusado
+e conector alternativo sem escrita. GitHub/VPS continuam `af24bbc`, worker
+`26e6359`; produção continua 38 pendentes/37 bloqueados. Quatro notas Maestri
+atualizadas e relidas, três rotinas mantidas. 1.347 testes, lint, typecheck e build
+passaram, 232 opcionais pulados. Sem novo conteúdo, fonte aprovada, associação,
+migração, alteração comercial ou de segredo. Backup adicional validado na VPS;
+build isolado interrompido, nenhum serviço recriado. Necessária reautenticação
+GitHub do proprietário antes de sincronizar/publicar. Ver
+`docs/FONTES-CURSOS-2026-09-07.md` para fontes, limitações autorais e retomada.
+
 **Entrada editorial dos 75 cursos publicada (07/09, 00h54 BRT):** worker
 editorial atualizado para `26e6359`, imagem
 `sha256:21607c80b892adb92815f8dfd2159f9cd38b4b9339c943458e74d72237dffdaf`.
