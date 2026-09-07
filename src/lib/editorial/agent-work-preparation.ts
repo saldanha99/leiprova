@@ -5,6 +5,7 @@ import { enqueueAgentWork, requirementContext, type AgentDatabase } from "./agen
 import { STYLE_PROFILE_SEEDS } from "./style-profiles";
 import { suggestLegalRequirementMapping, type MappingArticle } from "./legal-requirement-mapping";
 import { discoveryPortalPolicy } from "./discovery-policy";
+import { prepareCourseIntake } from "./course-intake";
 
 type Requirement = { id:number; opportunityId:number; text:string; locator:string; title:string;
   role:string; year:number; jurisdiction:string; documentUrl:string; bank:string|null;
@@ -91,6 +92,7 @@ export async function prepareAgentWork(db:AgentDatabase, now=new Date(), options
   // A confirmação de uma resposta não deve repetir a busca completa no corpus.
   // A preparação integral continua no ciclo de seis horas da VPS.
   if(options.followupsOnly) return {mappings,authoring,discovery,legalChanges,humanReviewRequired:true,publicationAllowed:false};
+  const courseIntake=await prepareCourseIntake(db);
   const portals=await db.execute<{bank:string; url:string}>(sql`
     select b.slug bank,p.official_url url from exam_source_portals p join quiz_banks b on b.id=p.quiz_bank_id
     where p.is_active and b.is_active order by b.slug
@@ -124,5 +126,5 @@ export async function prepareAgentWork(db:AgentDatabase, now=new Date(), options
       instructions:"Verifique a fonte normativa oficial usando agent-browser. Explique alteração ou ausência de mudança material, vigência e limitações. Não ativar versão, não marcar revisão humana nem publicar questões. Registre evidências e encaminhe à revisão administrativa.",
       context:{snapshotId:change.id,checksum:change.checksum,status:change.status,humanReviewRequired:true}})) legalChanges++;
   }
-  return {mappings,authoring,discovery,legalChanges,humanReviewRequired:true,publicationAllowed:false};
+  return {mappings,authoring,discovery,legalChanges,courseIntake,humanReviewRequired:true,publicationAllowed:false};
 }

@@ -5,11 +5,12 @@ import { z } from "zod";
 import * as schema from "../src/lib/db/schema";
 import { agentWorkSummary, claimAgentWork, completeAgentWork } from "../src/lib/editorial/agent-work-queue";
 import { prepareAgentWork } from "../src/lib/editorial/agent-work-preparation";
+import { prepareCourseIntake } from "../src/lib/editorial/course-intake";
 
 async function main() {
   const mode=process.argv[2]?.replace(/^--mode=/,"");
   const agent=process.argv[3]?.replace(/^--agent=/,"");
-  if(!["prepare","claim","complete","status"].includes(mode??"") || process.argv.length>4 ||
+  if(!["prepare","prepare-courses","claim","complete","status"].includes(mode??"") || process.argv.length>4 ||
     (agent && (mode!=="claim" || !["Radar","Guardião","Autor"].includes(agent) || !process.argv[3].startsWith("--agent=")))) throw new Error("Modo inválido.");
   if(process.env.EDITORIAL_AGENT_BRIDGE_ENABLED!=="true") throw new Error("Ponte editorial desativada.");
   const url=process.env.DATABASE_URL;
@@ -23,6 +24,7 @@ async function main() {
     if(identity.name!=="leiprova" || identity.role!=="leiprova_app" || identity.superuser) throw new Error("Destino/privilégios não autorizados.");
     let result:unknown;
     if(mode==="prepare") result=await prepareAgentWork(db);
+    else if(mode==="prepare-courses") result=await prepareCourseIntake(db);
     else if(mode==="claim") result=await claimAgentWork(db,new Date(),agent);
     else if(mode==="status") result=await agentWorkSummary(db);
     else {

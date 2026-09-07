@@ -7,6 +7,7 @@ import * as schema from "@/lib/db/schema";
 import { AGENT_WORK_VERSION,type AgentWorkPayload } from "@/lib/editorial/agent-work-contract";
 import { enqueueAgentWork,claimAgentWork,completeAgentWork,requirementContext } from "@/lib/editorial/agent-work-queue";
 import { prepareAgentWork } from "@/lib/editorial/agent-work-preparation";
+import { prepareCourseIntake } from "@/lib/editorial/course-intake";
 
 const url=process.env.LEIPROVA_TEST_DATABASE_URL;
 if(url){const parsed=new URL(url);if(!["localhost","127.0.0.1","[::1]"].includes(parsed.hostname)||parsed.pathname!=="/leiprova_automation_test")throw new Error("Somente banco de teste em loopback.");}
@@ -38,6 +39,38 @@ describe.skipIf(!url)('ponte editorial — PostgreSQL isolado',()=>{
   beforeAll(async()=>{expect((await db!.execute<{name:string}>(sql`select current_database() name`))[0].name).toBe('leiprova_automation_test');});
   beforeEach(async()=>{await db!.execute(sql`delete from editorial_agent_runs`);await db!.execute(sql`delete from editorial_agent_work`);});
   afterAll(async()=>{await client?.end();});
+  it('inclui produto novo sem inventar fonte e não duplica ordens nem aprova produtos',async()=>{
+    const slug=`intake-test-${randomUUID()}`;
+    await db!.insert(schema.contestStoreProducts).values({slug});
+    const before=(await db!.select().from(schema.contestStoreProducts).where(eq(schema.contestStoreProducts.slug,slug)))[0];
+    const first=await prepareCourseIntake(db!);
+    expect(first.enqueued).toBeGreaterThan(0);
+    expect((await prepareCourseIntake(db!)).enqueued).toBe(0);
+    const [job]=await db!.execute<{status:string;payload:AgentWorkPayload}>(sql`select status,payload from editorial_agent_work where job_key=${`course-intake:${slug}`}`);
+    expect(job.status).toBe('blocked');
+    expect(job.payload.context.productSlug).toBe(slug);
+    expect(job.payload.context.minimumQuestionCount).toBe(68);
+    expect(job.payload.sourceUrls).toEqual([]);
+    const after=(await db!.select().from(schema.contestStoreProducts).where(eq(schema.contestStoreProducts.slug,slug)))[0];
+    expect(after).toEqual(before);
+    await db!.delete(schema.contestStoreProducts).where(eq(schema.contestStoreProducts.slug,slug));
+  });
+  it('cria entrada com papel restrito e não reinicia pesquisa de produto retirado',async()=>{
+    const slug='tj-rs-juiz-de-direito-2026';
+    await db!.insert(schema.contestStoreProducts).values({slug}).onConflictDoNothing();
+    const restrictedClient=postgres(url!,{max:1,prepare:false,connection:{options:'-c role=leiprova_app'}});
+    try {
+      const restricted=drizzle(restrictedClient,{schema});
+      await prepareCourseIntake(restricted);
+      const [job]=await db!.execute<{status:string}>(sql`select status from editorial_agent_work where job_key=${`course-intake:${slug}`}`);
+      expect(job.status).toBe('pending');
+      await db!.update(schema.contestStoreProducts).set({status:'retired'}).where(eq(schema.contestStoreProducts.slug,slug));
+      await prepareCourseIntake(restricted);
+      const [retired]=await db!.execute<{status:string}>(sql`select status from editorial_agent_work where job_key=${`course-intake:${slug}`}`);
+      expect(retired.status).toBe('superseded');
+    }finally{await restrictedClient.end();}
+    await db!.delete(schema.contestStoreProducts).where(eq(schema.contestStoreProducts.slug,slug));
+  });
   it('reserva concorrente não duplica tarefa e respeita papel',async()=>{
     await enqueueAgentWork(db!,'test:1','discovery',discoveryPayload());
     expect((await claimAgentWork(db!,new Date(),'Autor')).state).toBe('idle');

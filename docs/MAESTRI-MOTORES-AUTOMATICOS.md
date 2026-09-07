@@ -7,6 +7,35 @@ operacional deve confirmar quais componentes foram efetivamente ativados.
 
 ## Responsabilidades
 
+### Entrada por curso e novos produtos (07/09/2026)
+
+O ciclo completo da VPS inclui `prepareCourseIntake`: cada produto não retirado
+e ainda sem edição associada recebe uma ordem estável `course-intake:SLUG` para
+o Radar, com identidade individual, meta de 68 e pesquisa pública existente.
+Novos produtos entram no ciclo seguinte; não dependem de uma lista fixa de 75.
+Sem identidade/pesquisa/fonte admitida pela política, a ordem fica bloqueada com
+motivo, em vez de desaparecer da fila ou consumir uma chamada de IA sem insumo.
+Produtos com edição associada continuam no fluxo de requisitos da edição;
+ordens de descoberta pendentes são encerradas quando associados ou retirados.
+
+O Radar deve confirmar edital/retificações, cargo, banca, UF, programa e corte
+normativo antes de encaminhar a revisão. A hipótese da pesquisa não é banca
+confirmada. As ordens não usam URLs do concorrente nem ampliam a lista de fontes.
+Editais históricos e pré-editais não viram ofertas atuais automaticamente.
+A mesma entrada/identidade não recria tarefas a cada ciclo; mudança de insumo
+invalida a reserva anterior. A preparação não gasta reservas nem chama API paga.
+
+Essa entrada não elimina os passos humanos pendentes: associação produto–edição,
+revisão de fonte/programa, questões e aderência de cada vínculo. Não distribui
+todo o acervo em todos os produtos. O gerador segue a banca E o cargo do pacote
+validado e produz rascunhos. Meta registrada não significa 68 entregues ou curso
+liberado. O teto compartilhado de 24 reservas/24h permanece inalterado.
+
+Operador de preparação pontual no worker (sem coleta nem geração):
+`scripts/editorial-agent-work.ts --mode=prepare-courses`, pelo mesmo comando
+tsx com `--env-file-if-exists=.env`. Exige a identidade restrita de banco e a
+flag já verificadas pela ponte. Veja registro de publicação antes de executá-lo.
+
 - VPS: captura de PDFs oficiais, monitor de normas, preparação e armazenamento
   durável dos trabalhos. Não depende do Mac para preservar a fila.
 - Radar: descoberta nos portais cadastrados de FGV e Cebraspe e nos índices
