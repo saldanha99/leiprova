@@ -9,6 +9,9 @@ describe("privilégios do app em produção", () => {
     expect(grants).toContain("grant select, insert, update on purchase_delivery_outbox to :app_user;");
     expect(grants).toContain("grant select, insert on purchase_delivery_events to :app_user;");
     expect(grants).toContain("grant execute on function public.lock_product_binding_review_product(text) to :app_user;");
+    expect(grants).toContain(
+      "grant execute on function public.lock_exam_document_review_edition(bigint) to :app_user;",
+    );
     expect(grants).toMatch(/grant update \(\s*status, reviewed_by_user_id, reviewed_at, review_notes, updated_at\s*\) on contest_product_question_bindings to :app_user;/);
     expect(grants).not.toMatch(/grant update[^;]*on contest_store_products to :app_user;/);
     expect(grants).not.toMatch(/grant[^;]*delete[^;]*on purchase_delivery_(?:outbox|events)/);
@@ -34,6 +37,9 @@ describe("privilégios do app em produção", () => {
       /grant update \(\s*editorial_status,\s*created_by_user_id,\s*reviewed_by_user_id,\s*clean_room_attested_at,\s*submitted_at,\s*review_notes,\s*similarity_max_bps,\s*similarity_reference_public_id,\s*originality_checked_at,[\s\S]*?\) on questions to :app_user;/,
     );
     expect(grants).toMatch(/grant insert \([\s\S]*question_id,[\s\S]*\) on question_options to :app_user;/);
+    expect(grants).toMatch(
+      /grant insert \([\s\S]*exam_edition_id,\s*exam_edition_document_id,\s*exam_edition_answer_key_document_id,\s*exam_edition_answer_key_document_type,\s*type,[\s\S]*\) on questions to :app_user;/,
+    );
     expect(grants).toContain("questions_id_seq");
     expect(grants).toContain("question_options_id_seq");
   });
@@ -47,13 +53,59 @@ describe("privilégios do app em produção", () => {
       /grant insert \([\s\S]*source_external_id,[\s\S]*source_content_stored,[\s\S]*\) on exam_editions to :app_user;/,
     );
     expect(grants).toMatch(
-      /grant update \(\s*title,\s*organizer,\s*jurisdiction,\s*official_url,\s*exam_date,\s*duration_minutes,\s*source_checked_at,\s*updated_at\s*\) on exam_editions to :app_user;/,
+      /grant insert \([\s\S]*bank_id,\s*institution_acronym,\s*jurisdiction_code,\s*source_external_id,[\s\S]*\) on exam_editions to :app_user;/,
+    );
+    expect(grants).toMatch(
+      /grant update \(\s*title,\s*organizer,\s*jurisdiction,\s*official_url,\s*exam_date,\s*duration_minutes,\s*published_at,\s*status,\s*source_policy,\s*source_content_stored,\s*source_checked_at,\s*updated_by_user_id,\s*updated_at\s*\) on exam_editions to :app_user;/,
     );
     expect(grants).not.toMatch(
       /grant insert \([^;]*\b(?:published_at|status)\b[^;]*\) on exam_editions to :app_user;/,
     );
+    const examEditionUpdateGrant =
+      grants.match(/grant update \([^;]+\) on exam_editions to :app_user;/)?.[0] ?? "";
+    expect(examEditionUpdateGrant).not.toMatch(
+      /\b(?:institution_acronym|jurisdiction_code)\b/,
+    );
     expect(grants).toContain("legal_source_snapshots_id_seq");
     expect(grants).toContain("exam_editions_id_seq");
+  });
+
+  it("mantém licença e identidade da prova anterior imutáveis após a proposta", () => {
+    expect(grants).toMatch(/exam_edition_documents,/);
+    expect(grants).toMatch(/contest_product_exam_references,/);
+    expect(grants).toMatch(
+      /grant insert \(\s*public_id,\s*exam_edition_id,\s*document_type,[\s\S]*?expected_question_count,[\s\S]*?license_expires_at,\s*initiated_by_user_id\s*\) on exam_edition_documents to :app_user;/,
+    );
+    expect(grants).toMatch(
+      /grant update \(\s*http_status,\s*source_checked_at,\s*status,\s*reviewed_by_user_id,\s*reviewed_at,\s*review_notes,\s*updated_at\s*\) on exam_edition_documents to :app_user;/,
+    );
+    expect(grants).toMatch(
+      /grant insert \(\s*public_id,\s*product_slug,\s*exam_edition_id,\s*primary_document_id,\s*primary_document_type,\s*answer_key_document_id,\s*answer_key_document_type,\s*relationship,\s*selection_verified_at,\s*initiated_by_user_id\s*\) on contest_product_exam_references to :app_user;/,
+    );
+    expect(grants).toMatch(
+      /grant update \(\s*selection_verified_at,\s*status,\s*reviewed_by_user_id,\s*reviewed_at,\s*review_notes,\s*updated_at\s*\) on contest_product_exam_references to :app_user;/,
+    );
+
+    const documentReviewGrant =
+      grants.match(
+        /grant update \([^;]+\) on exam_edition_documents to :app_user;/,
+      )?.[0] ?? "";
+    expect(documentReviewGrant).not.toMatch(
+      /\b(?:expected_question_count|rights_holder|license_basis|license_reference|licensed_at|license_expires_at|storage_key|source_url)\b/,
+    );
+
+    const referenceReviewGrant =
+      grants.match(
+        /grant update \([^;]+\) on contest_product_exam_references to :app_user;/,
+      )?.[0] ?? "";
+    expect(referenceReviewGrant).not.toMatch(
+      /\b(?:product_slug|exam_edition_id|primary_document_id|answer_key_document_id|relationship)\b/,
+    );
+    expect(grants).toContain("exam_edition_documents_id_seq");
+    expect(grants).toContain("contest_product_exam_references_id_seq");
+    expect(grants).not.toMatch(
+      /grant execute on function public\.guard_previous_exam_question_(?:review|options)\(\) to :app_user/,
+    );
   });
 
   it("limita a captura e ativação do corpus legal às colunas auditadas", () => {

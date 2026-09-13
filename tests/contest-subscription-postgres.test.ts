@@ -27,7 +27,13 @@ const stripe = vi.hoisted(() => ({
   invoicePayments: { list: vi.fn() },
   paymentIntents: { retrieve: vi.fn() },
 }));
+const content = vi.hoisted(() => ({
+  coverage: vi.fn().mockResolvedValue(true),
+}));
 vi.mock("@/lib/stripe", () => ({ getStripeClient: () => stripe }));
+vi.mock("@/lib/commerce/store", () => ({
+  hasSellableContestProductCoverage: content.coverage,
+}));
 import { processContestSubscriptionEvent } from "@/lib/commerce/subscription-webhook";
 import { getStudyEntitlement } from "@/lib/study/entitlement";
 
@@ -121,6 +127,20 @@ describe.skipIf(!db)(
       f.invoice.status = "open";
       await processContestSubscriptionEvent(f.event);
       expect(await purchases(f.id)).toHaveLength(0);
+    });
+    it("falha fechado quando a licença não cobre o fim do período pago", async () => {
+      const f = await fixture();
+      content.coverage.mockResolvedValueOnce(false);
+      await expect(processContestSubscriptionEvent(f.event)).rejects.toThrow(
+        "não cobre integralmente",
+      );
+      expect(await purchases(f.id)).toHaveLength(0);
+      expect(content.coverage).toHaveBeenCalledWith(
+        slug,
+        opportunityId,
+        new Date(f.end * 1000),
+        expect.anything(),
+      );
     });
     it.each([false, true])(
       "concede apenas o período pago; anual=%s; sem Master",

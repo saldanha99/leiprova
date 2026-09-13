@@ -13,6 +13,7 @@ import {
   quizCareerSpecializations,
   quizCareerTracks,
 } from "@/lib/db/schema";
+import { brazilianJurisdictionCodeSchema } from "@/lib/opportunities/domain";
 import { parseOfficialExamUrl } from "@/lib/official-sources/exam-registry";
 
 const slugSchema = z
@@ -37,6 +38,27 @@ function normalizedTextSchema(minimum: number, maximum: number) {
     .pipe(z.string().min(minimum).max(maximum));
 }
 
+export const institutionAcronymSchema = z
+  .string()
+  .transform((value) =>
+    value.replace(/\s+/g, " ").trim().toLocaleUpperCase("pt-BR"),
+  )
+  .pipe(
+    z
+      .string()
+      .min(2, "Informe a sigla do órgão ou instituição.")
+      .max(80, "A sigla do órgão ou instituição deve ter no máximo 80 caracteres.")
+      .regex(
+        /^[\p{Lu}\p{N}][\p{Lu}\p{N} .&/()ªº-]*$/u,
+        "A sigla do órgão ou instituição contém caracteres inválidos.",
+      ),
+  );
+
+export const normalizedBrazilianJurisdictionCodeSchema = z
+  .string()
+  .transform((value) => value.trim().toUpperCase())
+  .pipe(brazilianJurisdictionCodeSchema);
+
 function isIsoCalendarDate(value: string) {
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
   if (!match) return false;
@@ -60,6 +82,8 @@ export const discoveredExamEditionSchema = z
     bankSlug: slugSchema,
     careerSlug: slugSchema,
     specializationSlug: slugSchema.optional(),
+    institutionAcronym: institutionAcronymSchema,
+    jurisdictionCode: normalizedBrazilianJurisdictionCodeSchema,
     sourceExternalId: sourceExternalIdSchema,
     title: normalizedTextSchema(3, 300),
     organizer: normalizedTextSchema(2, 200),
@@ -80,6 +104,8 @@ export type DiscoveredExamEdition = {
   bankSlug: string;
   careerSlug: string;
   specializationSlug: string | null;
+  institutionAcronym: string;
+  jurisdictionCode: z.infer<typeof brazilianJurisdictionCodeSchema>;
   sourceExternalId: string;
   title: string;
   organizer: string;
@@ -136,6 +162,8 @@ export type ExistingExamEditionSyncState = {
   bankId: number;
   careerTrackId: number;
   specializationId: number | null;
+  institutionAcronym: string | null;
+  jurisdictionCode: string | null;
   sourceExternalId: string | null;
   title: string;
   organizer: string | null;
@@ -179,6 +207,7 @@ export class ExamEditionSyncConflictError extends Error {
   constructor(
     readonly code:
       | "identity_mismatch"
+      | "institution_scope_mismatch"
       | "taxonomy_move"
       | "source_policy_conflict"
       | "source_url_conflict"
@@ -216,6 +245,16 @@ export function planExamEditionMetadataSync(
     throw new ExamEditionSyncConflictError(
       "taxonomy_move",
       "A mesma identidade externa já pertence a outra carreira ou especialização.",
+    );
+  }
+
+  if (
+    existing.institutionAcronym !== discovered.institutionAcronym ||
+    existing.jurisdictionCode !== discovered.jurisdictionCode
+  ) {
+    throw new ExamEditionSyncConflictError(
+      "institution_scope_mismatch",
+      "A mesma identidade externa já pertence a outro órgão ou jurisdição.",
     );
   }
 
@@ -351,6 +390,8 @@ export async function syncDiscoveredExamEdition(input: unknown): Promise<ExamEdi
         bankId: bank.id,
         careerTrackId: career.id,
         specializationId,
+        institutionAcronym: discovered.institutionAcronym,
+        jurisdictionCode: discovered.jurisdictionCode,
         sourceExternalId: discovered.sourceExternalId,
         title: discovered.title,
         organizer: discovered.organizer,
@@ -379,6 +420,8 @@ export async function syncDiscoveredExamEdition(input: unknown): Promise<ExamEdi
           bankSlug: discovered.bankSlug,
           careerSlug: discovered.careerSlug,
           specializationSlug: discovered.specializationSlug,
+          institutionAcronym: discovered.institutionAcronym,
+          jurisdictionCode: discovered.jurisdictionCode,
           sourceExternalId: discovered.sourceExternalId,
           sourceObservedAt: discovered.sourceObservedAt,
           officialHost: new URL(discovered.officialUrl).hostname,
@@ -401,6 +444,8 @@ export async function syncDiscoveredExamEdition(input: unknown): Promise<ExamEdi
         bankId: examEditions.bankId,
         careerTrackId: examEditions.careerTrackId,
         specializationId: examEditions.specializationId,
+        institutionAcronym: examEditions.institutionAcronym,
+        jurisdictionCode: examEditions.jurisdictionCode,
         sourceExternalId: examEditions.sourceExternalId,
         title: examEditions.title,
         organizer: examEditions.organizer,
@@ -457,6 +502,8 @@ export async function syncDiscoveredExamEdition(input: unknown): Promise<ExamEdi
       entityId: existing.publicId,
       metadata: {
         bankSlug: discovered.bankSlug,
+        institutionAcronym: discovered.institutionAcronym,
+        jurisdictionCode: discovered.jurisdictionCode,
         sourceExternalId: discovered.sourceExternalId,
         sourceObservedAt: discovered.sourceObservedAt,
         officialHost: new URL(discovered.officialUrl).hostname,

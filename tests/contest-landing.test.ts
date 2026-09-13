@@ -7,6 +7,7 @@ import { describe, expect, it } from "vitest";
 import { ContestLanding } from "@/components/contests/contest-landing";
 import { PublicGuideShell } from "@/components/content/public-guide-shell";
 import type { PublicContestOpportunity } from "@/lib/db/contest-opportunities";
+import type { PublicContestExamReference } from "@/lib/exams/public-exam-reference-policy";
 import { contestCategories } from "@/lib/opportunities/categories";
 import {
   contestPlanCta,
@@ -44,10 +45,42 @@ const opportunity: PublicContestOpportunity = {
   bankName: null,
 };
 
+const lastExam: PublicContestExamReference = {
+  edition: {
+    publicId: "pc-ba-delegado-2022",
+    title: "PC-BA 2022 — Delegado",
+    examDate: "2022-07-24",
+    bank: { slug: "cebraspe", name: "Cebraspe" },
+  },
+  questionBooklet: {
+    publicId: "pc-ba-2022-caderno",
+    documentType: "question_booklet",
+    title: "Caderno de questões — Delegado",
+    officialUrl: "https://cdn.cebraspe.org.br/pc-ba-2022/prova.pdf",
+    accessType: "external_link",
+    licenseLabel: "Consulta na fonte oficial",
+    sourceCheckedAt: new Date("2026-09-10T12:00:00.000Z"),
+    questionCount: 100,
+  },
+  answerKeys: [
+    {
+      publicId: "pc-ba-2022-gabarito",
+      documentType: "answer_key",
+      title: "Gabarito definitivo",
+      officialUrl: "https://cdn.cebraspe.org.br/pc-ba-2022/gabarito.pdf",
+      accessType: "external_link",
+      licenseLabel: "Licença de uso registrada",
+      sourceCheckedAt: new Date("2026-09-10T12:00:00.000Z"),
+      questionCount: null,
+    },
+  ],
+};
+
 function render(
   overrides: Partial<PublicContestOpportunity> = {},
   commerceOpen = false,
   contactOpen = true,
+  examReference: PublicContestExamReference | null = null,
 ) {
   return renderToStaticMarkup(
     createElement(ContestLanding, {
@@ -55,6 +88,7 @@ function render(
       jurisdictionName: "Brasil",
       commerceOpen,
       contactOpen,
+      lastExam: examReference,
     }),
   );
 }
@@ -127,6 +161,22 @@ describe("página premium compartilhada de concursos", () => {
     expect(render({ registrationEndsAt: "2026-10-12" })).toContain(
       "Até 12 de outubro de 2026 · início ainda não informado",
     );
+  });
+
+  it("mostra a última prova somente quando a referência pública foi aprovada", () => {
+    expect(render()).not.toContain("ultima-prova");
+
+    const html = render({}, false, true, lastExam);
+    expect(html).toContain('id="ultima-prova"');
+    expect(html).toContain("Última prova oficial");
+    expect(html).toContain("PC-BA 2022 — Delegado");
+    expect(html).toContain("24 de julho de 2022");
+    expect(html).toContain("Caderno de questões — Delegado");
+    expect(html).toContain("Gabarito definitivo");
+    expect(html).toContain("LINK EXTERNO");
+    expect(html).toContain("acesso público ao PDF, por si só, não autoriza");
+    expect(html).toContain(lastExam.questionBooklet.officialUrl);
+    expect(html).toContain(lastExam.answerKeys[0].officialUrl);
   });
 
   it("lê os preços do catálogo único e não transforma equivalência em parcelas", () => {

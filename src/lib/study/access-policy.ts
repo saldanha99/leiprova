@@ -10,6 +10,8 @@ const freeQuestionIds = new Set<string>(FREE_STUDY_QUESTION_IDS);
 
 export type StudyEntitlement = {
   hasFullAccess: boolean;
+  /** Fim exclusivo do período Master, usado para revalidar licenças. */
+  accessEndsAt?: Date;
   questionPublicIds?: string[];
 };
 

@@ -1,7 +1,11 @@
 import { describe, expect, it } from "vitest";
 
 import { parseOfficialExamUrl } from "@/lib/official-sources/exam-registry";
-import { extractOfficialDocumentText, normalizeOfficialText } from "@/lib/official-sources/fetch";
+import {
+  extractOfficialDocumentText,
+  looksLikePdf,
+  normalizeOfficialText,
+} from "@/lib/official-sources/fetch";
 import {
   isAllowedOfficialLegalTextUrl,
   OFFICIAL_LEGAL_SOURCES,
@@ -19,6 +23,15 @@ describe("fontes oficiais", () => {
     const text = extractOfficialDocumentText("<html><body><h1>Lei</h1><script>segredo()</script><p>Art. 1º  Texto&nbsp; oficial.</p></body></html>");
     expect(text).toBe("Lei\nArt. 1º Texto oficial.");
     expect(normalizeOfficialText("a   b\n\n\n c")).toBe("a b\n\nc");
+  });
+
+  it("só classifica como PDF quando MIME e assinatura binária coincidem", () => {
+    const pdf = new TextEncoder().encode("%PDF-1.7\nobjeto de teste");
+    const html = new TextEncoder().encode("<html><body>não é PDF</body></html>");
+
+    expect(looksLikePdf(pdf, "application/pdf; charset=binary")).toBe(true);
+    expect(looksLikePdf(html, "application/pdf")).toBe(false);
+    expect(looksLikePdf(pdf, "text/html")).toBe(false);
   });
 
   it("mantém uma URN LexML federal única para cada lei monitorada", () => {

@@ -12,6 +12,11 @@ import {
   users,
 } from "@/lib/db/schema";
 import { getPlan } from "@/lib/plans";
+import { accessEndsAt } from "@/lib/commerce/catalog";
+import {
+  getMasterCatalogCoverageStatus,
+  isMasterCatalogCoverageReady,
+} from "@/lib/commerce/store";
 import {
   getCheckoutAvailability,
   getPublicOrigin,
@@ -74,6 +79,22 @@ export async function POST(request: NextRequest) {
   const expectedLive = stripeKeyExpectsLivemode(process.env.STRIPE_SECRET_KEY?.trim() ?? "");
   if (expectedLive === null) return jsonError("Modo de pagamento indisponível.", 503);
 
+  // A sessão pode ser paga até uma hora depois de criada. A licença precisa
+  // cobrir o período prometido a partir desse pior caso, não apenas hoje.
+  try {
+    const coverage = await getMasterCatalogCoverageStatus(
+      accessEndsAt(new Date(Date.now() + 3600_000), plan.billingMonths),
+    );
+    if (!isMasterCatalogCoverageReady(coverage)) {
+      return jsonError(
+        "O Master está temporariamente indisponível enquanto o catálogo completo é revisado.",
+        409,
+      );
+    }
+  } catch {
+    return jsonError("Não foi possível validar o catálogo do Master.", 503);
+  }
+
   let selection;
   try {
     selection = await db.transaction(async (tx) => {
@@ -121,6 +142,22 @@ export async function POST(request: NextRequest) {
     return jsonError("Esta tentativa foi encerrada. Recarregue a página para começar outra.", 409);
   if (attempt.status === "completed" && !attempt.providerSessionId)
     return jsonError("Pagamento concluído sem sessão local. Fale com o atendimento; não refaça a compra.", 409);
+
+  if (attempt.expiresAt) {
+    try {
+      const coverage = await getMasterCatalogCoverageStatus(
+        accessEndsAt(attempt.expiresAt, plan.billingMonths),
+      );
+      if (!isMasterCatalogCoverageReady(coverage)) {
+        return jsonError(
+          "O catálogo do Master mudou e precisa de nova revisão antes do pagamento.",
+          409,
+        );
+      }
+    } catch {
+      return jsonError("Não foi possível revalidar o catálogo do Master.", 503);
+    }
+  }
 
   const stripe = getStripeClient();
 

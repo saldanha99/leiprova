@@ -275,12 +275,47 @@ describe.skipIf(!testUrl)("importação local — PostgreSQL real com dados sint
       publicId: randomUUID(), careerTrackId: career.id, bankId: f.bank.id,
       title: "Prova licenciada inteiramente fictícia de QA", examDate: "2026-01-01",
     }).returning();
+    const [reviewer] = await database().insert(schema.users).values({
+      publicId: randomUUID(),
+      name: "Revisor independente fictício do importador",
+      email: `licensed-review-${randomUUID()}@example.invalid`,
+      passwordHash: "not-a-password",
+      role: "editor",
+    }).returning();
+    const sourceTitle = "Fixture de licença, sem material real";
+    const sourceUrl = "https://example.invalid/qa";
+    const rightsHolder = "Titular fictício";
+    const licenseBasis = "Licença fictícia de teste";
+    const licenseReference = "QA-local";
+    const [document] = await database().insert(schema.examEditionDocuments).values({
+      publicId: randomUUID(),
+      examEditionId: edition.id,
+      documentType: "question_booklet",
+      title: sourceTitle,
+      sourceUrl,
+      sourceHost: "example.invalid",
+      sourceCheckedAt: now,
+      httpStatus: 200,
+      contentType: "application/pdf",
+      expectedQuestionCount: 1,
+      sourcePolicy: "licensed_content",
+      rightsHolder,
+      licenseBasis,
+      licenseReference,
+      licensedAt: now,
+      status: "approved",
+      initiatedByUserId: f.operator.id,
+      reviewedByUserId: reviewer.id,
+      reviewedAt: now,
+      reviewNotes: "Documento inteiramente sintético revisado para este teste local.",
+    }).returning();
     await database().insert(schema.questions).values({
-      publicId: randomUUID(), subjectId: f.topic.subjectId, examEditionId: edition.id, quizMode: "previous_exam",
+      publicId: randomUUID(), subjectId: f.topic.subjectId, examEditionId: edition.id,
+      examEditionDocumentId: document.id, quizMode: "previous_exam",
       type: "true_false", prompt: f.request.batches[0].questions[1].prompt, explanation: "Item licenciado inventado exclusivamente para teste de software.",
-      topic: "QA", verifiedAt: now, sourceRights: "licensed", sourceTitle: "Fixture de licença, sem material real",
-      sourceUrl: "https://example.invalid/qa", sourceRightsHolder: "Titular fictício", licenseBasis: "Licença fictícia de teste",
-      licenseReference: "QA-local", licensedAt: now, originalQuestionNumber: "1", originalQuestionOrder: 1,
+      topic: "QA", verifiedAt: now, sourceRights: "licensed", sourceTitle,
+      sourceUrl, sourceRightsHolder: rightsHolder, licenseBasis,
+      licenseReference, licensedAt: now, originalQuestionNumber: "1", originalQuestionOrder: 1,
     });
     await expect(importLocalDrafts(database(), { ...f.request, mode: "preview" })).rejects.toThrow("muito semelhante");
     await expect(importLocalDrafts(database(), { ...f.request, mode: "apply", expectedFingerprint: p.fingerprint })).rejects.toThrow("muito semelhante");

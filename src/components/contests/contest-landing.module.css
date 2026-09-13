@@ -990,6 +990,98 @@
   font-size: 11px;
   font-weight: 750;
 }
+.lastExamSection {
+  padding-block: 72px;
+  background:
+    radial-gradient(circle at 13% 5%, color-mix(in srgb, var(--accent), transparent 91%), transparent 34%),
+    #071116;
+}
+.lastExamCard {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(360px, 1.1fr);
+  gap: 60px;
+  align-items: start;
+  padding: 39px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #0b1b1c;
+}
+.lastExamIntro h2 {
+  margin-top: 13px;
+  font-size: clamp(30px, 3.4vw, 43px);
+}
+.lastExamIntro > p {
+  margin-top: 17px;
+  color: #b3c1c1;
+  font-size: 13px;
+  line-height: 1.85;
+}
+.lastExamIntro > p strong {
+  color: #f0f3ef;
+  font-weight: 700;
+}
+.lastExamIntro .lastExamNotice {
+  padding-top: 17px;
+  border-top: 1px solid var(--line);
+  color: #91a6a5;
+  font-size: 11px;
+}
+.lastExamDocuments {
+  display: grid;
+  gap: 11px;
+}
+.examDocumentLink {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 15px;
+  min-height: 92px;
+  padding: 18px;
+  border: 1px solid #91ad9e2c;
+  border-radius: 10px;
+  background: #102720;
+  transition:
+    border-color 0.2s,
+    background 0.2s,
+    transform 0.2s;
+}
+.examDocumentLink:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--accent), transparent 55%);
+  background: #132d25;
+}
+.examDocumentLink > svg {
+  color: var(--accent);
+  flex: none;
+}
+.examDocumentLink > span:not(.sr-only) {
+  min-width: 0;
+}
+.examDocumentLink small,
+.examDocumentLink strong,
+.examDocumentLink em {
+  display: block;
+}
+.examDocumentLink small {
+  color: #91aaa3;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+}
+.examDocumentLink strong {
+  margin-top: 5px;
+  color: #f1f3ef;
+  font-size: 13px;
+  line-height: 1.5;
+  font-weight: 700;
+}
+.examDocumentLink em {
+  margin-top: 4px;
+  color: #9eb4ad;
+  font-size: 9px;
+  line-height: 1.5;
+  font-style: normal;
+}
 .pricingSection {
   background:
     radial-gradient(ellipse at 50% 50%, #25483159, transparent 65%), #081619;
@@ -1381,6 +1473,10 @@
   .editionAside > svg {
     float: right;
   }
+  .lastExamCard {
+    grid-template-columns: 1fr;
+    gap: 31px;
+  }
   .methodGrid {
     gap: 23px;
   }
@@ -1664,6 +1760,16 @@
   }
   .editionSummary {
     font-size: 12px;
+  }
+  .lastExamSection {
+    padding-block: 52px;
+  }
+  .lastExamCard {
+    padding: 24px;
+  }
+  .examDocumentLink {
+    gap: 12px;
+    padding: 16px;
   }
   .priceGrid {
     grid-template-columns: 1fr;

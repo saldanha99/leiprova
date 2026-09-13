@@ -6,6 +6,7 @@ import {
   ArrowUpRight,
   BookOpenCheck,
   CreditCard,
+  FileCheck2,
   FileSearch,
   LayoutDashboard,
   LogOut,
@@ -49,6 +50,12 @@ const adminNavItems = [
     label: "Fontes oficiais",
     icon: RefreshCcw,
     adminOnly: false,
+  },
+  {
+    href: "/admin/provas-anteriores",
+    label: "Provas anteriores",
+    icon: FileCheck2,
+    adminOnly: true,
   },
   {
     href: "/admin/motor-editais",

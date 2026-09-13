@@ -16,6 +16,7 @@ import {
 } from "./subscription-policy";
 import { readDuringCommerceTransaction, withCommerceTransaction, type CommerceTransaction } from "./webhook-transaction";
 import { enqueuePurchaseDelivery } from "./purchase-delivery";
+import { hasSellableContestProductCoverage } from "./store";
 
 const requestOptions: Stripe.RequestOptions = { timeout: 8_000, maxNetworkRetries: 1 };
 
@@ -124,6 +125,21 @@ export async function reconcileContestSubscription(
         : charge.disputed
           ? "disputed"
           : null;
+    if (!reversal) {
+      for (const line of order.lines) {
+        const covered = await hasSellableContestProductCoverage(
+          line.productSlug,
+          line.opportunityId,
+          period.end,
+          tx,
+        );
+        if (!covered) {
+          throw new Error(
+            "Conteúdo do concurso não cobre integralmente o período pago; acesso não concedido.",
+          );
+        }
+      }
+    }
     await tx
       .insert(contestBillingInvoices)
       .values({

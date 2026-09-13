@@ -518,6 +518,8 @@ export const examEditions = pgTable(
     bankId: bigint("bank_id", { mode: "number" })
       .notNull()
       .references(() => quizBanks.id, { onDelete: "restrict" }),
+    institutionAcronym: text("institution_acronym"),
+    jurisdictionCode: text("jurisdiction_code"),
     sourceExternalId: text("source_external_id"),
     title: text("title").notNull(),
     organizer: text("organizer"),
@@ -597,6 +599,24 @@ export const examEditions = pgTable(
       )`,
     ),
     check(
+      "exam_editions_institution_acronym_check",
+      sql`${table.institutionAcronym} is null or (
+        char_length(btrim(${table.institutionAcronym})) between 2 and 80
+        and ${table.institutionAcronym} = upper(btrim(${table.institutionAcronym}))
+      )`,
+    ),
+    check(
+      "exam_editions_jurisdiction_code_check",
+      sql`${table.jurisdictionCode} is null or ${table.jurisdictionCode} ~ '^(AC|AL|AP|AM|BA|CE|DF|ES|GO|MA|MT|MS|MG|PA|PB|PR|PE|PI|RJ|RN|RS|RO|RR|SC|SP|SE|TO|BR)$'`,
+    ),
+    check(
+      "exam_editions_scope_identity_check",
+      sql`${table.status} not in ('scheduled', 'held', 'published') or (
+        ${table.institutionAcronym} is not null
+        and ${table.jurisdictionCode} is not null
+      )`,
+    ),
+    check(
       "exam_editions_duration_check",
       sql`${table.durationMinutes} is null or ${table.durationMinutes} > 0`,
     ),
@@ -611,6 +631,405 @@ export const examEditions = pgTable(
     check(
       "exam_editions_source_http_status_check",
       sql`${table.sourceHttpStatus} is null or ${table.sourceHttpStatus} between 100 and 599`,
+    ),
+  ],
+);
+
+export const examEditionDocuments = pgTable(
+  "exam_edition_documents",
+  {
+    id: idColumn(),
+    publicId: text("public_id").notNull().unique(),
+    examEditionId: bigint("exam_edition_id", { mode: "number" })
+      .notNull()
+      .references(() => examEditions.id, { onDelete: "restrict" }),
+    documentType: text("document_type").notNull(),
+    title: text("title").notNull(),
+    sourceUrl: text("source_url").notNull(),
+    sourceHost: text("source_host").notNull(),
+    publishedAt: timestamp("published_at", { withTimezone: true }),
+    sourceCheckedAt: timestamp("source_checked_at", { withTimezone: true })
+      .notNull(),
+    httpStatus: integer("http_status").notNull(),
+    contentType: text("content_type"),
+    fileName: text("file_name"),
+    expectedQuestionCount: integer("expected_question_count"),
+    distributionMode: text("distribution_mode")
+      .notNull()
+      .default("external_link"),
+    sourcePolicy: text("source_policy")
+      .notNull()
+      .default("metadata_only"),
+    checksumSha256: text("checksum_sha256"),
+    storageKey: text("storage_key"),
+    byteLength: integer("byte_length"),
+    rightsHolder: text("rights_holder"),
+    licenseBasis: text("license_basis"),
+    licenseReference: text("license_reference"),
+    licenseEvidenceChecksumSha256: text(
+      "license_evidence_checksum_sha256",
+    ),
+    licenseEvidenceCheckedAt: timestamp("license_evidence_checked_at", {
+      withTimezone: true,
+    }),
+    licensedAt: timestamp("licensed_at", { withTimezone: true }),
+    licenseExpiresAt: timestamp("license_expires_at", { withTimezone: true }),
+    status: text("status").notNull().default("pending_review"),
+    initiatedByUserId: bigint("initiated_by_user_id", {
+      mode: "number",
+    })
+      .notNull()
+      .references(() => users.id, { onDelete: "restrict" }),
+    reviewedByUserId: bigint("reviewed_by_user_id", {
+      mode: "number",
+    }).references(() => users.id, { onDelete: "restrict" }),
+    reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+    reviewNotes: text("review_notes"),
+    ...timestamps,
+  },
+  (table) => [
+    uniqueIndex("exam_edition_documents_pending_scope_uidx")
+      .on(table.examEditionId, table.documentType, table.sourceUrl)
+      .where(sql`${table.status} = 'pending_review'`),
+    uniqueIndex("exam_edition_documents_approved_scope_uidx")
+      .on(table.examEditionId, table.documentType, table.sourceUrl)
+      .where(sql`${table.status} = 'approved'`),
+    uniqueIndex("exam_edition_documents_identity_scope_uidx").on(
+      table.id,
+      table.examEditionId,
+      table.documentType,
+    ),
+    uniqueIndex("exam_edition_documents_storage_key_uidx")
+      .on(table.storageKey)
+      .where(sql`${table.storageKey} is not null`),
+    index("exam_edition_documents_edition_status_idx").on(
+      table.examEditionId,
+      table.status,
+      table.documentType,
+    ),
+    index("exam_edition_documents_initiated_by_idx").on(
+      table.initiatedByUserId,
+    ),
+    index("exam_edition_documents_reviewed_by_idx").on(
+      table.reviewedByUserId,
+    ),
+    check(
+      "exam_edition_documents_public_id_check",
+      sql`${table.publicId} ~ '^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'`,
+    ),
+    check(
+      "exam_edition_documents_type_check",
+      sql`${table.documentType} in ('question_booklet', 'answer_key')`,
+    ),
+    check(
+      "exam_edition_documents_title_check",
+      sql`char_length(btrim(${table.title})) between 3 and 500`,
+    ),
+    check(
+      "exam_edition_documents_url_check",
+      sql`char_length(${table.sourceUrl}) between 12 and 4096
+        and ${table.sourceUrl} ~* '^https://[a-z0-9.-]+(?:/|$)'`,
+    ),
+    check(
+      "exam_edition_documents_host_check",
+      sql`char_length(${table.sourceHost}) between 1 and 253
+        and ${table.sourceHost} = lower(${table.sourceHost})
+        and ${table.sourceHost} ~ '^[a-z0-9.-]+$'
+        and ${table.sourceHost} = lower(substring(${table.sourceUrl} from '^https://([^/:?#]+)'))`,
+    ),
+    check(
+      "exam_edition_documents_http_check",
+      sql`${table.httpStatus} between 100 and 599`,
+    ),
+    check(
+      "exam_edition_documents_content_type_check",
+      sql`${table.contentType} is null or (
+        char_length(${table.contentType}) between 3 and 255
+        and ${table.contentType} ~* '^[a-z0-9!#$&^_.+-]+/[a-z0-9!#$&^_.+-]+(?:[[:space:]]*;.*)?$'
+      )`,
+    ),
+    check(
+      "exam_edition_documents_file_name_check",
+      sql`${table.fileName} is null or char_length(btrim(${table.fileName})) between 1 and 255`,
+    ),
+    check(
+      "exam_edition_documents_expected_questions_check",
+      sql`(
+        ${table.documentType} = 'question_booklet'
+        and ${table.expectedQuestionCount} is not null
+        and ${table.expectedQuestionCount} between 1 and 300
+      ) or (
+        ${table.documentType} = 'answer_key'
+        and ${table.expectedQuestionCount} is null
+      )`,
+    ),
+    check(
+      "exam_edition_documents_distribution_check",
+      sql`${table.distributionMode} in ('external_link', 'hosted_copy')`,
+    ),
+    check(
+      "exam_edition_documents_policy_check",
+      sql`${table.sourcePolicy} in ('metadata_only', 'licensed_content')`,
+    ),
+    check(
+      "exam_edition_documents_checksum_check",
+      sql`${table.checksumSha256} is null or ${table.checksumSha256} ~ '^[0-9a-f]{64}$'`,
+    ),
+    check(
+      "exam_edition_documents_storage_key_check",
+      sql`${table.storageKey} is null or (
+        char_length(${table.storageKey}) between 3 and 1024
+        and ${table.storageKey} !~ '^/'
+        and ${table.storageKey} !~ '(^|/)\\.\\.(/|$)'
+      )`,
+    ),
+    check(
+      "exam_edition_documents_source_policy_evidence_check",
+      sql`(
+        ${table.sourcePolicy} = 'metadata_only'
+        and ${table.rightsHolder} is null
+        and ${table.licenseBasis} is null
+        and ${table.licenseReference} is null
+        and ${table.licenseEvidenceChecksumSha256} is null
+        and ${table.licenseEvidenceCheckedAt} is null
+        and ${table.licensedAt} is null
+        and ${table.licenseExpiresAt} is null
+      ) or (
+        ${table.sourcePolicy} = 'licensed_content'
+        and nullif(btrim(${table.rightsHolder}), '') is not null
+        and char_length(btrim(${table.rightsHolder})) between 2 and 500
+        and nullif(btrim(${table.licenseBasis}), '') is not null
+        and char_length(btrim(${table.licenseBasis})) between 3 and 2000
+        and nullif(btrim(${table.licenseReference}), '') is not null
+        and char_length(btrim(${table.licenseReference})) between 3 and 2000
+        and ${table.licenseEvidenceChecksumSha256} is not null
+        and ${table.licenseEvidenceChecksumSha256} ~ '^[0-9a-f]{64}$'
+        and ${table.licenseEvidenceCheckedAt} is not null
+        and ${table.licenseEvidenceCheckedAt} <= ${table.createdAt}
+        and ${table.licensedAt} is not null
+      )`,
+    ),
+    check(
+      "exam_edition_documents_storage_check",
+      sql`(
+        ${table.distributionMode} = 'external_link'
+        and ${table.storageKey} is null
+        and ${table.byteLength} is null
+      ) or (
+        ${table.distributionMode} = 'hosted_copy'
+        and ${table.sourcePolicy} = 'licensed_content'
+        and ${table.storageKey} is not null
+        and ${table.checksumSha256} is not null
+        and ${table.byteLength} is not null
+        and ${table.byteLength} between 5 and 104857600
+        and nullif(btrim(${table.fileName}), '') is not null
+        and ${table.contentType} is not null
+        and lower(split_part(${table.contentType}, ';', 1)) = 'application/pdf'
+      )`,
+    ),
+    check(
+      "exam_edition_documents_license_period_check",
+      sql`${table.licenseExpiresAt} is null or (
+        ${table.licensedAt} is not null
+        and ${table.licenseExpiresAt} > ${table.licensedAt}
+      )`,
+    ),
+    check(
+      "exam_edition_documents_status_check",
+      sql`${table.status} in ('pending_review', 'approved', 'superseded', 'rejected')`,
+    ),
+    check(
+      "exam_edition_documents_review_check",
+      sql`(
+        ${table.status} = 'pending_review'
+        and ${table.reviewedByUserId} is null
+        and ${table.reviewedAt} is null
+        and ${table.reviewNotes} is null
+      ) or (
+        ${table.status} <> 'pending_review'
+        and ${table.reviewedByUserId} is not null
+        and ${table.reviewedAt} is not null
+        and ${table.reviewedAt} >= ${table.sourceCheckedAt}
+        and nullif(btrim(${table.reviewNotes}), '') is not null
+        and char_length(btrim(${table.reviewNotes})) between 20 and 2000
+      )`,
+    ),
+    check(
+      "exam_edition_documents_approval_check",
+      sql`${table.status} <> 'approved' or (
+        ${table.httpStatus} between 200 and 399
+        and ${table.contentType} is not null
+        and lower(split_part(${table.contentType}, ';', 1)) = 'application/pdf'
+        and (
+          ${table.sourcePolicy} <> 'licensed_content'
+          or (
+            ${table.licensedAt} <= ${table.reviewedAt}
+            and ${table.licenseEvidenceCheckedAt} <= ${table.reviewedAt}
+          )
+        )
+        and (
+          ${table.licenseExpiresAt} is null
+          or ${table.licenseExpiresAt} > ${table.reviewedAt}
+        )
+      )`,
+    ),
+    check(
+      "exam_edition_documents_independent_review_check",
+      sql`${table.status} <> 'approved'
+        or (
+          ${table.initiatedByUserId} is not null
+          and ${table.reviewedByUserId} <> ${table.initiatedByUserId}
+        )`,
+    ),
+  ],
+);
+
+export const contestProductExamReferences = pgTable(
+  "contest_product_exam_references",
+  {
+    id: idColumn(),
+    publicId: text("public_id").notNull().unique(),
+    productSlug: text("product_slug")
+      .notNull()
+      .references(() => contestStoreProducts.slug, { onDelete: "restrict" }),
+    examEditionId: bigint("exam_edition_id", { mode: "number" })
+      .notNull()
+      .references(() => examEditions.id, { onDelete: "restrict" }),
+    primaryDocumentId: bigint("primary_document_id", {
+      mode: "number",
+    }).notNull(),
+    primaryDocumentType: text("primary_document_type")
+      .notNull()
+      .default("question_booklet"),
+    answerKeyDocumentId: bigint("answer_key_document_id", {
+      mode: "number",
+    }).notNull(),
+    answerKeyDocumentType: text("answer_key_document_type")
+      .notNull()
+      .default("answer_key"),
+    relationship: text("relationship")
+      .notNull()
+      .default("latest_previous_exam"),
+    selectionVerifiedAt: timestamp("selection_verified_at", {
+      withTimezone: true,
+    }).notNull(),
+    status: text("status").notNull().default("pending_review"),
+    initiatedByUserId: bigint("initiated_by_user_id", {
+      mode: "number",
+    })
+      .notNull()
+      .references(() => users.id, { onDelete: "restrict" }),
+    reviewedByUserId: bigint("reviewed_by_user_id", {
+      mode: "number",
+    }).references(() => users.id, { onDelete: "restrict" }),
+    reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+    reviewNotes: text("review_notes"),
+    ...timestamps,
+  },
+  (table) => [
+    foreignKey({
+      columns: [
+        table.primaryDocumentId,
+        table.examEditionId,
+        table.primaryDocumentType,
+      ],
+      foreignColumns: [
+        examEditionDocuments.id,
+        examEditionDocuments.examEditionId,
+        examEditionDocuments.documentType,
+      ],
+      name: "contest_product_exam_references_document_scope_fk",
+    }).onDelete("restrict"),
+    foreignKey({
+      columns: [
+        table.answerKeyDocumentId,
+        table.examEditionId,
+        table.answerKeyDocumentType,
+      ],
+      foreignColumns: [
+        examEditionDocuments.id,
+        examEditionDocuments.examEditionId,
+        examEditionDocuments.documentType,
+      ],
+      name: "contest_product_exam_references_answer_key_scope_fk",
+    }).onDelete("restrict"),
+    uniqueIndex("contest_product_exam_references_active_identity_uidx")
+      .on(
+        table.productSlug,
+        table.examEditionId,
+        table.primaryDocumentId,
+        table.answerKeyDocumentId,
+        table.relationship,
+      )
+      .where(sql`${table.status} in ('pending_review', 'approved')`),
+    uniqueIndex("contest_product_exam_references_approved_uidx")
+      .on(table.productSlug, table.relationship)
+      .where(sql`${table.status} = 'approved'`),
+    index("contest_product_exam_references_product_status_idx").on(
+      table.productSlug,
+      table.status,
+      table.relationship,
+    ),
+    index("contest_product_exam_references_edition_idx").on(
+      table.examEditionId,
+    ),
+    index("contest_product_exam_references_document_scope_idx").on(
+      table.primaryDocumentId,
+      table.examEditionId,
+      table.primaryDocumentType,
+    ),
+    index("contest_product_exam_references_answer_key_scope_idx").on(
+      table.answerKeyDocumentId,
+      table.examEditionId,
+      table.answerKeyDocumentType,
+    ),
+    index("contest_product_exam_references_initiated_by_idx").on(
+      table.initiatedByUserId,
+    ),
+    index("contest_product_exam_references_reviewed_by_idx").on(
+      table.reviewedByUserId,
+    ),
+    check(
+      "contest_product_exam_references_public_id_check",
+      sql`${table.publicId} ~ '^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'`,
+    ),
+    check(
+      "contest_product_exam_references_document_type_check",
+      sql`${table.primaryDocumentType} = 'question_booklet'
+        and ${table.answerKeyDocumentType} = 'answer_key'
+        and ${table.answerKeyDocumentId} <> ${table.primaryDocumentId}`,
+    ),
+    check(
+      "contest_product_exam_references_relationship_check",
+      sql`${table.relationship} = 'latest_previous_exam'`,
+    ),
+    check(
+      "contest_product_exam_references_status_check",
+      sql`${table.status} in ('pending_review', 'approved', 'superseded', 'rejected')`,
+    ),
+    check(
+      "contest_product_exam_references_review_check",
+      sql`(
+        ${table.status} = 'pending_review'
+        and ${table.reviewedByUserId} is null
+        and ${table.reviewedAt} is null
+        and ${table.reviewNotes} is null
+      ) or (
+        ${table.status} <> 'pending_review'
+        and ${table.reviewedByUserId} is not null
+        and ${table.reviewedAt} is not null
+        and ${table.reviewedAt} >= ${table.selectionVerifiedAt}
+        and nullif(btrim(${table.reviewNotes}), '') is not null
+        and char_length(btrim(${table.reviewNotes})) between 20 and 2000
+      )`,
+    ),
+    check(
+      "contest_product_exam_references_independent_review_check",
+      sql`${table.status} <> 'approved'
+        or (
+          ${table.initiatedByUserId} is not null
+          and ${table.reviewedByUserId} <> ${table.initiatedByUserId}
+        )`,
     ),
   ],
 );
@@ -1779,6 +2198,18 @@ export const questions = pgTable(
         onDelete: "restrict",
       },
     ),
+    examEditionDocumentId: bigint("exam_edition_document_id", {
+      mode: "number",
+    }).references(() => examEditionDocuments.id, {
+      onDelete: "restrict",
+    }),
+    examEditionAnswerKeyDocumentId: bigint(
+      "exam_edition_answer_key_document_id",
+      { mode: "number" },
+    ),
+    examEditionAnswerKeyDocumentType: text(
+      "exam_edition_answer_key_document_type",
+    ),
     type: text("type").notNull(),
     prompt: text("prompt").notNull(),
     explanation: text("explanation").notNull(),
@@ -1831,6 +2262,27 @@ export const questions = pgTable(
     index("questions_topic_id_idx").on(table.topicId),
     index("questions_style_bank_id_idx").on(table.styleBankId),
     index("questions_exam_edition_id_idx").on(table.examEditionId),
+    index("questions_exam_edition_document_id_idx").on(
+      table.examEditionDocumentId,
+    ),
+    index("questions_exam_answer_key_document_scope_idx").on(
+      table.examEditionAnswerKeyDocumentId,
+      table.examEditionId,
+      table.examEditionAnswerKeyDocumentType,
+    ),
+    foreignKey({
+      columns: [
+        table.examEditionAnswerKeyDocumentId,
+        table.examEditionId,
+        table.examEditionAnswerKeyDocumentType,
+      ],
+      foreignColumns: [
+        examEditionDocuments.id,
+        examEditionDocuments.examEditionId,
+        examEditionDocuments.documentType,
+      ],
+      name: "questions_exam_answer_key_document_scope_fk",
+    }).onDelete("restrict"),
     index("questions_created_by_user_id_idx").on(table.createdByUserId),
     index("questions_reviewed_by_user_id_idx").on(table.reviewedByUserId),
     index("questions_topic_status_idx").on(table.topic, table.editorialStatus),
@@ -1846,9 +2298,11 @@ export const questions = pgTable(
       table.editorialStatus,
     ),
     uniqueIndex("questions_exam_original_order_uidx")
-      .on(table.examEditionId, table.originalQuestionOrder)
+      .on(table.examEditionDocumentId, table.originalQuestionOrder)
       .where(
-        sql`${table.examEditionId} is not null and ${table.originalQuestionOrder} is not null`,
+        sql`${table.examEditionDocumentId} is not null
+          and ${table.originalQuestionOrder} is not null
+          and ${table.editorialStatus} <> 'suspended'`,
       ),
     check(
       "questions_difficulty_check",
@@ -1887,12 +2341,18 @@ export const questions = pgTable(
         ${table.quizMode} = 'dry_law'
         and ${table.legalArticleId} is not null
         and ${table.examEditionId} is null
+        and ${table.examEditionDocumentId} is null
+        and ${table.examEditionAnswerKeyDocumentId} is null
+        and ${table.examEditionAnswerKeyDocumentType} is null
         and ${table.styleBankId} is null
       ) or (
         ${table.quizMode} = 'original_style'
         and ${table.legalArticleId} is not null
         and ${table.subjectId} is not null
         and ${table.examEditionId} is null
+        and ${table.examEditionDocumentId} is null
+        and ${table.examEditionAnswerKeyDocumentId} is null
+        and ${table.examEditionAnswerKeyDocumentType} is null
         and ${table.styleBankId} is not null
         and ${table.sourceRights} = 'original_authorial'
         and nullif(btrim(${table.learningObjective}), '') is not null
@@ -1900,6 +2360,10 @@ export const questions = pgTable(
         ${table.quizMode} = 'previous_exam'
         and ${table.subjectId} is not null
         and ${table.examEditionId} is not null
+        and ${table.examEditionDocumentId} is not null
+        and ${table.examEditionAnswerKeyDocumentId} is not null
+        and ${table.examEditionAnswerKeyDocumentType} = 'answer_key'
+        and ${table.examEditionAnswerKeyDocumentId} <> ${table.examEditionDocumentId}
         and ${table.styleBankId} is null
         and ${table.sourceRights} = 'licensed'
       )`,
@@ -1938,6 +2402,18 @@ export const questions = pgTable(
     check(
       "questions_reviewed_provenance_check",
       sql`${table.editorialStatus} <> 'reviewed' or ${table.reviewedByUserId} is not null`,
+    ),
+    check(
+      "questions_previous_exam_independent_review_check",
+      sql`${table.quizMode} <> 'previous_exam'
+        or ${table.editorialStatus} <> 'reviewed'
+        or (
+          ${table.createdByUserId} is not null
+          and ${table.reviewedByUserId} <> ${table.createdByUserId}
+          and ${table.submittedAt} is not null
+          and nullif(btrim(${table.reviewNotes}), '') is not null
+          and char_length(btrim(${table.reviewNotes})) between 20 and 1500
+        )`,
     ),
     check(
       "questions_submission_check",
@@ -2150,6 +2626,14 @@ export const questionOptions = pgTable(
       .on(table.questionId)
       .where(sql`${table.isCorrect}`),
     index("question_options_question_id_idx").on(table.questionId),
+    check(
+      "question_options_key_check",
+      sql`char_length(btrim(${table.optionKey})) between 1 and 10`,
+    ),
+    check(
+      "question_options_text_check",
+      sql`char_length(btrim(${table.text})) between 1 and 5000`,
+    ),
   ],
 );
 

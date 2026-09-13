@@ -244,6 +244,7 @@ describe.skipIf(!testUrl)("motor editorial — PostgreSQL real isolado", () => {
     const editions = await database().insert(schema.examEditions).values([1, 2].map((index) => ({
       publicId: `teste-edicao-${randomUUID()}`, careerTrackId: f.category.careerTrackId,
       bankId: f.bank.id, title: `Edição fictícia ${index}`, examDate: "2026-12-01", status: "scheduled",
+      institutionAcronym: "TEST", jurisdictionCode: "BR",
       officialUrl: "https://example.invalid/test-fixture", sourceCheckedAt: now,
     }))).returning();
     const eligible = (editionId: number | null) => database().select({ id: schema.questions.id })
@@ -309,19 +310,56 @@ describe.skipIf(!testUrl)("motor editorial — PostgreSQL real isolado", () => {
 
   it("não transfere questões de prova licenciada para a revisão autoral, mesmo antes do vencimento", async () => {
     const f = await fixture();
+    const [independentReviewer] = await database().insert(schema.users).values({
+      publicId: randomUUID(),
+      name: "Segundo revisor fictício — teste automatizado",
+      email: `reviewer-${randomUUID()}@example.invalid`,
+      passwordHash: "not-a-login-password",
+      role: "editor",
+    }).returning();
     const draft = await generateNoticeQuestionDraftForRequirement(database(), f.requirement.id, f.editor.id);
     const [edition] = await database().insert(schema.examEditions).values({
       publicId: `teste-licenca-${randomUUID()}`, careerTrackId: f.category.careerTrackId,
       bankId: f.bank.id, title: "Prova inteiramente fictícia de teste", examDate: "2026-01-01",
     }).returning();
+    const sourceTitle = "Caderno fictício de licença — teste automatizado";
+    const sourceUrl = "https://example.invalid/test-fixture";
+    const licensedAt = new Date(now.getTime() - 86_400_000);
+    const licenseExpiresAt = new Date(now.getTime() + 86_400_000);
+    const [document] = await database().insert(schema.examEditionDocuments).values({
+      publicId: randomUUID(),
+      examEditionId: edition.id,
+      documentType: "question_booklet",
+      title: sourceTitle,
+      sourceUrl,
+      sourceHost: "example.invalid",
+      sourceCheckedAt: now,
+      httpStatus: 200,
+      contentType: "application/pdf",
+      expectedQuestionCount: 1,
+      sourcePolicy: "licensed_content",
+      rightsHolder: "Fixture",
+      licenseBasis: "Licença fictícia — não corresponde a direito real",
+      licenseReference: "QA-local",
+      licensedAt,
+      licenseExpiresAt,
+      status: "approved",
+      initiatedByUserId: f.editor.id,
+      reviewedByUserId: independentReviewer.id,
+      reviewedAt: now,
+      reviewNotes: "Documento sintético conferido por segundo revisor neste teste.",
+    }).returning();
     const [question] = await database().update(schema.questions).set({
       quizMode: "previous_exam", styleBankId: null, examEditionId: edition.id,
-      sourceRights: "licensed", sourceTitle: "Licença fictícia de teste",
-      sourceUrl: "https://example.invalid/test-fixture", sourceRightsHolder: "Fixture",
+      examEditionDocumentId: document.id,
+      sourceRights: "licensed", sourceTitle,
+      sourceUrl, sourceRightsHolder: "Fixture",
       licenseBasis: "Licença fictícia — não corresponde a direito real",
-      licenseReference: "QA-local", licensedAt: new Date(now.getTime() - 86_400_000),
-      licenseExpiresAt: new Date(now.getTime() + 86_400_000), originalQuestionNumber: "1",
-      originalQuestionOrder: 1, editorialStatus: "reviewed", reviewedByUserId: f.editor.id,
+      licenseReference: "QA-local", licensedAt,
+      licenseExpiresAt, originalQuestionNumber: "1",
+      originalQuestionOrder: 1, editorialStatus: "reviewed",
+      reviewedByUserId: independentReviewer.id, submittedAt: now,
+      reviewNotes: "Revisão independente sintética exclusiva deste teste automatizado.",
     }).where(eq(schema.questions.publicId, draft.publicId)).returning();
     const mistake = [{ questionId: question.id, isCorrect: false }];
     expect(await enqueueNewQuizMistakes(database(), f.editor.id, mistake, now)).toBe(0);
@@ -329,9 +367,8 @@ describe.skipIf(!testUrl)("motor editorial — PostgreSQL real isolado", () => {
     expect(await database().select().from(schema.questions).where(and(
       eq(schema.questions.id, question.id), authorialStudyRightsConditions(),
     ))).toHaveLength(0);
-    await database().update(schema.questions).set({ licenseExpiresAt: new Date(now.getTime() - 60_000) })
-      .where(eq(schema.questions.id, question.id));
-    expect(await enqueueNewQuizMistakes(database(), f.editor.id, mistake, now)).toBe(0);
+    const afterLicenseExpiry = new Date(now.getTime() + 2 * 86_400_000);
+    expect(await enqueueNewQuizMistakes(database(), f.editor.id, mistake, afterLicenseExpiry)).toBe(0);
     expect(await database().select().from(schema.reviewQueue)
       .where(eq(schema.reviewQueue.userId, f.editor.id))).toHaveLength(0);
   });
@@ -341,6 +378,7 @@ describe.skipIf(!testUrl)("motor editorial — PostgreSQL real isolado", () => {
     const [edition] = await database().insert(schema.examEditions).values({
       publicId: `teste-futuro-${randomUUID()}`, careerTrackId: f.category.careerTrackId,
       bankId: f.bank.id, title: "Edição futura sintética", examDate: "2026-12-01", status: "scheduled",
+      institutionAcronym: "TEST", jurisdictionCode: "BR",
     }).returning();
     await database().update(schema.contestOpportunities).set({ examEditionId: edition.id })
       .where(eq(schema.contestOpportunities.id, f.opportunity.id));

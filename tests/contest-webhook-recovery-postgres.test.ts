@@ -34,8 +34,14 @@ const stripe = vi.hoisted(() => ({
   invoicePayments: { list: vi.fn() }, paymentIntents: { retrieve: vi.fn() },
 }));
 const delivery = vi.hoisted(() => ({ enqueue: vi.fn() }));
+const content = vi.hoisted(() => ({
+  coverage: vi.fn().mockResolvedValue(true),
+}));
 vi.mock("@/lib/stripe", () => ({ getStripeClient: () => stripe }));
 vi.mock("@/lib/commerce/purchase-delivery", () => ({ enqueuePurchaseDelivery: delivery.enqueue }));
+vi.mock("@/lib/commerce/store", () => ({
+  hasSellableContestProductCoverage: content.coverage,
+}));
 import { withTrackedContestStripeEvent } from "@/lib/commerce/webhook-transaction";
 import { processStripeEvent } from "@/app/api/stripe/webhook/process";
 

@@ -21,7 +21,12 @@ const client = url ? postgres(url, { max: 2, prepare: false, connection: { appli
 const db = client ? drizzle(client, { schema }) : null;
 vi.mock("@/lib/db/client", () => ({ getDb: () => db }));
 const mocks = vi.hoisted(() => ({
-  subscription: vi.fn(), invoice: vi.fn(), payments: vi.fn(), intent: vi.fn(), session: vi.fn(), email: vi.fn(), webhook: vi.fn(), disputes: vi.fn(),
+  subscription: vi.fn(), invoice: vi.fn(), payments: vi.fn(), intent: vi.fn(), session: vi.fn(), email: vi.fn(), webhook: vi.fn(), disputes: vi.fn(), catalog: vi.fn(),
+}));
+vi.mock("@/lib/commerce/store", () => ({
+  getMasterCatalogCoverageStatus: mocks.catalog,
+  isMasterCatalogCoverageReady: (status: { releasedCount: number; readyCount: number }) =>
+    status.releasedCount > 0 && status.readyCount === status.releasedCount,
 }));
 vi.mock("@/lib/stripe", () => ({ getStripeWebhookConfiguration: () => ({ secretKey: "sk_test_synthetic_master", webhookSecret: "whsec_synthetic_master_only" }), stripeKeyExpectsLivemode: () => false, getStripeClient: () => ({
   subscriptions: { retrieve: mocks.subscription }, invoices: { retrieve: mocks.invoice },
@@ -68,6 +73,7 @@ describe.skipIf(!db)("Master real handler — PostgreSQL sintético e Stripe sim
     mocks.intent.mockImplementation(async () => structuredClone(f.intent));
     mocks.session.mockImplementation(async () => structuredClone(session));
     mocks.email.mockResolvedValue({ status: "sent" });
+    mocks.catalog.mockResolvedValue({ releasedCount: 1, readyCount: 1 });
     mocks.disputes.mockImplementation(async () => ({ data: [{ id: "dp_qa", object: "dispute", charge: (f.intent.latest_charge as Stripe.Charge).id, payment_intent: f.intent.id, amount: f.amount, currency: "brl", livemode: false, status: "needs_response" }], has_more: false }));
     mocks.webhook.mockImplementation((body: string, signature: string, secret: string) => new Stripe("sk_test_synthetic_master").webhooks.constructEvent(body, signature, secret));
   });
@@ -105,6 +111,18 @@ describe.skipIf(!db)("Master real handler — PostgreSQL sintético e Stripe sim
     expect(await deliveries()).toHaveLength(1);
     expect((await deliveries())[0]).toMatchObject({ scope: "master", purchaseId: f.identity.attemptId, status: "pending" });
     expect(mocks.email).not.toHaveBeenCalled();
+  });
+  it("não concede Master quando um produto liberado não cobre o período pago", async () => {
+    mocks.catalog.mockResolvedValue({ releasedCount: 2, readyCount: 1 });
+    await expect(processMasterStripeEvent(event())).rejects.toThrow(
+      "não cobre integralmente",
+    );
+    expect(await stored()).toBeUndefined();
+    expect(await deliveries()).toHaveLength(0);
+    expect(mocks.catalog).toHaveBeenCalledWith(
+      new Date(f.end * 1000),
+      expect.anything(),
+    );
   });
   it("plano anual persiste valor e vigência anual pagos", async () => {
     const end = f.start + 365 * 86400; const amount = 89700;

@@ -16,6 +16,7 @@ import {
   getReviewedContestOpportunity,
   listReviewedContestOpportunities,
 } from "@/lib/db/contest-opportunities";
+import { getApprovedContestExamReference } from "@/lib/db/contest-exam-references";
 import { listReleasedContestProducts } from "@/lib/commerce/store";
 import { findExactProductForOpportunityPage } from "@/lib/commerce/product-page-association";
 import { isDatabaseConfigured } from "@/lib/db/client";
@@ -161,6 +162,9 @@ export default async function ContestOpportunityPage({
   const path = product
     ? catalogContestPath(product)
     : `/concursos/${categoria}/${uf}/${slug}`;
+  const lastExam = result.productSlug
+    ? await getApprovedContestExamReference(result.productSlug)
+    : null;
 
   const structuredData = {
     "@context": "https://schema.org",
@@ -212,6 +216,7 @@ export default async function ContestOpportunityPage({
         jurisdictionName={jurisdiction.name}
         commerceOpen={isCommerceOpen()}
         contactOpen={isContactEnabled()}
+        lastExam={lastExam}
         productSlug={result.productSlug}
         productAvailable={Boolean(result.productSlug)}
       />

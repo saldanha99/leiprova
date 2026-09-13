@@ -21,6 +21,12 @@ import {
   hasMinimumCourseQuestionCount,
   MINIMUM_COURSE_QUESTION_COUNT,
 } from "@/lib/commerce/minimum-course-content";
+import {
+  approvedProductPreviousExamExpectedQuestionCount,
+  approvedProductPreviousExamReferenceExists,
+  approvedProductPreviousExamQuestionCount,
+  licensedPreviousExamContentSatisfied,
+} from "@/lib/commerce/previous-exam-content";
 
 export default async function ProductCatalogAdminPage() {
   await requireSuperAdmin("/admin/catalogo-produtos");
@@ -31,11 +37,38 @@ export default async function ProductCatalogAdminPage() {
     validQuestionCount: approvedProductQuestionCount(
       contestStoreProducts.slug, contestStoreProducts.opportunityId,
     ),
+    licensedPreviousExamQuestionCount:
+      approvedProductPreviousExamQuestionCount(
+        contestStoreProducts.slug,
+        contestStoreProducts.opportunityId,
+      ),
+    expectedPreviousExamQuestionCount:
+      approvedProductPreviousExamExpectedQuestionCount(
+        contestStoreProducts.slug,
+        contestStoreProducts.opportunityId,
+      ),
+    hasCompleteLicensedPreviousExam: licensedPreviousExamContentSatisfied(
+      contestStoreProducts.slug,
+      contestStoreProducts.opportunityId,
+    ),
+    hasApprovedLastExamBooklet:
+      approvedProductPreviousExamReferenceExists(
+        contestStoreProducts.slug,
+        contestStoreProducts.opportunityId,
+      ),
   }).from(contestStoreProducts);
   const catalogSlugs = new Set(CONTEST_CATALOG.map((contest) => contest.slug));
   const productBySlug = new Map(products.map((row) => [row.product.slug, row]));
   const productsAtMinimum = products.filter((row) =>
     catalogSlugs.has(row.product.slug) && hasMinimumCourseQuestionCount(row.validQuestionCount),
+  ).length;
+  const productsWithCompleteLicensedPreviousExam = products.filter(
+    (row) =>
+      catalogSlugs.has(row.product.slug) &&
+      row.hasCompleteLicensedPreviousExam,
+  ).length;
+  const productsWithApprovedBooklet = products.filter(
+    (row) => catalogSlugs.has(row.product.slug) && row.hasApprovedLastExamBooklet,
   ).length;
   return (
     <main className="mx-auto max-w-6xl px-5 py-10">
@@ -53,6 +86,12 @@ export default async function ProductCatalogAdminPage() {
         {productsAtMinimum} de {CONTEST_CATALOG.length} cursos com pelo menos{" "}
         {MINIMUM_COURSE_QUESTION_COUNT} questões válidas. Rascunhos, propostas
         pendentes e vínculos desatualizados não entram nessa contagem.
+      </p>
+      <p className="mt-2 text-sm text-sky-100">
+        {productsWithApprovedBooklet} de {CONTEST_CATALOG.length} com caderno
+        oficial anterior vinculado e {productsWithCompleteLicensedPreviousExam}
+        com todas as questões do caderno licenciadas e revisadas. As duas
+        verificações são distintas.
       </p>
       <section aria-labelledby="production-plan-title" className="mt-8 overflow-hidden rounded-2xl border border-amber-200/25 bg-[#171b1a]">
         <div className="grid gap-6 p-6 md:grid-cols-[1fr_auto] md:p-8">
@@ -113,8 +152,11 @@ export default async function ProductCatalogAdminPage() {
           <h2 className="font-bold">Antes da liberação</h2>
           <p className="mt-3 text-sm leading-7 text-slate-400">
             Vincular edição oficial, aprovar pelo menos {MINIMUM_COURSE_QUESTION_COUNT}{" "}
-            questões distintas com aderência ao produto, conferir escopo editorial, validar preços
-            Stripe e realizar compra de teste. Vendas fechadas até autorização.
+            questões autorais distintas com aderência ao produto, vincular a última
+            prova oficial, comprovar licença e revisão independente de todas as
+            questões daquele caderno, conferir escopo editorial, validar preços
+            Stripe e realizar compra de teste. Vendas fechadas enquanto qualquer
+            etapa estiver pendente.
           </p>
         </div>
       </div>
@@ -129,6 +171,14 @@ export default async function ProductCatalogAdminPage() {
               const product = row?.product;
               const validQuestionCount = row?.validQuestionCount ?? 0;
               const missingQuestionCount = Math.max(0, MINIMUM_COURSE_QUESTION_COUNT - validQuestionCount);
+              const licensedPreviousExamQuestionCount =
+                row?.licensedPreviousExamQuestionCount ?? 0;
+              const expectedPreviousExamQuestionCount =
+                row?.expectedPreviousExamQuestionCount ?? 0;
+              const hasCompleteLicensedPreviousExam =
+                row?.hasCompleteLicensedPreviousExam ?? false;
+              const hasApprovedLastExamBooklet =
+                row?.hasApprovedLastExamBooklet ?? false;
               const order = orderBySlug.get(contest.slug)!;
               return (
                 <article
@@ -156,6 +206,24 @@ export default async function ProductCatalogAdminPage() {
                       </dd>
                     </div>
                     <div>
+                      <dt className="inline text-slate-500">Última prova oficial: </dt>
+                      <dd className="inline text-sky-100">
+                        {hasApprovedLastExamBooklet
+                          ? "caderno externo revisado"
+                          : "vínculo/caderno pendente"}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt className="inline text-slate-500">Questões reais licenciadas: </dt>
+                      <dd className="inline text-sky-100">
+                        {licensedPreviousExamQuestionCount} /{" "}
+                        {expectedPreviousExamQuestionCount || "?"}{" "}
+                        {hasCompleteLicensedPreviousExam
+                          ? "(caderno completo)"
+                          : "(incompleto)"}
+                      </dd>
+                    </div>
+                    <div>
                       <dt className="inline text-slate-500">Editorial: </dt>
                       <dd className="inline">{product?.status ?? "draft"}</dd>
                     </div>
@@ -177,6 +245,12 @@ export default async function ProductCatalogAdminPage() {
                     </div>
                   </dl>
                   <CourseProductionCard order={order} />
+                  <Link
+                    href="/admin/provas-anteriores"
+                    className="mt-4 mr-5 inline-flex min-h-11 items-center text-xs font-bold text-sky-200"
+                  >
+                    Organizar prova anterior
+                  </Link>
                   <Link
                     href={`/checkout/concurso/${contest.slug}`}
                     className="mt-4 inline-flex min-h-11 items-center text-xs font-bold text-emerald-200"

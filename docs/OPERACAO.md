@@ -3,6 +3,17 @@
 Documento de contexto para quem for continuar o projeto — pessoa ou assistente de IA.
 Descreve onde as coisas estão, como publicar e quais armadilhas já custaram tempo.
 
+**Governança de provas reais preparada em 12/09/2026:** a aplicação passa a
+vincular cada produto à última edição exata do cargo, ao caderno e ao gabarito
+oficial correspondentes. Importação integral, revisão por outra conta, licença
+vigente com SHA-256/data de conferência e revalidação na venda e na entrega são
+obrigatórias. A leitura imediatamente anterior à publicação encontrou 403
+questões, zero `previous_exam`, zero conteúdo licenciado, zero edições históricas,
+75 produtos em rascunho e zero pedidos/compras/assinaturas. Portanto, esta
+entrega não autoriza ligar o checkout nem importar PDF/questões sem licença e
+revisão humanas reais. Consulte
+[`PROVAS-REAIS-E-STRIPE-2026-09-12.md`](PROVAS-REAIS-E-STRIPE-2026-09-12.md).
+
 **Correção de fontes preparada, NÃO publicada (07/09, ~02h57 BRT):** código
 `6882945` admite páginas públicas delimitadas de quatro órgãos para pesquisa do
 Radar, após navegação/robots conferidos; cinco cursos destravados no ensaio local
@@ -487,10 +498,12 @@ ssh wisewolf-vps 'docker exec leiprova-db pg_dump -U leiprova_owner -d leiprova 
 
 `pnpm content:verify` confere as questões contra o Planalto e falha se um gabarito não for verbatim ou se um distrator reproduzir a norma.
 
-O banco de produção tem **12 questões**, todas ancoradas na Constituição Federal,
-assistidas por IA e conferidas contra a fonte oficial — mas **sem revisão humana
-independente registrada**. Cinco delas são liberadas sem assinatura, listadas em
-`src/lib/study/access-policy.ts`.
+Na leitura de produção de 12/09/2026, o banco tinha **403 questões**, 312 com
+estado editorial `reviewed`, mas **zero** em modo `previous_exam` e zero com
+licença registrada. Também havia zero edições/cadernos/gabaritos, 75 produtos em
+rascunho e nenhuma venda ou assinatura. Cinco questões de demonstração continuam
+listadas em `src/lib/study/access-policy.ts`; esse acesso gratuito não comprova
+revisão humana independente nem prontidão comercial dos concursos.
 
 O catálogo de navegação já é amplo (13 carreiras, 4 bancas, 13 matérias, 45
 tópicos), o que cria uma expectativa que o acervo ainda não sustenta. Ampliar

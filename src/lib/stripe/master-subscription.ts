@@ -8,6 +8,10 @@ import { readDuringCommerceTransaction, withCommerceTransaction } from "@/lib/co
 import { getDb } from "@/lib/db/client";
 import { checkoutAttempts, contestBillingInvoices, contestOrders, plans, stripeEvents, subscriptions, users } from "@/lib/db/schema";
 import { getStripeClient } from "@/lib/stripe";
+import {
+  getMasterCatalogCoverageStatus,
+  isMasterCatalogCoverageReady,
+} from "@/lib/commerce/store";
 import { isMasterMetadata, masterDisputesBlockAccess, masterInvoicePaymentIntent, masterPaymentReversal, paidMasterInvoicePeriod, validateMasterSubscription, type MasterBillingIdentity } from "./master-policy";
 
 const requestOptions: Stripe.RequestOptions = { timeout: 8_000, maxNetworkRetries: 1 };
@@ -134,6 +138,14 @@ async function reconcileMasterSubscription(subscriptionId: string, live: boolean
       }
     }
     if (paid && (!start || !end || end <= start)) throw new Error("Vigência Master inválida.");
+    if (paid && end) {
+      const coverage = await getMasterCatalogCoverageStatus(end, tx);
+      if (!isMasterCatalogCoverageReady(coverage)) {
+        throw new Error(
+          "O catálogo Master não cobre integralmente o período pago; acesso não concedido.",
+        );
+      }
+    }
     const values = {
       status, currentPeriodStart: start, currentPeriodEnd: end, accessEndsAt: end,
       providerCheckoutSessionId: sessionId, cancelAtPeriodEnd: current.cancel_at_period_end,

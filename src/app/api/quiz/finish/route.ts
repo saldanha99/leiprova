@@ -1,7 +1,8 @@
-import { and, asc, eq, sql } from "drizzle-orm";
+import { and, asc, eq, or, sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 import { getCurrentUser } from "@/lib/auth";
+import { approvedReleasedProductPreviousExamQuestionExists } from "@/lib/commerce/previous-exam-content";
 import { getDb } from "@/lib/db/client";
 import {
   legalActs,
@@ -43,6 +44,10 @@ export async function POST(request: Request) {
   const db = getDb();
   const now = new Date();
   const entitlement = await getStudyEntitlement(user.id, now);
+  const previousExamCoverageEndsAt =
+    entitlement.hasFullAccess && entitlement.accessEndsAt
+      ? sql`${entitlement.accessEndsAt.toISOString()}::timestamptz`
+      : sql`current_timestamp`;
   const finishState = await db.transaction(async (tx) => {
     const [session] = await tx
       .select({
@@ -65,16 +70,58 @@ export async function POST(request: Request) {
       return { kind: "expired" as const };
     }
 
-    if (!entitlement.hasFullAccess) {
-      const sessionQuestionRows = await tx
-        .select({ publicId: questions.publicId })
-        .from(quizSessionQuestions)
-        .innerJoin(questions, eq(quizSessionQuestions.questionId, questions.id))
-        .where(eq(quizSessionQuestions.sessionId, session.id));
-
-      if (sessionQuestionRows.some((question) => !canStudyQuestion(entitlement, question.publicId))) {
-        return { kind: "access_denied" as const };
+    const previousExamEditions = await tx
+      .selectDistinct({ id: questions.examEditionId })
+      .from(quizSessionQuestions)
+      .innerJoin(questions, eq(quizSessionQuestions.questionId, questions.id))
+      .where(
+        and(
+          eq(quizSessionQuestions.sessionId, session.id),
+          eq(questions.quizMode, "previous_exam"),
+          sql`${questions.examEditionId} is not null`,
+        ),
+      )
+      .orderBy(questions.examEditionId);
+    for (const { id } of previousExamEditions) {
+      if (id !== null) {
+        await tx.execute(
+          sql`select public.lock_exam_document_review_edition(${id})`,
+        );
       }
+    }
+
+    const sessionQuestionRows = await tx
+      .select({
+        publicId: questions.publicId,
+        quizMode: questions.quizMode,
+        previousExamGoverned: sql<boolean>`case
+          when ${questions.quizMode} <> 'previous_exam' then true
+          else ${approvedReleasedProductPreviousExamQuestionExists(
+            questions.id,
+            previousExamCoverageEndsAt,
+          )}
+        end`,
+      })
+      .from(quizSessionQuestions)
+      .innerJoin(questions, eq(quizSessionQuestions.questionId, questions.id))
+      .where(eq(quizSessionQuestions.sessionId, session.id));
+
+    if (
+      sessionQuestionRows.some(
+        (question) =>
+          question.quizMode === "previous_exam" &&
+          !question.previousExamGoverned,
+      )
+    ) {
+      return { kind: "content_unavailable" as const };
+    }
+    if (
+      !entitlement.hasFullAccess &&
+      sessionQuestionRows.some(
+        (question) => !canStudyQuestion(entitlement, question.publicId),
+      )
+    ) {
+      return { kind: "access_denied" as const };
     }
 
     if (session.status !== "completed") {
@@ -143,7 +190,66 @@ export async function POST(request: Request) {
       }
     }
 
-    return { kind: "completed" as const, session };
+    const answerRows = await tx
+      .select({
+        position: quizSessionQuestions.position,
+        questionId: questions.publicId,
+        selectedOptionId: questionOptions.optionKey,
+        correctOptionId: sql<string>`(
+          select correct_option.option_key
+          from question_options correct_option
+          where correct_option.question_id = ${questions.id}
+            and correct_option.is_correct = true
+          limit 1
+        )`,
+        isCorrect: quizSessionAnswers.isCorrect,
+        explanation: questions.explanation,
+        quizMode: questions.quizMode,
+        verifiedAt: questions.verifiedAt,
+        sourceTitle: questions.sourceTitle,
+        sourceUrl: questions.sourceUrl,
+        legalActTitle: legalActs.shortTitle,
+        officialLegalUrl: legalActs.officialUrl,
+        styleBankName: quizBanks.name,
+      })
+      .from(quizSessionQuestions)
+      .leftJoin(
+        quizSessionAnswers,
+        and(
+          eq(quizSessionAnswers.sessionId, quizSessionQuestions.sessionId),
+          eq(quizSessionAnswers.questionId, quizSessionQuestions.questionId),
+        ),
+      )
+      .innerJoin(questions, eq(quizSessionQuestions.questionId, questions.id))
+      .leftJoin(
+        questionOptions,
+        eq(quizSessionAnswers.selectedOptionId, questionOptions.id),
+      )
+      .leftJoin(legalArticles, eq(questions.legalArticleId, legalArticles.id))
+      .leftJoin(
+        legalVersions,
+        eq(legalArticles.legalVersionId, legalVersions.id),
+      )
+      .leftJoin(legalActs, eq(legalVersions.legalActId, legalActs.id))
+      .leftJoin(quizBanks, eq(questions.styleBankId, quizBanks.id))
+      .where(
+        and(
+          eq(quizSessionQuestions.sessionId, parsed.data.sessionId),
+          or(
+            sql`${questions.quizMode} <> 'previous_exam'`,
+            approvedReleasedProductPreviousExamQuestionExists(
+              questions.id,
+              previousExamCoverageEndsAt,
+            ),
+          ),
+        ),
+      )
+      .orderBy(asc(quizSessionQuestions.position));
+    if (answerRows.length !== session.questionCount) {
+      return { kind: "content_unavailable" as const };
+    }
+
+    return { kind: "completed" as const, session, answerRows };
   });
 
   if (finishState.kind === "not_found") {
@@ -155,45 +261,14 @@ export async function POST(request: Request) {
   if (finishState.kind === "access_denied") {
     return NextResponse.json({ error: "subscription_required" }, { status: 403 });
   }
+  if (finishState.kind === "content_unavailable") {
+    return NextResponse.json(
+      { error: "question_content_unavailable" },
+      { status: 409 },
+    );
+  }
 
-  const answerRows = await db
-    .select({
-      position: quizSessionQuestions.position,
-      questionId: questions.publicId,
-      selectedOptionId: questionOptions.optionKey,
-      correctOptionId: sql<string>`(
-        select correct_option.option_key
-        from question_options correct_option
-        where correct_option.question_id = ${questions.id}
-          and correct_option.is_correct = true
-        limit 1
-      )`,
-      isCorrect: quizSessionAnswers.isCorrect,
-      explanation: questions.explanation,
-      quizMode: questions.quizMode,
-      verifiedAt: questions.verifiedAt,
-      sourceTitle: questions.sourceTitle,
-      sourceUrl: questions.sourceUrl,
-      legalActTitle: legalActs.shortTitle,
-      officialLegalUrl: legalActs.officialUrl,
-      styleBankName: quizBanks.name,
-    })
-    .from(quizSessionQuestions)
-    .leftJoin(
-      quizSessionAnswers,
-      and(
-        eq(quizSessionAnswers.sessionId, quizSessionQuestions.sessionId),
-        eq(quizSessionAnswers.questionId, quizSessionQuestions.questionId),
-      ),
-    )
-    .innerJoin(questions, eq(quizSessionQuestions.questionId, questions.id))
-    .leftJoin(questionOptions, eq(quizSessionAnswers.selectedOptionId, questionOptions.id))
-    .leftJoin(legalArticles, eq(questions.legalArticleId, legalArticles.id))
-    .leftJoin(legalVersions, eq(legalArticles.legalVersionId, legalVersions.id))
-    .leftJoin(legalActs, eq(legalVersions.legalActId, legalActs.id))
-    .leftJoin(quizBanks, eq(questions.styleBankId, quizBanks.id))
-    .where(eq(quizSessionQuestions.sessionId, parsed.data.sessionId))
-    .orderBy(asc(quizSessionQuestions.position));
+  const { answerRows } = finishState;
 
   const answers = answerRows.map((answer) => ({
     questionId: answer.questionId,

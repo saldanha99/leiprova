@@ -12,6 +12,7 @@ import {
   verifyExamPortalAction,
   type SourceActionState,
 } from "@/app/admin/fontes-oficiais/actions";
+import { opportunityJurisdictions } from "@/lib/opportunities/jurisdictions";
 
 const initialState: SourceActionState = { status: "idle", message: "" };
 
@@ -206,8 +207,27 @@ export function ExamMetadataForm({
         <input type="date" name="examDate" required className={`${field} mt-2`} />
       </label>
       <label className="text-xs font-semibold text-slate-400">
-        Jurisdição
-        <input name="jurisdiction" maxLength={120} placeholder="Federal, SP, municipal…" className={`${field} mt-2`} />
+        Sigla do órgão ou instituição
+        <input
+          name="institutionAcronym"
+          required
+          minLength={2}
+          maxLength={80}
+          autoCapitalize="characters"
+          placeholder="Ex.: PC-BA, MPE-SP, CNJ"
+          className={`${field} mt-2 uppercase`}
+        />
+      </label>
+      <label className="text-xs font-semibold text-slate-400 sm:col-span-2">
+        Jurisdição / UF
+        <select name="jurisdictionCode" required className={`${field} mt-2`}>
+          <option value="">Selecione</option>
+          {opportunityJurisdictions.map((jurisdiction) => (
+            <option key={jurisdiction.code} value={jurisdiction.code}>
+              {jurisdiction.name} ({jurisdiction.code})
+            </option>
+          ))}
+        </select>
       </label>
       <label className="text-xs font-semibold text-slate-400 sm:col-span-2">
         Link no portal oficial

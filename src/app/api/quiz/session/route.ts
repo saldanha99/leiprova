@@ -57,6 +57,7 @@ import {
   editionHasOriginalTraining,
   originalStyleConditions,
 } from "@/lib/quiz/original-style-query";
+import { approvedReleasedProductPreviousExamQuestionExists } from "@/lib/commerce/previous-exam-content";
 import { accessibleQuestionIds } from "@/lib/study/access-policy";
 import { getStudyEntitlement } from "@/lib/study/entitlement";
 
@@ -248,6 +249,7 @@ function licensedPreviousQuestionConditions(selection: DbSelection, now: Date) {
     isNotNull(questions.originalQuestionNumber),
     isNotNull(questions.originalQuestionOrder),
     isNotNull(questions.licensedAt),
+    lte(questions.licensedAt, now),
     or(isNull(questions.licenseExpiresAt), gt(questions.licenseExpiresAt, now)),
     subjectCondition(selection),
     selection.topicId ? eq(questions.topicId, selection.topicId) : undefined,
@@ -419,6 +421,14 @@ export async function POST(request: Request) {
           )
         : and(
             licensedPreviousQuestionConditions(effectiveSelection, now),
+            // Mesmo o Master não recebe questões reais soltas: a questão
+            // precisa pertencer à prova completa de um produto liberado.
+            approvedReleasedProductPreviousExamQuestionExists(
+              questions.id,
+              entitlement.hasFullAccess && entitlement.accessEndsAt
+                ? sql`${entitlement.accessEndsAt.toISOString()}::timestamptz`
+                : sql`current_timestamp`,
+            ),
             examEditionConditions(
               effectiveSelection,
               todayIso,
@@ -469,24 +479,12 @@ export async function POST(request: Request) {
         : [asc(questions.originalQuestionOrder)]
       : [sql`random()`];
 
-  const questionRows = await getDb()
+  // A primeira leitura escolhe apenas identidades. Enunciados e alternativas
+  // são relidos dentro da transação protegida contra revogação.
+  const candidateQuestionRows = await getDb()
     .select({
       id: questions.id,
-      publicId: questions.publicId,
-      prompt: questions.prompt,
-      difficulty: questions.difficulty,
-      quizMode: questions.quizMode,
-      sourceTitle: questions.sourceTitle,
-      sourceUrl: questions.sourceUrl,
-      verifiedAt: questions.verifiedAt,
-      subjectSlug: quizSubjects.slug,
-      subjectName: quizSubjects.name,
-      topicSlug: quizTopics.slug,
-      topicName: quizTopics.name,
-      articleRef: legalArticles.articleRef,
-      legalActTitle: legalActs.shortTitle,
-      officialLegalUrl: legalActs.officialUrl,
-      originalQuestionOrder: questions.originalQuestionOrder,
+      examEditionId: questions.examEditionId,
     })
     .from(questions)
     .leftJoin(quizSubjects, eq(questions.subjectId, quizSubjects.id))
@@ -506,47 +504,99 @@ export async function POST(request: Request) {
     .orderBy(...questionOrdering)
     .limit(parsed.data.count);
 
-  const optionRows = questionRows.length
-    ? await getDb()
-        .select({
-          questionId: questionOptions.questionId,
-          id: questionOptions.optionKey,
-          text: questionOptions.text,
-        })
-        .from(questionOptions)
-        .where(
-          inArray(
-            questionOptions.questionId,
-            questionRows.map((question) => question.id),
-          ),
-        )
-        .orderBy(
-          asc(questionOptions.questionId),
-          asc(questionOptions.sortOrder),
-        )
-    : [];
-
-  const optionsByQuestion = new Map<
-    number,
-    Array<{ id: string; text: string }>
-  >();
-  for (const option of optionRows) {
-    const options = optionsByQuestion.get(option.questionId) ?? [];
-    options.push({ id: option.id, text: option.text });
-    optionsByQuestion.set(option.questionId, options);
-  }
-
   const sessionId = randomUUID();
-  const deadlineAt = calculateQuizDeadline(now, {
-    timed: parsed.data.timed,
-    count: questionRows.length || parsed.data.count,
-    editionDurationMinutes:
-      parsed.data.mode === "previous_exam"
-        ? selectedExamEdition?.durationMinutes
-        : undefined,
-  });
   const expiresAt = new Date(now.getTime() + 24 * 60 * 60 * 1_000);
-  await getDb().transaction(async (tx) => {
+  const sessionState = await getDb().transaction(async (tx) => {
+    if (parsed.data.mode === "previous_exam") {
+      const editionIds = [
+        ...new Set(
+          candidateQuestionRows
+            .map((question) => question.examEditionId)
+            .filter((id): id is number => id !== null),
+        ),
+      ].sort((left, right) => left - right);
+      for (const editionId of editionIds) {
+        await tx.execute(
+          sql`select public.lock_exam_document_review_edition(${editionId})`,
+        );
+      }
+    }
+
+    const securedRows = candidateQuestionRows.length
+      ? await tx
+          .select({
+            id: questions.id,
+            publicId: questions.publicId,
+            prompt: questions.prompt,
+            difficulty: questions.difficulty,
+            quizMode: questions.quizMode,
+            sourceTitle: questions.sourceTitle,
+            sourceUrl: questions.sourceUrl,
+            verifiedAt: questions.verifiedAt,
+            subjectSlug: quizSubjects.slug,
+            subjectName: quizSubjects.name,
+            topicSlug: quizTopics.slug,
+            topicName: quizTopics.name,
+            articleRef: legalArticles.articleRef,
+            legalActTitle: legalActs.shortTitle,
+            officialLegalUrl: legalActs.officialUrl,
+            originalQuestionOrder: questions.originalQuestionOrder,
+          })
+          .from(questions)
+          .leftJoin(quizSubjects, eq(questions.subjectId, quizSubjects.id))
+          .leftJoin(quizTopics, eq(questions.topicId, quizTopics.id))
+          .leftJoin(legalArticles, eq(questions.legalArticleId, legalArticles.id))
+          .leftJoin(
+            legalVersions,
+            eq(legalArticles.legalVersionId, legalVersions.id),
+          )
+          .leftJoin(legalActs, eq(legalVersions.legalActId, legalActs.id))
+          .leftJoin(examEditions, eq(questions.examEditionId, examEditions.id))
+          .where(
+            and(
+              questionJoinsAndConditions,
+              inArray(
+                questions.id,
+                candidateQuestionRows.map((question) => question.id),
+              ),
+              entitlement.hasFullAccess
+                ? undefined
+                : inArray(questions.publicId, accessibleQuestionIds(entitlement)),
+            ),
+          )
+      : [];
+    const securedById = new Map(securedRows.map((question) => [question.id, question]));
+    const questionRows = candidateQuestionRows
+      .map((candidate) => securedById.get(candidate.id))
+      .filter((question): question is NonNullable<typeof question> => Boolean(question));
+    const optionRows = questionRows.length
+      ? await tx
+          .select({
+            questionId: questionOptions.questionId,
+            id: questionOptions.optionKey,
+            text: questionOptions.text,
+          })
+          .from(questionOptions)
+          .where(
+            inArray(
+              questionOptions.questionId,
+              questionRows.map((question) => question.id),
+            ),
+          )
+          .orderBy(
+            asc(questionOptions.questionId),
+            asc(questionOptions.sortOrder),
+          )
+      : [];
+    const deadlineAt = calculateQuizDeadline(now, {
+      timed: parsed.data.timed,
+      count: questionRows.length || parsed.data.count,
+      editionDurationMinutes:
+        parsed.data.mode === "previous_exam"
+          ? selectedExamEdition?.durationMinutes
+          : undefined,
+    });
+
     await tx.insert(quizSessions).values({
       id: sessionId,
       userId: user.id,
@@ -579,7 +629,19 @@ export async function POST(request: Request) {
         })),
       );
     }
+    return { questionRows, optionRows, deadlineAt };
   });
+
+  const { questionRows, optionRows, deadlineAt } = sessionState;
+  const optionsByQuestion = new Map<
+    number,
+    Array<{ id: string; text: string }>
+  >();
+  for (const option of optionRows) {
+    const options = optionsByQuestion.get(option.questionId) ?? [];
+    options.push({ id: option.id, text: option.text });
+    optionsByQuestion.set(option.questionId, options);
+  }
 
   const responseQuestions: QuizSessionQuestion[] = questionRows.map(
     (question) => ({

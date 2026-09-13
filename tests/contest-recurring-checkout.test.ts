@@ -45,6 +45,7 @@ const mocked = vi.hoisted(() => ({
   subscription: vi.fn(),
   updateSubscription: vi.fn(),
   reconcile: vi.fn(),
+  coverage: vi.fn(),
 }));
 vi.mock("@/lib/auth", () => ({
   getCurrentUser: mocked.user,
@@ -56,6 +57,7 @@ vi.mock("@/lib/commerce/subscription-webhook", () => ({
 }));
 vi.mock("@/lib/commerce/store", () => ({
   listReleasedContestProducts: mocked.released,
+  hasSellableContestProductCoverage: mocked.coverage,
 }));
 vi.mock("@/lib/commerce/customer", () => ({
   getOrCreateStripeCustomer: mocked.customer,
@@ -126,6 +128,7 @@ describe.skipIf(!db)(
       mocked.enabled.mockReturnValue(true);
       mocked.trusted.mockReturnValue(true);
       mocked.customer.mockResolvedValue("cus_qa");
+      mocked.coverage.mockResolvedValue(true);
       mocked.released.mockResolvedValue([
         {
           slug,
@@ -235,6 +238,15 @@ describe.skipIf(!db)(
         recurring: null,
       });
       expect((await POST(request("monthly"))).status).toBe(409);
+      expect(mocked.create).not.toHaveBeenCalled();
+    });
+    it("não abre a Stripe quando a licença não cobre o período contratado", async () => {
+      mocked.coverage.mockResolvedValue(false);
+      const response = await POST(request("annual"));
+      expect(response.status).toBe(409);
+      expect(await response.json()).toMatchObject({
+        error: expect.stringContaining("não cobre integralmente"),
+      });
       expect(mocked.create).not.toHaveBeenCalled();
     });
     it("reutiliza a mesma sessão numa repetição", async () => {

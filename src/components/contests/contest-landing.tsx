@@ -6,6 +6,8 @@ import {
   CircleCheck,
   ClipboardList,
   ExternalLink,
+  FileCheck2,
+  FileText,
   MapPin,
   ShieldCheck,
   Target,
@@ -13,6 +15,7 @@ import {
 import Link from "next/link";
 
 import type { PublicContestOpportunity } from "@/lib/db/contest-opportunities";
+import type { PublicContestExamReference } from "@/lib/exams/public-exam-reference-policy";
 import { getCareerDirection } from "@/lib/opportunities/landing-presentation";
 import {
   formatOpportunityDate,
@@ -36,6 +39,7 @@ type ContestLandingProps = {
   jurisdictionName: string;
   commerceOpen: boolean;
   contactOpen: boolean;
+  lastExam?: PublicContestExamReference | null;
   productSlug?: string;
   productAvailable?: boolean;
 };
@@ -45,6 +49,7 @@ export function ContestLanding({
   jurisdictionName,
   commerceOpen,
   contactOpen,
+  lastExam = null,
   productSlug,
   productAvailable = false,
 }: ContestLandingProps) {
@@ -253,6 +258,73 @@ export function ContestLanding({
           </div>
         </div>
       </section>
+
+      {lastExam && (
+        <section
+          id="ultima-prova"
+          className={`${styles.section} ${styles.lastExamSection}`}
+          aria-labelledby="ultima-prova-title"
+        >
+          <div className={`${styles.container} ${styles.lastExamCard}`}>
+            <div className={styles.lastExamIntro}>
+              <span className={styles.eyebrow}>REFERÊNCIA HISTÓRICA REVISADA</span>
+              <h2 id="ultima-prova-title">Última prova oficial.</h2>
+              <p>
+                A edição vinculada a este concurso é {lastExam.edition.title},
+                aplicada em {formatOpportunityDate(lastExam.edition.examDate)} pela{" "}
+                <strong>{lastExam.edition.bank.name}</strong>.
+              </p>
+              <p className={styles.lastExamNotice}>
+                Os arquivos abaixo abrem na fonte oficial. Questões dessa prova
+                só entram no ambiente de estudo quando a licença de uso estiver
+                registrada e o conteúdo tiver concluído a revisão editorial. O
+                acesso público ao PDF, por si só, não autoriza sua reprodução.
+              </p>
+            </div>
+            <div className={styles.lastExamDocuments}>
+              <a
+                href={lastExam.questionBooklet.officialUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.examDocumentLink}
+              >
+                <FileText size={20} aria-hidden="true" />
+                <span>
+                  <small>
+                    CADERNO DE QUESTÕES
+                    {lastExam.questionBooklet.questionCount
+                      ? ` · ${lastExam.questionBooklet.questionCount} ITENS`
+                      : ""}
+                    {" · LINK EXTERNO"}
+                  </small>
+                  <strong>{lastExam.questionBooklet.title}</strong>
+                  <em>{lastExam.questionBooklet.licenseLabel}</em>
+                </span>
+                <ExternalLink size={16} aria-hidden="true" />
+                <span className="sr-only"> (abre em outra aba)</span>
+              </a>
+              {lastExam.answerKeys.map((answerKey) => (
+                <a
+                  key={answerKey.publicId}
+                  href={answerKey.officialUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.examDocumentLink}
+                >
+                  <FileCheck2 size={20} aria-hidden="true" />
+                  <span>
+                    <small>GABARITO · LINK EXTERNO</small>
+                    <strong>{answerKey.title}</strong>
+                    <em>{answerKey.licenseLabel}</em>
+                  </span>
+                  <ExternalLink size={16} aria-hidden="true" />
+                  <span className="sr-only"> (abre em outra aba)</span>
+                </a>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       <ContestPricing
         commerceOpen={commerceOpen}

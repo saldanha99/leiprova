@@ -21,12 +21,15 @@ const namespace = `checkout_test_${randomUUID().replaceAll("-", "")}`;
 const client = url ? postgres(url, { max: 4, prepare: false, connection: { search_path: namespace }, onnotice: () => {} }) : null;
 const control = url ? postgres(url, { max: 1, prepare: false, onnotice: () => {} }) : null;
 const db = client ? drizzle(client, { schema }) : null;
-const mocked = vi.hoisted(() => ({ user: vi.fn(), released: vi.fn(), create: vi.fn(), retrieve: vi.fn(), list: vi.fn(), expire: vi.fn(), customer: vi.fn(), prices: vi.fn() }));
+const mocked = vi.hoisted(() => ({ user: vi.fn(), released: vi.fn(), coverage: vi.fn(), create: vi.fn(), retrieve: vi.fn(), list: vi.fn(), expire: vi.fn(), customer: vi.fn(), prices: vi.fn() }));
 vi.mock("@/lib/db/client", () => ({ getDb: () => db }));
 vi.mock("@/lib/auth", () => ({ getCurrentUser: mocked.user, requireUser: mocked.user }));
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 vi.mock("@/lib/commerce/customer", () => ({ getOrCreateStripeCustomer: mocked.customer }));
-vi.mock("@/lib/commerce/store", () => ({ listReleasedContestProducts: mocked.released }));
+vi.mock("@/lib/commerce/store", () => ({
+  listReleasedContestProducts: mocked.released,
+  hasSellableContestProductCoverage: mocked.coverage,
+}));
 vi.mock("@/lib/study/entitlement", () => ({ getStudyEntitlement: async () => ({ hasFullAccess: false }) }));
 vi.mock("@/lib/stripe", () => ({ hasTrustedOrigin: () => true, isContestCheckoutEnabled: () => true,
   stripeKeyExpectsLivemode: () => false, getCheckoutAvailability: () => ({ available: true }), getPublicOrigin: () => "https://qa.example.invalid",
@@ -80,6 +83,7 @@ describe.skipIf(!db)("recuperação e cancelamento de checkout em PostgreSQL iso
     vi.clearAllMocks();
     mocked.user.mockResolvedValue(user);
     mocked.customer.mockResolvedValue("cus_qa");
+    mocked.coverage.mockResolvedValue(true);
     mocked.released.mockResolvedValue([{ slug, opportunityId: 1, stripeMode: "test", stripeProductId: "prod_qa", stripePriceMonthly: "price_qa" }]);
     mocked.prices.mockResolvedValue({ id: "price_qa", active: true, product: "prod_qa", currency: "brl", livemode: false, unit_amount: 6700,
       recurring: { interval: "month", interval_count: 1, usage_type: "licensed" } });

@@ -22,6 +22,10 @@ import {
   quizCareerTracks,
 } from "@/lib/db/schema";
 import { canReviewEditorialSubmission } from "@/lib/editorial/owner-approval";
+import {
+  institutionAcronymSchema,
+  normalizedBrazilianJurisdictionCodeSchema,
+} from "@/lib/official-sources/exam-edition-sync";
 import { resolveExamMetadataSpecialization } from "@/lib/official-sources/exam-metadata-selection";
 import {
   fetchOfficialConsolidatedLegalText,
@@ -30,6 +34,7 @@ import {
 } from "@/lib/official-sources/fetch";
 import { getOfficialLegalSource } from "@/lib/official-sources/legal-registry";
 import { parseConsolidatedLegalArticles } from "@/lib/official-sources/legal-text";
+import { getOpportunityJurisdictionByCode } from "@/lib/opportunities/jurisdictions";
 
 export type SourceActionState = { status: "idle" | "success" | "error"; message: string };
 
@@ -517,7 +522,8 @@ const examMetadataSchema = z.object({
   ),
   title: z.string().trim().min(5).max(220),
   examDate: z.iso.date(),
-  jurisdiction: z.string().trim().max(120),
+  institutionAcronym: institutionAcronymSchema,
+  jurisdictionCode: normalizedBrazilianJurisdictionCodeSchema,
   officialUrl: z.url().max(1000),
 });
 
@@ -533,7 +539,9 @@ export async function createExamMetadataAction(
   const parsed = examMetadataSchema.safeParse({
     bankId: formData.get("bankId"), careerTrackId: formData.get("careerTrackId"), title: formData.get("title"),
     specializationId: formData.get("specializationId"), examDate: formData.get("examDate"),
-    jurisdiction: formData.get("jurisdiction"), officialUrl: formData.get("officialUrl"),
+    institutionAcronym: formData.get("institutionAcronym"),
+    jurisdictionCode: formData.get("jurisdictionCode"),
+    officialUrl: formData.get("officialUrl"),
   });
   if (!parsed.success) return errorState(parsed.error.issues[0]?.message ?? "Revise os metadados da prova.");
 
@@ -557,6 +565,8 @@ export async function createExamMetadataAction(
     parsed.data.specializationId,
   );
   if (!specialization.success) return errorState(specialization.message);
+  const jurisdiction = getOpportunityJurisdictionByCode(parsed.data.jurisdictionCode);
+  if (!jurisdiction) return errorState("Jurisdição brasileira inválida.");
 
   try {
     const checked = await verifyOfficialExamUrl(bank[0].slug, parsed.data.officialUrl);
@@ -567,9 +577,12 @@ export async function createExamMetadataAction(
         bankId: bank[0].id,
         careerTrackId: career[0].id,
         specializationId: specialization.specializationId,
+        institutionAcronym: parsed.data.institutionAcronym,
+        jurisdictionCode: parsed.data.jurisdictionCode,
         title: parsed.data.title,
         examDate: parsed.data.examDate,
-        jurisdiction: parsed.data.jurisdiction || null,
+        organizer: parsed.data.institutionAcronym,
+        jurisdiction: jurisdiction.name,
         officialUrl: checked.finalUrl,
         sourcePolicy: "metadata_only",
         sourceContentStored: false,
@@ -579,7 +592,7 @@ export async function createExamMetadataAction(
         createdByUserId: user.id,
         updatedByUserId: user.id,
       });
-      await transaction.insert(auditLogs).values({ actorUserId: user.id, action: "editorial.exam_metadata.created", entityType: "exam_edition", entityId: publicId, metadata: { policy: "metadata_only", sourceContentStored: false, officialUrl: checked.finalUrl, specializationId: specialization.specializationId } });
+      await transaction.insert(auditLogs).values({ actorUserId: user.id, action: "editorial.exam_metadata.created", entityType: "exam_edition", entityId: publicId, metadata: { policy: "metadata_only", sourceContentStored: false, officialUrl: checked.finalUrl, specializationId: specialization.specializationId, institutionAcronym: parsed.data.institutionAcronym, jurisdictionCode: parsed.data.jurisdictionCode } });
     });
     revalidatePath("/admin/fontes-oficiais");
     return { status: "success", message: "Metadados registrados. Nenhum enunciado, alternativa ou gabarito foi copiado." };

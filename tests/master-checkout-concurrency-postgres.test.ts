@@ -19,9 +19,14 @@ const namespace = `master_checkout_${randomUUID().replaceAll("-", "")}`;
 const client = url ? postgres(url, { max: 2, prepare: false, connection: { search_path: namespace }, onnotice: () => undefined }) : null;
 const control = url ? postgres(url, { max: 1, prepare: false, onnotice: () => undefined }) : null;
 const db = client ? drizzle(client, { schema }) : null;
-const mocks = vi.hoisted(() => ({ user: vi.fn(), create: vi.fn(), retrieve: vi.fn(), price: vi.fn(), customer: vi.fn() }));
+const mocks = vi.hoisted(() => ({ user: vi.fn(), create: vi.fn(), retrieve: vi.fn(), price: vi.fn(), customer: vi.fn(), catalog: vi.fn() }));
 vi.mock("@/lib/db/client", () => ({ getDb: () => db }));
 vi.mock("@/lib/auth", () => ({ getCurrentUser: mocks.user }));
+vi.mock("@/lib/commerce/store", () => ({
+  getMasterCatalogCoverageStatus: mocks.catalog,
+  isMasterCatalogCoverageReady: (status: { releasedCount: number; readyCount: number }) =>
+    status.releasedCount > 0 && status.readyCount === status.releasedCount,
+}));
 vi.mock("@/lib/stripe", () => ({
   getCheckoutAvailability: (plan: { stripePriceEnv: string }) => ({ available: true,
     priceId: plan.stripePriceEnv === "STRIPE_PRICE_RITMO" ? "price_ritmo" : "price_foco" }),
@@ -66,6 +71,7 @@ describe.skipIf(!db)("Master: duas abas e retry com reserva durável PostgreSQL"
     await client!`insert into users(id,public_id,stripe_customer_id) values (${userId},${publicId},${`cus_${userId}`})`;
     mocks.user.mockResolvedValue({ id: userId, publicId, stripeCustomerId: `cus_${userId}`,
       email: `${publicId}@example.invalid`, name: "Cliente sintético", role: "student", avatarUrl: null });
+    mocks.catalog.mockResolvedValue({ releasedCount: 1, readyCount: 1 });
     mocks.price.mockImplementation(async id => price(id));
     mocks.create.mockImplementation(create);
     mocks.retrieve.mockImplementation(async id => {
@@ -227,5 +233,12 @@ describe.skipIf(!db)("Master: duas abas e retry com reserva durável PostgreSQL"
       expect(await attempts()).toHaveLength(0);
       expect(mocks.create).not.toHaveBeenCalled();
     } finally { await client!`update plans set amount_cents=29700 where slug='ritmo'`; }
+  });
+  it("não cria tentativa quando o Master não possui catálogo integral", async () => {
+    mocks.catalog.mockResolvedValue({ releasedCount: 2, readyCount: 1 });
+    const response = await POST(request());
+    expect(response.status).toBe(409);
+    expect(await attempts()).toHaveLength(0);
+    expect(mocks.create).not.toHaveBeenCalled();
   });
 });

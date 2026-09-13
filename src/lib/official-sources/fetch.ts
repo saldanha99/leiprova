@@ -46,7 +46,11 @@ async function fetchWithTrustedRedirects(
     validate(currentUrl);
     const response = await fetch(currentUrl, {
       redirect: "manual",
-      headers: { "User-Agent": USER_AGENT, Accept: "text/html,application/xhtml+xml" },
+      headers: {
+        "User-Agent": USER_AGENT,
+        Accept:
+          "text/html,application/xhtml+xml,application/pdf;q=0.9,*/*;q=0.1",
+      },
       signal: AbortSignal.timeout(20_000),
       cache: "no-store",
     });
@@ -58,6 +62,15 @@ async function fetchWithTrustedRedirects(
   }
 
   throw new Error("A fonte oficial excedeu o limite de redirecionamentos.");
+}
+
+export function looksLikePdf(
+  bytes: Uint8Array,
+  contentType: string | null,
+) {
+  const mediaType = contentType?.split(";", 1)[0]?.trim().toLowerCase();
+  const header = new TextDecoder("latin1").decode(bytes.slice(0, 1_024));
+  return mediaType === "application/pdf" && header.includes("%PDF-");
 }
 
 function validateLegalUrl(url: string) {
@@ -206,6 +219,8 @@ export async function verifyOfficialExamUrl(bankSlug: string, input: string) {
   return {
     httpStatus: response.status,
     pageTitle,
+    contentType,
+    isPdf: looksLikePdf(bytes, contentType),
     finalUrl,
     checkedAt: new Date(),
   };

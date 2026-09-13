@@ -7,9 +7,15 @@ import {
   contestPurchases,
   type ContestOrderLine,
 } from "@/lib/db/schema";
-import { getContestAccessOption } from "@/lib/commerce/catalog";
+import {
+  accessEndsAt,
+  getContestAccessOption,
+} from "@/lib/commerce/catalog";
 import { contestCartSchema } from "@/lib/commerce/order-policy";
-import { listReleasedContestProducts } from "@/lib/commerce/store";
+import {
+  hasSellableContestProductCoverage,
+  listReleasedContestProducts,
+} from "@/lib/commerce/store";
 import { contestCheckoutSessionResponse } from "@/lib/commerce/checkout-session-response";
 import {
   getCheckoutAvailability,
@@ -178,6 +184,31 @@ export async function POST(request: NextRequest) {
       "Já existe uma assinatura ou tentativa encerrada para este concurso. Gerencie-a em Meus concursos.",
       409,
     );
+
+  const latestActivationAt = new Date(
+    originalContestCheckoutExpiry(order) * 1000,
+  );
+  const contentCoverageIsReady = () =>
+    Promise.all(
+      order.lines.map((line) =>
+        hasSellableContestProductCoverage(
+          line.productSlug,
+          line.opportunityId,
+          accessEndsAt(latestActivationAt, line.months),
+        ),
+      ),
+    ).then((results) => results.every(Boolean));
+  try {
+    if (!(await contentCoverageIsReady())) {
+      return error(
+        "Uma das provas não cobre integralmente o período escolhido. Nenhuma cobrança foi iniciada.",
+        409,
+      );
+    }
+  } catch {
+    return error("Não foi possível validar o conteúdo desta contratação.", 503);
+  }
+
   try {
     const stripe = getStripeClient();
     if (order.stripeMode !== (expectedLive ? "live" : "test"))
@@ -220,6 +251,13 @@ export async function POST(request: NextRequest) {
           409,
         );
     }
+    // Revalida depois das leituras na Stripe para reduzir a janela entre a
+    // decisão editorial e a criação efetiva da sessão.
+    if (!(await contentCoverageIsReady()))
+      return error(
+        "O conteúdo desta contratação mudou durante a validação. Nenhuma cobrança foi iniciada.",
+        409,
+      );
     const metadata = {
       app: "leiprova",
       commerce: CONTEST_SUBSCRIPTION_COMMERCE,

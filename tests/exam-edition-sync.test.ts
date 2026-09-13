@@ -13,6 +13,8 @@ import {
 const discovery = normalizeDiscoveredExamEdition({
   bankSlug: " FGV ",
   careerSlug: " OAB ",
+  institutionAcronym: "  cfoab  ",
+  jurisdictionCode: " br ",
   sourceExternalId: "OAB-2025-01",
   title: "  Exame   de Ordem\n2025  ",
   organizer: "Conselho Federal da OAB",
@@ -35,6 +37,8 @@ const existing: ExistingExamEditionSyncState = {
   bankId: 1,
   careerTrackId: 2,
   specializationId: null,
+  institutionAcronym: discovery.institutionAcronym,
+  jurisdictionCode: discovery.jurisdictionCode,
   sourceExternalId: "OAB-2025-01",
   title: discovery.title,
   organizer: discovery.organizer,
@@ -54,6 +58,8 @@ describe("normalização de edições descobertas", () => {
       bankSlug: "fgv",
       careerSlug: "oab",
       specializationSlug: null,
+      institutionAcronym: "CFOAB",
+      jurisdictionCode: "BR",
       sourceExternalId: "OAB-2025-01",
       title: "Exame de Ordem 2025",
       organizer: "Conselho Federal da OAB",
@@ -69,6 +75,8 @@ describe("normalização de edições descobertas", () => {
     const base = {
       bankSlug: "fgv",
       careerSlug: "oab",
+      institutionAcronym: "CFOAB",
+      jurisdictionCode: "BR",
       sourceExternalId: "OAB-2025-01",
       title: "Exame de Ordem",
       organizer: "OAB",
@@ -79,6 +87,12 @@ describe("normalização de edições descobertas", () => {
     };
 
     expect(() => normalizeDiscoveredExamEdition({ ...base, arbitrary: true })).toThrow();
+    expect(() =>
+      normalizeDiscoveredExamEdition({ ...base, institutionAcronym: "" }),
+    ).toThrow(/sigla/);
+    expect(() =>
+      normalizeDiscoveredExamEdition({ ...base, jurisdictionCode: "XX" }),
+    ).toThrow();
     expect(() => normalizeDiscoveredExamEdition({ ...base, examDate: "2025-02-30" })).toThrow();
     expect(() =>
       normalizeDiscoveredExamEdition({ ...base, sourceObservedAt: "2100-01-01T00:00:00Z" }),
@@ -163,6 +177,23 @@ describe("plano idempotente de sincronização", () => {
     expect(() =>
       planExamEditionMetadataSync(existing, { ...resolved, specializationId: 10 }),
     ).toThrow(/outra carreira ou especialização/);
+  });
+
+  it("trata órgão e jurisdição normalizados como identidade imutável", () => {
+    for (const changedIdentity of [
+      { institutionAcronym: "OAB" },
+      { jurisdictionCode: "SP" as const },
+    ]) {
+      try {
+        planExamEditionMetadataSync(existing, { ...resolved, ...changedIdentity });
+        throw new Error("O conflito de identidade deveria ter sido lançado.");
+      } catch (error) {
+        expect(error).toBeInstanceOf(ExamEditionSyncConflictError);
+        expect((error as ExamEditionSyncConflictError).code).toBe(
+          "institution_scope_mismatch",
+        );
+      }
+    }
   });
 
   it("não sobrescreve conteúdo licenciado nem uma URL legada de host incompatível", () => {

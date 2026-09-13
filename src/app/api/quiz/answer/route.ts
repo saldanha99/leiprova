@@ -1,7 +1,8 @@
-import { and, eq, inArray, sql } from "drizzle-orm";
+import { and, eq, inArray, or, sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 import { getCurrentUser } from "@/lib/auth";
+import { approvedReleasedProductPreviousExamQuestionExists } from "@/lib/commerce/previous-exam-content";
 import { getDb } from "@/lib/db/client";
 import {
   legalActs,
@@ -83,44 +84,23 @@ export async function POST(request: Request) {
   }
 
   const db = getDb();
-  const [context] = await db
+  const now = new Date();
+  const entitlement = await getStudyEntitlement(user.id, now);
+  const previousExamCoverageEndsAt =
+    entitlement.hasFullAccess && entitlement.accessEndsAt
+      ? sql`${entitlement.accessEndsAt.toISOString()}::timestamptz`
+      : sql`current_timestamp`;
+  const [pointer] = await db
     .select({
       sessionId: quizSessions.id,
-      status: quizSessions.status,
-      experience: quizSessions.experience,
-      deadlineAt: quizSessions.deadlineAt,
-      expiresAt: quizSessions.expiresAt,
       questionDbId: questions.id,
       questionPublicId: questions.publicId,
       quizMode: questions.quizMode,
-      explanation: questions.explanation,
-      verifiedAt: questions.verifiedAt,
-      sourceTitle: questions.sourceTitle,
-      sourceUrl: questions.sourceUrl,
-      legalActTitle: legalActs.shortTitle,
-      officialLegalUrl: legalActs.officialUrl,
-      styleBankName: quizBanks.name,
-      selectedOptionDbId: questionOptions.id,
-      selectedIsCorrect: questionOptions.isCorrect,
-      correctOptionId: sql<string>`(
-        select correct_option.option_key
-        from question_options correct_option
-        where correct_option.question_id = ${questions.id}
-          and correct_option.is_correct = true
-        limit 1
-      )`,
+      examEditionId: questions.examEditionId,
     })
     .from(quizSessions)
     .innerJoin(quizSessionQuestions, eq(quizSessionQuestions.sessionId, quizSessions.id))
     .innerJoin(questions, eq(quizSessionQuestions.questionId, questions.id))
-    .innerJoin(
-      questionOptions,
-      and(eq(questionOptions.questionId, questions.id), eq(questionOptions.optionKey, parsed.data.optionId)),
-    )
-    .leftJoin(legalArticles, eq(questions.legalArticleId, legalArticles.id))
-    .leftJoin(legalVersions, eq(legalArticles.legalVersionId, legalVersions.id))
-    .leftJoin(legalActs, eq(legalVersions.legalActId, legalActs.id))
-    .leftJoin(quizBanks, eq(questions.styleBankId, quizBanks.id))
     .where(
       and(
         eq(quizSessions.id, parsed.data.sessionId),
@@ -130,51 +110,11 @@ export async function POST(request: Request) {
     )
     .limit(1);
 
-  if (!context || !context.correctOptionId) {
+  if (!pointer) {
     return NextResponse.json({ error: "question_not_found" }, { status: 404 });
   }
-  if (context.status === "completed") {
-    return NextResponse.json({ error: "session_finished" }, { status: 409 });
-  }
-
-  const now = new Date();
-  if (context.status === "expired" || context.expiresAt <= now) {
-    await db
-      .update(quizSessions)
-      .set({ status: "expired", updatedAt: now })
-      .where(and(eq(quizSessions.id, context.sessionId), eq(quizSessions.userId, user.id)));
-    return NextResponse.json({ error: "session_expired" }, { status: 410 });
-  }
-  if (context.deadlineAt && context.deadlineAt <= now) {
-    return NextResponse.json({ error: "quiz_deadline_reached" }, { status: 409 });
-  }
-
-  const entitlement = await getStudyEntitlement(user.id, now);
-  if (!canStudyQuestion(entitlement, context.questionPublicId)) {
+  if (!canStudyQuestion(entitlement, pointer.questionPublicId)) {
     return NextResponse.json({ error: "question_not_found" }, { status: 404 });
-  }
-
-  const [existing] = await db
-    .select({
-      isCorrect: quizSessionAnswers.isCorrect,
-      selectedOptionId: questionOptions.optionKey,
-    })
-    .from(quizSessionAnswers)
-    .innerJoin(questionOptions, eq(quizSessionAnswers.selectedOptionId, questionOptions.id))
-    .where(
-      and(
-        eq(quizSessionAnswers.sessionId, context.sessionId),
-        eq(quizSessionAnswers.questionId, context.questionDbId),
-      ),
-    )
-    .limit(1);
-
-  if (existing) {
-    if (context.experience !== "exam") {
-      return NextResponse.json(correctionResponse(context, existing.isCorrect), {
-        headers: { "Cache-Control": "no-store" },
-      });
-    }
   }
 
   const transactionResult = await db.transaction(async (tx) => {
@@ -185,7 +125,7 @@ export async function POST(request: Request) {
         expiresAt: quizSessions.expiresAt,
       })
       .from(quizSessions)
-      .where(and(eq(quizSessions.id, context.sessionId), eq(quizSessions.userId, user.id)))
+      .where(and(eq(quizSessions.id, pointer.sessionId), eq(quizSessions.userId, user.id)))
       .for("update")
       .limit(1);
 
@@ -201,6 +141,101 @@ export async function POST(request: Request) {
     }
     if (lockedSession.deadlineAt !== null && lockedSession.deadlineAt <= lockedAt) {
       return { closed: "deadline" as const, answer: null };
+    }
+
+    if (pointer.quizMode === "previous_exam") {
+      if (!pointer.examEditionId) {
+        return { closed: "content" as const, answer: null };
+      }
+      await tx.execute(
+        sql`select public.lock_exam_document_review_edition(${pointer.examEditionId})`,
+      );
+    }
+
+    const [context] = await tx
+      .select({
+        sessionId: quizSessions.id,
+        status: quizSessions.status,
+        experience: quizSessions.experience,
+        deadlineAt: quizSessions.deadlineAt,
+        expiresAt: quizSessions.expiresAt,
+        questionDbId: questions.id,
+        questionPublicId: questions.publicId,
+        quizMode: questions.quizMode,
+        explanation: questions.explanation,
+        verifiedAt: questions.verifiedAt,
+        sourceTitle: questions.sourceTitle,
+        sourceUrl: questions.sourceUrl,
+        legalActTitle: legalActs.shortTitle,
+        officialLegalUrl: legalActs.officialUrl,
+        styleBankName: quizBanks.name,
+        selectedOptionDbId: questionOptions.id,
+        selectedIsCorrect: questionOptions.isCorrect,
+        correctOptionId: sql<string>`(
+          select correct_option.option_key
+          from question_options correct_option
+          where correct_option.question_id = ${questions.id}
+            and correct_option.is_correct = true
+          limit 1
+        )`,
+      })
+      .from(quizSessions)
+      .innerJoin(
+        quizSessionQuestions,
+        eq(quizSessionQuestions.sessionId, quizSessions.id),
+      )
+      .innerJoin(questions, eq(quizSessionQuestions.questionId, questions.id))
+      .innerJoin(
+        questionOptions,
+        and(
+          eq(questionOptions.questionId, questions.id),
+          eq(questionOptions.optionKey, parsed.data.optionId),
+        ),
+      )
+      .leftJoin(legalArticles, eq(questions.legalArticleId, legalArticles.id))
+      .leftJoin(
+        legalVersions,
+        eq(legalArticles.legalVersionId, legalVersions.id),
+      )
+      .leftJoin(legalActs, eq(legalVersions.legalActId, legalActs.id))
+      .leftJoin(quizBanks, eq(questions.styleBankId, quizBanks.id))
+      .where(
+        and(
+          eq(quizSessions.id, pointer.sessionId),
+          eq(quizSessions.userId, user.id),
+          eq(questions.id, pointer.questionDbId),
+          eq(questions.publicId, pointer.questionPublicId),
+          or(
+            sql`${questions.quizMode} <> 'previous_exam'`,
+            approvedReleasedProductPreviousExamQuestionExists(
+              questions.id,
+              previousExamCoverageEndsAt,
+            ),
+          ),
+        ),
+      )
+      .limit(1);
+    if (!context?.correctOptionId) {
+      return { closed: "content" as const, answer: null };
+    }
+
+    const [existing] = await tx
+      .select({ isCorrect: quizSessionAnswers.isCorrect })
+      .from(quizSessionAnswers)
+      .where(
+        and(
+          eq(quizSessionAnswers.sessionId, context.sessionId),
+          eq(quizSessionAnswers.questionId, context.questionDbId),
+        ),
+      )
+      .limit(1);
+
+    if (existing && context.experience !== "exam") {
+      return {
+        closed: null,
+        answer: { isCorrect: existing.isCorrect },
+        context,
+      };
     }
 
     const answerValues = {
@@ -246,7 +281,22 @@ export async function POST(request: Request) {
           ),
         );
     }
-    return { closed: null, answer: answer ?? null };
+    const acceptedAnswer =
+      answer ??
+      (
+        await tx
+          .select({ isCorrect: quizSessionAnswers.isCorrect })
+          .from(quizSessionAnswers)
+          .where(
+            and(
+              eq(quizSessionAnswers.sessionId, context.sessionId),
+              eq(quizSessionAnswers.questionId, context.questionDbId),
+            ),
+          )
+          .limit(1)
+      )[0] ??
+      null;
+    return { closed: null, answer: acceptedAnswer, context };
   });
 
   if (transactionResult.closed === "deadline") {
@@ -255,21 +305,14 @@ export async function POST(request: Request) {
   if (transactionResult.closed === "session") {
     return NextResponse.json({ error: "session_finished" }, { status: 409 });
   }
+  if (transactionResult.closed === "content") {
+    return NextResponse.json({ error: "question_not_found" }, { status: 404 });
+  }
 
-  let acceptedIsCorrect = transactionResult.answer?.isCorrect;
-  if (acceptedIsCorrect === undefined) {
-    const [winner] = await db
-      .select({ isCorrect: quizSessionAnswers.isCorrect })
-      .from(quizSessionAnswers)
-      .where(
-        and(
-          eq(quizSessionAnswers.sessionId, context.sessionId),
-          eq(quizSessionAnswers.questionId, context.questionDbId),
-        ),
-      )
-      .limit(1);
-    if (!winner) return NextResponse.json({ error: "answer_not_saved" }, { status: 409 });
-    acceptedIsCorrect = winner.isCorrect;
+  const acceptedIsCorrect = transactionResult.answer?.isCorrect;
+  const context = transactionResult.context;
+  if (acceptedIsCorrect === undefined || !context) {
+    return NextResponse.json({ error: "answer_not_saved" }, { status: 409 });
   }
 
   if (context.experience === "exam") {

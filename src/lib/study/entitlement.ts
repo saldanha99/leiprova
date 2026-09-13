@@ -10,13 +10,20 @@ import {
 } from "@/lib/db/schema";
 import type { StudyEntitlement } from "@/lib/study/access-policy";
 import { approvedProductQuestionExists } from "@/lib/commerce/product-binding-query";
+import {
+  approvedProductPreviousExamQuestionExists,
+  licensedPreviousExamContentSatisfied,
+} from "@/lib/commerce/previous-exam-content";
 
 export async function getStudyEntitlement(
   userId: number,
   now = new Date(),
 ): Promise<StudyEntitlement> {
   const [validSubscription] = await getDb()
-    .select({ id: subscriptions.id })
+    .select({
+      id: subscriptions.id,
+      accessEndsAt: subscriptions.accessEndsAt,
+    })
     .from(subscriptions)
     .where(
       and(
@@ -43,11 +50,37 @@ export async function getStudyEntitlement(
     )
     .limit(1);
 
-  if (validSubscription) return { hasFullAccess: true };
+  if (validSubscription)
+    return {
+      hasFullAccess: true,
+      accessEndsAt: validSubscription.accessEndsAt ?? undefined,
+    };
   const scoped = await getDb()
     .selectDistinct({ publicId: questions.publicId })
     .from(contestPurchases)
-    .innerJoin(questions, approvedProductQuestionExists(contestPurchases.productSlug, questions.id, contestPurchases.opportunityId))
+    .innerJoin(
+      questions,
+      or(
+        approvedProductQuestionExists(
+          contestPurchases.productSlug,
+          questions.id,
+          contestPurchases.opportunityId,
+        ),
+        and(
+          licensedPreviousExamContentSatisfied(
+            contestPurchases.productSlug,
+            contestPurchases.opportunityId,
+            contestPurchases.accessEndsAt,
+          ),
+          approvedProductPreviousExamQuestionExists(
+            contestPurchases.productSlug,
+            questions.id,
+            contestPurchases.opportunityId,
+            contestPurchases.accessEndsAt,
+          ),
+        ),
+      ),
+    )
     .where(
       and(
         eq(contestPurchases.userId, userId),

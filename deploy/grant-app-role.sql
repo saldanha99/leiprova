@@ -5,6 +5,7 @@ begin;
 grant execute on function public.lock_editorial_approval_context(bigint[]) to :app_user;
 grant execute on function public.lock_product_binding_review_product(text) to :app_user;
 grant execute on function public.lock_editorial_agent_context(bigint,bigint[]) to :app_user;
+grant execute on function public.lock_exam_document_review_edition(bigint) to :app_user;
 
 alter default privileges in schema public revoke all privileges on tables from :app_user;
 alter default privileges in schema public revoke all privileges on sequences from :app_user;
@@ -28,6 +29,8 @@ grant select on
   quiz_topics,
   quiz_career_subjects,
   exam_editions,
+  exam_edition_documents,
+  contest_product_exam_references,
   exam_source_portals,
   contest_categories,
   contest_category_careers,
@@ -105,6 +108,9 @@ grant insert (
   quiz_mode,
   style_bank_id,
   exam_edition_id,
+  exam_edition_document_id,
+  exam_edition_answer_key_document_id,
+  exam_edition_answer_key_document_type,
   type,
   prompt,
   explanation,
@@ -284,6 +290,8 @@ grant insert (
   career_track_id,
   specialization_id,
   bank_id,
+  institution_acronym,
+  jurisdiction_code,
   source_external_id,
   title,
   organizer,
@@ -309,9 +317,76 @@ grant update (
   official_url,
   exam_date,
   duration_minutes,
+  published_at,
+  status,
+  source_policy,
+  source_content_stored,
   source_checked_at,
+  updated_by_user_id,
   updated_at
 ) on exam_editions to :app_user;
+
+-- Provas anteriores: a descoberta só insere uma proposta imutável. A decisão
+-- jurídica/editorial posterior altera exclusivamente o estado e sua auditoria.
+grant insert (
+  public_id,
+  exam_edition_id,
+  document_type,
+  title,
+  source_url,
+  source_host,
+  published_at,
+  source_checked_at,
+  http_status,
+  content_type,
+  file_name,
+  expected_question_count,
+  distribution_mode,
+  source_policy,
+  checksum_sha256,
+  storage_key,
+  byte_length,
+  rights_holder,
+  license_basis,
+  license_reference,
+  license_evidence_checksum_sha256,
+  license_evidence_checked_at,
+  licensed_at,
+  license_expires_at,
+  initiated_by_user_id
+) on exam_edition_documents to :app_user;
+
+grant update (
+  http_status,
+  source_checked_at,
+  status,
+  reviewed_by_user_id,
+  reviewed_at,
+  review_notes,
+  updated_at
+) on exam_edition_documents to :app_user;
+
+grant insert (
+  public_id,
+  product_slug,
+  exam_edition_id,
+  primary_document_id,
+  primary_document_type,
+  answer_key_document_id,
+  answer_key_document_type,
+  relationship,
+  selection_verified_at,
+  initiated_by_user_id
+) on contest_product_exam_references to :app_user;
+
+grant update (
+  selection_verified_at,
+  status,
+  reviewed_by_user_id,
+  reviewed_at,
+  review_notes,
+  updated_at
+) on contest_product_exam_references to :app_user;
 
 grant insert (
   public_id,
@@ -618,6 +693,8 @@ grant usage on
   legal_versions_id_seq,
   legal_articles_id_seq,
   exam_editions_id_seq,
+  exam_edition_documents_id_seq,
+  contest_product_exam_references_id_seq,
   contest_opportunities_id_seq,
   opportunity_source_documents_id_seq,
   opportunity_document_snapshots_id_seq,
