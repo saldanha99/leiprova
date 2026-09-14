@@ -232,19 +232,24 @@ export async function getApprovedContestExamReference(
           isNotNull(examEditionDocuments.sourceCheckedAt),
           sql`${examEditionDocuments.sourceCheckedAt} <= ${referenceDate}`,
           sql`${examEditionDocuments.sourceCheckedAt} >= ${referenceDate} - interval '30 days'`,
-          eq(examEditionDocuments.sourcePolicy, "licensed_content"),
-          isNotNull(examEditionDocuments.licensedAt),
-          lte(examEditionDocuments.licensedAt, referenceDate),
-          isNotNull(examEditionDocuments.rightsHolder),
-          isNotNull(examEditionDocuments.licenseBasis),
-          isNotNull(examEditionDocuments.licenseReference),
-          sql`${examEditionDocuments.licenseEvidenceChecksumSha256} ~ '^[0-9a-f]{64}$'`,
-          isNotNull(examEditionDocuments.licenseEvidenceCheckedAt),
-          lte(examEditionDocuments.licenseEvidenceCheckedAt, referenceDate),
-          sql`${examEditionDocuments.licenseEvidenceCheckedAt} <= ${examEditionDocuments.reviewedAt}`,
           or(
-            isNull(examEditionDocuments.licenseExpiresAt),
-            gt(examEditionDocuments.licenseExpiresAt, referenceDate),
+            eq(examEditionDocuments.sourcePolicy, "metadata_only"),
+            and(
+              eq(examEditionDocuments.sourcePolicy, "licensed_content"),
+              isNotNull(examEditionDocuments.licensedAt),
+              lte(examEditionDocuments.licensedAt, referenceDate),
+              isNotNull(examEditionDocuments.rightsHolder),
+              isNotNull(examEditionDocuments.licenseBasis),
+              isNotNull(examEditionDocuments.licenseReference),
+              sql`${examEditionDocuments.licenseEvidenceChecksumSha256} ~ '^[0-9a-f]{64}$'`,
+              isNotNull(examEditionDocuments.licenseEvidenceCheckedAt),
+              lte(examEditionDocuments.licenseEvidenceCheckedAt, referenceDate),
+              sql`${examEditionDocuments.licenseEvidenceCheckedAt} <= ${examEditionDocuments.reviewedAt}`,
+              or(
+                isNull(examEditionDocuments.licenseExpiresAt),
+                gt(examEditionDocuments.licenseExpiresAt, referenceDate),
+              ),
+            ),
           ),
         ),
       )
@@ -262,6 +267,31 @@ export async function getApprovedContestExamReference(
     );
   } catch (error) {
     // Permite publicar o código antes da migração sem vazar um estado parcial.
+    if (isExamReferenceCatalogUnavailable(error)) return null;
+    throw error;
+  }
+}
+
+/** Resolve apenas o identificador técnico já vinculado à oportunidade. O estado
+ * comercial do produto não é alterado nem inferido por esta consulta. */
+export async function getContestProductSlugForOpportunity(
+  opportunityPublicId: string,
+): Promise<string | null> {
+  const normalizedPublicId = opportunityPublicId.trim();
+  if (!normalizedPublicId) return null;
+  try {
+    const [row] = await getDb()
+      .select({ slug: contestStoreProducts.slug })
+      .from(contestStoreProducts)
+      .innerJoin(
+        contestOpportunities,
+        eq(contestStoreProducts.opportunityId, contestOpportunities.id),
+      )
+      .where(eq(contestOpportunities.publicId, normalizedPublicId))
+      .orderBy(contestStoreProducts.slug)
+      .limit(1);
+    return row?.slug ?? null;
+  } catch (error) {
     if (isExamReferenceCatalogUnavailable(error)) return null;
     throw error;
   }

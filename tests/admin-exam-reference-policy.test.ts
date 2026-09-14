@@ -92,6 +92,37 @@ describe("identidade da última prova por produto", () => {
     }
   });
 
+  it("permite vincular apenas o link oficial quando a reprodução não foi licenciada", () => {
+    const metadataOnly = {
+      ...validScope,
+      documentSourcePolicy: "metadata_only",
+      documentRightsHolder: null,
+      documentLicenseBasis: null,
+      documentLicenseReference: null,
+      documentLicenseEvidenceChecksumSha256: null,
+      documentLicenseEvidenceCheckedAt: null,
+      documentLicensedAt: null,
+      documentLicenseExpiresAt: null,
+      answerKeyDocumentSourcePolicy: "metadata_only",
+      answerKeyDocumentRightsHolder: null,
+      answerKeyDocumentLicenseBasis: null,
+      answerKeyDocumentLicenseReference: null,
+      answerKeyDocumentLicenseEvidenceChecksumSha256: null,
+      answerKeyDocumentLicenseEvidenceCheckedAt: null,
+      answerKeyDocumentLicensedAt: null,
+      answerKeyDocumentLicenseExpiresAt: null,
+    };
+
+    expect(validateExamReferenceScope(metadataOnly, "2026-09-12").valid).toBe(
+      false,
+    );
+    expect(
+      validateExamReferenceScope(metadataOnly, "2026-09-12", {
+        requireLicense: false,
+      }),
+    ).toEqual({ valid: true });
+  });
+
   it("recusa documento pendente, outra edição ou arquivo que não seja caderno", () => {
     for (const change of [
       { documentStatus: "pending_review" },

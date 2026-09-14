@@ -16,7 +16,10 @@ import {
   getReviewedContestOpportunity,
   listReviewedContestOpportunities,
 } from "@/lib/db/contest-opportunities";
-import { getApprovedContestExamReference } from "@/lib/db/contest-exam-references";
+import {
+  getApprovedContestExamReference,
+  getContestProductSlugForOpportunity,
+} from "@/lib/db/contest-exam-references";
 import { listReleasedContestProducts } from "@/lib/commerce/store";
 import { findExactProductForOpportunityPage } from "@/lib/commerce/product-page-association";
 import { isDatabaseConfigured } from "@/lib/db/client";
@@ -51,7 +54,14 @@ const getPageOpportunity = cache(
         jurisdictionSlug,
         opportunityPublicId: opportunity.publicId,
       });
-      return { opportunity, jurisdiction, productSlug: product?.slug };
+      const referenceProductSlug = product?.slug ??
+        await getContestProductSlugForOpportunity(opportunity.publicId);
+      return {
+        opportunity,
+        jurisdiction,
+        productSlug: product?.slug,
+        referenceProductSlug,
+      };
     }
     const planned = getCatalogContest(opportunitySlug);
     if (
@@ -66,7 +76,12 @@ const getPageOpportunity = cache(
       await listReviewedContestOpportunities({ categorySlug })
     ).find((item) => item.publicId === product.opportunityPublicId);
     return linked
-      ? { opportunity: linked, jurisdiction, productSlug: product.slug }
+      ? {
+          opportunity: linked,
+          jurisdiction,
+          productSlug: product.slug,
+          referenceProductSlug: product.slug,
+        }
       : null;
   },
 );
@@ -162,8 +177,8 @@ export default async function ContestOpportunityPage({
   const path = product
     ? catalogContestPath(product)
     : `/concursos/${categoria}/${uf}/${slug}`;
-  const lastExam = result.productSlug
-    ? await getApprovedContestExamReference(result.productSlug)
+  const lastExam = result.referenceProductSlug
+    ? await getApprovedContestExamReference(result.referenceProductSlug)
     : null;
 
   const structuredData = {

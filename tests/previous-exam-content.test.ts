@@ -86,7 +86,7 @@ describe("conteúdo real licenciado por produto", () => {
     expect(query.params).toContain(9);
   });
 
-  it("exige caderno e gabarito exatos, ambos licenciados e com evidência versionada", () => {
+  it("aceita a referência externa revisada sem afrouxar o gate de conteúdo", () => {
     const reference = new PgDialect().sqlToQuery(
       approvedProductPreviousExamReferenceExists(
         sql`${"concurso-x"}`,
@@ -94,16 +94,14 @@ describe("conteúdo real licenciado por produto", () => {
       ),
     );
 
-    expect(reference.sql).toContain("exam_document.source_policy = 'licensed_content'");
+    expect(reference.sql).toContain("exam_document.source_policy = 'metadata_only'");
     expect(reference.sql).toContain(
       "answer_key_document.id = exam_reference.answer_key_document_id",
     );
     expect(reference.sql).toContain(
       "answer_key_document.document_type = 'answer_key'",
     );
-    expect(reference.sql).toContain(
-      "answer_key_document.source_policy = 'licensed_content'",
-    );
+    expect(reference.sql).toContain("answer_key_document.source_policy = 'metadata_only'");
     expect(reference.sql).toContain(
       "exam_document.license_evidence_checksum_sha256 ~ '^[0-9a-f]{64}$'",
     );

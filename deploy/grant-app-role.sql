@@ -30,6 +30,7 @@ grant select on
   quiz_career_subjects,
   exam_editions,
   exam_edition_documents,
+  exam_license_requests,
   contest_product_exam_references,
   exam_source_portals,
   contest_categories,
@@ -355,6 +356,35 @@ grant insert (
   license_expires_at,
   initiated_by_user_id
 ) on exam_edition_documents to :app_user;
+
+-- A automação pode preparar e acompanhar pedidos, mas não registrar concessão.
+-- Evidência, decisão e aprovação continuam no fluxo humano dos documentos.
+grant insert (
+  public_id,
+  exam_edition_id,
+  bank_id,
+  status,
+  recipient_emails,
+  subject,
+  request_body,
+  scope_fingerprint,
+  initiated_by_user_id
+) on exam_license_requests to :app_user;
+
+grant update (
+  status,
+  recipient_emails,
+  subject,
+  request_body,
+  scope_fingerprint,
+  requested_at,
+  last_follow_up_at,
+  next_follow_up_at,
+  follow_up_count,
+  last_provider_message_id,
+  review_notes,
+  updated_at
+) on exam_license_requests to :app_user;
 
 grant update (
   http_status,
@@ -695,6 +725,7 @@ grant usage on
   legal_articles_id_seq,
   exam_editions_id_seq,
   exam_edition_documents_id_seq,
+  exam_license_requests_id_seq,
   contest_product_exam_references_id_seq,
   contest_opportunities_id_seq,
   opportunity_source_documents_id_seq,

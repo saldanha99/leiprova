@@ -366,8 +366,7 @@ export function ProductExamReferenceForm({
         (document) =>
           document.examPublicId === examPublicId &&
           document.status === "approved" &&
-          document.documentType === "question_booklet" &&
-          document.sourcePolicy === "licensed_content",
+          document.documentType === "question_booklet",
       ),
     [documents, examPublicId],
   );
@@ -377,8 +376,7 @@ export function ProductExamReferenceForm({
         (document) =>
           document.examPublicId === examPublicId &&
           document.status === "approved" &&
-          document.documentType === "answer_key" &&
-          document.sourcePolicy === "licensed_content",
+          document.documentType === "answer_key",
       ),
     [documents, examPublicId],
   );
@@ -437,7 +435,10 @@ export function ProductExamReferenceForm({
           <option value="">Selecione</option>
           {availableAnswerKeys.map((document) => (
             <option key={document.publicId} value={document.publicId}>
-              {document.title} · licença registrada
+              {document.title} ·{" "}
+              {document.sourcePolicy === "licensed_content"
+                ? "licença registrada"
+                : "link externo"}
             </option>
           ))}
         </select>

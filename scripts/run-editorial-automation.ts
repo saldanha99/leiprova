@@ -19,6 +19,12 @@ import { prepareAgentWork } from "../src/lib/editorial/agent-work-preparation";
 import { discoveryPathBlocked } from "../src/lib/editorial/discovery-policy";
 import { safeEditorialError as safeError } from "../src/lib/editorial/safe-error";
 import {
+  dispatchDueExamLicenseRequests,
+  prepareExamLicenseRequests,
+  reconcileGrantedExamLicenseRequests,
+  type LicenseEmail,
+} from "../src/lib/licensing/exam-license-automation";
+import {
   claimEditorialJob,
   editorialQueueSummary,
   enqueueReviewedRequirementJobs,
@@ -55,6 +61,42 @@ if (!ownerEmail) {
 const client = postgres(databaseUrl, { max: 1, prepare: false });
 const db = drizzle(client, { schema });
 const pause = () => new Promise((resolve) => setTimeout(resolve, 400));
+
+async function sendLicenseEmail(message: LicenseEmail) {
+  const apiKey = process.env.RESEND_API_KEY?.trim();
+  const from = process.env.TRANSACTIONAL_EMAIL_FROM?.trim();
+  if (
+    process.env.LICENSE_REQUEST_EMAIL_ENABLED !== "true" ||
+    process.env.TRANSACTIONAL_EMAIL_ENABLED !== "true" ||
+    !apiKey ||
+    !from
+  ) {
+    throw new Error("license_email_not_configured");
+  }
+  const response = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+      "Idempotency-Key": message.idempotencyKey,
+      "User-Agent": "editalume-license-automation/1.0",
+    },
+    body: JSON.stringify({
+      to: message.to,
+      from,
+      subject: message.subject,
+      text: message.text,
+    }),
+    signal: AbortSignal.timeout(8_000),
+  });
+  const payload = (await response.json().catch(() => null)) as {
+    id?: string;
+  } | null;
+  if (!response.ok || !payload?.id) {
+    throw new Error("license_email_provider_rejected");
+  }
+  return { messageId: payload.id };
+}
 
 async function requireOwner() {
   const [owner] = await db
@@ -389,6 +431,11 @@ async function main() {
     const syllabi = await extractApprovedSyllabi(owner.id);
     const drafts = await generateReviewedRequirementDrafts(owner.id);
     const agents = process.env.EDITORIAL_AGENT_BRIDGE_ENABLED === "true" ? await prepareAgentWork(db) : { enabled: false };
+    const licensingPrepared = await prepareExamLicenseRequests(db, owner.id);
+    const licensingReconciled = await reconcileGrantedExamLicenseRequests(db);
+    const licensingDispatch = process.env.LICENSE_REQUEST_EMAIL_ENABLED === "true"
+      ? await dispatchDueExamLicenseRequests(db, sendLicenseEmail)
+      : { due: 0, sent: 0, deferred: 0, manualReview: 0 };
     const summary = {
       completedAt: new Date().toISOString(),
       policy: "official_documents_to_draft_queue",
@@ -398,6 +445,12 @@ async function main() {
       syllabi,
       drafts,
       agents,
+      licensing: {
+        emailEnabled: process.env.LICENSE_REQUEST_EMAIL_ENABLED === "true",
+        prepared: licensingPrepared,
+        reconciled: licensingReconciled,
+        dispatch: licensingDispatch,
+      },
     };
     await db.insert(auditLogs).values({
       actorUserId: owner.id,

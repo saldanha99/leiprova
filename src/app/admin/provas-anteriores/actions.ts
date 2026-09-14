@@ -815,7 +815,9 @@ export async function createProductExamReferenceAction(
   const todayIso = saoPauloCalendarDate(new Date());
   const scope = await loadReferenceScope(getDb(), parsed.data, todayIso);
   if (!scope) return initialError("Não foi possível cruzar produto e prova.");
-  const decision = validateExamReferenceScope(scope, todayIso);
+  const decision = validateExamReferenceScope(scope, todayIso, {
+    requireLicense: false,
+  });
   if (!decision.valid) return initialError(decision.reason);
 
   const publicId = randomUUID();
@@ -963,7 +965,9 @@ export async function reviewProductExamReferenceAction(
             todayIso,
           );
           if (!scope) throw new Error("O escopo do vínculo deixou de existir.");
-          const decision = validateExamReferenceScope(scope, todayIso);
+          const decision = validateExamReferenceScope(scope, todayIso, {
+            requireLicense: false,
+          });
           if (!decision.valid) throw new Error(decision.reason);
 
           await transaction

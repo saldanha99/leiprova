@@ -8,6 +8,7 @@ import {
   contestOpportunities,
   contestProductExamReferences,
   contestStoreProducts,
+  examLicenseRequests,
   examEditionDocuments,
   examEditions,
   quizBanks,
@@ -31,7 +32,7 @@ export async function getPreviousExamsAdminSnapshot() {
     "exam_reference_answer_key",
   );
 
-  const [exams, documents, products, references, subjects, reviewBatches] =
+  const [exams, documents, products, references, licenseRequests, subjects, reviewBatches] =
     await Promise.all([
     db
       .select({
@@ -204,6 +205,29 @@ export async function getPreviousExamsAdminSnapshot() {
       .orderBy(desc(contestProductExamReferences.createdAt)),
     db
       .select({
+        publicId: examLicenseRequests.publicId,
+        status: examLicenseRequests.status,
+        editionPublicId: examEditions.publicId,
+        editionTitle: examEditions.title,
+        bankName: quizBanks.name,
+        recipientEmails: examLicenseRequests.recipientEmails,
+        requestedAt: examLicenseRequests.requestedAt,
+        lastFollowUpAt: examLicenseRequests.lastFollowUpAt,
+        nextFollowUpAt: examLicenseRequests.nextFollowUpAt,
+        followUpCount: examLicenseRequests.followUpCount,
+        responseReceivedAt: examLicenseRequests.responseReceivedAt,
+        expiresAt: examLicenseRequests.expiresAt,
+        updatedAt: examLicenseRequests.updatedAt,
+      })
+      .from(examLicenseRequests)
+      .innerJoin(
+        examEditions,
+        eq(examLicenseRequests.examEditionId, examEditions.id),
+      )
+      .innerJoin(quizBanks, eq(examLicenseRequests.bankId, quizBanks.id))
+      .orderBy(desc(examLicenseRequests.updatedAt)),
+    db
+      .select({
         careerTrackId: quizCareerSubjects.careerTrackId,
         subjectId: quizSubjects.id,
         subjectName: quizSubjects.name,
@@ -234,6 +258,7 @@ export async function getPreviousExamsAdminSnapshot() {
     })),
     products,
     references,
+    licenseRequests,
     subjects,
     reviewBatches,
     metrics: {
@@ -258,6 +283,14 @@ export async function getPreviousExamsAdminSnapshot() {
           .map((reference) => reference.productSlug),
       ).size,
       productsWithoutOpportunity: productsWithoutOpportunity?.value ?? 0,
+      licenseRequestsOpen: licenseRequests.filter((request) =>
+        ["prepared", "awaiting_response", "granted_pending_review", "manual_review"].includes(
+          request.status,
+        ),
+      ).length,
+      licenseRequestsGranted: licenseRequests.filter(
+        (request) => request.status === "granted",
+      ).length,
     },
   };
 }

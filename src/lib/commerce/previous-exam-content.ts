@@ -163,7 +163,25 @@ function approvedBookletConditions(
     }`;
 }
 
-function approvedAnswerKeyConditions(coverageEndsAt: SQLWrapper) {
+function approvedAnswerKeyConditions(
+  coverageEndsAt: SQLWrapper,
+  requireLicense = true,
+) {
+  const validLicense = sql`
+    answer_key_document.source_policy = 'licensed_content'
+    and answer_key_document.licensed_at is not null
+    and answer_key_document.licensed_at <= current_timestamp
+    and nullif(btrim(answer_key_document.rights_holder), '') is not null
+    and nullif(btrim(answer_key_document.license_basis), '') is not null
+    and nullif(btrim(answer_key_document.license_reference), '') is not null
+    and answer_key_document.license_evidence_checksum_sha256 ~ '^[0-9a-f]{64}$'
+    and answer_key_document.license_evidence_checked_at is not null
+    and answer_key_document.license_evidence_checked_at <= current_timestamp
+    and answer_key_document.license_evidence_checked_at <= answer_key_document.reviewed_at
+    and ${licenseCovers(
+      sql`answer_key_document.license_expires_at`,
+      coverageEndsAt,
+    )}`;
   return sql`
     and answer_key_document.document_type = 'answer_key'
     and answer_key_document.id <> exam_document.id
@@ -180,25 +198,19 @@ function approvedAnswerKeyConditions(coverageEndsAt: SQLWrapper) {
       sql`answer_key_document.source_url`,
       sql`answer_key_document.source_host`,
     )}
-    and answer_key_document.source_policy = 'licensed_content'
-    and answer_key_document.licensed_at is not null
-    and answer_key_document.licensed_at <= current_timestamp
-    and nullif(btrim(answer_key_document.rights_holder), '') is not null
-    and nullif(btrim(answer_key_document.license_basis), '') is not null
-    and nullif(btrim(answer_key_document.license_reference), '') is not null
-    and answer_key_document.license_evidence_checksum_sha256 ~ '^[0-9a-f]{64}$'
-    and answer_key_document.license_evidence_checked_at is not null
-    and answer_key_document.license_evidence_checked_at <= current_timestamp
-    and answer_key_document.license_evidence_checked_at <= answer_key_document.reviewed_at
-    and ${licenseCovers(
-      sql`answer_key_document.license_expires_at`,
-      coverageEndsAt,
-    )}`;
+    and ${
+      requireLicense
+        ? sql`(${validLicense})`
+        : sql`(
+            answer_key_document.source_policy = 'metadata_only'
+            or (${validLicense})
+          )`
+    }`;
 }
 
 /** Confirma que o produto possui a última prova exata com caderno e gabarito
- * oficiais, aprovados e licenciados. A reprodução das questões ainda depende
- * do predicado integral por questão usado na entrega. */
+ * oficiais aprovados, inclusive como simples links externos. A reprodução das
+ * questões continua dependente da licença integral por questão na entrega. */
 export function approvedProductPreviousExamReferenceExists(
   productSlug: SQLWrapper,
   opportunityId?: SQLWrapper,
@@ -228,8 +240,8 @@ export function approvedProductPreviousExamReferenceExists(
       and exam_reference.reviewed_at is not null
       and exam_reference.selection_verified_at is not null
       ${exactHistoricalScopeConditions()}
-      ${approvedBookletConditions(sql`current_timestamp`, true)}
-      ${approvedAnswerKeyConditions(sql`current_timestamp`)}
+      ${approvedBookletConditions(sql`current_timestamp`, false)}
+      ${approvedAnswerKeyConditions(sql`current_timestamp`, false)}
   )`;
 }
 

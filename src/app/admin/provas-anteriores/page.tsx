@@ -49,6 +49,17 @@ const statusLabel: Record<string, string> = {
   rejected: "Rejeitado",
 };
 
+const licenseStatusLabel: Record<string, string> = {
+  prepared: "Pedido preparado",
+  awaiting_response: "Aguardando resposta",
+  granted_pending_review: "Concedida; evidência em revisão",
+  granted: "Licença validada",
+  denied: "Negada",
+  expired: "Expirada",
+  manual_review: "Intervenção necessária",
+  cancelled: "Cancelada",
+};
+
 export default async function PreviousExamsAdminPage() {
   const user = await requireSuperAdmin("/admin/provas-anteriores");
   const snapshot = await getPreviousExamsAdminSnapshot();
@@ -67,12 +78,11 @@ export default async function PreviousExamsAdminPage() {
     opportunityTitle: product.opportunityTitle,
     opportunityEditorialStatus: product.opportunityEditorialStatus,
   }));
-  const approvedLicensedDocuments = snapshot.documents.filter(
+  const approvedDocuments = snapshot.documents.filter(
     (document) =>
-      document.status === "approved" &&
-      document.sourcePolicy === "licensed_content",
+      document.status === "approved",
   );
-  const referenceDocumentOptions = approvedLicensedDocuments.map(
+  const referenceDocumentOptions = approvedDocuments.map(
     (document) => ({
       publicId: document.publicId,
       examPublicId: document.examPublicId,
@@ -82,7 +92,9 @@ export default async function PreviousExamsAdminPage() {
       sourcePolicy: document.sourcePolicy,
     }),
   );
-  const importDocumentOptions = approvedLicensedDocuments.map((document) => ({
+  const importDocumentOptions = approvedDocuments
+    .filter((document) => document.sourcePolicy === "licensed_content")
+    .map((document) => ({
       publicId: document.publicId,
       examPublicId: document.examPublicId,
       examTitle: document.examTitle,
@@ -219,6 +231,49 @@ export default async function PreviousExamsAdminPage() {
             <p className="mt-1 text-xs font-semibold text-slate-500">{label}</p>
           </article>
         ))}
+      </section>
+
+      <section className="mt-5 rounded-2xl border border-violet-300/15 bg-[#0b1220] p-5 sm:p-6">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="text-xs font-extrabold uppercase tracking-[.17em] text-violet-300">
+              Licenciamento automatizado
+            </p>
+            <h2 className="mt-2 text-2xl font-semibold text-white">
+              Pedidos e acompanhamentos por edição
+            </h2>
+          </div>
+          <p className="text-sm text-slate-400">
+            {snapshot.metrics.licenseRequestsOpen} em andamento · {snapshot.metrics.licenseRequestsGranted} validadas
+          </p>
+        </div>
+        <p className="mt-3 max-w-4xl text-sm leading-6 text-slate-400">
+          O motor prepara um pedido apenas quando existe caderno e gabarito oficiais
+          exatos, envia e cobra resposta em ciclos auditáveis. Nenhum envio, silêncio
+          ou link público é convertido em licença. A resposta escrita ainda precisa
+          ser registrada e conferida antes da reprodução.
+        </p>
+        {snapshot.licenseRequests.length ? (
+          <div className="mt-5 grid gap-3 lg:grid-cols-2">
+            {snapshot.licenseRequests.map((request) => (
+              <article key={request.publicId} className="rounded-xl border border-white/10 bg-black/10 p-4">
+                <p className="font-semibold text-violet-100">{request.editionTitle}</p>
+                <p className="mt-1 text-xs text-slate-500">{request.bankName} · {request.editionPublicId}</p>
+                <dl className="mt-3 grid gap-2 text-xs text-slate-300 sm:grid-cols-2">
+                  <div><dt className="text-slate-500">Situação</dt><dd>{licenseStatusLabel[request.status] ?? request.status}</dd></div>
+                  <div><dt className="text-slate-500">Acompanhamentos</dt><dd>{request.followUpCount} / 3</dd></div>
+                  <div><dt className="text-slate-500">Pedido enviado</dt><dd>{formatDate(request.requestedAt)}</dd></div>
+                  <div><dt className="text-slate-500">Próxima ação</dt><dd>{formatDate(request.nextFollowUpAt)}</dd></div>
+                </dl>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <p className="mt-5 text-sm text-amber-100">
+            Nenhum caso foi preparado ainda: aprove primeiro os links oficiais do
+            caderno e do gabarito da edição histórica.
+          </p>
+        )}
       </section>
 
       {snapshot.metrics.productsWithoutOpportunity > 0 ? (

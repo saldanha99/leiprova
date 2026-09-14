@@ -281,6 +281,13 @@
       "when": 1789338825417,
       "tag": "0039_daily_study_plan",
       "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1789396571356,
+      "tag": "0040_typical_demogoblin",
+      "breakpoints": true
     }
   ]
 }

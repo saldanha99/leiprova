@@ -113,7 +113,9 @@ function hasCurrentLicensedEvidence(
 export function validateExamReferenceScope(
   scope: ExamReferenceScope,
   todayIso: string,
+  options: { requireLicense?: boolean } = {},
 ): ExamReferenceScopeDecision {
+  const requireLicense = options.requireLicense ?? true;
   if (scope.productStatus !== "draft") {
     return {
       valid: false,
@@ -203,6 +205,7 @@ export function validateExamReferenceScope(
     };
   }
   if (
+    requireLicense &&
     !hasCurrentLicensedEvidence(
       {
         sourcePolicy: scope.documentSourcePolicy,
@@ -236,7 +239,7 @@ export function validateExamReferenceScope(
       .toLowerCase() !== "application/pdf" ||
     !scope.answerKeyDocumentIsOfficialSource ||
     !isFreshSourceCheck(scope.answerKeyDocumentSourceCheckedAt, todayIso) ||
-    !hasCurrentLicensedEvidence(
+    (requireLicense && !hasCurrentLicensedEvidence(
       {
         sourcePolicy: scope.answerKeyDocumentSourcePolicy,
         rightsHolder: scope.answerKeyDocumentRightsHolder,
@@ -250,12 +253,14 @@ export function validateExamReferenceScope(
         licenseExpiresAt: scope.answerKeyDocumentLicenseExpiresAt,
       },
       todayIso,
-    )
+    ))
   ) {
     return {
       valid: false,
       reason:
-        "Selecione o gabarito oficial exato, aprovado, licenciado e vigente desta edição.",
+        requireLicense
+          ? "Selecione o gabarito oficial exato, aprovado, licenciado e vigente desta edição."
+          : "Selecione o gabarito oficial exato, aprovado e vigente desta edição.",
     };
   }
   if (

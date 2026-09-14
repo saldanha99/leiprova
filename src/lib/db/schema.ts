@@ -884,6 +884,128 @@ export const examEditionDocuments = pgTable(
   ],
 );
 
+/** Caso comercial de licenciamento por edição histórica. O caso organiza pedido,
+ * cobranças e resposta; nunca concede direitos sozinho. A concessão somente vira
+ * `granted` depois que caderno e gabarito licenciados forem aprovados no fluxo
+ * independente de `exam_edition_documents`. */
+export const examLicenseRequests = pgTable(
+  "exam_license_requests",
+  {
+    id: idColumn(),
+    publicId: text("public_id").notNull().unique(),
+    examEditionId: bigint("exam_edition_id", { mode: "number" })
+      .notNull()
+      .references(() => examEditions.id, { onDelete: "restrict" }),
+    bankId: bigint("bank_id", { mode: "number" })
+      .notNull()
+      .references(() => quizBanks.id, { onDelete: "restrict" }),
+    status: text("status").notNull().default("prepared"),
+    recipientEmails: jsonb("recipient_emails").$type<string[]>().notNull(),
+    subject: text("subject").notNull(),
+    requestBody: text("request_body").notNull(),
+    scopeFingerprint: text("scope_fingerprint").notNull(),
+    requestedAt: timestamp("requested_at", { withTimezone: true }),
+    lastFollowUpAt: timestamp("last_follow_up_at", { withTimezone: true }),
+    nextFollowUpAt: timestamp("next_follow_up_at", { withTimezone: true }),
+    followUpCount: smallint("follow_up_count").notNull().default(0),
+    lastProviderMessageId: text("last_provider_message_id"),
+    responseReference: text("response_reference"),
+    responseChecksumSha256: text("response_checksum_sha256"),
+    responseReceivedAt: timestamp("response_received_at", {
+      withTimezone: true,
+    }),
+    grantedAt: timestamp("granted_at", { withTimezone: true }),
+    expiresAt: timestamp("expires_at", { withTimezone: true }),
+    initiatedByUserId: bigint("initiated_by_user_id", { mode: "number" })
+      .notNull()
+      .references(() => users.id, { onDelete: "restrict" }),
+    reviewedByUserId: bigint("reviewed_by_user_id", {
+      mode: "number",
+    }).references(() => users.id, { onDelete: "restrict" }),
+    reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+    reviewNotes: text("review_notes"),
+    ...timestamps,
+  },
+  (table) => [
+    uniqueIndex("exam_license_requests_edition_uidx").on(table.examEditionId),
+    index("exam_license_requests_due_idx")
+      .on(table.nextFollowUpAt, table.createdAt)
+      .where(sql`${table.status} in ('prepared', 'awaiting_response')`),
+    index("exam_license_requests_bank_status_idx").on(
+      table.bankId,
+      table.status,
+    ),
+    index("exam_license_requests_initiated_by_idx").on(
+      table.initiatedByUserId,
+    ),
+    index("exam_license_requests_reviewed_by_idx").on(table.reviewedByUserId),
+    check(
+      "exam_license_requests_public_id_check",
+      sql`${table.publicId} ~ '^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'`,
+    ),
+    check(
+      "exam_license_requests_status_check",
+      sql`${table.status} in ('prepared','awaiting_response','granted_pending_review','granted','denied','expired','manual_review','cancelled')`,
+    ),
+    check(
+      "exam_license_requests_recipients_check",
+      sql`jsonb_typeof(${table.recipientEmails}) = 'array'
+        and jsonb_array_length(${table.recipientEmails}) between 1 and 8`,
+    ),
+    check(
+      "exam_license_requests_text_check",
+      sql`char_length(btrim(${table.subject})) between 10 and 300
+        and char_length(btrim(${table.requestBody})) between 200 and 12000`,
+    ),
+    check(
+      "exam_license_requests_fingerprint_check",
+      sql`${table.scopeFingerprint} ~ '^[a-f0-9]{64}$'`,
+    ),
+    check(
+      "exam_license_requests_follow_up_check",
+      sql`${table.followUpCount} between 0 and 3
+        and (${table.requestedAt} is not null or ${table.followUpCount} = 0)
+        and (${table.lastFollowUpAt} is null or ${table.requestedAt} is not null)`,
+    ),
+    check(
+      "exam_license_requests_response_check",
+      sql`(
+        ${table.responseReference} is null
+        and ${table.responseChecksumSha256} is null
+        and ${table.responseReceivedAt} is null
+        and ${table.grantedAt} is null
+      ) or (
+        nullif(btrim(${table.responseReference}), '') is not null
+        and ${table.responseReference} ~* '^https://[a-z0-9.-]+(?:/|$)'
+        and ${table.responseChecksumSha256} ~ '^[a-f0-9]{64}$'
+        and ${table.responseReceivedAt} is not null
+      )`,
+    ),
+    check(
+      "exam_license_requests_decision_check",
+      sql`${table.status} not in ('granted_pending_review','granted','denied','expired') or (
+        ${table.responseReference} is not null
+        and ${table.responseChecksumSha256} is not null
+        and ${table.responseReceivedAt} is not null
+        and ${table.reviewedByUserId} is not null
+        and ${table.reviewedAt} is not null
+        and nullif(btrim(${table.reviewNotes}), '') is not null
+        and char_length(btrim(${table.reviewNotes})) between 20 and 2000
+      )`,
+    ),
+    check(
+      "exam_license_requests_grant_check",
+      sql`${table.status} not in ('granted_pending_review','granted') or ${table.grantedAt} is not null`,
+    ),
+    check(
+      "exam_license_requests_period_check",
+      sql`${table.expiresAt} is null or (
+        ${table.grantedAt} is not null and ${table.expiresAt} > ${table.grantedAt}
+      )`,
+    ),
+  ],
+);
+
 export const contestProductExamReferences = pgTable(
   "contest_product_exam_references",
   {

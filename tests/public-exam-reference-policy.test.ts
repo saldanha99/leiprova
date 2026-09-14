@@ -146,8 +146,37 @@ describe("política pública da última prova", () => {
     expect(toPublicExamDocument(expired, now)).toBeNull();
   });
 
+  it("publica metadados revisados como link oficial sem alegar licença", () => {
+    const booklet = candidate({
+      sourcePolicy: "metadata_only",
+      rightsHolder: null,
+      licenseBasis: null,
+      licenseReference: null,
+      licenseEvidenceChecksumSha256: null,
+      licenseEvidenceCheckedAt: null,
+      licensedAt: null,
+      licenseExpiresAt: null,
+    });
+    const answerKey = candidate({
+      ...booklet,
+      documentId: 23,
+      documentPublicId: "gabarito-oficial",
+      documentType: "answer_key",
+      expectedQuestionCount: null,
+      documentTitle: "Gabarito oficial",
+      sourceUrl: "https://cdn.cebraspe.org.br/pc-ba-2022/gabarito.pdf",
+    });
+
+    const result = buildPublicContestExamReference([booklet, answerKey], now);
+    expect(result?.questionBooklet.licenseLabel).toBe(
+      "Consulta na fonte oficial",
+    );
+    expect(result?.answerKeys[0]?.licenseLabel).toBe(
+      "Consulta na fonte oficial",
+    );
+  });
+
   it.each([
-    { sourcePolicy: "metadata_only" },
     { licenseEvidenceChecksumSha256: null },
     { licenseEvidenceChecksumSha256: "A".repeat(64) },
     { licenseEvidenceCheckedAt: null },

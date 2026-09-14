@@ -181,7 +181,7 @@ export function toPublicExamDocument(
     ) {
       return null;
     }
-  } else {
+  } else if (row.sourcePolicy !== "metadata_only") {
     return null;
   }
 
