@@ -26,6 +26,7 @@
     "editorial:operate": "tsx --env-file-if-exists=.env scripts/operate-editorial-package.ts",
     "editorial:drafts:import": "tsx --env-file-if-exists=.env scripts/import-editorial-draft-package.ts",
     "editorial:review:80": "tsx --env-file-if-exists=.env scripts/review-editorial-80.ts",
+    "editorial:review:package": "tsx --env-file-if-exists=.env scripts/review-editorial-package.ts",
     "editorial:bindings:import": "tsx --env-file-if-exists=.env scripts/import-product-question-bindings.ts",
     "editorial:courses:plan": "tsx --env-file-if-exists=.env scripts/plan-course-production.ts",
     "editorial:scoped:verify": "tsx --env-file-if-exists=.env scripts/validate-scoped-authoring.ts",
