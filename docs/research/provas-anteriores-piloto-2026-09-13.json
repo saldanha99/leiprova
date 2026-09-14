@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-09-13T00:00:00-03:00",
+  "publicationAllowed": false,
+  "storageAllowed": false,
+  "rightsStatus": "written_authorization_pending",
+  "notes": [
+    "Inventário de metadados e links oficiais; nenhum conteúdo foi copiado.",
+    "A declaração geral de revisão do responsável não substitui a autorização escrita nem a segunda revisão por outro administrador.",
+    "O caderno anterior é referência histórica para o produto atual e não deve ser apresentado como edital aberto.",
+    "Pedidos de autorização comercial enviados à FGV em 13/09/2026; aguardando resposta escrita."
+  ],
+  "items": [
+    {
+      "targetProductSlug": "enac-exame-nacional-dos-cartorios-2026-2",
+      "institutionAcronym": "ENAC",
+      "organizer": "Fundação Getulio Vargas",
+      "bankSlug": "fgv",
+      "jurisdictionCode": "BR",
+      "historicalEdition": "2026.1",
+      "sourceExternalId": "enac-3exame-2026-1-tipo-1",
+      "examDate": "2026-06-14",
+      "questionCount": 100,
+      "bookletType": "1",
+      "officialPageUrl": "https://conhecimento.fgv.br/exames/enac/3exame",
+      "bookletUrl": "https://conhecimento.fgv.br/sites/default/files/concursos/enac-2026-1-enac-2026-1-tipo-1-2.pdf",
+      "definitiveAnswerKeyUrl": "https://conhecimento.fgv.br/sites/default/files/concursos/gabarito-definitivo-enac-2026.1.pdf",
+      "bookletPages": 36,
+      "answerKeyPages": 2,
+      "examContact": "enac@fgv.br",
+      "authorizationRequest": {
+        "status": "sent_awaiting_written_response",
+        "sentOn": "2026-09-13",
+        "recipients": [
+          "enac@fgv.br",
+          "demanda.conhecimento@fgv.br"
+        ],
+        "subject": "Pedido de autorização comercial — ENAC 2026.1 — Editalume"
+      },
+      "rightsStatus": "written_authorization_pending",
+      "reviewStatus": "second_independent_review_pending"
+    },
+    {
+      "targetProductSlug": "enam-exame-nacional-da-magistratura-2026-2",
+      "institutionAcronym": "ENAM",
+      "organizer": "Fundação Getulio Vargas",
+      "bankSlug": "fgv",
+      "jurisdictionCode": "BR",
+      "historicalEdition": "2026.1",
+      "sourceExternalId": "enam-5exame-2026-1-tipo-1",
+      "examDate": "2026-06-07",
+      "questionCount": 80,
+      "bookletType": "1",
+      "officialPageUrl": "https://conhecimento.fgv.br/exames/enam/5exame",
+      "bookletUrl": "https://conhecimento.fgv.br/sites/default/files/concursos/magistratura-cns001-tipo-1.pdf",
+      "definitiveAnswerKeyUrl": "https://conhecimento.fgv.br/sites/default/files/concursos/enam-exame-nacional-de-magistratura-2026.1.pdf",
+      "bookletPages": 32,
+      "answerKeyPages": 2,
+      "examContact": "examemagistratura@fgv.br",
+      "authorizationRequest": {
+        "status": "sent_awaiting_written_response",
+        "sentOn": "2026-09-13",
+        "recipients": [
+          "examemagistratura@fgv.br",
+          "demanda.conhecimento@fgv.br"
+        ],
+        "subject": "Pedido de autorização comercial — ENAM 2026.1 — Editalume"
+      },
+      "rightsStatus": "written_authorization_pending",
+      "reviewStatus": "second_independent_review_pending"
+    }
+  ]
+}

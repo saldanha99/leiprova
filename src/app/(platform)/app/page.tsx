@@ -59,6 +59,9 @@ export default async function DashboardPage() {
                 </div>
                 <span className="text-sm font-bold text-white">{stats.todayAnswered}/{goal}</span>
               </div>
+              <Link href="/app/plano-diario" className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-emerald-300">
+                Seguir plano diário <ArrowRight className="size-4" />
+              </Link>
             </div>
             <div className="flex shrink-0 flex-col gap-2 sm:flex-row lg:flex-col">
               <Link href="/app/quiz" className="group inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-amber-400 px-5 text-sm font-bold text-slate-950 transition hover:bg-amber-300">

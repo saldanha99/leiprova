@@ -2,6 +2,10 @@
 
 Data da verificação: 12/09/2026 (America/Sao_Paulo).
 
+O processo de obtenção de autorização, o texto pronto para contato com as
+organizadoras e o primeiro lote de PDFs oficiais identificados estão em
+[`LICENCIAMENTO-PROVAS-ANTERIORES.md`](./LICENCIAMENTO-PROVAS-ANTERIORES.md).
+
 ## Resultado objetivo
 
 A infraestrutura foi fechada para que uma prova real só possa ser vendida ou

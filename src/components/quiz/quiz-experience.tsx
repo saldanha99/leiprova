@@ -7,18 +7,12 @@ import { QuizSession } from "./quiz-session";
 import { isQuizConfigReady, type QuizConfig, type QuizSessionPayload } from "./types";
 import type { QuizExamEditionOption } from "@/lib/quiz/exam-edition-catalog";
 
-const initialConfig: QuizConfig = {
-  path: "career",
-  count: 10,
-  experience: "training",
-  timed: false,
-  examScope: "latest",
-};
-
 export function QuizExperience({
   examEditions,
+  initialConfig,
 }: {
   examEditions: readonly QuizExamEditionOption[];
+  initialConfig: QuizConfig;
 }) {
   const [config, setConfig] = useState<QuizConfig>(initialConfig);
   const [session, setSession] = useState<QuizSessionPayload | null>(null);

@@ -319,6 +319,41 @@ function qualifiedPreviousQuestionConditions(coverageEndsAt: SQLWrapper) {
 }
 
 /**
+ * Valida uma questão histórica licenciada sem vinculá-la à venda de um produto
+ * específico. Essa variante alimenta estatísticas editoriais de longo prazo:
+ * exige edição oficial, caderno e gabarito aprovados, licença vigente e revisão
+ * independente da questão, mas não exige que a edição seja a última de um cargo.
+ */
+export function approvedHistoricalPreviousExamQuestionExists(
+  questionId: SQLWrapper,
+  coverageEndsAt: SQLWrapper = sql`current_timestamp`,
+) {
+  return sql<boolean>`exists (
+    select 1
+    from questions previous_question
+    join exam_editions exam_edition
+      on exam_edition.id = previous_question.exam_edition_id
+    join quiz_banks exam_bank
+      on exam_bank.id = exam_edition.bank_id
+    join exam_edition_documents exam_document
+      on exam_document.id = previous_question.exam_edition_document_id
+      and exam_document.exam_edition_id = exam_edition.id
+    join exam_edition_documents answer_key_document
+      on answer_key_document.id = previous_question.exam_edition_answer_key_document_id
+      and answer_key_document.exam_edition_id = exam_edition.id
+    where previous_question.id = ${questionId}
+      and exam_edition.status in ('held', 'published')
+      and exam_edition.exam_date < (current_timestamp at time zone 'America/Sao_Paulo')::date
+      and ${freshnessSatisfied(sql`exam_edition.source_checked_at`)}
+      and ${officialExamUrlAllowed(sql`exam_bank.slug`, sql`exam_edition.official_url`)}
+      and exam_bank.is_active = true
+      ${approvedBookletConditions(coverageEndsAt, true)}
+      ${approvedAnswerKeyConditions(coverageEndsAt)}
+      ${qualifiedPreviousQuestionConditions(coverageEndsAt)}
+  )`;
+}
+
+/**
  * Revalida, a cada leitura, toda a cadeia produto -> última edição -> caderno
  * -> questão. Um simples link público ou um PDF em domínio oficial não concede
  * direito de reproduzir o enunciado dentro da área paga.

@@ -14,6 +14,7 @@
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "content:verify": "tsx scripts/verify-content.ts",
+    "content:feed:real": "tsx --env-file-if-exists=.env scripts/feed-available-real-data.ts",
     "legal:sources:check": "tsx --env-file-if-exists=.env scripts/check-official-sources.ts",
     "opportunities:sources:check": "tsx --env-file-if-exists=.env scripts/check-open-opportunities.ts",
     "opportunities:approve": "tsx --env-file-if-exists=.env scripts/approve-official-opportunities.ts",

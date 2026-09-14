@@ -9,6 +9,7 @@ import {
   FileText,
   Layers3,
   LockKeyhole,
+  Map,
   RotateCcw,
   ShieldCheck,
 } from "lucide-react";
@@ -283,6 +284,11 @@ export default async function MaterialsPage() {
         </div>
         <div className="mt-6">
           <FlashcardDeck cards={flashcards} />
+        </div>
+        <div className="mt-5 flex justify-end">
+          <Link href="/app/mapas" className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-emerald-300/15 bg-emerald-300/5 px-4 text-xs font-bold text-emerald-200">
+            <Map className="size-3.5" /> Abrir mapas de revisão
+          </Link>
         </div>
       </section>
 

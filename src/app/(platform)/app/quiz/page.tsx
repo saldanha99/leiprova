@@ -3,6 +3,7 @@ import { ListChecks } from "lucide-react";
 
 import { PageHeader } from "@/components/platform/page-header";
 import { QuizExperience } from "@/components/quiz/quiz-experience";
+import { quizConfigFromSearchParams, type QuizPresetSearchParams } from "@/components/quiz/preset-config";
 import { listEligibleQuizExamEditions } from "@/lib/db/quiz-exam-editions";
 import { toQuizExamEditionOptions } from "@/lib/quiz/exam-edition-catalog";
 
@@ -11,8 +12,13 @@ export const metadata: Metadata = {
   description: "Monte sessões por cargo, banca, matéria e estilo de questão.",
 };
 
-export default async function QuizPage() {
+export default async function QuizPage({
+  searchParams,
+}: {
+  searchParams: Promise<QuizPresetSearchParams>;
+}) {
   const examEditions = toQuizExamEditionOptions(await listEligibleQuizExamEditions(new Date(), true));
+  const initialConfig = quizConfigFromSearchParams(await searchParams, examEditions);
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-7 sm:px-7 lg:px-9 lg:py-10">
@@ -22,7 +28,7 @@ export default async function QuizPage() {
         description="Escolha o cargo ou a banca, refine a matéria e treine literalidade, questões licenciadas ou itens inéditos autorais no padrão de cobrança."
         icon={ListChecks}
       />
-      <QuizExperience examEditions={examEditions} />
+      <QuizExperience examEditions={examEditions} initialConfig={initialConfig} />
     </main>
   );
 }

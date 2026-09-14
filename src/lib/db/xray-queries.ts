@@ -1,14 +1,17 @@
 import "server-only";
 
-import { asc, desc, eq, sql } from "drizzle-orm";
+import { and, asc, desc, eq, isNotNull, sql } from "drizzle-orm";
 
+import { approvedHistoricalPreviousExamQuestionExists } from "@/lib/commerce/previous-exam-content";
 import { getDb } from "@/lib/db/client";
 import {
+  examEditions,
   legalActs,
   legalArticles,
   legalVersions,
   questionOptions,
   questions,
+  quizBanks,
   userAttempts,
 } from "@/lib/db/schema";
 
@@ -95,5 +98,76 @@ export async function getUserXRay(userId: number) {
     articlesStudied: byArticle.length,
     byMutation,
     byArticle,
+  };
+}
+
+/**
+ * Frequência editorial por banca. Só entram questões de provas anteriores cuja
+ * cadeia comercial completa continua liberada e licenciada no momento da
+ * leitura. Um rascunho, link público ou item autoral nunca aumenta a amostra.
+ */
+export async function getBankArticleXRay(bankSlug: string, limit = 100) {
+  const eligible = and(
+    eq(quizBanks.slug, bankSlug),
+    eq(quizBanks.isActive, true),
+    eq(questions.quizMode, "previous_exam"),
+    eq(questions.editorialStatus, "reviewed"),
+    eq(questions.sourceRights, "licensed"),
+    isNotNull(questions.legalArticleId),
+    sql`${examEditions.examDate} >= ((current_timestamp at time zone 'America/Sao_Paulo')::date - interval '10 years')::date`,
+    approvedHistoricalPreviousExamQuestionExists(questions.id),
+  );
+  const db = getDb();
+  const [rows, summaryRows] = await Promise.all([
+    db
+      .select({
+        articleId: legalArticles.id,
+        articleRef: legalArticles.articleRef,
+        articleOrder: legalArticles.articleOrder,
+        legalAct: legalActs.shortTitle,
+        legalActSlug: legalActs.slug,
+        questionCount: sql<number>`count(distinct ${questions.id})::int`,
+        editionCount: sql<number>`count(distinct ${examEditions.id})::int`,
+        lastExamDate: sql<string>`max(${examEditions.examDate})::text`,
+      })
+      .from(questions)
+      .innerJoin(examEditions, eq(questions.examEditionId, examEditions.id))
+      .innerJoin(quizBanks, eq(examEditions.bankId, quizBanks.id))
+      .innerJoin(legalArticles, eq(questions.legalArticleId, legalArticles.id))
+      .innerJoin(legalVersions, eq(legalArticles.legalVersionId, legalVersions.id))
+      .innerJoin(legalActs, eq(legalVersions.legalActId, legalActs.id))
+      .where(eligible)
+      .groupBy(legalArticles.id, legalActs.id)
+      .orderBy(
+        desc(sql`count(distinct ${questions.id})`),
+        asc(legalActs.shortTitle),
+        asc(legalArticles.articleOrder),
+      )
+      .limit(Math.max(1, Math.min(100, limit))),
+    db
+      .select({
+        questionCount: sql<number>`count(distinct ${questions.id})::int`,
+        editionCount: sql<number>`count(distinct ${examEditions.id})::int`,
+      })
+      .from(questions)
+      .innerJoin(examEditions, eq(questions.examEditionId, examEditions.id))
+      .innerJoin(quizBanks, eq(examEditions.bankId, quizBanks.id))
+      .innerJoin(legalArticles, eq(questions.legalArticleId, legalArticles.id))
+      .where(eligible),
+  ]);
+  const questionCount = summaryRows[0]?.questionCount ?? 0;
+  const editionCount = summaryRows[0]?.editionCount ?? 0;
+
+  return {
+    bankSlug,
+    questionCount,
+    editionCount,
+    articles: rows.map((row, index) => ({
+      ...row,
+      rank: index + 1,
+      sharePercent: questionCount
+        ? Math.round((row.questionCount / questionCount) * 10_000) / 100
+        : 0,
+    })),
   };
 }

@@ -2997,6 +2997,41 @@ export const questionNotebookItems = pgTable(
   ],
 );
 
+export const userDailyStudyProgress = pgTable(
+  "user_daily_study_progress",
+  {
+    userId: bigint("user_id", { mode: "number" })
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    studyDate: date("study_date").notNull(),
+    legalActId: bigint("legal_act_id", { mode: "number" })
+      .notNull()
+      .references(() => legalActs.id, { onDelete: "restrict" }),
+    articleStartOrder: integer("article_start_order").notNull(),
+    articleEndOrder: integer("article_end_order").notNull(),
+    readingCompletedAt: timestamp("reading_completed_at", {
+      withTimezone: true,
+    }),
+    reviewCompletedAt: timestamp("review_completed_at", {
+      withTimezone: true,
+    }),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    primaryKey({
+      columns: [table.userId, table.studyDate],
+      name: "user_daily_study_progress_pkey",
+    }),
+    index("user_daily_study_progress_legal_act_idx").on(table.legalActId),
+    check(
+      "user_daily_study_progress_range_check",
+      sql`${table.articleStartOrder} >= 0 and ${table.articleEndOrder} >= ${table.articleStartOrder}`,
+    ),
+  ],
+);
+
 export const studyDays = pgTable(
   "study_days",
   {

@@ -185,7 +185,7 @@ export async function getMonthlyRanking(limit = 20) {
   return getDb()
     .select({
       publicId: users.publicId,
-      xp: sql<number>`coalesce(sum(${studyDays.xpEarned}), 0)::int`,
+      correct: sql<number>`coalesce(sum(${studyDays.correctCount}), 0)::int`,
       answered: sql<number>`coalesce(sum(${studyDays.answeredCount}), 0)::int`,
     })
     .from(studyDays)
@@ -194,7 +194,10 @@ export async function getMonthlyRanking(limit = 20) {
       sql`${studyDays.studyDate} >= date_trunc('month', current_date)::date`,
     )
     .groupBy(users.id)
-    .orderBy(desc(sql`sum(${studyDays.xpEarned})`), asc(users.publicId))
+    .orderBy(
+      desc(sql`sum(${studyDays.correctCount})`),
+      asc(users.publicId),
+    )
     .limit(limit);
 }
 

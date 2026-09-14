@@ -602,6 +602,7 @@ grant select, insert, update on
   subscriptions,
   review_queue,
   study_days,
+  user_daily_study_progress,
   checkout_attempts,
   stripe_events,
   rate_limit_counters,

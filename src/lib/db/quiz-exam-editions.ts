@@ -6,9 +6,14 @@ import { getDb } from "@/lib/db/client";
 import { editionHasOriginalTraining } from "@/lib/quiz/original-style-query";
 import {
   examEditions,
+  legalActs,
+  legalArticles,
+  legalVersions,
+  questions,
   quizBanks,
   quizCareerSpecializations,
   quizCareerTracks,
+  quizSubjects,
 } from "@/lib/db/schema";
 import {
   buildQuizExamEditionCatalog,
@@ -79,6 +84,37 @@ export async function listEligibleQuizExamEditions(
     .orderBy(desc(examEditions.examDate), asc(examEditions.publicId));
 
   return buildQuizExamEditionCatalog(rows, todayIso, includeScheduled);
+}
+
+export async function listOriginalStyleSimulationCoverage() {
+  return getDb()
+    .select({
+      bankSlug: quizBanks.slug,
+      bankName: quizBanks.name,
+      subjectSlug: quizSubjects.slug,
+      subjectName: quizSubjects.name,
+      questionCount: sql<number>`count(distinct ${questions.id})::int`,
+    })
+    .from(questions)
+    .innerJoin(quizBanks, eq(questions.styleBankId, quizBanks.id))
+    .innerJoin(quizSubjects, eq(questions.subjectId, quizSubjects.id))
+    .innerJoin(legalArticles, eq(questions.legalArticleId, legalArticles.id))
+    .innerJoin(legalVersions, eq(legalArticles.legalVersionId, legalVersions.id))
+    .innerJoin(legalActs, eq(legalVersions.legalActId, legalActs.id))
+    .where(and(
+      eq(questions.editorialStatus, "reviewed"),
+      eq(questions.quizMode, "original_style"),
+      eq(questions.sourceRights, "original_authorial"),
+      isNotNull(questions.reviewedByUserId),
+      eq(quizBanks.isActive, true),
+      eq(quizSubjects.isActive, true),
+      eq(legalArticles.editorialStatus, "reviewed"),
+      eq(legalArticles.sourceRights, "official_text"),
+      eq(legalVersions.status, "current"),
+      eq(legalActs.isActive, true),
+    ))
+    .groupBy(quizBanks.id, quizSubjects.id)
+    .orderBy(desc(sql`count(distinct ${questions.id})`), asc(quizBanks.name), asc(quizSubjects.name));
 }
 
 export type { QuizExamEditionCatalogItem } from "@/lib/quiz/exam-edition-catalog";
