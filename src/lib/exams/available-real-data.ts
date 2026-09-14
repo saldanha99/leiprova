@@ -12,18 +12,18 @@ export type AvailableExamEdition = Readonly<{
   publicId: string;
   sourceExternalId: string;
   careerSlug: string;
-  bankSlug: "fgv";
-  institutionAcronym: "ENFAM" | "CNJ";
-  jurisdictionCode: "BR";
+  bankSlug: "fgv" | "fcc";
+  institutionAcronym: "ENFAM" | "CNJ" | "PC-PR" | "PGM-MANAUS";
+  jurisdictionCode: "BR" | "PR" | "AM";
   title: string;
   organizer: string;
   jurisdiction: string;
   officialUrl: string;
   examDate: string;
-  durationMinutes: number;
+  durationMinutes: number | null;
   status: "scheduled" | "published";
   opportunitySlug?: string;
-  productSlug?: string;
+  productSlugs?: readonly string[];
   documents: readonly AvailableExamDocument[];
 }>;
 
@@ -43,7 +43,7 @@ export const AVAILABLE_REAL_EXAM_EDITIONS = [
     durationMinutes: 300,
     status: "scheduled",
     opportunitySlug: "enac-2026-2",
-    productSlug: "enac-exame-nacional-dos-cartorios-2026-2",
+    productSlugs: ["enac-exame-nacional-dos-cartorios-2026-2"],
     documents: [],
   },
   {
@@ -61,7 +61,43 @@ export const AVAILABLE_REAL_EXAM_EDITIONS = [
     durationMinutes: 300,
     status: "scheduled",
     opportunitySlug: "enam-2026-2",
-    productSlug: "enam-exame-nacional-da-magistratura-2026-2",
+    productSlugs: ["enam-exame-nacional-da-magistratura-2026-2"],
+    documents: [],
+  },
+  {
+    publicId: "pc-pr-2026",
+    sourceExternalId: "pcpr26",
+    careerSlug: "policia-civil",
+    bankSlug: "fgv",
+    institutionAcronym: "PC-PR",
+    jurisdictionCode: "PR",
+    title: "Polícia Civil do Paraná — Concurso 2026",
+    organizer: "Fundação Getulio Vargas",
+    jurisdiction: "Paraná",
+    officialUrl: "https://conhecimento.fgv.br/concursos/pcpr26",
+    examDate: "2026-10-11",
+    durationMinutes: 300,
+    status: "scheduled",
+    opportunitySlug: "pc-pr-2026",
+    productSlugs: ["pc-pr-delegado-2026", "pc-pr-agente-2026"],
+    documents: [],
+  },
+  {
+    publicId: "pgm-manaus-2026",
+    sourceExternalId: "pgmam126",
+    careerSlug: "procurador",
+    bankSlug: "fcc",
+    institutionAcronym: "PGM-MANAUS",
+    jurisdictionCode: "AM",
+    title: "PGM Manaus 2026 — Procurador do Município de 3ª Classe",
+    organizer: "Fundação Carlos Chagas",
+    jurisdiction: "Amazonas",
+    officialUrl: "https://www.concursosfcc.com.br/concursos/pgmam126/index.html",
+    examDate: "2026-09-20",
+    durationMinutes: null,
+    status: "scheduled",
+    opportunitySlug: "pgm-manaus-2026",
+    productSlugs: ["pgm-manaus-procurador-do-municipio-2026"],
     documents: [],
   },
   {
@@ -140,12 +176,12 @@ export function validateAvailableRealExamEditions(
     publicIds.add(edition.publicId);
     sourceIds.add(`${edition.bankSlug}:${edition.sourceExternalId}`);
     parseOfficialExamUrl(edition.bankSlug, edition.officialUrl);
-    if (edition.status === "scheduled" && (!edition.opportunitySlug || !edition.productSlug)) {
+    if (edition.status === "scheduled" && (!edition.opportunitySlug || !edition.productSlugs?.length)) {
       throw new Error(`Edição futura sem oportunidade/produto: ${edition.publicId}.`);
     }
-    if (edition.productSlug) {
-      if (products.has(edition.productSlug)) throw new Error(`Produto duplicado: ${edition.productSlug}.`);
-      products.add(edition.productSlug);
+    for (const productSlug of edition.productSlugs ?? []) {
+      if (products.has(productSlug)) throw new Error(`Produto duplicado: ${productSlug}.`);
+      products.add(productSlug);
     }
     for (const document of edition.documents) {
       parseOfficialExamUrl(edition.bankSlug, document.sourceUrl);

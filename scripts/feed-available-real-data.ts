@@ -11,6 +11,7 @@ type Transaction = postgres.TransactionSql;
 function parseCommand(argv: readonly string[]) {
   if (argv.length === 0) return { apply: false } as const;
   if (argv.length === 1 && argv[0] === "--apply") return { apply: true } as const;
+  if (argv.length === 2 && argv[0] === "--" && argv[1] === "--apply") return { apply: true } as const;
   throw new Error("Use sem argumentos para a prévia ou somente --apply para gravar.");
 }
 
@@ -112,14 +113,16 @@ async function main() {
             result.opportunitiesLinked += 1;
             if (command.apply) await transaction`update contest_opportunities set exam_edition_id=${editionId}, updated_by_user_id=${operatorId}, updated_at=now() where id=${opportunity.id}`;
           }
-          if (!edition.productSlug) throw new Error(`Produto ausente para ${edition.publicId}.`);
-          const products = await transaction<{ opportunityId: string | null; status: string }[]>`select opportunity_id::text as "opportunityId", status from contest_store_products where slug=${edition.productSlug} limit 1 for update`;
-          const product = products[0];
-          if (!product || product.status !== "draft") throw new Error(`Produto inexistente ou não está em rascunho: ${edition.productSlug}.`);
-          if (product.opportunityId && product.opportunityId !== opportunity.id) throw new Error(`Produto já ligado a outra oportunidade: ${edition.productSlug}.`);
-          if (!product.opportunityId) {
-            result.productsLinked += 1;
-            if (command.apply) await transaction`update contest_store_products set opportunity_id=${opportunity.id}, updated_at=now() where slug=${edition.productSlug}`;
+          if (!edition.productSlugs?.length) throw new Error(`Produto ausente para ${edition.publicId}.`);
+          for (const productSlug of edition.productSlugs) {
+            const products = await transaction<{ opportunityId: string | null; status: string }[]>`select opportunity_id::text as "opportunityId", status from contest_store_products where slug=${productSlug} limit 1 for update`;
+            const product = products[0];
+            if (!product || product.status !== "draft") throw new Error(`Produto inexistente ou não está em rascunho: ${productSlug}.`);
+            if (product.opportunityId && product.opportunityId !== opportunity.id) throw new Error(`Produto já ligado a outra oportunidade: ${productSlug}.`);
+            if (!product.opportunityId) {
+              result.productsLinked += 1;
+              if (command.apply) await transaction`update contest_store_products set opportunity_id=${opportunity.id}, updated_at=now() where slug=${productSlug}`;
+            }
           }
         }
 
@@ -148,7 +151,7 @@ async function main() {
 
       if (command.apply) await transaction`
         insert into audit_logs (actor_user_id,action,entity_type,entity_id,metadata)
-        values (${operatorId},'content.available_real_data_fed','real_data_feed',${reference},${JSON.stringify({ ...result, sourcePolicy: "metadata_only", sourceContentStored: false, previousExamPublicationAllowed: false })}::jsonb)
+        values (${operatorId},'content.available_real_data_fed','real_data_feed',${reference},${transaction.json({ ...result, sourcePolicy: "metadata_only", sourceContentStored: false, previousExamPublicationAllowed: false })})
       `;
       return { operatorId, result };
     });
