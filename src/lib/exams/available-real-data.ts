@@ -13,7 +13,7 @@ export type AvailableExamEdition = Readonly<{
   sourceExternalId: string;
   careerSlug: string;
   bankSlug: "fgv";
-  institutionAcronym: "ENAM" | "ENAC";
+  institutionAcronym: "ENFAM" | "CNJ";
   jurisdictionCode: "BR";
   title: string;
   organizer: string;
@@ -33,7 +33,7 @@ export const AVAILABLE_REAL_EXAM_EDITIONS = [
     sourceExternalId: "enac-4exame-2026-2",
     careerSlug: "cartorios",
     bankSlug: "fgv",
-    institutionAcronym: "ENAC",
+    institutionAcronym: "CNJ",
     jurisdictionCode: "BR",
     title: "4º Exame Nacional dos Cartórios — ENAC 2026.2",
     organizer: "Fundação Getulio Vargas",
@@ -51,7 +51,7 @@ export const AVAILABLE_REAL_EXAM_EDITIONS = [
     sourceExternalId: "enam-6exame-2026-2",
     careerSlug: "magistratura",
     bankSlug: "fgv",
-    institutionAcronym: "ENAM",
+    institutionAcronym: "ENFAM",
     jurisdictionCode: "BR",
     title: "6º Exame Nacional da Magistratura — ENAM 2026.2",
     organizer: "Fundação Getulio Vargas",
@@ -69,7 +69,7 @@ export const AVAILABLE_REAL_EXAM_EDITIONS = [
     sourceExternalId: "enac-3exame-2026-1-tipo-1",
     careerSlug: "cartorios",
     bankSlug: "fgv",
-    institutionAcronym: "ENAC",
+    institutionAcronym: "CNJ",
     jurisdictionCode: "BR",
     title: "3º Exame Nacional dos Cartórios — ENAC 2026.1",
     organizer: "Fundação Getulio Vargas",
@@ -100,7 +100,7 @@ export const AVAILABLE_REAL_EXAM_EDITIONS = [
     sourceExternalId: "enam-5exame-2026-1-tipo-1",
     careerSlug: "magistratura",
     bankSlug: "fgv",
-    institutionAcronym: "ENAM",
+    institutionAcronym: "ENFAM",
     jurisdictionCode: "BR",
     title: "5º Exame Nacional da Magistratura — ENAM 2026.1",
     organizer: "Fundação Getulio Vargas",
