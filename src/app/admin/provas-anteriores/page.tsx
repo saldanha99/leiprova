@@ -12,6 +12,7 @@ import {
 import {
   ExamDocumentForm,
   ExamDocumentReviewControls,
+  ExamLicenseDecisionControls,
   LicensedPreviousExamImportForm,
   LicensedPreviousExamReviewControls,
   ProductExamReferenceForm,
@@ -20,7 +21,7 @@ import {
   RevokeProductExamReferenceControls,
   SuspendPreviousExamQuestionForm,
 } from "@/components/admin/previous-exam-actions";
-import { requireSuperAdmin } from "@/lib/auth";
+import { requireAdmin } from "@/lib/auth";
 import { CONTEST_CATALOG, contestTitle } from "@/lib/commerce/catalog";
 import { getPreviousExamsAdminSnapshot } from "@/lib/db/previous-exams-admin";
 
@@ -61,7 +62,7 @@ const licenseStatusLabel: Record<string, string> = {
 };
 
 export default async function PreviousExamsAdminPage() {
-  const user = await requireSuperAdmin("/admin/provas-anteriores");
+  const user = await requireAdmin("/admin/provas-anteriores");
   const snapshot = await getPreviousExamsAdminSnapshot();
   const examOptions = snapshot.exams.map((exam) => ({
     publicId: exam.publicId,
@@ -265,6 +266,12 @@ export default async function PreviousExamsAdminPage() {
                   <div><dt className="text-slate-500">Pedido enviado</dt><dd>{formatDate(request.requestedAt)}</dd></div>
                   <div><dt className="text-slate-500">Próxima ação</dt><dd>{formatDate(request.nextFollowUpAt)}</dd></div>
                 </dl>
+                {["awaiting_response", "manual_review"].includes(request.status) ? (
+                  <ExamLicenseDecisionControls
+                    publicId={request.publicId}
+                    canDecide={request.initiatedByUserId !== user.id}
+                  />
+                ) : null}
               </article>
             ))}
           </div>

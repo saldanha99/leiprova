@@ -211,6 +211,7 @@ export async function getPreviousExamsAdminSnapshot() {
         editionTitle: examEditions.title,
         bankName: quizBanks.name,
         recipientEmails: examLicenseRequests.recipientEmails,
+        initiatedByUserId: examLicenseRequests.initiatedByUserId,
         requestedAt: examLicenseRequests.requestedAt,
         lastFollowUpAt: examLicenseRequests.lastFollowUpAt,
         nextFollowUpAt: examLicenseRequests.nextFollowUpAt,

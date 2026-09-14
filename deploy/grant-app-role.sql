@@ -382,6 +382,13 @@ grant update (
   next_follow_up_at,
   follow_up_count,
   last_provider_message_id,
+  response_reference,
+  response_checksum_sha256,
+  response_received_at,
+  granted_at,
+  expires_at,
+  reviewed_by_user_id,
+  reviewed_at,
   review_notes,
   updated_at
 ) on exam_license_requests to :app_user;

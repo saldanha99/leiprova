@@ -13,6 +13,7 @@ import {
   createExamDocumentAction,
   createProductExamReferenceAction,
   importLicensedPreviousExamBookletAction,
+  recordExamLicenseDecisionAction,
   revokeExamDocumentAction,
   revokeProductExamReferenceAction,
   reviewExamDocumentAction,
@@ -41,6 +42,87 @@ function Feedback({ state }: { state: PreviousExamActionState }) {
       {state.message}
     </p>
   ) : null;
+}
+
+export function ExamLicenseDecisionControls({
+  publicId,
+  canDecide,
+}: {
+  publicId: string;
+  canDecide: boolean;
+}) {
+  const [state, action, pending] = useActionState(
+    recordExamLicenseDecisionAction,
+    initialState,
+  );
+  return (
+    <form action={action} className="mt-4 grid gap-3 rounded-xl border border-white/8 p-3 sm:grid-cols-2">
+      <input type="hidden" name="publicId" value={publicId} />
+      <label className="text-[11px] font-semibold text-slate-400 sm:col-span-2">
+        URL HTTPS da resposta ou contrato arquivado
+        <input type="url" name="responseReference" required maxLength={2000} className={field} />
+      </label>
+      <label className="text-[11px] font-semibold text-slate-400 sm:col-span-2">
+        SHA-256 do arquivo conferido
+        <input
+          name="responseChecksumSha256"
+          required
+          minLength={64}
+          maxLength={64}
+          pattern="[A-Fa-f0-9]{64}"
+          spellCheck={false}
+          className={`${field} font-mono`}
+        />
+      </label>
+      <label className="text-[11px] font-semibold text-slate-400">
+        Resposta recebida em
+        <input type="date" name="responseReceivedAt" required className={field} />
+      </label>
+      <label className="text-[11px] font-semibold text-slate-400">
+        Concedida em
+        <input type="date" name="grantedAt" className={field} />
+      </label>
+      <label className="text-[11px] font-semibold text-slate-400">
+        Validade, se houver
+        <input type="date" name="expiresAt" className={field} />
+      </label>
+      <label className="text-[11px] font-semibold text-slate-400 sm:col-span-2">
+        Parecer da conferência
+        <textarea name="notes" required minLength={20} maxLength={2000} className={`${field} min-h-20 py-3`} />
+      </label>
+      <label className="flex items-start gap-2 text-[11px] leading-5 text-slate-300 sm:col-span-2">
+        <input type="checkbox" name="attestation" className="mt-1 size-4 accent-violet-300" />
+        <span>
+          Conferi titular, documentos, uso comercial, reprodução, armazenamento,
+          atribuição, território, prazo, revogação e integridade do arquivo.
+        </span>
+      </label>
+      <div className="flex flex-wrap gap-2 sm:col-span-2">
+        <button
+          name="decision"
+          value="grant"
+          disabled={pending || !canDecide}
+          className="min-h-9 rounded-lg bg-violet-300 px-3 text-xs font-extrabold text-violet-950 disabled:opacity-50"
+        >
+          Registrar concessão
+        </button>
+        <button
+          name="decision"
+          value="deny"
+          disabled={pending || !canDecide}
+          className="min-h-9 rounded-lg border border-rose-300/20 bg-rose-300/8 px-3 text-xs font-bold text-rose-100 disabled:opacity-50"
+        >
+          Registrar negativa
+        </button>
+      </div>
+      {!canDecide ? (
+        <p className="text-[11px] text-slate-500 sm:col-span-2">
+          Outra conta editorial precisa revisar a resposta deste pedido.
+        </p>
+      ) : null}
+      <div className="sm:col-span-2"><Feedback state={state} /></div>
+    </form>
+  );
 }
 
 type ExamOption = {

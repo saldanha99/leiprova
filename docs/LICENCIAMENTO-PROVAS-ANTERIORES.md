@@ -107,6 +107,9 @@ externos até a chegada e validação da resposta escrita.
 - somente caderno e gabarito oficiais aprovados podem originar um pedido;
 - uma resposta só conclui o caso quando os dois documentos exatos carregam a
   mesma evidência escrita revisada. Silêncio nunca é tratado como consentimento.
+- a resposta pode ser registrada no painel de provas anteriores por conta
+  editorial diferente da iniciadora, com URL HTTPS, SHA-256, datas, escopo e
+  parecer; não é mais necessário pedir uma alteração de banco pelo chat.
 
 Os quatro PDFs FGV foram aprovados como links externos e vinculados aos produtos
 ENAC 2026.2 e ENAM 2026.2. As páginas públicas exibem a última prova na fonte

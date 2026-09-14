@@ -998,6 +998,13 @@ export const examLicenseRequests = pgTable(
       sql`${table.status} not in ('granted_pending_review','granted') or ${table.grantedAt} is not null`,
     ),
     check(
+      "exam_license_requests_independent_review_check",
+      sql`${table.status} not in ('granted_pending_review','granted','denied') or (
+        ${table.reviewedByUserId} is not null
+        and ${table.reviewedByUserId} <> ${table.initiatedByUserId}
+      )`,
+    ),
+    check(
       "exam_license_requests_period_check",
       sql`${table.expiresAt} is null or (
         ${table.grantedAt} is not null and ${table.expiresAt} > ${table.grantedAt}

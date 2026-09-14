@@ -288,6 +288,13 @@
       "when": 1789396571356,
       "tag": "0040_typical_demogoblin",
       "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "7",
+      "when": 1789397652372,
+      "tag": "0041_conscious_mother_askani",
+      "breakpoints": true
     }
   ]
 }

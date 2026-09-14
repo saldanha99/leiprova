@@ -8,7 +8,7 @@ import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
-import { requireSuperAdmin } from "@/lib/auth";
+import { requireAdmin, requireSuperAdmin } from "@/lib/auth";
 import { CONTEST_CATALOG } from "@/lib/commerce/catalog";
 import { isTrustedBindingReviewOrigin } from "@/lib/commerce/product-binding-admin";
 import { getDb } from "@/lib/db/client";
@@ -19,6 +19,7 @@ import {
   contestStoreProducts,
   examEditionDocuments,
   examEditions,
+  examLicenseRequests,
   opportunityOrganizerAssignments,
   questions,
   quizBanks,
@@ -77,6 +78,17 @@ async function requireTrustedSuperAdmin() {
   return trusted ? actor : null;
 }
 
+async function requireTrustedEditorialUser() {
+  const actor = await requireAdmin("/admin/provas-anteriores");
+  const requestHeaders = await headers();
+  const trusted = isTrustedBindingReviewOrigin(
+    requestHeaders.get("origin"),
+    process.env.APP_URL ?? process.env.NEXT_PUBLIC_APP_URL,
+    process.env.NODE_ENV === "production",
+  );
+  return trusted ? actor : null;
+}
+
 const optionalText = (max: number) =>
   z.preprocess(
     (value) => (typeof value === "string" && value.trim() ? value : undefined),
@@ -93,6 +105,160 @@ const optionalPositiveInteger = z.preprocess(
     typeof value === "string" && value.trim() ? Number(value) : undefined,
   z.number().int().min(1).max(300).optional(),
 );
+
+const licenseDecisionSchema = z
+  .object({
+    publicId: z.string().uuid(),
+    decision: z.enum(["grant", "deny"]),
+    responseReference: z.url().max(2_000),
+    responseChecksumSha256: z
+      .string()
+      .trim()
+      .toLowerCase()
+      .regex(/^[a-f0-9]{64}$/u),
+    responseReceivedAt: z.iso.date(),
+    grantedAt: optionalDate,
+    expiresAt: optionalDate,
+    notes: z.string().trim().min(20).max(2_000),
+    attestation: z.literal("on").optional(),
+  })
+  .superRefine((value, context) => {
+    try {
+      const url = new URL(value.responseReference);
+      if (
+        url.protocol !== "https:" ||
+        url.username ||
+        url.password ||
+        !url.hostname
+      ) {
+        throw new Error("invalid URL");
+      }
+    } catch {
+      context.addIssue({
+        code: "custom",
+        path: ["responseReference"],
+        message: "A evidência precisa usar uma URL HTTPS válida.",
+      });
+    }
+    if (value.decision === "grant" && (!value.grantedAt || value.attestation !== "on")) {
+      context.addIssue({
+        code: "custom",
+        message: "A concessão exige data e declaração explícita de conferência.",
+      });
+    }
+    if (value.grantedAt && value.expiresAt && value.expiresAt <= value.grantedAt) {
+      context.addIssue({
+        code: "custom",
+        message: "A validade deve terminar depois da concessão.",
+      });
+    }
+  });
+
+export async function recordExamLicenseDecisionAction(
+  _state: PreviousExamActionState,
+  formData: FormData,
+): Promise<PreviousExamActionState> {
+  const actor = await requireTrustedEditorialUser();
+  if (!actor) return initialError("Origem administrativa inválida.");
+  const parsed = licenseDecisionSchema.safeParse({
+    publicId: formData.get("publicId"),
+    decision: formData.get("decision"),
+    responseReference: formData.get("responseReference"),
+    responseChecksumSha256: formData.get("responseChecksumSha256"),
+    responseReceivedAt: formData.get("responseReceivedAt"),
+    grantedAt: formData.get("grantedAt"),
+    expiresAt: formData.get("expiresAt"),
+    notes: formData.get("notes"),
+    attestation: formData.get("attestation"),
+  });
+  if (!parsed.success) {
+    return initialError(
+      parsed.error.issues[0]?.message ?? "Revise a evidência da resposta.",
+    );
+  }
+
+  const responseReceivedAt = saoPauloCivilDateStart(parsed.data.responseReceivedAt);
+  const grantedAt = saoPauloCivilDateStart(parsed.data.grantedAt);
+  const expiresAt = saoPauloCivilDateEnd(parsed.data.expiresAt);
+  const now = new Date();
+  if (
+    !responseReceivedAt ||
+    responseReceivedAt > now ||
+    (grantedAt && grantedAt > now) ||
+    (expiresAt && expiresAt <= now)
+  ) {
+    return initialError("As datas da resposta ou da licença não são válidas hoje.");
+  }
+
+  try {
+    await getDb().transaction(async (transaction) => {
+      const [request] = await transaction.execute<{
+        publicId: string;
+        initiatedByUserId: number;
+        status: string;
+      }>(sql`
+        select public_id as "publicId",
+          initiated_by_user_id::integer as "initiatedByUserId",status
+        from exam_license_requests
+        where public_id=${parsed.data.publicId}
+        for update
+      `);
+      if (!request || !["awaiting_response", "manual_review"].includes(request.status)) {
+        throw new Error("O pedido não está aguardando uma decisão.");
+      }
+      if (request.initiatedByUserId === actor.id) {
+        throw new Error("Outra conta editorial precisa revisar a resposta da banca.");
+      }
+
+      const status = parsed.data.decision === "grant"
+        ? "granted_pending_review"
+        : "denied";
+      await transaction
+        .update(examLicenseRequests)
+        .set({
+          status,
+          responseReference: parsed.data.responseReference,
+          responseChecksumSha256: parsed.data.responseChecksumSha256,
+          responseReceivedAt,
+          grantedAt: parsed.data.decision === "grant" ? grantedAt : null,
+          expiresAt: parsed.data.decision === "grant" ? expiresAt : null,
+          nextFollowUpAt: null,
+          reviewedByUserId: actor.id,
+          reviewedAt: now,
+          reviewNotes: parsed.data.notes,
+          updatedAt: now,
+        })
+        .where(eq(examLicenseRequests.publicId, request.publicId));
+      await transaction.insert(auditLogs).values({
+        actorUserId: actor.id,
+        action: `editorial.exam_license.${status}`,
+        entityType: "exam_license_request",
+        entityId: request.publicId,
+        metadata: {
+          decision: parsed.data.decision,
+          responseReference: parsed.data.responseReference,
+          responseChecksumSha256: parsed.data.responseChecksumSha256,
+          responseReceivedAt: responseReceivedAt.toISOString(),
+          grantedAt: grantedAt?.toISOString() ?? null,
+          expiresAt: expiresAt?.toISOString() ?? null,
+          publicationAllowed: false,
+        },
+      });
+    });
+    revalidatePath("/admin/provas-anteriores");
+    return {
+      status: "success",
+      message:
+        parsed.data.decision === "grant"
+          ? "Concessão registrada. Cadastre caderno e gabarito com esta mesma evidência para a reconciliação automática."
+          : "Negativa registrada; os acompanhamentos foram encerrados.",
+    };
+  } catch (error) {
+    return initialError(
+      safeActionError(error, "Não foi possível registrar a resposta da banca."),
+    );
+  }
+}
 
 const createDocumentSchema = z
   .object({
