@@ -6,14 +6,17 @@ import { sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import * as schema from "../src/lib/db/schema";
-import { requireProductBindingTarget } from "../src/lib/commerce/product-binding-policy";
+import {
+  productBindingPackageSchema,
+  requireProductBindingTarget,
+} from "../src/lib/commerce/product-binding-policy";
 import { importProductQuestionBindings, ProductBindingError } from "../src/lib/commerce/product-binding-service";
 
 async function main() {
   const args = new Map<string, string>();
   for (const argument of process.argv.slice(2)) {
-    const match = /^--(input|actor|mode|fingerprint)=(.+)$/u.exec(argument);
-    if (!match || args.has(match[1])) throw new ProductBindingError("Use --input=ARQUIVO --actor=UUID --mode=preview|import-pending --fingerprint=SHA256. Não existe aprovação neste operador.");
+    const match = /^--(input|actor|mode|fingerprint|requirements)=(.+)$/u.exec(argument);
+    if (!match || args.has(match[1])) throw new ProductBindingError("Use --input=ARQUIVO --actor=UUID --mode=preview|import-pending --fingerprint=SHA256 [--requirements=ID,ID]. Não existe aprovação neste operador.");
     args.set(match[1], match[2]);
   }
   const mode = args.get("mode") ?? "preview";
@@ -39,7 +42,22 @@ async function main() {
     if (Buffer.byteLength(content) > 2_097_152 || before.size !== after.size || before.mtimeMs !== after.mtimeMs) {
       throw new ProductBindingError("Pacote alterado durante a leitura ou excede 2 MiB.");
     }
-    input = JSON.parse(content);
+    const parsedInput = productBindingPackageSchema.parse(JSON.parse(content));
+    const requirementFilter = args.get("requirements");
+    if (requirementFilter) {
+      const ids = requirementFilter.split(",").map((value) => Number(value));
+      if (!ids.length || ids.some((value) => !Number.isSafeInteger(value) || value <= 0) || new Set(ids).size !== ids.length) {
+        throw new ProductBindingError("Filtro de requisitos inválido.");
+      }
+      const filteredInput = {
+        ...parsedInput,
+        items: parsedInput.items.filter((item) => ids.includes(item.requirementId)),
+      };
+      if (!filteredInput.items.length) throw new ProductBindingError("O filtro não selecionou propostas.");
+      input = filteredInput;
+    } else {
+      input = parsedInput;
+    }
   } finally { await file.close(); }
   const client = postgres(target.connectionString, { max: 1, prepare: false, connect_timeout: 5, idle_timeout: 10 });
   try {

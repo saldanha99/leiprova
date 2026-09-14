@@ -2,11 +2,13 @@ import { createHash } from "node:crypto";
 import { z } from "zod";
 
 const sha = z.string().regex(/^[a-f0-9]{64}$/u);
+export const examEditionPublicIdSchema = z.string().trim().min(3).max(200)
+  .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/u);
 export const productBindingReviewSchema = z.object({
   schemaVersion: z.literal(1),
   productSlug: z.string().min(3).max(160).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/u),
   opportunityPublicId: z.uuid(),
-  examEditionPublicId: z.uuid(),
+  examEditionPublicId: examEditionPublicIdSchema,
   bindingIds: z.array(sha).min(1).max(250),
   notes: z.string().trim().min(20).max(2_000),
   decision: z.enum(["approve", "reject"]).default("approve"),

@@ -34,6 +34,8 @@ describe("revisão de vínculos — contrato estrito e escopo", () => {
   it("exige nota substantiva e edição explícita", () => {
     expect(() => productBindingReviewSchema.parse({ ...base, notes: "   curta   " })).toThrow();
     expect(() => productBindingReviewSchema.parse({ ...base, examEditionPublicId: undefined })).toThrow();
+    expect(productBindingReviewSchema.parse({ ...base, examEditionPublicId: "enam-2026-2" }).examEditionPublicId).toBe("enam-2026-2");
+    expect(() => productBindingReviewSchema.parse({ ...base, examEditionPublicId: "ENAM 2026.2" })).toThrow();
   });
   it.each(["edition", "program", "adherence"] as const)("bloqueia confirmação ausente de %s", (key) => {
     const request = input(); request.confirmations[key] = false;

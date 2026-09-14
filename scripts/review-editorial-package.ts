@@ -245,7 +245,9 @@ main().catch((error: unknown) => {
   console.error(
     error instanceof LocalImportError
       ? error.message
-      : "Revisão interrompida. Confira pacote, declaração humana e destino; nenhum conteúdo foi publicado.",
+      : `Revisão interrompida: ${
+          error instanceof Error ? error.message.slice(0, 500) : "falha sem detalhe seguro"
+        }. Nenhum conteúdo foi publicado.`,
   );
   process.exitCode = 1;
 });

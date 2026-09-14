@@ -1,5 +1,8 @@
 import { z } from "zod";
-import type { ProductBindingReviewDossier } from "./product-binding-review-policy";
+import {
+  examEditionPublicIdSchema,
+  type ProductBindingReviewDossier,
+} from "./product-binding-review-policy";
 
 export function isTrustedBindingReviewOrigin(origin: string | null, configuredUrl: string | undefined, production: boolean) {
   try {
@@ -14,7 +17,7 @@ export function isTrustedBindingReviewOrigin(origin: string | null, configuredUr
 export const bindingAdminSelectionSchema = z.object({
   productSlug: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/u).min(3).max(160),
   bindingId: z.string().regex(/^[a-f0-9]{64}$/u),
-  opportunityPublicId: z.uuid(), examEditionPublicId: z.uuid(),
+  opportunityPublicId: z.uuid(), examEditionPublicId: examEditionPublicIdSchema,
   notes: z.string().trim().min(20).max(2_000), decision: z.enum(["approve", "reject"]),
 }).strict();
 export type BindingAdminSelection = z.infer<typeof bindingAdminSelectionSchema>;
