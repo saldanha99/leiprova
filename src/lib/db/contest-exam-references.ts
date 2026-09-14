@@ -109,6 +109,9 @@ export async function getApprovedContestExamReference(
   const normalizedProductSlug = productSlug.trim();
   if (!normalizedProductSlug) return null;
   const referenceDateIso = saoPauloCalendarDate(referenceDate);
+  const sourceFreshSince = new Date(
+    referenceDate.getTime() - 30 * 86_400_000,
+  );
 
   try {
     const rows = await getDb()
@@ -177,8 +180,8 @@ export async function getApprovedContestExamReference(
           isNotNull(examEditions.officialUrl),
           sql`char_length(btrim(${examEditions.officialUrl})) > 0`,
           isNotNull(examEditions.sourceCheckedAt),
-          sql`${examEditions.sourceCheckedAt} <= ${referenceDate}`,
-          sql`${examEditions.sourceCheckedAt} >= ${referenceDate} - interval '30 days'`,
+          lte(examEditions.sourceCheckedAt, referenceDate),
+          gte(examEditions.sourceCheckedAt, sourceFreshSince),
           eq(quizBanks.isActive, true),
           sql`exists (
             select 1
@@ -230,8 +233,8 @@ export async function getApprovedContestExamReference(
           gte(examEditionDocuments.httpStatus, 200),
           lte(examEditionDocuments.httpStatus, 399),
           isNotNull(examEditionDocuments.sourceCheckedAt),
-          sql`${examEditionDocuments.sourceCheckedAt} <= ${referenceDate}`,
-          sql`${examEditionDocuments.sourceCheckedAt} >= ${referenceDate} - interval '30 days'`,
+          lte(examEditionDocuments.sourceCheckedAt, referenceDate),
+          gte(examEditionDocuments.sourceCheckedAt, sourceFreshSince),
           or(
             eq(examEditionDocuments.sourcePolicy, "metadata_only"),
             and(
