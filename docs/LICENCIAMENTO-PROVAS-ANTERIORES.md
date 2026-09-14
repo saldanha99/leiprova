@@ -1,6 +1,6 @@
 # Licenciamento de provas anteriores
 
-Atualizado em 13/09/2026. Este documento transforma a pesquisa de provas
+Atualizado em 14/09/2026. Este documento transforma a pesquisa de provas
 anteriores em um processo comercial auditável para a Editalume. Ele não é uma
 licença e não autoriza a reprodução de nenhum caderno, gabarito ou questão.
 
@@ -93,6 +93,24 @@ Os pedidos identificam os PDFs oficiais, o uso comercial pretendido e os
 limites que precisam constar da autorização. O registro de envio não altera o
 estado de direitos: os arquivos continuam somente como metadados e links
 externos até a chegada e validação da resposta escrita.
+
+### Automação publicada em 14/09/2026
+
+- ENAC 2026.1 e ENAM 2026.1 possuem casos auditáveis em
+  `exam_license_requests`, ambos em `awaiting_response`;
+- o envio inicial de 13/09 foi reconciliado sem duplicar a mensagem;
+- o primeiro acompanhamento está agendado para 20/09/2026 e o motor executa no
+  worker editorial a cada seis horas;
+- são permitidos no máximo três acompanhamentos, espaçados por sete dias e com
+  chave idempotente por destinatário;
+- alteração posterior de URL, edição ou escopo leva o caso para revisão manual;
+- somente caderno e gabarito oficiais aprovados podem originar um pedido;
+- uma resposta só conclui o caso quando os dois documentos exatos carregam a
+  mesma evidência escrita revisada. Silêncio nunca é tratado como consentimento.
+
+Os quatro PDFs FGV foram aprovados como links externos e vinculados aos produtos
+ENAC 2026.2 e ENAM 2026.2. As páginas públicas exibem a última prova na fonte
+oficial, mas não reproduzem enunciados nem afirmam que existe licença.
 
 ## Canais oficiais para a primeira rodada
 

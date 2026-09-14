@@ -3,6 +3,18 @@
 Documento de contexto para quem for continuar o projeto — pessoa ou assistente de IA.
 Descreve onde as coisas estão, como publicar e quais armadilhas já custaram tempo.
 
+**Links oficiais e licenciamento automatizado publicados em 14/09/2026:**
+ENAC 2026.2 e ENAM 2026.2 agora exibem caderno e gabarito da edição 2026.1 como
+links externos oficiais revisados. Quatro documentos e dois vínculos exatos
+foram aprovados, sem copiar PDFs ou questões. Dois casos FGV estão em
+`awaiting_response`; o contato inicial documentado de 13/09 não foi reenviado e
+os acompanhamentos semanais automáticos estão ativos, começando em 20/09 e
+limitados a três. Migration `0040` e commits `81ae504`/`3af7051`. Healthcheck e
+as duas páginas responderam 200. Permanecem 57 questões em rascunho, 12 em
+revisão, 132 requisitos sem revisão, 75 produtos em rascunho e zero provas com
+licença escrita. Portanto, `CHECKOUT_ENABLED` e `CONTEST_CHECKOUT_ENABLED`
+continuam fechados; Stripe live configurado não substitui prontidão do produto.
+
 **Governança de provas reais preparada em 12/09/2026:** a aplicação passa a
 vincular cada produto à última edição exata do cargo, ao caderno e ao gabarito
 oficial correspondentes. Importação integral, revisão por outra conta, licença
