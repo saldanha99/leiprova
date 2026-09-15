@@ -101,6 +101,8 @@ externos até a chegada e validação da resposta escrita.
 - o envio inicial de 13/09 foi reconciliado sem duplicar a mensagem;
 - o primeiro acompanhamento está agendado para 20/09/2026 e o motor executa no
   worker editorial a cada seis horas;
+- os acompanhamentos automáticos aceitam um `Reply-To` operacional separado do
+  remetente transacional, evitando depender de uma caixa postal de domínio;
 - são permitidos no máximo três acompanhamentos, espaçados por sete dias e com
   chave idempotente por destinatário;
 - alteração posterior de URL, edição ou escopo leva o caso para revisão manual;

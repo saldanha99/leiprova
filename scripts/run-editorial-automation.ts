@@ -65,6 +65,7 @@ const pause = () => new Promise((resolve) => setTimeout(resolve, 400));
 async function sendLicenseEmail(message: LicenseEmail) {
   const apiKey = process.env.RESEND_API_KEY?.trim();
   const from = process.env.TRANSACTIONAL_EMAIL_FROM?.trim();
+  const replyTo = process.env.LICENSE_REQUEST_REPLY_TO?.trim();
   if (
     process.env.LICENSE_REQUEST_EMAIL_ENABLED !== "true" ||
     process.env.TRANSACTIONAL_EMAIL_ENABLED !== "true" ||
@@ -84,6 +85,7 @@ async function sendLicenseEmail(message: LicenseEmail) {
     body: JSON.stringify({
       to: message.to,
       from,
+      ...(replyTo ? { reply_to: replyTo } : {}),
       subject: message.subject,
       text: message.text,
     }),

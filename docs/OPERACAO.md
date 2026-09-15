@@ -14,6 +14,8 @@ as duas páginas responderam 200. Permanecem 57 questões em rascunho, 12 em
 revisão, 132 requisitos sem revisão, 75 produtos em rascunho e zero provas com
 licença escrita. Portanto, `CHECKOUT_ENABLED` e `CONTEST_CHECKOUT_ENABLED`
 continuam fechados; Stripe live configurado não substitui prontidão do produto.
+O worker admite `LICENSE_REQUEST_REPLY_TO` para receber respostas em uma caixa
+operacional diferente do remetente verificado do provedor transacional.
 
 **Governança de provas reais preparada em 12/09/2026:** a aplicação passa a
 vincular cada produto à última edição exata do cargo, ao caderno e ao gabarito
