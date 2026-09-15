@@ -82,7 +82,7 @@ Anexar a relação exata de URLs do lote, nunca uma descrição genérica como
 painel, registrar somente a referência HTTPS da evidência, o hash SHA-256, a
 data, o titular e o fundamento aprovado.
 
-### Pedidos enviados em 13/09/2026
+### Pedidos enviados em 13/09/2026 e reenvio em 14/09/2026
 
 | Exame | Destinatários | Assunto | Situação |
 | --- | --- | --- | --- |
@@ -94,12 +94,22 @@ limites que precisam constar da autorização. O registro de envio não altera o
 estado de direitos: os arquivos continuam somente como metadados e links
 externos até a chegada e validação da resposta escrita.
 
+Em 14/09/2026, o Gmail informou falha temporária das duas entregas destinadas a
+`demanda.conhecimento@fgv.br` porque o remetente personalizado anterior dependia
+do servidor desativado `mail.2timeweb.com.br`. ENAC e ENAM foram reenviados às
+21h07 BRT pelo remetente principal `saldanha372@gmail.com`; o Gmail aceitou as
+duas mensagens e não apresentou nova devolução imediata. Os canais específicos
+`enac@fgv.br` e `examemagistratura@fgv.br` não foram duplicados, pois a falha
+reportada identificava somente o canal geral. O banco registra dois eventos
+`manual.exam_license.request_resent`; o próximo acompanhamento passou para
+21/09/2026 às 21h07 BRT.
+
 ### Automação publicada em 14/09/2026
 
 - ENAC 2026.1 e ENAM 2026.1 possuem casos auditáveis em
   `exam_license_requests`, ambos em `awaiting_response`;
 - o envio inicial de 13/09 foi reconciliado sem duplicar a mensagem;
-- o primeiro acompanhamento está agendado para 20/09/2026 e o motor executa no
+- o primeiro acompanhamento está agendado para 21/09/2026 e o motor executa no
   worker editorial a cada seis horas;
 - os acompanhamentos automáticos aceitam um `Reply-To` operacional separado do
   remetente transacional, evitando depender de uma caixa postal de domínio;

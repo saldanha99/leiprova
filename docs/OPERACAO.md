@@ -7,8 +7,9 @@ Descreve onde as coisas estão, como publicar e quais armadilhas já custaram te
 ENAC 2026.2 e ENAM 2026.2 agora exibem caderno e gabarito da edição 2026.1 como
 links externos oficiais revisados. Quatro documentos e dois vínculos exatos
 foram aprovados, sem copiar PDFs ou questões. Dois casos FGV estão em
-`awaiting_response`; o contato inicial documentado de 13/09 não foi reenviado e
-os acompanhamentos semanais automáticos estão ativos, começando em 20/09 e
+`awaiting_response`; as entregas que falharam pelo remetente personalizado foram
+reenviadas pelo Gmail principal em 14/09 e os acompanhamentos semanais
+automáticos estão ativos, começando em 21/09 e
 limitados a três. Migration `0040` e commits `81ae504`/`3af7051`. Healthcheck e
 as duas páginas responderam 200. Permanecem 57 questões em rascunho, 12 em
 revisão, 132 requisitos sem revisão, 75 produtos em rascunho e zero provas com
