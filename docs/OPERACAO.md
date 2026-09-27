@@ -3,6 +3,26 @@
 Documento de contexto para quem for continuar o projeto — pessoa ou assistente de IA.
 Descreve onde as coisas estão, como publicar e quais armadilhas já custaram tempo.
 
+**Fábrica reativada e provas anteriores registradas (27/09/2026, 19h35 BRT):** o
+proprietário reabriu o Maestri às 19h00 e as três rotinas existentes voltaram a
+disparar sem recriação. O Radar concluiu `discovery:cebraspe:2026-09-27` às 19h21
+(resposta, recolhimento e recibo sem falha) e reservou `discovery:fcc`. O Guardião
+reservou `legal-change:846` às 19h00 e não respondeu até 19h35; acompanhar, pois o
+mesmo papel expirou três vezes em 17/09. O Autor segue ocioso por falta de
+mapeamento concluído. O CLI `maestri` só roda dentro de terminal do Maestri; as
+notas do canvas não foram atualizadas por esta sessão. Publicado `457e24b`: etapas
+do worker isoladas, com `failedSteps` no resumo, e `/admin/motores` passa a alertar
+coleta atrasada (13 h) e agentes parados (24 h com fila). Em seguida, `3c08cb9`
+registrou pelo `content:feed:real` (referência
+`owner-request-2026-09-27:previous-exam-links`) 18 edições históricas de 17
+produtos, 8 da Cebraspe e 10 da FGV: 63 fontes oficiais conferidas, 36 documentos
+em `pending_review`, `metadata_only`, nenhum produto ligado ou liberado. Só a
+imagem `opportunity-approver` foi reconstruída; app e workers não foram recriados.
+Mapa dos 75 produtos e pendências em `docs/research/provas-anteriores-2026-09-27.json`.
+**Antes de aprovar esses documentos:** com `LICENSE_REQUEST_EMAIL_ENABLED=true`,
+cada edição aprovada gera e envia automaticamente um pedido de licença à banca,
+até quatro por ciclo. Decidir o envio antes de aprovar em lote.
+
 **Worker editorial restaurado e 1º acompanhamento FGV enviado (27/09/2026, 18h44 BRT):**
 de 14/09 às 21h05 até este deploy, as 52 execuções do `leiprova-editorial-automation`
 falharam com `ERR_INVALID_ARG_TYPE`. Com `LICENSE_REQUEST_EMAIL_ENABLED=true`,

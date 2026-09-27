@@ -123,6 +123,24 @@ reportada identificava somente o canal geral. O banco registra dois eventos
   editorial diferente da iniciadora, com URL HTTPS, SHA-256, datas, escopo e
   parecer; não é mais necessário pedir uma alteração de banco pelo chat.
 
+### Segunda rodada de links oficiais, registrada em 27/09/2026
+
+A pedido do proprietário, a última prova anterior de cada produto foi levantada
+nos portais oficiais da Cebraspe e da FGV, com robots.txt conferido. Entraram 18
+edições históricas de 17 produtos, cada uma com caderno Tipo 1 e gabarito
+definitivo como links externos `metadata_only`, todos em `pending_review`. Datas
+e contagens vieram de gabaritos, comunicados ou editais oficiais; nenhum PDF ou
+questão foi armazenado. A lista, as evidências e as 56 pendências por motivo
+estão em `docs/research/provas-anteriores-2026-09-27.json`.
+
+Aprovar caderno e gabarito de uma edição dispara, no ciclo seguinte do worker, a
+preparação e o envio automático de um pedido de licença por edição à banca
+(Cebraspe: `sac@cebraspe.org.br`; FGV: `demanda.conhecimento@fgv.br`), limitado a
+quatro por ciclo e com até três acompanhamentos. Esses envios são comunicação
+externa em nome da empresa: decidir antes de aprovar em lote se o pedido deve
+seguir por edição ou consolidado por banca. FCC e VUNESP continuam fora da
+automação pelas restrições de acesso registradas.
+
 ### Primeiro acompanhamento, enviado em 27/09/2026
 
 O envio automático previsto para 21/09 não ocorreu: o worker editorial falhava em
