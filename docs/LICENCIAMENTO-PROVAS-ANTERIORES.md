@@ -123,6 +123,16 @@ reportada identificava somente o canal geral. O banco registra dois eventos
   editorial diferente da iniciadora, com URL HTTPS, SHA-256, datas, escopo e
   parecer; não é mais necessário pedir uma alteração de banco pelo chat.
 
+### Primeiro acompanhamento, enviado em 27/09/2026
+
+O envio automático previsto para 21/09 não ocorreu: o worker editorial falhava em
+todo ciclo desde 14/09 (ver `OPERACAO.md`). Após a correção `6552e94`, o ciclo de
+27/09 às 18h44 BRT enviou o acompanhamento 1/3 de ENAC e ENAM aos mesmos
+destinatários, pelo remetente transacional e com reply-to da caixa operacional. O
+Resend aceitou as quatro mensagens, o que não comprova entrega nem resposta. O
+próximo acompanhamento está marcado para 04/10/2026 às 18h44 BRT; após o terceiro
+sem resposta registrada, o caso segue para revisão manual.
+
 Os quatro PDFs FGV foram aprovados como links externos e vinculados aos produtos
 ENAC 2026.2 e ENAM 2026.2. As páginas públicas exibem a última prova na fonte
 oficial, mas não reproduzem enunciados nem afirmam que existe licença.

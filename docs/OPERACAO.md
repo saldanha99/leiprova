@@ -3,6 +3,33 @@
 Documento de contexto para quem for continuar o projeto — pessoa ou assistente de IA.
 Descreve onde as coisas estão, como publicar e quais armadilhas já custaram tempo.
 
+**Worker editorial restaurado e 1º acompanhamento FGV enviado (27/09/2026, 18h44 BRT):**
+de 14/09 às 21h05 até este deploy, as 52 execuções do `leiprova-editorial-automation`
+falharam com `ERR_INVALID_ARG_TYPE`. Com `LICENSE_REQUEST_EMAIL_ENABLED=true`,
+`dispatchDueExamLicenseRequests` passava `Date` cru em SQL bruto, que o driver
+postgres-js do Drizzle não serializa. O ciclo abortava antes da auditoria
+`automation.editorial.completed`, por isso o acompanhamento de ENAC/ENAM previsto
+para 21/09 não saiu; o erro só aparecia no `docker logs`. Correção `6552e94`: datas
+como `${data.toISOString()}::timestamptz`, mesmo padrão de `store.ts`. O defeito
+também existia na aprovação de caderno em `/admin/provas-anteriores` e falharia no
+primeiro uso. As quatro aprovações de 14/09 foram gravadas em lote fora da tela; o
+`published_at` das edições 2026.1 segue nulo, sem efeito, pois nenhum código o lê.
+Deploy sem seed nem migração, com backup diário de 27/09 às 03h17 UTC; homologação
+preservada. Lint, typecheck, 1.457 testes e build passaram. O primeiro ciclo após o
+deploy concluiu às 18h44 com 2 pedidos devidos e 2 enviados: ENAC e ENAM estão em
+1/3 acompanhamentos, próximo em 04/10 às 18h44. O Resend aceitou as quatro mensagens;
+isso não comprova entrega nem resposta. Health e página ENAC responderam 200.
+**Regra: nunca interpolar `Date` em `sql` bruto.**
+
+**Maestri parado desde 17/09, 07h50 BRT (constatado em 27/09):** não há processo
+Maestri no Mac; o último evento do preflight local é das 07h51. As reservas
+`mapping:6` a `mapping:8` do Guardião expiraram sem resposta (`lease_expired`);
+`mapping:8` segue em `running` e volta à fila na próxima reserva. Pendentes: 126
+mapeamentos e 13 análises legislativas; nenhuma questão nova desde 12/09. Retomar
+exige reabrir o Maestri no Mac. Estado lido em 27/09: 403 questões (334 revisadas,
+12 pendentes, 57 rascunhos), 132 requisitos em rascunho e 2 revisados, 75 produtos
+em rascunho, zero pedidos, compras ou assinaturas. Checkout fechado; Stripe pausada.
+
 **Links oficiais e licenciamento automatizado publicados em 14/09/2026:**
 ENAC 2026.2 e ENAM 2026.2 agora exibem caderno e gabarito da edição 2026.1 como
 links externos oficiais revisados. Quatro documentos e dois vínculos exatos
