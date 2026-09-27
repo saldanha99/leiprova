@@ -6,11 +6,17 @@ import { describe, expect, it } from "vitest";
 import {
   AVAILABLE_REAL_EXAM_EDITIONS,
   validateAvailableRealExamEditions,
+  type AvailableExamEdition,
 } from "@/lib/exams/available-real-data";
+import { isOfficialExamUrl } from "@/lib/official-sources/exam-registry";
+
+const historical: readonly AvailableExamEdition[] = AVAILABLE_REAL_EXAM_EDITIONS.filter(
+  (edition) => edition.status === "published",
+);
 
 describe("carga de dados reais disponíveis", () => {
-  it("mantém quatro edições atuais vinculáveis e duas históricas oficiais", () => {
-    expect(validateAvailableRealExamEditions()).toHaveLength(6);
+  it("mantém quatro edições atuais vinculáveis e vinte históricas oficiais", () => {
+    expect(validateAvailableRealExamEditions()).toHaveLength(24);
 
     const scheduled = AVAILABLE_REAL_EXAM_EDITIONS.filter((edition) => edition.status === "scheduled");
     const published = AVAILABLE_REAL_EXAM_EDITIONS.filter((edition) => edition.status === "published");
@@ -22,14 +28,40 @@ describe("carga de dados reais disponíveis", () => {
       ["pgm-manaus-2026", "2026-09-20"],
     ]);
     expect(scheduled.every((edition) => edition.opportunitySlug && edition.productSlugs?.length)).toBe(true);
-    expect(published.map((edition) => edition.documents.length)).toEqual([2, 2]);
+    expect(published).toHaveLength(20);
+    expect(published.every((edition) => edition.documents.length === 2)).toBe(true);
   });
 
-  it("aceita somente fontes oficiais HTTPS da FGV e não incorpora conteúdo", () => {
+  it("registra cada prova histórica com um caderno contado e um gabarito definitivo", () => {
+    for (const edition of historical) {
+      const booklets = edition.documents.filter((document) => document.documentType === "question_booklet");
+      const answerKeys = edition.documents.filter((document) => document.documentType === "answer_key");
+
+      expect(booklets).toHaveLength(1);
+      expect(booklets[0].expectedQuestionCount).toBeGreaterThan(0);
+      expect(answerKeys).toHaveLength(1);
+      expect(answerKeys[0].title).toMatch(/definitivo/iu);
+      // Toda prova histórica já foi aplicada antes do levantamento de 27/09/2026.
+      expect(edition.examDate < "2026-09-27").toBe(true);
+      expect(edition.productSlugs).toBeUndefined();
+    }
+  });
+
+  it("recusa jurisdição, sigla ou prova histórica fora das regras do banco", () => {
+    const base = historical[0];
+
+    expect(() => validateAvailableRealExamEditions([{ ...base, jurisdictionCode: "XX" }])).toThrow("Jurisdição");
+    expect(() => validateAvailableRealExamEditions([{ ...base, institutionAcronym: "tj-ba" }])).toThrow("Sigla");
+    expect(() =>
+      validateAvailableRealExamEditions([{ ...base, documents: base.documents.slice(0, 1) }]),
+    ).toThrow("caderno e gabarito");
+  });
+
+  it("aceita somente fontes oficiais HTTPS das bancas e não incorpora conteúdo", () => {
     for (const edition of AVAILABLE_REAL_EXAM_EDITIONS) {
-      expect(["conhecimento.fgv.br", "www.concursosfcc.com.br"]).toContain(new URL(edition.officialUrl).hostname);
+      expect(isOfficialExamUrl(edition.bankSlug, edition.officialUrl)).toBe(true);
       for (const document of edition.documents) {
-        expect(new URL(document.sourceUrl).hostname).toBe("conhecimento.fgv.br");
+        expect(isOfficialExamUrl(edition.bankSlug, document.sourceUrl)).toBe(true);
         expect(Object.keys(document)).not.toContain("content");
         expect(Object.keys(document)).not.toContain("storageKey");
         expect(Object.keys(document)).not.toContain("license");

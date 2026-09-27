@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-09-27T21:30:00-03:00",
+  "publicationAllowed": false,
+  "storageAllowed": false,
+  "rightsStatus": "external_link_only",
+  "notes": [
+    "Levantamento automatizado nos portais oficiais da Cebraspe e da FGV, com robots.txt conferido (Cebraspe sem restrição; FGV veta apenas /search/ e áreas administrativas).",
+    "Somente metadados e links oficiais: nenhum caderno, questão ou gabarito foi copiado para o banco, o Git ou a imagem. PDFs foram lidos de forma transitória só para conferir data, tipo e contagem, e descartados.",
+    "Cada edição entra como pending_review. Aprovação de documento e vínculo produto–prova continuam exigindo revisão humana por conta diferente da proponente.",
+    "O vínculo ao produto só é possível depois que o produto estiver ligado à oportunidade oficial revisada do concurso atual (mesma carreira, instituição e jurisdição).",
+    "FCC (robots proíbe /concursos/ e PDFs) e VUNESP (bloqueio de acesso automatizado) não foram acessadas; organizadoras fora do catálogo (AOCP, Consulplan, Fundatec, Avalia, FADESP, NC-UFPR, comissões próprias) exigem ampliação do catálogo antes de qualquer registro."
+  ],
+  "registered": [
+    { "productSlug": "agu-advocacia-geral-da-uniao-pre-edital", "edition": "agu-advogado-2023", "bank": "cebraspe", "examDate": "2023-04-30", "dateEvidence": "gabarito definitivo: 'Aplicação: 30/04/2023'", "questions": 100, "countEvidence": "gabarito definitivo, itens 1–100" },
+    { "productSlug": "pc-ma-delegado-2026", "edition": "pc-ma-delegado-2018", "bank": "cebraspe", "examDate": "2018-01-28", "dateEvidence": "gabarito definitivo: 'Aplicação: 28/1/2018'", "questions": 100, "countEvidence": "gabarito definitivo, itens 1–100" },
+    { "productSlug": "pc-rj-delegado-2026", "edition": "pc-rj-delegado-2022", "bank": "cebraspe", "examDate": "2022-03-13", "dateEvidence": "gabarito definitivo: 'Aplicação: 13/03/2022'", "questions": 100, "countEvidence": "gabarito definitivo, itens 1–100" },
+    { "productSlug": "pge-al-procurador-do-estado-reta-final", "edition": "pge-al-procurador-2021", "bank": "cebraspe", "examDate": "2021-10-30", "dateEvidence": "gabarito definitivo: 'Aplicação: 30/10/2021'", "questions": 100, "countEvidence": "gabarito definitivo, itens 1–100" },
+    { "productSlug": "pgm-manaus-procurador-do-municipio-2026", "edition": "pgm-manaus-procurador-2018", "bank": "cebraspe", "examDate": "2018-05-20", "dateEvidence": "gabarito definitivo: 'Aplicação: 20/5/2018'", "questions": 150, "countEvidence": "gabarito definitivo, itens certo/errado 1–150" },
+    { "productSlug": "tj-ba-juiz-de-direito-2026", "edition": "tj-ba-juiz-2019", "bank": "cebraspe", "examDate": "2019-01-13", "dateEvidence": "gabarito definitivo: 'Aplicação: 13/1/2019'", "questions": 100, "countEvidence": "gabarito definitivo, itens 1–100" },
+    { "productSlug": "tj-dft-juiz-de-direito-reta-final", "edition": "tj-dft-juiz-2023", "bank": "cebraspe", "examDate": "2023-02-05", "dateEvidence": "gabarito definitivo: 'Aplicação: 05/02/2023'", "questions": 100, "countEvidence": "gabarito definitivo, itens 1–100" },
+    { "productSlug": "prf-policial-rodoviario-federal-2026", "edition": "prf-policial-2021", "bank": "cebraspe", "examDate": "2021-05-09", "dateEvidence": "Editais nº 7 e nº 10/2021: provas aplicadas em 9/5/2021", "questions": 112, "countEvidence": "caderno oficial 'itens de 9 a 120'", "caveat": "Itens 1 a 8 (língua estrangeira) estão em cadernos oficiais próprios, fora deste par." },
+    { "productSlug": "trf-5-juiz-federal-5-regiao", "edition": "trf-5-juiz-federal-2025", "bank": "fgv", "examDate": "2025-05-25", "dateEvidence": "comunicado oficial da prova objetiva: 25 de maio de 2025", "questions": 100, "countEvidence": "capa do caderno Tipo 1", "caveat": "Supera o concurso Cebraspe de 2017. Jurisdição registrada como PE (sede); confirmar a convenção antes de cadastrar a oportunidade do XVI concurso." },
+    { "productSlug": "tj-pe-juiz-de-direito-2026", "edition": "tj-pe-juiz-2024", "bank": "fgv", "examDate": "2024-12-01", "dateEvidence": "gabarito oficial definitivo: 01/12/2024", "questions": 100, "countEvidence": "capa do caderno Tipo 1" },
+    { "productSlug": "tst-magistratura-do-trabalho-pre-edital", "edition": "csjt-juiz-do-trabalho-2023", "bank": "fgv", "examDate": "2023-05-14", "dateEvidence": "gabarito oficial definitivo: 14/05/2023", "questions": 100, "countEvidence": "capa do caderno Tipo 1", "caveat": "Concurso nacional organizado pelo CSJT; o produto usa o rótulo TST. Alinhar a instituição da futura oportunidade (CSJT) antes do vínculo." },
+    { "productSlug": "mpe-rj-promotor-de-justica-2026", "edition": "mpe-rj-promotor-2025", "bank": "fgv", "examDate": "2025-08-03", "dateEvidence": "gabarito oficial definitivo: 03/08/2025", "questions": 100, "countEvidence": "capa do caderno Tipo 1" },
+    { "productSlug": "tj-pr-juiz-de-direito-2025-2026", "edition": "tj-pr-juiz-2023", "bank": "fgv", "examDate": "2023-12-03", "dateEvidence": "gabarito preliminar: 03/12/2023", "questions": 100, "countEvidence": "capa do caderno Tipo 1", "caveat": "Supera o concurso Cebraspe de 2018." },
+    { "productSlug": "mpe-go-promotor-de-justica-2025", "edition": "mpe-go-promotor-2024", "bank": "fgv", "examDate": "2024-01-28", "dateEvidence": "Comunicado nº 11 (gabarito definitivo): 28/01/2024", "questions": 100, "countEvidence": "capa do caderno Tipo 1", "caveat": "A prova do concurso atual (FGV 2025) já foi aplicada; esta é a imediatamente anterior." },
+    { "productSlug": "tj-go-juiz-de-direito-2026", "edition": "tj-go-juiz-2023", "bank": "fgv", "examDate": "2023-12-17", "dateEvidence": "gabarito oficial definitivo: 17/12/2023", "questions": 100, "countEvidence": "capa do caderno Tipo 1", "caveat": "A prova do concurso atual (FGV 2025) já foi aplicada; esta é a imediatamente anterior." },
+    { "productSlug": "tj-ms-analista-judiciario-area-fim-reta-final", "edition": "tj-ms-analista-area-fim-2026", "bank": "fgv", "examDate": "2026-01-25", "dateEvidence": "gabarito oficial definitivo: 25/01/2026", "questions": 60, "countEvidence": "capa do caderno Tipo 1", "caveat": "Produto sem edição definida; se o produto for este XI concurso, a prova é dele mesmo e não conta como anterior." },
+    { "productSlug": "trt-ms-analista-e-tecnico-2024-2025", "edition": "trt-ms-analista-judiciario-2025", "bank": "fgv", "examDate": "2025-05-11", "dateEvidence": "gabarito definitivo da reaplicação: 11/05/2025", "questions": 60, "countEvidence": "capa do caderno Tipo 1", "caveat": "O produto nomeia o concurso já aplicado e agrega dois cargos; só um vínculo aprovado por produto. Decidir próxima edição e divisão por cargo." },
+    { "productSlug": "trt-ms-analista-e-tecnico-2024-2025", "edition": "trt-ms-tecnico-judiciario-2025", "bank": "fgv", "examDate": "2025-03-09", "dateEvidence": "gabarito definitivo retificado: 09/03/2025", "questions": 60, "countEvidence": "capa do caderno Tipo 1" }
+  ],
+  "alreadyApproved": [
+    { "productSlug": "enac-exame-nacional-dos-cartorios-2026-2", "edition": "enac-2026-1" },
+    { "productSlug": "enam-exame-nacional-da-magistratura-2026-2", "edition": "enam-2026-1" }
+  ],
+  "pending": [
+    { "reason": "fcc_robots", "detail": "robots.txt da FCC proíbe acesso automatizado a /concursos/ e PDFs; obter pelo órgão contratante ou manualmente.", "productSlugs": ["alems-assembleia-legislativa-do-ms-reta-final", "dpe-ba-defensor-publico-2026", "dpe-ma-defensor-publico-2026", "dpe-mt-defensor-publico-2026", "sefaz-sc-auditor-area-direito-2026", "trt-15-analista-e-tecnico-campinas", "trt-pe-analista-e-tecnico-2024-2025", "trt-rj-analista-e-tecnico-2025", "trt-sp-analista-e-tecnico-2-regiao", "sefaz-sp-auditor-fiscal-reta-final"] },
+    { "reason": "vunesp_blocked", "detail": "Acesso automatizado bloqueado; não contornar.", "productSlugs": ["tce-sp-auditor-dipe-direito-2026", "mpe-sc-promotor-de-justica-2025-2026"] },
+    { "reason": "organizer_outside_catalog", "detail": "Última prova por organizadora ou comissão fora do catálogo (quiz_banks) e do registro de portais oficiais.", "productSlugs": ["pc-ba-delegado-2026", "pc-ba-escrivao-e-investigador-2026", "pc-pr-agente-2026", "pc-pr-delegado-2026", "pp-rn-policia-penal-2026", "pp-rs-policial-analista-e-tecnico-2026", "sefa-pa-auditor-fiscal-e-analista-reta-final", "mp-sp-promotor-de-justica-97-concurso", "mpe-ms-promotor-de-justica-2026", "mpt-procurador-do-trabalho-2024", "pge-rj-procurador-do-estado-reta-final", "pc-df-delegado-de-policia-reta-final", "tj-rs-juiz-de-direito-2026", "tj-mg-juiz-de-direito-2026"] },
+    { "reason": "current_exam_already_applied", "detail": "A página FGV localizada é a do concurso atual; a edição anterior do mesmo cargo não está em banca do catálogo.", "productSlugs": ["trf-2-juiz-federal-2-regiao", "mpe-mt-promotor-de-justica-2026"] },
+    { "reason": "split_booklets", "detail": "Cebraspe publica conhecimentos gerais e específicos em arquivos separados; o modelo aceita um caderno e um gabarito por edição.", "productSlugs": ["pc-al-agente-e-escrivao-2026", "pc-ma-oficial-investigador-2026", "sefaz-al-auditor-fiscal-2026", "sefaz-ce-auditor-fiscal-2026", "tj-ce-analista-e-tecnico-2026", "trt-10-analista-e-tecnico-df-to", "camara-camara-dos-deputados-2026", "tc-df-analista-2026"] },
+    { "reason": "needs_manual_check", "detail": "Página sem caderno localizado, cargo ainda não confirmado ou mais de um gabarito definitivo (reaplicação).", "productSlugs": ["tj-ms-cartorios-reta-final", "sefaz-mt-fiscal-de-tributos-estaduais-reta-final", "alerj-assembleia-legislativa-do-rj-reta-final", "pc-sc-agente-e-escrivao-2025-2026", "tj-rj-analista-e-tecnico-2025", "alego-assembleia-legislativa-de-goias-reta-final", "al-es-analista-consultor-e-policial-legislativo-2025", "tj-ce-cartorios-reta-final", "tj-mt-cartorios-reta-final", "tj-pr-cartorios-reta-final", "tj-mg-cartorios-reta-final", "tj-rs-cartorios-reta-final", "tce-ma-analista-e-tecnico-2026", "tce-rn-auditor-2026", "pp-ma-inspetor-2026", "sefaz-go-auditor-fiscal-reta-final", "sefaz-rn-auditor-fiscal-reta-final", "tj-go-analista-judiciario-reta-final", "pge-ac-procurador-do-estado-reta-final", "pgm-rj-procurador-do-municipio-reta-final"] }
+  ],
+  "rejectedCandidates": [
+    { "source": "cebraspe:PGE_RJ_22", "reason": "concurso de servidores, não de procurador" },
+    { "source": "cebraspe:TST_23", "reason": "concurso de servidores, não de magistratura" },
+    { "source": "cebraspe:TRF5_17_JUIZ", "reason": "superado pelo concurso FGV de 2025" },
+    { "source": "cebraspe:TJ_PR_18_JUIZ", "reason": "superado pelo concurso FGV de 2023" },
+    { "source": "fgv:tcesp23", "reason": "cargos de TI, não Auditor — Direito" },
+    { "source": "fgv:pgmcmrio", "reason": "cargos de analista, não Procurador do Município" }
+  ]
+}
