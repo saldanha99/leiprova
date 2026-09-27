@@ -1,6 +1,11 @@
 import {describe,it,expect} from 'vitest';
-import {safeEditorialError} from '@/lib/editorial/safe-error';
+import {safeEditorialError,safeEditorialErrorCode} from '@/lib/editorial/safe-error';
 describe('diagnóstico editorial sem segredos',()=>{
+  it('expõe o código do driver sem o envelope nem os parâmetros da consulta',()=>{
+    const error=new Error('Failed query: select $1\nparams: Sun Sep 27 2026',{cause:{code:'ERR_INVALID_ARG_TYPE',message:'Received an instance of Date'}});
+    expect(safeEditorialErrorCode(error)).toBe('ERR_INVALID_ARG_TYPE');
+    expect(safeEditorialError(error)).toBe('{"code":"ERR_INVALID_ARG_TYPE"}');
+  });
   it('mantém apenas código seguro do driver ou fetch',()=>{
     expect(safeEditorialError(new Error('SQL e senha',{cause:{code:'42501',message:'segredo'}}))).toBe('{"code":"42501"}');
   });

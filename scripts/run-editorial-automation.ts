@@ -16,14 +16,14 @@ import {
 } from "../src/lib/db/schema";
 import { extractOfficialSyllabusCandidates } from "../src/lib/editorial/official-syllabus-extractor";
 import { prepareAgentWork } from "../src/lib/editorial/agent-work-preparation";
+import {
+  runExamLicensingSteps,
+  runIsolatedStep,
+  type EditorialStepFailure,
+} from "../src/lib/editorial/automation-cycle";
 import { discoveryPathBlocked } from "../src/lib/editorial/discovery-policy";
 import { safeEditorialError as safeError } from "../src/lib/editorial/safe-error";
-import {
-  dispatchDueExamLicenseRequests,
-  prepareExamLicenseRequests,
-  reconcileGrantedExamLicenseRequests,
-  type LicenseEmail,
-} from "../src/lib/licensing/exam-license-automation";
+import type { LicenseEmail } from "../src/lib/licensing/exam-license-automation";
 import {
   claimEditorialJob,
   editorialQueueSummary,
@@ -429,30 +429,38 @@ async function generateReviewedRequirementDrafts(ownerUserId: number) {
 async function main() {
   try {
     const owner = await requireOwner();
-    const documents = await capturePendingOfficialDocuments(owner.id);
-    const syllabi = await extractApprovedSyllabi(owner.id);
-    const drafts = await generateReviewedRequirementDrafts(owner.id);
-    const agents = process.env.EDITORIAL_AGENT_BRIDGE_ENABLED === "true" ? await prepareAgentWork(db) : { enabled: false };
-    const licensingPrepared = await prepareExamLicenseRequests(db, owner.id);
-    const licensingReconciled = await reconcileGrantedExamLicenseRequests(db);
-    const licensingDispatch = process.env.LICENSE_REQUEST_EMAIL_ENABLED === "true"
-      ? await dispatchDueExamLicenseRequests(db, sendLicenseEmail)
-      : { due: 0, sent: 0, deferred: 0, manualReview: 0 };
+    // Etapas independentes falham sozinhas: o resumo diz qual falhou e o ciclo
+    // ainda grava a conclusão, em vez de sumir até alguém abrir o docker logs.
+    const failedSteps: EditorialStepFailure[] = [];
+    const documents = await runIsolatedStep(failedSteps, "documents", () =>
+      capturePendingOfficialDocuments(owner.id),
+    );
+    const syllabi = await runIsolatedStep(failedSteps, "syllabi", () =>
+      extractApprovedSyllabi(owner.id),
+    );
+    const drafts = await runIsolatedStep(failedSteps, "drafts", () =>
+      generateReviewedRequirementDrafts(owner.id),
+    );
+    const agents = process.env.EDITORIAL_AGENT_BRIDGE_ENABLED === "true"
+      ? await runIsolatedStep(failedSteps, "agents", () => prepareAgentWork(db))
+      : { enabled: false };
+    const licensing = await runExamLicensingSteps(
+      db,
+      owner.id,
+      failedSteps,
+      process.env.LICENSE_REQUEST_EMAIL_ENABLED === "true" ? sendLicenseEmail : null,
+    );
     const summary = {
       completedAt: new Date().toISOString(),
       policy: "official_documents_to_draft_queue",
       approvalsAutomated: 0,
       publicationsAutomated: 0,
+      failedSteps,
       documents,
       syllabi,
       drafts,
       agents,
-      licensing: {
-        emailEnabled: process.env.LICENSE_REQUEST_EMAIL_ENABLED === "true",
-        prepared: licensingPrepared,
-        reconciled: licensingReconciled,
-        dispatch: licensingDispatch,
-      },
+      licensing,
     };
     await db.insert(auditLogs).values({
       actorUserId: owner.id,
@@ -461,7 +469,13 @@ async function main() {
       metadata: summary,
     });
     console.log(JSON.stringify(summary));
-    if (documents.failures || syllabi.failures || drafts.failures || drafts.lostLeases) process.exitCode = 1;
+    if (
+      failedSteps.length ||
+      documents?.failures ||
+      syllabi?.failures ||
+      drafts?.failures ||
+      drafts?.lostLeases
+    ) process.exitCode = 1;
   } finally {
     await client.end();
   }

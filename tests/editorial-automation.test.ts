@@ -69,6 +69,15 @@ describe("automação editorial segura", () => {
     expect(script).toContain('"automation.editorial.completed"');
   });
 
+  it("isola cada etapa e grava a conclusão mesmo com falha parcial", () => {
+    for (const step of ["documents", "syllabi", "drafts", "agents"]) {
+      expect(script).toContain(`runIsolatedStep(failedSteps, "${step}"`);
+    }
+    expect(script).toContain("runExamLicensingSteps(");
+    expect(script).toMatch(/publicationsAutomated: 0,\s+failedSteps,/u);
+    expect(script).toContain("failedSteps.length ||");
+  });
+
   it("captura o corpus somente após a fotografia vigente ter sido aprovada", () => {
     expect(legalMonitor).toContain('if (saved.status !== "approved")');
     expect(legalMonitor).toContain("fetchOfficialConsolidatedLegalText");

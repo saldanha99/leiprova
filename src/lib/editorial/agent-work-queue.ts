@@ -187,6 +187,7 @@ export async function completeAgentWork(db: AgentDatabase,
 
 export async function agentWorkSummary(db: AgentDatabase) {
   const counts=await db.execute<{kind:AgentWorkKind;status:string;count:number}>(sql`select kind,status,count(*)::int count from editorial_agent_work group by kind,status order by kind,status`);
-  const [budget]=await db.execute<{used:number}>(sql`select count(*)::int used from editorial_agent_runs where started_at>now()-interval '24 hours'`);
-  return { counts, budget:{...budget,limit:AGENT_WORK_DAILY_LIMIT},publicationAllowed:false };
+  const [runs]=await db.execute<{used:number;lastRunAt:string|null}>(sql`select count(*) filter (where started_at>now()-interval '24 hours')::int used,
+    max(started_at)::text "lastRunAt" from editorial_agent_runs`);
+  return { counts, budget:{used:runs.used,limit:AGENT_WORK_DAILY_LIMIT},lastRunAt:runs.lastRunAt,publicationAllowed:false };
 }

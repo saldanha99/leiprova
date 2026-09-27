@@ -4,9 +4,15 @@ import { requireAdmin } from "@/lib/auth";
 import { getDb } from "@/lib/db/client";
 import { agentWorkSummary } from "@/lib/editorial/agent-work-queue";
 import { AGENT_FOR_WORK, agentWorkResultSchema, type AgentWorkKind } from "@/lib/editorial/agent-work-contract";
+import { AGENT_RUN_STALE_HOURS, agentFreshness, cycleFailedSteps, EDITORIAL_CYCLE_STALE_HOURS, engineFreshness, type EngineFreshness } from "@/lib/editorial/operations-health";
 
 const statuses:Record<string,string>={pending:"Na fila",running:"Em execução",prepared:"Preparado · revisar",blocked:"Precisa de insumo",failed:"Falhou",superseded:"Fonte alterada"};
 const kinds:Record<AgentWorkKind,string>={discovery:"Novos editais",legal_mapping:"Vínculo com a lei",authoring:"Questões inéditas",legal_change:"Mudança legislativa"};
+const steps:Record<string,string>={documents:"coleta de documentos oficiais",syllabi:"extração de programas",drafts:"rascunhos por requisito",agents:"preparação para os agentes","licensing.prepare":"preparação de pedidos de licença","licensing.reconcile":"conciliação de licenças","licensing.dispatch":"envio de acompanhamentos de licença"};
+const moment=(date:Date)=>date.toLocaleString('pt-BR',{timeZone:'America/Sao_Paulo'});
+// Espaço não separável mantém número e unidade na mesma linha no celular.
+const age=(hours:number)=>hours<1?'há menos de 1\u00a0h':hours<48?`há ${Math.floor(hours)}\u00a0h`:`há ${Math.floor(hours/24)}\u00a0dias`;
+const lastSeen=(health:EngineFreshness,label:string,missing:string)=>health.lastAt&&health.ageHours!==null?`${label} em ${moment(health.lastAt)}, ${age(health.ageHours)}.`:missing;
 type WorkRow={key:string;kind:AgentWorkKind;status:string;title:string;attempts:number;updatedAt:string;result:unknown;error:string|null};
 
 export default async function MotorsPage({searchParams}:{searchParams:Promise<Record<string,string|string[]|undefined>>}) {
@@ -24,6 +30,13 @@ export default async function MotorsPage({searchParams}:{searchParams:Promise<Re
       where action in ('automation.editorial.completed','monitor.legal.completed') order by action,created_at desc`),
   ]);
   const counts=summary.counts;
+  const now=new Date();
+  const editorialCycle=cycles.find(cycle=>cycle.action==='automation.editorial.completed');
+  const worker=engineFreshness(editorialCycle?.at??null,now,EDITORIAL_CYCLE_STALE_HOURS);
+  const failedSteps=cycleFailedSteps(editorialCycle?.data);
+  const pendingWork=counts.filter(item=>item.status==='pending').reduce((sum,item)=>sum+item.count,0);
+  const agents=agentFreshness(summary.lastRunAt,pendingWork,now);
+  const tone=(alert:boolean)=>alert?'border-amber-300/50 bg-amber-300/[.06]':'border-white/10 bg-white/[.025]';
   return <main className="mx-auto max-w-6xl px-5 py-10 md:px-8">
     <header className="border-b border-white/10 pb-8">
       <p className="text-xs font-semibold uppercase tracking-[.22em] text-emerald-300">EDITALUME / CENTRAL EDITORIAL</p>
@@ -35,6 +48,21 @@ export default async function MotorsPage({searchParams}:{searchParams:Promise<Re
         <span className="rounded-full border border-white/15 px-3 py-2 text-slate-300">{String(summary.budget.used??0)} / {summary.budget.limit} reservas nas últimas 24h</span>
       </div>
     </header>
+    <section aria-label="Saúde dos motores" className="mt-8 grid gap-3 md:grid-cols-2">
+      <article className={`rounded-2xl border p-6 ${tone(worker.stale||failedSteps.length>0)}`}>
+        <p className="text-xs tracking-widest text-slate-500">VPS / COLETA E PREPARAÇÃO</p>
+        <h2 className="mt-3 text-lg font-semibold">{worker.stale?'Atrasada':failedSteps.length?'Concluída com falhas':'Em dia'}</h2>
+        <p className="mt-2 text-sm leading-6 text-slate-400">{lastSeen(worker,'Última conclusão','Nenhuma conclusão registrada neste ambiente.')}</p>
+        {worker.stale&&<p className="mt-2 text-sm leading-6 text-amber-200">O ciclo roda a cada 6&nbsp;h. Sem conclusão há mais de {EDITORIAL_CYCLE_STALE_HOURS}&nbsp;h, confira os registros do worker editorial na VPS.</p>}
+        {failedSteps.length>0&&<ul className="mt-3 space-y-1 text-sm leading-6 text-amber-200">{failedSteps.map(item=><li key={item.step} className="break-words">Falhou: {steps[item.step]??item.step} ({item.code})</li>)}</ul>}
+      </article>
+      <article className={`rounded-2xl border p-6 ${tone(agents.stale)}`}>
+        <p className="text-xs tracking-widest text-slate-500">MAESTRI / AGENTES</p>
+        <h2 className="mt-3 text-lg font-semibold">{agents.stale?'Parados':pendingWork?'Em dia':'Sem fila pendente'}</h2>
+        <p className="mt-2 text-sm leading-6 text-slate-400">{lastSeen(agents,'Última execução','Nenhuma execução de agente registrada.')}</p>
+        {agents.stale&&<p className="mt-2 text-sm leading-6 text-amber-200">{pendingWork} tarefa(s) na fila sem execução há mais de {AGENT_RUN_STALE_HOURS}&nbsp;h. Confira se o Maestri está aberto.</p>}
+      </article>
+    </section>
     <section aria-label="Filas por motor" className="mt-8 grid gap-px overflow-hidden rounded-2xl border border-white/10 bg-white/10 sm:grid-cols-2 xl:grid-cols-4">
       {Object.entries(kinds).map(([kind,label],index)=>{
         const group=counts.filter(item=>item.kind===kind);const total=group.reduce((sum,item)=>sum+item.count,0);
