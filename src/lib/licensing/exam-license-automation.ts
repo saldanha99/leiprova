@@ -232,6 +232,8 @@ export async function dispatchDueExamLicenseRequests(
   now = new Date(),
   limit = 4,
 ) {
+  // O driver postgres-js do Drizzle não serializa Date em SQL bruto (ERR_INVALID_ARG_TYPE).
+  const nowIso = now.toISOString();
   const due = await db.execute<{
     publicId: string;
     status: string;
@@ -246,7 +248,7 @@ export async function dispatchDueExamLicenseRequests(
       follow_up_count::integer as "followUpCount"
     from exam_license_requests
     where status='prepared'
-      or (status='awaiting_response' and next_follow_up_at <= ${now})
+      or (status='awaiting_response' and next_follow_up_at <= ${nowIso}::timestamptz)
     order by coalesce(next_follow_up_at,created_at),created_at
     limit ${limit}
   `);
@@ -261,7 +263,7 @@ export async function dispatchDueExamLicenseRequests(
     if (followUpNumber > MAX_LICENSE_FOLLOW_UPS) {
       await db.execute(sql`
         update exam_license_requests set status='manual_review',next_follow_up_at=null,
-          review_notes='Três acompanhamentos automáticos concluídos sem resposta registrada.',updated_at=${now}
+          review_notes='Três acompanhamentos automáticos concluídos sem resposta registrada.',updated_at=${nowIso}::timestamptz
         where public_id=${request.publicId} and status='awaiting_response'
       `);
       manualReview += 1;
@@ -290,13 +292,13 @@ export async function dispatchDueExamLicenseRequests(
       }
       const nextFollowUpAt = followUpNumber >= MAX_LICENSE_FOLLOW_UPS
         ? null
-        : followUpDate(now);
+        : followUpDate(now).toISOString();
       await db.execute(sql`
         update exam_license_requests set status=${followUpNumber >= MAX_LICENSE_FOLLOW_UPS ? "manual_review" : "awaiting_response"},
-          requested_at=coalesce(requested_at,${now}),
-          last_follow_up_at=${followUpNumber ? now : null},
-          next_follow_up_at=${nextFollowUpAt},follow_up_count=${followUpNumber},
-          last_provider_message_id=${lastMessageId},updated_at=${now}
+          requested_at=coalesce(requested_at,${nowIso}::timestamptz),
+          last_follow_up_at=${followUpNumber ? nowIso : null}::timestamptz,
+          next_follow_up_at=${nextFollowUpAt}::timestamptz,follow_up_count=${followUpNumber},
+          last_provider_message_id=${lastMessageId},updated_at=${nowIso}::timestamptz
         where public_id=${request.publicId}
           and status=${request.status}
           and scope_fingerprint=${request.fingerprint}

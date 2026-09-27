@@ -735,7 +735,7 @@ export async function reviewExamDocumentAction(
             .update(examEditions)
             .set({
               status: "published",
-              publishedAt: sql`coalesce(${examEditions.publishedAt}, ${reviewedAt})`,
+              publishedAt: sql`coalesce(${examEditions.publishedAt}, ${reviewedAt.toISOString()}::timestamptz)`,
               sourcePolicy:
                 document.sourcePolicy === "licensed_content"
                   ? "licensed_content"
