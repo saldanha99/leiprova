@@ -248,7 +248,12 @@ versão do Claude Code) com diretório de trabalho igual à pasta do papel. Sem 
 registra `agent_offline` com saída 3 e a rotina não chama a IA. Retomar exige
 abrir o agente no terminal do papel pelo Maestri; o login do Codex é
 compartilhado com o aplicativo (`codex login status`). Reabrir tarefas em
-`failed` é decisão operacional à parte: primeiro confirmar o agente no ar.
+`failed` é decisão operacional à parte: primeiro confirmar o agente no ar. As
+quatro análises citadas voltaram à fila em 28/09 por decisão do proprietário, com
+auditoria `manual.agent_work.requeued`. Mesmo com o agente de volta, a ponte não
+reserva enquanto houver no papel um `packet.json` sem recibo e com reserva ainda
+válida (`agent_has_active_lease`): a retomada espera o fim dessa reserva perdida,
+até 45 minutos.
 
 Configuração exata e IDs: `.local/maestri/ativacao-rotinas-20260906.json` e
 `.local/maestri/preflight-config-20260906.json`. Esses arquivos não contêm chaves,

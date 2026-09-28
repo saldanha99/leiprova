@@ -21,8 +21,12 @@ detalhes em `LICENCIAMENTO-PROVAS-ANTERIORES.md`.
 reservas expiravam: `legal-change:846`, `843` e `860` viraram `failed`, e `854`
 segue o mesmo caminho quando a reserva expirar.
 O preflight local agora não reserva sem o agente aberto (`agent_offline`); ver
-`MAESTRI-MOTORES-AUTOMATICOS.md`. O login do Codex já está válido: falta abrir o
-`codex` no terminal do Guardião. O Radar concluiu 6 tarefas na madrugada (FGV,
+`MAESTRI-MOTORES-AUTOMATICOS.md`. Às 08h42 o proprietário abriu o `codex` nos
+terminais do Guardião e do Autor e autorizou devolver as quatro análises à fila:
+voltaram a `pending` com zero tentativas, auditadas como
+`manual.agent_work.requeued` (conta proprietária, `owner_chat_2026-09-28`). A cota
+estava em 21 de 24 execuções em 24 h, consumida em boa parte pelas reservas
+perdidas; até 19h de 28/09 cabem só mais 3. O Radar concluiu 6 tarefas na madrugada (FGV,
 FCC, Cebraspe e 3 entradas de curso: PC-DF, PGE-AL, TRT-10), todas `prepared`.
 
 **Revisor diferente removido e produtos ligados a editais (28/09/2026, 00h35 BRT):**
