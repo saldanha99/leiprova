@@ -18,6 +18,7 @@ import {
   saoPauloCalendarDate,
   shiftIsoCalendarDate,
 } from "@/lib/opportunities/catalog-policy";
+import { CALENDAR_CLOSED_WINDOW_DAYS } from "@/lib/opportunities/calendar";
 
 const primaryAssignments = alias(
   opportunityOrganizerAssignments,
@@ -168,6 +169,58 @@ export async function listReviewedContestOpportunities(filters?: {
       )
       .where(and(...conditions))
       .orderBy(desc(contestOpportunities.isFeatured), desc(contestOpportunities.statusAsOf));
+  } catch (error) {
+    if (isOpportunityCatalogNotMigrated(error)) return [];
+    throw error;
+  }
+}
+
+/** Calendário público: editais revisados em qualquer fase. Encerrados só dentro
+ * da janela do calendário; a seção de cada um é decidida em `calendar.ts`. */
+export async function listContestCalendarOpportunities(referenceDate = new Date()) {
+  const closedCutoff = shiftIsoCalendarDate(
+    saoPauloCalendarDate(referenceDate),
+    -CALENDAR_CLOSED_WINDOW_DAYS,
+  );
+  try {
+    return await getDb()
+      .select({
+        ...publicOpportunitySelection,
+        // Um produto do catálogo por edital; o primeiro em ordem alfabética basta.
+        productSlug: sql<string | null>`(
+          select product.slug from contest_store_products product
+          where product.opportunity_id = ${contestOpportunities.id}
+          order by product.slug limit 1
+        )`,
+      })
+      .from(contestOpportunities)
+      .innerJoin(contestCategories, eq(contestOpportunities.categoryId, contestCategories.id))
+      .innerJoin(quizCareerTracks, eq(contestOpportunities.careerTrackId, quizCareerTracks.id))
+      .leftJoin(
+        primaryAssignments,
+        and(
+          eq(primaryAssignments.opportunityId, contestOpportunities.id),
+          currentPrimaryResponsibleJoin,
+        ),
+      )
+      .leftJoin(
+        examinationProviderAssignments,
+        and(
+          eq(examinationProviderAssignments.opportunityId, contestOpportunities.id),
+          currentExaminationProviderJoin,
+        ),
+      )
+      .leftJoin(primaryBanks, eq(primaryAssignments.quizBankId, primaryBanks.id))
+      .leftJoin(
+        examinationProviderBanks,
+        eq(examinationProviderAssignments.quizBankId, examinationProviderBanks.id),
+      )
+      .where(
+        and(
+          eq(contestOpportunities.editorialStatus, "reviewed"),
+          or(isNull(contestOpportunities.examDate), gte(contestOpportunities.examDate, closedCutoff)),
+        ),
+      );
   } catch (error) {
     if (isOpportunityCatalogNotMigrated(error)) return [];
     throw error;

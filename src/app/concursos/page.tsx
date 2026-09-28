@@ -115,13 +115,22 @@ export default async function ContestsPage() {
                   estão identificadas; edital, banca e conteúdo só são
                   confirmados após revisão de fontes oficiais.
                 </p>
-                <a
-                  href="#catalogo-planejado"
-                  className="mt-6 inline-flex min-h-11 items-center gap-2 text-sm font-bold underline underline-offset-4"
-                >
-                  Explorar os concursos{" "}
-                  <ArrowRight size={16} aria-hidden="true" />
-                </a>
+                <div className="mt-6 flex flex-wrap gap-x-8 gap-y-2">
+                  <a
+                    href="#catalogo-planejado"
+                    className="inline-flex min-h-11 items-center gap-2 text-sm font-bold underline underline-offset-4"
+                  >
+                    Explorar os concursos{" "}
+                    <ArrowRight size={16} aria-hidden="true" />
+                  </a>
+                  <Link
+                    href="/concursos/calendario"
+                    className="inline-flex min-h-11 items-center gap-2 text-sm font-bold text-emerald-300 underline underline-offset-4"
+                  >
+                    Calendário: inscrições, provas e encerrados{" "}
+                    <ArrowRight size={16} aria-hidden="true" />
+                  </Link>
+                </div>
               </div>
 
               <aside className="rounded-[1.7rem] border border-amber-300/20 bg-amber-300/[0.055] p-6 text-sm leading-7 text-amber-100/80">

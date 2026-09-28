@@ -28,6 +28,12 @@ const PUBLIC_PAGES = [
     priority: 0.9,
   },
   {
+    path: "/concursos/calendario",
+    lastModified: "2026-09-28",
+    changeFrequency: "daily",
+    priority: 0.8,
+  },
+  {
     path: "/metodologia",
     lastModified: "2026-09-01",
     changeFrequency: "monthly",

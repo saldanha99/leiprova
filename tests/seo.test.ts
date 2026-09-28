@@ -24,7 +24,11 @@ describe("fundação GEO e SEO", () => {
     );
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls).not.toContain("https://leiprova.2b.app.br/contato");
-    expect(urls.some((url) => url.startsWith("https://leiprova.2b.app.br/concursos/"))).toBe(false);
+    // Páginas de edição só entram pelo banco, depois de revisadas; o calendário é
+    // a única subpágina fixa de /concursos.
+    expect(urls.filter((url) => url.startsWith("https://leiprova.2b.app.br/concursos/"))).toEqual([
+      "https://leiprova.2b.app.br/concursos/calendario",
+    ]);
     expect(
       entries.every((entry) =>
         entry.lastModified instanceof Date && !Number.isNaN(entry.lastModified.getTime()),

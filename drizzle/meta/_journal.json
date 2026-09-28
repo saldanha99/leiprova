@@ -302,6 +302,13 @@
       "when": 1790549181097,
       "tag": "0042_next_mother_askani",
       "breakpoints": true
+    },
+    {
+      "idx": 43,
+      "version": "7",
+      "when": 1790597858895,
+      "tag": "0043_contest_lifecycle_advance",
+      "breakpoints": true
     }
   ]
 }

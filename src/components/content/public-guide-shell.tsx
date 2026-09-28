@@ -95,7 +95,13 @@ export function PublicGuideShell({
   );
 }
 
-export function GuideBreadcrumbs({ current }: { current: string }) {
+export function GuideBreadcrumbs({
+  current,
+  parent,
+}: {
+  current: string;
+  parent?: { label: string; href: string };
+}) {
   return (
     <nav
       aria-label="Trilha de navegação"
@@ -105,6 +111,14 @@ export function GuideBreadcrumbs({ current }: { current: string }) {
         Início
       </Link>
       <span aria-hidden="true">/</span>
+      {parent ? (
+        <>
+          <Link className="hover:text-amber-300" href={parent.href}>
+            {parent.label}
+          </Link>
+          <span aria-hidden="true">/</span>
+        </>
+      ) : null}
       <span aria-current="page" className="text-amber-300">
         {current}
       </span>

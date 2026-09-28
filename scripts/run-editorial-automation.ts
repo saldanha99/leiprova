@@ -35,6 +35,7 @@ import {
   generateNoticeQuestionDraftForRequirement,
   NoticeDraftGenerationError,
 } from "../src/lib/editorial/notice-draft-service";
+import { advanceOpportunityLifecycles } from "../src/lib/opportunities/lifecycle-advance";
 import {
   captureOfficialPdf,
   discoverOfficialDocumentCandidates,
@@ -432,6 +433,11 @@ async function main() {
     // Etapas independentes falham sozinhas: o resumo diz qual falhou e o ciclo
     // ainda grava a conclusão, em vez de sumir até alguém abrir o docker logs.
     const failedSteps: EditorialStepFailure[] = [];
+    // Primeiro a fase dos editais: sem ela o concurso some do catálogo quando as
+    // inscrições acabam e nunca aparece como encerrado depois da prova.
+    const lifecycle = await runIsolatedStep(failedSteps, "lifecycle", () =>
+      advanceOpportunityLifecycles(db, owner.id),
+    );
     const documents = await runIsolatedStep(failedSteps, "documents", () =>
       capturePendingOfficialDocuments(owner.id),
     );
@@ -456,6 +462,7 @@ async function main() {
       approvalsAutomated: 0,
       publicationsAutomated: 0,
       failedSteps,
+      lifecycle,
       documents,
       syllabi,
       drafts,
