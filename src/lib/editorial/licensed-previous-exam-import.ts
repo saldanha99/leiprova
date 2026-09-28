@@ -1012,13 +1012,10 @@ export function validateLicensedPreviousExamReviewBatch(input: {
       "O lote auditado não corresponde mais ao total integral do caderno.",
     );
   }
-  if (
-    input.batch.importedByUserId === null ||
-    (input.decision !== "reject" &&
-      input.batch.importedByUserId === input.reviewerUserId)
-  ) {
+  // A mesma conta pode importar e revisar (autorização do proprietário, 27/09/2026).
+  if (input.batch.importedByUserId === null) {
     throw new LicensedPreviousExamImportError(
-      "A revisão do caderno precisa ser feita por outro administrador.",
+      "O lote auditado não identifica a conta que o importou.",
     );
   }
 

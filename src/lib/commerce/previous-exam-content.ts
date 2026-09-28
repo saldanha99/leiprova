@@ -252,7 +252,6 @@ function qualifiedPreviousQuestionConditions(coverageEndsAt: SQLWrapper) {
     and previous_question.editorial_status = 'reviewed'
     and previous_question.created_by_user_id is not null
     and previous_question.reviewed_by_user_id is not null
-    and previous_question.reviewed_by_user_id <> previous_question.created_by_user_id
     and previous_question.submitted_at is not null
     and nullif(btrim(previous_question.review_notes), '') is not null
     and char_length(btrim(previous_question.review_notes)) between 20 and 1500

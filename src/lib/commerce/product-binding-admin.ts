@@ -35,8 +35,7 @@ export type BindingDossierView = {
 };
 export type BindingReviewState = {
   status: "idle" | "preview" | "success" | "error"; message: string;
-  preview?: { selection: BindingAdminSelection; fingerprint: string; dossier: BindingDossierView;
-    reviewerAllowed: boolean; requiresOwnerOverride: boolean };
+  preview?: { selection: BindingAdminSelection; fingerprint: string; dossier: BindingDossierView };
 };
 const record = (value: unknown): Record<string, unknown> => value && typeof value === "object" && !Array.isArray(value)
   ? value as Record<string, unknown> : {};

@@ -21,7 +21,6 @@ import {
   quizCareerSpecializations,
   quizCareerTracks,
 } from "@/lib/db/schema";
-import { canReviewEditorialSubmission } from "@/lib/editorial/owner-approval";
 import {
   institutionAcronymSchema,
   normalizedBrazilianJurisdictionCodeSchema,
@@ -146,15 +145,6 @@ export async function reviewLegalSnapshotAction(
     .where(eq(legalSourceSnapshots.publicId, parsed.data.publicId))
     .limit(1);
   if (!snapshot || snapshot.status !== "pending_review") return errorState("A fotografia não está mais pendente.");
-  if (
-    !canReviewEditorialSubmission({
-      initiatorUserId: snapshot.initiatorId,
-      reviewerUserId: user.id,
-      reviewerEmail: user.email,
-    })
-  ) {
-    return errorState("Somente a conta proprietária pode revisar a própria fotografia.");
-  }
   if (parsed.data.notes.length < 10) {
     return errorState("Registre uma nota de revisão com pelo menos 10 caracteres.");
   }
@@ -323,15 +313,6 @@ export async function reviewLegalTextAction(
     .limit(1);
   if (!snapshot || snapshot.status !== "pending_review") {
     return errorState("A compilação não está mais pendente.");
-  }
-  if (
-    !canReviewEditorialSubmission({
-      initiatorUserId: snapshot.initiatorId,
-      reviewerUserId: user.id,
-      reviewerEmail: user.email,
-    })
-  ) {
-    return errorState("Somente a conta proprietária pode revisar a própria compilação.");
   }
 
   const approved = parsed.data.decision === "approve";

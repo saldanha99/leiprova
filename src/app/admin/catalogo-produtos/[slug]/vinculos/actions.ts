@@ -33,12 +33,11 @@ export async function reviewBindingAction(_state: BindingReviewState, form: Form
       expectedFingerprint: typeof form.get("fingerprint") === "string" ? String(form.get("fingerprint")) : undefined,
       input: { schemaVersion: 1, productSlug: selection.productSlug, opportunityPublicId: selection.opportunityPublicId,
         examEditionPublicId: selection.examEditionPublicId, bindingIds: [selection.bindingId], notes: selection.notes,
-        decision: selection.decision, ownerOverride: form.get("ownerOverride") === "on",
+        decision: selection.decision,
         confirmations: { edition: form.get("edition") === "on", program: form.get("program") === "on", adherence: form.get("adherence") === "on" } },
     });
     if (result.mode === "preview") return { status: "preview", message: "Confira o dossiê e a nota antes de registrar sua decisão.",
-      preview: { selection, fingerprint: result.fingerprint, dossier: toBindingDossierView(result.dossiers[0]),
-        reviewerAllowed: result.reviewerAllowed, requiresOwnerOverride: result.requiresOwnerOverride } };
+      preview: { selection, fingerprint: result.fingerprint, dossier: toBindingDossierView(result.dossiers[0]) } };
     revalidatePath("/admin/catalogo-produtos");
     revalidatePath(`/admin/catalogo-produtos/${selection.productSlug}/vinculos`);
     return { status: "success", message: selection.decision === "approve"

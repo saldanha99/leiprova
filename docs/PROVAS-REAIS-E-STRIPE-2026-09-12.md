@@ -41,7 +41,8 @@ Uma prova anterior só fica elegível quando:
 4. edição e PDF foram reconferidos em fonte oficial permitida nos últimos 30
    dias;
 5. o caderno e o gabarito exato são PDFs oficiais distintos, aprovados e
-   revisados por pessoa diferente de quem os propôs;
+   revisados com nota (desde 28/09/2026 a mesma conta que propôs pode revisar,
+   por decisão do proprietário);
 6. a evidência de cada licença possui URL, hash SHA-256 imutável e data de
    conferência, todos incluídos no dossiê apresentado ao segundo administrador;
 7. cada posição de `1` a `N` possui uma única questão, opções válidas, uma única

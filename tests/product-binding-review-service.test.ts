@@ -95,18 +95,19 @@ describe("revisão de vínculos — serviço transacional sem banco", () => {
     await expect(reviewProductQuestionBindings(f.db, { input, actorPublicId, mode: "apply", expectedFingerprint: "a".repeat(64) })).rejects.toThrow("permission denied");
     expect(f.transact).toHaveBeenCalledOnce(); expect(f.auditValues).not.toHaveBeenCalled();
   });
-  it.each(["generic-editor", "owner-unconfirmed", "owner-confirmed"])("proposta própria: %s", async (scenario) => {
-    const f = fixture(); f.dossier.proposedByUserId = 1;
-    vi.stubEnv("EDITORIAL_OWNER_APPROVER_EMAIL", scenario === "generic-editor" ? "other@example.invalid" : "reviewer@example.invalid");
-    const preview = await reviewProductQuestionBindings(f.db, { input, actorPublicId, mode: "preview" });
-    const request = { input: { ...input, ownerOverride: scenario !== "owner-unconfirmed" }, actorPublicId, mode: "apply" as const, expectedFingerprint: preview.fingerprint };
-    if (scenario === "owner-confirmed") {
-      expect((await reviewProductQuestionBindings(f.db, request)).approved).toBe(1);
-    } else {
-      await expect(reviewProductQuestionBindings(f.db, request)).rejects.toThrow("Proposta própria");
-      expect(f.statements.some((s) => /^\s*update /u.test(s))).toBe(false);
-    }
-  });
+  it.each([[1, "owner_self_review"], [2, "independent_review"]])(
+    "aprova proposta do usuário %i registrando %s na auditoria",
+    async (proposedByUserId, approvalBasis) => {
+      // A mesma conta pode revisar a própria proposta (autorização do proprietário, 27/09/2026).
+      const f = fixture(); f.dossier.proposedByUserId = proposedByUserId;
+      const preview = await reviewProductQuestionBindings(f.db, { input, actorPublicId, mode: "preview" });
+      const result = await reviewProductQuestionBindings(f.db, { input, actorPublicId, mode: "apply", expectedFingerprint: preview.fingerprint });
+      expect(result.approved).toBe(1);
+      expect(f.auditValues).toHaveBeenCalledWith(expect.arrayContaining([
+        expect.objectContaining({ metadata: expect.objectContaining({ approvalBasis }) }),
+      ]));
+    },
+  );
   it("edição ausente/incompatível produz preview bloqueado e não permite aplicar", async () => {
     const f = fixture(); f.dossier.eligible = false; f.dossier.snapshot.edition = null;
     const preview = await reviewProductQuestionBindings(f.db, { input, actorPublicId, mode: "preview" });

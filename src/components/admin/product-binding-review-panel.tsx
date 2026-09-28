@@ -12,7 +12,7 @@ export function BindingDecisionPreview({ state, pending, action }: { state: Bind
   const preview = state.preview;
   if (!preview) return null;
   const { dossier, selection } = preview;
-  const blocked = !preview.reviewerAllowed || dossier.status !== "pending_review" || (selection.decision === "approve" && !dossier.eligible);
+  const blocked = dossier.status !== "pending_review" || (selection.decision === "approve" && !dossier.eligible);
   return <section aria-label="Dossiê para decisão humana" className="mt-6 space-y-5 border-t border-amber-200/25 pt-6">
     <p className="text-xs font-semibold uppercase tracking-widest text-amber-200">02 · Conferência final</p>
     <p className="whitespace-pre-wrap text-base leading-7 text-white">{dossier.prompt}</p>
@@ -31,7 +31,6 @@ export function BindingDecisionPreview({ state, pending, action }: { state: Bind
       <ul className="mt-3 list-disc space-y-2 pl-5 text-sm leading-6 text-amber-100/90">{dossier.blockers.map((message) => <li key={message}>{message}</li>)}</ul>
       <p className="mt-3 text-xs leading-6 text-slate-300">Rejeitar a proposta não aprova estes requisitos e não invalida a questão globalmente.</p>
     </div>}
-    {!preview.reviewerAllowed && <p role="alert" className="text-sm text-rose-200">Esta conta não pode revisar a própria proposta. É necessária revisão independente ou a exceção proprietária já prevista na política.</p>}
     <form action={action} className="space-y-4 rounded-xl border border-white/15 p-5">
       {Object.entries(selection).map(([name, value]) => <input key={name} type="hidden" name={name} value={value} />)}
       <input type="hidden" name="mode" value="apply" />
@@ -44,7 +43,6 @@ export function BindingDecisionPreview({ state, pending, action }: { state: Bind
         ["program", "Conferi o programa e as fontes apresentados."],
         ["adherence", "Examinei a aderência desta questão e assumo a decisão indicada acima."]].map(([name, label]) =>
         <label key={name} className="flex min-h-11 items-start gap-3 py-2 text-sm leading-6"><input type="checkbox" name={name} required className="mt-1 size-4 shrink-0" />{label}</label>)}
-      {preview.requiresOwnerOverride && <label className="flex min-h-11 items-start gap-3 py-2 text-sm leading-6 text-amber-100"><input type="checkbox" name="ownerOverride" required className="mt-1 size-4 shrink-0" />Estou usando conscientemente a exceção proprietária para revisar minha própria proposta.</label>}
       <button type="submit" disabled={pending || blocked} className={buttonClass}>{pending ? "Conferindo…" : "Registrar decisão deste vínculo"}</button>
     </form>
   </section>;

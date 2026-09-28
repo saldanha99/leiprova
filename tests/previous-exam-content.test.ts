@@ -73,7 +73,9 @@ describe("conteúdo real licenciado por produto", () => {
     expect(query.sql).toContain("previous_question.source_rights_holder = exam_document.rights_holder");
     expect(query.sql).toContain("previous_question.license_expires_at is not distinct from exam_document.license_expires_at");
     expect(query.sql).toContain("from quiz_career_subjects career_subject");
-    expect(query.sql).toContain("previous_question.reviewed_by_user_id <> previous_question.created_by_user_id");
+    // Revisão registrada continua obrigatória; revisor diferente não (27/09/2026).
+    expect(query.sql).toContain("previous_question.reviewed_by_user_id is not null");
+    expect(query.sql).not.toContain("previous_question.reviewed_by_user_id <> previous_question.created_by_user_id");
     expect(query.sql).toContain("previous_question.original_question_order between 1 and exam_document.expected_question_count");
     expect(query.sql).toContain("previous_question.type in ('true_false', 'multiple_choice')");
     expect(query.sql).toContain("from question_options invalid_option");

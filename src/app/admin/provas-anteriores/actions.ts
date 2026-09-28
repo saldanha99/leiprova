@@ -206,9 +206,6 @@ export async function recordExamLicenseDecisionAction(
       if (!request || !["awaiting_response", "manual_review"].includes(request.status)) {
         throw new Error("O pedido não está aguardando uma decisão.");
       }
-      if (request.initiatedByUserId === actor.id) {
-        throw new Error("Outra conta editorial precisa revisar a resposta da banca.");
-      }
 
       const status = parsed.data.decision === "grant"
         ? "granted_pending_review"
@@ -599,12 +596,6 @@ export async function reviewExamDocumentAction(
       "Confirme explicitamente a conferência jurídica do dossiê antes de aprovar.",
     );
   }
-  if (approved && candidate.initiatedByUserId === actor.id) {
-    return initialError(
-      "A aprovação de fonte e licença precisa ser feita por outro administrador.",
-    );
-  }
-
   try {
     let checked: Awaited<ReturnType<typeof verifyOfficialExamUrl>> | null =
       null;
@@ -656,11 +647,6 @@ export async function reviewExamDocumentAction(
           ) {
             throw new Error(
               "A fonte ou a edição mudou durante a revisão. Recarregue o painel.",
-            );
-          }
-          if (document.initiatedByUserId === actor.id) {
-            throw new Error(
-              "A aprovação de fonte e licença precisa ser feita por outro administrador.",
             );
           }
           if (
@@ -1023,7 +1009,7 @@ export async function createProductExamReferenceAction(
     return {
       status: "success",
       message:
-        "Vínculo proposto. Outra conta administrativa precisa confirmar que esta é a última prova exata do cargo e da banca.",
+        "Vínculo proposto. Confirme na revisão que esta é a última prova exata do cargo e da banca.",
     };
   } catch (error) {
     return initialError(
@@ -1108,11 +1094,6 @@ export async function reviewProductExamReferenceAction(
           )
           .limit(1);
         if (!reference) throw new Error("O vínculo não está mais pendente.");
-        if (approved && reference.initiatedByUserId === actor.id) {
-          throw new Error(
-            "A confirmação da última prova precisa ser feita por outro administrador.",
-          );
-        }
 
         await transaction.execute(
           sql`select public.lock_product_binding_review_product(${reference.productSlug})`,

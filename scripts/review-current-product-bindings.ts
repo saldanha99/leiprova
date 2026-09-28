@@ -103,10 +103,9 @@ async function main() {
       decision: "approve" as const, confirmations: { edition: true, program: true, adherence: true },
     };
     const preview = await reviewProductQuestionBindings(db, { input, actorPublicId: args.actorPublicId, mode: "preview" });
-    if (preview.eligible !== preview.total || !preview.reviewerAllowed || preview.requiresOwnerOverride) {
+    if (preview.eligible !== preview.total) {
       throw new ProductBindingReviewError(
-        `O conjunto não pode ser decidido: elegíveis ${preview.eligible}/${preview.total}; ` +
-        `revisor autorizado=${preview.reviewerAllowed}; exceção proprietária exigida=${preview.requiresOwnerOverride}.`,
+        `O conjunto não pode ser decidido: elegíveis ${preview.eligible}/${preview.total}.`,
       );
     }
     const fingerprint = operationFingerprint({ version: "current-product-bindings-review-v1", reference: args.reference,

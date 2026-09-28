@@ -62,7 +62,7 @@ const licenseStatusLabel: Record<string, string> = {
 };
 
 export default async function PreviousExamsAdminPage() {
-  const user = await requireAdmin("/admin/provas-anteriores");
+  await requireAdmin("/admin/provas-anteriores");
   const snapshot = await getPreviousExamsAdminSnapshot();
   const examOptions = snapshot.exams.map((exam) => ({
     publicId: exam.publicId,
@@ -121,7 +121,6 @@ export default async function PreviousExamsAdminPage() {
     documentTitle: batch.documentTitle,
     answerKeyDocumentPublicId: batch.answerKeyDocumentPublicId,
     answerKeyDocumentTitle: batch.answerKeyDocumentTitle,
-    canApprove: batch.importedByUserId !== user.id,
     expectedQuestionCount: batch.expectedQuestionCount,
     rightsHolder: batch.rightsHolder,
     licenseEvidenceUrl: batch.licenseEvidenceUrl,
@@ -203,8 +202,8 @@ export default async function PreviousExamsAdminPage() {
           </h1>
           <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-400 sm:text-base">
             O link do PDF oficial e o direito de reproduzir questões são duas
-            decisões separadas. Cada proposta nasce pendente, exige outra conta
-            revisora e nunca abre vendas ou publica questões automaticamente.
+            decisões separadas. Cada proposta nasce pendente, exige revisão
+            registrada e nunca abre vendas ou publica questões automaticamente.
           </p>
           <div className="mt-5 flex flex-wrap gap-3 text-xs font-semibold text-slate-300">
             <span>Somente domínios oficiais cadastrados</span>
@@ -269,7 +268,6 @@ export default async function PreviousExamsAdminPage() {
                 {["awaiting_response", "manual_review"].includes(request.status) ? (
                   <ExamLicenseDecisionControls
                     publicId={request.publicId}
-                    canDecide={request.initiatedByUserId !== user.id}
                   />
                 ) : null}
               </article>
@@ -488,14 +486,13 @@ export default async function PreviousExamsAdminPage() {
           Fontes e licenças pendentes
         </h2>
         <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-500">
-          Quem cadastrou não pode aprovar o próprio item. A URL é consultada de
-          novo no momento da decisão e a nota fica no histórico de auditoria.
+          A URL é consultada de novo no momento da decisão e a nota fica no
+          histórico de auditoria.
         </p>
         <div className="mt-5 grid gap-4 xl:grid-cols-2">
           {snapshot.documents
             .filter((document) => document.status === "pending_review")
             .map((document) => {
-              const canApprove = document.initiatedByUserId !== user.id;
               return (
                 <article
                   key={document.publicId}
@@ -544,7 +541,6 @@ export default async function PreviousExamsAdminPage() {
                   <ExamDocumentReviewControls
                     publicId={document.publicId}
                     dossierFingerprint={document.reviewFingerprint}
-                    canApprove={canApprove}
                   />
                 </article>
               );
@@ -568,7 +564,6 @@ export default async function PreviousExamsAdminPage() {
           {snapshot.references
             .filter((reference) => reference.status === "pending_review")
             .map((reference) => {
-              const canApprove = reference.initiatedByUserId !== user.id;
               return (
                 <article
                   key={reference.publicId}
@@ -605,7 +600,6 @@ export default async function PreviousExamsAdminPage() {
                   </p>
                   <ProductExamReferenceReviewControls
                     publicId={reference.publicId}
-                    canApprove={canApprove}
                   />
                 </article>
               );

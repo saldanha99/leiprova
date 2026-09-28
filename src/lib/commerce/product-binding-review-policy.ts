@@ -13,7 +13,6 @@ export const productBindingReviewSchema = z.object({
   notes: z.string().trim().min(20).max(2_000),
   decision: z.enum(["approve", "reject"]).default("approve"),
   confirmations: z.object({ edition: z.boolean(), program: z.boolean(), adherence: z.boolean() }).strict(),
-  ownerOverride: z.boolean().optional(),
 }).strict().superRefine((value, context) => {
   if (new Set(value.bindingIds).size !== value.bindingIds.length) {
     context.addIssue({ code: "custom", path: ["bindingIds"], message: "Selecione IDs de vínculo distintos." });

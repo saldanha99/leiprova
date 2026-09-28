@@ -489,11 +489,12 @@ Tudo que é comercial fecha por padrão. Estado em produção na última verific
 | `STRIPE_CONNECT_MODE` | `test` | Contém o risco do item acima. |
 | `STRIPE_CONNECT_BR_APPROVED` | `false` | Trava final. |
 
-`EDITORIAL_OWNER_APPROVER_EMAIL` identifica a única conta editorial proprietária. Ela pode
-registrar a exceção `owner_override` na aprovação de um PDF oficial e concluir com a mesma
-conta as revisões de fontes, compilações e requisitos. A nota humana continua obrigatória e a
-auditoria registra `owner_self_review`. Outras contas continuam impedidas de revisar o que
-elas mesmas iniciaram. Essa permissão nunca publica questões automaticamente.
+Desde 28/09/2026, por decisão do proprietário, **nenhuma revisão exige conta diferente
+da proponente** (migração `0042`). Continuam exigidos o papel adequado (revisão de provas
+anteriores só por admin), a nota humana e a trilha de auditoria, que marca a autorrevisão
+como `owner_self_review` ou, em PDF de edital, `owner_override`. `EDITORIAL_OWNER_APPROVER_EMAIL`
+segue identificando a conta usada pelo worker editorial. Nenhuma aprovação publica questões
+automaticamente.
 
 O corpus jurídico integral é capturado em `/admin/fontes-oficiais` somente depois que a
 fotografia de monitoramento da norma foi aprovada. A captura encontra a compilação monovigente

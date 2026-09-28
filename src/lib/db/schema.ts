@@ -873,13 +873,10 @@ export const examEditionDocuments = pgTable(
         )
       )`,
     ),
+    // Revisão pela mesma conta autorizada pelo proprietário em 27/09/2026.
     check(
-      "exam_edition_documents_independent_review_check",
-      sql`${table.status} <> 'approved'
-        or (
-          ${table.initiatedByUserId} is not null
-          and ${table.reviewedByUserId} <> ${table.initiatedByUserId}
-        )`,
+      "exam_edition_documents_initiator_check",
+      sql`${table.status} <> 'approved' or ${table.initiatedByUserId} is not null`,
     ),
   ],
 );
@@ -998,11 +995,9 @@ export const examLicenseRequests = pgTable(
       sql`${table.status} not in ('granted_pending_review','granted') or ${table.grantedAt} is not null`,
     ),
     check(
-      "exam_license_requests_independent_review_check",
-      sql`${table.status} not in ('granted_pending_review','granted','denied') or (
-        ${table.reviewedByUserId} is not null
-        and ${table.reviewedByUserId} <> ${table.initiatedByUserId}
-      )`,
+      "exam_license_requests_reviewer_check",
+      sql`${table.status} not in ('granted_pending_review','granted','denied')
+        or ${table.reviewedByUserId} is not null`,
     ),
     check(
       "exam_license_requests_period_check",
@@ -1153,12 +1148,8 @@ export const contestProductExamReferences = pgTable(
       )`,
     ),
     check(
-      "contest_product_exam_references_independent_review_check",
-      sql`${table.status} <> 'approved'
-        or (
-          ${table.initiatedByUserId} is not null
-          and ${table.reviewedByUserId} <> ${table.initiatedByUserId}
-        )`,
+      "contest_product_exam_references_initiator_check",
+      sql`${table.status} <> 'approved' or ${table.initiatedByUserId} is not null`,
     ),
   ],
 );
@@ -1714,12 +1705,6 @@ export const contestOpportunities = pgTable(
       )`,
     ),
     check(
-      "contest_opportunities_independent_review_check",
-      sql`${table.editorialStatus} <> 'reviewed'
-        or ${table.createdByUserId} is null
-        or ${table.reviewedByUserId} <> ${table.createdByUserId}`,
-    ),
-    check(
       "contest_opportunities_review_notes_check",
       sql`${table.reviewNotes} is null or char_length(${table.reviewNotes}) <= 2000`,
     ),
@@ -1940,16 +1925,6 @@ export const opportunityDocumentSnapshots = pgTable(
     check(
       "opportunity_document_snapshots_review_check",
       sql`${table.status} <> 'approved' or (${table.reviewedByUserId} is not null and ${table.reviewedAt} is not null)`,
-    ),
-    check(
-      "opportunity_document_snapshots_independent_review_check",
-      sql`${table.status} <> 'approved'
-        or ${table.initiatedByUserId} is null
-        or ${table.reviewedByUserId} <> ${table.initiatedByUserId}
-        or (${table.approvalBasis} = 'owner_override'
-          and ${table.authorizationScope} = 'owner-approval-2026-09-01'
-          and ${table.authorizedByUserId} is not null
-          and ${table.authorizedByUserId} = ${table.reviewedByUserId})`,
     ),
     check(
       "opportunity_document_snapshots_review_notes_check",
@@ -2252,12 +2227,6 @@ export const opportunityAnalysisSnapshots = pgTable(
         and ${table.reviewedAt} is not null
       )`,
     ),
-    check(
-      "opportunity_analysis_snapshots_independent_review_check",
-      sql`${table.status} <> 'reviewed'
-        or ${table.createdByUserId} is null
-        or ${table.reviewedByUserId} <> ${table.createdByUserId}`,
-    ),
   ],
 );
 
@@ -2533,12 +2502,12 @@ export const questions = pgTable(
       sql`${table.editorialStatus} <> 'reviewed' or ${table.reviewedByUserId} is not null`,
     ),
     check(
-      "questions_previous_exam_independent_review_check",
+      "questions_previous_exam_review_check",
       sql`${table.quizMode} <> 'previous_exam'
         or ${table.editorialStatus} <> 'reviewed'
         or (
           ${table.createdByUserId} is not null
-          and ${table.reviewedByUserId} <> ${table.createdByUserId}
+          and ${table.reviewedByUserId} is not null
           and ${table.submittedAt} is not null
           and nullif(btrim(${table.reviewNotes}), '') is not null
           and char_length(btrim(${table.reviewNotes})) between 20 and 1500

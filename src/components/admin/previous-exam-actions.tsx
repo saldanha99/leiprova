@@ -46,10 +46,8 @@ function Feedback({ state }: { state: PreviousExamActionState }) {
 
 export function ExamLicenseDecisionControls({
   publicId,
-  canDecide,
 }: {
   publicId: string;
-  canDecide: boolean;
 }) {
   const [state, action, pending] = useActionState(
     recordExamLicenseDecisionAction,
@@ -101,7 +99,7 @@ export function ExamLicenseDecisionControls({
         <button
           name="decision"
           value="grant"
-          disabled={pending || !canDecide}
+          disabled={pending}
           className="min-h-9 rounded-lg bg-violet-300 px-3 text-xs font-extrabold text-violet-950 disabled:opacity-50"
         >
           Registrar concessão
@@ -109,17 +107,12 @@ export function ExamLicenseDecisionControls({
         <button
           name="decision"
           value="deny"
-          disabled={pending || !canDecide}
+          disabled={pending}
           className="min-h-9 rounded-lg border border-rose-300/20 bg-rose-300/8 px-3 text-xs font-bold text-rose-100 disabled:opacity-50"
         >
           Registrar negativa
         </button>
       </div>
-      {!canDecide ? (
-        <p className="text-[11px] text-slate-500 sm:col-span-2">
-          Outra conta editorial precisa revisar a resposta deste pedido.
-        </p>
-      ) : null}
       <div className="sm:col-span-2"><Feedback state={state} /></div>
     </form>
   );
@@ -304,14 +297,12 @@ function ReviewControls({
   publicId,
   action,
   approveLabel,
-  canApprove = true,
   dossierFingerprint,
   requiresLegalAttestation = false,
 }: {
   publicId: string;
   action: typeof reviewExamDocumentAction;
   approveLabel: string;
-  canApprove?: boolean;
   dossierFingerprint?: string;
   requiresLegalAttestation?: boolean;
 }) {
@@ -356,7 +347,7 @@ function ReviewControls({
         <button
           name="decision"
           value="approve"
-          disabled={pending || !canApprove}
+          disabled={pending}
           className="inline-flex min-h-9 items-center gap-2 rounded-lg bg-emerald-300 px-3 text-xs font-extrabold text-emerald-950 disabled:opacity-50"
         >
           <Check className="size-3.5" />
@@ -372,12 +363,6 @@ function ReviewControls({
           Rejeitar
         </button>
       </div>
-      {!canApprove ? (
-        <p className="mt-2 text-[11px] text-slate-500">
-          Você pode rejeitar esta proposta, mas outra conta administrativa deve
-          aprová-la.
-        </p>
-      ) : null}
     </form>
   );
 }
@@ -385,18 +370,15 @@ function ReviewControls({
 export function ExamDocumentReviewControls({
   publicId,
   dossierFingerprint,
-  canApprove,
 }: {
   publicId: string;
   dossierFingerprint: string;
-  canApprove: boolean;
 }) {
   return (
     <ReviewControls
       publicId={publicId}
       action={reviewExamDocumentAction}
       approveLabel="Aprovar documento"
-      canApprove={canApprove}
       dossierFingerprint={dossierFingerprint}
       requiresLegalAttestation
     />
@@ -540,17 +522,14 @@ export function ProductExamReferenceForm({
 
 export function ProductExamReferenceReviewControls({
   publicId,
-  canApprove,
 }: {
   publicId: string;
-  canApprove: boolean;
 }) {
   return (
     <ReviewControls
       publicId={publicId}
       action={reviewProductExamReferenceAction}
       approveLabel="Confirmar última prova"
-      canApprove={canApprove}
     />
   );
 }
@@ -764,7 +743,6 @@ type LicensedReviewBatch = {
   documentTitle: string;
   answerKeyDocumentPublicId: string;
   answerKeyDocumentTitle: string;
-  canApprove: boolean;
   expectedQuestionCount: number | null;
   rightsHolder: string;
   licenseEvidenceUrl: string;
@@ -891,7 +869,7 @@ export function LicensedPreviousExamReviewControls({
         <button
           name="decision"
           value="approve"
-          disabled={pending || !batch.canApprove}
+          disabled={pending}
           className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-emerald-300 px-4 text-xs font-extrabold text-emerald-950 disabled:opacity-50"
         >
           <Check className="size-3.5" />
@@ -907,12 +885,6 @@ export function LicensedPreviousExamReviewControls({
           Suspender lote completo
         </button>
       </div>
-      {!batch.canApprove ? (
-        <p className="mt-2 text-[11px] text-slate-500">
-          Você pode suspender o lote que importou, mas outra conta administrativa
-          precisa revisá-lo para aprovação.
-        </p>
-      ) : null}
     </form>
   );
 }

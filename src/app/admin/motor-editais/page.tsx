@@ -28,7 +28,6 @@ import {
 } from "@/components/admin/notice-engine-controls";
 import { requireAdmin } from "@/lib/auth";
 import { getNoticeEngineSnapshot } from "@/lib/db/notice-engine-admin";
-import { isEditorialOwnerApprover } from "@/lib/editorial/owner-approval";
 
 const numberFormatter = new Intl.NumberFormat("pt-BR");
 const dateFormatter = new Intl.DateTimeFormat("pt-BR", {
@@ -75,7 +74,6 @@ export default async function NoticeEnginePage() {
     title,
     editorialStatus,
   }));
-  const isOwnerApprover = isEditorialOwnerApprover(user.email);
   const approvedSourceOptions = snapshot.sourceDocuments
     .filter((item) => item.status === "approved")
     .map(({ publicId, title, opportunityTitle }) => ({ publicId, title, opportunityTitle }));
@@ -215,9 +213,7 @@ export default async function NoticeEnginePage() {
         {snapshot.sourceDocuments.length ? (
           <div className="mt-5 grid gap-4 xl:grid-cols-2">
             {snapshot.sourceDocuments.map((item) => {
-              const canReview =
-                item.status === "pending_review" &&
-                (item.initiatedByUserId !== user.id || isOwnerApprover);
+              const canReview = item.status === "pending_review";
               return (
                 <article key={item.publicId} className="rounded-2xl border border-white/8 bg-black/10 p-4">
                   <div className="flex flex-wrap items-start justify-between gap-3">
@@ -240,7 +236,6 @@ export default async function NoticeEnginePage() {
                   </p>
                   {item.reviewNotes ? <p className="mt-2 rounded-lg bg-white/[.035] p-2 text-xs text-slate-400">{item.reviewNotes}</p> : null}
                   {canReview ? <NoticeSourceReviewControls publicId={item.publicId} /> : null}
-                  {item.status === "pending_review" && item.initiatedByUserId === user.id && !isOwnerApprover ? <p className="mt-3 text-xs text-amber-200/70">Somente a conta proprietária ou outra conta editorial pode decidir esta fonte.</p> : null}
                   {item.status === "approved" ? <OfficialDocumentDiscoveryControls sourceDocumentPublicId={item.publicId} /> : null}
                 </article>
               );
@@ -262,8 +257,7 @@ export default async function NoticeEnginePage() {
         {snapshot.documentSnapshots.length ? (
           <div className="mt-5 grid gap-4 xl:grid-cols-2">
             {snapshot.documentSnapshots.map((item) => {
-              const allowOwnerOverride = item.initiatedByUserId === user.id && isOwnerApprover;
-              const canReview = item.status === "pending_review" && (item.initiatedByUserId !== user.id || allowOwnerOverride);
+              const canReview = item.status === "pending_review";
               return (
                 <article key={item.publicId} className="rounded-2xl border border-white/8 bg-black/10 p-4">
                   <div className="flex flex-wrap items-start justify-between gap-3">
@@ -288,8 +282,7 @@ export default async function NoticeEnginePage() {
                     </p>
                   ) : null}
                   {item.reviewNotes ? <p className="mt-2 rounded-lg bg-white/[.035] p-2 text-xs text-slate-400">{item.reviewNotes}</p> : null}
-                  {canReview ? <NoticeDocumentReviewControls snapshotPublicId={item.publicId} allowOwnerOverride={allowOwnerOverride} /> : null}
-                  {item.status === "pending_review" && item.initiatedByUserId === user.id && !allowOwnerOverride ? <p className="mt-3 text-xs text-amber-200/70">Outra pessoa deve conferir esta captura.</p> : null}
+                  {canReview ? <NoticeDocumentReviewControls snapshotPublicId={item.publicId} selfReview={item.initiatedByUserId === user.id} /> : null}
                   {item.status === "approved" ? <ExtractSnapshotButton snapshotPublicId={item.publicId} /> : null}
                 </article>
               );
@@ -313,9 +306,7 @@ export default async function NoticeEnginePage() {
         {snapshot.requirements.length ? (
           <div className="mt-5 grid gap-4 xl:grid-cols-2">
             {snapshot.requirements.map((item) => {
-              const canReview =
-                item.editorialStatus === "pending_review" &&
-                (item.createdByUserId !== user.id || isOwnerApprover);
+              const canReview = item.editorialStatus === "pending_review";
               const canGenerate = item.editorialStatus === "reviewed" && item.sourceDocumentStatus === "approved" && item.assignment;
               return (
                 <article key={item.id} className="rounded-2xl border border-white/8 bg-black/10 p-4">
@@ -346,7 +337,6 @@ export default async function NoticeEnginePage() {
                     />
                   ) : null}
                   {canReview ? <RequirementReviewControls requirementId={item.id} /> : null}
-                  {item.editorialStatus === "pending_review" && item.createdByUserId === user.id && !isOwnerApprover ? <p className="mt-3 text-xs text-amber-200/70">Somente a conta proprietária ou outra conta editorial pode revisar este requisito.</p> : null}
                   {canGenerate ? <GenerateRequirementButton requirementId={item.id} /> : null}
                   {item.editorialStatus === "reviewed" && !item.assignment ? <p className="mt-3 text-xs text-amber-200">A geração aguarda uma banca organizadora revisada.</p> : null}
                 </article>

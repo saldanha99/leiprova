@@ -296,7 +296,7 @@ describe("importação administrativa de prova anterior licenciada", () => {
     ).not.toBe(fingerprint);
   });
 
-  it("só permite revisão integral por outro administrador", () => {
+  it("só permite revisão integral, inclusive pela conta que importou", () => {
     const document = licensedDocument();
     const answerKeyDocument = licensedAnswerKey();
     let sequence = 0;
@@ -347,9 +347,16 @@ describe("importação administrativa de prova anterior licenciada", () => {
     };
 
     expect(() => validateLicensedPreviousExamReviewBatch(review)).not.toThrow();
+    // A conta que importou também pode aprovar (autorização do proprietário, 27/09/2026).
     expect(() =>
       validateLicensedPreviousExamReviewBatch({ ...review, reviewerUserId: 99 }),
-    ).toThrow("outro administrador");
+    ).not.toThrow();
+    expect(() =>
+      validateLicensedPreviousExamReviewBatch({
+        ...review,
+        batch: { ...batch, importedByUserId: null },
+      }),
+    ).toThrow("não identifica a conta");
     expect(() =>
       validateLicensedPreviousExamReviewBatch({
         ...review,

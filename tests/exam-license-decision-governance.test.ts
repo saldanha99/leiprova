@@ -7,7 +7,7 @@ const actions = readFileSync(
   "utf8",
 );
 const migration = readFileSync(
-  new URL("../drizzle/0041_conscious_mother_askani.sql", import.meta.url),
+  new URL("../drizzle/0042_next_mother_askani.sql", import.meta.url),
   "utf8",
 );
 const grants = readFileSync(
@@ -16,15 +16,15 @@ const grants = readFileSync(
 );
 
 describe("governança da resposta de licenciamento", () => {
-  it("exige evidência versionada, decisão editorial e conta independente", () => {
+  it("exige evidência versionada e decisão registrada, aceitando a mesma conta", () => {
     expect(actions).toContain("recordExamLicenseDecisionAction");
     expect(actions).toContain("responseChecksumSha256");
-    expect(actions).toContain("Outra conta editorial precisa revisar");
     expect(actions).toContain('"granted_pending_review"');
     expect(actions).toContain("publicationAllowed: false");
-    expect(migration).toContain(
-      '"reviewed_by_user_id" <> "exam_license_requests"."initiated_by_user_id"',
-    );
+    // Revisor diferente deixou de ser exigido por decisão do proprietário (27/09/2026).
+    expect(actions).not.toContain("Outra conta editorial precisa revisar");
+    expect(migration).toContain('DROP CONSTRAINT "exam_license_requests_independent_review_check"');
+    expect(migration).toContain('"exam_license_requests"."reviewed_by_user_id" is not null');
   });
 
   it("concede ao aplicativo apenas as colunas necessárias ao fluxo auditado", () => {

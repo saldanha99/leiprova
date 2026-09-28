@@ -13,7 +13,8 @@ documento porque:
 
 - os 75 produtos ainda não estão vinculados a oportunidades oficiais exatas;
 - cada caderno, tipo e gabarito precisa ser identificado sem ambiguidade;
-- a aplicação exige uma segunda revisão por usuário administrativo diferente;
+- cada documento precisa de revisão registrada no painel (desde 28/09/2026 a
+  mesma conta que propôs pode aprovar, por decisão do proprietário);
 - ainda não existe autorização escrita dos titulares para reprodução comercial;
 - o cadastro fiscal/empresarial e o modo ao vivo da Stripe continuam incompletos.
 
@@ -196,7 +197,8 @@ Um documento somente muda de `metadata_only` para `licensed` quando houver:
 4. autorização escrita cujo escopo cubra o produto pago e a modalidade usada;
 5. referência HTTPS da evidência e hash SHA-256 do arquivo autorizado;
 6. validade territorial e temporal da autorização;
-7. revisão do proponente e revisão independente de outro administrador;
+7. revisão registrada por administrador, com nota; desde 28/09/2026 pode ser a
+   mesma conta que propôs, por decisão do proprietário;
 8. tratamento explícito de anulações, retificações e versões do gabarito.
 
 Links públicos sem autorização permanecem externos e gratuitos. Não importar o

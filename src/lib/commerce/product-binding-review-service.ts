@@ -2,7 +2,6 @@ import { sql } from "drizzle-orm";
 import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { z } from "zod";
 import * as schema from "../db/schema";
-import { canReviewEditorialSubmission } from "../editorial/owner-approval";
 import { approvedProductQuestionExists } from "./product-binding-query";
 import {
   assertProductBindingReviewDecision, assertProductBindingReviewScope,
@@ -126,21 +125,13 @@ export async function reviewProductQuestionBindings(db: Db, request: {
       const edition = dossier.snapshot.edition;
       return !edition || typeof edition !== "object" || !("public_id" in edition) || edition.public_id !== input.examEditionPublicId;
     })) throw new ProductBindingReviewError("A rejeição exige a edição exata do vínculo; não use uma edição presumida.");
-    const includesOwnProposal = dossiers.some((d) => d.proposedByUserId === actor.id);
-    const reviewerAllowed = dossiers.every((d) => canReviewEditorialSubmission({
-      initiatorUserId: d.proposedByUserId, reviewerUserId: actor.id, reviewerEmail: actor.email,
-    }));
     const fingerprint = productBindingReviewFingerprint(input, { publicId: actorPublicId, role: actor.role }, dossiers);
     if (request.mode === "preview") {
       return { mode: "preview" as const, fingerprint, total: dossiers.length, approved: 0,
         eligible: dossiers.filter((d) => d.eligible && d.bindingStatus === "pending_review").length,
-        dossiers, reviewerAllowed, requiresOwnerOverride: includesOwnProposal,
-        productReleased: false as const, checkoutEnabled: false as const };
+        dossiers, productReleased: false as const, checkoutEnabled: false as const };
     }
     assertProductBindingReviewDecision(input, actor.role, dossiers, request.expectedFingerprint, fingerprint);
-    if (!reviewerAllowed || (includesOwnProposal && input.ownerOverride !== true) || (!includesOwnProposal && input.ownerOverride === true)) {
-      throw new ProductBindingReviewError("Proposta própria exige a conta proprietária configurada e exceção explícita; os demais casos exigem revisão independente.");
-    }
     const approved = input.decision === "approve";
     const updated = await transaction.execute<{ id: string }>(sql`
       update public.contest_product_question_bindings set status=${approved ? "approved" : "rejected"}, reviewed_by_user_id=${actor.id},
@@ -166,8 +157,8 @@ export async function reviewProductQuestionBindings(db: Db, request: {
         examEditionPublicId: input.examEditionPublicId,
         dossierFingerprint: fingerprint, selectedBindingIds: [...input.bindingIds].sort(), notes: input.notes, decision: input.decision,
         confirmations: input.confirmations, humanReviewRecorded: true,
+        // Autorrevisão liberada pelo proprietário em 27/09/2026; o registro a identifica.
         approvalBasis: dossier.proposedByUserId === actor.id ? "owner_self_review" : "independent_review",
-        ownerOverride: dossier.proposedByUserId === actor.id && input.ownerOverride === true,
         productReleased: false, checkoutEnabled: false },
     })));
     return { mode: "apply" as const, fingerprint, total: dossiers.length, approved: approved ? updated.length : 0,

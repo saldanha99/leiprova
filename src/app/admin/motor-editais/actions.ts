@@ -28,10 +28,6 @@ import {
   generateNoticeQuestionDraftForRequirement,
   NoticeDraftGenerationError,
 } from "@/lib/editorial/notice-draft-service";
-import {
-  canReviewEditorialSubmission,
-  isEditorialOwnerApprover,
-} from "@/lib/editorial/owner-approval";
 import { parseSyllabusItems } from "@/lib/editorial/syllabus-parser";
 import { extractOfficialSyllabusCandidates } from "@/lib/editorial/official-syllabus-extractor";
 import type { InternalOpportunitySourceCandidate } from "@/lib/opportunities/official-candidates";
@@ -224,15 +220,6 @@ export async function reviewNoticeSourceAction(
     .limit(1);
   if (!source || source.status !== "pending_review") {
     return errorState("A fonte não está mais pendente de revisão.");
-  }
-  if (
-    !canReviewEditorialSubmission({
-      initiatorUserId: source.initiatedByUserId,
-      reviewerUserId: user.id,
-      reviewerEmail: user.email,
-    })
-  ) {
-    return errorState("Somente a conta proprietária pode revisar a própria fonte.");
   }
   if (parsed.data.notes.length < 10) {
     return errorState("Registre uma nota de revisão com pelo menos 10 caracteres.");
@@ -515,20 +502,8 @@ export async function reviewNoticeDocumentAction(
     return errorState("Esta captura não está mais pendente.");
   }
   const approved = parsed.data.decision === "approve";
-  const isInitiator = snapshot.initiatedByUserId === user.id;
-  const ownerOverride = approved && isInitiator && parsed.data.ownerOverride === "true";
-  if (approved && isInitiator && !ownerOverride) {
-    return errorState("Confirme que esta é uma aprovação explícita do proprietário.");
-  }
-  if (approved && parsed.data.ownerOverride === "true" && !isInitiator) {
-    return errorState("A exceção do proprietário só pode ser registrada pelo autor da captura.");
-  }
-  if (ownerOverride && !isEditorialOwnerApprover(user.email)) {
-    return errorState("Somente a conta do proprietário configurada pode registrar esta exceção.");
-  }
-  if (ownerOverride && snapshot.authorizationScope !== OFFICIAL_DOCUMENT_AUTHORIZATION_SCOPE) {
-    return errorState("Esta captura não possui a autorização formal exigida para a exceção.");
-  }
+  // Autorrevisão liberada pelo proprietário em 27/09/2026; continua marcada no registro.
+  const ownerOverride = approved && snapshot.initiatedByUserId === user.id;
   if (parsed.data.decision === "approve" && snapshot.sourceStatus !== "approved") {
     return errorState("A fonte oficial vinculada precisa continuar aprovada.");
   }
@@ -969,15 +944,6 @@ export async function reviewRequirementAction(
     .limit(1);
   if (!requirement || requirement.status !== "pending_review") {
     return errorState("O requisito não está mais pendente.");
-  }
-  if (
-    !canReviewEditorialSubmission({
-      initiatorUserId: requirement.createdByUserId,
-      reviewerUserId: user.id,
-      reviewerEmail: user.email,
-    })
-  ) {
-    return errorState("Somente a conta proprietária pode revisar o próprio requisito.");
   }
   if (parsed.data.notes.length < 10) {
     return errorState("Registre uma nota de revisão com pelo menos 10 caracteres.");
