@@ -56,6 +56,15 @@ describe("candidatos oficiais internos de oportunidades", () => {
       "pc-ma-2026",
       "pc-pr-2026",
       "pgm-manaus-2026",
+      "trf-5-juiz-federal-2026",
+      "tj-rs-juiz-2026",
+      "pc-al-2026",
+      "pc-ma-delegado-2026",
+      "pc-ma-investigador-2026",
+      "seap-ma-inspetor-2026",
+      "sefaz-al-auditor-fiscal-2026",
+      "tce-ma-2026",
+      "tc-df-analista-2026",
     ]);
     expect(getOfficialOpportunityCandidate("enam-2026-2")?.lifecycleStatus).toBe(
       "registration_open",
@@ -83,7 +92,8 @@ describe("candidatos oficiais internos de oportunidades", () => {
       candidate.officialSources.map((source) => source.url),
     );
 
-    expect(urls).toHaveLength(9);
+    expect(urls).toHaveLength(18);
+    expect(new Set(urls).size).toBe(urls.length);
     expect(urls).not.toContain(
       "https://www.ba.gov.br/policiacivil/noticias/2026-03/24530/governo-da-bahia-alcanca-marca-de-9000-policiais-peritos-e-bombeiros",
     );
@@ -93,5 +103,21 @@ describe("candidatos oficiais internos de oportunidades", () => {
     expect(getOfficialOpportunityCandidate("pc-ba-2026")?.officialUrl).toBe(
       "https://www.ba.gov.br/ssp/sites/site-ssp/files/2026-05/Relatorio_de_Gestao_2025___rev.final___consolidado___2026.04.23.pdf",
     );
+  });
+
+  it("registra os editais ativos com a banca como fonte e responsável primário", () => {
+    for (const slug of ["pc-al-2026", "sefaz-al-auditor-fiscal-2026", "tc-df-analista-2026"]) {
+      const candidate = getOfficialOpportunityCandidate(slug);
+      expect(candidate?.officialSources).toMatchObject([{ sourceId: "cebraspe", documentType: "notice" }]);
+      expect(candidate?.organizerSignals).toMatchObject([
+        { role: "primary_responsible", quizBankSlug: "cebraspe", sourceUrl: candidate?.officialUrl },
+      ]);
+    }
+    expect(getOfficialOpportunityCandidate("trf-5-juiz-federal-2026")).toMatchObject({
+      institutionAcronym: "TRF-5",
+      jurisdictionCode: "PE",
+      examDate: "2026-12-20",
+      organizerSignals: [{ quizBankSlug: "fgv" }],
+    });
   });
 });

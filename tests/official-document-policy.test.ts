@@ -37,6 +37,20 @@ describe("política de captura de documentos oficiais", () => {
     ).toThrow(/não podem ser capturados/i);
   });
 
+  it("aceita o edital da Cebraspe no CDN e barra o caderno da mesma página", () => {
+    const pdf = "https://cdn.cebraspe.org.br/concursos/PC_AL_26/arquivos/5D5AD5B60F3E7BDD8865B1E3FB9965D652ADB351313D202E409B68BE1CEEFCC5.pdf";
+
+    expect(buildDirectOfficialDocumentCandidate(pdf, "cebraspe", "Edital nº 1 - Abertura")).toMatchObject({
+      hostname: "cdn.cebraspe.org.br",
+    });
+    expect(() =>
+      buildDirectOfficialDocumentCandidate(pdf, "cebraspe", "PROVA OBJETIVA - CARGO 1"),
+    ).toThrow(/não podem ser capturados/i);
+    expect(() =>
+      parseOfficialOpportunityDocumentUrl("https://cdn.example/concursos/edital.pdf", "cebraspe"),
+    ).toThrow(/mesma origem oficial/i);
+  });
+
   it("descobre, ordena e deduplica apenas editais e anexos elegíveis", () => {
     const result = discoverOfficialDocumentCandidatesFromHtml(
       `

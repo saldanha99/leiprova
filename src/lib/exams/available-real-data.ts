@@ -28,6 +28,39 @@ export type AvailableExamEdition = Readonly<{
   documents: readonly AvailableExamDocument[];
 }>;
 
+const NOTICE_PAGES = {
+  fgv: { base: "https://conhecimento.fgv.br/concursos/", organizer: "Fundação Getulio Vargas" },
+  cebraspe: { base: "https://www.cebraspe.org.br/concursos/", organizer: "Cebraspe" },
+} as const;
+
+/** Edição futura de um edital publicado na página da banca, sem documentos de prova. */
+function scheduledNotice(
+  bankSlug: keyof typeof NOTICE_PAGES,
+  sourceExternalId: string,
+  edition: Pick<
+    AvailableExamEdition,
+    | "publicId"
+    | "careerSlug"
+    | "institutionAcronym"
+    | "jurisdictionCode"
+    | "title"
+    | "jurisdiction"
+    | "examDate"
+  > & { productSlugs: readonly string[] },
+): AvailableExamEdition {
+  return {
+    ...edition,
+    sourceExternalId,
+    bankSlug,
+    organizer: NOTICE_PAGES[bankSlug].organizer,
+    officialUrl: `${NOTICE_PAGES[bankSlug].base}${sourceExternalId}`,
+    durationMinutes: null,
+    status: "scheduled",
+    opportunitySlug: edition.publicId,
+    documents: [],
+  };
+}
+
 export const AVAILABLE_REAL_EXAM_EDITIONS = [
   {
     publicId: "enac-2026-2",
@@ -163,6 +196,98 @@ export const AVAILABLE_REAL_EXAM_EDITIONS = [
       },
     ],
   },
+  // Editais ativos de 28/09/2026: ligam cada produto à oportunidade oficial
+  // aprovada em official-candidates.ts (mesma carreira, sigla, UF e data).
+  scheduledNotice("fgv", "trf5juiz26", {
+    publicId: "trf-5-juiz-federal-2026",
+    careerSlug: "magistratura",
+    institutionAcronym: "TRF-5",
+    jurisdictionCode: "PE",
+    title: "TRF-5 — XVI Concurso para Juiz Federal Substituto",
+    jurisdiction: "5ª Região (AL, CE, PB, PE, RN e SE)",
+    examDate: "2026-12-20",
+    productSlugs: ["trf-5-juiz-federal-5-regiao"],
+  }),
+  scheduledNotice("fgv", "tjrsjuiz26", {
+    publicId: "tj-rs-juiz-2026",
+    careerSlug: "magistratura",
+    institutionAcronym: "TJ-RS",
+    jurisdictionCode: "RS",
+    title: "TJ-RS — Concurso para Juiz de Direito Substituto 2026",
+    jurisdiction: "Rio Grande do Sul",
+    examDate: "2026-12-13",
+    productSlugs: ["tj-rs-juiz-de-direito-2026"],
+  }),
+  scheduledNotice("cebraspe", "PC_AL_26", {
+    publicId: "pc-al-2026",
+    careerSlug: "policia-civil",
+    institutionAcronym: "PC-AL",
+    jurisdictionCode: "AL",
+    title: "Polícia Civil de Alagoas — Agente e Escrivão 2026",
+    jurisdiction: "Alagoas",
+    examDate: "2026-12-06",
+    productSlugs: ["pc-al-agente-e-escrivao-2026"],
+  }),
+  scheduledNotice("cebraspe", "PC_MA_26_DELEGADO", {
+    publicId: "pc-ma-delegado-2026",
+    careerSlug: "delegado",
+    institutionAcronym: "PC-MA",
+    jurisdictionCode: "MA",
+    title: "Polícia Civil do Maranhão — Delegado 2026",
+    jurisdiction: "Maranhão",
+    examDate: "2026-11-01",
+    productSlugs: ["pc-ma-delegado-2026"],
+  }),
+  scheduledNotice("cebraspe", "PC_MA_26_INVESTIGADOR", {
+    publicId: "pc-ma-investigador-2026",
+    careerSlug: "policia-civil",
+    institutionAcronym: "PC-MA",
+    jurisdictionCode: "MA",
+    title: "Polícia Civil do Maranhão — Investigador 2026",
+    jurisdiction: "Maranhão",
+    examDate: "2026-12-06",
+    productSlugs: ["pc-ma-oficial-investigador-2026"],
+  }),
+  scheduledNotice("cebraspe", "SEAP_MA_26_INSPETOR_MONITOR", {
+    publicId: "seap-ma-inspetor-2026",
+    careerSlug: "policia-penal",
+    institutionAcronym: "SEAP-MA",
+    jurisdictionCode: "MA",
+    title: "SEAP-MA — Inspetor de Polícia Penal 2026",
+    jurisdiction: "Maranhão",
+    examDate: "2026-12-13",
+    productSlugs: ["pp-ma-inspetor-2026"],
+  }),
+  scheduledNotice("cebraspe", "SEFAZ_AL_26", {
+    publicId: "sefaz-al-auditor-fiscal-2026",
+    careerSlug: "auditor-fiscal",
+    institutionAcronym: "SEFAZ-AL",
+    jurisdictionCode: "AL",
+    title: "SEFAZ-AL — Auditor Fiscal 2026",
+    jurisdiction: "Alagoas",
+    examDate: "2026-12-20",
+    productSlugs: ["sefaz-al-auditor-fiscal-2026"],
+  }),
+  scheduledNotice("cebraspe", "TCE_MA_26", {
+    publicId: "tce-ma-2026",
+    careerSlug: "controle-externo",
+    institutionAcronym: "TCE-MA",
+    jurisdictionCode: "MA",
+    title: "TCE-MA — Controle Externo 2026",
+    jurisdiction: "Maranhão",
+    examDate: "2026-11-22",
+    productSlugs: ["tce-ma-analista-e-tecnico-2026"],
+  }),
+  scheduledNotice("cebraspe", "TC_DF_26_ANALISTA", {
+    publicId: "tc-df-analista-2026",
+    careerSlug: "controle-externo",
+    institutionAcronym: "TC-DF",
+    jurisdictionCode: "DF",
+    title: "TC-DF — Analista Administrativo de Controle Externo 2026",
+    jurisdiction: "Distrito Federal",
+    examDate: "2026-11-22",
+    productSlugs: ["tc-df-analista-2026"],
+  }),
   // Últimas provas anteriores por produto, levantadas em 27/09/2026 nos portais
   // oficiais. Datas conferidas no gabarito, comunicado ou edital de cada prova;
   // detalhes e pendências em docs/research/provas-anteriores-2026-09-27.json.

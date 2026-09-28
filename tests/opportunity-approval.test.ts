@@ -19,15 +19,26 @@ import {
 import { classifyOpportunitySourceHttpStatus } from "@/lib/opportunities/source-metadata-check";
 
 describe("aprovação explícita das oportunidades oficiais", () => {
-  it("valida os seis candidatos atuais e confirma elegibilidade no catálogo", () => {
+  it("valida os seis candidatos de 31/08 e confirma elegibilidade no catálogo", () => {
     const result = validateOfficialOpportunityApprovalBatch(
-      OFFICIAL_OPPORTUNITY_CANDIDATES,
+      OFFICIAL_OPPORTUNITY_CANDIDATES.slice(0, 6),
       "2026-09-01",
     );
 
     expect(result).toHaveLength(6);
     expect(result.every((candidate) => candidate.catalogEligible)).toBe(true);
     expect(result.reduce((total, candidate) => total + candidate.sourceUrls.length, 0)).toBe(9);
+  });
+
+  it("valida os nove editais ativos de 28/09 com provas futuras", () => {
+    const result = validateOfficialOpportunityApprovalBatch(
+      OFFICIAL_OPPORTUNITY_CANDIDATES.slice(6),
+      "2026-09-28",
+    );
+
+    expect(result).toHaveLength(9);
+    expect(result.every((candidate) => candidate.catalogEligible)).toBe(true);
+    expect(result.every((candidate) => candidate.organizerCount === 1)).toBe(true);
   });
 
   it("recusa datas incoerentes e etapa sem responsável primário", () => {

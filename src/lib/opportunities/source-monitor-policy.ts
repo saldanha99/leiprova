@@ -53,6 +53,14 @@ export const OFFICIAL_OPPORTUNITY_SOURCE_POLICIES = [
     allowedHosts: ["concursosfcc.com.br", "www.concursosfcc.com.br"],
     allowedPathPrefixes: ["/concursos/"],
   },
+  // Páginas e editais da Cebraspe (robots.txt sem restrições, conferido em 27/09/2026).
+  // O CDN hospeda os PDFs; cadernos e gabaritos seguem barrados pela política de documentos.
+  {
+    id: "cebraspe",
+    publisher: "Cebraspe",
+    allowedHosts: ["cebraspe.org.br", "www.cebraspe.org.br", "cdn.cebraspe.org.br"],
+    allowedPathPrefixes: ["/concursos/"],
+  },
 ] as const;
 
 export type OfficialOpportunitySourcePolicy =

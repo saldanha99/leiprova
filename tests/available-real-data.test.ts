@@ -15,10 +15,12 @@ const historical: readonly AvailableExamEdition[] = AVAILABLE_REAL_EXAM_EDITIONS
 );
 
 describe("carga de dados reais disponíveis", () => {
-  it("mantém quatro edições atuais vinculáveis e vinte históricas oficiais", () => {
-    expect(validateAvailableRealExamEditions()).toHaveLength(24);
+  it("mantém treze edições atuais vinculáveis e vinte históricas oficiais", () => {
+    expect(validateAvailableRealExamEditions()).toHaveLength(33);
 
-    const scheduled = AVAILABLE_REAL_EXAM_EDITIONS.filter((edition) => edition.status === "scheduled");
+    const scheduled: readonly AvailableExamEdition[] = AVAILABLE_REAL_EXAM_EDITIONS.filter(
+      (edition) => edition.status === "scheduled",
+    );
     const published = AVAILABLE_REAL_EXAM_EDITIONS.filter((edition) => edition.status === "published");
 
     expect(scheduled.map((edition) => [edition.publicId, edition.examDate])).toEqual([
@@ -26,6 +28,15 @@ describe("carga de dados reais disponíveis", () => {
       ["enam-2026-2", "2026-11-29"],
       ["pc-pr-2026", "2026-10-11"],
       ["pgm-manaus-2026", "2026-09-20"],
+      ["trf-5-juiz-federal-2026", "2026-12-20"],
+      ["tj-rs-juiz-2026", "2026-12-13"],
+      ["pc-al-2026", "2026-12-06"],
+      ["pc-ma-delegado-2026", "2026-11-01"],
+      ["pc-ma-investigador-2026", "2026-12-06"],
+      ["seap-ma-inspetor-2026", "2026-12-13"],
+      ["sefaz-al-auditor-fiscal-2026", "2026-12-20"],
+      ["tce-ma-2026", "2026-11-22"],
+      ["tc-df-analista-2026", "2026-11-22"],
     ]);
     expect(scheduled.every((edition) => edition.opportunitySlug && edition.productSlugs?.length)).toBe(true);
     expect(published).toHaveLength(20);
