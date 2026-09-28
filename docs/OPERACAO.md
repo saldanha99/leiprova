@@ -3,6 +3,25 @@
 Documento de contexto para quem for continuar o projeto — pessoa ou assistente de IA.
 Descreve onde as coisas estão, como publicar e quais armadilhas já custaram tempo.
 
+**Revisor diferente removido e produtos ligados a editais (28/09/2026, 00h35 BRT):**
+por decisão do proprietário, `f2f7480` removeu a exigência de revisor diferente
+em toda a plataforma (migração `0042`, aplicada: zero restrições
+`*_independent_review_check`). A autorrevisão continua registrada na auditoria.
+Em seguida, `defde3d` cadastrou a Cebraspe como fonte oficial (páginas e PDFs de
+edital; cadernos e gabaritos seguem barrados) e registrou nove editais ativos,
+lidos no cabeçalho, cronograma e assinatura de cada documento: TRF-5 XVI e TJ-RS
+Juiz (FGV); PC-AL, PC-MA Delegado, PC-MA Investigador, SEAP-MA Inspetor, SEFAZ-AL,
+TCE-MA e TC-DF (Cebraspe), com provas entre 01/11 e 20/12/2026. Aprovação pelo
+`opportunities:approve` (referência `owner-authorization-2026-09-28:official-notices`):
+9 aprovados, 6 inalterados, 18 fontes conferidas. A carga `content:feed:real` ligou
+os 9 produtos: **14 de 75 produtos têm edital oficial**. PC-MA Delegado, PGM Manaus,
+TRF-5, ENAC e ENAM já têm prova anterior registrada para o mesmo cargo e órgão;
+faltam aprovar caderno/gabarito e o vínculo em `/admin/provas-anteriores`
+(cada edição aprovada dispara pedido de licença por e-mail à banca). Ficaram fora
+editais com prova já aplicada (TJ-PE 27/09, TJ-BA, MP-GO, TJ-GO, TJ-PR, TRF-2,
+MP-MT, PC-DF, PGE-AL, SEFAZ-RN, TCE-RN, TJ-MT), cartórios TJ-RS/TJ-CE (datas a
+confirmar) e bancas sem fonte automatizável (FCC, VUNESP e outras).
+
 **Fábrica reativada e provas anteriores registradas (27/09/2026, 19h35 BRT):** o
 proprietário reabriu o Maestri às 19h00 e as três rotinas existentes voltaram a
 disparar sem recriação. O Radar concluiu `discovery:cebraspe:2026-09-27` às 19h21
