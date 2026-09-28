@@ -3,6 +3,39 @@
 Documento de contexto para quem for continuar o projeto — pessoa ou assistente de IA.
 Descreve onde as coisas estão, como publicar e quais armadilhas já custaram tempo.
 
+**Fase dos concursos automática e calendário público (28/09/2026, 09h45 BRT):**
+publicado `ce00268` com a migração `0043`. Nada avançava a fase de um edital
+revisado: o ENAM 2026.2 seguia "inscrições abertas" após 24/09 e sumiu do catálogo
+em 25/09; a PGM Manaus fez a prova em 20/09 sem virar encerrada. A trava do edital
+revisado agora aceita só dois avanços pelas datas oficiais já revisadas
+(inscrições encerradas após `registration_ends_at`; prova realizada após
+`exam_date`), com `status_as_of` igual à data de São Paulo do banco. Datas nulas
+nunca avançam e qualquer outra mudança segue exigindo nova revisão. O worker faz
+isso primeiro em cada ciclo (auditoria `automation.opportunity.lifecycle_advanced`):
+às 09h37 ENAM → inscrições encerradas (voltou ao catálogo) e PGM Manaus → prova
+realizada. `/concursos/calendario` lista inscrições abertas, em breve, provas
+marcadas (com contagem regressiva), previstos e encerrados de 12 meses, pelas datas
+oficiais. Validado em PostgreSQL 17 local com a cadeia inteira de migrações (9
+casos da trava, execução dupla idempotente); lint, typecheck, build e testes
+passaram (o `local-authoring-corpus` oscila por tempo limite com a máquina em carga
+14; sozinho leva 0,7 s). As 11 análises legislativas antigas também voltaram à
+fila por pedido do proprietário: 25 pendentes, nenhuma em `failed`. A primeira
+devolvida (`legal-change:653`) voltou `blocked` por falta do texto da captura no
+pacote; as demais antigas podem ter o mesmo limite.
+**Análise de abertura de vendas (28/09):** ainda não dá para vender. O checkout
+exige, por produto, prova anterior licenciada e importada N/N
+(`licensedPreviousExamContentSatisfied`) e 68 inéditas aprovadas: nenhum produto tem
+a prova licenciada (bancas sem resposta) e só o ENAM tem 68 inéditas. Não existe
+comando nem tela que libere produto (`released`). A Stripe roda com chave `rk_test`
+enquanto `STRIPE_PAYMENTS_MODE=live` e os preços são LIVE, o que o checkout recusa
+no domínio público; nunca houve compra de teste ponta a ponta (0 eventos, 0 pedidos,
+0 alunos). Cadastro fechado, checkouts fechados, `PURCHASE_DELIVERY_ENABLED` vazio.
+Fornecedor completo (razão social, CNPJ, endereço, contatos). A "ajuda por IA" do
+aluno é o Raio-X de erros por tipo de pegadinha, revisões e plano diário, sem modelo
+de linguagem ao vivo. Decisões pendentes do proprietário: aceitar prova anterior
+como link oficial para vender (e importar as questões quando houver licença),
+escopo do lançamento (ENAM primeiro?), Master no lançamento e criação da chave LIVE.
+
 **Pedidos de licença por banca e duas provas anteriores ligadas (28/09/2026, 08h40 BRT):**
 publicado `1c525e6` (deploy completo, sem seed; lint, typecheck, 1.474 testes e
 build passaram). O envio de licença agrupa os casos devidos por banca e etapa, um
