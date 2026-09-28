@@ -62,6 +62,46 @@ function canonicalFingerprint(value: unknown) {
   return createHash("sha256").update(JSON.stringify(value)).digest("hex");
 }
 
+type LicenseItem = Pick<
+  RequestSource,
+  "editionTitle" | "bookletTitle" | "bookletUrl" | "answerKeyTitle" | "answerKeyUrl"
+>;
+
+const REQUEST_TERMS = [
+  "O uso pretendido compreende reprodução integral ou parcial dos enunciados e alternativas em banco autenticado; indexação por concurso, cargo, disciplina, assunto e dispositivo legal; comentários e estatísticas autorais; e, somente se autorizado, hospedagem de cópia do PDF.",
+  "",
+  "Pedimos que a resposta identifique o titular, os documentos e edições abrangidos, modalidades permitidas, atribuição exigida, prazo, território, preço, revogação, tratamento de questões anuladas e permissão ou vedação de armazenamento do PDF.",
+  "",
+  `A ${BRAND_NAME} manterá fonte oficial, versão, data e hash de cada evidência e não publicará o material como licenciado antes da formalização e revisão.`,
+  "",
+  `Atenciosamente,\nResponsável legal da ${BRAND_NAME}`,
+];
+
+function licenseItemLines(item: LicenseItem) {
+  return [
+    `• Caderno: ${item.bookletTitle}`,
+    `  ${item.bookletUrl}`,
+    `• Gabarito: ${item.answerKeyTitle}`,
+    `  ${item.answerKeyUrl}`,
+  ];
+}
+
+/** Um único pedido para várias provas da mesma banca (autorização do proprietário, 28/09/2026). */
+export function buildConsolidatedLicenseText(items: readonly LicenseItem[]) {
+  return [
+    "À equipe responsável,",
+    "",
+    `A ${BRAND_NAME} é uma plataforma educacional de preparação para concursos. Solicitamos autorização expressa, não exclusiva e documentada para utilizar em produto digital pago os ${items.length} cadernos e gabaritos abaixo:`,
+    "",
+    ...items.flatMap((item, index) => [
+      `${index + 1}. ${item.editionTitle}`,
+      ...licenseItemLines(item),
+      "",
+    ]),
+    ...REQUEST_TERMS,
+  ].join("\n");
+}
+
 export function buildLicenseRequestDraft(
   source: RequestSource,
 ): LicenseRequestDraft | null {
@@ -76,18 +116,9 @@ export function buildLicenseRequestDraft(
     "",
     `A ${BRAND_NAME} é uma plataforma educacional de preparação para concursos. Solicitamos autorização expressa, não exclusiva e documentada para utilizar o caderno e o gabarito abaixo em produto digital pago:`,
     "",
-    `• Caderno: ${source.bookletTitle}`,
-    `  ${source.bookletUrl}`,
-    `• Gabarito: ${source.answerKeyTitle}`,
-    `  ${source.answerKeyUrl}`,
+    ...licenseItemLines(source),
     "",
-    "O uso pretendido compreende reprodução integral ou parcial dos enunciados e alternativas em banco autenticado; indexação por concurso, cargo, disciplina, assunto e dispositivo legal; comentários e estatísticas autorais; e, somente se autorizado, hospedagem de cópia do PDF.",
-    "",
-    "Pedimos que a resposta identifique o titular, os documentos e edições abrangidos, modalidades permitidas, atribuição exigida, prazo, território, preço, revogação, tratamento de questões anuladas e permissão ou vedação de armazenamento do PDF.",
-    "",
-    `A ${BRAND_NAME} manterá fonte oficial, versão, data e hash de cada evidência e não publicará o material como licenciado antes da formalização e revisão.`,
-    "",
-    `Atenciosamente,\nResponsável legal da ${BRAND_NAME}`,
+    ...REQUEST_TERMS,
   ].join("\n");
   const fingerprint = canonicalFingerprint({
     version: "exam-license-request-v1",
@@ -226,41 +257,52 @@ function followUpBody(body: string, followUpNumber: number) {
   ].join("\n");
 }
 
+type DueLicenseRequest = LicenseItem & {
+  publicId: string;
+  status: string;
+  bankId: number;
+  recipients: string[];
+  subject: string;
+  body: string;
+  fingerprint: string;
+  followUpCount: number;
+};
+
 export async function dispatchDueExamLicenseRequests(
   db: Database,
   sender: LicenseEmailSender,
   now = new Date(),
-  limit = 4,
+  limit = 25,
 ) {
   // O driver postgres-js do Drizzle não serializa Date em SQL bruto (ERR_INVALID_ARG_TYPE).
   const nowIso = now.toISOString();
-  const due = await db.execute<{
-    publicId: string;
-    status: string;
-    recipients: string[];
-    subject: string;
-    body: string;
-    fingerprint: string;
-    followUpCount: number;
-  }>(sql`
-    select public_id as "publicId",status,recipient_emails as recipients,
-      subject,request_body as body,scope_fingerprint as fingerprint,
-      follow_up_count::integer as "followUpCount"
-    from exam_license_requests
-    where status='prepared'
-      or (status='awaiting_response' and next_follow_up_at <= ${nowIso}::timestamptz)
-    order by coalesce(next_follow_up_at,created_at),created_at
+  const due = await db.execute<DueLicenseRequest>(sql`
+    select request.public_id as "publicId",request.status,request.bank_id::integer as "bankId",
+      request.recipient_emails as recipients,request.subject,request.request_body as body,
+      request.scope_fingerprint as fingerprint,request.follow_up_count::integer as "followUpCount",
+      edition.title as "editionTitle",booklet.title as "bookletTitle",booklet.source_url as "bookletUrl",
+      answer_key.title as "answerKeyTitle",answer_key.source_url as "answerKeyUrl"
+    from exam_license_requests request
+    join exam_editions edition on edition.id=request.exam_edition_id
+    join exam_edition_documents booklet on booklet.exam_edition_id=edition.id
+      and booklet.document_type='question_booklet' and booklet.status='approved'
+    join exam_edition_documents answer_key on answer_key.exam_edition_id=edition.id
+      and answer_key.document_type='answer_key' and answer_key.status='approved'
+    where request.status='prepared'
+      or (request.status='awaiting_response' and request.next_follow_up_at <= ${nowIso}::timestamptz)
+    order by coalesce(request.next_follow_up_at,request.created_at),request.created_at
     limit ${limit}
   `);
 
   let sent = 0;
   let deferred = 0;
   let manualReview = 0;
+  let emails = 0;
+  // Pedidos da mesma banca na mesma etapa seguem juntos: um e-mail por destinatário.
+  const groups = new Map<string, { stage: number; requests: DueLicenseRequest[] }>();
   for (const request of due) {
-    const followUpNumber = request.status === "prepared"
-      ? 0
-      : request.followUpCount + 1;
-    if (followUpNumber > MAX_LICENSE_FOLLOW_UPS) {
+    const stage = request.status === "prepared" ? 0 : request.followUpCount + 1;
+    if (stage > MAX_LICENSE_FOLLOW_UPS) {
       await db.execute(sql`
         update exam_license_requests set status='manual_review',next_follow_up_at=null,
           review_notes='Três acompanhamentos automáticos concluídos sem resposta registrada.',updated_at=${nowIso}::timestamptz
@@ -269,46 +311,68 @@ export async function dispatchDueExamLicenseRequests(
       manualReview += 1;
       continue;
     }
-    try {
-      let lastMessageId = "";
+    const key = `${request.bankId}:${stage}`;
+    const group = groups.get(key) ?? { stage, requests: [] };
+    group.requests.push(request);
+    groups.set(key, group);
+  }
+
+  for (const { stage, requests } of groups.values()) {
+    const byRecipient = new Map<string, DueLicenseRequest[]>();
+    for (const request of requests) {
       for (const recipient of request.recipients) {
+        byRecipient.set(recipient, [...(byRecipient.get(recipient) ?? []), request]);
+      }
+    }
+    const failed = new Set<string>();
+    const messageIds = new Map<string, string>();
+    for (const [recipient, batch] of byRecipient) {
+      const subject = batch.length === 1
+        ? batch[0].subject
+        : `Pedido de autorização comercial — ${batch.length} provas anteriores — ${BRAND_NAME}`;
+      const text = batch.length === 1 ? batch[0].body : buildConsolidatedLicenseText(batch);
+      try {
         const delivery = await sender({
           to: recipient,
-          subject: followUpNumber
-            ? `Acompanhamento ${followUpNumber}/3 — ${request.subject}`
-            : request.subject,
-          text: followUpNumber
-            ? followUpBody(request.body, followUpNumber)
-            : request.body,
+          subject: stage ? `Acompanhamento ${stage}/3 — ${subject}` : subject,
+          text: stage ? followUpBody(text, stage) : text,
           idempotencyKey: canonicalFingerprint({
-            version: "exam-license-email-v1",
-            requestPublicId: request.publicId,
-            fingerprint: request.fingerprint,
-            followUpNumber,
+            version: "exam-license-email-v2",
+            stage,
             recipient,
+            requests: batch.map((request) => `${request.publicId}:${request.fingerprint}`).sort(),
           }),
         });
-        lastMessageId = delivery.messageId;
+        emails += 1;
+        for (const request of batch) messageIds.set(request.publicId, delivery.messageId);
+      } catch {
+        for (const request of batch) failed.add(request.publicId);
       }
-      const nextFollowUpAt = followUpNumber >= MAX_LICENSE_FOLLOW_UPS
+    }
+
+    for (const request of requests) {
+      // Sem todos os destinatários confirmados, o pedido volta no próximo ciclo.
+      if (failed.has(request.publicId)) {
+        deferred += 1;
+        continue;
+      }
+      const nextFollowUpAt = stage >= MAX_LICENSE_FOLLOW_UPS
         ? null
         : followUpDate(now).toISOString();
       await db.execute(sql`
-        update exam_license_requests set status=${followUpNumber >= MAX_LICENSE_FOLLOW_UPS ? "manual_review" : "awaiting_response"},
+        update exam_license_requests set status=${stage >= MAX_LICENSE_FOLLOW_UPS ? "manual_review" : "awaiting_response"},
           requested_at=coalesce(requested_at,${nowIso}::timestamptz),
-          last_follow_up_at=${followUpNumber ? nowIso : null}::timestamptz,
-          next_follow_up_at=${nextFollowUpAt}::timestamptz,follow_up_count=${followUpNumber},
-          last_provider_message_id=${lastMessageId},updated_at=${nowIso}::timestamptz
+          last_follow_up_at=${stage ? nowIso : null}::timestamptz,
+          next_follow_up_at=${nextFollowUpAt}::timestamptz,follow_up_count=${stage},
+          last_provider_message_id=${messageIds.get(request.publicId) ?? ""},updated_at=${nowIso}::timestamptz
         where public_id=${request.publicId}
           and status=${request.status}
           and scope_fingerprint=${request.fingerprint}
       `);
       sent += 1;
-    } catch {
-      deferred += 1;
     }
   }
-  return { due: due.length, sent, deferred, manualReview };
+  return { due: due.length, sent, deferred, manualReview, emails };
 }
 
 /** Uma resposta registrada não basta: o caso somente conclui quando os dois

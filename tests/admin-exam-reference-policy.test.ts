@@ -14,6 +14,11 @@ const actionsSource = readFileSync(
   ),
   "utf8",
 );
+// A consulta de escopo foi extraída para uso também pelo comando de servidor.
+const reviewQueriesSource = readFileSync(
+  new URL("../src/lib/exams/previous-exam-review.ts", import.meta.url),
+  "utf8",
+);
 
 const validScope: ExamReferenceScope = {
   productStatus: "draft",
@@ -163,9 +168,10 @@ describe("identidade da última prova por produto", () => {
   });
 
   it("falha fechado diante de edição posterior ainda não validada", () => {
-    expect(actionsSource).toContain("from exam_editions newer_edition");
-    expect(actionsSource).not.toContain("newer_edition.official_url");
-    expect(actionsSource).not.toContain("newer_edition.source_checked_at");
+    expect(reviewQueriesSource).toContain("from exam_editions newer_edition");
+    expect(reviewQueriesSource).not.toContain("newer_edition.official_url");
+    expect(reviewQueriesSource).not.toContain("newer_edition.source_checked_at");
+    expect(actionsSource).toContain('from "@/lib/exams/previous-exam-review"');
   });
 
   it("usa hoje como corte quando o edital ainda não informa a prova atual", () => {

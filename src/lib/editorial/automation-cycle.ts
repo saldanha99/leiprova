@@ -48,6 +48,6 @@ export async function runExamLicensingSteps(
     ? await runIsolatedStep(failures, "licensing.dispatch", () =>
         dispatchDueExamLicenseRequests(db, sender),
       )
-    : { due: 0, sent: 0, deferred: 0, manualReview: 0 };
+    : { due: 0, sent: 0, deferred: 0, manualReview: 0, emails: 0 };
   return { emailEnabled: sender !== null, prepared, reconciled, dispatch };
 }

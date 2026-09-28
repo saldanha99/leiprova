@@ -90,7 +90,7 @@ describe("etapas isoladas do ciclo editorial", () => {
     );
 
     expect(licensing.emailEnabled).toBe(false);
-    expect(licensing.dispatch).toEqual({ due: 0, sent: 0, deferred: 0, manualReview: 0 });
+    expect(licensing.dispatch).toEqual({ due: 0, sent: 0, deferred: 0, manualReview: 0, emails: 0 });
     expect(failures).toEqual([]);
     const queries = execute.mock.calls.map(([query]) => new PgDialect().sqlToQuery(query).sql);
     expect(queries.some((text) => text.includes("next_follow_up_at <="))).toBe(false);
