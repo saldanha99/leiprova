@@ -1,6 +1,6 @@
 # Licenciamento de provas anteriores
 
-Atualizado em 14/09/2026. Este documento transforma a pesquisa de provas
+Atualizado em 28/09/2026. Este documento transforma a pesquisa de provas
 anteriores em um processo comercial auditável para a Editalume. Ele não é uma
 licença e não autoriza a reprodução de nenhum caderno, gabarito ou questão.
 
@@ -135,12 +135,16 @@ questão foi armazenado. A lista, as evidências e as 56 pendências por motivo
 estão em `docs/research/provas-anteriores-2026-09-27.json`.
 
 Aprovar caderno e gabarito de uma edição dispara, no ciclo seguinte do worker, a
-preparação e o envio automático de um pedido de licença por edição à banca
-(Cebraspe: `sac@cebraspe.org.br`; FGV: `demanda.conhecimento@fgv.br`), limitado a
-quatro por ciclo e com até três acompanhamentos. Esses envios são comunicação
-externa em nome da empresa: decidir antes de aprovar em lote se o pedido deve
-seguir por edição ou consolidado por banca. FCC e VUNESP continuam fora da
-automação pelas restrições de acesso registradas.
+preparação de um caso de licença por edição (até quatro por ciclo, com até três
+acompanhamentos). Por decisão do proprietário em 28/09/2026, o **envio é
+consolidado por banca**: casos devidos da mesma banca e da mesma etapa (pedido
+inicial ou acompanhamento N/3) seguem em um único e-mail por destinatário, que
+lista cada prova com caderno e gabarito oficiais. Destinatários: Cebraspe
+`sac@cebraspe.org.br`; FGV `demanda.conhecimento@fgv.br` e, quando houver, o
+canal específico do exame. Um caso isolado mantém o texto e a impressão digital
+originais. O caso só avança quando todos os seus destinatários aceitaram a
+mensagem; uma recusa adia apenas os casos daquele destinatário. FCC e VUNESP
+continuam fora da automação pelas restrições de acesso registradas.
 
 ### Primeiro acompanhamento, enviado em 27/09/2026
 
@@ -155,6 +159,27 @@ sem resposta registrada, o caso segue para revisão manual.
 Os quatro PDFs FGV foram aprovados como links externos e vinculados aos produtos
 ENAC 2026.2 e ENAM 2026.2. As páginas públicas exibem a última prova na fonte
 oficial, mas não reproduzem enunciados nem afirmam que existe licença.
+
+### Links aprovados e pedidos enviados em 28/09/2026
+
+Sob autorização do proprietário (referência
+`owner-authorization-2026-09-28:previous-exam-links`), o comando
+`exams:links:approve` aprovou caderno e gabarito e o vínculo de dois produtos,
+com nova consulta às URLs oficiais e a mesma política do painel:
+
+| Produto | Prova anterior | Banca |
+| --- | --- | --- |
+| PC-MA Delegado 2026 | PC-MA 2017, Delegado, prova objetiva de 28/01/2018 | Cebraspe |
+| TRF-5 Juiz Federal 2026 | TRF-5 2025, Juiz Federal Substituto, 25/05/2025 | FGV |
+
+PGM Manaus ficou fora: o edital atual é da FCC e a prova registrada, de 2018, é
+da Cebraspe; a política aceita apenas prova da mesma banca do edital vigente.
+
+O ciclo do worker de 08h26 BRT preparou e enviou os dois pedidos, um por banca
+(`sac@cebraspe.org.br` e `demanda.conhecimento@fgv.br`), com o texto individual,
+pois cada banca tinha uma só prova no lote. O Resend aceitou as duas mensagens,
+o que não comprova entrega nem resposta. O 1º acompanhamento está marcado para
+05/10/2026 às 08h26 BRT.
 
 ## Canais oficiais para a primeira rodada
 

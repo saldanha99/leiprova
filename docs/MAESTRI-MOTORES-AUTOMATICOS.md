@@ -231,6 +231,25 @@ limites devem virar pendência, nunca API paga alternativa. Guardião e Autor
 continuam nos nós Codex existentes. Não aguardar resposta síncrona do Maestro
 para finalizar um trabalho: salvar o recibo e encerrar evita espera circular.
 
+### Agente fora do ar não reserva tarefa (28/09/2026)
+
+De 17/09 a 28/09 o terminal do Guardião ficou só com o `zsh`: o Codex encerrou
+por erro de token em 17/09 e, ao reabrir o Maestri em 27/09, o terminal voltou
+sem o agente. A rotina continuou disparando (`sentToTerminal`), o texto caía no
+shell como comandos inexistentes e cada reserva expirava; após três expirações a
+tarefa vira `failed` e não volta sozinha. Perderam-se assim `legal-change:846`,
+`843` e `860` (`854` expira em seguida), e cada disparo vazio consumiu a cota
+diária compartilhada. Toda falha da fila até 28/09 é `lease_expired`, nenhuma
+por resposta inválida.
+
+Desde então o preflight local, depois do recolhimento e antes da reserva, exige
+um processo `codex` ou `claude` (nome dado pelo `ps`, pois o `lsof` mostra a
+versão do Claude Code) com diretório de trabalho igual à pasta do papel. Sem ele,
+registra `agent_offline` com saída 3 e a rotina não chama a IA. Retomar exige
+abrir o agente no terminal do papel pelo Maestri; o login do Codex é
+compartilhado com o aplicativo (`codex login status`). Reabrir tarefas em
+`failed` é decisão operacional à parte: primeiro confirmar o agente no ar.
+
 Configuração exata e IDs: `.local/maestri/ativacao-rotinas-20260906.json` e
 `.local/maestri/preflight-config-20260906.json`. Esses arquivos não contêm chaves,
 mas permanecem privados. Ao migrar para outro host, recriar a configuração pelo

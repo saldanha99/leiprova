@@ -3,6 +3,28 @@
 Documento de contexto para quem for continuar o projeto — pessoa ou assistente de IA.
 Descreve onde as coisas estão, como publicar e quais armadilhas já custaram tempo.
 
+**Pedidos de licença por banca e duas provas anteriores ligadas (28/09/2026, 08h40 BRT):**
+publicado `1c525e6` (deploy completo, sem seed; lint, typecheck, 1.474 testes e
+build passaram). O envio de licença agrupa os casos devidos por banca e etapa, um
+e-mail por destinatário. As consultas de `/admin/provas-anteriores` foram para
+`src/lib/exams/previous-exam-review.ts`, e o novo `pnpm exams:links:approve
+[--apply] produto=edição` aprova caderno, gabarito e vínculo com a mesma política
+(prévia por padrão; roda no `opportunity-approver` com
+`PREVIOUS_EXAM_APPROVAL_REFERENCE`). Aplicado a PC-MA Delegado 2026 ← PC-MA 2017
+(Cebraspe) e TRF-5 Juiz Federal ← TRF-5 2025 (FGV): as duas páginas públicas já
+mostram caderno e gabarito oficiais. **4 de 75 produtos têm prova anterior
+ligada.** PGM Manaus ficou fora por banca diferente (edital FCC, prova Cebraspe).
+O ciclo das 08h26 enviou os dois pedidos (Cebraspe e FGV), sem etapa com falha;
+detalhes em `LICENCIAMENTO-PROVAS-ANTERIORES.md`.
+**Guardião fora do ar desde 17/09:** o terminal dele no Maestri está só com o
+`zsh` (o Codex saiu por erro de token e não voltou na reabertura de 27/09). As
+reservas expiravam: `legal-change:846`, `843` e `860` viraram `failed`, e `854`
+segue o mesmo caminho quando a reserva expirar.
+O preflight local agora não reserva sem o agente aberto (`agent_offline`); ver
+`MAESTRI-MOTORES-AUTOMATICOS.md`. O login do Codex já está válido: falta abrir o
+`codex` no terminal do Guardião. O Radar concluiu 6 tarefas na madrugada (FGV,
+FCC, Cebraspe e 3 entradas de curso: PC-DF, PGE-AL, TRT-10), todas `prepared`.
+
 **Revisor diferente removido e produtos ligados a editais (28/09/2026, 00h35 BRT):**
 por decisão do proprietário, `f2f7480` removeu a exigência de revisor diferente
 em toda a plataforma (migração `0042`, aplicada: zero restrições
