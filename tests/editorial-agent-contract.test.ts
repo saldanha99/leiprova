@@ -1,5 +1,5 @@
 import { describe,it,expect } from "vitest";
-import { AGENT_WORK_VERSION,agentInputHash,validateAgentWorkResult,validateDiscoveryUrl,
+import { AGENT_WORK_LEASE_MINUTES,AGENT_WORK_VERSION,agentInputHash,validateAgentWorkResult,validateDiscoveryUrl,
   type AgentWorkPayload } from "@/lib/editorial/agent-work-contract";
 
 const payload:AgentWorkPayload={version:AGENT_WORK_VERSION,title:"Concurso sintético",instructions:"Somente teste.",
@@ -13,6 +13,10 @@ function question(){return {prompt:"No exercício inteiramente fictício, qual c
   options:["Organizar cartões","Guardar a tarefa","Ignorar cartões","Começar sem preparo","Interromper todos"]
     .map((text,index)=>({key:"ABCDE"[index],text,correct:index===0,rationale:"Justificativa sintética para verificar o contrato."}))};}
 describe("contrato da ponte editorial",()=>{
+  it("reserva cobre meia hora de trabalho mais a espera da rodada de 20 minutos",()=>{
+    // Em 28-29/09/2026 respostas de 29 e 121 minutos venceram a reserva de 45 e voltaram à fila.
+    expect(AGENT_WORK_LEASE_MINUTES).toBeGreaterThanOrEqual(30+20+20);
+  });
   it("hash estável apesar da ordem de propriedades",()=>{
     expect(agentInputHash(payload)).toBe(agentInputHash({...payload,context:{sourceContextHash:"a".repeat(64),requirement:"Regra sintética"}}));
     expect(agentInputHash(payload)).not.toBe(agentInputHash({...payload,role:"Outro cargo"}));

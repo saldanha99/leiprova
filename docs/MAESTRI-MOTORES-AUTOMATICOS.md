@@ -56,7 +56,7 @@ flag já verificadas pela ponte. Veja registro de publicação antes de executá
 
 ## Fluxo e proteção
 
-Cada trabalho possui identidade estável, hash dos insumos, reserva de 45 minutos,
+Cada trabalho possui identidade estável, hash dos insumos, reserva de 90 minutos,
 até três tentativas e limite compartilhado de 24 reservas por 24 horas. A reserva
 é atômica; um reinício não duplica a tarefa. Novo insumo invalida a reserva antiga.
 Uma confirmação idêntica pode ser repetida após perda da resposta de rede: o
@@ -253,7 +253,9 @@ quatro análises citadas voltaram à fila em 28/09 por decisão do proprietário
 auditoria `manual.agent_work.requeued`. Mesmo com o agente de volta, a ponte não
 reserva enquanto houver no papel um `packet.json` sem recibo e com reserva ainda
 válida (`agent_has_active_lease`): a retomada espera o fim dessa reserva perdida,
-até 45 minutos.
+até 90 minutos (eram 45 até 29/09/2026: a rotina só recolhe a resposta
+na rodada seguinte e não dispara com o agente ocupado, então tarefas de meia hora
+perdiam a reserva e voltavam à fila, gastando a cota).
 
 Configuração exata e IDs: `.local/maestri/ativacao-rotinas-20260906.json` e
 `.local/maestri/preflight-config-20260906.json`. Esses arquivos não contêm chaves,

@@ -5,7 +5,9 @@ import { discoveryPathBlocked } from "./discovery-policy";
 import { isVerifiedCourseDiscoveryUrl } from "./course-discovery-sources";
 
 export const AGENT_WORK_VERSION = "editalume-agents-v1";
-export const AGENT_WORK_LEASE_MINUTES = 45;
+// A resposta só é recolhida na rodada seguinte da rotina (20 min) e a rotina não
+// dispara com o agente ocupado; com 45 min, tarefa de meia hora perdia a reserva.
+export const AGENT_WORK_LEASE_MINUTES = 90;
 export const AGENT_WORK_DAILY_LIMIT = 24;
 export const agentWorkKindSchema = z.enum(["discovery", "legal_mapping", "authoring", "legal_change"]);
 export type AgentWorkKind = z.infer<typeof agentWorkKindSchema>;
