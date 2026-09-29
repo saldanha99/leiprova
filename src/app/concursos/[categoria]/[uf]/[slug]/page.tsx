@@ -10,7 +10,11 @@ import {
   getCatalogContest,
   contestTitle,
 } from "@/lib/commerce/catalog";
-import { isCommerceOpen, isContactEnabled } from "@/lib/launch";
+import {
+  isCommerceOpen,
+  isContactEnabled,
+  isMasterCommerceOpen,
+} from "@/lib/launch";
 import { JsonLd } from "@/components/seo/json-ld";
 import {
   getReviewedContestOpportunity,
@@ -164,6 +168,7 @@ export default async function ContestOpportunityPage({
         <PlannedContestLanding
           contest={planned}
           commerceOpen={isCommerceOpen()}
+          masterOpen={isMasterCommerceOpen()}
           contactOpen={isContactEnabled()}
         />
       </PublicGuideShell>
@@ -230,6 +235,7 @@ export default async function ContestOpportunityPage({
         opportunity={opportunity}
         jurisdictionName={jurisdiction.name}
         commerceOpen={isCommerceOpen()}
+        masterOpen={isMasterCommerceOpen()}
         contactOpen={isContactEnabled()}
         lastExam={lastExam}
         productSlug={result.productSlug}

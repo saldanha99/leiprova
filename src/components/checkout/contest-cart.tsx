@@ -35,6 +35,7 @@ export function ContestCart({
   available,
   publishableKey,
   supplierIdentity,
+  masterOpen = false,
 }: {
   contest: CatalogContest;
   related: CatalogContest[];
@@ -42,6 +43,7 @@ export function ContestCart({
   available: boolean;
   publishableKey?: string;
   supplierIdentity?: ReactNode;
+  masterOpen?: boolean;
 }) {
   const [access, setAccess] = useState(initialAccess);
   const [extras, setExtras] = useState<string[]>([]);
@@ -292,52 +294,54 @@ export function ContestCart({
               </div>
             </fieldset>
           )}
-          <section
-            className={styles.master}
-            aria-labelledby="checkout-master-title"
-          >
-            <p className={styles.eyebrow}>Uma alternativa, não um adicional</p>
-            <h2 id="checkout-master-title">
-              Mais de um destino?
-              <br />
-              Conheça o Master.
-            </h2>
-            <p>
-              Uma assinatura para acessar todos os concursos liberados durante
-              sua vigência. Edições em preparação só entram quando forem
-              liberadas.
-            </p>
-            {masterSavings > 0 && (
-              <p className={styles.masterComparison}>
-                Com sua seleção atual, o {comparableMaster!.name} custa{" "}
-                {formatBRL(masterSavings)} a menos{" "}
-                {access === "annual" ? "por ano" : "por mês"}. Compare antes de
-                decidir.
+          {masterOpen && (
+            <section
+              className={styles.master}
+              aria-labelledby="checkout-master-title"
+            >
+              <p className={styles.eyebrow}>Uma alternativa, não um adicional</p>
+              <h2 id="checkout-master-title">
+                Mais de um destino?
+                <br />
+                Conheça o Master.
+              </h2>
+              <p>
+                Uma assinatura para acessar todos os concursos liberados durante
+                sua vigência. Edições em preparação só entram quando forem
+                liberadas.
               </p>
-            )}
-            <div className={styles.masterPlans}>
-              {PLANS.map((plan) => (
-                <Link
-                  key={plan.slug}
-                  href={`/checkout/${plan.slug}`}
-                  aria-label={`Comparar ${plan.name} por ${formatBRL(plan.priceCents)}${plan.billingLabel}`}
-                >
-                  <span>
-                    <small>{plan.name}</small>
-                    <strong>
-                      {formatBRL(plan.priceCents)}
-                      <small>{plan.billingLabel}</small>
-                    </strong>
-                  </span>
-                  <ArrowRight size={18} aria-hidden="true" />
-                </Link>
-              ))}
-            </div>
-            <small>
-              Abre uma contratação separada para você conferir. Seu carrinho de
-              concursos não é cobrado nem convertido automaticamente.
-            </small>
-          </section>
+              {masterSavings > 0 && (
+                <p className={styles.masterComparison}>
+                  Com sua seleção atual, o {comparableMaster!.name} custa{" "}
+                  {formatBRL(masterSavings)} a menos{" "}
+                  {access === "annual" ? "por ano" : "por mês"}. Compare antes de
+                  decidir.
+                </p>
+              )}
+              <div className={styles.masterPlans}>
+                {PLANS.map((plan) => (
+                  <Link
+                    key={plan.slug}
+                    href={`/checkout/${plan.slug}`}
+                    aria-label={`Comparar ${plan.name} por ${formatBRL(plan.priceCents)}${plan.billingLabel}`}
+                  >
+                    <span>
+                      <small>{plan.name}</small>
+                      <strong>
+                        {formatBRL(plan.priceCents)}
+                        <small>{plan.billingLabel}</small>
+                      </strong>
+                    </span>
+                    <ArrowRight size={18} aria-hidden="true" />
+                  </Link>
+                ))}
+              </div>
+              <small>
+                Abre uma contratação separada para você conferir. Seu carrinho de
+                concursos não é cobrado nem convertido automaticamente.
+              </small>
+            </section>
+          )}
         </div>
         <aside
           className={styles.summary}

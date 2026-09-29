@@ -81,12 +81,14 @@ function render(
   commerceOpen = false,
   contactOpen = true,
   examReference: PublicContestExamReference | null = null,
+  masterOpen = false,
 ) {
   return renderToStaticMarkup(
     createElement(ContestLanding, {
       opportunity: { ...opportunity, ...overrides },
       jurisdictionName: "Brasil",
       commerceOpen,
+      masterOpen,
       contactOpen,
       lastExam: examReference,
     }),
@@ -201,7 +203,12 @@ describe("página premium compartilhada de concursos", () => {
   );
 
   it("só oferece a assinatura geral quando o comércio está aberto, sem liberar o curso", () => {
-    const html = render({}, true);
+    // Venda por concurso aberta e Master fechado: nenhum link de compra do Master.
+    const contestOnly = render({}, true);
+    for (const plan of PLANS)
+      expect(contestOnly).not.toContain(`/cadastro?plano=${plan.slug}`);
+
+    const html = render({}, true, true, null, true);
     for (const plan of PLANS)
       expect(html).toContain(`/cadastro?plano=${plan.slug}`);
     expect(html).toContain("Escolher assinatura da plataforma");

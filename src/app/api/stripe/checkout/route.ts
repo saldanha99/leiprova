@@ -18,7 +18,7 @@ import {
   isMasterCatalogCoverageReady,
 } from "@/lib/commerce/store";
 import {
-  getCheckoutAvailability,
+  getMasterCheckoutAvailability,
   getPublicOrigin,
   getStripeClient,
   hasTrustedOrigin,
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
   const plan = getPlan(input.data.planSlug);
   if (!plan) return jsonError("Plano não encontrado.", 404);
 
-  const availability = getCheckoutAvailability(plan);
+  const availability = getMasterCheckoutAvailability(plan);
   if (!availability.available) {
     return jsonError("Os pagamentos estão temporariamente indisponíveis.", 503);
   }

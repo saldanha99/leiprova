@@ -18,10 +18,12 @@ import styles from "./course-experience.module.css";
 export function PlannedContestLanding({
   contest,
   commerceOpen,
+  masterOpen = false,
   contactOpen,
 }: {
   contest: CatalogContest;
   commerceOpen: boolean;
+  masterOpen?: boolean;
   contactOpen: boolean;
 }) {
   const category = contestCategories.find(
@@ -135,6 +137,7 @@ export function PlannedContestLanding({
         contestName={contestTitle(contest)}
         productSlug={contest.slug}
         commerceOpen={commerceOpen}
+        masterOpen={masterOpen}
         contactOpen={contactOpen}
       />
       <section id="duvidas" className={styles.faq} aria-labelledby="faq-title">

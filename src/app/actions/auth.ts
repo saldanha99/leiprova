@@ -19,7 +19,7 @@ import { isRegistrationEnabled } from "@/lib/launch";
 import { PRIVACY_VERSION, TERMS_VERSION } from "@/lib/legal";
 import { getPlan } from "@/lib/plans";
 import { consumeRateLimits, getRequestIp } from "@/lib/rate-limit";
-import { getCheckoutAvailability } from "@/lib/stripe";
+import { getMasterCheckoutAvailability } from "@/lib/stripe";
 import { safeRedirectPath } from "@/lib/utils";
 
 export type AuthActionState = {
@@ -181,7 +181,7 @@ export async function beginPurchaseAction(
   if (!parsed.success) return { fieldErrors: mapFieldErrors(parsed.error) };
 
   const plan = getPlan(parsed.data.planSlug);
-  if (!plan || !getCheckoutAvailability(plan).available) {
+  if (!plan || !getMasterCheckoutAvailability(plan).available) {
     return { error: "Este plano ainda não está disponível para compra." };
   }
 

@@ -16,6 +16,7 @@ import { isDatabaseConfigured } from "@/lib/db/client";
 import {
   getCheckoutAvailability,
   isContestCheckoutEnabled,
+  isMasterCheckoutEnabled,
 } from "@/lib/stripe";
 
 export default async function ContestCheckoutPage({
@@ -72,6 +73,7 @@ export default async function ContestCheckoutPage({
           available={available}
           publishableKey={available ? process.env.STRIPE_PUBLISHABLE_KEY : undefined}
           supplierIdentity={<SupplierIdentityBlock />}
+          masterOpen={isMasterCheckoutEnabled()}
         />
       </div>
     </main>

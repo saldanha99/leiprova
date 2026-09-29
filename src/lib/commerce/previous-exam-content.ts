@@ -210,10 +210,13 @@ function approvedAnswerKeyConditions(
 
 /** Confirma que o produto possui a última prova exata com caderno e gabarito
  * oficiais aprovados, inclusive como simples links externos. A reprodução das
- * questões continua dependente da licença integral por questão na entrega. */
+ * questões continua dependente da licença integral por questão na entrega.
+ * `coverageEndsAt` só pesa em documento licenciado: a licença precisa cobrir o
+ * período vendido; link oficial sem licença não tem validade a conferir. */
 export function approvedProductPreviousExamReferenceExists(
   productSlug: SQLWrapper,
   opportunityId?: SQLWrapper,
+  coverageEndsAt: SQLWrapper = sql`current_timestamp`,
 ) {
   return sql<boolean>`exists (
     select 1
@@ -240,8 +243,8 @@ export function approvedProductPreviousExamReferenceExists(
       and exam_reference.reviewed_at is not null
       and exam_reference.selection_verified_at is not null
       ${exactHistoricalScopeConditions()}
-      ${approvedBookletConditions(sql`current_timestamp`, false)}
-      ${approvedAnswerKeyConditions(sql`current_timestamp`, false)}
+      ${approvedBookletConditions(coverageEndsAt, false)}
+      ${approvedAnswerKeyConditions(coverageEndsAt, false)}
   )`;
 }
 

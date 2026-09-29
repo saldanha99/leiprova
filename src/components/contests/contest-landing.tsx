@@ -38,6 +38,7 @@ type ContestLandingProps = {
   opportunity: PublicContestOpportunity;
   jurisdictionName: string;
   commerceOpen: boolean;
+  masterOpen?: boolean;
   contactOpen: boolean;
   lastExam?: PublicContestExamReference | null;
   productSlug?: string;
@@ -48,6 +49,7 @@ export function ContestLanding({
   opportunity,
   jurisdictionName,
   commerceOpen,
+  masterOpen = false,
   contactOpen,
   lastExam = null,
   productSlug,
@@ -328,6 +330,7 @@ export function ContestLanding({
 
       <ContestPricing
         commerceOpen={commerceOpen}
+        masterOpen={masterOpen}
         contactOpen={contactOpen}
         contestName={opportunity.title}
         productSlug={productSlug}

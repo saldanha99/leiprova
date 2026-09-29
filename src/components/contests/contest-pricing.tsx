@@ -13,12 +13,14 @@ import offer from "./contest-subscription-pricing.module.css";
 
 export function ContestPricing({
   commerceOpen,
+  masterOpen = false,
   contactOpen,
   contestName = "este concurso",
   productSlug,
   productAvailable = false,
 }: {
   commerceOpen: boolean;
+  masterOpen?: boolean;
   contactOpen: boolean;
   contestName?: string;
   productSlug?: string;
@@ -175,7 +177,7 @@ export function ContestPricing({
         </div>
         <div className={styles.priceGrid}>
           {PLANS.map((plan) => {
-            const cta = contestPlanCta(plan, commerceOpen, contactOpen);
+            const cta = contestPlanCta(plan, masterOpen, contactOpen);
             return (
               <article
                 key={plan.slug}
@@ -206,7 +208,7 @@ export function ContestPricing({
                 </p>
                 <div className={styles.priceDivider} />
                 <p className={styles.priceIncludes}>
-                  {commerceOpen
+                  {masterOpen
                     ? "Recursos do plano"
                     : "Recursos previstos no plano"}
                 </p>

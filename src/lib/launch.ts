@@ -23,3 +23,9 @@ export function isCommerceOpen() {
     enabled("TRANSACTIONAL_EMAIL_ENABLED")
   );
 }
+
+/** Ofertas do Master (home, cadastro com plano, cartões e carrinho) só aparecem
+ * como compráveis quando o Master também estiver aberto. */
+export function isMasterCommerceOpen() {
+  return isCommerceOpen() && enabled("MASTER_CHECKOUT_ENABLED");
+}

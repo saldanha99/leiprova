@@ -13,7 +13,7 @@ import { CheckoutUnavailable } from "@/components/checkout/checkout-unavailable"
 import { LeiProvaMark } from "@/components/ui/leiprova-mark";
 import { requireUser } from "@/lib/auth";
 import { formatBRL, getMonthlyEquivalentCents, getPlan } from "@/lib/plans";
-import { getCheckoutAvailability } from "@/lib/stripe";
+import { getMasterCheckoutAvailability } from "@/lib/stripe";
 
 export default async function CheckoutPage({
   params,
@@ -24,7 +24,7 @@ export default async function CheckoutPage({
   const plan = getPlan(slug);
   if (!plan) return <CheckoutUnavailable invalidPlan />;
 
-  const availability = getCheckoutAvailability(plan);
+  const availability = getMasterCheckoutAvailability(plan);
   if (!availability.available) return <CheckoutUnavailable />;
 
   const user = await requireUser(`/checkout/${plan.slug}`);

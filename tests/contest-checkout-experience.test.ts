@@ -14,6 +14,7 @@ function render(
   index = 0,
   access: ContestAccessKey = "monthly",
   available = false,
+  masterOpen = false,
 ) {
   const contest = CONTEST_CATALOG[index];
   const related = CONTEST_CATALOG.filter(
@@ -28,6 +29,7 @@ function render(
         initialAccess: access,
         available,
         publishableKey: available ? "pk_test_synthetic" : undefined,
+        masterOpen,
         supplierIdentity: createElement(
           "div",
           { "data-supplier-identity": true },
@@ -82,7 +84,12 @@ describe("checkout editorial, explícito e personalizável", () => {
   });
 
   it("upgrade anual é uma escolha explícita e Master segue para contratação separada", () => {
-    const $ = render();
+    // Com o Master fechado (decisão de 28/09/2026), o carrinho não o oferece.
+    const closed = render();
+    for (const plan of PLANS) expect(closed(`a[href='/checkout/${plan.slug}']`)).toHaveLength(0);
+    expect(closed("button:contains('Preferir o anual e economizar')")).toHaveLength(1);
+
+    const $ = render(0, "monthly", false, true);
     expect($("button:contains('Preferir o anual e economizar')")).toHaveLength(
       1,
     );

@@ -9,11 +9,14 @@ import {
 import { listReviewedContestOpportunities } from "@/lib/db/contest-opportunities";
 import { getCatalogContest } from "./catalog";
 import { minimumCourseContentSatisfied } from "./minimum-course-content";
-import { licensedPreviousExamContentSatisfied } from "./previous-exam-content";
+import { approvedProductPreviousExamReferenceExists } from "./previous-exam-content";
 
 export const listReleasedContestProducts = cache(
   async function listReleasedContestProducts() {
-    // Página revisada + liberação explícita + pelo menos 68 questões válidas por produto.
+    // Página revisada + liberação explícita + pelo menos 68 questões válidas por
+    // produto + última prova oficial aprovada. Decisão do proprietário (28/09/2026):
+    // a prova anterior entra na venda como link oficial (caderno + gabarito); as
+    // questões dela só aparecem na plataforma quando houver licença, pela entrega.
     const publicOpportunities = await listReviewedContestOpportunities();
     const publicById = new Map(
       publicOpportunities.map((item) => [item.publicId, item]),
@@ -32,7 +35,7 @@ export const listReleasedContestProducts = cache(
         and(
           eq(contestStoreProducts.status, "released"),
           minimumCourseContentSatisfied(contestStoreProducts.slug, contestStoreProducts.opportunityId),
-          licensedPreviousExamContentSatisfied(
+          approvedProductPreviousExamReferenceExists(
             contestStoreProducts.slug,
             contestStoreProducts.opportunityId,
           ),
@@ -80,11 +83,10 @@ export async function hasSellableContestProductCoverage(
           contestStoreProducts.slug,
           contestStoreProducts.opportunityId,
         ),
-        licensedPreviousExamContentSatisfied(
+        approvedProductPreviousExamReferenceExists(
           contestStoreProducts.slug,
           contestStoreProducts.opportunityId,
           sql`${coverageEndsAt.toISOString()}::timestamptz`,
-          true,
         ),
       ),
     )
@@ -114,11 +116,10 @@ export async function getMasterCatalogCoverageStatus(
           contestStoreProducts.slug,
           contestStoreProducts.opportunityId,
         )}
-        and ${licensedPreviousExamContentSatisfied(
+        and ${approvedProductPreviousExamReferenceExists(
           contestStoreProducts.slug,
           contestStoreProducts.opportunityId,
           sql`${coverageEndsAt.toISOString()}::timestamptz`,
-          true,
         )}
       )::integer`.mapWith(Number),
     })

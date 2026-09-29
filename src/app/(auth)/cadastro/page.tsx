@@ -8,6 +8,7 @@ import { AuthShell } from "@/components/auth/auth-shell";
 import { PurchaseIdentityForm } from "@/components/auth/purchase-identity-form";
 import { getCurrentUser } from "@/lib/auth";
 import { isRegistrationEnabled } from "@/lib/launch";
+import { isMasterCheckoutEnabled } from "@/lib/stripe";
 import { getPlan } from "@/lib/plans";
 import { safeRedirectPath } from "@/lib/utils";
 
@@ -17,7 +18,8 @@ export default async function RegisterPage({
   searchParams: Promise<{ next?: string; plano?: string }>;
 }) {
   const params = await searchParams;
-  const selectedPlan = getPlan(params.plano);
+  // Com o Master fechado, um link antigo com ?plano= cai no cadastro comum.
+  const selectedPlan = isMasterCheckoutEnabled() ? getPlan(params.plano) : null;
   const nextPath = selectedPlan ? `/checkout/${selectedPlan.slug}` : safeRedirectPath(params.next);
   if (await getCurrentUser()) redirect(nextPath);
 
