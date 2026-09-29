@@ -2,6 +2,13 @@
 
 Data da verificação: 12/09/2026 (America/Sao_Paulo).
 
+> **Regra de venda alterada em 28/09/2026 por decisão do proprietário.** A venda
+> por concurso passou a exigir a última prova oficial aprovada como **link
+> externo** (caderno + gabarito), e não mais a prova licenciada e importada N/N.
+> As questões da prova anterior continuam só com licença, pela entrega. O restante
+> deste documento descreve a regra de 12/09 e segue válido para o conteúdo
+> licenciado. Estado atual em [`OPERACAO.md`](./OPERACAO.md).
+
 O processo de obtenção de autorização, o texto pronto para contato com as
 organizadoras e o primeiro lote de PDFs oficiais identificados estão em
 [`LICENCIAMENTO-PROVAS-ANTERIORES.md`](./LICENCIAMENTO-PROVAS-ANTERIORES.md).

@@ -3,6 +3,29 @@
 Documento de contexto para quem for continuar o projeto — pessoa ou assistente de IA.
 Descreve onde as coisas estão, como publicar e quais armadilhas já custaram tempo.
 
+**Venda por concurso com link oficial; ENAM liberado; Master em espera (29/09/2026, 03h BRT):**
+decisões do proprietário em 28/09: prova anterior entra na venda como link oficial,
+ENAM primeiro, Master segura, chave LIVE criada por ele. Publicado `232d542`: o
+produto é vendável quando `released`, com 68 inéditas aprovadas e a última prova
+oficial aprovada (`approvedProductPreviousExamReferenceExists`, o mesmo predicado da
+página pública). Questões da prova anterior só chegam ao aluno com licença, pela
+entrega. O Master ganhou a chave própria `MASTER_CHECKOUT_ENABLED` (padrão `false`,
+declarada no compose em `23c3fda`): página, API e cadastro com plano recusam o
+Master; a home segue em prévia; a página do concurso mostra o Master sem link de
+compra; o carrinho esconde o Master; `?plano=` cai no cadastro comum. Novo
+`pnpm commerce:product:release [--apply] produto` (imagem `opportunity-approver`,
+`PRODUCT_RELEASE_REFERENCE`) libera só produto que cumpre todas as condições de
+venda, sob o lock do produto, serializável e auditado (`commerce.product.released`);
+não mexe nas chaves de venda. **ENAM 2026.2 liberado** às 02h58 (referência
+`owner-decision-2026-09-28:enam-first`, 68 questões); a prévia recusou o ENAC com
+0 de 68. Testes (1.494), lint, typecheck e build passaram. **Vendas ainda fechadas:**
+falta instalar a chave restrita LIVE, a publicável LIVE e o segredo do webhook LIVE
+(formulário privado em `.local/commerce/stripe-live-app-20260929/`, que confere a
+chave na Stripe só com leituras e grava na VPS com backup do `.env`), depois ligar
+`REGISTRATION_ENABLED`, `CHECKOUT_ENABLED`, `CONTEST_CHECKOUT_ENABLED` e
+`PURCHASE_DELIVERY_ENABLED` (Master continua `false`) e fazer uma compra real de
+controle com estorno.
+
 **Fase dos concursos automática e calendário público (28/09/2026, 09h45 BRT):**
 publicado `ce00268` com a migração `0043`. Nada avançava a fase de um edital
 revisado: o ENAM 2026.2 seguia "inscrições abertas" após 24/09 e sumiu do catálogo
