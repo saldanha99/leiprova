@@ -7,6 +7,9 @@ import { extractText, getDocumentProxy } from "unpdf";
 import {
   assertOfficialDocumentAccess,
   buildDirectOfficialDocumentCandidate,
+  cebraspeEventApiUrl,
+  cebraspeEventIdFromSourceUrl,
+  discoverCebraspeEventDocumentCandidates,
   discoverOfficialDocumentCandidatesFromHtml,
   isProhibitedExamMaterial,
   MAX_OFFICIAL_DOCUMENT_BYTES,
@@ -189,6 +192,9 @@ export async function discoverOfficialDocumentCandidates(
     ]);
   }
 
+  const cebraspeEvent = id === "cebraspe" ? cebraspeEventIdFromSourceUrl(officialSource.url) : null;
+  if (cebraspeEvent) return discoverCebraspeEvent(cebraspeEvent);
+
   const { response, finalUrl } = await fetchOfficialResource(officialSource.url, id);
   const contentType = response.headers.get("content-type")?.toLowerCase() ?? "";
   if (contentType.includes("application/pdf")) {
@@ -207,6 +213,23 @@ export async function discoverOfficialDocumentCandidates(
   } catch (error) {
     throw normalizeOfficialDocumentFetchError(error, "official_discovery_failed", "discovery", id);
   }
+}
+
+async function discoverCebraspeEvent(eventId: string) {
+  const { response } = await fetchOfficialResource(cebraspeEventApiUrl(eventId), "cebraspe");
+  const contentType = response.headers.get("content-type")?.toLowerCase() ?? "";
+  if (!contentType.includes("application/json")) {
+    await discardBody(response);
+    throw new OfficialDocumentFetchError("unsupported_source_type", "discovery", "cebraspe");
+  }
+  const body = await readLimitedBody(response, MAX_DISCOVERY_BYTES, "cebraspe");
+  let payload: unknown;
+  try {
+    payload = JSON.parse(new TextDecoder("utf-8", { fatal: false }).decode(body));
+  } catch {
+    throw new OfficialDocumentFetchError("official_discovery_failed", "discovery", "cebraspe");
+  }
+  return discoverCebraspeEventDocumentCandidates(payload, eventId);
 }
 
 function safeFileName(response: Response, finalUrl: string) {

@@ -55,10 +55,12 @@ export const OFFICIAL_OPPORTUNITY_SOURCE_POLICIES = [
   },
   // Páginas e editais da Cebraspe (robots.txt sem restrições, conferido em 27/09/2026).
   // O CDN hospeda os PDFs; cadernos e gabaritos seguem barrados pela política de documentos.
+  // A API lista os editais que a página monta por JavaScript (apis e cdn sem
+  // robots.txt, conferido em 01/10/2026). Fora de /concursos/, não vira fonte.
   {
     id: "cebraspe",
     publisher: "Cebraspe",
-    allowedHosts: ["cebraspe.org.br", "www.cebraspe.org.br", "cdn.cebraspe.org.br"],
+    allowedHosts: ["cebraspe.org.br", "www.cebraspe.org.br", "cdn.cebraspe.org.br", "apis.cebraspe.org.br"],
     allowedPathPrefixes: ["/concursos/"],
   },
 ] as const;

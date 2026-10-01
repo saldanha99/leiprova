@@ -47,6 +47,10 @@ function rankDocument(label: string, url: string) {
   if (/edital/i.test(haystack)) score += 70;
   if (/anexo/i.test(haystack)) score += 35;
   if (/retifica[cç][aã]o/i.test(haystack)) score += 15;
+  // A abertura traz o programa (abaixo de um anexo só de conteúdo programático);
+  // entre duas aberturas, a consolidada com as retificações vem primeiro.
+  if (/abertura/i.test(haystack)) score += 25;
+  if (/conforme\s+retifica|atualizad[oa]/i.test(haystack)) score += 5;
   if (/\.pdf(?:$|[?#])/i.test(url)) score += 20;
   return score;
 }
@@ -83,6 +87,66 @@ export function buildDirectOfficialDocumentCandidate(
     label: normalizedLabel,
     score: rankDocument(normalizedLabel, official.url),
   });
+}
+
+const CEBRASPE_EVENT_ID = /^[A-Za-z0-9_]{3,80}$/;
+const CEBRASPE_FILE_NAME = /^[A-Za-z0-9][A-Za-z0-9._-]{0,199}\.pdf$/i;
+const CEBRASPE_SYLLABUS_DOCUMENT =
+  /abertura|conte[uú]do\s+program[aá]tico|objetos?\s+de\s+avalia[cç][aã]o|t[oó]picos?/i;
+const MAX_CEBRASPE_CANDIDATES = 4;
+
+function isRecord(input: unknown): input is Record<string, unknown> {
+  return typeof input === "object" && input !== null && !Array.isArray(input);
+}
+
+/** A página de concurso da Cebraspe é montada por JavaScript e não traz links
+ * no HTML; o identificador dela leva à lista oficial de editais do portal. */
+export function cebraspeEventIdFromSourceUrl(url: string) {
+  const { hostname, pathname } = new URL(url);
+  if (hostname !== "www.cebraspe.org.br" && hostname !== "cebraspe.org.br") return null;
+  const eventId = pathname.match(/^\/concursos\/([^/]+)\/?$/)?.[1];
+  return eventId && CEBRASPE_EVENT_ID.test(eventId) ? eventId : null;
+}
+
+/** Mesma API pública que a página do concurso consulta (robots: sem restrição). */
+export function cebraspeEventApiUrl(eventId: string) {
+  return `https://apis.cebraspe.org.br/cebraspe/eventos/${eventId}`;
+}
+
+/** Só editais com programa (abertura, conteúdo programático, tópicos); listas de
+ * inscritos, resultados e cadernos ficam de fora pelas regras de sempre. */
+export function discoverCebraspeEventDocumentCandidates(payload: unknown, eventId: string) {
+  if (
+    !CEBRASPE_EVENT_ID.test(eventId) ||
+    !isRecord(payload) ||
+    typeof payload.eventoURL !== "string" ||
+    payload.eventoURL.toLowerCase() !== eventId.toLowerCase() ||
+    !Array.isArray(payload.arquivosEdital)
+  ) {
+    throw new OfficialDocumentFetchError("official_discovery_failed", "discovery", "cebraspe");
+  }
+  const candidates = new Map<string, OfficialDocumentCandidate>();
+  for (const file of payload.arquivosEdital) {
+    if (!isRecord(file) || file.isGuid === true) continue;
+    const fileName = typeof file.nomeArquivo === "string" ? file.nomeArquivo.trim() : "";
+    const label = normalizeLabel(typeof file.descricaoArquivo === "string" ? file.descricaoArquivo : "");
+    if (!CEBRASPE_FILE_NAME.test(fileName) || !CEBRASPE_SYLLABUS_DOCUMENT.test(label)) continue;
+    try {
+      const candidate = buildDirectOfficialDocumentCandidate(
+        `https://cdn.cebraspe.org.br/concursos/${eventId}/arquivos/${fileName}`,
+        "cebraspe",
+        label,
+      );
+      candidates.set(candidate.url, candidate);
+    } catch {
+      // Caderno, gabarito ou documento sem edital no nome: fora da coleta.
+    }
+  }
+  return Object.freeze(
+    [...candidates.values()]
+      .sort((left, right) => right.score - left.score || left.label.localeCompare(right.label, "pt-BR"))
+      .slice(0, MAX_CEBRASPE_CANDIDATES),
+  );
 }
 
 export function discoverOfficialDocumentCandidatesFromHtml(

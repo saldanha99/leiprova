@@ -9,6 +9,26 @@ import { AGENT_FOR_WORK, AGENT_WORK_DAILY_LIMIT, AGENT_WORK_LEASE_MINUTES,
   agentWorkResultSchema,
   type AgentWorkKind, type AgentWorkPayload } from "./agent-work-contract";
 
+/** Dentro do mesmo tipo, o orçamento diário vai primeiro para quem ainda não
+ * vende: edital sem produto liberado e com a prova mais próxima. Produto já
+ * liberado e prova passada ficam por último; tarefa sem edital não é afetada. */
+const PRODUCT_DEADLINE_ORDER = sql.raw(`(
+    select case when exists (
+      select 1 from contest_store_products product
+      where product.opportunity_id = opportunity.id and product.status = 'released'
+    ) then 1 else 0 end
+    from contest_opportunities opportunity
+    where opportunity.id = case when work.payload->>'opportunityId' ~ '^[0-9]{1,18}$'
+      then (work.payload->>'opportunityId')::bigint end
+  ) nulls first,
+  (
+    select case when opportunity.exam_date >= (now() at time zone 'America/Sao_Paulo')::date
+      then opportunity.exam_date end
+    from contest_opportunities opportunity
+    where opportunity.id = case when work.payload->>'opportunityId' ~ '^[0-9]{1,18}$'
+      then (work.payload->>'opportunityId')::bigint end
+  ) nulls last`);
+
 export type AgentDatabase = PostgresJsDatabase<typeof schema>;
 export type AgentWork = {
   jobKey: string; kind: AgentWorkKind; inputHash: string; payload: AgentWorkPayload;
@@ -54,9 +74,10 @@ export async function claimAgentWork(db: AgentDatabase, now = new Date(), agent?
       update editorial_agent_work set status='running',attempts=attempts+1,
         lease_token=${leaseToken}::uuid,lease_expires_at=${expires}::timestamptz,
         updated_at=${now.toISOString()}::timestamptz
-      where job_key=(select job_key from editorial_agent_work where status='pending' and attempts<3
+      where job_key=(select job_key from editorial_agent_work work where status='pending' and attempts<3
         and kind in (${sql.join(kinds.map(kind=>sql`${kind}`),sql`,`)})
         order by case kind when 'legal_change' then 0 when 'authoring' then 1 when 'discovery' then 2 else 3 end,
+          ${PRODUCT_DEADLINE_ORDER},
           created_at,job_key for update skip locked limit 1)
       returning job_key as "jobKey",kind,input_hash as "inputHash",payload,
         lease_token::text as "leaseToken",lease_expires_at::text as "leaseExpiresAt"

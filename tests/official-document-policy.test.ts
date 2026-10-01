@@ -2,10 +2,16 @@ import { describe, expect, it } from "vitest";
 
 import {
   buildDirectOfficialDocumentCandidate,
+  cebraspeEventApiUrl,
+  cebraspeEventIdFromSourceUrl,
+  discoverCebraspeEventDocumentCandidates,
   discoverOfficialDocumentCandidatesFromHtml,
   isProhibitedExamMaterial,
 } from "@/lib/opportunities/official-document-policy";
-import { parseOfficialOpportunityDocumentUrl } from "@/lib/opportunities/source-monitor-policy";
+import {
+  parseOfficialOpportunityDocumentUrl,
+  parseOfficialOpportunitySourceUrl,
+} from "@/lib/opportunities/source-monitor-policy";
 
 describe("política de captura de documentos oficiais", () => {
   it("aceita o diretório de arquivos do mesmo host oficial sem ampliar a origem", () => {
@@ -69,5 +75,46 @@ describe("política de captura de documentos oficiais", () => {
     expect(result.map((item) => item.url)).not.toContain(
       "https://www.ssp.ma.gov.br/sites/default/files/gabarito.pdf",
     );
+  });
+
+  it("lê a lista oficial de editais da Cebraspe, que a página monta por JavaScript", () => {
+    expect(cebraspeEventIdFromSourceUrl("https://www.cebraspe.org.br/concursos/TC_DF_26_ANALISTA")).toBe("TC_DF_26_ANALISTA");
+    expect(cebraspeEventIdFromSourceUrl("https://www.cebraspe.org.br/concursos/")).toBeNull();
+    expect(cebraspeEventIdFromSourceUrl("https://cdn.cebraspe.org.br/concursos/TC_DF_26_ANALISTA")).toBeNull();
+    expect(cebraspeEventIdFromSourceUrl("https://www.cebraspe.org.br/concursos/../x")).toBeNull();
+    expect(cebraspeEventApiUrl("TC_DF_26_ANALISTA")).toBe("https://apis.cebraspe.org.br/cebraspe/eventos/TC_DF_26_ANALISTA");
+    // A API só serve para listar: fora de /concursos/ não vira fonte de oportunidade.
+    expect(() => parseOfficialOpportunitySourceUrl("https://apis.cebraspe.org.br/cebraspe/eventos/TC_DF_26_ANALISTA")).toThrow();
+
+    const file = (descricaoArquivo: string, nomeArquivo: string, extra: Record<string, unknown> = {}) => ({
+      tipoExtensaoArquivo: nomeArquivo.endsWith(".pdf") ? "_.pdf" : "_.html",
+      nomeArquivo,
+      descricaoArquivo,
+      isGuid: false,
+      ...extra,
+    });
+    const result = discoverCebraspeEventDocumentCandidates({
+      eventoURL: "TC_DF_26_ANALISTA",
+      arquivosEdital: [
+        file("Edital nº 2 - Retificação da alínea a do subitem 10.1, bem como a renumeração de tópicos de Direito Previdenciário", "5CB4.pdf"),
+        file("Edital nº 1 – Abertura – Atualizado conforme retificações", "1328.pdf"),
+        file("Edital n° 1 - Abertura", "7971.pdf"),
+        file("Edital n° 1 - Abertura - Vlibras", "7972.html"),
+        file("Edital nº 3 - Relação final dos candidatos com isenção deferida", "C506.pdf"),
+        file("Edital nº 5 - Resultado final na prova objetiva e convocação", "AB12.pdf"),
+        file("Edital nº 1 - Abertura", "../../segredo.pdf"),
+        file("Edital nº 1 - Abertura", "GUID.pdf", { isGuid: true }),
+      ],
+    }, "TC_DF_26_ANALISTA");
+
+    expect(result.map((item) => item.label)).toEqual([
+      "Edital nº 1 – Abertura – Atualizado conforme retificações",
+      "Edital n° 1 - Abertura",
+      "Edital nº 2 - Retificação da alínea a do subitem 10.1, bem como a renumeração de tópicos de Direito Previdenciário",
+    ]);
+    expect(result[0].url).toBe("https://cdn.cebraspe.org.br/concursos/TC_DF_26_ANALISTA/arquivos/1328.pdf");
+    expect(() => discoverCebraspeEventDocumentCandidates({ eventoURL: "OUTRO_26", arquivosEdital: [] }, "TC_DF_26_ANALISTA"))
+      .toThrow();
+    expect(() => discoverCebraspeEventDocumentCandidates([], "TC_DF_26_ANALISTA")).toThrow();
   });
 });
