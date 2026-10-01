@@ -37,6 +37,12 @@ function officialExamUrlAllowed(
   )`;
 }
 
+/** Documento aprovado: vale a conferência mais recente, a da revisão ou a
+ * reconferência automática do link (que nunca altera a revisão). */
+function documentCheckedAt(alias: "exam_document" | "answer_key_document") {
+  return sql.raw(`greatest(${alias}.source_checked_at, ${alias}.link_verified_at)`);
+}
+
 function freshnessSatisfied(checkedAt: SQLWrapper) {
   return sql`${checkedAt} is not null
     and ${checkedAt} >= current_timestamp - make_interval(days => ${OFFICIAL_EXAM_SOURCE_MAX_AGE_DAYS})
@@ -147,7 +153,7 @@ function approvedBookletConditions(
     and exam_document.distribution_mode = 'external_link'
     and lower(split_part(exam_document.content_type, ';', 1)) = 'application/pdf'
     and exam_document.expected_question_count between 1 and 300
-    and ${freshnessSatisfied(sql`exam_document.source_checked_at`)}
+    and ${freshnessSatisfied(documentCheckedAt("exam_document"))}
     and ${officialExamUrlAllowed(
       sql`exam_bank.slug`,
       sql`exam_document.source_url`,
@@ -192,7 +198,7 @@ function approvedAnswerKeyConditions(
     and answer_key_document.distribution_mode = 'external_link'
     and lower(split_part(answer_key_document.content_type, ';', 1)) = 'application/pdf'
     and answer_key_document.expected_question_count is null
-    and ${freshnessSatisfied(sql`answer_key_document.source_checked_at`)}
+    and ${freshnessSatisfied(documentCheckedAt("answer_key_document"))}
     and ${officialExamUrlAllowed(
       sql`exam_bank.slug`,
       sql`answer_key_document.source_url`,

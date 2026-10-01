@@ -1,0 +1,2 @@
+ALTER TABLE "exam_edition_documents" ADD COLUMN "link_verified_at" timestamp with time zone;--> statement-breakpoint
+ALTER TABLE "exam_edition_documents" ADD CONSTRAINT "exam_edition_documents_link_verified_check" CHECK ("exam_edition_documents"."link_verified_at" is null or "exam_edition_documents"."link_verified_at" >= "exam_edition_documents"."source_checked_at");

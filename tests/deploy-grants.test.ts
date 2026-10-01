@@ -77,7 +77,7 @@ describe("privilégios do app em produção", () => {
       /grant insert \(\s*public_id,\s*exam_edition_id,\s*document_type,[\s\S]*?expected_question_count,[\s\S]*?license_expires_at,\s*initiated_by_user_id\s*\) on exam_edition_documents to :app_user;/,
     );
     expect(grants).toMatch(
-      /grant update \(\s*http_status,\s*source_checked_at,\s*status,\s*reviewed_by_user_id,\s*reviewed_at,\s*review_notes,\s*updated_at\s*\) on exam_edition_documents to :app_user;/,
+      /grant update \(\s*http_status,\s*source_checked_at,\s*link_verified_at,\s*status,\s*reviewed_by_user_id,\s*reviewed_at,\s*review_notes,\s*updated_at\s*\) on exam_edition_documents to :app_user;/,
     );
     expect(grants).toMatch(
       /grant insert \(\s*public_id,\s*product_slug,\s*exam_edition_id,\s*primary_document_id,\s*primary_document_type,\s*answer_key_document_id,\s*answer_key_document_type,\s*relationship,\s*selection_verified_at,\s*initiated_by_user_id\s*\) on contest_product_exam_references to :app_user;/,

@@ -309,6 +309,13 @@
       "when": 1790597858895,
       "tag": "0043_contest_lifecycle_advance",
       "breakpoints": true
+    },
+    {
+      "idx": 44,
+      "version": "7",
+      "when": 1790868427788,
+      "tag": "0044_exam_document_link_verified",
+      "breakpoints": true
     }
   ]
 }

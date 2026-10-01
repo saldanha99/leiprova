@@ -393,9 +393,11 @@ grant update (
   updated_at
 ) on exam_license_requests to :app_user;
 
+-- link_verified_at: reconferência semanal do worker; não altera a revisão.
 grant update (
   http_status,
   source_checked_at,
+  link_verified_at,
   status,
   reviewed_by_user_id,
   reviewed_at,

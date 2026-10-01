@@ -685,6 +685,9 @@ export const examEditionDocuments = pgTable(
     }).references(() => users.id, { onDelete: "restrict" }),
     reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
     reviewNotes: text("review_notes"),
+    // Reconferência automática do link aprovado. Fica separada de
+    // source_checked_at, que não pode passar da data da revisão humana.
+    linkVerifiedAt: timestamp("link_verified_at", { withTimezone: true }),
     ...timestamps,
   },
   (table) => [
@@ -740,6 +743,10 @@ export const examEditionDocuments = pgTable(
     check(
       "exam_edition_documents_http_check",
       sql`${table.httpStatus} between 100 and 599`,
+    ),
+    check(
+      "exam_edition_documents_link_verified_check",
+      sql`${table.linkVerifiedAt} is null or ${table.linkVerifiedAt} >= ${table.sourceCheckedAt}`,
     ),
     check(
       "exam_edition_documents_content_type_check",

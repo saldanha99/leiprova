@@ -31,6 +31,12 @@ import {
 } from "@/lib/exams/public-exam-reference-policy";
 import { saoPauloCalendarDate } from "@/lib/opportunities/catalog-policy";
 
+/** Conferência mais recente do documento: a da revisão ou a reconferência
+ * automática do link, que fica em coluna própria. */
+const documentCheckedAt = sql<Date>`greatest(${examEditionDocuments.sourceCheckedAt}, ${examEditionDocuments.linkVerifiedAt})`.mapWith(
+  examEditionDocuments.sourceCheckedAt,
+);
+
 const publicExamReferenceSelection = {
   referenceId: contestProductExamReferences.id,
   referencePublicId: contestProductExamReferences.publicId,
@@ -62,7 +68,7 @@ const publicExamReferenceSelection = {
   documentTitle: examEditionDocuments.title,
   sourceUrl: examEditionDocuments.sourceUrl,
   sourceHost: examEditionDocuments.sourceHost,
-  sourceCheckedAt: examEditionDocuments.sourceCheckedAt,
+  sourceCheckedAt: documentCheckedAt,
   httpStatus: examEditionDocuments.httpStatus,
   contentType: examEditionDocuments.contentType,
   expectedQuestionCount: examEditionDocuments.expectedQuestionCount,
@@ -232,9 +238,8 @@ export async function getApprovedContestExamReference(
           sql`lower(split_part(${examEditionDocuments.contentType}, ';', 1)) = 'application/pdf'`,
           gte(examEditionDocuments.httpStatus, 200),
           lte(examEditionDocuments.httpStatus, 399),
-          isNotNull(examEditionDocuments.sourceCheckedAt),
-          lte(examEditionDocuments.sourceCheckedAt, referenceDate),
-          gte(examEditionDocuments.sourceCheckedAt, sourceFreshSince),
+          sql`${documentCheckedAt} <= ${referenceDate.toISOString()}::timestamptz`,
+          sql`${documentCheckedAt} >= ${sourceFreshSince.toISOString()}::timestamptz`,
           or(
             eq(examEditionDocuments.sourcePolicy, "metadata_only"),
             and(

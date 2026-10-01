@@ -19,6 +19,20 @@ describe("conteúdo real licenciado por produto", () => {
     expect(PREVIOUS_EXAM_SOURCE_FRESHNESS_DAYS).toBe(30);
   });
 
+  it("aceita a reconferência automática do link sem mexer na revisão", () => {
+    const query = new PgDialect().sqlToQuery(
+      approvedProductPreviousExamReferenceExists(sql`${"enam-exame-nacional-da-magistratura-2026-2"}`),
+    );
+    for (const alias of ["exam_document", "answer_key_document"]) {
+      expect(query.sql).toContain(
+        `greatest(${alias}.source_checked_at, ${alias}.link_verified_at) >= current_timestamp - make_interval(days =>`,
+      );
+      expect(query.sql).not.toContain(`${alias}.source_checked_at >= current_timestamp`);
+    }
+    // A edição não tem trava de revisão na data e continua usando source_checked_at.
+    expect(query.sql).toContain("exam_edition.source_checked_at >= current_timestamp - make_interval(days =>");
+  });
+
   it("revalida licença, revisão, edição, caderno e produto exatos", () => {
     const query = new PgDialect().sqlToQuery(
       approvedProductPreviousExamQuestionExists(

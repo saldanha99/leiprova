@@ -76,7 +76,7 @@ export async function refreshApprovedOfficialExamLinks(
         document.public_id,
         bank.slug,
         document.source_url,
-        document.source_checked_at
+        greatest(document.source_checked_at, document.link_verified_at)
       from exam_edition_documents document
       join exam_editions edition on edition.id = document.exam_edition_id
       join quiz_banks bank on bank.id = edition.bank_id
@@ -87,7 +87,8 @@ export async function refreshApprovedOfficialExamLinks(
             and (reference.primary_document_id = document.id
               or reference.answer_key_document_id = document.id)
         )
-        and document.source_checked_at < now() - make_interval(days => ${OFFICIAL_LINK_REFRESH_AFTER_DAYS})
+        and greatest(document.source_checked_at, document.link_verified_at)
+          < now() - make_interval(days => ${OFFICIAL_LINK_REFRESH_AFTER_DAYS})
     ) due_links
     order by checked_at nulls first, id
     limit ${MAX_LINKS_PER_RUN}
@@ -117,9 +118,10 @@ export async function refreshApprovedOfficialExamLinks(
         where id = ${link.id}::bigint and official_url = ${link.url}
       `);
     } else {
+      // source_checked_at fica preso à revisão humana (reviewed_at >= source_checked_at).
       await db.execute(sql`
         update exam_edition_documents
-        set source_checked_at = ${checkedAt}::timestamptz,
+        set link_verified_at = ${checkedAt}::timestamptz,
           http_status = ${checked.httpStatus}, updated_at = now()
         where id = ${link.id}::bigint and status = 'approved' and source_url = ${link.url}
       `);

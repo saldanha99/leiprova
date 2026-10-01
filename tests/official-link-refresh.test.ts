@@ -88,6 +88,11 @@ describe("reconferência dos links aprovados", () => {
     expect(select.params).toContain(OFFICIAL_LINK_REFRESH_AFTER_DAYS);
     expect(documentUpdate.sql).toContain("update exam_edition_documents");
     expect(documentUpdate.sql).toContain("status = 'approved' and source_url = $");
+    // O documento aprovado guarda a reconferência à parte: source_checked_at
+    // não pode passar da data da revisão humana (exam_edition_documents_review_check).
+    expect(documentUpdate.sql).toContain("set link_verified_at = $");
+    expect(documentUpdate.sql).not.toContain("source_checked_at =");
+    expect(select.sql).toContain("greatest(document.source_checked_at, document.link_verified_at)");
     expect(documentUpdate.params).toEqual([checkedAt.toISOString(), 200, "11", pdf]);
     expect(editionUpdate.sql).toContain("update exam_editions");
     expect(editionUpdate.params).toEqual([checkedAt.toISOString(), 5, "7", page]);
