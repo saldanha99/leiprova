@@ -3,6 +3,47 @@
 Documento de contexto para quem for continuar o projeto — pessoa ou assistente de IA.
 Descreve onde as coisas estão, como publicar e quais armadilhas já custaram tempo.
 
+**Pendências do ENAM resolvidas, editais da Cebraspe capturados e prova anterior de mais 4 concursos (01/10/2026, 13h BRT):**
+`6c463b0` leva a página do edital com um único produto liberado à página de venda
+(307; `.../enam-2026-2` → página do produto ENAM); dois produtos no mesmo edital
+não escolhem nenhum. O worker ganhou a etapa `examLinks`, logo após `lifecycle`:
+a cada 7 dias reconfere edições e PDFs de vínculos de prova anterior aprovados
+(até 24 por ciclo) e audita falhas em `automation.exam_link.check_failed`. O
+primeiro ciclo falhou com 23514: documento aprovado exige `reviewed_at >=
+source_checked_at`. Por isso `49a6c28` (migração `0044`) grava a reconferência em
+`link_verified_at` (`>= source_checked_at`, UPDATE concedido ao app), e venda e
+página usam `greatest(source_checked_at, link_verified_at)`. Às 12h31 os 4 PDFs de
+ENAC/ENAM (de 14/09) foram renovados sem tocar na data da revisão humana.
+
+`90c3ddb`: a página de concurso da Cebraspe é montada por JavaScript e o coletor
+achava 0 PDFs nos 7 editais dela. A descoberta agora lê a lista oficial que a
+própria página consulta (`apis.cebraspe.org.br/cebraspe/eventos/<ID>`; apis e cdn
+sem robots.txt, conferido em 01/10) e só aceita, no CDN, abertura, versão
+consolidada e retificação de programa/tópicos (até 4 por concurso). O limite de 6
+PDFs novos por ciclo continua: entraram TC-DF, TCE-MA, PC-MA Investigador, SEAP-MA e
+SEFAZ-AL; PC-AL e PC-MA Delegado ficam para o ciclo seguinte. Na fila dos agentes,
+dentro de cada tipo, vem primeiro o edital sem produto liberado e com prova mais
+próxima; produto liberado e prova passada vão para o fim (os 128 mapeamentos do
+ENAM, que já vende, deixam de bloquear os demais).
+
+`2a6a4d9`: cadastradas e aprovadas (`owner-instruction-2026-10-01:previous-exam-links`)
+as provas anteriores Cebraspe de PC-AL Agente 2021 (29/08/2021), PC-MA Investigador
+2017 (28/01/2018), SEFAZ-AL Auditor Fiscal 2021 (23/10/2021) e TC-DF Analista 2023
+(19/11/2023), mesma banca, órgão e carreira dos editais abertos. A Cebraspe divide a
+prova em partes com gabaritos próprios; o vínculo usa o caderno e o gabarito
+definitivo dos conhecimentos específicos (onde está a lei), com os itens no título,
+e a página da edição traz as demais partes. Itens contados nos gabaritos oficiais,
+datas tiradas dos editais de aplicação. `content:feed:real` não falha mais com
+produto já liberado no mesmo edital.
+
+Estado: 8 dos 13 editais abertos têm prova anterior aprovada. Sem prova anterior da
+mesma banca (primeira edição com ela): PC-PR e TJ-RS (FGV), TCE-MA e SEAP-MA
+(Cebraspe); usar prova de outra banca depende do proprietário. Só o ENAM tem
+programa extraído: os demais esperam a aprovação do PDF do edital em
+`/admin/motor-editais`, e sem ela nada chega a Guardião e Autor. As 334 inéditas
+revisadas são todas de Constituição Federal e não são redistribuídas entre
+produtos (a autoria segue banca e cargo).
+
 **Venda do ENAM aberta em LIVE (01/10/2026, 12h10 BRT):** webhook LIVE
 `we_1ULXBMBkl6797u2uZyCIYjSM` criado pelo conector Stripe (18 eventos do app, API
 `2026-07-29.dahlia`). A chave restrita LIVE "editalume" (`mk_1ULlJjBkl6797u2umEJ73xWf`)
@@ -18,11 +59,9 @@ abertura com backup `.env.bak-sales-open-20261001T151004Z`: `REGISTRATION_ENABLE
 `true`, `MASTER_CHECKOUT_ENABLED=false` (o checkout do Master mostra "em preparação").
 O ENAM é vendido na página do produto
 `/concursos/carreiras-juridicas/brasil/enam-exame-nacional-da-magistratura-2026-2`;
-a página do edital `.../enam-2026-2` ainda mostra "em preparação", porque só vende
-produto de mesmo slug (pendência de navegação). Pendentes: compra real de controle
-com estorno, feita pelo proprietário; reconferência automática dos links de prova
-anterior antes de 14/10 (PDFs do ENAM conferidos em 14/09 vencem em 30 dias e,
-vencidos, fecham a venda). A fábrica ficou parada de 29/09 15h34 a 30/09 ~20h40:
+a página do edital `.../enam-2026-2` mostrava "em preparação" e a reconferência dos
+links de prova anterior não existia (ambas resolvidas no mesmo dia, ver acima).
+Pendente: compra real de controle com estorno, feita pelo proprietário. A fábrica ficou parada de 29/09 15h34 a 30/09 ~20h40:
 a limpeza de disco autorizada apagou o `node_modules` do projeto, do qual o
 preflight do Maestri depende; restaurado com `pnpm install --frozen-lockfile`.
 
