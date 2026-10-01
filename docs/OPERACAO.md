@@ -3,6 +3,29 @@
 Documento de contexto para quem for continuar o projeto — pessoa ou assistente de IA.
 Descreve onde as coisas estão, como publicar e quais armadilhas já custaram tempo.
 
+**Venda do ENAM aberta em LIVE (01/10/2026, 12h10 BRT):** webhook LIVE
+`we_1ULXBMBkl6797u2uZyCIYjSM` criado pelo conector Stripe (18 eventos do app, API
+`2026-07-29.dahlia`). A chave restrita LIVE "editalume" (`mk_1ULlJjBkl6797u2umEJ73xWf`)
+foi criada pelo proprietário pela tela de "agente", que marcava escrita em quase
+toda a conta; foi reduzida no painel a Gravação em Customers, Checkout Sessions,
+Subscriptions e Customer Portal e Leitura em Charges and Refunds, Payment
+Disputes, Payment Intents, Products, Invoices e Prices. Conferido da VPS com a
+própria chave: 9 recursos usados respondem 200; saldo, repasses, contas
+conectadas, transferências, webhooks, Issuing e links de pagamento dão 403.
+Chaves instaladas pelo formulário privado (backup `.env.bak-stripe-live-20261001T145312Z`);
+abertura com backup `.env.bak-sales-open-20261001T151004Z`: `REGISTRATION_ENABLED`,
+`CHECKOUT_ENABLED`, `CONTEST_CHECKOUT_ENABLED` e `PURCHASE_DELIVERY_ENABLED` em
+`true`, `MASTER_CHECKOUT_ENABLED=false` (o checkout do Master mostra "em preparação").
+O ENAM é vendido na página do produto
+`/concursos/carreiras-juridicas/brasil/enam-exame-nacional-da-magistratura-2026-2`;
+a página do edital `.../enam-2026-2` ainda mostra "em preparação", porque só vende
+produto de mesmo slug (pendência de navegação). Pendentes: compra real de controle
+com estorno, feita pelo proprietário; reconferência automática dos links de prova
+anterior antes de 14/10 (PDFs do ENAM conferidos em 14/09 vencem em 30 dias e,
+vencidos, fecham a venda). A fábrica ficou parada de 29/09 15h34 a 30/09 ~20h40:
+a limpeza de disco autorizada apagou o `node_modules` do projeto, do qual o
+preflight do Maestri depende; restaurado com `pnpm install --frozen-lockfile`.
+
 **Venda por concurso com link oficial; ENAM liberado; Master em espera (29/09/2026, 03h BRT):**
 decisões do proprietário em 28/09: prova anterior entra na venda como link oficial,
 ENAM primeiro, Master segura, chave LIVE criada por ele. Publicado `232d542`: o
