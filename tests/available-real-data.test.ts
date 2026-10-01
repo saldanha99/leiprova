@@ -15,8 +15,8 @@ const historical: readonly AvailableExamEdition[] = AVAILABLE_REAL_EXAM_EDITIONS
 );
 
 describe("carga de dados reais disponíveis", () => {
-  it("mantém treze edições atuais vinculáveis e vinte históricas oficiais", () => {
-    expect(validateAvailableRealExamEditions()).toHaveLength(33);
+  it("mantém treze edições atuais vinculáveis e vinte e quatro históricas oficiais", () => {
+    expect(validateAvailableRealExamEditions()).toHaveLength(37);
 
     const scheduled: readonly AvailableExamEdition[] = AVAILABLE_REAL_EXAM_EDITIONS.filter(
       (edition) => edition.status === "scheduled",
@@ -39,7 +39,7 @@ describe("carga de dados reais disponíveis", () => {
       ["tc-df-analista-2026", "2026-11-22"],
     ]);
     expect(scheduled.every((edition) => edition.opportunitySlug && edition.productSlugs?.length)).toBe(true);
-    expect(published).toHaveLength(20);
+    expect(published).toHaveLength(24);
     expect(published.every((edition) => edition.documents.length === 2)).toBe(true);
   });
 
@@ -80,6 +80,25 @@ describe("carga de dados reais disponíveis", () => {
     }
   });
 
+  it("cadastra as provas anteriores da Cebraspe pela parte de conhecimentos específicos", () => {
+    const byId = new Map(historical.map((edition) => [edition.publicId, edition]));
+    const expected = [
+      ["pc-al-agente-2021", "policia-civil", "2021-08-29", 120],
+      ["pc-ma-investigador-2018", "policia-civil", "2018-01-28", 40],
+      ["sefaz-al-auditor-fiscal-2021", "auditor-fiscal", "2021-10-23", 160],
+      ["tc-df-analista-2023", "controle-externo", "2023-11-19", 70],
+    ] as const;
+    for (const [publicId, careerSlug, examDate, count] of expected) {
+      const edition = byId.get(publicId);
+      expect(edition).toMatchObject({ bankSlug: "cebraspe", careerSlug, examDate, status: "published" });
+      const [booklet, answerKey] = edition!.documents;
+      expect(booklet).toMatchObject({ documentType: "question_booklet", expectedQuestionCount: count });
+      // Gabarito separado por parte: o título diz qual parte ele cobre.
+      expect(answerKey.title).toMatch(/gabarito definitivo/iu);
+      expect(answerKey.sourceUrl.startsWith(`https://cdn.cebraspe.org.br/concursos/${edition!.sourceExternalId}/arquivos/`)).toBe(true);
+    }
+  });
+
   it("preserva os bloqueios editoriais e comerciais no comando de aplicação", () => {
     const script = readFileSync(join(process.cwd(), "scripts", "feed-available-real-data.ts"), "utf8");
 
@@ -88,5 +107,7 @@ describe("carga de dados reais disponíveis", () => {
     expect(script).toContain("productsReleased: 0");
     expect(script).not.toContain("sourceRights: \"licensed\"");
     expect(script).not.toContain("status='released'");
+    // Reaplicar a carga não falha nem mexe no produto já liberado deste edital.
+    expect(script).toContain('if (!product.opportunityId && product.status !== "draft")');
   });
 });

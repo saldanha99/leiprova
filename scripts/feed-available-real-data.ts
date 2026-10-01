@@ -117,8 +117,10 @@ async function main() {
           for (const productSlug of edition.productSlugs) {
             const products = await transaction<{ opportunityId: string | null; status: string }[]>`select opportunity_id::text as "opportunityId", status from contest_store_products where slug=${productSlug} limit 1 for update`;
             const product = products[0];
-            if (!product || product.status !== "draft") throw new Error(`Produto inexistente ou não está em rascunho: ${productSlug}.`);
+            if (!product) throw new Error(`Produto inexistente: ${productSlug}.`);
             if (product.opportunityId && product.opportunityId !== opportunity.id) throw new Error(`Produto já ligado a outra oportunidade: ${productSlug}.`);
+            // Produto liberado já ligado a este edital segue intacto; só rascunho recebe vínculo novo.
+            if (!product.opportunityId && product.status !== "draft") throw new Error(`Produto fora de rascunho sem edital: ${productSlug}.`);
             if (!product.opportunityId) {
               result.productsLinked += 1;
               if (command.apply) await transaction`update contest_store_products set opportunity_id=${opportunity.id}, updated_at=now() where slug=${productSlug}`;
