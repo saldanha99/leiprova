@@ -35,6 +35,7 @@ import {
   generateNoticeQuestionDraftForRequirement,
   NoticeDraftGenerationError,
 } from "../src/lib/editorial/notice-draft-service";
+import { refreshApprovedOfficialExamLinks } from "../src/lib/exams/official-link-refresh";
 import { advanceOpportunityLifecycles } from "../src/lib/opportunities/lifecycle-advance";
 import {
   captureOfficialPdf,
@@ -438,6 +439,11 @@ async function main() {
     const lifecycle = await runIsolatedStep(failedSteps, "lifecycle", () =>
       advanceOpportunityLifecycles(db, owner.id),
     );
+    // Link de prova anterior com mais de 30 dias sem conferência fecha a venda;
+    // reconferir toda semana mantém o produto vendável enquanto a fonte existir.
+    const examLinks = await runIsolatedStep(failedSteps, "examLinks", () =>
+      refreshApprovedOfficialExamLinks(db, owner.id),
+    );
     const documents = await runIsolatedStep(failedSteps, "documents", () =>
       capturePendingOfficialDocuments(owner.id),
     );
@@ -463,6 +469,7 @@ async function main() {
       publicationsAutomated: 0,
       failedSteps,
       lifecycle,
+      examLinks,
       documents,
       syllabi,
       drafts,

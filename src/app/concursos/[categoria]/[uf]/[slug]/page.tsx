@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { cache } from "react";
 
 import { PublicGuideShell } from "@/components/content/public-guide-shell";
@@ -25,7 +25,10 @@ import {
   getContestProductSlugForOpportunity,
 } from "@/lib/db/contest-exam-references";
 import { listReleasedContestProducts } from "@/lib/commerce/store";
-import { findExactProductForOpportunityPage } from "@/lib/commerce/product-page-association";
+import {
+  findExactProductForOpportunityPage,
+  singleReleasedProductPath,
+} from "@/lib/commerce/product-page-association";
 import { isDatabaseConfigured } from "@/lib/db/client";
 import { getOpportunityJurisdictionBySlug } from "@/lib/opportunities/jurisdictions";
 import { WEBSITE_ID, absoluteUrl } from "@/lib/seo";
@@ -58,14 +61,24 @@ const getPageOpportunity = cache(
         jurisdictionSlug,
         opportunityPublicId: opportunity.publicId,
       });
+      if (!product) {
+        // O único produto liberado deste edital é vendido na própria página.
+        const productPath = singleReleasedProductPath(released, opportunity.publicId);
+        if (
+          productPath &&
+          productPath !== `/concursos/${categorySlug}/${jurisdictionSlug}/${opportunitySlug}`
+        )
+          return { kind: "redirect", redirectTo: productPath } as const;
+      }
       const referenceProductSlug = product?.slug ??
         await getContestProductSlugForOpportunity(opportunity.publicId);
       return {
+        kind: "page",
         opportunity,
         jurisdiction,
         productSlug: product?.slug,
         referenceProductSlug,
-      };
+      } as const;
     }
     const planned = getCatalogContest(opportunitySlug);
     if (
@@ -80,12 +93,13 @@ const getPageOpportunity = cache(
       await listReviewedContestOpportunities({ categorySlug })
     ).find((item) => item.publicId === product.opportunityPublicId);
     return linked
-      ? {
+      ? ({
+          kind: "page",
           opportunity: linked,
           jurisdiction,
           productSlug: product.slug,
           referenceProductSlug: product.slug,
-        }
+        } as const)
       : null;
   },
 );
@@ -97,6 +111,12 @@ export async function generateMetadata({
 }: ContestOpportunityPageProps): Promise<Metadata> {
   const { categoria, uf, slug } = await params;
   const result = await getPageOpportunity(categoria, uf, slug);
+  if (result?.kind === "redirect") {
+    return {
+      alternates: { canonical: result.redirectTo },
+      robots: { index: false, follow: true },
+    };
+  }
 
   if (!result) {
     const planned = getCatalogContest(slug);
@@ -156,6 +176,7 @@ export default async function ContestOpportunityPage({
 }: ContestOpportunityPageProps) {
   const { categoria, uf, slug } = await params;
   const result = await getPageOpportunity(categoria, uf, slug);
+  if (result?.kind === "redirect") redirect(result.redirectTo);
   if (!result) {
     const planned = getCatalogContest(slug);
     if (

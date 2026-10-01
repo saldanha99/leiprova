@@ -1,10 +1,12 @@
+import { readFileSync } from "node:fs";
+
 import { sql } from "drizzle-orm";
 import { PgDialect } from "drizzle-orm/pg-core";
 import { describe, expect, it } from "vitest";
 import { MINIMUM_COURSE_QUESTION_COUNT, approvedProductQuestionCount,
   hasMinimumCourseQuestionCount, minimumCourseContentSatisfied } from "../src/lib/commerce/minimum-course-content";
 import { CONTEST_CATALOG, catalogContestPath } from "../src/lib/commerce/catalog";
-import { findExactProductForOpportunityPage } from "../src/lib/commerce/product-page-association";
+import { findExactProductForOpportunityPage, singleReleasedProductPath } from "../src/lib/commerce/product-page-association";
 
 describe("piso editorial por produto", () => {
   it.each([[0, false], [1, false], [67, false], [68, true], [69, true], [NaN, false],
@@ -51,6 +53,23 @@ describe("associação exata de página e produto", () => {
       { categorySlug: "tribunais" }, { opportunityPublicId: "outra-edicao" }]) {
       expect(findExactProductForOpportunityPage(products, { ...input, ...change })).toBeUndefined();
     }
+  });
+  it("leva a página do edital à venda só quando há um único produto liberado", () => {
+    const enam = CONTEST_CATALOG.find((contest) => contest.slug === "enam-exame-nacional-da-magistratura-2026-2")!;
+    const released = [{ slug: enam.slug, opportunityPublicId: "edital-enam" }];
+    expect(singleReleasedProductPath(released, "edital-enam")).toBe(catalogContestPath(enam));
+    expect(singleReleasedProductPath(released, "outro-edital")).toBeNull();
+    // Dois cargos no mesmo edital: nenhum é escolhido.
+    expect(singleReleasedProductPath(products, products[0].opportunityPublicId)).toBeNull();
+    expect(singleReleasedProductPath([{ slug: "fora-do-catalogo", opportunityPublicId: "x" }], "x")).toBeNull();
+  });
+  it("redireciona a página do edital sem produto exato e não indexa o desvio", () => {
+    const page = readFileSync(new URL("../src/app/concursos/[categoria]/[uf]/[slug]/page.tsx", import.meta.url), "utf8");
+    expect(page).toContain("singleReleasedProductPath(released, opportunity.publicId)");
+    expect(page).toContain("if (result?.kind === \"redirect\") redirect(result.redirectTo);");
+    expect(page).toContain("robots: { index: false, follow: true }");
+    // A rota do próprio produto nunca redireciona para si mesma.
+    expect(page).toContain("productPath !== `/concursos/${categorySlug}/${jurisdictionSlug}/${opportunitySlug}`");
   });
   it("preserva associação canônica exata para as 75 rotas planejadas", () => {
     for (const contest of CONTEST_CATALOG) {
