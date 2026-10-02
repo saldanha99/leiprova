@@ -13,6 +13,15 @@ type Requirement = { id:number; opportunityId:number; text:string; locator:strin
 
 export async function prepareAgentWork(db:AgentDatabase, now=new Date(), options:{followupsOnly?:boolean}={}) {
   let mappings=0, authoring=0, discovery=0, legalChanges=0;
+  // Requisito retirado ou suspenso (reextração do programa) não gasta reserva de agente.
+  if(!options.followupsOnly) await db.execute(sql`
+    update editorial_agent_work work set status='superseded',last_error_code='requirement_withdrawn',updated_at=now()
+    where work.status='pending' and work.kind in ('legal_mapping','authoring')
+      and work.payload->>'requirementId' ~ '^[0-9]{1,18}$'
+      and not exists (select 1 from opportunity_requirements requirement
+        where requirement.id=(work.payload->>'requirementId')::bigint
+          and requirement.editorial_status in ('draft','pending_review','reviewed'))
+  `);
   const requirements=options.followupsOnly ? [] : await db.execute<Requirement>(sql`
     select r.id::int id,r.opportunity_id::int as "opportunityId",r.requirement_text text,r.source_locator locator,
       o.title,o.role_name role,o.cycle_year as "year",o.jurisdiction_code jurisdiction,s.document_url as "documentUrl",

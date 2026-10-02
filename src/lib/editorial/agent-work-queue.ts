@@ -9,18 +9,33 @@ import { AGENT_FOR_WORK, AGENT_WORK_DAILY_LIMIT, AGENT_WORK_LEASE_MINUTES,
   agentWorkResultSchema,
   type AgentWorkKind, type AgentWorkPayload } from "./agent-work-contract";
 
-/** Dentro do mesmo tipo, o orçamento diário vai primeiro para quem ainda não
- * vende: edital sem produto liberado e com a prova mais próxima. Produto já
- * liberado e prova passada ficam por último; tarefa sem edital não é afetada. */
-const PRODUCT_DEADLINE_ORDER = sql.raw(`(
-    select case when exists (
-      select 1 from contest_store_products product
-      where product.opportunity_id = opportunity.id and product.status = 'released'
-    ) then 1 else 0 end
+/** Faixa do edital da tarefa: 0 = ainda pode vender a tempo (sem produto
+ * liberado, prova a 14 dias ou mais e menos de 68 questões ligadas); 1 = demais
+ * editais sem venda (prova em menos de 14 dias ou 68 rascunhos já feitos);
+ * 2 = produto liberado. Tarefa sem edital fica sem faixa (null). */
+function productTier(alias: "work" | "other") {
+  return `(
+    select case
+      when exists (
+        select 1 from contest_store_products product
+        where product.opportunity_id = opportunity.id and product.status = 'released'
+      ) then 2
+      when opportunity.exam_date < (now() at time zone 'America/Sao_Paulo')::date + 14
+        or (
+          select count(*) from question_opportunities link
+          join questions question on question.id = link.question_id
+          where link.opportunity_id = opportunity.id and question.editorial_status <> 'suspended'
+        ) >= 68 then 1
+      else 0 end
     from contest_opportunities opportunity
-    where opportunity.id = case when work.payload->>'opportunityId' ~ '^[0-9]{1,18}$'
-      then (work.payload->>'opportunityId')::bigint end
-  ) nulls first,
+    where opportunity.id = case when ${alias}.payload->>'opportunityId' ~ '^[0-9]{1,18}$'
+      then (${alias}.payload->>'opportunityId')::bigint end
+  )`;
+}
+
+/** Dentro do mesmo tipo, a faixa 0 vem primeiro, pela prova mais próxima;
+ * prova passada ou sem data vai para o fim da sua faixa. */
+const PRODUCT_DEADLINE_ORDER = sql.raw(`${productTier("work")} nulls first,
   (
     select case when opportunity.exam_date >= (now() at time zone 'America/Sao_Paulo')::date
       then opportunity.exam_date end
@@ -28,6 +43,17 @@ const PRODUCT_DEADLINE_ORDER = sql.raw(`(
     where opportunity.id = case when work.payload->>'opportunityId' ~ '^[0-9]{1,18}$'
       then (work.payload->>'opportunityId')::bigint end
   ) nulls last`);
+
+/** O teto diário é compartilhado pelos três agentes: produto já liberado só
+ * reserva quando nenhum edital da faixa 0 tem tarefa na fila. */
+const RELEASED_WAITS_FOR_UNSOLD = sql.raw(`not (
+    coalesce(${productTier("work")}, 0) = 2
+    and exists (
+      select 1 from editorial_agent_work other
+      where other.status = 'pending' and other.attempts < 3
+        and ${productTier("other")} = 0
+    )
+  )`);
 
 export type AgentDatabase = PostgresJsDatabase<typeof schema>;
 export type AgentWork = {
@@ -76,6 +102,7 @@ export async function claimAgentWork(db: AgentDatabase, now = new Date(), agent?
         updated_at=${now.toISOString()}::timestamptz
       where job_key=(select job_key from editorial_agent_work work where status='pending' and attempts<3
         and kind in (${sql.join(kinds.map(kind=>sql`${kind}`),sql`,`)})
+        and ${RELEASED_WAITS_FOR_UNSOLD}
         order by case kind when 'legal_change' then 0 when 'authoring' then 1 when 'discovery' then 2 else 3 end,
           ${PRODUCT_DEADLINE_ORDER},
           created_at,job_key for update skip locked limit 1)

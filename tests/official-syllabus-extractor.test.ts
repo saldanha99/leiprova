@@ -91,14 +91,95 @@ describe("extração determinística do conteúdo programático", () => {
         suggestedSubjectId: 20,
         suggestedSubjectName: "Direito Administrativo",
       },
+      // "Sociologia do Direito", da formação humanística, não é lei seca e não vira requisito.
+    ]);
+  });
+
+  it("lê o formato da Cebraspe por tema numerado e deixa de fora matéria sem lei", () => {
+    const candidates = extractOfficialSyllabusCandidates(
+      [
+        "20 DOS OBJETOS DE AVALIAÇÃO (HABILIDADES E CONHECIMENTOS)\n20.2.3 CONHECIMENTOS BÁSICOS\nLÍNGUA PORTUGUESA: 1 Compreensão e interpretação de textos. 2 Reconhecimento\nde tipos e gêneros textuais.",
+        "20.2.4 CONHECIMENTOS ESPECÍFICOS\nNOÇÕES DE DIREITO PENAL: 1 Aplicação da lei penal. 1.1 Princípios. 1.2 A lei penal no\ntempo e no espaço. 2 Do crime, conforme o art. 5 Dos Direitos. 3 Da imputabilidade penal.\nNOÇÕES DE DIREITO CONSTITUCIONAL: 1 Constituição Federal de 1988. 1.1 Direitos e\ngarantias fundamentais. 1.2 Organização do Estado. 1.3 Poder Judiciário.\nANEXO I\nCRONOGRAMA",
+      ],
+      [
+        { id: 10, name: "Direito Constitucional" },
+        { id: 30, name: "Direito Penal" },
+      ],
+    );
+
+    expect(candidates).toEqual([
       {
-        requirementText: "Sociologia do Direito.",
-        pageNumber: 3,
-        sourceLocator:
-          "Conteúdo programático, p. 3 · NOÇÕES GERAIS DE DIREITO E FORMAÇÃO HUMANÍSTICA",
-        suggestedSubjectId: null,
-        suggestedSubjectName: "NOÇÕES GERAIS DE DIREITO E FORMAÇÃO HUMANÍSTICA",
+        requirementText: "Aplicação da lei penal. 1.1 Princípios. 1.2 A lei penal no tempo e no espaço.",
+        pageNumber: 2,
+        sourceLocator: "Conteúdo programático, p. 2 · NOÇÕES DE DIREITO PENAL · item 1",
+        suggestedSubjectId: 30,
+        suggestedSubjectName: "Direito Penal",
       },
+      {
+        // "art. 5 Dos Direitos" não abre o item 5: a numeração esperada é 3.
+        requirementText: "Do crime, conforme o art. 5 Dos Direitos.",
+        pageNumber: 2,
+        sourceLocator: "Conteúdo programático, p. 2 · NOÇÕES DE DIREITO PENAL · item 2",
+        suggestedSubjectId: 30,
+        suggestedSubjectName: "Direito Penal",
+      },
+      {
+        requirementText: "Da imputabilidade penal.",
+        pageNumber: 2,
+        sourceLocator: "Conteúdo programático, p. 2 · NOÇÕES DE DIREITO PENAL · item 3",
+        suggestedSubjectId: 30,
+        suggestedSubjectName: "Direito Penal",
+      },
+      // Matéria com um item só desce aos subitens, em vez de virar um requisito único.
+      ...["Direitos e garantias fundamentais.", "Organização do Estado.", "Poder Judiciário."].map((text, index) => ({
+        requirementText: text,
+        pageNumber: 2,
+        sourceLocator: `Conteúdo programático, p. 2 · NOÇÕES DE DIREITO CONSTITUCIONAL · item 1.${index + 1}`,
+        suggestedSubjectId: 10,
+        suggestedSubjectName: "Direito Constitucional",
+      })),
+    ]);
+  });
+
+  it("lê matéria numerada com temas no segundo nível (PC-PR) e ignora o sumário", () => {
+    const candidates = extractOfficialSyllabusCandidates(
+      [
+        "SUMÁRIO\nAnexo I – Conteúdo Programático.\nAnexo II – Modelo de declaração.",
+        "ANEXO I\nCONTEÚDO PROGRAMÁTICO\nDELEGADO DE POLÍCIA\n1. DIREITO PENAL: 1.1 Princípios Fundamentais. 1.1.1 Legalidade. 1.2 Aplicação da\nLei Penal. 1.3 Teoria Geral do Crime.\n2. DIREITO PROCESSUAL PENAL: 2.1 Inquérito Policial. 2.2 Ação Penal. 2.3 Prisões.\n3. INFORMÁTICA: 3.1 Redes. 3.2 Segurança.\nANEXO II\nDECLARAÇÃO",
+      ],
+      [
+        { id: 30, name: "Direito Penal" },
+        { id: 40, name: "Direito Processual Penal" },
+      ],
+    );
+
+    expect(candidates.map((item) => [item.suggestedSubjectId, item.requirementText])).toEqual([
+      [30, "Princípios Fundamentais. 1.1.1 Legalidade."],
+      [30, "Aplicação da Lei Penal."],
+      [30, "Teoria Geral do Crime."],
+      [40, "Inquérito Policial."],
+      [40, "Ação Penal."],
+      [40, "Prisões."],
+      // INFORMÁTICA não é lei seca e fica de fora.
+    ]);
+    expect(candidates[0].sourceLocator).toBe("Conteúdo programático, p. 2 · DIREITO PENAL · item 1.1");
+  });
+
+  it("aceita outro anexo, cabeçalho repetido e tema que lembra título do edital (TJ-RS, TRF-5)", () => {
+    const header = "TRIBUNAL DE JUSTIÇA | CONCURSO PÚBLICO 2026";
+    const candidates = extractOfficialSyllabusCandidates(
+      [
+        `${header} 1\nANEXO II – CONTEÚDO PROGRAMÁTICO\nBLOCO UM\nLÍNGUA PORTUGUESA\n1. Ortografia.\nDIREITO CIVIL\n1. Das Provas.\n2. Dos bens. Dos bens`,
+        `${header} 2\npúblicos.\nDIREITO AMBIENTAL\n1.Princípios do Direito Ambiental.\nA) SOCIOLOGIA DO DIREITO\n1. Sociologia jurídica.`,
+        `${header} 3\nANEXO III - CRONOGRAMA PREVISTO\n1. Inscrições.`,
+      ],
+      [{ id: 50, name: "Direito Civil" }],
+    );
+
+    expect(candidates.map((item) => [item.suggestedSubjectName, item.requirementText])).toEqual([
+      ["Direito Civil", "Das Provas."],
+      ["Direito Civil", "Dos bens. Dos bens públicos."],
+      ["DIREITO AMBIENTAL", "Princípios do Direito Ambiental."],
     ]);
   });
 });
