@@ -20,8 +20,11 @@ achava 0 PDFs nos 7 editais dela. A descoberta agora lê a lista oficial que a
 própria página consulta (`apis.cebraspe.org.br/cebraspe/eventos/<ID>`; apis e cdn
 sem robots.txt, conferido em 01/10) e só aceita, no CDN, abertura, versão
 consolidada e retificação de programa/tópicos (até 4 por concurso). O limite de 6
-PDFs novos por ciclo continua: entraram TC-DF, TCE-MA, PC-MA Investigador, SEAP-MA e
-SEFAZ-AL; PC-AL e PC-MA Delegado ficam para o ciclo seguinte. Na fila dos agentes,
+PDFs novos por ciclo continua: entraram TC-DF, TCE-MA, PC-MA Investigador, SEAP-MA,
+SEFAZ-AL e PC-MA Delegado. O da PC-AL falhava com 23514: 20 letras matemáticas de
+fórmula (U+1D441…) contam 2 em `.length` e 1 no `char_length` do Postgres;
+`1f1040c` passou a contar o texto em caracteres e ele entrou em 02/10 (71 páginas).
+Os 13 editais abertos têm o PDF oficial capturado (12 aguardando aprovação). Na fila dos agentes,
 dentro de cada tipo, vem primeiro o edital sem produto liberado e com prova mais
 próxima; produto liberado e prova passada vão para o fim (os 128 mapeamentos do
 ENAM, que já vende, deixam de bloquear os demais).
