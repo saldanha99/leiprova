@@ -252,6 +252,14 @@ describe("leitura limitada e PDF", () => {
     mocks.extractText.mockResolvedValue({ totalPages: 1, text: [text] });
     expect((await failure(capture())).code).toBe(code); expect(mocks.cleanup).toHaveBeenCalled();
   });
+  it("conta o texto em caracteres, como o char_length do Postgres", async () => {
+    // Edital da PC-AL 2026: letras matemáticas de fórmula (U+1D441) ocupam 2 em .length.
+    const text = `Edital nº 1 – Abertura. Fórmula: 𝑁 = 𝐴 + 𝐵. ${"Conteúdo programático. ".repeat(6)}`;
+    mocks.extractText.mockResolvedValue({ totalPages: 1, text: [text] });
+    const result = await capture();
+    expect(result.textLength).toBe([...result.extractedText].length);
+    expect(result.textLength).toBe(result.extractedText.length - 3);
+  });
   it("tipa falha de limpeza quando não há erro anterior", async () => {
     mocks.cleanup.mockRejectedValue(unsafeError());
     expect((await failure(capture())).code).toBe("pdf_cleanup_failed");

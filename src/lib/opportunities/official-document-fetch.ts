@@ -322,7 +322,9 @@ export async function captureOfficialPdf(
       pageCount: result.totalPages,
       extractedText,
       pageTexts: Object.freeze(pageTexts),
-      textLength: extractedText.length,
+      // Em caracteres, como o char_length do Postgres: letras matemáticas de
+      // fórmulas (U+1D400…) contam 2 em .length e barravam a gravação (PC-AL 2026).
+      textLength: [...extractedText].length,
       parserVersion: OFFICIAL_DOCUMENT_PARSER_VERSION,
     });
   } catch (error) {
