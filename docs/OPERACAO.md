@@ -3,6 +3,46 @@
 Documento de contexto para quem for continuar o projeto — pessoa ou assistente de IA.
 Descreve onde as coisas estão, como publicar e quais armadilhas já custaram tempo.
 
+**Editais aprovados, programa extraído dos 12 concursos e fila focada (02/10/2026, 21h BRT):**
+decisões do proprietário em 02/10: aprovar por ele os editais capturados (só a versão
+consolidada; mais as retificações de programa de TCE-MA e SEFAZ-AL), teto dos agentes
+de 24 para 48 reservas/24 h e aceitar prova anterior de outra banca quando o órgão
+nunca fez prova com a banca atual. `bd0a62b` criou `pnpm editorial:notices:approve
+[--apply] aprovar=<id> substituir=<id>` (imagem `opportunity-approver`,
+`NOTICE_APPROVAL_REFERENCE`): mesma "aprovação do proprietário" do painel, transação
+serializável, captura travada, fonte aprovada e edital revisado exigidos, auditoria
+por decisão. Aplicado com `owner-decision-2026-10-02:notice-approval`: 13 PDFs
+aprovados e 6 versões repetidas substituídas; só a retificação nº 2 da PC-PR ficou
+pendente.
+
+A primeira extração achou programa só nos editais da FGV e mal: TJ-RS em pedaços de
+linha, TRF-5 com matérias fora da lista atribuídas à anterior e corte em 200, ENAC em
+parágrafos. `ad13056` reescreveu o extrator: formato da Cebraspe e da PC-PR
+("MATÉRIA: 1 Tema. 1.1 Subtema") com um requisito por tema (subtemas juntos, numeração
+conferida em sequência), anexo de qualquer número, cabeçalho repetido ignorado,
+título em maiúsculas fora da lista vira matéria, "Das Provas." dentro de Civil não
+encerra o programa, foco em lei seca (português, humanidades, contabilidade,
+estatística e TI não viram requisito) e limite de 400. Texto sempre literal do PDF.
+Os 345 rascunhos da primeira extração (ENAC, TJ-RS, TRF-5; sem vínculo, questão ou
+tarefa iniciada) foram removidos em transação auditada
+(`editorial.syllabus.reextraction_reset`) e as 345 tarefas, superadas. Resultado:
+PC-PR 146, PC-MA Delegado 121, ENAC 43, TC-DF 48, TCE-MA 149, PC-AL 65, PC-MA
+Investigador 71, TJ-RS 188, SEAP-MA 84, TRF-5 199 e SEFAZ-AL 63 requisitos. Cada ciclo
+agora supera tarefas de requisito retirado. Na fila, dentro do tipo, vêm primeiro os
+editais que ainda podem vender a tempo (prova a 14 dias ou mais, menos de 68 questões
+ligadas), pela prova mais próxima; produto liberado (ENAM) só reserva quando nenhum
+deles tem tarefa esperando. A PC-PR (prova em 11/10) fica na segunda faixa.
+
+Prova anterior de outra banca: só o TJ-RS é viável (FAURGS, prova de 16/01/2022,
+Edital 61/2019; arquivos em `portalfaurgs.com.br/LerArquivo/<id>`, páginas montadas
+por JavaScript). Falta localizar os endereços oficiais, cadastrar a FAURGS como banca e
+portal e mudar a regra de identidade (hoje exige a mesma banca do edital atual). Sem
+fonte oficial possível: TCE-MA (FCC 2005; robots da FCC proíbe baixar PDFs), SEAP-MA
+(FUNCAB 2016, banca extinta) e PC-PR (prova em 11/10). A biblioteca legal tem só CF,
+CC, CPC, CLT, CPP, CP, ECA, Lei 8.112 e CTN: requisito sem artigo correspondente é
+bloqueado sem gastar reserva (`official_corpus_missing`), o que limita, por enquanto,
+Legislação Penal Especial, notarial (ENAC) e leis estaduais.
+
 **Pendências do ENAM resolvidas, editais da Cebraspe capturados e prova anterior de mais 4 concursos (01/10/2026, 13h BRT):**
 `6c463b0` leva a página do edital com um único produto liberado à página de venda
 (307; `.../enam-2026-2` → página do produto ENAM); dois produtos no mesmo edital
