@@ -8,7 +8,9 @@ export const AGENT_WORK_VERSION = "editalume-agents-v1";
 // A resposta só é recolhida na rodada seguinte da rotina (20 min) e a rotina não
 // dispara com o agente ocupado; com 45 min, tarefa de meia hora perdia a reserva.
 export const AGENT_WORK_LEASE_MINUTES = 90;
-export const AGENT_WORK_DAILY_LIMIT = 24;
+// Decisão do proprietário em 02/10/2026: 48 reservas por 24 h, compartilhadas
+// pelos três agentes (eram 24, esgotadas todo dia com 12 editais na fila).
+export const AGENT_WORK_DAILY_LIMIT = 48;
 export const agentWorkKindSchema = z.enum(["discovery", "legal_mapping", "authoring", "legal_change"]);
 export type AgentWorkKind = z.infer<typeof agentWorkKindSchema>;
 export const AGENT_FOR_WORK: Record<AgentWorkKind, string> = {

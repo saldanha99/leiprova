@@ -33,7 +33,8 @@ Essa entrada não elimina os passos humanos pendentes: associação produto–ed
 revisão de fonte/programa, questões e aderência de cada vínculo. Não distribui
 todo o acervo em todos os produtos. O gerador segue a banca E o cargo do pacote
 validado e produz rascunhos. Meta registrada não significa 68 entregues ou curso
-liberado. O teto compartilhado de 24 reservas/24h permanece inalterado.
+liberado. O teto compartilhado passou de 24 para 48 reservas/24h por decisão do proprietário
+em 02/10/2026 (`AGENT_WORK_DAILY_LIMIT`); continua sem API paga.
 
 Operador de preparação pontual no worker (sem coleta nem geração):
 `scripts/editorial-agent-work.ts --mode=prepare-courses`, pelo mesmo comando
@@ -57,7 +58,7 @@ flag já verificadas pela ponte. Veja registro de publicação antes de executá
 ## Fluxo e proteção
 
 Cada trabalho possui identidade estável, hash dos insumos, reserva de 90 minutos,
-até três tentativas e limite compartilhado de 24 reservas por 24 horas. A reserva
+até três tentativas e limite compartilhado de 48 reservas por 24 horas (24 até 02/10/2026). A reserva
 é atômica; um reinício não duplica a tarefa. Novo insumo invalida a reserva antiga.
 Uma confirmação idêntica pode ser repetida após perda da resposta de rede: o
 recibo já aplicado é devolvido, sem reinserir questões. Resposta alterada é recusada.
