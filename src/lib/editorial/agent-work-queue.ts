@@ -9,58 +9,53 @@ import { AGENT_FOR_WORK, AGENT_WORK_DAILY_LIMIT, AGENT_WORK_LEASE_MINUTES,
   agentWorkResultSchema,
   type AgentWorkKind, type AgentWorkPayload } from "./agent-work-contract";
 
-/** Faixa do edital da tarefa: 0 = ainda pode vender a tempo (sem produto
- * liberado, prova a 14 dias ou mais e menos de 68 questões ligadas); 1 = demais
- * editais sem venda (prova em menos de 14 dias ou 68 rascunhos já feitos);
- * 2 = produto liberado. Tarefa sem edital fica sem faixa (null). */
-function productTier(alias: "work" | "other") {
-  return `(
-    select case
-      when exists (
-        select 1 from contest_store_products product
-        where product.opportunity_id = opportunity.id and product.status = 'released'
-      ) then 2
-      when opportunity.exam_date < (now() at time zone 'America/Sao_Paulo')::date + 14
-        or (
-          select count(*) from question_opportunities link
-          join questions question on question.id = link.question_id
-          where link.opportunity_id = opportunity.id and question.editorial_status <> 'suspended'
-        ) >= 68 then 1
-      else 0 end
-    from contest_opportunities opportunity
-    where opportunity.id = case when ${alias}.payload->>'opportunityId' ~ '^[0-9]{1,18}$'
-      then (${alias}.payload->>'opportunityId')::bigint end
-  )`;
-}
+// O requisito sai da chave ("mapping:<id>", "author:<id>"): ler o payload, com os
+// artigos candidatos, custava segundos por reserva.
+const requirementIdOf = (alias: "work" | "other") =>
+  `case when ${alias}.job_key ~ '^(mapping|author):[0-9]{1,18}$' then split_part(${alias}.job_key, ':', 2)::bigint end`;
 
-/** Dentro do mesmo tipo, a faixa 0 vem primeiro, pela prova mais próxima;
- * prova passada ou sem data vai para o fim da sua faixa. No mesmo edital, vem
- * antes o requisito de matéria conhecida (penal, constitucional...), que a
- * biblioteca de leis cobre; matéria sem lei carregada espera a biblioteca. */
-const PRODUCT_DEADLINE_ORDER = sql.raw(`${productTier("work")} nulls first,
-  (
-    select case when opportunity.exam_date >= (now() at time zone 'America/Sao_Paulo')::date
-      then opportunity.exam_date end
-    from contest_opportunities opportunity
-    where opportunity.id = case when work.payload->>'opportunityId' ~ '^[0-9]{1,18}$'
-      then (work.payload->>'opportunityId')::bigint end
-  ) nulls last,
-  (
-    select requirement.subject_id is null from opportunity_requirements requirement
-    where requirement.id = case when work.payload->>'requirementId' ~ '^[0-9]{1,18}$'
-      then (work.payload->>'requirementId')::bigint end
-  ) nulls last`);
+/** Faixa de cada edital, calculada uma vez por reserva (antes era por tarefa e
+ * a reserva levava 50 s com 1.300 tarefas): 0 = ainda pode vender a tempo (sem
+ * produto liberado, prova a 14 dias ou mais e menos de 68 questões ligadas);
+ * 1 = demais editais sem venda; 2 = produto liberado. */
+const OPPORTUNITY_TIERS = sql.raw(`opportunity_tier as (
+      select opportunity.id,
+        case
+          when exists (
+            select 1 from contest_store_products product
+            where product.opportunity_id = opportunity.id and product.status = 'released'
+          ) then 2
+          when opportunity.exam_date < (now() at time zone 'America/Sao_Paulo')::date + 14
+            or (
+              select count(*) from question_opportunities link
+              join questions question on question.id = link.question_id
+              where link.opportunity_id = opportunity.id and question.editorial_status <> 'suspended'
+            ) >= 68 then 1
+          else 0 end as tier,
+        case when opportunity.exam_date >= (now() at time zone 'America/Sao_Paulo')::date
+          then opportunity.exam_date end as upcoming_exam
+      from contest_opportunities opportunity
+    ),
+    unsold_waiting as (
+      select exists (
+        select 1 from editorial_agent_work other
+        join opportunity_requirements waiting_requirement on waiting_requirement.id = ${requirementIdOf("other")}
+        join opportunity_tier waiting on waiting.id = waiting_requirement.opportunity_id
+        where other.status = 'pending' and other.attempts < 3 and waiting.tier = 0
+      ) as value
+    )`);
 
-/** O teto diário é compartilhado pelos três agentes: produto já liberado só
- * reserva quando nenhum edital da faixa 0 tem tarefa na fila. */
-const RELEASED_WAITS_FOR_UNSOLD = sql.raw(`not (
-    coalesce(${productTier("work")}, 0) = 2
-    and exists (
-      select 1 from editorial_agent_work other
-      where other.status = 'pending' and other.attempts < 3
-        and ${productTier("other")} = 0
-    )
-  )`);
+/** Dentro do mesmo tipo: faixa 0 primeiro, pela prova mais próxima (prova
+ * passada ou sem data no fim da faixa) e, no mesmo edital, matéria conhecida
+ * antes. O teto diário é compartilhado pelos três agentes: produto liberado só
+ * reserva quando nenhum edital da faixa 0 tem tarefa na fila. Tarefa sem edital
+ * não tem faixa e segue a ordem de chegada. */
+const CLAIM_FROM = sql.raw(`from editorial_agent_work work
+    left join opportunity_requirements requirement on requirement.id = ${requirementIdOf("work")}
+    left join opportunity_tier tier on tier.id = requirement.opportunity_id`);
+const RELEASED_WAITS_FOR_UNSOLD = sql.raw(`not (coalesce(tier.tier, 0) = 2 and (select value from unsold_waiting))`);
+const PRODUCT_DEADLINE_ORDER = sql.raw(`tier.tier nulls first, tier.upcoming_exam nulls last,
+          (requirement.subject_id is null) nulls last`);
 
 export type AgentDatabase = PostgresJsDatabase<typeof schema>;
 export type AgentWork = {
@@ -107,12 +102,14 @@ export async function claimAgentWork(db: AgentDatabase, now = new Date(), agent?
       update editorial_agent_work set status='running',attempts=attempts+1,
         lease_token=${leaseToken}::uuid,lease_expires_at=${expires}::timestamptz,
         updated_at=${now.toISOString()}::timestamptz
-      where job_key=(select job_key from editorial_agent_work work where status='pending' and attempts<3
-        and kind in (${sql.join(kinds.map(kind=>sql`${kind}`),sql`,`)})
+      where job_key=(with ${OPPORTUNITY_TIERS}
+        select work.job_key ${CLAIM_FROM}
+        where work.status='pending' and work.attempts<3
+        and work.kind in (${sql.join(kinds.map(kind=>sql`${kind}`),sql`,`)})
         and ${RELEASED_WAITS_FOR_UNSOLD}
-        order by case kind when 'legal_change' then 0 when 'authoring' then 1 when 'discovery' then 2 else 3 end,
+        order by case work.kind when 'legal_change' then 0 when 'authoring' then 1 when 'discovery' then 2 else 3 end,
           ${PRODUCT_DEADLINE_ORDER},
-          created_at,job_key for update skip locked limit 1)
+          work.created_at,work.job_key for update of work skip locked limit 1)
       returning job_key as "jobKey",kind,input_hash as "inputHash",payload,
         lease_token::text as "leaseToken",lease_expires_at::text as "leaseExpiresAt"
     `);

@@ -19,32 +19,28 @@ describe("prioridade da fila dos agentes", () => {
     return { db: db as unknown as Parameters<typeof claimAgentWork>[0], queries };
   }
 
-  it("serve primeiro os editais que ainda não vendem, pela prova mais próxima", async () => {
+  it("serve primeiro os editais que ainda podem vender a tempo, sem ler o payload", async () => {
     const { db, queries } = fakeDatabase();
 
     expect(await claimAgentWork(db, new Date("2026-10-01T15:00:00Z"))).toEqual({ state: "idle" });
 
     const claim = new PgDialect().sqlToQuery(queries[3]);
-    const order = claim.sql.slice(claim.sql.indexOf("order by"));
-    // O tipo continua mandando; dentro dele, produto liberado vai para o fim.
-    expect(order.indexOf("when 'legal_change' then 0")).toBeLessThan(order.indexOf("product.status = 'released'"));
-    expect(order).toContain("product.status = 'released'\n      ) then 2");
-    // Prova a menos de 14 dias ou 68 questões já ligadas cedem a vez aos demais.
-    expect(order).toContain("::date + 14");
-    expect(order).toContain("question.editorial_status <> 'suspended'\n        ) >= 68 then 1");
-    expect(order).toContain("else 0 end");
-    // Prova passada ou sem data não passa à frente de uma prova marcada.
-    expect(order).toContain("when opportunity.exam_date >= (now() at time zone 'America/Sao_Paulo')::date");
-    expect(order).toContain("select requirement.subject_id is null from opportunity_requirements requirement");
-    expect(order).toContain(") nulls last,\n          created_at,job_key for update skip locked limit 1");
-    // Payload sem edital numérico não quebra a reserva com erro de conversão.
-    expect(order).toContain("work.payload->>'opportunityId' ~ '^[0-9]{1,18}$'");
-    expect(claim.params.filter((param) => param instanceof Date)).toEqual([]);
+    // Faixa por edital calculada uma vez: com 1.300 tarefas a versão por tarefa levava 50 s.
+    expect(claim.sql).toContain("with opportunity_tier as (");
+    expect(claim.sql).toContain("product.status = 'released'\n          ) then 2");
+    expect(claim.sql).toContain("::date + 14");
+    expect(claim.sql).toContain("question.editorial_status <> 'suspended'\n            ) >= 68 then 1");
+    // O requisito sai da chave da tarefa; o payload (artigos candidatos) não é lido.
+    expect(claim.sql).toContain("work.job_key ~ '^(mapping|author):[0-9]{1,18}$' then split_part(work.job_key, ':', 2)::bigint");
+    expect(claim.sql).not.toContain("payload->>'opportunityId'");
+    expect(claim.sql).not.toContain("payload->>'requirementId'");
     // O teto é compartilhado: produto liberado espera enquanto a faixa 0 tem tarefa.
-    const filter = claim.sql.slice(claim.sql.indexOf("select job_key from editorial_agent_work work"), claim.sql.indexOf("order by"));
-    expect(filter).toContain("not (\n    coalesce(");
-    expect(filter).toContain(", 0) = 2\n    and exists (\n      select 1 from editorial_agent_work other");
-    expect(filter).toContain("other.payload->>'opportunityId'");
+    expect(claim.sql).toContain("not (coalesce(tier.tier, 0) = 2 and (select value from unsold_waiting))");
+    const order = claim.sql.slice(claim.sql.indexOf("order by"));
+    expect(order).toContain("tier.tier nulls first, tier.upcoming_exam nulls last");
+    expect(order).toContain("(requirement.subject_id is null) nulls last");
+    expect(order).toContain("work.created_at,work.job_key for update of work skip locked limit 1");
+    expect(claim.params.filter((param) => param instanceof Date)).toEqual([]);
   });
 
   it("encerra, antes de cada ciclo, tarefas de requisito retirado ou suspenso", async () => {
