@@ -3,6 +3,18 @@
 Documento de contexto para quem for continuar o projeto — pessoa ou assistente de IA.
 Descreve onde as coisas estão, como publicar e quais armadilhas já custaram tempo.
 
+**Biblioteca legal de 9 para 45 leis (03/10/2026, madrugada BRT):** autorização
+geral do proprietário ("autorize tudo"), que não vale como revisão de questões ou
+vínculos. `8ebbf21` registrou 36 leis federais dos editais abertos (norma e data pela
+API do Senado, URN do registro da norma, página do Planalto aberta pela VPS) e criou
+`pnpm legal:laws:load [--apply] lei=<slug>` (`LEGAL_LOAD_REFERENCE`), com os mesmos
+passos e registros de /admin/fontes-oficiais e conferência da contagem de artigos.
+Carga aplicada com `owner-authorization-2026-10-03:special-laws`: 36 leis e cerca
+de 3.276 artigos; a biblioteca ficou com 45 leis e 9.545 artigos. Sem compilação em
+texto no Senado: LGPD, Lei 12.737/2012 e Lei 14.133/2021. `4f96485` faz o Guardião
+mapear antes, dentro do mesmo edital, os requisitos de matéria conhecida. Mac com
+`caffeinate` destacado por 24 h.
+
 **Editais aprovados, programa extraído dos 12 concursos e fila focada (02/10/2026, 21h BRT):**
 decisões do proprietário em 02/10: aprovar por ele os editais capturados (só a versão
 consolidada; mais as retificações de programa de TCE-MA e SEFAZ-AL), teto dos agentes
