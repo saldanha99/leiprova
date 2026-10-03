@@ -3,6 +3,28 @@
 Documento de contexto para quem for continuar o projeto — pessoa ou assistente de IA.
 Descreve onde as coisas estão, como publicar e quais armadilhas já custaram tempo.
 
+**Prova anterior de outra banca (TJ-RS) e reserva dos agentes destravada (03/10/2026, madrugada BRT):**
+`303ff6c` aplica a decisão de 02/10: a prova anterior é a última do mesmo órgão,
+cargo, especialidade e jurisdição, mesmo de outra banca, com a banca na página; a
+banca do edital atual continua exigida. Vale na conferência do vínculo, na busca da
+edição mais nova, na regra de venda e na página pública. A migração `0045` criou a
+FAURGS só como banca de prova anterior (os filtros de estudo leem a lista do código) e
+o registro de provas ganhou o portal dela (robots bloqueia só /emails e /templates).
+TJ-RS ← FAURGS 2022 (Edital 61/2019, prova em 16/01/2022): caderno da prova objetiva e
+Edital nº 43/2022, com o gabarito definitivo após os recursos (9 anuladas, a 33 mudou
+para A), achados com o agent-browser em `portalfaurgs.com.br` e aprovados com
+`owner-decision-2026-10-02:other-bank-previous-exam`. A página do edital mostra
+"aplicada em 16 de janeiro de 2022 pela FAURGS". Agora 9 dos 13 editais abertos têm
+prova anterior; seguem sem: TCE-MA (FCC 2005, robots proíbe baixar PDFs), SEAP-MA
+(FUNCAB, extinta) e PC-PR (prova em 11/10).
+
+Depois da carga das leis, os agentes ficaram mais de uma hora devolvendo
+`idle_or_budget`: a reserva calculava a faixa de cada tarefa com subconsultas,
+comparava todas as tarefas entre si e lia o payload (com os artigos) de cada uma;
+com 1.300 tarefas levava 50 s. `78bb9d4` calcula a faixa uma vez por edital, testa
+uma vez se há tarefa da faixa 0 e tira o requisito da chave da tarefa
+(`mapping:<id>`, `author:<id>`): 22 ms na produção, com as mesmas escolhas.
+
 **Biblioteca legal de 9 para 45 leis (03/10/2026, madrugada BRT):** autorização
 geral do proprietário ("autorize tudo"), que não vale como revisão de questões ou
 vínculos. `8ebbf21` registrou 36 leis federais dos editais abertos (norma e data pela
