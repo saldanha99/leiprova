@@ -19,6 +19,7 @@
     "commerce:product:release": "tsx --env-file-if-exists=.env scripts/release-contest-product.ts",
     "editorial:notices:approve": "tsx --env-file-if-exists=.env scripts/approve-notice-snapshots.ts",
     "legal:sources:check": "tsx --env-file-if-exists=.env scripts/check-official-sources.ts",
+    "legal:laws:load": "tsx --env-file-if-exists=.env scripts/load-official-laws.ts",
     "opportunities:sources:check": "tsx --env-file-if-exists=.env scripts/check-open-opportunities.ts",
     "opportunities:approve": "tsx --env-file-if-exists=.env scripts/approve-official-opportunities.ts",
     "editorial:automation": "tsx --env-file-if-exists=.env scripts/run-editorial-automation.ts",
