@@ -34,7 +34,9 @@ function productTier(alias: "work" | "other") {
 }
 
 /** Dentro do mesmo tipo, a faixa 0 vem primeiro, pela prova mais próxima;
- * prova passada ou sem data vai para o fim da sua faixa. */
+ * prova passada ou sem data vai para o fim da sua faixa. No mesmo edital, vem
+ * antes o requisito de matéria conhecida (penal, constitucional...), que a
+ * biblioteca de leis cobre; matéria sem lei carregada espera a biblioteca. */
 const PRODUCT_DEADLINE_ORDER = sql.raw(`${productTier("work")} nulls first,
   (
     select case when opportunity.exam_date >= (now() at time zone 'America/Sao_Paulo')::date
@@ -42,6 +44,11 @@ const PRODUCT_DEADLINE_ORDER = sql.raw(`${productTier("work")} nulls first,
     from contest_opportunities opportunity
     where opportunity.id = case when work.payload->>'opportunityId' ~ '^[0-9]{1,18}$'
       then (work.payload->>'opportunityId')::bigint end
+  ) nulls last,
+  (
+    select requirement.subject_id is null from opportunity_requirements requirement
+    where requirement.id = case when work.payload->>'requirementId' ~ '^[0-9]{1,18}$'
+      then (work.payload->>'requirementId')::bigint end
   ) nulls last`);
 
 /** O teto diário é compartilhado pelos três agentes: produto já liberado só

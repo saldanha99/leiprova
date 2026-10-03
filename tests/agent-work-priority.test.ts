@@ -35,6 +35,7 @@ describe("prioridade da fila dos agentes", () => {
     expect(order).toContain("else 0 end");
     // Prova passada ou sem data não passa à frente de uma prova marcada.
     expect(order).toContain("when opportunity.exam_date >= (now() at time zone 'America/Sao_Paulo')::date");
+    expect(order).toContain("select requirement.subject_id is null from opportunity_requirements requirement");
     expect(order).toContain(") nulls last,\n          created_at,job_key for update skip locked limit 1");
     // Payload sem edital numérico não quebra a reserva com erro de conversão.
     expect(order).toContain("work.payload->>'opportunityId' ~ '^[0-9]{1,18}$'");
