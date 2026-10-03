@@ -76,13 +76,17 @@ const validScope: ExamReferenceScope = {
 };
 
 describe("identidade da última prova por produto", () => {
-  it("aceita apenas o mesmo recorte de banca, cargo e especialidade", () => {
+  it("aceita apenas o mesmo órgão, cargo e especialidade, com a banca do edital confirmada", () => {
     expect(validateExamReferenceScope(validScope, "2026-09-12")).toEqual({
+      valid: true,
+    });
+    // Prova anterior de outra banca vale (decisão de 02/10/2026; TJ-RS: FAURGS antes da FGV).
+    expect(validateExamReferenceScope({ ...validScope, responsibleBankId: 3 }, "2026-09-12")).toEqual({
       valid: true,
     });
 
     for (const change of [
-      { responsibleBankId: 3 },
+      { responsibleBankId: null },
       { editionCareerTrackId: 7 },
       { editionSpecializationId: 10 },
       { editionIsOfficialSource: false },

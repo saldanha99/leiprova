@@ -195,7 +195,7 @@ export async function getApprovedContestExamReference(
             where assignment.opportunity_id = ${contestOpportunities.id}
               and assignment.status = 'reviewed'
               and assignment.valid_until is null
-              and assignment.quiz_bank_id = ${examEditions.bankId}
+              and assignment.quiz_bank_id is not null
               and (
                 assignment.role = 'examination_provider'
                 or (
@@ -215,7 +215,6 @@ export async function getApprovedContestExamReference(
             select 1
             from exam_editions newer_edition
             where newer_edition.id <> ${examEditions.id}
-              and newer_edition.bank_id = ${examEditions.bankId}
               and newer_edition.career_track_id = ${examEditions.careerTrackId}
               and newer_edition.specialization_id is not distinct from ${examEditions.specializationId}
               and newer_edition.institution_acronym = ${examEditions.institutionAcronym}

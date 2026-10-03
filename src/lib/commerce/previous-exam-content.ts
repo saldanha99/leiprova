@@ -89,7 +89,7 @@ function exactHistoricalScopeConditions() {
       where assignment.opportunity_id = opportunity.id
         and assignment.status = 'reviewed'
         and assignment.valid_until is null
-        and assignment.quiz_bank_id = exam_edition.bank_id
+        and assignment.quiz_bank_id is not null
         and (
           assignment.role = 'examination_provider'
           or (
@@ -109,7 +109,6 @@ function exactHistoricalScopeConditions() {
       select 1
       from exam_editions newer_edition
       where newer_edition.id <> exam_edition.id
-        and newer_edition.bank_id = exam_edition.bank_id
         and newer_edition.career_track_id = exam_edition.career_track_id
         and newer_edition.specialization_id is not distinct from exam_edition.specialization_id
         and newer_edition.institution_acronym = exam_edition.institution_acronym

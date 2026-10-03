@@ -67,6 +67,10 @@ describe("conteúdo real licenciado por produto", () => {
     );
     expect(query.sql).toContain("exam_bank.is_active = true");
     expect(query.sql).toContain("assignment.role = 'examination_provider'");
+    // Outra banca vale (decisão de 02/10/2026), mas a banca do edital atual precisa estar confirmada.
+    expect(query.sql).toContain("assignment.quiz_bank_id is not null");
+    expect(query.sql).not.toContain("assignment.quiz_bank_id = exam_edition.bank_id");
+    expect(query.sql).not.toContain("newer_edition.bank_id");
     expect(query.sql).toContain("from exam_editions newer_edition");
     expect(query.sql).toContain("newer_edition.exam_date = exam_edition.exam_date");
     expect(query.sql).toContain("newer_edition.id > exam_edition.id");

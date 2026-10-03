@@ -316,6 +316,13 @@
       "when": 1790868427788,
       "tag": "0044_exam_document_link_verified",
       "breakpoints": true
+    },
+    {
+      "idx": 45,
+      "version": "7",
+      "when": 1790990175184,
+      "tag": "0045_register_faurgs_bank",
+      "breakpoints": true
     }
   ]
 }

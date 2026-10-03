@@ -15,8 +15,8 @@ const historical: readonly AvailableExamEdition[] = AVAILABLE_REAL_EXAM_EDITIONS
 );
 
 describe("carga de dados reais disponíveis", () => {
-  it("mantém treze edições atuais vinculáveis e vinte e quatro históricas oficiais", () => {
-    expect(validateAvailableRealExamEditions()).toHaveLength(37);
+  it("mantém treze edições atuais vinculáveis e vinte e cinco históricas oficiais", () => {
+    expect(validateAvailableRealExamEditions()).toHaveLength(38);
 
     const scheduled: readonly AvailableExamEdition[] = AVAILABLE_REAL_EXAM_EDITIONS.filter(
       (edition) => edition.status === "scheduled",
@@ -39,7 +39,7 @@ describe("carga de dados reais disponíveis", () => {
       ["tc-df-analista-2026", "2026-11-22"],
     ]);
     expect(scheduled.every((edition) => edition.opportunitySlug && edition.productSlugs?.length)).toBe(true);
-    expect(published).toHaveLength(24);
+    expect(published).toHaveLength(25);
     expect(published.every((edition) => edition.documents.length === 2)).toBe(true);
   });
 

@@ -21,8 +21,15 @@ export const OFFICIAL_EXAM_PORTALS = [
     officialUrl: "https://www.cebraspe.org.br/concursos/",
     allowedHosts: ["cebraspe.org.br", "www.cebraspe.org.br", "cdn.cebraspe.org.br"],
   },
+  // Só prova anterior (TJ-RS 2022). Robots conferido em 03/10/2026: bloqueia
+  // apenas /emails e /templates; arquivos em /LerArquivo/<id>.
+  {
+    bankSlug: "faurgs",
+    officialUrl: "https://portalfaurgs.com.br/concursosFaurgs/encerrados",
+    allowedHosts: ["portalfaurgs.com.br", "www.portalfaurgs.com.br"],
+  },
 ] as const satisfies readonly {
-  bankSlug: QuizBankSlug;
+  bankSlug: QuizBankSlug | "faurgs";
   officialUrl: string;
   allowedHosts: readonly string[];
 }[];

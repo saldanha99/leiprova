@@ -175,12 +175,10 @@ export function validateExamReferenceScope(
         "A prova anterior não pertence ao mesmo órgão e à mesma jurisdição do produto.",
     };
   }
-  if (scope.responsibleBankId !== scope.editionBankId) {
-    return {
-      valid: false,
-      reason: "A prova anterior não pertence à banca confirmada desta edição.",
-    };
-  }
+  // Decisão do proprietário em 02/10/2026: vale a última prova do mesmo órgão,
+  // cargo e jurisdição mesmo aplicada por outra banca (TJ-RS: FAURGS antes da
+  // FGV); a página mostra a banca da prova. A banca do edital atual continua
+  // exigida acima.
   if (
     scope.documentExamEditionId !== scope.editionId ||
     scope.documentType !== "question_booklet"

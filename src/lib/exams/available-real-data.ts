@@ -12,7 +12,7 @@ export type AvailableExamEdition = Readonly<{
   publicId: string;
   sourceExternalId: string;
   careerSlug: string;
-  bankSlug: "fgv" | "fcc" | "cebraspe";
+  bankSlug: "fgv" | "fcc" | "cebraspe" | "faurgs";
   // Validados em validateAvailableRealExamEditions contra as mesmas regras do banco.
   institutionAcronym: string;
   jurisdictionCode: string;
@@ -477,6 +477,40 @@ export const AVAILABLE_REAL_EXAM_EDITIONS = [
         title: "TC-DF 2023 — Analista Administrativo de Controle Externo — gabarito definitivo P3 (itens 81 a 150)",
         sourceUrl: "https://cdn.cebraspe.org.br/concursos/TC_DF_23/arquivos/GAB_DEFINITIVO_895_TCDF_001_01.PDF",
         fileName: "GAB_DEFINITIVO_895_TCDF_001_01.PDF",
+        expectedQuestionCount: null,
+      },
+    ],
+  },
+  // TJ-RS fez a última prova de juiz com a FAURGS (Edital 61/2019, aplicada em
+  // 16/01/2022); a edição 2026 é da FGV. Vale pela decisão de 02/10/2026. O
+  // gabarito definitivo saiu no Edital nº 43/2022, após os recursos.
+  {
+    publicId: "tj-rs-juiz-2022",
+    sourceExternalId: "127-612019",
+    careerSlug: "magistratura",
+    bankSlug: "faurgs",
+    institutionAcronym: "TJ-RS",
+    jurisdictionCode: "RS",
+    title: "TJ-RS 2022 — Juiz de Direito Substituto — prova objetiva",
+    organizer: "FAURGS",
+    jurisdiction: "Rio Grande do Sul",
+    officialUrl: "https://portalfaurgs.com.br/concursosFaurgs/encerrados/127-612019tribunaldejusticadoestadodoriograndedosul",
+    examDate: "2022-01-16",
+    durationMinutes: null,
+    status: "published",
+    documents: [
+      {
+        documentType: "question_booklet",
+        title: "TJ-RS 2022 — Juiz de Direito Substituto — caderno da prova objetiva",
+        sourceUrl: "https://portalfaurgs.com.br/LerArquivo/6a4df8bd-ebc4-4bcb-be50-a574cc59277d",
+        fileName: "prova-objetiva-juiz-de-direito-substituto.pdf",
+        expectedQuestionCount: 100,
+      },
+      {
+        documentType: "answer_key",
+        title: "TJ-RS 2022 — Juiz de Direito Substituto — gabarito definitivo (Edital nº 43/2022)",
+        sourceUrl: "https://portalfaurgs.com.br/LerArquivo/d41f6110-ba74-4c1c-959a-27e385c63382",
+        fileName: "edital-43-2022-gabarito-definitivo.pdf",
         expectedQuestionCount: null,
       },
     ],
