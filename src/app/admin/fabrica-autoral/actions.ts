@@ -426,6 +426,10 @@ export async function claimGeneratedDraftBatchAction(
   const parsed = generatedDraftBatchClaimSchema.safeParse({
     cleanRoomAttestation: formData.get("cleanRoomAttestation") === "on",
   });
+  const contestSlug = String(formData.get("opportunitySlug") ?? "").trim();
+  if (contestSlug && !/^[a-z0-9]+(?:-[a-z0-9]+)*$/u.test(contestSlug)) {
+    return errorState("Concurso inválido para o lote.");
+  }
 
   if (!parsed.success) {
     return errorState(parsed.error.issues[0]?.message ?? "Confirme a declaração editorial do lote.");
@@ -464,6 +468,14 @@ export async function claimGeneratedDraftBatchAction(
         eq(questions.quizMode, "original_style"),
         eq(questions.editorialStatus, "draft"),
         isNull(questions.createdByUserId),
+        // Com concurso escolhido na fila, o lote leva só os rascunhos daquele edital.
+        contestSlug
+          ? sql`${questions.id} in (
+              select link.question_id from question_opportunities link
+              join contest_opportunities opportunity on opportunity.id = link.opportunity_id
+              where opportunity.slug = ${contestSlug}
+            )`
+          : undefined,
       ),
     )
     .orderBy(questions.createdAt, questions.id)

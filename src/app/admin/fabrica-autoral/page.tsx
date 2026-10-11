@@ -21,7 +21,9 @@ import {
 import { ClaimDraftControls } from "@/components/admin/claim-draft-controls";
 import { ReviewControls } from "@/components/admin/review-controls";
 import { requireAdmin } from "@/lib/auth";
-import { getEditorialFactorySnapshot } from "@/lib/db/editorial-admin";
+import Link from "next/link";
+
+import { getEditorialFactorySnapshot, listEditorialContests } from "@/lib/db/editorial-admin";
 
 const numberFormatter = new Intl.NumberFormat("pt-BR");
 const dateFormatter = new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeStyle: "short" });
@@ -41,9 +43,17 @@ const statusClasses: Record<string, string> = {
   draft: "border-white/10 bg-white/5 text-slate-300",
 };
 
-export default async function EditorialFactoryPage() {
+export default async function EditorialFactoryPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ concurso?: string | string[] }>;
+}) {
   await requireAdmin();
-  const snapshot = await getEditorialFactorySnapshot();
+  const query = await searchParams;
+  const contests = await listEditorialContests();
+  // Só aceita concurso que existe na lista; valor estranho volta para a fila geral.
+  const selectedContest = contests.find((contest) => contest.slug === query.concurso) ?? null;
+  const snapshot = await getEditorialFactorySnapshot({ opportunitySlug: selectedContest?.slug });
 
   const metrics = [
     { label: "Autorais registradas", value: snapshot.metrics.total, icon: Fingerprint, tone: "text-sky-300 bg-sky-300/10" },
@@ -118,7 +128,41 @@ export default async function EditorialFactoryPage() {
         </section>
       ) : null}
 
-      <BatchClaimControls claimableCount={snapshot.metrics.claimable} />
+      <nav aria-label="Revisar por concurso" className="mt-5 rounded-[1.5rem] border border-white/10 bg-[#09131f]/95 p-5">
+        <h2 className="text-sm font-extrabold uppercase tracking-[.14em] text-sky-300">Revisar por concurso</h2>
+        <p className="mt-1 text-xs leading-5 text-slate-400">
+          Cada concurso vende com 68 questões revisadas e vinculadas. Escolha um para ver só o que falta revisar dele.
+        </p>
+        <ul className="mt-3 flex flex-wrap gap-2">
+          <li>
+            <Link
+              href="/admin/fabrica-autoral"
+              className={`inline-flex min-h-10 items-center rounded-xl border px-3 text-xs font-bold ${selectedContest ? "border-white/10 text-slate-300" : "border-sky-300/40 bg-sky-300/10 text-sky-100"}`}
+            >
+              Fila geral
+            </Link>
+          </li>
+          {contests.map((contest) => (
+            <li key={contest.slug}>
+              <Link
+                href={`/admin/fabrica-autoral?concurso=${contest.slug}`}
+                className={`inline-flex min-h-10 flex-col justify-center rounded-xl border px-3 py-1.5 text-xs ${selectedContest?.slug === contest.slug ? "border-sky-300/40 bg-sky-300/10 text-sky-100" : "border-white/10 text-slate-300"}`}
+              >
+                <span className="font-bold">{contest.title}</span>
+                <span className="text-[11px] text-slate-400">
+                  {numberFormatter.format(contest.drafts)} rascunhos · {numberFormatter.format(contest.pending)} na fila ·{" "}
+                  {numberFormatter.format(contest.reviewed)} revisadas
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      <BatchClaimControls
+        claimableCount={selectedContest ? snapshot.queue.filter((item) => item.editorialStatus === "draft" && !item.creatorUserId).length : snapshot.metrics.claimable}
+        opportunitySlug={selectedContest?.slug}
+      />
 
       <section className="mt-5" aria-labelledby="profiles-title">
         <div className="mb-3">

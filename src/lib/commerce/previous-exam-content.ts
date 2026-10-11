@@ -253,6 +253,21 @@ export function approvedProductPreviousExamReferenceExists(
   )`;
 }
 
+/** Requisito de prova anterior da venda: vínculo oficial aprovado ou dispensa
+ * registrada pelo proprietário para o produto exato (órgão sem prova anterior em
+ * fonte oficial; a página mostra o motivo). */
+export function productPreviousExamRequirementMet(
+  productSlug: SQLWrapper,
+  opportunityId?: SQLWrapper,
+  coverageEndsAt: SQLWrapper = sql`current_timestamp`,
+) {
+  return sql<boolean>`(${approvedProductPreviousExamReferenceExists(productSlug, opportunityId, coverageEndsAt)}
+    or exists (
+      select 1 from contest_product_previous_exam_waivers waiver
+      where waiver.product_slug = ${productSlug}
+    ))`;
+}
+
 function qualifiedPreviousQuestionConditions(coverageEndsAt: SQLWrapper) {
   return sql`
     and exam_edition.source_policy = 'licensed_content'

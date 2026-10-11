@@ -17,6 +17,7 @@
     "content:feed:real": "tsx --env-file-if-exists=.env scripts/feed-available-real-data.ts",
     "exams:links:approve": "tsx --env-file-if-exists=.env scripts/approve-previous-exam-links.ts",
     "commerce:product:release": "tsx --env-file-if-exists=.env scripts/release-contest-product.ts",
+    "commerce:previous-exam:waive": "tsx --env-file-if-exists=.env scripts/waive-previous-exam.ts",
     "editorial:notices:approve": "tsx --env-file-if-exists=.env scripts/approve-notice-snapshots.ts",
     "legal:sources:check": "tsx --env-file-if-exists=.env scripts/check-official-sources.ts",
     "legal:laws:load": "tsx --env-file-if-exists=.env scripts/load-official-laws.ts",

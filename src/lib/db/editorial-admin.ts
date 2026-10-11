@@ -1,6 +1,6 @@
 import "server-only";
 
-import { and, desc, eq, sql } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
 import { getDb } from "@/lib/db/client";
@@ -63,10 +63,52 @@ export function toQuestionDossier(
   };
 }
 
-export async function getEditorialFactorySnapshot() {
+/** Questões ligadas ao edital (question_opportunities), para revisar por concurso. */
+function questionsOfContest(opportunitySlug: string) {
+  return sql`${questions.id} in (
+    select link.question_id from question_opportunities link
+    join contest_opportunities opportunity on opportunity.id = link.opportunity_id
+    where opportunity.slug = ${opportunitySlug}
+  )`;
+}
+
+/** Concursos com inéditas da fábrica, com o que falta revisar em cada um. */
+export async function listEditorialContests() {
+  return getDb().execute<{
+    slug: string;
+    title: string;
+    examDate: string | null;
+    drafts: number;
+    pending: number;
+    reviewed: number;
+  }>(sql`
+    select opportunity.slug, opportunity.title, opportunity.exam_date::text as "examDate",
+      count(*) filter (where question.editorial_status = 'draft')::int as drafts,
+      count(*) filter (where question.editorial_status = 'pending_review')::int as pending,
+      count(*) filter (where question.editorial_status = 'reviewed')::int as reviewed
+    from question_opportunities link
+    join contest_opportunities opportunity on opportunity.id = link.opportunity_id
+    join questions question on question.id = link.question_id
+    where question.quiz_mode = 'original_style'
+    group by opportunity.slug, opportunity.title, opportunity.exam_date
+    order by opportunity.exam_date nulls last, opportunity.slug
+  `);
+}
+
+export async function getEditorialFactorySnapshot(filter: { opportunitySlug?: string } = {}) {
   const db = getDb();
   const creator = alias(users, "question_creator");
   const reviewer = alias(users, "question_reviewer");
+  // Com concurso escolhido, a fila mostra só o que falta revisar dele, na ordem
+  // em que o Autor escreveu; sem filtro, segue a fila geral mais recente.
+  const contest = filter.opportunitySlug;
+  const queueWhere = contest
+    ? and(
+        eq(questions.quizMode, "original_style"),
+        inArray(questions.editorialStatus, ["draft", "pending_review"]),
+        questionsOfContest(contest),
+      )
+    : eq(questions.quizMode, "original_style");
 
   const [profiles, articles, subjects, topics, queueRows, optionRows, metricRows] = await Promise.all([
     db
@@ -160,8 +202,8 @@ export async function getEditorialFactorySnapshot() {
       .leftJoin(quizTopics, eq(questions.topicId, quizTopics.id))
       .leftJoin(creator, eq(questions.createdByUserId, creator.id))
       .leftJoin(reviewer, eq(questions.reviewedByUserId, reviewer.id))
-      .where(eq(questions.quizMode, "original_style"))
-      .orderBy(desc(questions.createdAt))
+      .where(queueWhere)
+      .orderBy(contest ? asc(questions.createdAt) : desc(questions.createdAt))
       .limit(EDITORIAL_BATCH_LIMIT),
     db
       .select({
@@ -174,8 +216,8 @@ export async function getEditorialFactorySnapshot() {
       })
       .from(questionOptions)
       .innerJoin(questions, eq(questionOptions.questionId, questions.id))
-      .where(eq(questions.quizMode, "original_style"))
-      .orderBy(desc(questions.createdAt), questionOptions.sortOrder)
+      .where(queueWhere)
+      .orderBy(contest ? asc(questions.createdAt) : desc(questions.createdAt), questionOptions.sortOrder)
       .limit(EDITORIAL_BATCH_LIMIT * 5),
     db
       .select({

@@ -19,6 +19,7 @@ import { getDb } from "@/lib/db/client";
 import {
   contestOpportunities,
   contestProductExamReferences,
+  contestProductPreviousExamWaivers,
   contestStoreProducts,
   examEditionDocuments,
   examEditions,
@@ -305,3 +306,22 @@ export async function getContestProductSlugForOpportunity(
 }
 
 export type { PublicContestExamReference };
+
+/** Motivo registrado pelo proprietário quando o produto vende sem prova anterior
+ * (órgão sem prova anterior em fonte oficial). A página mostra o motivo ao aluno. */
+export async function getPreviousExamWaiverReason(productSlug: string): Promise<string | null> {
+  const normalizedProductSlug = productSlug.trim();
+  if (!normalizedProductSlug) return null;
+  try {
+    const [row] = await getDb()
+      .select({ reason: contestProductPreviousExamWaivers.reason })
+      .from(contestProductPreviousExamWaivers)
+      .where(eq(contestProductPreviousExamWaivers.productSlug, normalizedProductSlug))
+      .limit(1);
+    return row?.reason ?? null;
+  } catch (error) {
+    // Código publicado antes da migração não expõe estado parcial.
+    if (isExamReferenceCatalogUnavailable(error)) return null;
+    throw error;
+  }
+}

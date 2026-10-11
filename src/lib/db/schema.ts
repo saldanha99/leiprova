@@ -1015,6 +1015,35 @@ export const examLicenseRequests = pgTable(
   ],
 );
 
+/** Venda sem prova anterior só com dispensa do proprietário para o produto exato,
+ * quando o órgão não tem prova anterior em fonte oficial (decisão de 11/10/2026:
+ * TCE-MA e SEAP-MA). A página mostra o motivo ao aluno. */
+export const contestProductPreviousExamWaivers = pgTable(
+  "contest_product_previous_exam_waivers",
+  {
+    productSlug: text("product_slug")
+      .primaryKey()
+      .references(() => contestStoreProducts.slug, { onDelete: "restrict" }),
+    reason: text("reason").notNull(),
+    approvalReference: text("approval_reference").notNull(),
+    decidedByUserId: bigint("decided_by_user_id", { mode: "number" })
+      .notNull()
+      .references(() => users.id, { onDelete: "restrict" }),
+    decidedAt: timestamp("decided_at", { withTimezone: true }).notNull().defaultNow(),
+    ...timestamps,
+  },
+  (table) => [
+    check(
+      "contest_product_previous_exam_waivers_reason_check",
+      sql`char_length(btrim(${table.reason})) between 20 and 1000`,
+    ),
+    check(
+      "contest_product_previous_exam_waivers_reference_check",
+      sql`${table.approvalReference} ~ '^[a-z0-9][a-z0-9._:/-]{0,159}$'`,
+    ),
+  ],
+);
+
 export const contestProductExamReferences = pgTable(
   "contest_product_exam_references",
   {

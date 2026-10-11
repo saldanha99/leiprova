@@ -9,7 +9,7 @@ import {
 import { listReviewedContestOpportunities } from "@/lib/db/contest-opportunities";
 import { getCatalogContest } from "./catalog";
 import { minimumCourseContentSatisfied } from "./minimum-course-content";
-import { approvedProductPreviousExamReferenceExists } from "./previous-exam-content";
+import { productPreviousExamRequirementMet } from "./previous-exam-content";
 
 export const listReleasedContestProducts = cache(
   async function listReleasedContestProducts() {
@@ -35,7 +35,7 @@ export const listReleasedContestProducts = cache(
         and(
           eq(contestStoreProducts.status, "released"),
           minimumCourseContentSatisfied(contestStoreProducts.slug, contestStoreProducts.opportunityId),
-          approvedProductPreviousExamReferenceExists(
+          productPreviousExamRequirementMet(
             contestStoreProducts.slug,
             contestStoreProducts.opportunityId,
           ),
@@ -83,7 +83,7 @@ export async function hasSellableContestProductCoverage(
           contestStoreProducts.slug,
           contestStoreProducts.opportunityId,
         ),
-        approvedProductPreviousExamReferenceExists(
+        productPreviousExamRequirementMet(
           contestStoreProducts.slug,
           contestStoreProducts.opportunityId,
           sql`${coverageEndsAt.toISOString()}::timestamptz`,
@@ -116,7 +116,7 @@ export async function getMasterCatalogCoverageStatus(
           contestStoreProducts.slug,
           contestStoreProducts.opportunityId,
         )}
-        and ${approvedProductPreviousExamReferenceExists(
+        and ${productPreviousExamRequirementMet(
           contestStoreProducts.slug,
           contestStoreProducts.opportunityId,
           sql`${coverageEndsAt.toISOString()}::timestamptz`,

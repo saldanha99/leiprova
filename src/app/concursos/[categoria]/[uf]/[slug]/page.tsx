@@ -23,6 +23,7 @@ import {
 import {
   getApprovedContestExamReference,
   getContestProductSlugForOpportunity,
+  getPreviousExamWaiverReason,
 } from "@/lib/db/contest-exam-references";
 import { listReleasedContestProducts } from "@/lib/commerce/store";
 import {
@@ -206,6 +207,9 @@ export default async function ContestOpportunityPage({
   const lastExam = result.referenceProductSlug
     ? await getApprovedContestExamReference(result.referenceProductSlug)
     : null;
+  const previousExamWaiverReason = !lastExam && result.referenceProductSlug
+    ? await getPreviousExamWaiverReason(result.referenceProductSlug)
+    : null;
 
   const structuredData = {
     "@context": "https://schema.org",
@@ -259,6 +263,7 @@ export default async function ContestOpportunityPage({
         masterOpen={isMasterCommerceOpen()}
         contactOpen={isContactEnabled()}
         lastExam={lastExam}
+        previousExamWaiverReason={previousExamWaiverReason}
         productSlug={result.productSlug}
         productAvailable={Boolean(result.productSlug)}
       />

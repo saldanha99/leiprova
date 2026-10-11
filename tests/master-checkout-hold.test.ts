@@ -71,7 +71,8 @@ describe("Master fechado com a venda por concurso aberta (decisão de 28/09/2026
 describe("prova anterior na venda por concurso", () => {
   it("exige o link oficial aprovado em vez da prova licenciada importada", () => {
     const store = read("src/lib/commerce/store.ts");
-    expect(store.match(/approvedProductPreviousExamReferenceExists\(/gu)).toHaveLength(3);
+    // Prova anterior aprovada ou dispensa registrada (decisão de 11/10/2026).
+    expect(store.match(/productPreviousExamRequirementMet\(/gu)).toHaveLength(3);
     expect(store).not.toContain("licensedPreviousExamContentSatisfied");
     // A cobertura do período pago continua chegando até a checagem do link.
     expect(store).toContain("sql`${coverageEndsAt.toISOString()}::timestamptz`,\n        ),");

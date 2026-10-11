@@ -32,6 +32,7 @@ grant select on
   exam_edition_documents,
   exam_license_requests,
   contest_product_exam_references,
+  contest_product_previous_exam_waivers,
   exam_source_portals,
   contest_categories,
   contest_category_careers,

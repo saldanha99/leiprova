@@ -36,7 +36,7 @@ describe("liberação comercial de produto", () => {
       "67 de 68 questões aprovadas",
     ]);
     expect(releaseBlockers(slug, { ...enam, previousExamLinked: false }, "2026-09-28")).toEqual([
-      "sem prova anterior oficial aprovada",
+      "sem prova anterior oficial aprovada nem dispensa registrada",
     ]);
     expect(releaseBlockers(slug, { ...enam, stripeMode: "test" }, "2026-09-28")).toEqual([
       "produto e preços LIVE da Stripe incompletos",

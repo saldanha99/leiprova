@@ -41,6 +41,8 @@ type ContestLandingProps = {
   masterOpen?: boolean;
   contactOpen: boolean;
   lastExam?: PublicContestExamReference | null;
+  /** Produto vendido sem prova anterior por dispensa do proprietário. */
+  previousExamWaiverReason?: string | null;
   productSlug?: string;
   productAvailable?: boolean;
 };
@@ -52,6 +54,7 @@ export function ContestLanding({
   masterOpen = false,
   contactOpen,
   lastExam = null,
+  previousExamWaiverReason = null,
   productSlug,
   productAvailable = false,
 }: ContestLandingProps) {
@@ -260,6 +263,26 @@ export function ContestLanding({
           </div>
         </div>
       </section>
+
+      {!lastExam && previousExamWaiverReason && (
+        <section
+          id="ultima-prova"
+          className={`${styles.section} ${styles.lastExamSection}`}
+          aria-labelledby="ultima-prova-title"
+        >
+          <div className={`${styles.container} ${styles.lastExamCard}`}>
+            <div className={styles.lastExamIntro}>
+              <span className={styles.eyebrow}>PROVA ANTERIOR</span>
+              <h2 id="ultima-prova-title">Sem prova anterior oficial disponível.</h2>
+              <p>{previousExamWaiverReason}</p>
+              <p className={styles.lastExamNotice}>
+                O curso traz as questões inéditas revisadas sobre a lei cobrada neste edital. Se uma prova
+                anterior oficial ficar disponível, ela passa a aparecer aqui.
+              </p>
+            </div>
+          </div>
+        </section>
+      )}
 
       {lastExam && (
         <section

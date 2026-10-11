@@ -39,7 +39,13 @@ function Feedback({ state }: { state: EditorialActionState }) {
  * A atestação deixou de ser um campo oculto com valor fixo: quem envia precisa
  * marcar a caixa.
  */
-export function BatchClaimControls({ claimableCount }: { claimableCount: number }) {
+export function BatchClaimControls({
+  claimableCount,
+  opportunitySlug,
+}: {
+  claimableCount: number;
+  opportunitySlug?: string;
+}) {
   const [state, action, pending] = useActionState(claimGeneratedDraftBatchAction, initialState);
 
   if (claimableCount <= 0) return null;
@@ -50,6 +56,7 @@ export function BatchClaimControls({ claimableCount }: { claimableCount: number 
       aria-labelledby="batch-claim-title"
     >
       <form action={action} className="p-5 sm:p-6">
+        {opportunitySlug ? <input type="hidden" name="opportunitySlug" value={opportunitySlug} /> : null}
         <span className="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-[.14em] text-sky-300">
           <Files aria-hidden="true" className="size-4" />
           Enviar rascunhos à revisão

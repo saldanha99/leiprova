@@ -9,7 +9,7 @@ import {
   approvedProductQuestionCount,
   MINIMUM_COURSE_QUESTION_COUNT,
 } from "../src/lib/commerce/minimum-course-content";
-import { approvedProductPreviousExamReferenceExists } from "../src/lib/commerce/previous-exam-content";
+import { productPreviousExamRequirementMet } from "../src/lib/commerce/previous-exam-content";
 import {
   parseOpportunityApprovalReviewerIdentity,
   requireOpportunityApprovalDatabaseUrl,
@@ -80,7 +80,7 @@ export function releaseBlockers(slug: string, state: ProductState, todayIso: str
   if (state.questionCount < MINIMUM_COURSE_QUESTION_COUNT) {
     blockers.push(`${state.questionCount} de ${MINIMUM_COURSE_QUESTION_COUNT} questões aprovadas`);
   }
-  if (!state.previousExamLinked) blockers.push("sem prova anterior oficial aprovada");
+  if (!state.previousExamLinked) blockers.push("sem prova anterior oficial aprovada nem dispensa registrada");
   if (
     state.stripeMode !== "live" ||
     !state.stripeProductId ||
@@ -132,7 +132,7 @@ async function main() {
               opportunity.exam_date::text as "examDate",
               category.slug as "categorySlug",
               ${approvedProductQuestionCount(sql`product.slug`, sql`product.opportunity_id`)} as "questionCount",
-              ${approvedProductPreviousExamReferenceExists(sql`product.slug`, sql`product.opportunity_id`)} as "previousExamLinked"
+              ${productPreviousExamRequirementMet(sql`product.slug`, sql`product.opportunity_id`)} as "previousExamLinked"
             from contest_store_products product
             left join contest_opportunities opportunity on opportunity.id = product.opportunity_id
             left join contest_categories category on category.id = opportunity.category_id
