@@ -2159,6 +2159,27 @@ export const opportunityRequirements = pgTable(
   ],
 );
 
+/** Artigos adicionais que um item do programa cobre além do artigo principal do
+ * requisito. Um item como "inquérito policial" abrange vários artigos e, às
+ * vezes, mais de uma lei (decisão de 11/10/2026). Só a revisão do requisito
+ * grava o conjunto; o vínculo ao produto aceita o artigo principal ou um destes. */
+export const opportunityRequirementArticles = pgTable(
+  "opportunity_requirement_articles",
+  {
+    requirementId: bigint("requirement_id", { mode: "number" })
+      .notNull()
+      .references(() => opportunityRequirements.id, { onDelete: "cascade" }),
+    legalArticleId: bigint("legal_article_id", { mode: "number" })
+      .notNull()
+      .references(() => legalArticles.id, { onDelete: "restrict" }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.requirementId, table.legalArticleId] }),
+    index("opportunity_requirement_articles_article_idx").on(table.legalArticleId),
+  ],
+);
+
 export const opportunityAnalysisSnapshots = pgTable(
   "opportunity_analysis_snapshots",
   {

@@ -22,6 +22,7 @@ export type AuthoredQuestion = Readonly<{
   requirementText: string;
   requirementLocator: string;
   requirementArticleId: number | null;
+  coveredArticleIds: number[];
   opportunityPublicId: string;
   opportunitySlug: string;
   questionPublicId: string;
@@ -38,25 +39,16 @@ export function parseProposeArgs(argv: readonly string[]) {
   return { productSlug: product };
 }
 
-/** Um requisito aceita um único artigo (revisão de requisito exige unanimidade):
- * vale o artigo já mapeado no requisito ou, sem mapeamento, o que reúne mais
- * questões revisadas; empate fica com o menor id, para o pacote ser estável. */
+/** Um item do programa pode cobrir vários artigos (decisão de 11/10/2026): sem
+ * mapeamento, entram todas as questões escritas para ele e a revisão do requisito
+ * grava o conjunto. Requisito já mapeado só aceita o artigo principal e os
+ * adicionais gravados naquela revisão. Ordem estável por requisito e questão. */
 export function selectBindableQuestions(rows: readonly AuthoredQuestion[]) {
-  const byRequirement = new Map<number, AuthoredQuestion[]>();
-  for (const row of rows) byRequirement.set(row.requirementId, [...(byRequirement.get(row.requirementId) ?? []), row]);
-  const selected: AuthoredQuestion[] = [];
-  for (const [, items] of [...byRequirement].sort(([left], [right]) => left - right)) {
-    const counts = new Map<number, number>();
-    for (const item of items) counts.set(item.legalArticleId, (counts.get(item.legalArticleId) ?? 0) + 1);
-    const article = items[0].requirementArticleId ??
-      [...counts].sort((left, right) => right[1] - left[1] || left[0] - right[0])[0][0];
-    selected.push(
-      ...items
-        .filter((item) => item.legalArticleId === article)
-        .sort((left, right) => left.questionPublicId.localeCompare(right.questionPublicId)),
-    );
-  }
-  return selected;
+  return rows
+    .filter((row) => row.requirementArticleId === null ||
+      row.legalArticleId === row.requirementArticleId || row.coveredArticleIds.includes(row.legalArticleId))
+    .toSorted((left, right) =>
+      left.requirementId - right.requirementId || left.questionPublicId.localeCompare(right.questionPublicId));
 }
 
 export function buildProposalPackage(productSlug: string, rows: readonly AuthoredQuestion[]) {
@@ -97,6 +89,8 @@ async function main() {
           requirement.requirement_text as "requirementText",
           requirement.source_locator as "requirementLocator",
           requirement.legal_article_id::int as "requirementArticleId",
+          array(select covered.legal_article_id::int from opportunity_requirement_articles covered
+            where covered.requirement_id = requirement.id order by 1) as "coveredArticleIds",
           opportunity.public_id as "opportunityPublicId",
           opportunity.slug as "opportunitySlug",
           question.public_id as "questionPublicId",

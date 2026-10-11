@@ -46,7 +46,14 @@ async function prepare(transaction: Transaction, item: Proposal, actorUserId: nu
       legal.article.sourceRights !== "official_text" || !containsVerbatimQuote(legal.article.literalText, item.legalQuote)) {
     throw new ProductBindingError("A citação legal exige texto oficial vigente, revisado e correspondente ao artigo da questão.");
   }
-  if ((requirement.legalArticleId !== null && requirement.legalArticleId !== legal.article.id) ||
+  // Requisito já revisado aceita o artigo principal ou um dos adicionais da revisão.
+  const articleCovered = requirement.legalArticleId === null || requirement.legalArticleId === legal.article.id ||
+    (await transaction.select({ id: schema.opportunityRequirementArticles.legalArticleId })
+      .from(schema.opportunityRequirementArticles).where(and(
+        eq(schema.opportunityRequirementArticles.requirementId, requirement.id),
+        eq(schema.opportunityRequirementArticles.legalArticleId, legal.article.id),
+      ))).length > 0;
+  if (!articleCovered ||
       (requirement.subjectId !== null && requirement.subjectId !== question.subjectId) ||
       (requirement.topicId !== null && requirement.topicId !== question.topicId)) {
     throw new ProductBindingError("O requisito já foi mapeado para artigo, disciplina ou tópico diferente. Não será remapeado implicitamente.");

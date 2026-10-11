@@ -19,7 +19,9 @@ function exactEditionRequirementExists(examEditionId: number | SQLWrapper) {
     select 1 from question_opportunities link
     join contest_opportunities opportunity on opportunity.id = link.opportunity_id
     join opportunity_requirements requirement on requirement.opportunity_id = opportunity.id
-      and requirement.legal_article_id = ${questions.legalArticleId}
+      and (requirement.legal_article_id = ${questions.legalArticleId} or exists (
+        select 1 from opportunity_requirement_articles covered
+        where covered.requirement_id = requirement.id and covered.legal_article_id = ${questions.legalArticleId}))
       and requirement.subject_id = ${questions.subjectId}
       and requirement.editorial_status = 'reviewed'
     join opportunity_source_documents source on source.id = requirement.source_document_id

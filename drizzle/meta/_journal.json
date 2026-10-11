@@ -330,6 +330,13 @@
       "when": 1791757176510,
       "tag": "0046_previous_exam_waivers",
       "breakpoints": true
+    },
+    {
+      "idx": 47,
+      "version": "7",
+      "when": 1791760359229,
+      "tag": "0047_requirement_articles",
+      "breakpoints": true
     }
   ]
 }

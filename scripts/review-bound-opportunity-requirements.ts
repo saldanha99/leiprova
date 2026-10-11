@@ -20,6 +20,7 @@ type Candidate = Readonly<{
   topicIds: number[];
   legalArticleIds: number[];
   legalActIds: number[];
+  primaryArticleId: number;
   proposalCount: number;
   questionCount: number;
   contextValid: boolean;
@@ -123,6 +124,8 @@ async function loadCandidates(query: Query, opportunitySlug: string) {
       array_agg(distinct question.topic_id::integer order by question.topic_id::integer) as "topicIds",
       array_agg(distinct binding.legal_article_id::integer order by binding.legal_article_id::integer) as "legalArticleIds",
       array_agg(distinct version.legal_act_id::integer order by version.legal_act_id::integer) as "legalActIds",
+      -- Artigo principal: o que reúne mais propostas; empate fica com o menor id.
+      mode() within group (order by binding.legal_article_id::integer) as "primaryArticleId",
       count(binding.id)::integer as "proposalCount",
       count(distinct binding.question_id)::integer as "questionCount",
       bool_and(
@@ -168,13 +171,16 @@ function validateCandidates(candidates: readonly Candidate[]) {
       !candidate.sourceSnapshotId ||
       candidate.subjectIds.length !== 1 ||
       candidate.topicIds.length !== 1 ||
-      candidate.legalArticleIds.length !== 1 ||
-      candidate.legalActIds.length !== 1 ||
+      // Um item do programa pode cobrir vários artigos e leis (decisão de 11/10/2026);
+      // matéria e tópico continuam únicos.
+      candidate.legalArticleIds.length < 1 ||
+      !candidate.legalArticleIds.includes(candidate.primaryArticleId) ||
+      candidate.legalActIds.length < 1 ||
       candidate.proposalCount < 1 ||
       candidate.questionCount < 1
     ) {
       throw new RequirementReviewError(
-        `O requisito ${candidate.id} não possui contexto oficial, revisado e unânime.`,
+        `O requisito ${candidate.id} não possui contexto oficial, revisado e com matéria única.`,
       );
     }
   }
@@ -272,8 +278,12 @@ async function main() {
           update opportunity_requirements set
             subject_id=${candidate.subjectIds[0]},
             topic_id=${candidate.topicIds[0]},
-            legal_act_id=${candidate.legalActIds[0]},
-            legal_article_id=${candidate.legalArticleIds[0]},
+            legal_act_id=(
+              select version.legal_act_id from legal_articles article
+              join legal_versions version on version.id=article.legal_version_id
+              where article.id=${candidate.primaryArticleId}
+            ),
+            legal_article_id=${candidate.primaryArticleId},
             editorial_status='reviewed',
             created_by_user_id=${actor.id},
             reviewed_by_user_id=${actor.id},
@@ -286,12 +296,22 @@ async function main() {
         if (updated.length !== 1) {
           throw new RequirementReviewError("O requisito mudou antes da aprovação.");
         }
+        const extraArticleIds = candidate.legalArticleIds.filter((id) => id !== candidate.primaryArticleId);
+        if (extraArticleIds.length) {
+          await transaction`
+            insert into opportunity_requirement_articles(requirement_id,legal_article_id)
+            select ${candidate.id},unnest(${extraArticleIds}::bigint[])
+            on conflict do nothing
+          `;
+        }
         const mappedMetadata = JSON.stringify({
           subjectId: candidate.subjectIds[0],
           topicId: candidate.topicIds[0],
-          legalArticleId: candidate.legalArticleIds[0],
+          legalArticleId: candidate.primaryArticleId,
+          legalArticleIds: candidate.legalArticleIds,
+          legalActIds: candidate.legalActIds,
           proposalCount: candidate.proposalCount,
-          mappingBasis: "unanimous_reviewed_product_proposals",
+          mappingBasis: "reviewed_product_proposals_article_set",
           dossierFingerprint: operationFingerprint,
         });
         const reviewedMetadata = JSON.stringify({

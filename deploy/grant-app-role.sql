@@ -599,6 +599,9 @@ grant update (
   updated_at
 ) on opportunity_requirements to :app_user;
 
+-- Artigos adicionais de cada item do programa, gravados só na revisão do requisito.
+grant select, insert on opportunity_requirement_articles to :app_user;
+
 grant insert (
   public_id,
   opportunity_id,

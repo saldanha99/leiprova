@@ -30,7 +30,10 @@ export function approvedProductQuestionExists(
       and requirement.source_snapshot_id is not distinct from binding.source_snapshot_id
       and requirement.editorial_status = 'reviewed'
       and requirement.requirement_text = binding.requirement_text and requirement.source_locator = binding.source_locator
-      and requirement.legal_article_id = binding.legal_article_id
+      -- Artigo principal do requisito ou um dos adicionais gravados na revisão dele.
+      and (requirement.legal_article_id = binding.legal_article_id or exists (
+        select 1 from opportunity_requirement_articles covered
+        where covered.requirement_id = requirement.id and covered.legal_article_id = binding.legal_article_id))
       -- Tópico é filtro de estudo: requisito e questão precisam coincidir, inclusive
       -- os dois sem tópico (programa extraído do edital não traz tópico do catálogo).
       and requirement.subject_id = q.subject_id and requirement.topic_id is not distinct from q.topic_id

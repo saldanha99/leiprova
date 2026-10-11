@@ -11,12 +11,19 @@ import {
 
 const script = readFileSync(new URL("../scripts/propose-product-bindings.ts", import.meta.url), "utf8");
 
-function row(requirementId: number, questionPublicId: string, legalArticleId: number, requirementArticleId: number | null = null): AuthoredQuestion {
+function row(
+  requirementId: number,
+  questionPublicId: string,
+  legalArticleId: number,
+  requirementArticleId: number | null = null,
+  coveredArticleIds: number[] = [],
+): AuthoredQuestion {
   return {
     requirementId,
     requirementText: "Aplicação da lei penal. 1.1 Princípios.",
     requirementLocator: "Conteúdo programático, p. 64 · NOÇÕES DE DIREITO PENAL · item 1",
     requirementArticleId,
+    coveredArticleIds,
     opportunityPublicId: "11111111-1111-4111-8111-111111111111",
     opportunitySlug: "pc-ma-delegado-2026",
     questionPublicId,
@@ -38,17 +45,17 @@ describe("propostas de vínculo a partir das inéditas revisadas", () => {
     expect(script).not.toMatch(/\b(insert into|update |delete from)\b/iu);
   });
 
-  it("mantém um único artigo por requisito: o já mapeado ou o que reúne mais questões", () => {
+  it("leva todos os artigos do item sem mapeamento e só os revisados do item mapeado", () => {
     const selected = selectBindableQuestions([
-      row(10, "q-c", 7), row(10, "q-a", 5), row(10, "q-b", 5),
-      row(20, "q-d", 9, 8), row(20, "q-e", 8, 8),
       row(30, "q-f", 3), row(30, "q-g", 2),
+      row(10, "q-c", 7), row(10, "q-a", 5), row(10, "q-b", 5),
+      row(20, "q-d", 9, 8), row(20, "q-e", 8, 8), row(20, "q-h", 4, 8, [4]),
     ]);
     expect(selected.map((item) => [item.requirementId, item.questionPublicId])).toEqual([
-      [10, "q-a"], [10, "q-b"],
-      [20, "q-e"],
-      // Empate de 1 a 1: fica o menor id de artigo, para o pacote ser estável.
-      [30, "q-g"],
+      [10, "q-a"], [10, "q-b"], [10, "q-c"],
+      // Requisito 20 já revisado: artigo 8 (principal) e 4 (adicional); o 9 fica fora.
+      [20, "q-e"], [20, "q-h"],
+      [30, "q-f"], [30, "q-g"],
     ]);
   });
 

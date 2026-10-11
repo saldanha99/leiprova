@@ -53,7 +53,8 @@ describe("destinos isolados do importador de propostas", () => {
     // Programa extraído do edital não traz tópico; o vínculo se apoia em artigo, versão e citações.
     expect(query.sql).toContain("requirement.topic_id is not distinct from q.topic_id");
     expect(query.sql).not.toContain("requirement.topic_id = q.topic_id");
-    expect(query.sql).toContain("requirement.legal_article_id = binding.legal_article_id");
+    expect(query.sql).toContain("requirement.legal_article_id = binding.legal_article_id or exists (");
+    expect(query.sql).toContain("covered.requirement_id = requirement.id and covered.legal_article_id = binding.legal_article_id");
     expect(query.sql).toContain("requirement.subject_id = q.subject_id");
     const service = readFileSync(new URL("../src/lib/commerce/product-binding-service.ts", import.meta.url), "utf8");
     expect(service).toContain('!requirement.legalArticleId || !requirement.subjectId) blockers.push("Requisito ainda exige mapeamento e revisão humana.")');
