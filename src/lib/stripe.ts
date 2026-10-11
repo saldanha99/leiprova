@@ -31,12 +31,13 @@ export function isContestCheckoutEnabled() {
 }
 
 /** O Master tem chave própria: por decisão do proprietário (28/09/2026) ele segue
- * fechado enquanto a assinatura por concurso abre com poucos concursos liberados. */
-export function isMasterCheckoutEnabled() {
-  return (
-    isCheckoutEnabled() &&
-    process.env.MASTER_CHECKOUT_ENABLED?.trim().toLowerCase() === "true"
-  );
+ * fechado enquanto a assinatura por concurso abre com poucos concursos liberados.
+ * "true" abre; "auto" abre sozinho quando houver concursos suficientes à venda
+ * (decisão de 11/10/2026, ver `@/lib/commerce/master-gate`); o resto fecha. */
+export function masterCheckoutMode(): "open" | "auto" | "closed" {
+  if (!isCheckoutEnabled()) return "closed";
+  const value = process.env.MASTER_CHECKOUT_ENABLED?.trim().toLowerCase();
+  return value === "true" ? "open" : value === "auto" ? "auto" : "closed";
 }
 
 export type CheckoutAvailability =
@@ -100,14 +101,6 @@ export function getCheckoutAvailability(
     return { available: false, reason: "webhook" };
 
   return { available: true, publishableKey, priceId };
-}
-
-/** Disponibilidade dos planos Master: a mesma checagem da venda, mais a chave própria. */
-export function getMasterCheckoutAvailability(
-  plan: Pick<PlanDefinition, "stripePriceEnv">,
-): CheckoutAvailability {
-  if (!isMasterCheckoutEnabled()) return { available: false, reason: "disabled" };
-  return getCheckoutAvailability(plan);
 }
 
 export function getStripeWebhookConfiguration() {

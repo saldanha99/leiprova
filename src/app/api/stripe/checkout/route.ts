@@ -13,12 +13,12 @@ import {
 } from "@/lib/db/schema";
 import { getPlan } from "@/lib/plans";
 import { accessEndsAt } from "@/lib/commerce/catalog";
+import { getMasterCheckoutAvailability } from "@/lib/commerce/master-gate";
 import {
   getMasterCatalogCoverageStatus,
   isMasterCatalogCoverageReady,
 } from "@/lib/commerce/store";
 import {
-  getMasterCheckoutAvailability,
   getPublicOrigin,
   getStripeClient,
   hasTrustedOrigin,
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
   const plan = getPlan(input.data.planSlug);
   if (!plan) return jsonError("Plano não encontrado.", 404);
 
-  const availability = getMasterCheckoutAvailability(plan);
+  const availability = await getMasterCheckoutAvailability(plan);
   if (!availability.available) {
     return jsonError("Os pagamentos estão temporariamente indisponíveis.", 503);
   }

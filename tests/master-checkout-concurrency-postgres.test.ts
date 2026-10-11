@@ -39,6 +39,10 @@ vi.mock("@/lib/stripe", () => ({
   getStripeClient: () => ({ checkout: { sessions: { create: mocks.create, retrieve: mocks.retrieve } },
     prices: { retrieve: mocks.price }, customers: { create: mocks.customer } }),
 }));
+vi.mock("@/lib/commerce/master-gate", () => ({
+  getMasterCheckoutAvailability: async (plan: { stripePriceEnv: string }) => ({ available: true,
+    priceId: plan.stripePriceEnv === "STRIPE_PRICE_RITMO" ? "price_ritmo" : "price_foco" }),
+}));
 import { POST } from "@/app/api/stripe/checkout/route";
 
 describe.skipIf(!db)("Master: duas abas e retry com reserva durável PostgreSQL", () => {

@@ -13,13 +13,13 @@ import {
   hashPassword,
   verifyPassword,
 } from "@/lib/auth";
+import { getMasterCheckoutAvailability } from "@/lib/commerce/master-gate";
 import { getDb, isDatabaseConfigured } from "@/lib/db/client";
 import { users } from "@/lib/db/schema";
 import { isRegistrationEnabled } from "@/lib/launch";
 import { PRIVACY_VERSION, TERMS_VERSION } from "@/lib/legal";
 import { getPlan } from "@/lib/plans";
 import { consumeRateLimits, getRequestIp } from "@/lib/rate-limit";
-import { getMasterCheckoutAvailability } from "@/lib/stripe";
 import { safeRedirectPath } from "@/lib/utils";
 
 export type AuthActionState = {
@@ -181,7 +181,7 @@ export async function beginPurchaseAction(
   if (!parsed.success) return { fieldErrors: mapFieldErrors(parsed.error) };
 
   const plan = getPlan(parsed.data.planSlug);
-  if (!plan || !getMasterCheckoutAvailability(plan).available) {
+  if (!plan || !(await getMasterCheckoutAvailability(plan)).available) {
     return { error: "Este plano ainda não está disponível para compra." };
   }
 

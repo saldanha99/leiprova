@@ -3,6 +3,17 @@
 Documento de contexto para quem for continuar o projeto — pessoa ou assistente de IA.
 Descreve onde as coisas estão, como publicar e quais armadilhas já custaram tempo.
 
+**Master abre sozinho com 3 concursos à venda (11/10/2026, 21h BRT):** decisão do
+proprietário ("Abrir com 3+ concursos"), para não cobrar R$ 297 pelo catálogo inteiro com
+um único concurso. `MASTER_CHECKOUT_ENABLED` aceita `auto` além de `true`/`false`: com
+`auto`, `src/lib/commerce/master-gate.ts` conta `listReleasedContestProducts()` (o mesmo
+filtro da loja) e abre o Master — home, cadastro com plano, página do concurso, carrinho,
+`/checkout/<plano>` e a API — a partir de 3 produtos à venda; com menos, ou se a contagem
+falhar, fica fechado. A cobertura do catálogo pelo período contratado continua conferida
+no checkout e no webhook. Produção passou a `auto` (backup do `.env` na VPS com o sufixo
+`.bak-master-auto-20261011`); hoje só o ENAM está à venda, então o Master segue fechado
+até o terceiro produto ser liberado.
+
 **"Vamos vender tudo": revisão por concurso e dispensa de prova anterior (11/10/2026, 19h30 BRT):**
 `d8b509b`: `/admin/fabrica-autoral` lista os concursos com inéditas da fábrica (rascunhos,
 na fila e revisadas) e, com `?concurso=<edital>`, mostra só o que falta revisar daquele
@@ -762,6 +773,7 @@ Tudo que é comercial fecha por padrão. Estado em produção na última verific
 | `CONTACT_ENABLED` | `false` | Formulário de contato fecha. |
 | `PRIVACY_REQUESTS_ENABLED` | `false` por padrão | Abre somente o formulário de direitos LGPD em `/privacidade`; não abre cadastro, contato comercial ou checkout. |
 | `CHECKOUT_ENABLED` | `false` | Sem chaves Stripe preenchidas. |
+| `MASTER_CHECKOUT_ENABLED` | `auto` (desde 11/10/2026) | `false` fecha o Master, `true` abre, `auto` abre sozinho com 3+ concursos à venda. |
 | `SUPPLIER_*` | vazias | Seis variáveis de identificação do fornecedor. Enquanto faltar qualquer uma, o checkout não abre — trava aplicada em `getCheckoutAvailability`, não em documentação. |
 | `STRIPE_CONNECT_ENABLED` | `true` | **Diverge do README**, que pede `false`. |
 | `STRIPE_CONNECT_ONBOARDING_ENABLED` | `true` | Idem. |

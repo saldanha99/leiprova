@@ -11,12 +11,12 @@ import {
   getCatalogContest,
   getContestAccessOption,
 } from "@/lib/commerce/catalog";
+import { isMasterCheckoutEnabled } from "@/lib/commerce/master-gate";
 import { listReleasedContestProducts } from "@/lib/commerce/store";
 import { isDatabaseConfigured } from "@/lib/db/client";
 import {
   getCheckoutAvailability,
   isContestCheckoutEnabled,
-  isMasterCheckoutEnabled,
 } from "@/lib/stripe";
 
 export default async function ContestCheckoutPage({
@@ -73,7 +73,7 @@ export default async function ContestCheckoutPage({
           available={available}
           publishableKey={available ? process.env.STRIPE_PUBLISHABLE_KEY : undefined}
           supplierIdentity={<SupplierIdentityBlock />}
-          masterOpen={isMasterCheckoutEnabled()}
+          masterOpen={await isMasterCheckoutEnabled()}
         />
       </div>
     </main>

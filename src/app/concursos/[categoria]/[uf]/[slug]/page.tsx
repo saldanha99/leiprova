@@ -10,11 +10,8 @@ import {
   getCatalogContest,
   contestTitle,
 } from "@/lib/commerce/catalog";
-import {
-  isCommerceOpen,
-  isContactEnabled,
-  isMasterCommerceOpen,
-} from "@/lib/launch";
+import { isMasterCommerceOpen } from "@/lib/commerce/master-gate";
+import { isCommerceOpen, isContactEnabled } from "@/lib/launch";
 import { JsonLd } from "@/components/seo/json-ld";
 import {
   getReviewedContestOpportunity,
@@ -178,6 +175,7 @@ export default async function ContestOpportunityPage({
   const { categoria, uf, slug } = await params;
   const result = await getPageOpportunity(categoria, uf, slug);
   if (result?.kind === "redirect") redirect(result.redirectTo);
+  const masterOpen = await isMasterCommerceOpen();
   if (!result) {
     const planned = getCatalogContest(slug);
     if (
@@ -190,7 +188,7 @@ export default async function ContestOpportunityPage({
         <PlannedContestLanding
           contest={planned}
           commerceOpen={isCommerceOpen()}
-          masterOpen={isMasterCommerceOpen()}
+          masterOpen={masterOpen}
           contactOpen={isContactEnabled()}
         />
       </PublicGuideShell>
@@ -260,7 +258,7 @@ export default async function ContestOpportunityPage({
         opportunity={opportunity}
         jurisdictionName={jurisdiction.name}
         commerceOpen={isCommerceOpen()}
-        masterOpen={isMasterCommerceOpen()}
+        masterOpen={masterOpen}
         contactOpen={isContactEnabled()}
         lastExam={lastExam}
         previousExamWaiverReason={previousExamWaiverReason}

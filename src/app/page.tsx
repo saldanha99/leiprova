@@ -35,7 +35,8 @@ import { PricingPlans } from "@/components/landing/PricingPlans";
 import { ProductShowcase } from "@/components/landing/ProductShowcase";
 import { SectionHeading } from "@/components/landing/SectionHeading";
 import { JsonLd } from "@/components/seo/json-ld";
-import { isContactEnabled, isMasterCommerceOpen } from "@/lib/launch";
+import { isMasterCommerceOpen } from "@/lib/commerce/master-gate";
+import { isContactEnabled } from "@/lib/launch";
 import { getAnnualDiscountPercentage } from "@/lib/plans";
 import {
   ORGANIZATION_ID,
@@ -192,9 +193,9 @@ function ArrowCta() {
   );
 }
 
-export default function Home() {
+export default async function Home() {
   // O funil da home leva ao Master; com ele fechado, a home segue no modo prévio.
-  const commerceOpen = isMasterCommerceOpen();
+  const commerceOpen = await isMasterCommerceOpen();
   const contactOpen = isContactEnabled();
   const annualDiscountPercentage = getAnnualDiscountPercentage();
   const primaryHref = primaryCtaHref(commerceOpen, true);
