@@ -18,6 +18,7 @@ type Candidate = Readonly<{
   sourceSnapshotId: number;
   subjectIds: number[];
   topicIds: number[];
+  nullTopicCount: number;
   legalArticleIds: number[];
   legalActIds: number[];
   primaryArticleId: number;
@@ -121,7 +122,11 @@ async function loadCandidates(query: Query, opportunitySlug: string) {
       r.source_document_id::integer as "sourceDocumentId",
       r.source_snapshot_id::integer as "sourceSnapshotId",
       array_agg(distinct question.subject_id::integer order by question.subject_id::integer) as "subjectIds",
-      array_agg(distinct question.topic_id::integer order by question.topic_id::integer) as "topicIds",
+      -- Tópico vazio (programa extraído do edital) não entra no array: o driver o
+      -- leria como NaN. Unanimidade = um único tópico ou todos vazios.
+      coalesce(array_agg(distinct question.topic_id::integer order by question.topic_id::integer)
+        filter (where question.topic_id is not null), '{}') as "topicIds",
+      count(*) filter (where question.topic_id is null)::integer as "nullTopicCount",
       array_agg(distinct binding.legal_article_id::integer order by binding.legal_article_id::integer) as "legalArticleIds",
       array_agg(distinct version.legal_act_id::integer order by version.legal_act_id::integer) as "legalActIds",
       -- Artigo principal: o que reúne mais propostas; empate fica com o menor id.
@@ -170,7 +175,7 @@ function validateCandidates(candidates: readonly Candidate[]) {
       !candidate.contextValid ||
       !candidate.sourceSnapshotId ||
       candidate.subjectIds.length !== 1 ||
-      candidate.topicIds.length !== 1 ||
+      (candidate.topicIds.length + (candidate.nullTopicCount > 0 ? 1 : 0)) !== 1 ||
       // Um item do programa pode cobrir vários artigos e leis (decisão de 11/10/2026);
       // matéria e tópico continuam únicos.
       candidate.legalArticleIds.length < 1 ||
@@ -277,7 +282,7 @@ async function main() {
         const updated = await transaction<{ id: number }[]>`
           update opportunity_requirements set
             subject_id=${candidate.subjectIds[0]},
-            topic_id=${candidate.topicIds[0]},
+            topic_id=${candidate.topicIds[0] ?? null},
             legal_act_id=(
               select version.legal_act_id from legal_articles article
               join legal_versions version on version.id=article.legal_version_id
@@ -306,7 +311,7 @@ async function main() {
         }
         const mappedMetadata = JSON.stringify({
           subjectId: candidate.subjectIds[0],
-          topicId: candidate.topicIds[0],
+          topicId: candidate.topicIds[0] ?? null,
           legalArticleId: candidate.primaryArticleId,
           legalArticleIds: candidate.legalArticleIds,
           legalActIds: candidate.legalActIds,

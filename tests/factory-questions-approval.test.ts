@@ -33,6 +33,9 @@ describe("aprovação em massa das inéditas por autorização do proprietário"
   it("revisão do requisito grava o conjunto de artigos do item, com matéria única", () => {
     expect(reviewScript).toContain('mode() within group (order by binding.legal_article_id::integer) as "primaryArticleId"');
     expect(reviewScript).toContain("candidate.subjectIds.length !== 1");
+    // Tópico vazio não vira NaN no driver: conta à parte e grava null.
+    expect(reviewScript).toContain("filter (where question.topic_id is not null), '{}') as \"topicIds\"");
+    expect(reviewScript).toContain("topic_id=${candidate.topicIds[0] ?? null}");
     expect(reviewScript).toContain("insert into opportunity_requirement_articles(requirement_id,legal_article_id)");
   });
 });
