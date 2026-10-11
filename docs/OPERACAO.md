@@ -3,6 +3,21 @@
 Documento de contexto para quem for continuar o projeto — pessoa ou assistente de IA.
 Descreve onde as coisas estão, como publicar e quais armadilhas já custaram tempo.
 
+**"Vamos vender tudo": revisão por concurso e dispensa de prova anterior (11/10/2026, 19h30 BRT):**
+`d8b509b`: `/admin/fabrica-autoral` lista os concursos com inéditas da fábrica (rascunhos,
+na fila e revisadas) e, com `?concurso=<edital>`, mostra só o que falta revisar daquele
+edital, na ordem de autoria; o envio em lote para revisão passa a levar só os rascunhos
+do concurso escolhido. Declaração do revisor e confirmação por questão continuam iguais.
+Dispensa de prova anterior (migração `0046`, tabela
+`contest_product_previous_exam_waivers`; `pnpm commerce:previous-exam:waive`): a venda
+aceita prova anterior aprovada ou dispensa do produto exato, e a página mostra "Sem prova
+anterior oficial disponível" com o motivo. Aplicada com `owner-decision-2026-10-11:sell-all`
+a TCE-MA (última prova FCC 2005, PDFs proibidos pelo robots) e SEAP-MA (FUNCAB, extinta).
+Os 12 editais abertos agora cumprem o requisito de prova anterior; falta a cada um as 68
+inéditas revisadas e vinculadas. Guardião e Autor seguem offline até o Codex ser reaberto
+nos terminais do Maestri. LGPD, Lei 12.737 e Lei 14.133 (≈45 de ≈1.300 requisitos) ficam
+para depois: exigem ler o Planalto, que mistura texto revogado.
+
 **Fábrica parada de 06/10 a 11/10 e caminho até a venda das inéditas (11/10/2026, 14h30 BRT):**
 de 03 a 05/10 os agentes usaram a cota cheia (48, 46 e 47 execuções) e geraram 49
 mapeamentos e 40 autorias: 82 rascunhos para PC-MA Delegado, 53 para TC-DF e 52 para
