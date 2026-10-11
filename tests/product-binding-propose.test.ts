@@ -42,6 +42,7 @@ describe("propostas de vínculo a partir das inéditas revisadas", () => {
     expect(script).toContain("set transaction read only");
     expect(script).toContain("question.editorial_status = 'reviewed'");
     expect(script).toContain("binding.status in ('pending_review', 'approved')");
+    expect(script).toContain("and (requirement.topic_id is null or requirement.topic_id = question.topic_id)");
     expect(script).not.toMatch(/\b(insert into|update |delete from)\b/iu);
   });
 

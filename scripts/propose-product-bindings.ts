@@ -109,6 +109,10 @@ async function main() {
         where product.slug = ${productSlug}
           and question.editorial_status = 'reviewed'
           and requirement.editorial_status <> 'suspended'
+          -- Requisito já mapeado recusa matéria ou tópico diferente no importador, que
+          -- rejeita o pacote inteiro; essas questões ficam fora da proposta.
+          and (requirement.subject_id is null or requirement.subject_id = question.subject_id)
+          and (requirement.topic_id is null or requirement.topic_id = question.topic_id)
           and not exists (
             select 1 from contest_product_question_bindings binding
             where binding.product_slug = product.slug and binding.question_id = question.id

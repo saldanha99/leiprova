@@ -3,6 +3,31 @@
 Documento de contexto para quem for continuar o projeto — pessoa ou assistente de IA.
 Descreve onde as coisas estão, como publicar e quais armadilhas já custaram tempo.
 
+**PC-MA Delegado à venda; inéditas aprovadas em massa (11/10/2026, 20h30 BRT):** o
+proprietário declarou ter conferido as 274 inéditas da fábrica ("eu já vi tudo, libere tudo
+em massa"), mas nenhuma revisão estava registrada no painel. Novo
+`pnpm editorial:questions:approve [--apply] --contest=<edital>` (imagem
+`opportunity-approver`, `QUESTION_APPROVAL_REFERENCE`): envia à revisão e aprova numa
+transação, com as checagens do painel (procedência, fonte vigente, perfil da banca,
+alternativas, gabarito, originalidade); a auditoria marca `owner_bulk_authorization`, não
+conferência item a item. Aplicado com `owner-chat-2026-10-11:viu-tudo-libere-em-massa`:
+PC-MA Delegado 82, TC-DF 53, ENAC 52, ENAM 87 — nenhuma recusada.
+Um item do programa aceitava um único artigo, e só 44 das 82 do PC-MA contariam. A migração
+`0047` cria `opportunity_requirement_articles`: a revisão do requisito grava o artigo
+principal (o de mais propostas) e os adicionais, inclusive de outras leis; acesso, quiz e
+importador aceitam qualquer um deles. Matéria e tópico continuam únicos. A revisão de
+requisitos lia tópico vazio como `NaN` (corrigido em `523ae11`), e a revisão de vínculos
+passou a aceitar produto já liberado.
+Caminho executado por produto, com o ator admin e a mesma referência:
+`editorial:bindings:propose` → `.local/editorial/binding-input/proposals.json` →
+`editorial-binding-importer` (preview e `import-pending`) → `editorial:review:requirements`
+→ `editorial:review:bindings` → `commerce:product:release`. As duas revisões rodam no
+serviço `editorial-binding-importer`, com `LEIPROVA_*_DATABASE_URL` apontando para
+`$LEIPROVA_BINDING_DATABASE_URL` dentro do contêiner e `LEIPROVA_*_APPROVED` exatos.
+Resultado: PC-MA Delegado liberado com 82 questões; ENAM passou de 68 para 141; TC-DF (53)
+e ENAC (52) estão revisados e vinculados, mas precisam de mais 15 e 16 questões do Autor.
+Com 2 concursos à venda, o Master segue fechado até o terceiro.
+
 **Master abre sozinho com 3 concursos à venda (11/10/2026, 21h BRT):** decisão do
 proprietário ("Abrir com 3+ concursos"), para não cobrar R$ 297 pelo catálogo inteiro com
 um único concurso. `MASTER_CHECKOUT_ENABLED` aceita `auto` além de `true`/`false`: com
