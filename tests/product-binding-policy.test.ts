@@ -1,5 +1,11 @@
 import { randomUUID } from "node:crypto";
+import { readFileSync } from "node:fs";
+
+import { sql } from "drizzle-orm";
+import { PgDialect } from "drizzle-orm/pg-core";
 import { describe, expect, it } from "vitest";
+
+import { approvedProductQuestionExists } from "../src/lib/commerce/product-binding-query";
 import { bindingFingerprint, containsVerbatimQuote, productBindingPackageSchema, requireProductBindingTarget } from "../src/lib/commerce/product-binding-policy";
 
 const proposal = { productSlug: "enam-exame-nacional-da-magistratura-2026-2", opportunityPublicId: randomUUID(), requirementId: 7,
@@ -41,5 +47,15 @@ describe("destinos isolados do importador de propostas", () => {
     expect(() => requireProductBindingTarget(live, "https://leiprova.2b.app.br", "production")).toThrow();
     expect(requireProductBindingTarget(live, "https://leiprova.2b.app.br", "production", "import_pending_bindings").production).toBe(true);
     expect(() => requireProductBindingTarget(live.replace("leiprova_app@", "postgres@"), "https://leiprova.2b.app.br", "production", "import_pending_bindings")).toThrow();
+  });
+  it("aceita requisito e questão sem tópico do catálogo, desde que coincidam (02–11/10/2026)", () => {
+    const query = new PgDialect().sqlToQuery(approvedProductQuestionExists(sql`${"pc-ma-delegado-2026"}`, sql`${1}`));
+    // Programa extraído do edital não traz tópico; o vínculo se apoia em artigo, versão e citações.
+    expect(query.sql).toContain("requirement.topic_id is not distinct from q.topic_id");
+    expect(query.sql).not.toContain("requirement.topic_id = q.topic_id");
+    expect(query.sql).toContain("requirement.legal_article_id = binding.legal_article_id");
+    expect(query.sql).toContain("requirement.subject_id = q.subject_id");
+    const service = readFileSync(new URL("../src/lib/commerce/product-binding-service.ts", import.meta.url), "utf8");
+    expect(service).toContain('!requirement.legalArticleId || !requirement.subjectId) blockers.push("Requisito ainda exige mapeamento e revisão humana.")');
   });
 });

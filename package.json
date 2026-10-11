@@ -34,6 +34,7 @@
     "editorial:review:requirements": "tsx --env-file-if-exists=.env scripts/review-bound-opportunity-requirements.ts",
     "editorial:review:bindings": "tsx --env-file-if-exists=.env scripts/review-current-product-bindings.ts",
     "editorial:bindings:import": "tsx --env-file-if-exists=.env scripts/import-product-question-bindings.ts",
+    "editorial:bindings:propose": "tsx --env-file-if-exists=.env scripts/propose-product-bindings.ts",
     "editorial:courses:plan": "tsx --env-file-if-exists=.env scripts/plan-course-production.ts",
     "editorial:scoped:verify": "tsx --env-file-if-exists=.env scripts/validate-scoped-authoring.ts",
     "stripe:inventory": "tsx --env-file-if-exists=.env scripts/inventory-stripe-catalog.ts",

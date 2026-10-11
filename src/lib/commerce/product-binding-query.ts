@@ -31,7 +31,9 @@ export function approvedProductQuestionExists(
       and requirement.editorial_status = 'reviewed'
       and requirement.requirement_text = binding.requirement_text and requirement.source_locator = binding.source_locator
       and requirement.legal_article_id = binding.legal_article_id
-      and requirement.subject_id = q.subject_id and requirement.topic_id = q.topic_id
+      -- Tópico é filtro de estudo: requisito e questão precisam coincidir, inclusive
+      -- os dois sem tópico (programa extraído do edital não traz tópico do catálogo).
+      and requirement.subject_id = q.subject_id and requirement.topic_id is not distinct from q.topic_id
       and source.status = 'approved'
       and binding.evidence->>'sourceUrl' = source.source_url
       and (binding.source_snapshot_id is null or (

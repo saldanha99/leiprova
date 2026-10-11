@@ -66,7 +66,8 @@ async function prepare(transaction: Transaction, item: Proposal, actorUserId: nu
   if (question.editorialStatus !== "reviewed") blockers.push("Questão ainda sem revisão editorial aprovada.");
   if (opportunity.editorialStatus !== "reviewed") blockers.push("Oportunidade ainda sem revisão aprovada.");
   if (source.status !== "approved" || (snapshot && snapshot.status !== "approved")) blockers.push("Documento ou captura ainda sem aprovação.");
-  if (requirement.editorialStatus !== "reviewed" || !requirement.legalArticleId || !requirement.subjectId || !requirement.topicId) blockers.push("Requisito ainda exige mapeamento e revisão humana.");
+  // O vínculo se apoia no artigo e na matéria; tópico do catálogo é opcional (só precisa coincidir).
+  if (requirement.editorialStatus !== "reviewed" || !requirement.legalArticleId || !requirement.subjectId) blockers.push("Requisito ainda exige mapeamento e revisão humana.");
   if (question.quizMode === "original_style" && (!organizer || organizer.quizBankId !== question.styleBankId || !profile?.isActive || profile.format !== question.type)) {
     blockers.push("Banca organizadora/perfil de estilo não corresponde à questão.");
   }
