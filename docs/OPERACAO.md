@@ -3,6 +3,30 @@
 Documento de contexto para quem for continuar o projeto — pessoa ou assistente de IA.
 Descreve onde as coisas estão, como publicar e quais armadilhas já custaram tempo.
 
+**Fábrica parada de 06/10 a 11/10 e caminho até a venda das inéditas (11/10/2026, 14h30 BRT):**
+de 03 a 05/10 os agentes usaram a cota cheia (48, 46 e 47 execuções) e geraram 49
+mapeamentos e 40 autorias: 82 rascunhos para PC-MA Delegado, 53 para TC-DF e 52 para
+ENAC (o ENAM segue com 87). Em 06/10, por volta das 11h BRT, o Maestri deixou de
+disparar as rotinas; ao ser reaberto em 11/10 restaurou o Radar (Claude), mas não o
+Codex do Autor (terminal em zsh vazio) nem o terminal do Guardião. O preflight local
+contava como online o daemon de fundo do Codex (também chamado `codex`, na pasta do
+Autor, sem terminal) e o Autor reservou `author:1094` sem ninguém para executar; o
+preflight agora exige agente com tty (backup `.local/maestri/preflight.cjs.bak-20261011`).
+Os links de prova anterior do ENAM foram renovados sozinhos em 08/10. Nenhuma venda
+até aqui. `caffeinate` destacado por 7 dias.
+
+Nenhum rascunho da fábrica podia chegar à venda: todos herdam o tópico vazio do
+requisito extraído do edital e a regra de acesso comparava `requirement.topic_id =
+q.topic_id` (falso com os dois vazios), além de o vínculo apontar tópico ausente como
+pendência. `20b4ed4` torna o tópico um filtro que só precisa coincidir (inclusive
+vazio); artigo, versão vigente, matéria e citações literais continuam exigidos. Também
+criou `pnpm editorial:bindings:propose -- --product=<slug>` (somente leitura): monta o
+pacote de propostas a partir das questões revisadas que o Autor escreveu para cada
+requisito, com um único artigo por requisito. Caminho até vender cada concurso:
+revisão das questões em `/admin/fabrica-autoral` → propostas → importação pendente
+(`editorial-binding-importer`, `.local/editorial/binding-input/proposals.json` na VPS)
+→ revisão dos vínculos e dos requisitos → `commerce:product:release`.
+
 **Prova anterior de outra banca (TJ-RS) e reserva dos agentes destravada (03/10/2026, madrugada BRT):**
 `303ff6c` aplica a decisão de 02/10: a prova anterior é a última do mesmo órgão,
 cargo, especialidade e jurisdição, mesmo de outra banca, com a banca na página; a
