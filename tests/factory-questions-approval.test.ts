@@ -6,6 +6,7 @@ import { parseFactoryApprovalArgs } from "../scripts/approve-factory-questions";
 
 const script = readFileSync(new URL("../scripts/approve-factory-questions.ts", import.meta.url), "utf8");
 const reviewScript = readFileSync(new URL("../scripts/review-bound-opportunity-requirements.ts", import.meta.url), "utf8");
+const bindingReviewScript = readFileSync(new URL("../scripts/review-current-product-bindings.ts", import.meta.url), "utf8");
 
 describe("aprovação em massa das inéditas por autorização do proprietário", () => {
   it("exige um concurso e só grava com --apply", () => {
@@ -37,5 +38,9 @@ describe("aprovação em massa das inéditas por autorização do proprietário"
     expect(reviewScript).toContain("filter (where question.topic_id is not null), '{}') as \"topicIds\"");
     expect(reviewScript).toContain("topic_id=${candidate.topicIds[0] ?? null}");
     expect(reviewScript).toContain("insert into opportunity_requirement_articles(requirement_id,legal_article_id)");
+  });
+
+  it("aprova vínculos novos também de produto já liberado", () => {
+    expect(bindingReviewScript).toContain("product.status in ('draft','released')");
   });
 });

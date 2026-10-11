@@ -75,7 +75,8 @@ async function main() {
       from contest_store_products product join contest_opportunities opportunity on opportunity.id=product.opportunity_id
       join exam_editions edition on edition.id=opportunity.exam_edition_id
       where product.slug=${args.productSlug} and opportunity.slug=${args.opportunitySlug}
-        and product.status='draft' and opportunity.editorial_status='reviewed'
+        -- Produto liberado também recebe vínculos novos: aprovar só acrescenta questões.
+        and product.status in ('draft','released') and opportunity.editorial_status='reviewed'
     `);
     if (!scope) throw new ProductBindingReviewError("Produto, oportunidade ou edição não corresponde ao escopo revisado.");
     const rows = await db.execute<{ id: string }>(sql`
