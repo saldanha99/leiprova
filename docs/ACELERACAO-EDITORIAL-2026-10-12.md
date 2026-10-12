@@ -47,6 +47,14 @@ válidos confirmou ENAC **78**, ENAM **146** e TC-DF **69**: **293 questões**,
 três preparações disponíveis. Três inéditas do ENAC efetivamente publicadas;
 o lote TC-DF chegou depois do início dessa rodada e aguarda a seguinte.
 
+Rodada seguinte concluída às **21:06:32 UTC**: três inéditas TC-DF aprovadas,
+três vínculos aprovados. Leitura posterior confirmou **TC-DF 72, ENAC 78 e
+ENAM 146**, total **296 válidas em três preparações**. Portanto, as seis novas
+inéditas foram efetivamente publicadas. PC-MA continua com zero. Recibos das
+duas rodadas em `release-runs/20261012T210327Z.Qh9wJq` e
+`release-runs/20261012T210516Z.nwjcyX`, sem marcador de falha. Fonte implantada
+`8ac951d1`; modelos de cron comparados com os arquivos instalados, sem divergência.
+
 ## Validação técnica
 
 Lint, geração de tipos, typecheck e build de produção passaram na VPS isolada.
