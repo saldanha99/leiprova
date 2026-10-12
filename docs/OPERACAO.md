@@ -3,6 +3,15 @@
 Documento de contexto para quem for continuar o projeto — pessoa ou assistente de IA.
 Descreve onde as coisas estão, como publicar e quais armadilhas já custaram tempo.
 
+**Retomada após 12h27 BRT em 12/10/2026:** 20 disciplinas efetivamente
+cadastradas (auditorias 8414–8433) e mais 332 requisitos classificados
+(auditorias 8434–8765), com `humanReview:false`. As 579 classificações anteriores
+foram preservadas; 190 requisitos dos cinco programas ainda têm divergências
+de evidência. Código de manutenção `9cdbf0c`, ferramentas compiladas; catálogo
+e classificações não equivalem a mapas legais ou questões aprovadas. Leia
+[retomada e próxima sequência](RETOMADA-2026-10-12.md), que supera as notas
+históricas do canvas e o relatório do Maestro anterior à suspensão do PC-MA.
+
 **Produção migrada (12/10/2026, cerca de 01h23 BRT):** o endereço canônico agora é
 `https://editaleiseca.com.br`, na VPS Everglades (`everglades-vps`, `179.236.255.4`),
 com marca Edital Lei Seca; após o corte foram publicadas `3e9323a`, `c6ef50f`

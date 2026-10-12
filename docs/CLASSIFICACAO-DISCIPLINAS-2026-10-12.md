@@ -1,5 +1,42 @@
 # Disciplinas dos programas: operador e QA
 
+## Retomada aplicada — 12/10/2026, após 12h27 BRT
+
+Mais **332 requisitos classificados**, após o cadastro das 20 disciplinas:
+
+| Programa | Novos requisitos | Auditorias |
+| --- | ---: | --- |
+| TRF-5 | 79 | 8687–8765 |
+| MPMT | 101 | 8434–8534 |
+| MPRJ | 112 | 8535–8646 |
+| PGE-AC | 40 | 8647–8686 |
+
+Seis lotes com até 100 itens, prévias e aplicações separadas com fingerprints
+coincidentes. Todos foram reconferidos no banco: disciplina igual à auditoria,
+estado `draft`, revisão anterior limpa, mapas/tópicos nulos e `humanReview:false`.
+As 579 classificações preexistentes foram preservadas: total 911 de 1.101
+requisitos nos cinco escopos. Esses números não representam questões publicadas.
+
+**190 itens continuam bloqueados**: sete TRF-5, 26 SEFAZ-AL, 56 MPMT e 101 MPRJ.
+São divergências de cabeçalho/localizador, texto integral não demonstrado pelas
+páginas ou posição ambígua. Não aprovar por aproximação nem dividir disciplinas
+compostas para preencher quantidade. Revisão material dos mapas legais permanece
+necessária antes de autoria/liberação.
+
+Código/ferramentas `9cdbf0c`; QA final: 1.813 testes gerais, 35 específicos
+(incluindo nove PostgreSQL), lint, tipagem e build aprovados. Recibos privados
+na VPS em `.local/editorial/classification-resumed-20261012/`, com seis entradas,
+prévias e aplicações. Backup anterior e hash no documento de admissão.
+
+A comparação integral antes/depois confirmou exatamente 332 requisitos
+alterados, os outros 769 intactos e as 579 classificações anteriores preservadas.
+A primeira preparação da fila examinou 100 requisitos e atualizou 39 pacotes de
+mapeamento, sem autoria; `hasMore:true` indica pendência de atualização integral.
+A conferência comercial posterior preservou três preparações/285 questões
+válidas, com saúde do site `ok`.
+
+## Histórico anterior à retomada
+
 O operador classifica somente cinco oportunidades/cargos exatos: TRF-5 Juiz Federal, SEFAZ-AL Auditor Fiscal, MPMT/MPRJ Promotor Substituto e PGE-AC Procurador Classe I. Não escolhe artigos, fontes novas, questões ou produtos. O catálogo atual comporta429 candidatas com evidência: MPMT197, MPRJ176 e PGE56. As150 classificações anteriores de TRF/SEFAZ são preservadas. Quantidade candidata não significa aplicação.
 
 Cada item revalida texto integral, localizador/páginas, SHA dos bytes, snapshot/fonte aprovados, cargo/edição e disciplina canônica ativa. Fragmentos separados exigem offsets UTF-16 explícitos, ordem, ausência de sobreposição e mesma seção/ponto; todo o requisito deve ser reconstruído, sem inferência de trecho contíguo. Cabeçalho de Processual Civil na mesma linha do Ponto1 é aceito com sua linha integral. Disciplinas compostas não são divididas ou convertidas em genéricas; proposta privada separada contém20 disciplinas ainda não cadastradas.

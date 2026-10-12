@@ -1,5 +1,24 @@
 # Cadastro de disciplinas oficiais: operador verificado
 
+## Aplicação concluída — 12/10/2026, 12h27 BRT
+
+**20 disciplinas cadastradas em produção**, IDs 794–813, auditorias 8414–8433.
+Conferência independente confirmou todas ativas e `humanReview:false`.
+Operador publicado na imagem de ferramentas a partir de `9cdbf0c`; app/worker
+não precisaram ser recriados para executar este operador de manutenção.
+
+Prévia e aplicação usaram o fingerprint
+`ae4dfdf5380a050c830f86c36ebcf1f1e4d0dfe994623fa4b34d7c5007b6ad57`.
+Recibos privados na VPS: `.local/editorial/subject-admission-20261012/preview-9cdbf0c.json`
+e `applied-9cdbf0c.json`. A etapa criou somente catálogo e auditoria.
+A classificação posterior de 332 requisitos tem recibo próprio em
+[Classificação de disciplinas](CLASSIFICACAO-DISCIPLINAS-2026-10-12.md).
+
+O histórico de preparação e QA abaixo explica as correções; suas frases
+“não aplicado” referem-se àquele estágio, superado pelo recibo acima.
+
+## Histórico de preparação
+
 Vinte nomes ausentes no catálogo atual foram confrontados com24 provas de rótulos literais em páginas oficiais aprovadas, nas oportunidades TRF-5/SEFAZ-AL/MPMT/MPRJ/PGE-AC. São disciplinas próprias, incluindo nomes compostos; não equivalem a cobertura legal, mapas aprovados, questões ou cursos disponíveis. Entradas como Direito Civil e Empresarial e Direito Civil e Direito Empresarial permanecem distintas. PrefixosF)/H) do programa ficam na prova literal, enquanto o nome de catálogo identifica a disciplina.
 
 A conferência read-only efetiva às13:52:22UTC validou os20 nomes, páginas/linhas completas, cargo, edição atual e SHA dos bytes. Fonte de portal pode ser metadata_only; o snapshot do PDF é necessariamente official_document/aprovado. Nenhum corpo de prova de questões foi utilizado. A primeira consulta de diagnóstico escolheu a sobrecarga TEXT do operador JSON e retornou páginas nulas; corrigida para índice INTEGER, antes de qualquer cadastro. O diagnóstico anterior foi preservado.
