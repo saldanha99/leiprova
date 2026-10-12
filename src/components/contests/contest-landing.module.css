@@ -624,12 +624,23 @@
   color: #567064;
 }
 .previewLogo {
-  font-size: 17px;
-  font-weight: 850;
-  letter-spacing: -0.05em;
+  flex: none;
 }
-.previewLogo > span {
-  color: #227457;
+.previewLogo :global(.editalume-logo) {
+  --emerald: #227457;
+  --amber: #9b721f;
+  color: #173d31;
+  gap: 6px;
+}
+.previewLogo :global(.editalume-logo__mark) {
+  height: 24px;
+}
+.previewLogo :global(.editalume-logo__name) {
+  font-size: 13px;
+}
+.previewLogo :global(.editalume-logo__tagline) {
+  font-size: 6px;
+  color: #567064;
 }
 .previewBody {
   padding: 30px;

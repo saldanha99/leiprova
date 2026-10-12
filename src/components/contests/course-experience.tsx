@@ -17,6 +17,8 @@ import {
   Target,
 } from "lucide-react";
 import { CONTEST_ACCESS_OPTIONS } from "@/lib/commerce/catalog";
+import { EditalumeLogo } from "@/components/brand/EditalumeLogo";
+import { BRAND_NAME } from "@/lib/brand";
 import { formatBRL } from "@/lib/plans";
 import { ContestProductTour } from "./contest-product-tour";
 import base from "./contest-landing.module.css";
@@ -133,8 +135,8 @@ function CourseArtwork({
         />
         <div className={styles.cardOverlay} />
         <div className={styles.bookTop}>
-          <span>
-            edita<b>lume</b>
+          <span className={styles.bookBrand} role="img" aria-label={BRAND_NAME}>
+            <EditalumeLogo />
           </span>
           <ArrowUpRight size={23} aria-hidden="true" />
         </div>

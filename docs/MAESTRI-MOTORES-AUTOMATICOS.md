@@ -172,6 +172,22 @@ O worker está configurado para `EDITORIAL_AGENT_BRIDGE_ENABLED=true` por padrã
 no Compose. Uma configuração explícita `false` pode pausá-lo. Não confundir essa
 flag com a rotina local do Maestri: ambas precisam estar disponíveis.
 
+## Prioridade por conteúdo válido (11/10/2026)
+
+A meta de produção é o piso de 68 questões **válidas por produto**. Rascunhos,
+questões revisadas sem vínculo válido e simples associações em
+`question_opportunities` não cumprem esse piso. A reserva usa o mesmo predicado
+de `approvedProductQuestionCount` da oferta: programa/artigo revisado, fonte
+aprovada, versão legal vigente, revisão e evidências exatas do vínculo.
+
+A contagem é calculada uma vez por produto ligado, em CTEs materializadas, e
+agregada por oportunidade. Um produto em rascunho com 68 questões associadas mas
+67 válidas continua na faixa prioritária, se a prova estiver a pelo menos 14 dias.
+Se uma edição tiver mais de um produto, o produto com menos conteúdo válido
+continua exigindo produção. O orçamento, as reservas exclusivas e a ordem por
+data/matéria conhecida permanecem. Essa regra não aprova fontes, não amplia
+artigos de requisitos já revisados e não libera produtos.
+
 ## Formato de response.json
 
 Objeto JSON estrito, sem cerca Markdown. Campos comuns:

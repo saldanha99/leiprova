@@ -1,6 +1,38 @@
 # Catálogo Stripe — aplicação de produção
 
-## Atualização de 11/10/2026
+## Estado atual — 11/10/2026, após a liberação do ENAC
+
+A verificação independente LIVE de apresentação passou para a marca **Edital Lei
+Seca**: **84 concursos individuais + Master, 85 produtos ativos do projeto e 170
+preços ativos**, com os IDs e periodicidades preservados. Os quatro preços ativos
+legados continuam preservados. O catálogo Stripe completo não comprova conteúdo
+editorial pronto.
+
+A oferta possui **quatro preparações efetivamente liberadas**: ENAM (146) questões
+válidas, ENAC (70), PC-MA Delegado (82) e TC-DF (69). O Master segue aberto por `auto`, pois
+há mais de três produtos elegíveis. Os outros 80 produtos continuam em preparação,
+mesmo com preços LIVE. A contagem usa fonte, programa, versão legal e vínculo exatos;
+rascunhos ou questões sem vínculo válido não contam.
+
+Runtime LIVE e canais já habilitados foram mantidos. Não houve compra de controle,
+transação de cobrança ou estorno homologado nesta operação. Cadastro de produtos,
+preços e retorno para autenticação são verificações diferentes da liquidação de
+pagamento e entrega após webhook.
+
+Verificação adicional na sessão autenticada do proprietário, às 23h30 BRT: o
+checkout mensal do ENAC abriu o Payment Element protegido. O resumo retornado
+pela própria Stripe confirmou `livemode: true`, `currency: brl` e total de 6.700
+centavos recorrentes. Nenhum dado de cartão foi inserido nem pagamento confirmado.
+Essa tentativa técnica deve ser encerrada em Meus concursos; não é uma compra.
+
+A origem continua ativa em `wisewolf-vps` e `leiprova.2b.app.br`. A migração para a
+VPS do Everglades e `editaleiseca.com.br` aguarda DNS e confirmação de HTTPS. Não
+considerar cortadas as URLs de retorno ou os webhooks nem alterar sua origem por
+suposição. Conferir `docs/MIGRACAO-EDITAL-LEI-SECA-2026-10-11.md` antes de nova ação.
+
+Os registros abaixo preservam a sequência histórica de sincronização e marca.
+
+## Registro intermediário — 11/10/2026, 22h05 BRT
 
 O pedido de abrir checkout em produção foi conferido: runtime LIVE, conta autorizada
 confirmada e flags de cadastro, checkout por concurso e entrega já habilitadas.
@@ -109,7 +141,7 @@ independente do catálogo passou. A aplicação da marca foi publicada.**
   SHA-256 `a8567a117bc4e04effcd2c89620a37cc9aa9e3adf2ed8758fc4e4da5c950363d`.
   Painel Chrome Vini também mostrou 76 ativos e 23 arquivados; aba deixada aberta.
 
-## Catálogo sincronizado e verificado
+## Catálogo sincronizado e verificado em 06/09/2026
 
 | Escopo | Produtos | Preços | Valores recorrentes |
 |---|---:|---:|---|

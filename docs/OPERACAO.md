@@ -1,12 +1,24 @@
-# Operação da Editalume
+# Operação do Edital Lei Seca
 
 Documento de contexto para quem for continuar o projeto — pessoa ou assistente de IA.
 Descreve onde as coisas estão, como publicar e quais armadilhas já custaram tempo.
 
+**Nova marca e migração em preparação (11/10/2026, noite BRT):** o proprietário
+escolheu Edital Lei Seca e adquiriu `editaleiseca.com.br`. Código `f789d9b` publicado
+na origem, com logo, SEO e modos explícitos. A VPS Everglades (`everglades-vps`,
+`179.236.255.4`) já tem clone, banco de ensaio restaurado, migrações 0048/0049,
+app saudável, rede isolada e Caddy preparado em manutenção. DNS A e CNAME www
+foram salvos no Registro.br às 22h42 BRT; ainda não houve corte de banco, troca
+de webhook ou redirecionamento da origem. Veja o roteiro de migração. Não iniciar
+workers de escrita em ambas as VPS. ENAC foi liberado com 70 questões válidas;
+são quatro produtos disponíveis. Biblioteca Planalto continua sem captura por
+falha regular de acesso, apesar de parser/captura pendente implementados.
+
 **Catálogo integral e Stripe LIVE (11/10/2026, noite BRT):** 84 preparações foram
 sincronizadas com produtos/preços LIVE, com verificação independente sem divergências.
 O proprietário escolheu treino histórico e pré-edital separados, com legislação atual.
-Isso define o escopo; esses modos ainda exigem implementação e conteúdo. Flags já
+O suporte aos modos está implementado (migração 0048); cada produto ainda exige
+programa de referência conferido e conteúdo, conforme `docs/MODOS-DE-PREPARACAO.md`. Flags já
 estavam abertas; não foram alteradas. Veja `docs/PREPARACOES-INTEGRAIS-2026-10-11.md`
 para diagnóstico, prova anterior, backup e limites de entrega. Produto Stripe não
 é preparação pronta.

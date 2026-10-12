@@ -1,0 +1,13 @@
+# Proxy legado para usar na VPS de origem, atrás do Traefik existente.
+# Instalar apenas depois do corte confirmado, com a aplicação antiga parada.
+:8080 {
+  @stripeWebhook path /api/stripe/webhook
+  handle @stripeWebhook {
+    reverse_proxy https://editaleiseca.com.br {
+      header_up Host editaleiseca.com.br
+    }
+  }
+  handle {
+    redir https://editaleiseca.com.br{uri} permanent
+  }
+}

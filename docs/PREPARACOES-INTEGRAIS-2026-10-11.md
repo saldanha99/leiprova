@@ -1,10 +1,60 @@
-# Editalume — preparação integral do catálogo
+# Edital Lei Seca — preparação integral do catálogo
+
+## Estado atual verificado — 11/10/2026, 23h23 BRT
+
+Consulta somente de leitura da origem ativa `wisewolf-vps`, com o predicado exato
+`approvedProductQuestionCount` e a condição de prova anterior da oferta:
+
+| Preparação disponível | Questões válidas | Modo |
+| --- | ---: | --- |
+| ENAM 2026.2 | 146 | Edital atual |
+| ENAC 2026.2 | 70 | Edital atual |
+| PC-MA Delegado | 82 | Edital atual |
+| TC-DF Analista | 69 | Edital atual |
+
+**Quatro preparações liberadas entre 84 planejadas.** As outras 80 estão abaixo
+do piso comercial e têm zero questões válidas por produto nessa consulta. O
+**déficit mínimo atual é 5.440 questões válidas**; continuam 70 produtos sem edição
+oficial revisada e 73 sem prova anterior aprovada ou dispensa. Esses números se
+sobrepõem e não devem ser somados como total de preparações. O piso não comprova
+cobertura integral de edital.
+
+O ENAC passou pela linha autorizada e foi liberado com 70 vínculos válidos. Uma
+questão revisada sobre CF 62 ficou sem vínculo ao requisito 655 e não entrou na
+contagem. As três novas de `author:657` usam CF 5, já admitido entre os artigos do
+requisito, e completaram o produto sem ampliar seu programa para atingir a meta.
+A prioridade da fábrica agora considera questões **válidas por produto**, em
+CTEs materializadas, em vez de rascunhos simplesmente ligados à edição.
+
+O suporte explícito a treino histórico e pré-edital foi implementado pela
+migração 0048, com revisão da edição-base e identificação do uso de legislação
+vigente. Todos os produtos continuam no modo `current_notice`; nenhum foi
+reclassificado automaticamente. Veja `docs/MODOS-DE-PREPARACAO.md`.
+
+A marca pública atual é **Edital Lei Seca**. A conferência LIVE de apresentação
+passou para os 84 produtos individuais e o Master, com 170 preços ativos do
+projeto e IDs preservados. Os quatro preços legados continuam preservados.
+O Master permanece aberto pela regra `auto`; não houve compra de controle nem
+comprovação financeira de cobrança/estorno nesta rodada.
+
+**Migração aguardando DNS:** a origem ainda atende em `leiprova.2b.app.br`.
+`editaleiseca.com.br` foi registrado e o destino da migração é a VPS do Everglades;
+preparar o destino não comprova corte de tráfego. Não trocar o destino da ponte,
+URLs operacionais ou webhooks com base nesta anotação. Confirmar a conclusão no
+registro de migração e por HTTPS antes de declarar o novo domínio em produção.
+
+Fila na mesma janela: orçamento 34/48 reservas em 24h, 18 autorias e 1.273
+mapeamentos pendentes. Há três reservas em execução nos agentes existentes:
+`author:1110`, `mapping:1111` e `discovery:cebraspe:2026-10-12` (a chave de descoberta
+usa data UTC). Os prazos eram 03h50, 03h49 e 03h28 UTC de 12/10, respectivamente.
+Isso é um retrato de execução, não garantia de funcionamento contínuo; preservar
+as reservas e recibos durante a migração.
 
 ## Escopo confirmado pelo proprietário
 
 Em 11/10/2026, o proprietário solicitou todas as 84 preparações prontas, com inéditas e PDFs oficiais de provas anteriores, além de checkout Stripe em produção. Para concursos já realizados e sem edital atual, escolheu: **treino histórico e pré-edital, identificados separadamente, com legislação atualizada**.
 
-A vitrine foi publicada com filtros e 84 preparações planejadas. Um cartão ou produto Stripe não comprova conteúdo pronto. Treino histórico usa a identidade/programa da edição de referência e o corte normativo atual; não deve ser anunciado como reprodução de uma prova antiga. Pré-edital deve mostrar a base adotada e não inventar banca ou programa atual. Esses dois modos ainda precisam ser implementados na elegibilidade comercial, além de preparar seus conteúdos.
+A vitrine foi publicada com filtros e 84 preparações planejadas. Um cartão ou produto Stripe não comprova conteúdo pronto. Treino histórico usa a identidade/programa da edição de referência e o corte normativo atual; não deve ser anunciado como reprodução de uma prova antiga. Pré-edital deve mostrar a base adotada e não inventar banca ou programa atual. O suporte desses dois modos foi implementado, mas cada preparação ainda exige revisão explícita da edição-base, fontes e conteúdo próprio antes da liberação. A implementação não transforma o catálogo planejado em ofertas prontas.
 
 ## Operação comercial verificada
 
@@ -24,7 +74,7 @@ Há nove conjuntos de links oficiais aprovados de provas anteriores: ENAM, ENAC,
 
 O Autor existente foi recuperado após erro de modelo não suportado: selecionado GPT-6-Astra com raciocínio high no próprio terminal, preservando o nó e as rotinas. A ponte aceita as entregas como rascunhos. Aprovação e vínculos passam exclusivamente pela linha autorizada; o Maestro confere depois.
 
-## Entrega confirmada nesta rodada
+## Registro intermediário — 11/10/2026, 22h05 BRT
 
 A linha de liberação concluiu às 01h05 UTC de 12/10 (22h05 BRT de 11/10):
 **TC-DF liberado com 69 inéditas**. API pública confirmou três produtos disponíveis:
@@ -33,11 +83,11 @@ anterior foram verificadas contra o corpus; nenhum erro identificado, nenhuma
 suspensão. Marcador privado atualizado até 01h03min13,313668s UTC.
 
 O Master atingiu a condição de três preparações elegíveis; seu checkout anual e o
-checkout mensal do TC-DF redirecionam para login com o retorno correto. ENAC segue com 52 e
-precisa de mais 16 para o mínimo comercial. O restante ainda não está pronto:
+checkout mensal do TC-DF redirecionam para login com o retorno correto. Naquele momento, ENAC seguia com 52 e
+precisava de mais 16 para o mínimo comercial. O restante ainda não estava pronto:
 o déficit mínimo remanescente de todo o catálogo é 5.456, considerando as
-quantidades válidas desta rodada; além disso faltam fontes e a implementação
-comercial dos modos histórico/pré-edital. Não há confirmação de cobertura
+quantidades válidas daquela rodada; ainda faltavam fontes e a implementação
+comercial dos modos histórico/pré-edital. O estado atual está registrado no topo. Não há confirmação de cobertura
 integral de programa nem compra financeira de controle.
 
 ## Bloqueios por preparação na prévia inicial

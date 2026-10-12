@@ -1,9 +1,39 @@
-# Maestro central da Editalume
+# Maestro central da Edital Lei Seca
 
 Roteiro do agente que coordena a produção editorial no nó **Maestro LeiProva** do
 Maestri (workspace "LeiProva — Fábrica Editorial"). Desde 11/10/2026 o Maestro pode
 ser o **Codex**. Leia antes `AGENTS.md`, `docs/OPERACAO.md` (entradas do topo) e
 `docs/MAESTRI-MOTORES-AUTOMATICOS.md`. Responda ao proprietário sempre em português.
+
+## Estado operacional atual — 11/10/2026, 23h23 BRT
+
+Marca atual: **Edital Lei Seca**. O nó `Maestro LeiProva`, os IDs dos agentes, o
+workspace, os aliases técnicos e os recursos `leiprova` permanecem preservados.
+Não renomear identificadores nem criar agentes ou rotinas duplicados.
+
+Origem ativa: **`wisewolf-vps`**, aplicação em **`leiprova.2b.app.br`**. A migração
+para a VPS do Everglades (`everglades-vps`) e `editaleiseca.com.br` ainda aguarda DNS
+nesta conferência. Os comandos deste roteiro continuam na origem; não mudar ponte,
+cron, webhook ou tráfego com base apenas em cópia/restauração do destino. Antes de
+qualquer ação, conferir `docs/MIGRACAO-EDITAL-LEI-SECA-2026-10-11.md` e o arquivo
+privado de destino da ponte `.local/maestri/remote-target.json`, se existir.
+
+Oferta confirmada pelo predicado de vínculos válidos: **ENAM (146), ENAC (70), PC-MA
+Delegado (82) e TC-DF (69)**. São quatro preparações disponíveis; o Master está aberto
+por `auto`. Entre os 84 produtos, 80 ainda não atingem 68 válidas, 70 carecem de
+edição oficial revisada e 73 de prova anterior aprovada ou dispensa. Déficit mínimo:
+5.440 questões válidas. Não apresentar preço LIVE ou rascunho como preparação pronta.
+
+A prioridade passou a considerar `approvedProductQuestionCount`, calculado uma vez
+por produto ligado em CTEs materializadas. Um produto com 68 associações mas 67
+vínculos válidos continua incompleto. A conferência de fontes, artigos do programa,
+versão legal, perfil e evidências permanece. Não ampliar mapeamento aprovado para
+atingir quantidade.
+
+No retrato desta conferência, os agentes existentes tinham reservas ativas
+`author:1110`, `mapping:1111` e `discovery:cebraspe:2026-10-12`; orçamento 34/48 em 24h.
+Não recolher ou sobrepor uma reserva ativa. Reconsultar status antes da pausa e do
+snapshot final da migração, preservando a conclusão e os recibos dos pacotes.
 
 ## Como trocar o Maestro para o Codex
 
@@ -90,7 +120,35 @@ Log: `/var/log/leiprova-release-chain.log` na VPS.
   - publique com `ssh wisewolf-vps 'cd /opt/leiprova && LEIPROVA_SKIP_SEED=1 ./deploy/pull-deploy.sh'`
     (nunca rode o seed em produção).
 
-## Pendências conhecidas (11/10/2026)
+## Pendências atuais (11/10/2026)
+
+- **80 preparações abaixo do piso**, com déficit mínimo de 5.440 questões válidas.
+  **70 sem edição oficial revisada** e **73 sem referência aprovada de prova anterior
+  ou dispensa**. Descoberta, cargo/especialidade/edição, programa, fonte e produção
+  precisam ser tratados por preparação. Ver `docs/PREPARACOES-INTEGRAIS-2026-10-11.md`.
+- **Histórico e pré-edital:** suporte implementado, mas nenhuma oferta reclassificada.
+  Conferir edição-base e modo explicitamente; usar legislação vigente e não anunciar
+  treino atual como reprodução de prova antiga. Ver `docs/MODOS-DE-PREPARACAO.md`.
+- **LGPD, Lei 12.737 e Lei 14.133:** continuam pendentes no corpus conforme a última
+  conferência. Não suprir artigos por inferência; ler/revisar fonte oficial sem texto
+  revogado antes de carga. Reconsultar os requisitos bloqueados; a estimativa anterior
+  era cerca de 45.
+- **PC-PR:** a prova foi em 11/10; não anunciar o edital como futura inscrição. O pedido
+  de treino histórico exige modo/edição-base revisados e legislação vigente; tarefas
+  antigas não devem ser declaradas prontas ou descartadas somente pela data.
+- **Propostas antigas de vínculos do ENAM e 12 questões do piloto:** revisar a situação
+  antes de nova ação. Proposta repetida não é nova questão publicada por produto.
+- **Compra financeira de controle e estorno:** continuam sem homologação nesta rodada.
+- **Migração/DNS:** origem ainda ativa nesta conferência; destino preparado não prova
+  corte. Consultar o registro operacional antes de mudar a ponte ou publicar novo
+  domínio como produção.
+
+## Registro histórico das pendências anteriores
+
+O bloco abaixo é o diagnóstico anterior às rodadas desta noite, preservado para
+comparação. TC-DF e ENAC já superaram as quantidades indicadas e estão liberados
+com 69 e 70 válidas; as demais estimativas devem ser revalidadas.
+
 
 - **TC-DF (53 questões) e ENAC (52)**, provas em 22/11: faltam 15 e 16 questões. A fila
   já prioriza os dois, e a linha libera sozinha ao chegar a 68. O terceiro concurso à

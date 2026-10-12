@@ -216,8 +216,19 @@
   letter-spacing: -0.06em;
   font-weight: 800;
 }
-.bookTop b {
-  color: var(--accent);
+.bookBrand :global(.editalume-logo) {
+  color: #dce9d6;
+  gap: 7px;
+}
+.bookBrand :global(.editalume-logo__mark) {
+  height: 26px;
+}
+.bookBrand :global(.editalume-logo__name) {
+  font-size: 15px;
+}
+.bookBrand :global(.editalume-logo__tagline) {
+  font-size: 7px;
+  color: #bfd0bc;
 }
 .bookTitle {
   top: 103px;

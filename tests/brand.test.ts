@@ -5,6 +5,8 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { metadata } from "@/app/layout";
 import manifest from "@/app/manifest";
 import { BrandMark } from "@/components/brand/BrandMark";
+import { CourseHero } from "@/components/contests/course-experience";
+import { ContestProductTour } from "@/components/contests/contest-product-tour";
 import { LeiProvaMark } from "@/components/ui/leiprova-mark";
 import { buildAccountAccessEmail } from "@/lib/account-access-email";
 import { BRAND_NAME, BRAND_TAGLINE, normalizeBrandEmailSender } from "@/lib/brand";
@@ -64,6 +66,19 @@ describe("identidade pública da Edital Lei Seca", () => {
     for (const html of [platformLogo, landingLogo]) {
       expect(html).toContain(BRAND_TAGLINE.toLowerCase());
       expect(html).not.toMatch(/Lei\s*Prova/i);
+    }
+  });
+
+  it("usa a identidade compartilhada nas artes de curso e no tour ilustrativo", () => {
+    const hero = renderToStaticMarkup(createElement(CourseHero, {
+      acronym: "ENAC", role: "Exame Nacional dos Cartórios", category: "Cartórios",
+      categorySlug: "cartorios", location: "Brasil", edition: "2026.2",
+    }));
+    const tour = renderToStaticMarkup(createElement(ContestProductTour));
+    for (const html of [hero, tour]) {
+      expect(html).toContain(`role="img" aria-label="${BRAND_NAME}"`);
+      expect(html).toContain("Edital <em>Lei Seca</em>");
+      expect(html).not.toMatch(/edita<(?:b|span)>lume/);
     }
   });
 

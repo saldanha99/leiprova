@@ -13,6 +13,8 @@ import {
   Target,
 } from "lucide-react";
 import { useId, useState } from "react";
+import { EditalumeLogo } from "@/components/brand/EditalumeLogo";
+import { BRAND_NAME } from "@/lib/brand";
 
 import styles from "./contest-landing.module.css";
 
@@ -118,8 +120,8 @@ export function ContestProductTour() {
           aria-live="polite"
         >
           <div className={styles.previewHeader}>
-            <span className={styles.previewLogo}>
-              edita<span>lume</span>
+            <span className={styles.previewLogo} role="img" aria-label={BRAND_NAME}>
+              <EditalumeLogo />
             </span>
             <span>Modo ilustrativo</span>
           </div>
