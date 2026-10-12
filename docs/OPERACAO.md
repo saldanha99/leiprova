@@ -3,6 +3,14 @@
 Documento de contexto para quem for continuar o projeto — pessoa ou assistente de IA.
 Descreve onde as coisas estão, como publicar e quais armadilhas já custaram tempo.
 
+**Catálogo integral e Stripe LIVE (11/10/2026, noite BRT):** 84 preparações foram
+sincronizadas com produtos/preços LIVE, com verificação independente sem divergências.
+O proprietário escolheu treino histórico e pré-edital separados, com legislação atual.
+Isso define o escopo; esses modos ainda exigem implementação e conteúdo. Flags já
+estavam abertas; não foram alteradas. Veja `docs/PREPARACOES-INTEGRAIS-2026-10-11.md`
+para diagnóstico, prova anterior, backup e limites de entrega. Produto Stripe não
+é preparação pronta.
+
 **Aprovação automática permanente e Maestro no Codex (11/10/2026, 21h30 BRT):** o
 proprietário escolheu "aprovar sozinho, sem me perguntar" para as próximas inéditas.
 `deploy/editorial-release-chain.sh`, agendada em `/etc/cron.d/leiprova-release-chain`
