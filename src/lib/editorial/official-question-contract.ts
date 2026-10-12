@@ -48,7 +48,7 @@ export function officialFormatEvidenceMatches(format:OfficialQuestionContract['f
   const text=quote.normalize('NFKD').replace(/\p{M}/gu,'').replace(/\s+/gu,' ').toLowerCase();
   const mc=/(?:5|cinco)\s*(?:\(cinco\))?\s*(?:alternativas|opcoes)/u.test(text);
   const ce=/\bcerto\b/u.test(text)&&/\berrado\b/u.test(text)&&/julgamento|julgue|julgad[oa]/u.test(text);
-  const single=/apenas uma resposta correta|uma unica resposta|um,? e somente um/u.test(text);
+  const single=/apenas uma resposta correta|uma unica resposta|um,? e somente um|das quais apenas 1\s*\(uma\) sera correta/u.test(text);
   return format==='multiple_choice'?mc&&single&&!ce:ce&&!mc;
 }
 

@@ -26,6 +26,15 @@ describe('contrato oficial por cargo/edição/etapa',()=>{
     expect(validateQuestionAgainstContract(c,{type:'true_false',options:options.slice(0,2)}).allowed).toBe(false);
     expect(getStyleProfileSeed('cebraspe')?.format).toBe('true_false');
   });
+  it('admite a redação do TJ-RS sem confundir quantidade de alternativas e respostas corretas',()=>{
+    const clause='Cada questão com 5 (cinco) alternativas de resposta,\ndas quais apenas 1 (uma) será correta.';
+    expect(officialFormatEvidenceMatches('multiple_choice',clause)).toBe(true);
+    expect(officialFormatEvidenceMatches('true_false',clause)).toBe(false);
+    expect(officialFormatEvidenceMatches('multiple_choice',clause.replace('1 (uma)','2 (duas)'))).toBe(false);
+    expect(officialFormatEvidenceMatches('multiple_choice',clause.replace('será correta','não será correta'))).toBe(false);
+    expect(officialFormatEvidenceMatches('multiple_choice',clause+' Outra etapa terá julgamento CERTO ou ERRADO.')).toBe(false);
+    expect(officialFormatEvidenceMatches('multiple_choice','Cada questão com 5 (cinco) alternativas de resposta, das quais apenas 1 (uma) será assinalada.')).toBe(false);
+  });
   it('TC-DF exige C/E com códigos oficiais C/E e internos A/B explícitos',()=>{
     const base=syntheticQuestionContract(),c=syntheticQuestionContract({format:'true_false',optionKeys:['A','B'],officialAnswerKeys:['C','E'],profile:{...base.profile,format:'true_false'}});
     expect(validateQuestionAgainstContract(c,{type:'true_false',options:[{key:'A',text:'Certo',correct:true},{key:'B',text:'Errado',correct:false}]}).allowed).toBe(true);
