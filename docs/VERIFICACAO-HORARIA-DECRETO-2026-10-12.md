@@ -1,6 +1,6 @@
 # Verificação horária das fontes do Decreto 12.807
 
-Estado em 12/10/2026: **instalado na VPS Everglades e primeira execução manual concluída às 07:35:49 UTC**, com saída 0 e auditoria **7177** (`editorial.legal_complementary_sources.verified`), IDs de fontes **1 e 2**, `humanReview:false`. A aprovação inicial foi registrada na auditoria **7176** após aplicar a migração 0053. O cron gerenciado dispara aos 17 minutos de cada hora; um disparo agendado posterior ainda precisa ter seu recibo conferido. O monitor não aprova fontes pendentes, artigos, questões ou contratos do Autor.
+Estado em 12/10/2026: **instalado na VPS Everglades e primeira execução manual concluída às 07:35:49 UTC**, com saída 0 e auditoria **7177** (`editorial.legal_complementary_sources.verified`), IDs de fontes **1 e 2**, `humanReview:false`. A aprovação inicial foi registrada na auditoria **7176** após aplicar a migração 0053. **Primeiro disparo agendado conferido às08:17:15UTC**, saída0, auditoria **7188**, os mesmos dois IDs e `humanReview:false`; log real em `/var/log/leiprova-supplementary-monitor.log`. O cron gerenciado dispara aos17 minutos de cada hora. O monitor não aprova fontes pendentes, artigos, questões ou contratos do Autor.
 
 ## Por que uma execução separada
 

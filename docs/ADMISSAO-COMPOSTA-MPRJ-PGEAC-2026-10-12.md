@@ -1,8 +1,17 @@
 # Admissão delimitada de programas compostos — MPRJ e PGE-AC
 
 Operador novo `scripts/admit-composite-official-course.ts`, separado da admissão
-MPMT. Estado deste documento: **implementado e testado em prévia/simulador de
-transação; nenhuma admissão no banco executada por este trabalho**.
+MPMT. **Aplicado na produção Everglades em12/10/2026**, após recaptura e
+conferência de todos os sete hashes documentais e dos dois programas compostos.
+MPRJ: oportunidade20, pública `31739f51-3b4b-4984-a272-54fb549c034d`,
+auditoria7411,389 requisitos, fontes25–28/snapshots1254–1257. PGE-AC:
+oportunidade21, pública `f16c8847-9d0d-4c47-84f8-752f3a72562d`, auditoria7412,
+96 requisitos, fontes30–32/snapshots1258–1260. Ambos permanecem draft,
+historical_training, sem questões/mapeamentos/liberações comerciais.
+Os recibos completos estão nas pastas privadas `composite-mprj-apply-20261012.7sbgZP`
+e `composite-pgeac-apply-20261012.6KW98W` em `/opt/leiprova/.local/editorial/`;
+backup anterior validado em `backups/before-composite-mprj-pgeac-20261012.dump`.
+Auditorias JSONB objeto, `owner_standing_authorization`, `humanReview:false`.
 
 Somente dois produtos são permitidos: `mpe-rj-promotor-de-justica-2026` (MPRJ,
 Promotor de Justiça Substituto, XXXIX/2026, RJ) e
@@ -43,6 +52,12 @@ pelo verificador oficial existente. Para MPRJ, a última edição é XXXIX/2026:
 somente o caderno Tipo1 está confirmado; o portal FGV oferece gabarito
 **preliminar**, e o definitivo público não foi localizado. A receita não usa
 XXXVIII/2025 como última prova nem transforma preliminar em definitivo.
+Pesquisa oficial posterior encontrou o [aviso de manutenção dos gabaritos após
+recursos](https://conhecimento.fgv.br/sites/default/files/concursos/22.06-recursos-gabarito-preambular.pdf),
+uma página, publicado no portal FGV em22/06. Ele confirma manutenção dos
+gabaritos da preambular, mas não é um novo PDF de gabarito definitivo. O suporte
+à comprovação composta por preliminar e decisão oficial ainda exige implementação,
+captura delimitada e auditoria próprias; nenhum bloqueio foi dispensado por essa pista.
 `definitiveAnswerKeyAvailable:false` e bloqueio explícito mantêm a referência
 MPRJ incompleta. Todos permanecem links externos **pendentes de aprovação para o
 produto**, sem armazenamento/extração ou licença presumida.

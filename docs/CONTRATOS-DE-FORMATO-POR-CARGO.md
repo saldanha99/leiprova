@@ -1,8 +1,25 @@
 # Contratos de formato por cargo, edição e etapa
 
-Preparação técnica de12/10/2026. **Aplicação parcial real:** migrações0052/0053,
-contratos ENAM/ENAC e suas certificações aplicados; o app anterior ainda estava
-ativo, aguardando a certificação TC-DF e a correção delimitada descrita abaixo.
+**Aplicação concluída em 12/10/2026:** migrações0052/0053, cinco contratos e
+certificações dos três cursos válidos aplicados. App e workers publicados com
+`3e49120` após corrigir a correlação SQL. Leitura transacional às08:29:35UTC
+confirmou ENAM146, ENAC70 e TC-DF69: três preparações e285 questões válidas.
+PC-MA segue com zero elegíveis e82 suspensas; MPMT histórico permanece draft/zero.
+
+Auditorias de contrato: ENAM6879, ENAC7105, PC-MA7189, TC-DF7190 e MPMT7260.
+O ENAM mantém225 certificados históricos, dos quais192 bindings aprovados passam
+pelos predicados atuais e representam146 questões distintas; os33 bindings
+pending_review não são aprovados por consequência. ENAC70 e TC-DF69 vínculos
+foram certificados. A operação não alterou as655 questões:561 reviewed,
+82 suspended e12 pending_review. Backups e previews/aplicações privados foram
+preservados no destino. `/api/health` e `/concursos` responderam200; app e três
+workers estavam running, com zero reinícios na conferência posterior.
+
+QA final da correção: lint/typecheck,1.747 testes gerais e23 testes PostgreSQL
+reais da fábrica/contratos passaram, além dos12 testes PostgreSQL de fontes
+complementares e seis verificações Bash/Python. O build Docker de produção
+passou; a última inclusão da URL exata do edital MPMT teve12 testes focados
+aprovados e foi compilada no deploy integral com seed desabilitado.
 
 O formato vem da cláusula da fonte oficial do cargo/edição/etapa. O perfil global
 da banca permanece histórico e interno: Cebraspe pode usar cinco alternativas na

@@ -44,8 +44,13 @@ recebeu `c08b6b4`: fontes pertencem a root com grupo node e leitura/execução d
 grupo, permitindo manutenção com capacidades removidas e worker UID1000.
 O worker de entrega passou a executar ciclos reais, com zero reinícios na
 conferência posterior; ciclos sem itens não comprovam cobrança ou envio de email.
-As migrações 0052/0053 e os contratos específicos ainda estavam em QA isolado
-nesse recibo; testes de unidade aprovados não comprovam aplicação em produção.
+Em conferência posterior às08:29UTC, migrações0052/0053 e cinco contratos
+específicos já foram efetivamente aplicados; app e workers usam `3e49120`.
+ENAM146, ENAC70 e TC-DF69 preservaram três preparações/285 questões válidas,
+com PC-MA fechado/zero e MPMT draft/zero. QA geral1.747 testes e23 PostgreSQL
+reais passaram. O primeiro ciclo agendado das fontes complementares ocorreu
+às08:17:15UTC, auditoria7188; ver [contratos e recibos](CONTRATOS-DE-FORMATO-POR-CARGO.md)
+e [monitor horário](VERIFICACAO-HORARIA-DECRETO-2026-10-12.md).
 QA da revisão `3e9323a`: 1.623 testes aprovados,
 239 opcionais pulados. Em 12/10, o Search Console verificou automaticamente o novo
 domínio por DNS. O sitemap foi enviado e depois **processado**, com 23 páginas e zero vídeos.
