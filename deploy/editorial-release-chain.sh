@@ -103,10 +103,13 @@ while read -r product opportunity status; do
   pending_counts=$(sql_ro "select count(*) filter (where r.editorial_status='draft'), count(*)
     from contest_product_question_bindings b
     join opportunity_requirements r on r.id=b.requirement_id
-    where b.product_slug='$product' and b.status='pending_review'") || exit 1
+    join questions q on q.id=b.question_id
+    where b.product_slug='$product' and b.status='pending_review'
+      and q.editorial_status='reviewed'
+      and date_trunc('milliseconds',q.updated_at)=date_trunc('milliseconds',b.question_updated_at)") || exit 1
   read -r pending_requirements pending_bindings <<< "$pending_counts"
   if [ "$pending_bindings" = "0" ]; then
-    log "sem vínculos pendentes $product"
+    log "sem vínculos pendentes com versão atual $product; vínculos antigos são preservados"
     continue
   fi
 
