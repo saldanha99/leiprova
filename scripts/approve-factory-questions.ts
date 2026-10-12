@@ -34,7 +34,10 @@ import {
 // originalidade. Item reprovado numa checagem fica em rascunho e é listado. A
 // auditoria registra a autorização do proprietário, não uma conferência item a
 // item no painel. Não cria vínculo nem libera produto.
-// Uso: tsx scripts/approve-factory-questions.ts [--apply] --contest=<slug do edital>
+// --standing: autorização permanente do proprietário (11/10/2026, "aprovar sozinho,
+// sem me perguntar"), usada pela linha automática deploy/editorial-release-chain.sh;
+// a auditoria registra que nenhum humano conferiu o item.
+// Uso: tsx scripts/approve-factory-questions.ts [--apply] [--standing] --contest=<slug do edital>
 // Sem --apply, tudo roda numa transação desfeita ao final (prévia).
 
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/u;
@@ -42,10 +45,11 @@ const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/u;
 export function parseFactoryApprovalArgs(argv: readonly string[]) {
   const args = argv.filter((arg) => arg !== "--");
   const apply = args.includes("--apply");
-  const rest = args.filter((arg) => arg !== "--apply");
+  const standing = args.includes("--standing");
+  const rest = args.filter((arg) => arg !== "--apply" && arg !== "--standing");
   const contest = rest.length === 1 ? /^--contest=(.+)$/u.exec(rest[0])?.[1] : undefined;
-  if (!contest || !SLUG.test(contest)) throw new Error("Use --contest=<slug do edital> [--apply].");
-  return { apply, contestSlug: contest };
+  if (!contest || !SLUG.test(contest)) throw new Error("Use --contest=<slug do edital> [--apply] [--standing].");
+  return { apply, standing, contestSlug: contest };
 }
 
 type Skipped = { publicId: string; reason: string };
@@ -53,7 +57,7 @@ type Skipped = { publicId: string; reason: string };
 class PreviewRollback extends Error {}
 
 async function main() {
-  const { apply, contestSlug } = parseFactoryApprovalArgs(process.argv.slice(2));
+  const { apply, standing, contestSlug } = parseFactoryApprovalArgs(process.argv.slice(2));
   const reviewer = parseOpportunityApprovalReviewerIdentity({
     ADMIN_EMAILS: process.env.ADMIN_EMAILS,
     OPPORTUNITY_APPROVAL_REFERENCE: process.env.QUESTION_APPROVAL_REFERENCE,
@@ -152,7 +156,9 @@ async function main() {
 
         const now = new Date();
         const batchId = randomUUID();
-        const notes = `Aprovação em massa sob declaração do proprietário de que conferiu as questões (${reviewer.approvalReference}).`;
+        const notes = standing
+          ? `Aprovação automática sob autorização permanente do proprietário, sem conferência humana do item (${reviewer.approvalReference}).`
+          : `Aprovação em massa sob declaração do proprietário de que conferiu as questões (${reviewer.approvalReference}).`;
         const skipped: Skipped[] = [];
         const approved: Array<{ publicId: string; dossierFingerprint: string; similarityMaxBps: number;
           similarityReferencePublicId: string | null; generatorModel: string | null; promptVersion: string | null }> = [];
@@ -235,7 +241,7 @@ async function main() {
             batchId,
             batchSize: approved.length,
             contestSlug,
-            approvalMode: "owner_authorization",
+            approvalMode: standing ? "owner_standing_authorization" : "owner_authorization",
             approvalReference: reviewer.approvalReference,
             executionSource: "server_cli",
           };
@@ -262,7 +268,8 @@ async function main() {
               metadata: {
                 ...common,
                 reviewAttested: true,
-                itemBindingMode: "owner_bulk_authorization",
+                itemBindingMode: standing ? "owner_standing_authorization" : "owner_bulk_authorization",
+                humanItemReview: !standing,
                 dossierFingerprint: item.dossierFingerprint,
                 notes,
               },

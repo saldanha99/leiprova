@@ -3,6 +3,25 @@
 Documento de contexto para quem for continuar o projeto — pessoa ou assistente de IA.
 Descreve onde as coisas estão, como publicar e quais armadilhas já custaram tempo.
 
+**Aprovação automática permanente e Maestro no Codex (11/10/2026, 21h30 BRT):** o
+proprietário escolheu "aprovar sozinho, sem me perguntar" para as próximas inéditas.
+`deploy/editorial-release-chain.sh`, agendada em `/etc/cron.d/leiprova-release-chain`
+(01h40, 07h40, 13h40 e 19h40 UTC, log em `/var/log/leiprova-release-chain.log`, trava
+`flock`):
+1. aprova os rascunhos da fábrica com `editorial:questions:approve --standing`
+   (`owner-standing-2026-10-11:aprovar-sozinho`; auditoria com
+   `owner_standing_authorization` e `humanItemReview: false`);
+2. importa os vínculos;
+3. revisa os itens do edital e os vínculos;
+4. libera o produto em rascunho que cumprir as condições.
+
+Flags comerciais e Stripe ficam de fora. A conferência passa a ser posterior: o Maestro
+(roteiro em `docs/MAESTRO-CENTRAL.md`) lê as questões aprovadas sem revisão humana e
+suspende os erros com `pnpm editorial:questions:suspend`. A suspensão tira a questão do
+treino e dos produtos, e a venda fecha sozinha se um produto cair abaixo de 68. Como a
+sessão do Claude estava acabando, o proprietário autorizou trocar o Maestro central
+para o Codex.
+
 **PC-MA Delegado à venda; inéditas aprovadas em massa (11/10/2026, 20h30 BRT):** o
 proprietário declarou ter conferido as 274 inéditas da fábrica ("eu já vi tudo, libere tudo
 em massa"), mas nenhuma revisão estava registrada no painel. Novo

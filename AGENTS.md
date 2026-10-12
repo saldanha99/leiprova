@@ -32,6 +32,10 @@ Regras que valem sempre:
 - Canais comerciais (cadastro, contato, checkout, Stripe Connect) ficam fechados
   por feature flag. Não abra nenhum sem decisão explícita do responsável.
 - Conteúdo jurídico exige fonte oficial e revisão humana antes de publicar.
+  Exceção decidida pelo proprietário em 11/10/2026: as inéditas da fábrica são
+  aprovadas, vinculadas e liberadas pela linha automática
+  `deploy/editorial-release-chain.sh`, sem conferência humana do item (auditoria
+  `owner_standing_authorization`); o Maestro confere depois e suspende o que tiver erro.
   Não faça scraping nem reutilize questões de terceiros sem licença escrita.
 - Scripts novos que rodem por `tsx` precisam de `--env-file-if-exists=.env`;
   o projeto não tem `dotenv`.
@@ -67,8 +71,13 @@ Regras que valem sempre:
   rascunhos. O Maestro coordena os nós existentes, sem duplicá-los.
 - Use a ponte delimitada por SSH existente; nunca copie credenciais para agentes
   ou notas. `.local/maestri/queue` é privada e não entra em Git ou Docker.
-- Resultado `prepared` não é aprovação. Publicação e vínculo comercial continuam
-  exigindo revisão humana efetiva. Stripe permanece pausada por decisão atual.
+- Resultado `prepared` não é aprovação: quem aprova as inéditas da fábrica é a linha
+  de liberação (exceção acima); fora dela, publicação e vínculo comercial continuam
+  exigindo revisão humana efetiva. Stripe está em modo live só para a venda já aberta;
+  não altere flags comerciais.
+- **Maestro central** (nó "Maestro LeiProva", pode ser Claude ou Codex): siga
+  `docs/MAESTRO-CENTRAL.md` — saúde, conferência das aprovadas, suspensão de erros e
+  relatório ao proprietário em português.
 - Documentação, nós conectados ou fila pendente não comprovam execução: registrar
   IDs reais de rotinas e recibos. Maestri fechado/host indisponível deixa a fila
   aguardando; não prometer autoria 24/7 nem recorrer a APIs pagas.
