@@ -87,7 +87,7 @@ describe("captura pendente da LGPD atualizada da Câmara", () => {
     vi.stubGlobal("fetch", mocked);
     await expect(fetchOfficialConsolidatedLegalText(CAMARA_LGPD_SOURCE.monitorUrl)).rejects.toThrow(/bloqueada/u);
     expect(mocked).toHaveBeenCalledTimes(1);
-    await expect(fetchOfficialConsolidatedLegalText("https://legis.senado.leg.br/norma/33382036", { provider: "camara" })).rejects.toThrow(/identidade exata/u);
+    await expect(fetchOfficialConsolidatedLegalText("https://legis.senado.leg.br/norma/552282", { provider: "camara" })).rejects.toThrow(/identidades exatas/u);
     expect(mocked).toHaveBeenCalledTimes(1);
     mocked.mockReset().mockResolvedValueOnce(new Response("User-agent: *\nDisallow:")).mockResolvedValueOnce(new Response(html(), { headers: { "content-type": "text/html; charset=iso-8859-1" } }));
     await expect(fetchOfficialConsolidatedLegalText(CAMARA_LGPD_SOURCE.monitorUrl)).rejects.toThrow(/UTF-8/u);

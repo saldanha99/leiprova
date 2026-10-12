@@ -9,7 +9,8 @@ seus volumes/arquivos como consequência automática da migração.
 
 Registro baseado nas verificações efetivas do operador de migração. Produção agora
 em **https://editaleiseca.com.br**, na VPS Everglades. A revisão publicada é
-`1b5bc146`; QA da imagem: 1.605 testes aprovados e 239 opcionais pulados. Os dados
+`1b5bc146` no corte, seguida de `3e9323a` (1.623 testes aprovados e 239 opcionais
+pulados). Os dados
 abaixo descrevem o corte, não uma homologação financeira nem a conclusão dos 84 cursos.
 
 | Conferência | Resultado registrado |
@@ -57,18 +58,21 @@ No corte havia **4 preparações disponíveis entre 84 planejadas**, com **367 q
 com vínculos válidos**: ENAM, PC-MA Delegado, TC-DF e ENAC. Os produtos e preços LIVE
 cadastrados para os demais concursos não indicam que seu conteúdo esteja pronto.
 Treino histórico e pré-edital precisam de programa identificado e legislação atual;
-o novo parser LGPD e o fluxo de autorização de programa ainda não estão ativos
-na imagem publicada `1b5bc146`.
+a LGPD recebeu carga real de 72 artigos na versão legal 110. A aprovação consta
+na auditoria 6309 (`editorial.legal_text.approved`,
+`approvalMode: owner_standing_authorization`, `humanReview: false`), com snapshot
+`0f7ba2b8-797e-4939-a86f-57077eea58a5` e checksum
+`2189954871b10f2cdec1609149aa12ab2cd836343407fb8c26f2b1429c0fb490`.
+Esse recibo não libera automaticamente preparações sem programa e questões válidas.
 
 ### Recibos Google — 12/10/2026
 
 - **Titularidade:** o Search Console verificou automaticamente o novo domínio por
   DNS; não permanece pendente a confirmação da propriedade nova.
-- **Sitemap enviado:** `https://editaleiseca.com.br/sitemap.xml`, em 12/10. O primeiro
-  status no painel foi **“Não foi possível buscar”**. Uma consulta externa com
-  Googlebot recebeu HTTP 200 e XML contendo 23 URLs válidas, todas no domínio novo.
-  Esse acesso externo não comprova que o Search Console já leu o arquivo; acompanhar
-  seu processamento e investigar se o erro persistir.
+- **Sitemap enviado e processado:** `https://editaleiseca.com.br/sitemap.xml`, em
+  12/10. O primeiro erro “Não foi possível buscar” foi superado: o painel passou
+  a informar processamento de **23 páginas e zero vídeos**. Captura privada:
+  `google-sitemap-processed.png`.
 - **Mudança de endereço confirmada:** propriedade de origem exata
   `https://leiprova.2b.app.br/` → `sc-domain:editaleiseca.com.br`. As verificações de
   redirecionamento 301 e titularidade passaram. O painel confirmou **“Este site está
@@ -76,10 +80,20 @@ na imagem publicada `1b5bc146`.
 - **Capturas privadas:** `google-change-address-confirmed.png` e
   `google-sitemap-submitted.png`; manter fora do Git.
 
-A solicitação de mudança foi aceita, mas leitura do sitemap pelo Google,
-indexação, ranking e citações por IA **não estão confirmados**. A auditoria pública
-completa após o corte deve ter recibo próprio; a auditoria de 24 URLs no domínio
-antigo e o HTML conferido privadamente no destino são evidências anteriores.
+A auditoria pública após o corte confirmou **23 URLs HTTP 200 e indexáveis**, sem
+problemas críticos, avisos, JSON-LD inválido ou URLs repetidas. A home apresentou
+1.488 palavras ao agente padrão, Googlebot e OAI-SearchBot, sem diferença de volume.
+A auditoria antiga de 24 URLs e a cópia de ensaio continuam como histórico.
+
+A solicitação de mudança foi aceita e o sitemap foi processado. **Indexação das
+páginas, ranking e citações por IA não estão confirmados**; o processamento é um
+recibo de descoberta, não uma garantia de resultado.
+
+IndexNow está preparado por operador com preview como padrão, somente para URLs
+públicas do sitemap no domínio novo; arquivo de titularidade precisa ser publicado
+e conferido antes de `--apply`. **Ainda não houve notificação IndexNow.** Ver
+[operador e limites](INDEXNOW-DESCOBERTA-2026-10-12.md).
+
 
 ## Origem e destino
 

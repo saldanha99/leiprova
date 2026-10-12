@@ -16,6 +16,7 @@ export const OFFICIAL_OPPORTUNITY_SOURCE_POLICIES = [
     publisher: "FGV Conhecimento",
     allowedHosts: ["conhecimento.fgv.br"],
     allowedPathPrefixes: ["/concursos/", "/exames/"],
+    allowedExactPaths: ["/sites/default/files/concursos/comunicado_n_05_2026_resultado_definitivo_p_objetiva_04_08_2026_assinado.pdf"],
   },
   {
     id: "governo-bahia",
@@ -147,7 +148,8 @@ function urlMatchesPolicy(url: URL, policy: OfficialOpportunitySourcePolicy) {
   const hostname = url.hostname.toLowerCase();
   return (
     (policy.allowedHosts as readonly string[]).includes(hostname) &&
-    policy.allowedPathPrefixes.some((prefix) => url.pathname.startsWith(prefix))
+    (policy.allowedPathPrefixes.some((prefix) => url.pathname.startsWith(prefix)) ||
+      ("allowedExactPaths" in policy && (policy.allowedExactPaths as readonly string[]).includes(url.pathname)))
   );
 }
 

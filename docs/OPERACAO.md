@@ -5,7 +5,7 @@ Descreve onde as coisas estão, como publicar e quais armadilhas já custaram te
 
 **Produção migrada (12/10/2026, cerca de 01h23 BRT):** o endereço canônico agora é
 `https://editaleiseca.com.br`, na VPS Everglades (`everglades-vps`, `179.236.255.4`),
-com marca Edital Lei Seca e código publicado `1b5bc146`. DNS autoritativo
+com marca Edital Lei Seca; a revisão publicada após o corte é `3e9323a`. DNS autoritativo
 `b.sec.dns.br` / `c.sec.dns.br`, registro A e TXT Google públicos; HTTPS válido,
 home e `/api/health` com HTTP 200, `www` com 301 para o host canônico. A cópia final
 foi restaurada e a conferência das 68 tabelas coincidiu. SHA-256 do dump:
@@ -22,16 +22,25 @@ homologada. A home Everglades continuou respondendo HTTP 200.
 
 O catálogo tem **4 de 84 preparações disponíveis, somando 367 questões com vínculos
 válidos** na conferência do corte. Produto/preço Stripe cadastrado não significa
-curso pronto. O novo parser LGPD e o fluxo de autorização de programa ainda
-não estão ativos na imagem publicada. QA dessa imagem: 1.605 testes aprovados,
+curso pronto. A LGPD foi carregada com 72 artigos na versão legal 110; auditoria
+6309 (`editorial.legal_text.approved`), com aprovação permanente do proprietário
+e `humanReview: false`. QA da revisão `3e9323a`: 1.623 testes aprovados,
 239 opcionais pulados. Em 12/10, o Search Console verificou automaticamente o novo
-domínio por DNS. O sitemap foi enviado, mas seu primeiro status foi **“Não foi
-possível buscar”**; a conferência externa com Googlebot recebeu HTTP 200 e XML com
-23 URLs válidas no domínio novo. A mudança de endereço da propriedade exata
+domínio por DNS. O sitemap foi enviado e depois **processado**, com 23 páginas e zero vídeos.
+O erro inicial de busca foi superado no painel. A auditoria pública confirmou
+23 URLs HTTP 200 e indexáveis, sem problemas críticos, avisos, JSON-LD inválido
+ou duplicatas; a home entregou 1.488 palavras igualmente a Googlebot, OAI-SearchBot
+e ao agente padrão. A mudança de endereço da propriedade exata
 `https://leiprova.2b.app.br/` para `sc-domain:editaleiseca.com.br` passou pelas
 verificações de 301 e titularidade e foi confirmada no painel: **“Este site está
-sendo movido”**, início em 12/10. Leitura do sitemap pelo Google, indexação e
-ranking ainda não estão confirmados.
+sendo movido”**, início em 12/10. O processamento do sitemap não confirma que
+as páginas foram indexadas, ganharam ranking ou foram citadas por IA.
+
+IndexNow está preparado por operador com preview como padrão, somente para URLs
+públicas do sitemap no domínio novo; arquivo de titularidade precisa ser publicado
+e conferido antes de `--apply`. **Ainda não houve notificação IndexNow.** Ver
+[operador e limites](INDEXNOW-DESCOBERTA-2026-10-12.md).
+
 Recibos e retorno: [migração concluída e limites](MIGRACAO-EDITAL-LEI-SECA-2026-10-11.md).
 
 **Registro histórico de preparação (11/10/2026, noite BRT; superado pelo corte acima):** o proprietário
@@ -863,7 +872,8 @@ pnpm dev
 ```
 
 Comandos de verificação. A imagem publicada no corte de 12/10/2026 teve lint,
-tipagem e build aprovados, 1.605 testes aprovados e 239 opcionais pulados:
+tipagem e build aprovados; a revisão `3e9323a` teve 1.623 testes aprovados e
+239 opcionais pulados:
 
 ```bash
 pnpm lint && pnpm typecheck && pnpm test && pnpm build

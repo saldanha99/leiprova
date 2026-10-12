@@ -22,6 +22,7 @@ import {
 import { getOfficialLegalSource } from "../src/lib/official-sources/legal-registry";
 import { parseConsolidatedLegalArticles } from "../src/lib/official-sources/legal-text";
 import { getPlanaltoConsolidatedSource } from "../src/lib/official-sources/planalto-text";
+import { CAMARA_PROCUREMENT_REVIEW_LIMITATIONS, CAMARA_PROCUREMENT_SOURCE } from "../src/lib/official-sources/camara-procurement-text";
 import {
   parseOpportunityApprovalReviewerIdentity,
   requireOpportunityApprovalDatabaseUrl,
@@ -196,7 +197,7 @@ async function main() {
               action: "editorial.legal_text.captured",
               entityType: "legal_text_snapshot",
               entityId: textRow.publicId,
-              metadata: { legalActSlug: slug, sourceUrl: captured.sourceUrl, checksum: captured.checksumSha256, articleCount: articles.length, parserVersion: captured.parserVersion, status: "pending_review", executionSource: "server_cli", captureReference: reviewer.approvalReference, humanReview: false },
+              metadata: { legalActSlug: slug, sourceUrl: captured.sourceUrl, checksum: captured.checksumSha256, articleCount: articles.length, parserVersion: captured.parserVersion, status: "pending_review", executionSource: "server_cli", captureReference: reviewer.approvalReference, humanReview: false, ...(captured.sourceUrl === CAMARA_PROCUREMENT_SOURCE.url ? { reviewLimitations: CAMARA_PROCUREMENT_REVIEW_LIMITATIONS, monetaryDependencyArticlePaths: ["art-6", "art-37", "art-70", "art-75", "art-95", "art-184-a"], judicialDependencyArticlePaths: ["art-75"], vetoReconciliationRequired: true } : {}) },
             });
             const summary = { slug, articles: articles.length, monitor: monitorRow.status, text: "pending_review", versionsActivated: 0 };
             if (!apply) throw new PreviewRollback(JSON.stringify(summary));

@@ -8,6 +8,13 @@ import {
 } from "@/lib/opportunities/source-monitor-policy";
 
 describe("allowlist de fontes oficiais de oportunidades", () => {
+  it("admite o comunicado MPMT exato sem liberar outros assets da FGV", () => {
+    const url = "https://conhecimento.fgv.br/sites/default/files/concursos/comunicado_n_05_2026_resultado_definitivo_p_objetiva_04_08_2026_assinado.pdf";
+    expect(parseOfficialOpportunitySourceUrl(url, "fgv-conhecimento").url).toBe(url);
+    expect(() => parseOfficialOpportunitySourceUrl(`${url}/outro`, "fgv-conhecimento")).toThrow();
+    expect(() => parseOfficialOpportunitySourceUrl("https://conhecimento.fgv.br/sites/default/files/concursos/outro.pdf", "fgv-conhecimento")).toThrow();
+    expect(() => parseOfficialOpportunitySourceUrl(url, "cnj")).toThrow();
+  });
   it("aceita somente host e caminho registrados e remove fragmentos", () => {
     expect(
       parseOfficialOpportunitySourceUrl(

@@ -5,6 +5,22 @@ Base: decisão explícita do proprietário em 12/10/2026, registrada em
 da Câmara e o monitoramento da mesma norma no Senado. Não altera o loader de
 captura, o painel de revisão ou a autorização de quaisquer outros atos.
 
+## Recibo de produção — 12/10/2026
+
+Aplicado na VPS `everglades-vps`, após captura e prévia com fontes oficiais frescas.
+Fotografia `0f7ba2b8-797e-4939-a86f-57077eea58a5`, checksum
+`2189954871b10f2cdec1609149aa12ab2cd836343407fb8c26f2b1429c0fb490`,
+fingerprint `bbeb605c51ff7bf6f249075b58c1ca4ee5549e02f3d445718bfe60bf4453f611`.
+Versão **110**, **72 artigos**, recibo audit **6309**,
+`owner_standing_authorization`, `humanReview:false`. Consulta posterior confirmou
+os 72 artigos da versão atual e o modo da auditoria. Nenhuma questão aprovada ou
+vínculo criado por este operador.
+
+A fotografia antiga `e0cd6971-6a94-4298-9e6a-2fd347d430ba` permaneceu **rejeitada**;
+a comparação e os logs completos ficam privados na VPS e em `.local/`.
+Código executado: `3e9323a`; lint, typecheck e 1.623 testes passaram, com 239
+opcionais pulados; build publicado na VPS, sem servidor/build no Mac.
+
 ## Correção encontrada antes de ativar
 
 A revisão posterior à captura inicial encontrou **14 títulos de seção** em

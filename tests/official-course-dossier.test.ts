@@ -3,7 +3,7 @@ import { createHash } from "node:crypto";
 import { describe, expect, it } from "vitest";
 
 import { buildOfficialCourseDossierPreview, extractLetteredProgrammeCandidates, OFFICIAL_COURSE_DOSSIER_RECIPES, OFFICIAL_COURSE_STANDING_REFERENCE } from "../src/lib/editorial/official-course-dossier";
-import { assertStandingCourseAdmission, assertStandingCourseProductUpdate, requireStandingCourseMaintenanceDatabaseUrl } from "../src/lib/editorial/official-course-admission";
+import { assertStandingCourseAdmission, assertStandingCourseProductUpdate, assertStandingCourseStageMetadata, requireStandingCourseMaintenanceDatabaseUrl } from "../src/lib/editorial/official-course-admission";
 import type { CapturedOfficialDocument } from "../src/lib/opportunities/official-document-fetch";
 import { parseOfficialCourseDossierArgs, safeOfficialCourseDossierError } from "../scripts/prepare-official-course-dossiers";
 
@@ -85,5 +85,14 @@ describe("bounded official course dossier preview", () => {
     expect(safeOfficialCourseDossierError(dbError)).not.toContain("private");
     const message = safeOfficialCourseDossierError(new Error("https://host/private?token=secret postgres://owner:private@host/db sk_live_synthetic password=private token=private Bearer private"));
     expect(message).not.toMatch(/private|secret|sk_live|postgres:|https:/u);
+  });
+  it("refuses redirected, HTML or empty result documents even with HTTP200", () => {
+    const url = "https://conhecimento.fgv.br/sites/default/files/concursos/comunicado_n_05_2026_resultado_definitivo_p_objetiva_04_08_2026_assinado.pdf";
+    const stage = { url, contentType: "application/pdf", contentLength: 1234 };
+    expect(() => assertStandingCourseStageMetadata(stage, url)).not.toThrow();
+    expect(() => assertStandingCourseStageMetadata({ ...stage, contentLength: null }, url)).not.toThrow();
+    expect(() => assertStandingCourseStageMetadata({ ...stage, url: "https://conhecimento.fgv.br/concursos/mpmt" }, url)).toThrow();
+    expect(() => assertStandingCourseStageMetadata({ ...stage, contentType: "text/html" }, url)).toThrow();
+    expect(() => assertStandingCourseStageMetadata({ ...stage, contentLength: 0 }, url)).toThrow();
   });
 });

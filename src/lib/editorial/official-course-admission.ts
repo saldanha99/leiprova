@@ -26,6 +26,13 @@ export function assertStandingCourseProductUpdate(rows: readonly { slug: string 
   if (rows.length !== 1 || rows[0].slug !== productSlug) throw new Error("Vínculo do produto não atualizou exatamente o alvo esperado; transação cancelada.");
 }
 
+export function assertStandingCourseStageMetadata(stage: Readonly<{ url: string; contentType: string | null; contentLength: number | null }>, expectedUrl: string) {
+  if (stage.url !== expectedUrl || stage.contentType?.split(";", 1)[0].trim().toLowerCase() !== "application/pdf"
+    || (stage.contentLength !== null && (!Number.isSafeInteger(stage.contentLength) || stage.contentLength <= 0))) {
+    throw new Error("Marco do resultado diverge da URL/PDF oficial esperado; admissão bloqueada.");
+  }
+}
+
 /** New MPMT baseline only. Existing reviewed opportunities are never overwritten. */
 export async function admitStandingOfficialCourse(recipe: OfficialCourseDossierRecipe, document: CapturedOfficialDocument, expectedHash: string) {
   assertStandingCourseAdmission(recipe.productSlug, expectedHash, document.checksumSha256, process.env.OPPORTUNITY_APPROVAL_REFERENCE);
@@ -36,6 +43,7 @@ export async function admitStandingOfficialCourse(recipe: OfficialCourseDossierR
   const stage = await checkOpportunitySourceMetadata({ sourceId: "fgv-conhecimento", publisher: "FGV Conhecimento", url: stageEvidenceUrl,
     documentType: "official_announcement", status: "pending_review", sourcePolicy: "metadata_only", sourceContentStored: false });
   if (classifyOpportunitySourceHttpStatus(stage.httpStatus) !== "verified") throw new Error("Marco oficial do resultado indisponível; admissão bloqueada.");
+  assertStandingCourseStageMetadata(stage, stageEvidenceUrl);
   const reviewer = parseOpportunityApprovalReviewerIdentity({ ADMIN_EMAILS: process.env.ADMIN_EMAILS, OPPORTUNITY_APPROVAL_REFERENCE: process.env.OPPORTUNITY_APPROVAL_REFERENCE });
   const client = postgres(databaseUrl, { max: 1, prepare: false });
   const note = `Revisão automatizada sob owner_standing_authorization (${reviewer.approvalReference}); humanReview:false. Programa do edital 01/2026 compilado; treino histórico objetivo com legislação atual. Sem aprovação de vínculos legais ou questões.`;

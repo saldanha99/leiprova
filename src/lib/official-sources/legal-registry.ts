@@ -1,5 +1,6 @@
 import { isAllowedPlanaltoConsolidatedUrl } from "./planalto-text";
 import { isAllowedCamaraConsolidatedUrl } from "./camara-text";
+import { isAllowedCamaraProcurementUrl } from "./camara-procurement-text";
 
 export const OFFICIAL_LEGAL_SOURCES = [
   {
@@ -536,6 +537,7 @@ export function isAllowedOfficialLegalUrl(url: string) {
 }
 
 export function isAllowedOfficialLegalTextUrl(url: string) {
+  if (isAllowedCamaraProcurementUrl(url)) return true;
   if (isAllowedCamaraConsolidatedUrl(url)) return true;
   if (isAllowedPlanaltoConsolidatedUrl(url)) return true;
   try {

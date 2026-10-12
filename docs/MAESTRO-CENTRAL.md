@@ -5,18 +5,20 @@ Maestri (workspace "LeiProva — Fábrica Editorial"). Desde 11/10/2026 o Maestr
 ser o **Codex**. Leia antes `AGENTS.md`, `docs/OPERACAO.md` (entradas do topo) e
 `docs/MAESTRI-MOTORES-AUTOMATICOS.md`. Responda ao proprietário sempre em português.
 
-## Estado operacional atual — 11/10/2026, 23h23 BRT
+## Estado operacional atual — 12/10/2026, após o corte de produção
 
 Marca atual: **Edital Lei Seca**. O nó `Maestro LeiProva`, os IDs dos agentes, o
 workspace, os aliases técnicos e os recursos `leiprova` permanecem preservados.
 Não renomear identificadores nem criar agentes ou rotinas duplicados.
 
-Origem ativa: **`wisewolf-vps`**, aplicação em **`leiprova.2b.app.br`**. A migração
-para a VPS do Everglades (`everglades-vps`) e `editaleiseca.com.br` ainda aguarda DNS
-nesta conferência. Os comandos deste roteiro continuam na origem; não mudar ponte,
-cron, webhook ou tráfego com base apenas em cópia/restauração do destino. Antes de
-qualquer ação, conferir `docs/MIGRACAO-EDITAL-LEI-SECA-2026-10-11.md` e o arquivo
-privado de destino da ponte `.local/maestri/remote-target.json`, se existir.
+Produção ativa: **`everglades-vps`**, aplicação em **`editaleiseca.com.br`**.
+O corte foi concluído em 12/10/2026, cerca de 01h23 BRT, com HTTPS válido,
+cópia final e conferência das 68 tabelas. A origem `wisewolf-vps` preserva banco,
+pooler e backups; app e workers estão parados. Caddy legado redireciona páginas
+em 301 e encaminha o webhook antigo. Não reiniciar workers na origem.
+A ponte privada `.local/maestri/remote-target.json` aponta para `everglades-vps`;
+crons de backup/liberação e os três workers foram iniciados somente no destino.
+Leia `docs/MIGRACAO-EDITAL-LEI-SECA-2026-10-11.md` antes de operar ou retornar.
 
 Oferta confirmada pelo predicado de vínculos válidos: **ENAM (146), ENAC (70), PC-MA
 Delegado (82) e TC-DF (69)**. São quatro preparações disponíveis; o Master está aberto
@@ -30,10 +32,9 @@ vínculos válidos continua incompleto. A conferência de fontes, artigos do pro
 versão legal, perfil e evidências permanece. Não ampliar mapeamento aprovado para
 atingir quantidade.
 
-No retrato desta conferência, os agentes existentes tinham reservas ativas
-`author:1110`, `mapping:1111` e `discovery:cebraspe:2026-10-12`; orçamento 34/48 em 24h.
-Não recolher ou sobrepor uma reserva ativa. Reconsultar status antes da pausa e do
-snapshot final da migração, preservando a conclusão e os recibos dos pacotes.
+No retrato da ponte após o corte, o orçamento era 43/48 em 24h, com reservas
+ativas preservadas. Reconsultar status antes de disparar qualquer tarefa e conferir
+os recibos; inicialização e documentação não comprovam produção contínua.
 
 ## Como trocar o Maestro para o Codex
 
@@ -66,7 +67,7 @@ Log: `/var/log/leiprova-release-chain.log` na VPS.
 ## Rotina do Maestro (a cada sessão ou rotina)
 
 1. **Saúde.** Siga o checklist de retomada, usando consultas só de leitura:
-   - `ssh wisewolf-vps "tail -40 /var/log/leiprova-release-chain.log"`;
+   - `ssh everglades-vps "tail -40 /var/log/leiprova-release-chain.log"`;
    - último `automation.editorial.completed` em `audit_logs`;
    - `tail .local/maestri/preflight-events.jsonl`. `agent_offline` do Guardião ou do Autor
      significa que o Codex daquele nó fechou: peça ao proprietário para reabrir (nó →
@@ -76,7 +77,7 @@ Log: `/var/log/leiprova-release-chain.log` na VPS.
    `.local/maestri/maestro-conferencia.txt`; esse arquivo é privado e fica fora do Git.
 
    ```bash
-   ssh wisewolf-vps "docker exec -i -e PGOPTIONS='-c default_transaction_read_only=on' leiprova-db psql -U leiprova_owner -d leiprova -At -c \"
+   ssh everglades-vps "docker exec -i -e PGOPTIONS='-c default_transaction_read_only=on' leiprova-db psql -U leiprova_owner -d leiprova -At -c \"
    select q.public_id, q.prompt, a.article_ref, a.literal_text,
      (select string_agg(o.option_key || case when o.is_correct then '*' else '' end || ') ' || o.text, E'\n' order by o.sort_order) from question_options o where o.question_id = q.id)
    from audit_logs l join questions q on q.public_id = l.entity_id
@@ -94,10 +95,10 @@ Log: `/var/log/leiprova-release-chain.log` na VPS.
    cair abaixo de 68, a venda dele fecha sozinha.
 
    ```bash
-   ssh wisewolf-vps 'cd /opt/leiprova && docker compose --profile tools run --rm -T -e SUSPENSION_REFERENCE=maestro-conferencia-AAAA-MM-DD opportunity-approver pnpm -s editorial:questions:suspend -- --apply --reason="<erro encontrado>" question=<uuid> question=<uuid>'
+   ssh everglades-vps 'cd /opt/leiprova && docker compose --profile tools run --rm -T -e SUSPENSION_REFERENCE=maestro-conferencia-AAAA-MM-DD opportunity-approver pnpm -s editorial:questions:suspend -- --apply --reason="<erro encontrado>" question=<uuid> question=<uuid>'
    ```
 4. **Rodar a linha fora do horário,** se houver rascunhos novos e pressa:
-   `ssh wisewolf-vps /opt/leiprova/deploy/editorial-release-chain.sh`.
+   `ssh everglades-vps /opt/leiprova/deploy/editorial-release-chain.sh`.
 5. **Relatório ao proprietário,** em português:
    - concursos à venda e questões por produto;
    - o que foi aprovado e o que foi suspenso;
@@ -110,17 +111,19 @@ Log: `/var/log/leiprova-release-chain.log` na VPS.
   explícita do proprietário. A Master abre sozinha pela regra `auto`; não mexa nela.
 - Nunca copie segredos para notas, prompts ou Git. O `.env` de produção fica só na VPS.
 - Não faça scraping de questões de terceiros; prova anterior só por link oficial.
-- A aprovação permanente vale **apenas** para inéditas da fábrica, pela linha de
-  liberação. Prova anterior, edital, dispensa e produto fora dela seguem as regras de
-  `AGENTS.md`.
+- A aprovação permanente das inéditas usa a linha de liberação. Em 12/10/2026,
+  o proprietário também autorizou revisão automatizada de fontes, editais e
+  programas oficiais, com auditoria `humanReview:false`. Cada aplicação exige
+  evidência primária e identidade exata; `prepared` não é aprovação. Prova anterior,
+  direitos e dispensa continuam sujeitos às verificações específicas de `AGENTS.md`.
 - Mudança de código: siga `AGENTS.md`. Rode `pnpm lint && pnpm typecheck && pnpm test && pnpm build`
-  (com a máquina carregada, `pnpm exec vitest run --maxWorkers=4`). Depois:
+  (com a máquina carregada, `pnpm exec vitest run --maxWorkers=2`). Depois:
   - commit com mensagem em inglês;
   - `git push origin HEAD:main`;
-  - publique com `ssh wisewolf-vps 'cd /opt/leiprova && LEIPROVA_SKIP_SEED=1 ./deploy/pull-deploy.sh'`
+  - publique com `ssh everglades-vps 'cd /opt/leiprova && LEIPROVA_SKIP_SEED=1 ./deploy/pull-deploy.sh'`
     (nunca rode o seed em produção).
 
-## Pendências atuais (11/10/2026)
+## Pendências editoriais do corte (12/10/2026)
 
 - **80 preparações abaixo do piso**, com déficit mínimo de 5.440 questões válidas.
   **70 sem edição oficial revisada** e **73 sem referência aprovada de prova anterior
@@ -139,9 +142,9 @@ Log: `/var/log/leiprova-release-chain.log` na VPS.
 - **Propostas antigas de vínculos do ENAM e 12 questões do piloto:** revisar a situação
   antes de nova ação. Proposta repetida não é nova questão publicada por produto.
 - **Compra financeira de controle e estorno:** continuam sem homologação nesta rodada.
-- **Migração/DNS:** origem ainda ativa nesta conferência; destino preparado não prova
-  corte. Consultar o registro operacional antes de mudar a ponte ou publicar novo
-  domínio como produção.
+- **Migração/DNS:** corte concluído; domínio Google verificado e mudança de endereço
+  confirmada. Sitemap enviado, com primeira leitura ainda em falha; acompanhar a
+  leitura sem presumir indexação ou ranking.
 
 ## Registro histórico das pendências anteriores
 
