@@ -81,6 +81,9 @@ por atualização direta do banco.
   `leiprova-progressive-prepare-20261012.service`; recibos em
   `.local/editorial/preparation-runs/20261012T161245Z.qauULl/`. Início da unidade
   não comprova conclusão de todas as páginas nem geração de questões.
+  O primeiro recibo posteriormente confirmou 100 requisitos examinados e 44
+  pacotes de mapeamento atualizados, zero autorias e `hasMore:true`; a rodada
+  continuou para a página seguinte. Não equivale a 44 mapas aprovados.
 - Lint, tipagem e build passaram na VPS; 1.814 testes gerais passaram e 294
   opcionais foram pulados por ausência de ambiente específico. Sete cenários
   executados com comandos simulados verificaram fim da fila, limite de páginas,
