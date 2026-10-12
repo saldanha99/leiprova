@@ -110,3 +110,9 @@ Continuar os mapas/autoria de edições com contrato atual e disciplinas
 confirmadas, preparar insumos do TJ-RS e acompanhar as entregas após o reset.
 Não tocar nas reservas em andamento. WhatsApp aguarda integração identificada;
 anúncios aguardam contas/orçamento. Não assumir envio ou veiculação.
+
+Vetor foi reutilizado após a entrega do PP-MA para uma análise delimitada do
+snapshot 458 (PC-MA Oficial Investigador). Deve propor identidade e escopo
+com páginas/trechos, sem alterar o cadastro divergente nem admitir contrato.
+Saídas esperadas: `pc-ma-investigador-scope-vetor.json` e `.md`, na pasta
+privada de continuação. Despacho não comprova entrega; verificar os arquivos.
