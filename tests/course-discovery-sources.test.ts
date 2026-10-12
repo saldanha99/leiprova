@@ -41,6 +41,6 @@ describe("fontes conferidas para pesquisa individual", () => {
       expect(order.payload.context.humanReviewRequired).toBe(true);
       expect(order.payload.context.minimumQuestionCount).toBe(68);
     }
-    expect(orders.filter(item => item.blockedReason)).toHaveLength(32);
+    expect(orders.filter(item => item.blockedReason)).toHaveLength(41);
   });
 });

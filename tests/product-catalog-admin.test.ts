@@ -15,7 +15,7 @@ describe("progresso editorial no catálogo administrativo", () => {
     })));
     const html = renderToStaticMarkup(await ProductCatalogAdminPage());
     expect(mocks.authorize).toHaveBeenCalledWith("/admin/catalogo-produtos");
-    expect(html).toContain("1 de 75 cursos com pelo menos 68 questões válidas");
+    expect(html).toContain("1 de 84 cursos com pelo menos 68 questões válidas");
     expect(html).toContain("67 / 68");
     expect(html).toContain("faltam 1 para o mínimo");
     expect(html).toContain("68 / 68");
@@ -24,10 +24,10 @@ describe("progresso editorial no catálogo administrativo", () => {
     expect(html).toContain("Rascunhos, propostas pendentes e vínculos desatualizados não entram");
     expect(html).toContain("Preços mensal / anual");
     expect(html).not.toContain("· único");
-    expect(html).toContain("CADERNO DE PRODUÇÃO · 75 CURSOS");
-    expect(html).toContain("5.100");
+    expect(html).toContain("CADERNO DE PRODUÇÃO · 84 CURSOS");
+    expect(html).toContain("5.712");
     expect(html).toContain("não representa questões geradas nem agentes executando");
-    expect(html.match(/Preparação editorial ·/g)).toHaveLength(75);
+    expect(html.match(/Preparação editorial ·/g)).toHaveLength(84);
     expect(html).toContain("Fontes e pistas oficiais");
     expect(html).toContain("Leitura e localização do programa pendentes");
     expect(html).toContain("/admin/motor-editais");

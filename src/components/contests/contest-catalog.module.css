@@ -433,3 +433,24 @@
     }
   }
 }
+
+.phaseTabs { display: flex; flex-wrap: wrap; gap: 9px; margin: 28px 0; }
+.phaseTabs button { display: inline-flex; align-items: center; gap: 9px; border: 1px solid #ffffff20; border-radius: 999px; padding: 10px 15px; min-height: 44px; background: #ffffff04; color: #b4c3d3; font-size: 12px; font-weight: 700; cursor: pointer; }
+.phaseTabs button[aria-pressed="true"] { background: #f2b84b; border-color: #f2b84b; color: #0b172a; }
+.phaseTabs button span { font-size: 11px; opacity: .8; }
+.phaseTabs button:focus-visible, .catalogFilters select:focus-visible, .catalogFilters input:focus-visible, .resultsHeading button:focus-visible, .card a:focus-visible { outline: 2px solid #f2b84b; outline-offset: 4px; }
+.resultsHeading { display: flex; justify-content: space-between; align-items: center; gap: 15px; margin-bottom: 12px; }
+.resultsHeading button { min-height: 44px; color: #adc1d5; font-size: 12px; text-decoration: underline; cursor: pointer; }
+.card { position: relative; display: flex; flex-direction: column; min-height: 310px; overflow: hidden; box-shadow: 0 12px 30px #0002; }
+.card h3 { font-size: 27px; margin-top: 22px; }
+.card .cardRole { color: #e8edf5; font-weight: 650; font-size: 15px; }
+.cardTop { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.newBadge { display: inline-flex; align-items: center; gap: 4px; flex-shrink: 0; border: 1px solid #f2b84b66; border-radius: 999px; padding: 4px 8px; background: #f2b84b20; color: #ffdc96; font-size: 10px; font-weight: 800; text-transform: uppercase; }
+.cardFacts { margin: 17px 0; padding-top: 15px; border-top: 1px solid #ffffff0d; }
+.cardFacts p { font-size: 12px; margin-top: 7px; }
+.phaseBadge { color: #bdcadd; font-size: 11px; font-weight: 700; }
+.availableCard { border-color: #19b6a255; background: radial-gradient(ellipse at top right, #19b6a218, transparent 70%), linear-gradient(140deg, #122034, #09131f); }
+.card .availableText { display: flex; align-items: center; gap: 7px; color: #62dfca; }
+.closedCard { background: linear-gradient(140deg, #111b28, #0a111b); }
+.closedCard h3, .closedCard .cardRole { color: #a5b4c7; }
+.card a { margin-top: auto; padding-top: 20px; min-height: 44px; }

@@ -31,10 +31,10 @@ const cart = () => ({
   items: [{ productSlug: police[0].slug, accessKey: "monthly" }],
 });
 describe("catálogo comercial por edição", () => {
-  it("preserva as 75 ofertas e oito categorias sem duplicar produtos regionais", () => {
-    expect(CONTEST_CATALOG).toHaveLength(75);
-    expect(new Set(CONTEST_CATALOG.map((item) => item.slug)).size).toBe(75);
-    expect(new Set(CONTEST_CATALOG.map(catalogContestPath)).size).toBe(75);
+  it("preserva as 84 preparações e oito categorias sem duplicar produtos regionais", () => {
+    expect(CONTEST_CATALOG).toHaveLength(84);
+    expect(new Set(CONTEST_CATALOG.map((item) => item.slug)).size).toBe(84);
+    expect(new Set(CONTEST_CATALOG.map(catalogContestPath)).size).toBe(84);
     expect(new Set(CONTEST_CATALOG.map((item) => item.categorySlug)).size).toBe(
       8,
     );
@@ -68,13 +68,13 @@ describe("catálogo comercial por edição", () => {
     expect(ba).toHaveLength(2);
     expect(ba[0].slug).not.toBe(ba[1].slug);
   });
-  it("atribui 150 preços de Stripe distintos a partir da fonte central", () => {
+  it("atribui 168 preços de Stripe distintos a partir da fonte central", () => {
     const keys = CONTEST_CATALOG.flatMap((contest) =>
       CONTEST_ACCESS_OPTIONS.map((option) =>
         contestPriceLookupKey(contest.slug, option.key),
       ),
     );
-    expect(new Set(keys).size).toBe(150);
+    expect(new Set(keys).size).toBe(168);
   });
   it("renderiza páginas planejadas sem promessa de venda ou banca", () => {
     for (const category of contestCategories) {

@@ -36,10 +36,10 @@ const dossier = (items = [item()]) => ({ schemaVersion: 1, checkedAt, items });
 const step = (value: CourseResearchItem) => buildCourseProductionPlan(dossier([value]), oneCatalog)[0].nextStep;
 
 describe("contrato estrito da pesquisa por produto", () => {
-  it("valida o dossiê real dos 75 sem publicar nem omitir pendências", () => {
+  it("valida o dossiê real dos 84 sem publicar nem omitir pendências", () => {
     const parsed = parseCourseResearch(research75);
     const orders = buildCourseProductionPlan(parsed);
-    expect(orders).toHaveLength(75);
+    expect(orders).toHaveLength(84);
     expect(orders.map((order) => order.productSlug)).toEqual(CONTEST_CATALOG.map((contest) => contest.slug));
     expect(orders.every((order) => order.minimum68 === 68 && order.publicationAllowed === false &&
       order.humanReview === "pending" && order.research.publicationAllowed === false)).toBe(true);

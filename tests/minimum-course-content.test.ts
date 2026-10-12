@@ -13,9 +13,9 @@ describe("piso editorial por produto", () => {
     [Infinity, false], [68.5, false], [-1, false]])("avalia %s questões distintas como %s", (count, expected) => {
     expect(hasMinimumCourseQuestionCount(Number(count))).toBe(expected);
   });
-  it("mantém piso explícito de 68 por cada um dos 75 produtos", () => {
+  it("mantém piso explícito de 68 por cada um dos 84 produtos", () => {
     expect(MINIMUM_COURSE_QUESTION_COUNT).toBe(68);
-    expect(CONTEST_CATALOG.length * MINIMUM_COURSE_QUESTION_COUNT).toBe(5100);
+    expect(CONTEST_CATALOG.length * MINIMUM_COURSE_QUESTION_COUNT).toBe(5712);
   });
   it("conta DISTINCT question_id, preservando o predicado completo de evidências e o produto", () => {
     const query = new PgDialect().sqlToQuery(approvedProductQuestionCount(sql`${"concurso-x"}`, sql`${123}`));
@@ -71,7 +71,7 @@ describe("associação exata de página e produto", () => {
     // A rota do próprio produto nunca redireciona para si mesma.
     expect(page).toContain("productPath !== `/concursos/${categorySlug}/${jurisdictionSlug}/${opportunitySlug}`");
   });
-  it("preserva associação canônica exata para as 75 rotas planejadas", () => {
+  it("preserva associação canônica exata para as 84 rotas planejadas", () => {
     for (const contest of CONTEST_CATALOG) {
       const product = { slug: contest.slug, opportunityPublicId: "mesma-oportunidade" };
       expect(findExactProductForOpportunityPage([product], inputFor(contest.slug))).toBe(product);

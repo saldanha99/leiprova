@@ -6,10 +6,10 @@ import research from "@/lib/editorial/course-source-research.json";
 
 const products = CONTEST_CATALOG.map(({ slug }) => ({ slug, opportunityId: null }));
 describe("entrada editorial de todos os cursos", () => {
-  it("cria exatamente uma ordem por cada um dos 75 produtos, com meta individual de 68", () => {
+  it("cria exatamente uma ordem por cada um dos 84 produtos, com meta individual de 68", () => {
     const orders = buildCourseIntakeOrders(products);
-    expect(orders).toHaveLength(75);
-    expect(new Set(orders.map(order => order.key)).size).toBe(75);
+    expect(orders).toHaveLength(84);
+    expect(new Set(orders.map(order => order.key)).size).toBe(84);
     for (const order of orders) {
       expect(order.payload.context.minimumQuestionCount).toBe(68);
       expect(order.payload.context.humanReviewRequired).toBe(true);
@@ -52,7 +52,7 @@ describe("entrada editorial de todos os cursos", () => {
   it("inclui automaticamente produto novo com pendência explícita, sem inventar pesquisa", () => {
     const newCourse = { ...CONTEST_CATALOG[0], slug: "novo-cargo-2027", role: "Novo cargo", editionLabel: "2027" };
     const orders = buildCourseIntakeOrders([...products, { slug: newCourse.slug, opportunityId: null }], [...CONTEST_CATALOG, newCourse]);
-    expect(orders).toHaveLength(76);
+    expect(orders).toHaveLength(85);
     expect(orders.at(-1)).toMatchObject({ key: "course-intake:novo-cargo-2027", blockedReason: "course_research_missing" });
     expect(orders.at(-1)?.payload.sourceUrls).toEqual([]);
   });

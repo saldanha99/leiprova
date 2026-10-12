@@ -748,5 +748,95 @@
     "jurisdictionCodes": ["ES"],
     "status": "research",
     "sourceUrl": "https://www.decorandoaleiseca.com.br/reta-final/al-es"
+  },
+  {
+    "slug": "pc-pe-delegado-2026",
+    "categorySlug": "carreiras-policiais",
+    "acronym": "PC-PE",
+    "role": "Delegado",
+    "editionLabel": "2026",
+    "jurisdictionCodes": ["PE"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/"
+  },
+  {
+    "slug": "trt-8-analista-e-tecnico-2026",
+    "categorySlug": "trabalhistas",
+    "acronym": "TRT-8",
+    "role": "Analista e Técnico Judiciário",
+    "editionLabel": "2026",
+    "jurisdictionCodes": ["PA", "AP"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/"
+  },
+  {
+    "slug": "alepa-assembleia-legislativa-do-para-2026",
+    "categorySlug": "area-legislativa",
+    "acronym": "ALEPA",
+    "role": "Assembleia Legislativa do Pará",
+    "editionLabel": "2026",
+    "jurisdictionCodes": ["PA"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/"
+  },
+  {
+    "slug": "tce-go-tecnico-de-controle-externo-2026",
+    "categorySlug": "fiscal-e-controle",
+    "acronym": "TCE-GO",
+    "role": "Técnico de Controle Externo",
+    "editionLabel": "2026",
+    "jurisdictionCodes": ["GO"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/"
+  },
+  {
+    "slug": "pgm-curitiba-procurador-do-municipio-2026",
+    "categorySlug": "procuradorias",
+    "acronym": "PGM Curitiba",
+    "role": "Procurador do Município",
+    "editionLabel": "2026",
+    "jurisdictionCodes": ["PR"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/"
+  },
+  {
+    "slug": "dpe-pb-analista-e-tecnico-2026",
+    "categorySlug": "tribunais",
+    "acronym": "DPE-PB",
+    "role": "Analista e Técnico da Defensoria",
+    "editionLabel": "2026",
+    "jurisdictionCodes": ["PB"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/"
+  },
+  {
+    "slug": "dpe-sp-defensor-publico-2026",
+    "categorySlug": "carreiras-juridicas",
+    "acronym": "DPE-SP",
+    "role": "Defensor Público",
+    "editionLabel": "2026",
+    "jurisdictionCodes": ["SP"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/"
+  },
+  {
+    "slug": "pc-ap-delegado-2026",
+    "categorySlug": "carreiras-policiais",
+    "acronym": "PC-AP",
+    "role": "Delegado",
+    "editionLabel": "2026",
+    "jurisdictionCodes": ["AP"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/"
+  },
+  {
+    "slug": "enap-exame-nacional-da-advocacia-publica-1",
+    "categorySlug": "procuradorias",
+    "acronym": "ENAP",
+    "role": "Exame Nacional da Advocacia Pública",
+    "editionLabel": "1º Exame",
+    "jurisdictionCodes": ["BR"],
+    "status": "research",
+    "sourceUrl": "https://www.decorandoaleiseca.com.br/"
   }
 ]

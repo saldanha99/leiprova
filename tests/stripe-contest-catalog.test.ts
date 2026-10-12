@@ -87,9 +87,9 @@ function fixture() {
 }
 
 describe("apresentação do catálogo Stripe", () => {
-  it("75 URLs canônicas HTTPS, imagens existentes e identidades estáveis distintas", () => {
+  it("84 URLs canônicas HTTPS, imagens existentes e identidades estáveis distintas", () => {
     const ids = new Set(CONTEST_CATALOG.map((item) => contestStripeProductId(item.slug)));
-    expect(ids.size).toBe(75);
+    expect(ids.size).toBe(84);
     for (const item of CONTEST_CATALOG) {
       const presentation = contestStripePresentation(item);
       expect(presentation.url).toBe(`https://leiprova.2b.app.br${catalogContestPath(item)}`);

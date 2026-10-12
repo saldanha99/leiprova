@@ -96,7 +96,7 @@ export default async function ProductCatalogAdminPage() {
       <section aria-labelledby="production-plan-title" className="mt-8 overflow-hidden rounded-2xl border border-amber-200/25 bg-[#171b1a]">
         <div className="grid gap-6 p-6 md:grid-cols-[1fr_auto] md:p-8">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-amber-200">CADERNO DE PRODUÇÃO · 75 CURSOS</p>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-amber-200">CADERNO DE PRODUÇÃO · {CONTEST_CATALOG.length} CURSOS</p>
             <h2 id="production-plan-title" className="mt-3 font-serif text-3xl text-amber-50">Cada concurso, seu próprio percurso.</h2>
             <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-300">
               Fonte, edição, cargo, banca e programa individualizados. Este plano organiza
