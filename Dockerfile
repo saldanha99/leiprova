@@ -27,7 +27,8 @@ RUN case "$LEIPROVA_BUILD_PROFILE" in \
 
 FROM deps AS migrator
 WORKDIR /app
-COPY --chown=node:node . .
+COPY --chown=root:node . .
+RUN find /app -path /app/node_modules -prune -o -exec chmod g+rX {} +
 CMD ["pnpm", "db:migrate"]
 
 FROM node:22.22-alpine AS runner
