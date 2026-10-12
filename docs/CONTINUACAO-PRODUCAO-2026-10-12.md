@@ -163,3 +163,71 @@ Lint, tipos e build passaram; suíte geral com 1.825 aprovados, 290 opcionais
 pulados e 3 timeouts de 5s em wrappers sob carga. Repetição isolada dos dois
 arquivos com um worker/20s: 9/9 passaram. Sem mudança de configuração de testes,
 código da aplicação, imagens, flags comerciais ou permissões dos agentes.
+
+## Heartbeat de20h47 BRT: quarta preparação aberta
+
+TJ-RS Juiz de Direito Substituto2026 foi liberado pela linha automática às
+23h31m25.276955 UTC, audit**13845**, com72 questões no momento da abertura.
+Referência `owner-standing-2026-10-12:abertura-progressiva-84`, execução server
+CLI, modo current_notice, prova anterior official_link. Às23h54m15 UTC já eram
+81 válidas. Relatório somente leitura: **4/84 disponíveis**, ENAM146, ENAC78,
+TC-DF72 e TJ-RS81, total377. **97 questões distintas novas publicadas no dia**
+de São Paulo, sem multiplicar reaprovações ou vínculos. Checkout não atestado.
+
+TRF-5 avançou de35 às23h47 para**55 válidas** às23h54, ainda draft; faltam13
+ao piso68 e este é o único bloqueio apresentado pelo relatório. Rascunhos no
+TRF-5 ainda não compõem a métrica diária publicada. Meta1.000/dia e prazo para
+84 preparações permanecem sem comprovação de capacidade.
+
+Conferidas87 inéditas distintas desde a marca22h50m07, audits13452–13899:
+enunciados, alternativas, gabaritos e explicações comparados ao corpus oficial
+armazenado de CF, CC, CPC, LGPD, LRP, LINDB e LBI. CPC799I foi recuperado
+independentemente para a questão referenciada em804. Sem erro encontrado,
+nenhuma suspensão. Marca d'água23h40m14.790699 UTC. Conferência por agente,
+`humanReview:false`; não recaptura de todas as normas nem revisão humana.
+Recibo privado `heartbeat-2347-conference.json`.
+
+[Página TJ-RS](https://editaleiseca.com.br/concursos/carreiras-juridicas/rio-grande-do-sul/tj-rs-juiz-de-direito-2026)
+respondeu HTTP200, com conteúdo liberado e recorte progressivo explícito.
+Saúde pública status ok. Preparados dois anúncios Meta, um RSA Google e duas
+peças feed/stories em SVG/PNG; limites de texto conferidos, imagens inspecionadas
+e ZIP privado atualizado. Sem compra, campanha nas contas ou gasto.
+
+PP-MA continua sem contrato enquanto24 requisitos de Monitor estiverem na trilha
+do Inspetor. A extração automática pula snapshots que já têm requisitos e a
+importação manual ignora duplicatas; uma futura suspensão auditada não deve
+ser desfeita por essas rotas existentes. PC-MA ainda exige nome oficial exato.
+Não aplicar alteração sem prévia/fingerprint e validação das reservas atuais.
+
+Mac segue bloqueado para o acesso nativo; não repetido pedido de desbloqueio.
+Guardião/Autor registraram entregas e novas reservas às23h53 na ponte privada,
+sem interrupção, duplicação ou troca de identidade. WhatsApp aguarda provedor;
+Meta/Google aguardam orçamento e autenticação. Nenhuma flag comercial alterada.
+
+Complemento da conferência: outras20 inéditas, audits13971–14009, comparadas ao
+corpus da CF (156-B,167,62,71,166,84,49,102,93,103-B,105), sem erro encontrado
+e sem suspensão. Total107 nesta rodada; marca final23h50m07.729945 UTC.
+Recibo privado `heartbeat-2347-later-conference.json`.
+
+Lint, typecheck, build e suíte geral passaram:1.828 testes aprovados,290 opcionais
+pulados, dois workers/timeout20s para a carga atual do host. Sem alteração de
+configuração de testes, imagens, aplicação ou permissões. Documentação e
+criativos privados são as mudanças desta rodada.
+
+Rodada extraordinária autorizada da linha às 23h56m06 UTC, encerrada às
+23h57m26: dez inéditas TRF-5 aprovadas e vinculadas, dois requisitos admitidos
+pelo caminho vigente. Relatório posterior às 23h57m40: **TRF-5 com 65 válidas**,
+ainda draft, faltam apenas 3 ao piso; quatro preparações abertas e 97 novas
+publicadas no dia preservadas. Nenhum bloqueio foi contornado.
+As dez aprovações (audits 14081–14099) foram conferidas contra a literalidade
+armazenada de CPC 525 e CF 102/128/134/52, sem erro encontrado ou suspensão.
+Total **117 conferidas neste heartbeat**, marca final 23h56m12.101778 UTC,
+recibo `heartbeat-2347-extra-conference.json`; sem revisão humana/jurisprudencial.
+
+Estado somente leitura da ponte: orçamento com `limit:null`, 214 reservas/24h
+como telemetria, 70 autorias prepared e 37 pending. Autor recuperou author:863
+por expiração automática e tem reserva ativa até 01h23 UTC; Guardião tem
+mapping:881 até 01h23, além de duas reservas anteriores. Não reenviar, cancelar
+ou duplicar. Inatividade entre disparos não comprova limite diário.
+Input privado do contrato PP-MA preparado com identidade atual e marcado
+`not-ready`; aplicação continua proibida até a correção auditada de escopo.

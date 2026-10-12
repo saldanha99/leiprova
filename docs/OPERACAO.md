@@ -1,5 +1,16 @@
 # Operação do Edital Lei Seca
 
+**Heartbeat em 12/10/2026, 20h57 BRT:** TJ-RS Juiz de Direito Substituto
+aberto automaticamente, audit 13845 às 23h31 UTC. Agora **4/84 disponíveis**:
+ENAM 146, ENAC 78, TC-DF 72 e TJ-RS 81, total 377. Produção diária distinta
+efetivamente publicada: 97. TRF-5 avançou para 65 válidas, ainda draft/faltam 3
+para o piso 68. Conferidas 117 novas aprovações contra o corpus oficial, sem
+suspensão e sem revisão humana; marca 23h56m12.101778 UTC. Oferta pública
+TJ-RS respondeu 200; textos Meta/Google e feed/stories preparados sem veiculação.
+Guardião/Autor continuam com recibos de entrega; Mac ainda bloqueado impede
+coordenação nativa. PP-MA/PC-MA aguardam correção auditada de cargo/programa.
+Veja [recibos e pendências](CONTINUACAO-PRODUCAO-2026-10-12.md).
+
 **Heartbeat em 12/10/2026, 19h51 BRT:** seguem 3/84 preparações disponíveis
 (ENAM 146, ENAC 78, TC-DF 72). TRF-5 avançou para 25 válidas e TJ-RS para 10,
 ambos draft; a métrica diária de novas publicadas continua 16. Cinco últimas

@@ -7,6 +7,12 @@ Mantêm-se fontes oficiais, identidade por cargo/edição, contratos atuais,
 originalidade, piso de conteúdo e a auditoria da autorização permanente.
 Resultados prepared continuam propostas. Não usar APIs pagas como alternativa.
 
+Atualização às 20h57 BRT: **4/84 disponíveis**, com 377 questões válidas nas
+ofertas abertas e 97 distintas novas publicadas hoje. TJ-RS Juiz de Direito
+Substituto abriu pela linha automática (audit 13845); oferta pública conferida
+e anúncios adicionados ao pacote privado. TRF-5 tem 65 válidas/faltam 3 ao piso.
+Os valores anteriores abaixo são históricos. Não há prazo comprovado para84.
+
 ## Continuação automática
 
 Heartbeat do Codex `produ-o-edital-lei-seca`, ativo, de hora em hora, ligado a
@@ -65,6 +71,13 @@ ser conferidos antes da ativação. Supermetrics Marketing Agent foi sugerido
 como conector para as plataformas e já está disponível. A consulta retornou
 `NOT_AUTHENTICATED` tanto para Google Ads quanto para Meta Ads; os links de
 login foram entregues ao proprietário. Nenhuma campanha foi criada nas contas.
+
+O pacote foi ampliado com `anuncios-tjrs-meta-google.md` (duas variações Meta,
+dez títulos e quatro descrições Google, limites de caracteres conferidos),
+`tjrs-feed` e `tjrs-stories` em SVG/PNG. Renderizações inspecionadas visualmente;
+ZIP atualizado. Conteúdo inicial e ampliação progressiva explícitos, sem
+quantidade fixa prometida. Página pública TJ-RS200 e saúde ok; não houve compra
+nem homologação do pagamento. Nenhuma campanha ativada ou gasto realizado.
 
 Correções comerciais associadas: Master anual apresenta a cobrança única
 anual sem sugerir parcelamento; termos e reembolso passam a ler os dados
