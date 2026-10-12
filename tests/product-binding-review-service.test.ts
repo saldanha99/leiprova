@@ -3,6 +3,7 @@ import type { SQL } from "drizzle-orm";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { reviewProductQuestionBindings } from "../src/lib/commerce/product-binding-review-service";
 import type { ProductBindingReviewDossier } from "../src/lib/commerce/product-binding-review-policy";
+import {FACTORY_STANDING_REVIEW_REFERENCE} from '../src/lib/editorial/factory-standing-review';
 
 // Testes de controle/SQL com executor falso: nunca leem .env nem conectam a PostgreSQL.
 const actorPublicId = "10000000-0000-4000-8000-000000000001";
@@ -13,7 +14,7 @@ const input = {
 };
 function fixture() {
   const statements: string[] = [];
-  let role = "editor", valid = true, updatedCount = 1;
+  let role = "editor", valid = true, updatedCount = 1,factoryOrigin=true;
   const dossier: ProductBindingReviewDossier = { bindingId: input.bindingIds[0], questionId: 1, proposedByUserId: 2,
     productSlug: input.productSlug, opportunityPublicId: input.opportunityPublicId,
     bindingStatus: "pending_review", eligible: true, snapshot: { version: "QA-v1" } };
@@ -24,6 +25,7 @@ function fixture() {
       statements.push(statement);
       if (statement.includes("select id::integer as id, role, email from users")) return [{ id: 1, role, email: "reviewer@example.invalid" }];
       if (statement.includes("as dossier")) return [{ dossier: structuredClone(dossier) }];
+      if (statement.includes('as "factoryOrigin"')) return [{id:input.bindingIds[0],factoryOrigin}];
       if (statement.includes('select b.id,c.id as "contractId"')) return [{id:input.bindingIds[0],contractId:'c'.repeat(64),contentHash:'d'.repeat(64)}];
       if (statement.includes('from question_contract_certifications where binding_id=')) return [{contractId:'c'.repeat(64),contentHash:'d'.repeat(64),status:'approved'}];
       if (/^\s*update public.contest_product_question_bindings/u.test(statement)) return Array.from({ length: updatedCount }, () => ({ id: input.bindingIds[0] }));
@@ -40,10 +42,33 @@ function fixture() {
   const db = { transaction: transact } as unknown as Parameters<typeof reviewProductQuestionBindings>[0];
   return { db, statements, transaction, transact, auditValues, dossier,
     setRole: (value: string) => { role = value; }, setValid: (value: boolean) => { valid = value; },
-    setUpdatedCount: (value: number) => { updatedCount = value; } };
+    setUpdatedCount: (value: number) => { updatedCount = value; },setFactoryOrigin:(value:boolean)=>{factoryOrigin=value;} };
 }
 describe("revisão de vínculos — serviço transacional sem banco", () => {
   afterEach(() => vi.unstubAllEnvs());
+  it('a linha da fábrica registra revisão automatizada com referência exata, sem presumir revisão humana',async()=>{
+    const f=fixture();f.setRole('admin');
+    const request={input,actorPublicId,standingFactoryReviewReference:FACTORY_STANDING_REVIEW_REFERENCE};
+    const preview=await reviewProductQuestionBindings(f.db,{...request,mode:'preview'});
+    await reviewProductQuestionBindings(f.db,{...request,mode:'apply',expectedFingerprint:preview.fingerprint});
+    expect(f.auditValues).toHaveBeenCalledWith(expect.arrayContaining([expect.objectContaining({metadata:expect.objectContaining({
+      humanReviewRecorded:false,humanReview:false,approvalBasis:'owner_standing_authorization',
+      approvalReference:FACTORY_STANDING_REVIEW_REFERENCE,sourceProgramReference:'owner-standing-2026-10-12:official-sources-programs'})})]));
+  });
+  it.each(['editor','foreign-reference','no-factory-receipt','manual-fingerprint'])('revisão automática recusa %s antes de escrever',async failure=>{
+    const f=fixture();f.setRole('admin');
+    const manual=await reviewProductQuestionBindings(f.db,{input,actorPublicId,mode:'preview'});
+    const request={input,actorPublicId,standingFactoryReviewReference:FACTORY_STANDING_REVIEW_REFERENCE as string};
+    if(failure==='editor')f.setRole('editor');
+    if(failure==='foreign-reference')request.standingFactoryReviewReference='owner-standing-forged';
+    if(failure==='no-factory-receipt')f.setFactoryOrigin(false);
+    if(failure==='manual-fingerprint'){
+      const automatic=await reviewProductQuestionBindings(f.db,{...request,mode:'preview'});
+      expect(automatic.fingerprint).not.toBe(manual.fingerprint);
+    }
+    await expect(reviewProductQuestionBindings(f.db,{...request,mode:'apply',expectedFingerprint:manual.fingerprint})).rejects.toThrow();
+    expect(f.statements.some(s=>/^\s*update /u.test(s))).toBe(false);expect(f.auditValues).not.toHaveBeenCalled();
+  });
   it("preview é read only, não bloqueia/escreve e usa regra real de acesso via CTE", async () => {
     const f = fixture();
     const result = await reviewProductQuestionBindings(f.db, { input, actorPublicId, mode: "preview" });

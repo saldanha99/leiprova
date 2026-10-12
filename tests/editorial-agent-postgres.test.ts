@@ -17,6 +17,8 @@ import { OFFICIAL_COURSE_STANDING_REFERENCE } from "@/lib/editorial/official-cou
 import { questionOptionsMatchContract } from "@/lib/editorial/question-contract-query";
 import { approvedProductQuestionExists } from "@/lib/commerce/product-binding-query";
 import { approvedProductQuestionCount } from "@/lib/commerce/minimum-course-content";
+import {reviewProductQuestionBindings} from '@/lib/commerce/product-binding-review-service';
+import {FACTORY_STANDING_REVIEW_REFERENCE} from '@/lib/editorial/factory-standing-review';
 
 const url=process.env.LEIPROVA_TEST_DATABASE_URL;
 if(url){const parsed=new URL(url);if(!["localhost","127.0.0.1","[::1]"].includes(parsed.hostname)||parsed.pathname!=="/leiprova_automation_test")throw new Error("Somente banco de teste em loopback.");}
@@ -69,6 +71,58 @@ describe.skipIf(!url)('ponte editorial — PostgreSQL isolado',()=>{
   beforeAll(async()=>{expect((await db!.execute<{name:string}>(sql`select current_database() name`))[0].name).toBe('leiprova_automation_test');});
   beforeEach(async()=>{await db!.execute(sql`delete from editorial_agent_runs`);await db!.execute(sql`delete from editorial_agent_work`);});
   afterAll(async()=>{await client?.end();});
+  it('revisão automática de vínculo exige recibo da fábrica no concurso exato e audita ausência de revisão humana',async()=>{
+    const f=await fixture(true),now=new Date(),slug=`standing-product-${randomUUID()}`;
+    const [opportunity]=await db!.select().from(schema.contestOpportunities).where(eq(schema.contestOpportunities.id,f.requirement.opportunityId));
+    const [edition]=await db!.select().from(schema.examEditions).where(eq(schema.examEditions.id,f.contract.examEditionId));
+    await db!.update(schema.opportunityRequirements).set({editorialStatus:'reviewed',legalArticleId:f.article.id,legalActId:f.version.legalActId,
+      reviewedByUserId:f.editor.id,reviewedAt:now,reviewNotes:'Conferência exclusivamente sintética.'}).where(eq(schema.opportunityRequirements.id,f.requirement.id));
+    await db!.insert(schema.contestStoreProducts).values({slug,opportunityId:opportunity.id});
+    const contractRequest={input:{contract:f.contract,productSlug:slug},actorPublicId:f.editor.publicId,
+      approvalReference:OFFICIAL_COURSE_STANDING_REFERENCE,mode:'preview' as const};
+    const contractPreview=await reviewOfficialQuestionContract(db!,contractRequest);
+    await reviewOfficialQuestionContract(db!,{...contractRequest,mode:'apply',expectedFingerprint:contractPreview.fingerprint});
+    const [question]=await db!.insert(schema.questions).values({publicId:randomUUID(),legalArticleId:f.article.id,
+      subjectId:f.requirement.subjectId,topicId:f.requirement.topicId,quizMode:'original_style',styleBankId:f.contract.bankId,type:'multiple_choice',
+      prompt:`Pergunta fictícia de auditoria ${randomUUID()}`,explanation:'Explicação fictícia para conferir o registro de autorização automática.',
+      learningObjective:'Verificar auditoria e isolamento sem conteúdo jurídico real.',topic:'QA',editorialStatus:'reviewed',createdByUserId:f.editor.id,
+      reviewedByUserId:f.editor.id,cleanRoomAttestedAt:now,sourceUrl:f.version.sourceUrl,sourceTitle:'Fonte sintética',verifiedAt:now,
+      originalityCheckedAt:now,similarityMaxBps:0,authorshipMethod:'ai_assisted',generatorModel:'synthetic-software-test',promptVersion:'qa-v1',submittedAt:now}).returning();
+    const options='ABCDE'.split('').map((optionKey,sortOrder)=>({optionKey,text:`Opção fictícia ${sortOrder}`,isCorrect:sortOrder===0,
+      rationale:'Justificativa fictícia de software.',sortOrder}));
+    await db!.insert(schema.questionOptions).values(options.map(option=>({...option,questionId:question.id})));
+    const bindingId=hash(slug);
+    await db!.insert(schema.contestProductQuestionBindings).values({id:bindingId,productSlug:slug,opportunityId:opportunity.id,
+      requirementId:f.requirement.id,questionId:question.id,sourceDocumentId:f.source.id,sourceSnapshotId:f.snapshot.id,
+      sourceSnapshotChecksum:f.contract.sourceSnapshotChecksum,legalArticleId:f.article.id,legalVersionId:f.version.id,
+      legalVersionChecksum:f.version.checksumSha256,questionUpdatedAt:question.updatedAt,requirementText:f.requirement.requirementText,
+      sourceLocator:f.requirement.sourceLocator,requirementQuote:f.requirement.requirementText,legalQuote:f.article.literalText,
+      scopeNotes:'Apenas QA sintético de aprovação automática.',evidence:{sourceUrl:f.source.sourceUrl,legalArticleText:f.article.literalText,
+        legalSourceUrl:f.version.sourceUrl,questionContent:{prompt:question.prompt,explanation:question.explanation,
+          type:question.type,learningObjective:question.learningObjective,options}},proposedByUserId:f.editor.id,status:'pending_review'});
+    const input={schemaVersion:1,productSlug:slug,opportunityPublicId:opportunity.publicId,examEditionPublicId:edition.publicId,
+      bindingIds:[bindingId],notes:'Conferência fictícia na linha automática de testes.',confirmations:{edition:true,program:true,adherence:true}};
+    const request={input,actorPublicId:f.editor.publicId,standingFactoryReviewReference:FACTORY_STANDING_REVIEW_REFERENCE};
+    const factoryAudit=(contestSlug:string)=>db!.insert(schema.auditLogs).values({actorUserId:f.editor.id,action:'editorial.original_question.batch_approved',
+      entityType:'question',entityId:question.publicId,metadata:{executionSource:'server_cli',contestSlug,
+        approvalReference:FACTORY_STANDING_REVIEW_REFERENCE,approvalMode:'owner_standing_authorization',humanItemReview:false}});
+    await factoryAudit('outro-concurso-ficticio');
+    await expect(reviewProductQuestionBindings(db!,{...request,mode:'preview'})).rejects.toThrow('concurso exato');
+    expect((await db!.select().from(schema.contestProductQuestionBindings).where(eq(schema.contestProductQuestionBindings.id,bindingId)))[0].status).toBe('pending_review');
+    const manual=await reviewProductQuestionBindings(db!,{input,actorPublicId:f.editor.publicId,mode:'preview'});
+    await factoryAudit(opportunity.slug);
+    const preview=await reviewProductQuestionBindings(db!,{...request,mode:'preview'});
+    expect(preview.eligible).toBe(1);expect(preview.fingerprint).not.toBe(manual.fingerprint);
+    await expect(reviewProductQuestionBindings(db!,{...request,mode:'apply',expectedFingerprint:manual.fingerprint})).rejects.toThrow('preview');
+    const applied=await reviewProductQuestionBindings(db!,{...request,mode:'apply',expectedFingerprint:preview.fingerprint});
+    expect(applied.approved).toBe(1);
+    const [audit]=await db!.select().from(schema.auditLogs).where(sql`${schema.auditLogs.action}='editorial.product_binding.approved' and ${schema.auditLogs.entityId}=${bindingId}`);
+    expect(audit.metadata).toMatchObject({approvalBasis:'owner_standing_authorization',approvalReference:FACTORY_STANDING_REVIEW_REFERENCE,
+      sourceProgramReference:OFFICIAL_COURSE_STANDING_REFERENCE,humanReview:false,humanReviewRecorded:false});
+    expect((await db!.execute<{kind:string}>(sql`select jsonb_typeof(metadata) kind from audit_logs where id=${audit.id}`))[0].kind).toBe('object');
+    expect((await db!.select().from(schema.contestStoreProducts).where(eq(schema.contestStoreProducts.slug,slug)))[0].status).toBe('draft');
+    expect((await db!.execute<{count:number}>(sql`select ${approvedProductQuestionCount(sql`${slug}`)}::int count`))[0].count).toBe(1);
+  });
   it('inclui produto novo sem inventar fonte e não duplica ordens nem aprova produtos',async()=>{
     const slug=`intake-test-${randomUUID()}`;
     await db!.insert(schema.contestStoreProducts).values({slug});

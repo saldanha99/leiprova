@@ -12,6 +12,7 @@ import {
   reviewProductQuestionBindings,
 } from "../src/lib/commerce/product-binding-review-service";
 import { ProductBindingReviewError } from "../src/lib/commerce/product-binding-review-policy";
+import {FACTORY_STANDING_REVIEW_REFERENCE} from '../src/lib/editorial/factory-standing-review';
 
 const slug = z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/u);
 const sha256 = /^[a-f0-9]{64}$/u;
@@ -99,13 +100,16 @@ async function main() {
       ) current_binding where ordinal=1 order by id
     `);
     if (!rows.length || rows.length > 250) throw new ProductBindingReviewError("Nenhum conjunto atual e revisável de vínculos foi encontrado.");
-    const notes = `Aderência ao produto, edição, programa e questões confirmada pelo proprietário. Referência: ${args.reference}`;
+    const standingFactoryReviewReference=args.reference===FACTORY_STANDING_REVIEW_REFERENCE?args.reference:undefined;
+    const notes = standingFactoryReviewReference
+      ? `Revisão automatizada de aderência ao produto, edição e programa das inéditas da fábrica; sem revisão humana. Referência: ${args.reference}`
+      : `Aderência ao produto, edição, programa e questões confirmada pelo proprietário. Referência: ${args.reference}`;
     const input = {
       schemaVersion: 1 as const, productSlug: args.productSlug, opportunityPublicId: scope.opportunityPublicId,
       examEditionPublicId: scope.examEditionPublicId, bindingIds: rows.map((row) => row.id), notes,
       decision: "approve" as const, confirmations: { edition: true, program: true, adherence: true },
     };
-    const preview = await reviewProductQuestionBindings(db, { input, actorPublicId: args.actorPublicId, mode: "preview" });
+    const preview = await reviewProductQuestionBindings(db, { input, actorPublicId: args.actorPublicId, mode: "preview",standingFactoryReviewReference });
     if (preview.eligible !== preview.total) {
       throw new ProductBindingReviewError(
         `O conjunto não pode ser decidido: elegíveis ${preview.eligible}/${preview.total}.`,
@@ -120,7 +124,7 @@ async function main() {
     }
     if (args.expectedFingerprint !== fingerprint) throw new ProductBindingReviewError("Dossiê ou contexto mudou; confira uma nova prévia.");
     const result = await reviewProductQuestionBindings(db, { input, actorPublicId: args.actorPublicId,
-      mode: "apply", expectedFingerprint: preview.fingerprint });
+      mode: "apply", expectedFingerprint: preview.fingerprint,standingFactoryReviewReference });
     console.log(JSON.stringify({ database: identity.name, ...result, operationFingerprint: fingerprint }, null, 2));
   } finally { await client.end(); }
 }

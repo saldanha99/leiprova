@@ -18,6 +18,7 @@ exec 9>/tmp/leiprova-release-chain.lock
 if ! flock -n 9; then echo "$(date -u +%FT%TZ) já em execução; saindo."; exit 0; fi
 
 REF="owner-standing-2026-10-11:aprovar-sozinho"
+PROGRAM_REF="owner-standing-2026-10-12:official-sources-programs"
 log() { echo "$(date -u +%FT%TZ) $*"; }
 sql_ro() {
   docker exec -i -e PGOPTIONS='-c default_transaction_read_only=on' leiprova-db \
@@ -74,7 +75,7 @@ while read -r product opportunity status; do
 
   requirements() {
     tools -e LEIPROVA_REQUIREMENT_REVIEW_APPROVED="review-requirements:$opportunity" editorial-binding-importer \
-      sh -c "LEIPROVA_REQUIREMENT_REVIEW_DATABASE_URL=\$LEIPROVA_BINDING_DATABASE_URL pnpm -s editorial:review:requirements --opportunity=$opportunity --actor=$ACTOR --reference=$REF $*"
+      sh -c "LEIPROVA_REQUIREMENT_REVIEW_DATABASE_URL=\$LEIPROVA_BINDING_DATABASE_URL pnpm -s editorial:review:requirements --opportunity=$opportunity --actor=$ACTOR --reference=$PROGRAM_REF $*"
   }
   fp=$(requirements --mode=preview | fingerprint)
   [ -n "$fp" ] && log "itens do edital $opportunity: $(requirements --mode=apply --fingerprint="$fp" | summary)"

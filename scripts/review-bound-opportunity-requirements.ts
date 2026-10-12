@@ -4,6 +4,8 @@ import { createHash } from "node:crypto";
 
 import postgres from "postgres";
 import { z } from "zod";
+import {FACTORY_STANDING_REVIEW_REFERENCE,FACTORY_BULK_REVIEW_REFERENCE} from '../src/lib/editorial/factory-standing-review';
+import {OFFICIAL_COURSE_STANDING_REFERENCE} from '../src/lib/editorial/official-course-dossier';
 
 const slug = z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/u);
 const sha256 = /^[a-f0-9]{64}$/u;
@@ -27,6 +29,7 @@ type Candidate = Readonly<{
   proposalCount: number;
   questionCount: number;
   contextValid: boolean;
+  factoryOrigin: boolean;
 }>;
 
 function canonical(value: unknown): unknown {
@@ -135,6 +138,19 @@ async function loadCandidates(query: Query, opportunitySlug: string) {
       mode() within group (order by binding.legal_article_id::integer) as "primaryArticleId",
       count(binding.id)::integer as "proposalCount",
       count(distinct binding.question_id)::integer as "questionCount",
+      bool_and(question.quiz_mode='original_style' and exists (
+        select 1 from audit_logs factory_review_audit
+        where factory_review_audit.entity_type='question' and factory_review_audit.entity_id=question.public_id
+          and factory_review_audit.action='editorial.original_question.batch_approved'
+          and factory_review_audit.metadata->>'executionSource'='server_cli'
+          and factory_review_audit.metadata->>'contestSlug'=opportunity.slug
+          and ((factory_review_audit.metadata->>'approvalReference'=${FACTORY_STANDING_REVIEW_REFERENCE}
+            and factory_review_audit.metadata->>'approvalMode'='owner_standing_authorization'
+            and factory_review_audit.metadata->>'humanItemReview'='false')
+            or (factory_review_audit.metadata->>'approvalReference'=${FACTORY_BULK_REVIEW_REFERENCE}
+            and factory_review_audit.metadata->>'approvalMode'='owner_authorization'
+            and factory_review_audit.metadata->>'itemBindingMode'='owner_bulk_authorization'))
+      )) as "factoryOrigin",
       bool_and(
         opportunity.editorial_status='reviewed'
         and source.status='approved'
@@ -166,7 +182,7 @@ async function loadCandidates(query: Query, opportunitySlug: string) {
   `;
 }
 
-function validateCandidates(candidates: readonly Candidate[]) {
+function validateCandidates(candidates: readonly Candidate[],standing=false) {
   if (!candidates.length) {
     throw new RequirementReviewError(
       "Nenhum requisito rascunho possui propostas revisáveis neste escopo.",
@@ -175,6 +191,7 @@ function validateCandidates(candidates: readonly Candidate[]) {
   for (const candidate of candidates) {
     if (
       !candidate.contextValid ||
+      (standing&&!candidate.factoryOrigin) ||
       !candidate.sourceSnapshotId ||
       candidate.subjectIds.length !== 1 ||
       (candidate.topicIds.length + (candidate.nullTopicCount > 0 ? 1 : 0)) !== 1 ||
@@ -195,6 +212,7 @@ function validateCandidates(candidates: readonly Candidate[]) {
 
 async function main() {
   const args = parseArguments(process.argv.slice(2));
+  const standing=args.reference===OFFICIAL_COURSE_STANDING_REFERENCE;
   const target = requireTarget(args.opportunitySlug);
   const client = postgres(target.connectionString, {
     max: 1,
@@ -223,8 +241,9 @@ async function main() {
     if (!actor || !["admin", "editor"].includes(actor.role)) {
       throw new RequirementReviewError("Responsável editorial não autorizado.");
     }
+    if(standing&&actor.role!=='admin')throw new RequirementReviewError('Revisão automatizada exige administrador identificado.');
     const previewCandidates = await loadCandidates(client, args.opportunitySlug);
-    validateCandidates(previewCandidates);
+    validateCandidates(previewCandidates,standing);
     const operationFingerprint = fingerprint({
       version: "bound-opportunity-requirements-review-v1",
       actorPublicId: args.actorPublicId,
@@ -254,9 +273,10 @@ async function main() {
         "Contexto, responsável ou confirmação mudou; confira nova prévia.",
       );
     }
-    const note =
-      "Programa, matéria, assunto e dispositivo conferidos pelo proprietário nas fontes oficiais e nas propostas autorais vinculadas.";
-    const result = await client.begin(async (transaction) => {
+    const note = standing
+      ? `Revisão automatizada do programa, matéria e dispositivos a partir das fontes oficiais e das inéditas comprovadas da fábrica. Sem revisão humana. ${args.reference}`
+      : "Programa, matéria, assunto e dispositivo conferidos pelo proprietário nas fontes oficiais e nas propostas autorais vinculadas.";
+    const result = await client.begin('isolation level serializable',async (transaction) => {
       await transaction`set local statement_timeout='30s'`;
       await transaction`set local lock_timeout='5s'`;
       await transaction`select pg_advisory_xact_lock(621743,39)`;
@@ -267,7 +287,7 @@ async function main() {
         order by r.id for update
       `;
       const current = await loadCandidates(transaction, args.opportunitySlug);
-      validateCandidates(current);
+      validateCandidates(current,standing);
       const currentFingerprint = fingerprint({
         version: "bound-opportunity-requirements-review-v1",
         actorPublicId: args.actorPublicId,
@@ -311,7 +331,7 @@ async function main() {
             on conflict do nothing
           `;
         }
-        const mappedMetadata = JSON.stringify({
+        const mappedMetadata = {
           subjectId: candidate.subjectIds[0],
           topicId: candidate.topicIds[0] ?? null,
           legalArticleId: candidate.primaryArticleId,
@@ -320,19 +340,21 @@ async function main() {
           proposalCount: candidate.proposalCount,
           mappingBasis: "reviewed_product_proposals_article_set",
           dossierFingerprint: operationFingerprint,
-        });
-        const reviewedMetadata = JSON.stringify({
+        };
+        const reviewedMetadata = {
           reference: args.reference,
-          humanReviewConfirmed: true,
+          humanReviewConfirmed: !standing,
+          humanReview: !standing,
           reviewerAlsoResponsible: true,
-          approvalBasis: "owner_explicit_confirmation",
+          approvalBasis: standing ? 'owner_standing_authorization' : "owner_explicit_confirmation",
+          ...(standing ? {sourceProgramReference:OFFICIAL_COURSE_STANDING_REFERENCE,factoryQuestionReference:FACTORY_STANDING_REVIEW_REFERENCE} : {}),
           dossierFingerprint: operationFingerprint,
-        });
+        };
         await transaction`
           insert into audit_logs(actor_user_id,action,entity_type,entity_id,metadata)
           values
-            (${actor.id},'editorial.notice_requirement.mapped','opportunity_requirement',${String(candidate.id)},${mappedMetadata}::jsonb),
-            (${actor.id},'editorial.notice_requirement.reviewed','opportunity_requirement',${String(candidate.id)},${reviewedMetadata}::jsonb)
+            (${actor.id},'editorial.notice_requirement.mapped','opportunity_requirement',${String(candidate.id)},${transaction.json(mappedMetadata as unknown as postgres.JSONValue)}),
+            (${actor.id},'editorial.notice_requirement.reviewed','opportunity_requirement',${String(candidate.id)},${transaction.json(reviewedMetadata as unknown as postgres.JSONValue)})
         `;
       }
       return { approved: current.length };

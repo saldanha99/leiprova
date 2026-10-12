@@ -6,6 +6,7 @@ import { approvedProductQuestionExists } from "./product-binding-query";
 import { currentQuestionContractExists, questionContractContentHash, questionOptionsMatchContract } from "../editorial/question-contract-query";
 import { certifyProductBindingContracts } from "../editorial/question-contract-service";
 import { OFFICIAL_COURSE_STANDING_REFERENCE } from "../editorial/official-course-dossier";
+import {approvedFactoryQuestionProvenanceExists,requireFactoryStandingReview} from '../editorial/factory-standing-review';
 import {
   assertProductBindingReviewDecision, assertProductBindingReviewScope,
   productBindingReviewDossierSchema, productBindingReviewFingerprint, productBindingReviewSchema,
@@ -117,6 +118,8 @@ async function lockContext(transaction: Transaction, input: ProductBindingReview
  */
 export async function reviewProductQuestionBindings(db: Db, request: {
   input: unknown; actorPublicId: string; mode: "preview" | "apply"; expectedFingerprint?: string;
+  /** Somente CLI interno da linha da fábrica; formulários não fornecem este campo. */
+  standingFactoryReviewReference?: string;
 }) {
   if (!["preview", "apply"].includes(request.mode)) throw new ProductBindingReviewError("Modo de revisão inválido.");
   const input = productBindingReviewSchema.parse(request.input);
@@ -132,14 +135,24 @@ export async function reviewProductQuestionBindings(db: Db, request: {
       ${request.mode === "apply" ? sql`for share` : sql``}
     `);
     if (!actor || !["admin", "editor"].includes(actor.role)) throw new ProductBindingReviewError("Operador editorial não autorizado.");
+    const automation=request.standingFactoryReviewReference===undefined?undefined:
+      requireFactoryStandingReview(request.standingFactoryReviewReference,actor.role,input.decision);
     if (request.mode === "apply") await lockContext(transaction, input);
     const dossiers = await loadDossiers(transaction, input, actor.id);
     assertProductBindingReviewScope(input, dossiers);
+    if(automation){
+      const rows=await transaction.execute<{id:string;factoryOrigin:boolean}>(sql`select standing_binding.id,
+        ${approvedFactoryQuestionProvenanceExists(sql`standing_binding.question_id`,sql`standing_binding.opportunity_id`)} as "factoryOrigin"
+        from public.contest_product_question_bindings standing_binding
+        where standing_binding.id=any(${idsSql(input.bindingIds)}) order by standing_binding.id`);
+      if(rows.length!==input.bindingIds.length||rows.some(row=>!row.factoryOrigin))
+        throw new ProductBindingReviewError('A revisão automática exige aprovação comprovada da fábrica para todas as questões no concurso exato.');
+    }
     if (input.decision === "reject" && dossiers.some((dossier) => {
       const edition = dossier.snapshot.edition;
       return !edition || typeof edition !== "object" || !("public_id" in edition) || edition.public_id !== input.examEditionPublicId;
     })) throw new ProductBindingReviewError("A rejeição exige a edição exata do vínculo; não use uma edição presumida.");
-    const fingerprint = productBindingReviewFingerprint(input, { publicId: actorPublicId, role: actor.role }, dossiers);
+    const fingerprint = productBindingReviewFingerprint(input, { publicId: actorPublicId, role: actor.role }, dossiers,automation);
     if (request.mode === "preview") {
       return { mode: "preview" as const, fingerprint, total: dossiers.length, approved: 0,
         eligible: dossiers.filter((d) => d.eligible && d.bindingStatus === "pending_review").length,
@@ -171,9 +184,10 @@ export async function reviewProductQuestionBindings(db: Db, request: {
       entityId: dossier.bindingId, metadata: { productSlug: input.productSlug, opportunityPublicId: input.opportunityPublicId,
         examEditionPublicId: input.examEditionPublicId,
         dossierFingerprint: fingerprint, selectedBindingIds: [...input.bindingIds].sort(), notes: input.notes, decision: input.decision,
-        confirmations: input.confirmations, humanReviewRecorded: true,
+        confirmations: input.confirmations, humanReviewRecorded: automation ? false : true,
         // Autorrevisão liberada pelo proprietário em 27/09/2026; o registro a identifica.
-        approvalBasis: dossier.proposedByUserId === actor.id ? "owner_self_review" : "independent_review",
+        approvalBasis: automation ? 'owner_standing_authorization' : dossier.proposedByUserId === actor.id ? "owner_self_review" : "independent_review",
+        ...(automation??{}),
         productReleased: false, checkoutEnabled: false },
     })));
     return { mode: "apply" as const, fingerprint, total: dossiers.length, approved: approved ? updated.length : 0,

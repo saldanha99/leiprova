@@ -41,9 +41,10 @@ function canonical(value: unknown): unknown {
 }
 
 /** A confirmação não altera o dossiê: o humano marca os três checks depois do preview. */
-export function productBindingReviewFingerprint(input: ProductBindingReviewInput, actor: { publicId: string; role: string }, dossiers: readonly ProductBindingReviewDossier[]) {
+export function productBindingReviewFingerprint(input: ProductBindingReviewInput, actor: { publicId: string; role: string }, dossiers: readonly ProductBindingReviewDossier[], automation?: {approvalReference:string;sourceProgramReference:string;humanReview:false}) {
   return createHash("sha256").update(JSON.stringify(canonical({
-    purpose: "product-binding-human-review-v1", productSlug: input.productSlug,
+    purpose: automation ? "product-binding-factory-standing-review-v1" : "product-binding-human-review-v1", productSlug: input.productSlug,
+    ...(automation ? {automation} : {}),
     opportunityPublicId: input.opportunityPublicId, examEditionPublicId: input.examEditionPublicId,
     bindingIds: [...input.bindingIds].sort(),
     notes: input.notes, decision: input.decision, actor, dossiers: [...dossiers].sort((a, b) => a.bindingId.localeCompare(b.bindingId)),
