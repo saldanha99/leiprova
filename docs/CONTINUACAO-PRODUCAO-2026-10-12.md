@@ -37,7 +37,10 @@ pela linha, todas corretas contra o corpus recebido; nenhuma suspensão.
 Recibo `.local/maestri/maestro-continuation-20261012.md`; marca d'água
 22h22m29 UTC. Conferir as aprovações posteriores na próxima rodada.
 Claude chegou ao limite de sessão, com retomada automática indicada para
-19h30 BRT. Assinaturas, host e Maestri continuam condicionando a operação;
+19h30 BRT. Após a renovação, Guardião voltou a entregar/reservar às 22h32 UTC;
+Autor entregou outras cinco inéditas em `author:867`, recolhidas sem falha
+pela ponte. A retomada foi conferida na tela e no recibo efetivo.
+Assinaturas, host e Maestri continuam condicionando a operação;
 cron e documentação não comprovam produção ininterrupta.
 
 ## TJ-RS: contrato admitido
@@ -84,10 +87,10 @@ apenas para retornar código. Contrato é admissão auditada, não abertura come
 
 ## Resultado e próximo insumo
 
-Relatório às 22h28m53 UTC: **3/84 abertas**, ENAM 146, ENAC 78 e TC-DF 72
-vínculos válidos (296 nas ofertas abertas). **TRF-5: 15 válidas**, ainda draft,
-faltando 53 para o piso de abertura. A métrica diária permanece 16 questões
-novas em produtos abertos; as 15 do TRF-5 não entram nela enquanto draft.
+Relatório às 22h36m08 UTC: **3/84 abertas**, ENAM 146, ENAC 78 e TC-DF 72
+vínculos válidos (296 nas ofertas abertas). **TRF-5: 20 válidas**, ainda draft,
+faltando 48 para o piso de abertura. A métrica diária permanece 16 questões
+novas em produtos abertos; as 20 do TRF-5 não entram nela enquanto draft.
 As linhas de liberação extraordinárias concluíram a avaliação sem falha.
 Não atestar compra real ou integralidade do programa por essas quantidades.
 
@@ -96,6 +99,9 @@ snapshot 456, distinguindo Inspetor (cargo 1) de Monitor (cargo 2), com
 conhecimentos gerais e específicos por página. Arquivos em
 `.local/editorial/continuation-20261012/pp-ma-scope-vetor.json` e `.md`.
 Proposta, `publicationAllowed:false`, `humanReview:false`; não admitida.
+Na reconferência independente, o checksum do PDF coincidiu com a ficha,
+o trecho de identidade do Inspetor existe na p.2 e os cabeçalhos comuns,
+específicos do Inspetor e do Monitor estão respectivamente nas pp.68, 69 e 71.
 Próxima ação: reconferir os trechos contra as páginas oficiais, verificar os
 requisitos existentes e excluir qualquer mistura de cargo antes de admitir
 contrato/fonte/programa pelo operador próprio. Não liberar perfil C/E herdado.

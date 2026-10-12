@@ -5,7 +5,7 @@ contrato objetivo do TJ-RS admitido pelo operador auditado (evento 13241,
 `owner_standing_authorization`, `humanReview:false`). Guardião e Autor foram
 trocados nos mesmos nós para Claude e retomaram entregas; Maestro também usa
 Claude nesta sessão por erro de autenticação do Codex. Rotinas preservadas.
-TRF-5 já tem 15 vínculos válidos, ainda abaixo dos 68 para abertura; seguem
+TRF-5 já tem 20 vínculos válidos, ainda abaixo dos 68 para abertura; seguem
 3/84 preparações abertas, com 296 questões válidas. O Antigravity entregou
 análise preparatória de isolamento do cargo Inspetor no PP-MA, sem admissão.
 Veja [recibos e próxima sequência](CONTINUACAO-PRODUCAO-2026-10-12.md).
