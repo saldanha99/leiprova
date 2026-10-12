@@ -36,12 +36,12 @@ describe("prioridade da fila dos agentes", () => {
     expect(claim.sql).toContain("min(valid_question_count)");
     expect(claim.sql).toContain("count(distinct content_binding.question_id)");
     expect(claim.sql).toContain("content_binding.product_slug = priority_product.slug");
-    expect(claim.sql).toContain("binding.product_slug = priority_product.slug");
-    expect(claim.sql).toContain("binding.opportunity_id = priority_product.opportunity_id");
-    expect(claim.sql).toContain("q.editorial_status = 'reviewed'");
-    expect(claim.sql).toContain("requirement.editorial_status = 'reviewed'");
-    expect(claim.sql).toContain("source.status = 'approved'");
-    expect(claim.sql).toContain("version.status = 'current'");
+    expect(claim.sql).toContain("verified_product_binding.product_slug = priority_product.slug");
+    expect(claim.sql).toContain("verified_product_binding.opportunity_id = priority_product.opportunity_id");
+    expect(claim.sql).toContain("verified_product_question.editorial_status = 'reviewed'");
+    expect(claim.sql).toContain("verified_product_requirement.editorial_status = 'reviewed'");
+    expect(claim.sql).toContain("verified_product_source.status = 'approved'");
+    expect(claim.sql).toContain("verified_product_version.status = 'current'");
     expect(claim.sql).not.toContain("from question_opportunities link");
     expect(claim.sql).not.toContain("question.editorial_status <> 'suspended'");
     // O requisito sai da chave da tarefa; o payload (artigos candidatos) não é lido.

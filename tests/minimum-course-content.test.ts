@@ -21,12 +21,12 @@ describe("piso editorial por produto", () => {
     const query = new PgDialect().sqlToQuery(approvedProductQuestionCount(sql`${"concurso-x"}`, sql`${123}`));
     expect(query.sql).toContain("count(distinct content_binding.question_id)");
     expect(query.sql).toContain("content_binding.status = 'approved'");
-    expect(query.sql).toContain("binding.status = 'approved'");
-    expect(query.sql).toContain("q.editorial_status = 'reviewed'");
-    expect(query.sql).toContain("requirement.editorial_status = 'reviewed'");
-    expect(query.sql).toContain("version.status = 'current'");
-    expect(query.sql).toContain("binding.evidence->'questionContent'");
-    expect(query.sql).toContain("product.opportunity_id = binding.opportunity_id");
+    expect(query.sql).toContain("verified_product_binding.status = 'approved'");
+    expect(query.sql).toContain("verified_product_question.editorial_status = 'reviewed'");
+    expect(query.sql).toContain("verified_product_requirement.editorial_status = 'reviewed'");
+    expect(query.sql).toContain("verified_product_version.status = 'current'");
+    expect(query.sql).toContain("verified_product_binding.evidence->'questionContent'");
+    expect(query.sql).toContain("verified_product.opportunity_id = verified_product_binding.opportunity_id");
     expect(query.params).toContain("concurso-x");
     expect(query.params).toContain(123);
     const gate = new PgDialect().sqlToQuery(minimumCourseContentSatisfied(sql`${"concurso-x"}`));

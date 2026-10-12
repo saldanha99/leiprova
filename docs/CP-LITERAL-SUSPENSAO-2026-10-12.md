@@ -34,3 +34,22 @@ atuais do Código Penal. A conferência encontrou as alterações de14.155/2021 
 artigo154-A e de15.397/2026 no artigo266 já presentes no corpus; não carregar a
 redação original de2012 como se fosse a redação atual. Isso ainda não aprova os
 11 requisitos sem mapeamento que mencionam12.737/14.155.
+
+## Suspensão adicional pela comparação integral
+
+A captura atual da Câmara e a publicação oficial da Lei15.517/2026 permitiram
+comparar o corpus inteiro. Outros25 registros foram suspensos, com auditoria real
+**7187**, mesma referência permanente, JSONBobjeto e `humanReview:false`:
+22 integralmente revogados/vetados, artigos155/157 desatualizados e artigo361 com
+assinatura/footer incorporados. A transação reconferiu hashes, versão63 atual,
+zero questões, zero vínculos e zero requisitos principais/adicionais para todos
+os25. O texto e a versão foram preservados. Agora27 registros da versão63 estão
+suspended; não houve restauração dos dois registros da auditoria6878.
+
+Backup validado: `/opt/leiprova/backups/before-cp-hold25-20261012.dump`;
+recibo `/opt/leiprova/backups/cp-hold25-applied-20261012.log`. Proposta privada
+SHA256 `0ada928e2f7a5572ae0a7c6666e58cbe27b2dae0e8b99fb2e2d47c276144d580`.
+A nova coleção de402 artigos ainda é candidata. A substituição integral afeta
+cinco questões ENAC baseadas no artigo351, cujo literal antigo contém título
+vizinho. Exige revisão efetiva dessas questões e vínculos/citações/certificações
+novos antes do corte; não inferir zero impacto integral a partir destes25 holds.

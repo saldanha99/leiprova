@@ -8,7 +8,7 @@ import { approvedProductQuestionExists } from "@/lib/commerce/product-binding-qu
 import { evaluateOriginalQuestionApproval } from "@/lib/editorial/approval-eligibility";
 import { originalStyleConditions } from "@/lib/quiz/original-style-query";
 import { authorialStudyRightsConditions } from "@/lib/study/question-rights";
-import { currentQuestionContractExists } from "@/lib/editorial/question-contract-query";
+import { approvedBindingQuestionContractExists, currentQuestionContractExists, questionOptionsMatchContract } from "@/lib/editorial/question-contract-query";
 
 const options=['A','B','C','D','E'].map((key,index)=>({key,text:`Alternativa sintética ${index}`,correct:index===0}));
 describe('contrato oficial por cargo/edição/etapa',()=>{
@@ -45,12 +45,32 @@ describe('contrato oficial por cargo/edição/etapa',()=>{
   });
   it('guarda comercial verifica formato/versão/fonte/hash também para dry_law',()=>{
     const q=new PgDialect().sqlToQuery(approvedProductQuestionExists(sql`product.slug`,sql`q.id`));
-    expect(q.sql).toContain('question_contract_certifications cert');
-    expect(q.sql).toContain('cert.question_content_hash=');
+    expect(q.sql).toContain('question_contract_certifications verified_binding_contract_certificate');
+    expect(q.sql).toContain('verified_binding_contract_certificate.question_content_hash=');
     expect(q.sql).toContain("current_scoped_contract.source_snapshot_checksum");
-    expect(q.sql).toContain("format_contract.format=q.type");
+    expect(q.sql).toContain("format_contract.format=certified_contract_question.type");
     expect(q.sql).not.toContain("q.quiz_mode = 'dry_law' or exists");
     expect(q.sql).not.toContain('profile.format = q.type');
+  });
+  it.each(['binding','q','product','opportunity','requirement','source','snapshot','article','version','act','covered','option'])('o vínculo comercial preserva a correlação externa %s',alias=>{
+    const query=new PgDialect().sqlToQuery(approvedProductQuestionExists(sql.raw(`${alias}.product_slug`),sql.raw(`${alias}.question_id`),sql.raw(`${alias}.opportunity_id`),sql.raw(`${alias}.id`))).sql;
+    expect(query).toContain(`verified_product_binding.product_slug = ${alias}.product_slug`);
+    expect(query).toContain(`verified_product_binding.question_id = ${alias}.question_id`);
+    expect(query).toContain(`verified_product_binding.opportunity_id = ${alias}.opportunity_id`);
+    expect(query).toContain(`verified_product_binding.id = ${alias}.id`);
+    expect(query).not.toMatch(/\b(?:from|join) [a-z_]+ (?:binding|q|product|opportunity|requirement|source|snapshot|article|version|act|covered|option)\b/u);
+  });
+  it('certificação resolve a questão externa explicitamente sem depender de alias q do chamador',()=>{
+    const query=new PgDialect().sqlToQuery(approvedBindingQuestionContractExists(sql`binding.id`,sql`outside_question.id`,sql`binding.opportunity_id`)).sql;
+    expect(query).toContain('join questions certified_contract_question on certified_contract_question.id=outside_question.id');
+    expect(query).toContain('verified_binding_contract_certificate.binding_id=binding.id');
+    expect(query).toContain('current_scoped_contract.opportunity_id=binding.opportunity_id');
+    expect(query).not.toMatch(/\bq\./u);
+  });
+  it('normaliza whitespace SQL sem transformar a letra s em separador',()=>{
+    const query=new PgDialect().sqlToQuery(questionOptionsMatchContract(sql`external.id`,sql`external.type`,sql`external.contract_id`)).sql;
+    expect(query).toContain("regexp_replace(btrim(qo.text),'[[:space:]]+',' ','g')");
+    expect(query).not.toContain("regexp_replace(btrim(qo.text),'s+'");
   });
   it('quiz genérico e recorte de edição revalidam o contrato sem forçar C/E pela banca',()=>{
     const dialect=new PgDialect();

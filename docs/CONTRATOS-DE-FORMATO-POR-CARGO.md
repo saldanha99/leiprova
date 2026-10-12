@@ -1,6 +1,8 @@
 # Contratos de formato por cargo, edição e etapa
 
-Preparação técnica de 12/10/2026, **sem aplicação de contratos ou certificações em produção por este documento**.
+Preparação técnica de12/10/2026. **Aplicação parcial real:** migrações0052/0053,
+contratos ENAM/ENAC e suas certificações aplicados; o app anterior ainda estava
+ativo, aguardando a certificação TC-DF e a correção delimitada descrita abaixo.
 
 O formato vem da cláusula da fonte oficial do cargo/edição/etapa. O perfil global
 da banca permanece histórico e interno: Cebraspe pode usar cinco alternativas na
@@ -130,3 +132,31 @@ nenhum trigger foi desligado para obter aprovação dos testes.
 
 Recibos privados de QA estão em `.local/qa-agent-20261012/`. Tentativas anteriores
 com falhas foram preservadas e não representam validações aprovadas.
+
+## Conferência da aplicação parcial
+
+Código234daeb aplicado primeiro às ferramentas, às migrações e aos grants no
+destino Everglades, preservando o app8017e64. Backup prévio validado em
+`/opt/leiprova/backups/before-question-contracts-0052-0053-20261012.dump`.
+ENAM e ENAC receberam seus contratos e certificações adicionais. A conferência
+encontrou ENAM225 certificados de formato, correspondentes a146 questões;
+192 vínculos estão approved e33 continuam pending_review. Certificação de formato
+não aprova o vínculo pendente nem libera seu acesso. ENAC tem70 certificados e70
+questões. A fotografia de estado/timestamps das655 questões permaneceu idêntica:
+SHA256 `3a73a6350df1aa32eccd77f1626959d79ef1e98477d3de132f4b7ee3a2af3460`.
+
+A aplicação PC-MA foi recusada e desfeita por divergência de fingerprint: depois
+de existir outro produto certificado, a prévia passou incorretamente de0 para82.
+O helper comercial também repetia o alias binding do chamador. A correção usa
+aliases exclusivos em todas as tabelas e passa a questão explicitamente à guarda
+da certificação. Um teste PostgreSQL com dois produtos mantém B em0 antes/depois
+de certificar A, confirma ausência de contrato/certificados B e nega vínculo
+alheio. A normalização de alternativas usa `[[:space:]]+`, evitando perder a barra
+de escape no template JavaScript. A regressão real rejeita duplicatas com newline.
+
+QA posterior:1.747 testes gerais aprovados,269 opcionais não executados; lint,
+typecheck e build de produção passaram. Os **23 testes PostgreSQL reais passaram**,
+sem skips ou OOM. A permissão de fonte recebeu somente o caminho exato do edital
+MPMT compilado já admitido, com teste negativo para caderno/outros PDFs. Esses
+recibos não comprovam aplicação da correção, certificação TC-DF/PC-MA ou troca
+do app; registrar essas execuções separadamente.

@@ -1,8 +1,10 @@
 # MPMT 01/2026 — prova preambular oficial como links externos
 
-Estado deste trabalho: prévia pública verificada, código preparado; **nenhum
-cadastro, aprovação ou vínculo no banco de produção executado aqui**. Não é
-liberação do curso, licença de reprodução ou importação de questões.
+**Aplicação real concluída em12/10/2026:** edição-base39 cadastrada e vinculada à
+oportunidade19; os dois links oficiais e a referência do produto foram aprovados.
+O produto permanece draft/historical_training, com zero questões e zero releases.
+Não é licença de reprodução das questões. As seções seguintes documentam o
+operador e seu QA, com recibos reais ao final.
 
 Em 12/10/2026, às 06h00m40s UTC (03h00m40s BRT), a
 [página oficial FGV/MPMT](https://conhecimento.fgv.br/concursos/mpmt) e o robots
@@ -126,3 +128,23 @@ vínculo pré-existente bloqueado e seis casos de retorno ausente/divergente/mú
 nos updates, todos sem recibo de commit/auditoria de sucesso. ESLint passou.
 Esses testes usam fixtures sintéticas e simulador de transação; aplicação real e
 QA integral da VPS continuam com o operador responsável.
+
+## Recibos reais
+
+Cadastro aplicado na oportunidade pública
+`7f61780d-24e2-45ca-98dd-67e522b91972`, anteriormente admitida pela auditoria6877.
+Auditoria **7178**, `editorial.previous_exam.mpmt_metadata_registered`; edição
+real39, pública `mpmt-promotor-substituto-2026-objetiva`. A mesma transação atribuiu
+essa edição-base e sincronizou o timestamp da preparação. Os documentos foram
+inicialmente pendentes, sem importação de conteúdo de prova.
+
+Depois de nova conferência na origem, auditorias **7183/7184** aprovaram os dois
+links; **7185/7186** propuseram/aprovaram a referência pública
+`ba088a35-6779-407f-9f77-bf36a462eed9`. Todos os metadados são objetos JSONB e
+declaram `owner_standing_authorization`, referência permanente de12/10 e
+`humanReview:false`. Os produtos liberados e as questões importadas continuam zero.
+
+Recibo privado completo:
+`/opt/leiprova/.local/editorial/mpmt-baseline-live-20261012/receipt.json`;
+aprovação dos links:
+`/opt/leiprova/backups/mpmt-previous-links-applied-20261012.json`.

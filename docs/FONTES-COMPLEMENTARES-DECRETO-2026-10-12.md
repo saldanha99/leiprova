@@ -32,9 +32,22 @@ Depois de registrar/aplicar 0053 pela rotina normal e confirmar a propriedade da
 grant select on legal_complementary_sources to :app_user;
 ```
 
-Não dar APP INSERT/UPDATE/DELETE, acesso à sequência ou função privilegiada. RLS permite SELECT apenas de linhas `approved` com `last_verified_at` dentro de seis horas; manutenção usa o proprietário existente. O novo módulo ainda não altera `schema.ts`, journal ou grants compartilhados. Essas integrações e a QA de banco são obrigações do operador principal antes do apply.
+Não dar APP INSERT/UPDATE/DELETE, acesso à sequência ou função privilegiada. RLS permite SELECT apenas de linhas `approved` com `last_verified_at` dentro de seis horas; manutenção usa o proprietário existente. Export, journal e grants foram integrados e aplicados pelo operador principal na revisão234daeb. Os12 testes PostgreSQL reais de constraints/RLS passaram antes da aplicação.
 
 ## Operação e recibos reais
+
+**Aplicado em12/10/2026:** corpo ID1, público
+`a4537c02-594a-4f06-8cf2-82b029e9dd41`; anexo ID2, público
+`bf60d8aa-584e-45d5-890b-2ccebcb0b3ca`. Auditoria real **7176**,
+`editorial.legal_complementary_sources.approved`, ato alvo22, fingerprint
+`eadebca092a414eb45c5fb77b0ee9457ea6143c5af4c6095685d742fed6db5e0`.
+O monitor recapturou o par e a ficha às07h35m49s UTC, auditoria **7177**,
+`editorial.legal_complementary_sources.verified`, saída0. Metadados JSONBobjeto,
+`humanReview:false`; nenhuma questão/artigo foi aprovado por essas operações.
+Os nove artigos da Lei14.133 continuam pendentes; integração com Autor/acesso
+continua sendo uma etapa separada. Recibos privados em
+`/opt/leiprova/backups/decree-complementary-applied-20261012.json` e
+`/opt/leiprova/backups/decree-monitor-first-run-20261012.log`.
 
 Exige `MIGRATION_DATABASE_URL` de `leiprova_owner` no banco `leiprova`, administrador único e `LEGAL_STANDING_REVIEW_REFERENCE=owner-standing-2026-10-12:official-sources-programs`. A decisão permanente do proprietário autoriza revisão automatizada; a auditoria registra `owner_standing_authorization` e `humanReview:false`.
 

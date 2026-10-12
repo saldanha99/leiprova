@@ -17,6 +17,8 @@ export const OFFICIAL_OPPORTUNITY_SOURCE_POLICIES = [
     allowedHosts: ["conhecimento.fgv.br"],
     allowedPathPrefixes: ["/concursos/", "/exames/"],
     allowedExactPaths: [
+      // Approved MPMT notice (admission6877): source itself is this exact PDF.
+      "/sites/default/files/concursos/edital_n_01_2026_compilado_ate_a_1_a_retificacao_de_20_07_2026-1.pdf",
       "/sites/default/files/concursos/comunicado_n_05_2026_resultado_definitivo_p_objetiva_04_08_2026_assinado.pdf",
       // Composite MPRJ/PGEAC admissions: metadata only, no candidate lists stored/extracted.
       "/sites/default/files/concursos/05.10-aviso-relacao-de-habilitados-a-inscricao-definitiva-republicacao.pdf",

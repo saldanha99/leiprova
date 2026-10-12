@@ -36,7 +36,7 @@ export function questionOptionsMatchContract(questionId: SQLWrapper, questionTyp
     where format_contract.id=${contractId} and format_contract.format=${questionType}
       and (select count(*) from question_options qo where qo.question_id=${questionId})=jsonb_array_length(format_contract.option_keys)
       and (select count(*) from question_options qo where qo.question_id=${questionId} and qo.is_correct)=1
-      and (select count(distinct lower(regexp_replace(btrim(qo.text),'\s+',' ','g')))
+      and (select count(distinct lower(regexp_replace(btrim(qo.text),'[[:space:]]+',' ','g')))
         from question_options qo where qo.question_id=${questionId})=jsonb_array_length(format_contract.option_keys)
       and (select jsonb_agg(qo.option_key order by qo.sort_order) from question_options qo where qo.question_id=${questionId})=format_contract.option_keys
       and (format_contract.format<>'true_false' or (select jsonb_agg(lower(btrim(qo.text)) order by qo.sort_order)
@@ -55,13 +55,14 @@ export function questionContractContentHash(questionId: SQLWrapper) {
 }
 
 export function approvedBindingQuestionContractExists(bindingId: SQLWrapper, questionId: SQLWrapper, opportunityId: SQLWrapper) {
-  return sql`exists (select 1 from question_contract_certifications cert
-    where cert.binding_id=${bindingId} and cert.status='approved'
-      and ${currentQuestionContractExists(sql`cert.contract_id`, opportunityId)}
-      and ${questionOptionsMatchContract(questionId, sql`q.type`, sql`cert.contract_id`)}
-      and cert.question_content_hash=${questionContractContentHash(questionId)}
-      and (q.question_contract_id is null or q.question_contract_id=cert.contract_id)
-      and (q.quiz_mode='dry_law' or exists (select 1 from opportunity_question_contracts author_contract
-        where author_contract.id=cert.contract_id and author_contract.bank_id=q.style_bank_id))
+  return sql`exists (select 1 from question_contract_certifications verified_binding_contract_certificate
+    join questions certified_contract_question on certified_contract_question.id=${questionId}
+    where verified_binding_contract_certificate.binding_id=${bindingId} and verified_binding_contract_certificate.status='approved'
+      and ${currentQuestionContractExists(sql`verified_binding_contract_certificate.contract_id`, opportunityId)}
+      and ${questionOptionsMatchContract(sql`certified_contract_question.id`, sql`certified_contract_question.type`, sql`verified_binding_contract_certificate.contract_id`)}
+      and verified_binding_contract_certificate.question_content_hash=${questionContractContentHash(sql`certified_contract_question.id`)}
+      and (certified_contract_question.question_contract_id is null or certified_contract_question.question_contract_id=verified_binding_contract_certificate.contract_id)
+      and (certified_contract_question.quiz_mode='dry_law' or exists (select 1 from opportunity_question_contracts certified_question_author_contract
+        where certified_question_author_contract.id=verified_binding_contract_certificate.contract_id and certified_question_author_contract.bank_id=certified_contract_question.style_bank_id))
   )`;
 }

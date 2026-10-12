@@ -1,6 +1,6 @@
 # Verificação horária das fontes do Decreto 12.807
 
-Estado desta entrega: **wrapper, instalador e testes preparados, sem instalação ou execução em produção**. Não existem recibos de cron ou de verificação gerados por esta etapa. A aprovação inicial das duas fontes e seus IDs é uma operação separada; o monitor não aprova fontes pendentes, artigos, questões ou contratos do Autor.
+Estado em 12/10/2026: **instalado na VPS Everglades e primeira execução manual concluída às 07:35:49 UTC**, com saída 0 e auditoria **7177** (`editorial.legal_complementary_sources.verified`), IDs de fontes **1 e 2**, `humanReview:false`. A aprovação inicial foi registrada na auditoria **7176** após aplicar a migração 0053. O cron gerenciado dispara aos 17 minutos de cada hora; um disparo agendado posterior ainda precisa ter seu recibo conferido. O monitor não aprova fontes pendentes, artigos, questões ou contratos do Autor.
 
 ## Por que uma execução separada
 

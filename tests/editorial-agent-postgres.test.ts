@@ -14,6 +14,8 @@ import { certifyProductBindingContracts,lockQuestionContracts } from "@/lib/edit
 import { lockApprovalScope } from "@/lib/editorial/approval-lock";
 import { reviewOfficialQuestionContract } from "@/lib/editorial/official-question-contract-review";
 import { OFFICIAL_COURSE_STANDING_REFERENCE } from "@/lib/editorial/official-course-dossier";
+import { questionOptionsMatchContract } from "@/lib/editorial/question-contract-query";
+import { approvedProductQuestionExists } from "@/lib/commerce/product-binding-query";
 import { approvedProductQuestionCount } from "@/lib/commerce/minimum-course-content";
 
 const url=process.env.LEIPROVA_TEST_DATABASE_URL;
@@ -352,6 +354,75 @@ describe.skipIf(!url)('ponte editorial — PostgreSQL isolado',()=>{
     expect((await db!.select().from(schema.questions).where(eq(schema.questions.id,question.id)))[0]).toMatchObject({questionContractId:null,updatedAt:question.updatedAt});
     const [valid]=await db!.execute<{count:number}>(sql`select ${approvedProductQuestionCount(sql`${slug}`)}::int count`);
     expect(Number(valid.count)).toBe(1);
+  });
+  it('certificar o produto A não concede vínculos nem certificações ao produto B de outro cargo',async()=>{
+    async function productFixture(type:'multiple_choice'|'true_false',suspended=false){
+      const f=await fixture(true),now=new Date(),slug=`isolated-product-${randomUUID()}`;
+      await db!.update(schema.opportunityRequirements).set({editorialStatus:'reviewed',legalArticleId:f.article.id,legalActId:f.version.legalActId,
+        reviewedByUserId:f.editor.id,reviewedAt:now,reviewNotes:'Somente fixture sintética isolada.'}).where(eq(schema.opportunityRequirements.id,f.requirement.id));
+      await db!.insert(schema.contestStoreProducts).values({slug,opportunityId:f.requirement.opportunityId});
+      const [question]=await db!.insert(schema.questions).values({publicId:randomUUID(),legalArticleId:f.article.id,
+        subjectId:f.requirement.subjectId,topicId:f.requirement.topicId,quizMode:'dry_law',type,
+        prompt:`Pergunta fictícia de isolamento ${randomUUID()}`,explanation:'Explicação sintética exclusivamente para verificar isolamento entre produtos.',
+        learningObjective:'Isolamento de certificações comerciais.',topic:'QA',editorialStatus:suspended?'suspended':'reviewed',createdByUserId:f.editor.id,
+        reviewedByUserId:f.editor.id,cleanRoomAttestedAt:now,sourceUrl:f.version.sourceUrl,sourceTitle:'Fonte sintética',verifiedAt:now}).returning();
+      const options=(type==='multiple_choice'?'ABCDE':'AB').split('').map((optionKey,sortOrder)=>({optionKey,
+        text:type==='true_false'?(sortOrder===0?'Certo':'Errado'):`Opção sintética isolada ${sortOrder}`,
+        isCorrect:sortOrder===0,rationale:'Justificativa fictícia de software.',sortOrder}));
+      await db!.insert(schema.questionOptions).values(options.map(option=>({...option,questionId:question.id})));
+      const bindingId=hash(slug);
+      await db!.insert(schema.contestProductQuestionBindings).values({id:bindingId,productSlug:slug,opportunityId:f.requirement.opportunityId,
+        requirementId:f.requirement.id,questionId:question.id,sourceDocumentId:f.source.id,sourceSnapshotId:f.snapshot.id,
+        sourceSnapshotChecksum:f.contract.sourceSnapshotChecksum,legalArticleId:f.article.id,legalVersionId:f.version.id,
+        legalVersionChecksum:f.version.checksumSha256,questionUpdatedAt:question.updatedAt,requirementText:f.requirement.requirementText,
+        sourceLocator:f.requirement.sourceLocator,requirementQuote:f.requirement.requirementText,legalQuote:f.article.literalText,
+        scopeNotes:'Somente teste sintético, sem publicação.',evidence:{sourceUrl:f.source.sourceUrl,legalArticleText:f.article.literalText,
+          legalSourceUrl:f.version.sourceUrl,questionContent:{prompt:question.prompt,explanation:question.explanation,
+            type:question.type,learningObjective:question.learningObjective,options}},proposedByUserId:f.editor.id,status:'approved',
+        reviewedByUserId:f.editor.id,reviewedAt:now,reviewNotes:'Revisão fictícia para isolamento.'});
+      const request={input:{contract:f.contract,productSlug:slug},actorPublicId:f.editor.publicId,
+        approvalReference:OFFICIAL_COURSE_STANDING_REFERENCE,mode:'preview' as const};
+      return{...f,slug,question,bindingId,request};
+    }
+    const a=await productFixture('multiple_choice'),b=await productFixture('true_false',true);
+    const beforeB=await reviewOfficialQuestionContract(db!,b.request);
+    expect(beforeB).toMatchObject({validQuestionCount:0,certificates:[]});
+    const previewA=await reviewOfficialQuestionContract(db!,a.request);
+    expect(previewA.validQuestionCount).toBe(1);expect(previewA.certificates.map(row=>row.id)).toEqual([a.bindingId]);
+    await reviewOfficialQuestionContract(db!,{...a.request,mode:'apply',expectedFingerprint:previewA.fingerprint});
+    const afterB=await reviewOfficialQuestionContract(db!,b.request);
+    expect(afterB).toMatchObject({validQuestionCount:0,certificates:[],fingerprint:beforeB.fingerprint});
+    expect(await db!.select().from(schema.questionContractCertifications).where(eq(schema.questionContractCertifications.bindingId,b.bindingId))).toHaveLength(0);
+    expect(await db!.select().from(schema.opportunityQuestionContracts).where(eq(schema.opportunityQuestionContracts.id,b.contractId))).toHaveLength(0);
+    const repeatedA=await reviewOfficialQuestionContract(db!,a.request);
+    expect(repeatedA.fingerprint).toBe(previewA.fingerprint);expect(repeatedA.certificates.map(row=>row.id)).toEqual([a.bindingId]);
+    await reviewOfficialQuestionContract(db!,{...a.request,mode:'apply',expectedFingerprint:repeatedA.fingerprint});
+    expect(await db!.select().from(schema.questionContractCertifications).where(eq(schema.questionContractCertifications.bindingId,a.bindingId))).toHaveLength(1);
+    const [counts]=await db!.execute<{a:number;b:number;foreign:boolean}>(sql`select
+      ${approvedProductQuestionCount(sql`${a.slug}`)}::int a,${approvedProductQuestionCount(sql`${b.slug}`)}::int b,
+      ${approvedProductQuestionExists(sql`${a.slug}`,sql`${a.question.id}`,sql`${a.requirement.opportunityId}`,sql`${b.bindingId}`)} as foreign`);
+    expect(counts).toEqual({a:1,b:0,foreign:false});
+    // O alias do operador real deve continuar referindo a linha externa.
+    const scope=await db!.execute<{id:string;allowed:boolean}>(sql`select binding.id,
+      ${approvedProductQuestionExists(sql`binding.product_slug`,sql`binding.question_id`,sql`binding.opportunity_id`,sql`binding.id`)} allowed
+      from contest_product_question_bindings binding where binding.id in (${a.bindingId},${b.bindingId}) order by binding.id`);
+    expect(scope.find(row=>row.id===a.bindingId)?.allowed).toBe(true);
+    expect(scope.find(row=>row.id===b.bindingId)?.allowed).toBe(false);
+  });
+  it('opções MC5 preservam letras s e recusam duplicatas diferenciadas só por newline interno',async()=>{
+    const f=await fixture();
+    const [question]=await db!.insert(schema.questions).values({publicId:randomUUID(),legalArticleId:f.article.id,
+      subjectId:f.requirement.subjectId,topicId:f.requirement.topicId,quizMode:'dry_law',type:'multiple_choice',
+      prompt:'Questão fictícia para testar normalização de espaços.',explanation:'Texto exclusivamente sintético para testar integridade de alternativas.',
+      learningObjective:'Preservar palavras e rejeitar opções repetidas.',topic:'QA',verifiedAt:new Date()}).returning();
+    const texts=['casas aqui','ca a  aqui','Alternativa alfa','Alternativa beta','Alternativa gama'];
+    await db!.insert(schema.questionOptions).values(texts.map((text,sortOrder)=>({questionId:question.id,optionKey:'ABCDE'[sortOrder],
+      text,isCorrect:sortOrder===0,rationale:'Justificativa sintética.',sortOrder})));
+    const valid=async()=>(await db!.execute<{allowed:boolean}>(sql`select
+      ${questionOptionsMatchContract(sql`${question.id}`,sql`${question.type}`,sql`${f.contractId}`)} allowed`))[0].allowed;
+    expect(await valid()).toBe(true);
+    await db!.update(schema.questionOptions).set({text:'casas\n aqui'}).where(sql`${schema.questionOptions.questionId}=${question.id} and ${schema.questionOptions.optionKey}='B'`);
+    expect(await valid()).toBe(false);
   });
   it('preparação repetida é idempotente e descobre portais sem gastar API',async()=>{
     const f=await fixture();

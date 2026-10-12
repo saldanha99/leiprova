@@ -8,6 +8,13 @@ import {
 } from "@/lib/opportunities/source-monitor-policy";
 
 describe("allowlist de fontes oficiais de oportunidades", () => {
+  it("admite somente o edital MPMT compilado aprovado, sem abrir cadernos ou outros PDFs", () => {
+    const url = "https://conhecimento.fgv.br/sites/default/files/concursos/edital_n_01_2026_compilado_ate_a_1_a_retificacao_de_20_07_2026-1.pdf";
+    expect(parseOfficialOpportunitySourceUrl(url, "fgv-conhecimento").url).toBe(url);
+    expect(() => parseOfficialOpportunitySourceUrl(`${url}/outro`, "fgv-conhecimento")).toThrow();
+    expect(() => parseOfficialOpportunitySourceUrl("https://conhecimento.fgv.br/sites/default/files/concursos/promotor-de-justica-substituto-cns100-tipo-1_1.pdf", "fgv-conhecimento")).toThrow();
+    expect(() => parseOfficialOpportunitySourceUrl(url, "cnj")).toThrow();
+  });
   it("admite o comunicado MPMT exato sem liberar outros assets da FGV", () => {
     const url = "https://conhecimento.fgv.br/sites/default/files/concursos/comunicado_n_05_2026_resultado_definitivo_p_objetiva_04_08_2026_assinado.pdf";
     expect(parseOfficialOpportunitySourceUrl(url, "fgv-conhecimento").url).toBe(url);
