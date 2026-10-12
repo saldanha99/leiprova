@@ -1,0 +1,91 @@
+# Produção, controle do proprietário e anúncios
+
+Decisão de 12/10/2026: maximizar a produção diária, buscando 1.000 questões
+válidas publicadas/dia, e abrir progressivamente as preparações elegíveis.
+1.000 é uma meta de capacidade, não um teto, resultado comprovado ou prazo.
+Mantêm-se fontes oficiais, identidade por cargo/edição, contratos atuais,
+originalidade, piso de conteúdo e a auditoria da autorização permanente.
+Resultados prepared continuam propostas. Não usar APIs pagas como alternativa.
+
+## Continuação automática
+
+Heartbeat do Codex `produ-o-edital-lei-seca`, ativo, de hora em hora, ligado a
+este chat. Reaproveita os agentes existentes do Maestri e fica silencioso quando
+nada relevante muda. Notifica avanços, falhas ou decisões necessárias. Não
+substitui os executores do Maestri nem comprova disponibilidade ininterrupta.
+Os executores dependem do aplicativo/host abertos e das assinaturas disponíveis.
+
+Cadências existentes: Guardião e Autor 1 minuto, Radar 5 minutos; preparação
+na VPS 5 minutos e liberação 10 minutos. Proteções de agente ocupado e locks
+permanecem. A identidade da CLI do Maestro ainda aparece como Autor; não usar
+essa identidade divergente para administrar nós ou rotinas.
+
+O diagnóstico privado encontrou 881 mapas candidatos com contrato atual e
+disciplina definida; a seleção anterior consumia muitas rodadas sem contrato.
+A alteração prioriza esses mapas dentro da mesma faixa de produto, antes da
+data da prova. Preserva prioridade de mudanças legais, reservas, tentativas,
+auditoria e requisitos. Isso melhora os insumos; não comprova 1.000/dia.
+
+## Relatório e WhatsApp
+
+`scripts/editorial-owner-report.ts --json`, executado por tsx com
+`--env-file-if-exists=.env`, produz um relatório em transação somente leitura,
+repeatable read e timeout de 60 segundos. O destino deve ser o banco leiprova.
+Conta questões distintas cuja primeira publicação auditada, considerando a
+data de abertura do produto, ocorreu no dia de São Paulo e que ainda têm um
+vínculo válido em produto liberado e editorialmente elegível. Reaprovação ou
+múltiplos vínculos não multiplicam a contagem. A métrica não atesta checkout.
+Na VPS, executar `bash deploy/editorial-owner-report.sh`; o wrapper limita o
+tempo e usa a imagem de ferramentas com transação somente leitura.
+
+O telefone confirmado está apenas em `.local/maestri/owner-control.json`, com
+permissão 600. Comandos solicitados: status, pendências e solicitar liberação.
+O proprietário escolheu uma integração existente e ainda vai identificá-la.
+**WhatsApp não está conectado e nenhum envio foi confirmado.** Não utilizar
+instâncias de outro projeto por inferência. Após identificar o serviço,
+validar autenticação do remetente e comandos, deduplicação e recibo de envio;
+solicitar liberação deve executar os mesmos gates auditados da operação.
+Horário proposto para relatório diário: 18h, America/Sao_Paulo; eventos
+relevantes também podem gerar avisos, sem repetir estados inalterados.
+
+## Anúncios
+
+Meta e Google Ads autorizados para preparação. Orçamento ainda não definido;
+não ativar campanhas ou gastos. Usar somente ofertas efetivamente disponíveis,
+com recorte inicial e ampliação progressiva explícitos. Não prometer aprovação,
+conteúdo integral ou vínculo oficial com a banca.
+
+Rascunhos e seis peças feed/stories de ENAM, ENAC e TC-DF estão em
+`.local/commerce/campanhas-20261012/`, fora do Git e da imagem da aplicação.
+O pacote contém texto e UTMs; contas, orçamento e mensuração ainda precisam
+ser conferidos antes da ativação. Supermetrics Marketing Agent foi sugerido
+como conector para as plataformas e já está disponível. A consulta retornou
+`NOT_AUTHENTICATED` tanto para Google Ads quanto para Meta Ads; os links de
+login foram entregues ao proprietário. Nenhuma campanha foi criada nas contas.
+
+Correções comerciais associadas: Master anual apresenta a cobrança única
+anual sem sugerir parcelamento; termos e reembolso passam a ler os dados
+atuais do fornecedor em runtime. As cláusulas jurídicas não foram revisadas.
+
+## Recibo de implementação
+
+Validação em imagem isolada na VPS: lint, geração de tipos, typecheck e build
+aprovados; 1.819 testes passaram e 298 opcionais foram pulados. Separadamente,
+os 29 testes da ponte editorial passaram em PostgreSQL 17 sintético, incluindo
+os três cenários novos de prioridade, concorrência e permissões restritas.
+O shell do wrapper passou em `bash -n`. Nenhum seed foi executado em produção.
+
+Relatório somente leitura às 21:48 UTC: 3/84 produtos editorialmente aptos e
+liberados; ENAM 146, ENAC 78 e TC-DF 72 questões válidas, total 296. Foram 16
+questões distintas novas publicadas no dia de São Paulo e ainda válidas.
+Isso não representa 1.000/dia nem uma previsão comprovada para os 84 produtos.
+
+Backup anterior ao deploy, com catálogo do dump conferido:
+`/opt/leiprova-qa-owner-control-20261012/before-deploy.dump`, SHA-256
+`ff9ee267a698faa271aa3c5a190ca9477eb53e0243ddebc3753f2c1f077cd313`.
+Imagens anteriores preservadas com tag `before-owner-control-20261012` nos
+repositórios `leiprova-app` e `leiprova-editorial-automation`. Não há migração
+de schema nesta mudança; retorno do código não deve restaurar o banco sobre
+as entregas editoriais posteriores. Recibos privados ficam no diretório de QA.
+
+Implantação em andamento; registrar revisão e conferência pública ao concluir.

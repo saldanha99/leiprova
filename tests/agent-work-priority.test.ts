@@ -52,10 +52,44 @@ describe("prioridade da fila dos agentes", () => {
     expect(claim.sql).not.toContain("unsold_waiting");
     expect(queries).toHaveLength(3);
     const order = claim.sql.slice(claim.sql.indexOf("order by"));
-    expect(order).toContain("tier.tier nulls first, tier.upcoming_exam nulls last");
+    expect(order).toMatch(/tier\.tier nulls first,\s+case when work\.kind='legal_mapping'[\s\S]+?then 0 else 1 end,\s+tier\.upcoming_exam nulls last/u);
     expect(order).toContain("(requirement.subject_id is null) nulls last");
     expect(order).toContain("work.created_at,work.job_key for update of work skip locked limit 1");
     expect(claim.params.filter((param) => param instanceof Date)).toEqual([]);
+  });
+
+  it("materializa o contrato vigente por oportunidade e usa prontidão somente na ordenação de mapeamentos", async () => {
+    const { db, queries } = fakeDatabase();
+    await claimAgentWork(db, new Date(), "Guardião");
+    const claim = new PgDialect().sqlToQuery(queries[2]);
+    const readiness = claim.sql.slice(claim.sql.indexOf("mapping_contract_readiness as materialized ("), claim.sql.indexOf("select work.job_key"));
+    expect(readiness).toContain("from contest_opportunities mapping_opportunity");
+    expect(readiness).toContain("mapping_contract.opportunity_id = mapping_opportunity.id");
+    expect(readiness).toContain("current_scoped_contract.id=mapping_contract.id");
+    expect(readiness).toContain("current_scoped_contract.opportunity_id=mapping_opportunity.id");
+    expect(readiness).toContain("current_scoped_contract.status='approved'");
+    expect(readiness).toContain("current_scoped_contract.scope='single_role'");
+    expect(readiness).toContain("contract_current_snapshot.checksum_sha256=current_scoped_contract.source_snapshot_checksum");
+    expect(readiness).not.toContain("requirement.");
+    expect(claim.sql.match(/mapping_contract_readiness as materialized/gu)).toHaveLength(1);
+
+    const selection = claim.sql.slice(claim.sql.indexOf("where work.status='pending'"), claim.sql.indexOf("order by case work.kind"));
+    expect(selection).not.toContain("mapping_readiness");
+    const order = claim.sql.slice(claim.sql.indexOf("order by case work.kind"));
+    expect(order).toContain("when 'legal_change' then 0 when 'authoring' then 1 when 'discovery' then 2 else 3 end");
+    expect(order).toMatch(/tier\.tier nulls first,[\s\S]+coalesce\(mapping_readiness.has_current_contract, false\)[\s\S]+requirement\.subject_id is not null then 0 else 1 end,[\s\S]+tier\.upcoming_exam nulls last/u);
+    expect(order).toContain("for update of work skip locked limit 1");
+  });
+
+  it.each(["Autor", "Radar"])("preserva o despacho de %s sem calcular prontidão dos mapeamentos", async (agent) => {
+    const { db, queries } = fakeDatabase();
+    await claimAgentWork(db, new Date(), agent);
+    const claim = new PgDialect().sqlToQuery(queries[2]);
+    expect(claim.sql).not.toContain("mapping_contract_readiness");
+    expect(claim.sql).toContain("tier.tier nulls first, tier.upcoming_exam nulls last");
+    expect(claim.sql).toContain("(requirement.subject_id is null) nulls last");
+    expect(claim.params).toContain(agent === "Autor" ? "authoring" : "discovery");
+    expect(claim.params).not.toContain("legal_mapping");
   });
 
   it("encerra, antes de cada ciclo, tarefas de requisito retirado ou suspenso", async () => {

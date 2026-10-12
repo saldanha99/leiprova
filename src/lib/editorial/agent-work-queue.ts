@@ -46,9 +46,20 @@ export const AGENT_OPPORTUNITY_PRIORITY_CTES = sql`product_content as materializ
       from contest_opportunities opportunity
       left join opportunity_content content on content.opportunity_id = opportunity.id
     )`;
-/** Dentro do mesmo tipo: faixa 0 primeiro, pela prova mais próxima (prova
- * passada ou sem data no fim da faixa) e, no mesmo edital, matéria conhecida
- * antes. A prioridade ordena as tarefas elegíveis do próprio agente, sem deixar
+// Somente o despacho de mapeamentos precisa desta fotografia. O predicado
+// completo é materializado por oportunidade, nunca por requisito da fila.
+const MAPPING_CONTRACT_READINESS_CTE = sql`mapping_contract_readiness as materialized (
+      select mapping_opportunity.id, exists (
+        select 1 from opportunity_question_contracts mapping_contract
+        where mapping_contract.opportunity_id = mapping_opportunity.id
+          and ${currentQuestionContractExists(sql`mapping_contract.id`, sql`mapping_opportunity.id`)}
+      ) as has_current_contract
+      from contest_opportunities mapping_opportunity
+    )`;
+/** Dentro do mesmo tipo: faixa 0 primeiro; nos mapeamentos, contrato vigente
+ * e matéria conhecida precedem a data da prova dentro da faixa. Depois, prova
+ * mais próxima (passada ou sem data no fim) e matéria conhecida no mesmo edital.
+ * A prioridade ordena as tarefas elegíveis do próprio agente, sem deixar
  * um agente ocioso por pendências de outro. Tarefa sem edital não tem faixa e
  * segue a ordem de chegada. */
 const CLAIM_FROM = sql.raw(`from editorial_agent_work work
@@ -85,6 +96,14 @@ export async function enqueueAgentWork(db: AgentDatabase, key: string, kind: Age
 export async function claimAgentWork(db: AgentDatabase, now = new Date(), agent?:string) {
   if(agent && !Object.values(AGENT_FOR_WORK).includes(agent)) throw new Error("Agente inválido.");
   const kinds=Object.entries(AGENT_FOR_WORK).filter(([,name])=>!agent||name===agent).map(([kind])=>kind);
+  const prioritizesMappings = kinds.includes('legal_mapping');
+  const mappingReadiness = prioritizesMappings ? sql`, ${MAPPING_CONTRACT_READINESS_CTE}` : sql``;
+  const mappingJoin = prioritizesMappings ? sql`left join mapping_contract_readiness mapping_readiness
+    on mapping_readiness.id = requirement.opportunity_id` : sql``;
+  const productOrder = prioritizesMappings ? sql`tier.tier nulls first,
+          case when work.kind='legal_mapping' and coalesce(mapping_readiness.has_current_contract, false)
+            and requirement.subject_id is not null then 0 else 1 end,
+          tier.upcoming_exam nulls last, (requirement.subject_id is null) nulls last` : PRODUCT_DEADLINE_ORDER;
   return db.transaction(async tx => {
     await tx.execute(sql`select pg_advisory_xact_lock(621743,37)`);
     await tx.execute(sql`
@@ -98,13 +117,13 @@ export async function claimAgentWork(db: AgentDatabase, now = new Date(), agent?
       update editorial_agent_work set status='running',attempts=attempts+1,
         lease_token=${leaseToken}::uuid,lease_expires_at=${expires}::timestamptz,
         updated_at=${now.toISOString()}::timestamptz
-      where job_key=(with ${AGENT_OPPORTUNITY_PRIORITY_CTES}
-        select work.job_key ${CLAIM_FROM}
+      where job_key=(with ${AGENT_OPPORTUNITY_PRIORITY_CTES}${mappingReadiness}
+        select work.job_key ${CLAIM_FROM} ${mappingJoin}
         where work.status='pending' and work.attempts<3
         and (work.kind<>'authoring' or ${currentQuestionContractExists(sql`work.payload->>'questionContractId'`,sql`requirement.opportunity_id`)})
         and work.kind in (${sql.join(kinds.map(kind=>sql`${kind}`),sql`,`)})
         order by case work.kind when 'legal_change' then 0 when 'authoring' then 1 when 'discovery' then 2 else 3 end,
-          ${PRODUCT_DEADLINE_ORDER},
+          ${productOrder},
           work.created_at,work.job_key for update of work skip locked limit 1)
       returning job_key as "jobKey",kind,input_hash as "inputHash",payload,
         lease_token::text as "leaseToken",lease_expires_at::text as "leaseExpiresAt"

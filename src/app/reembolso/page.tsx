@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 
 import { LegalDocument, LegalSection } from "@/components/legal/legal-document";
 import { SupplierIdentityBlock } from "@/components/legal/supplier-identity";
@@ -23,9 +24,10 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RefundPage() {
+export default async function RefundPage() {
+  await connection();
   return (
-    <LegalDocument title="Política de Reembolso" updatedAt="16 de agosto de 2026" notice="Documento da fase beta, pendente de revisão jurídica final. Não há oferta comercial ativa: o checkout permanece bloqueado enquanto a identificação do fornecedor não estiver completa.">
+    <LegalDocument title="Política de Reembolso" updatedAt="12 de outubro de 2026" notice="Documento pendente de revisão jurídica final. As condições de cobrança são informadas na oferta antes do pagamento; os canais atuais do fornecedor estão apresentados abaixo.">
       <LegalSection title="Direito de arrependimento"><p>O consumidor pode desistir da contratação no prazo de {WITHDRAWAL_PERIOD_DAYS} (sete) dias corridos, contados da contratação ou do recebimento do acesso, o que ocorrer por último. É o art. 49 do Código de Defesa do Consumidor, aplicável por se tratar de contratação fora do estabelecimento comercial.</p><p>Não é preciso justificar o pedido, e o uso da plataforma durante o prazo não afasta o direito. Os valores pagos são devolvidos de imediato e monetariamente atualizados, na forma do parágrafo único do art. 49.</p></LegalSection>
       <LegalSection title="Como solicitar"><p>A solicitação pode ser feita pelo canal de suporte autenticado, pelo formulário de contato ou pelo e-mail de atendimento, informando o e-mail da conta e o plano. Confirmamos o recebimento imediatamente, conforme o art. 5º do Decreto 7.962/2013.</p><p>Nunca solicitaremos senha, código de segurança nem os dados completos do cartão.</p><SupplierIdentityBlock /></LegalSection>
       <LegalSection title="Processamento"><p>Após a validação da titularidade e da elegibilidade, a restituição será iniciada na Stripe. O prazo de visualização depende do método de pagamento e da instituição financeira.</p></LegalSection>

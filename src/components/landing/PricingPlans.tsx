@@ -71,10 +71,10 @@ export function PricingPlans({ commerceOpen, contactOpen }: PricingPlansProps) {
             <div className="pricing-card__annual-price">
               <span>Equivalente a</span>
               <div>
-                <small>12x de</small>
                 <strong>{monthlyEquivalent}</strong>
+                <small>/mês</small>
               </div>
-              <p>{formatBRL(activePlan.priceCents)} cobrados a cada 12 meses.</p>
+              <p>{formatBRL(activePlan.priceCents)} em cobrança única a cada 12 meses. Não é parcelamento.</p>
             </div>
           ) : (
             <>

@@ -27,7 +27,7 @@ const db=client?drizzle(client,{schema}):null;
 const hash=(text:string)=>createHash('sha256').update(text).digest('hex');
 const base={schemaVersion:1,publicationAllowed:false,outcome:'prepared',summary:'Teste sintético; sem publicação.',limitations:[],evidence:[]};
 function discoveryPayload():AgentWorkPayload{return{version:AGENT_WORK_VERSION,title:'Descoberta sintética',instructions:'Somente teste.',context:{},articles:[],sourceUrls:['https://www.vunesp.com.br/']};}
-async function fixture(operator=false){
+async function fixture(operator=false,examDate?:string){
   const database=db!;const tag=randomUUID();
   const [editor]=await database.insert(schema.users).values({publicId:randomUUID(),name:'Editor sintético',email:`${tag}@example.invalid`,passwordHash:'not-a-password',role:operator?'admin':'editor'}).returning();
   const [category]=await database.select().from(schema.contestCategoryCareers).limit(1);
@@ -43,7 +43,7 @@ async function fixture(operator=false){
   const [act]=await database.insert(schema.legalActs).values({slug:`agent-test-${tag}`,title:'Regra sintética',shortTitle:'Regra sintética',actType:'lei',officialUrl:'https://example.invalid/synthetic'}).returning();
   const [version]=await database.insert(schema.legalVersions).values({legalActId:act.id,sourceUrl:'https://example.invalid/synthetic',checksumSha256:hash(tag),verifiedAt:new Date(),status:'current'}).returning();
   const [article]=await database.insert(schema.legalArticles).values({legalVersionId:version.id,articleRef:'Art. 1',articleOrder:1,path:'art-1',literalText:'No exercício fictício, a equipe deve organizar os cartões antes da atividade.',editorialStatus:'reviewed'}).returning();
-  const [opportunity]=await database.insert(schema.contestOpportunities).values({publicId:randomUUID(),slug:`agent-test-${tag}`,categoryId:category.categoryId,careerTrackId:category.careerTrackId,jurisdictionCode:'BR',scope:'national',cycleYear:2026,institutionAcronym:`TEST-${tag.toUpperCase()}`,institutionName:'Instituição sintética',roleName:'Cargo sintético',title:'Concurso sintético',summary:'Exclusivo para teste.',statusAsOf:'2026-09-06',editorialStatus:'draft',officialUrl:landing,sourceCheckedAt:new Date()}).returning();
+  const [opportunity]=await database.insert(schema.contestOpportunities).values({publicId:randomUUID(),slug:`agent-test-${tag}`,categoryId:category.categoryId,careerTrackId:category.careerTrackId,jurisdictionCode:'BR',scope:'national',cycleYear:2026,institutionAcronym:`TEST-${tag.toUpperCase()}`,institutionName:'Instituição sintética',roleName:'Cargo sintético',title:'Concurso sintético',summary:'Exclusivo para teste.',statusAsOf:'2026-09-06',editorialStatus:'draft',officialUrl:landing,sourceCheckedAt:new Date(),examDate}).returning();
   const [source]=await database.insert(schema.opportunitySourceDocuments).values({publicId:randomUUID(),opportunityId:opportunity.id,documentType:'official_announcement',title:'Fonte sintética',sourceUrl:landing,sourceHost,observedAt:new Date(),lastSeenAt:new Date(),httpStatus:200,status:'approved',reviewedByUserId:editor.id,reviewedAt:new Date()}).returning();
   await database.update(schema.contestOpportunities).set({examEditionId:edition.id,officialNoticeNumber:'QA/2026',editorialStatus:'reviewed',reviewedByUserId:editor.id,reviewedAt:new Date(),publishedAt:new Date()}).where(eq(schema.contestOpportunities.id,opportunity.id));
   const syntheticText=operator?'Instituição fictícia, Cargo sintético, prova sem validade jurídica: cinco alternativas e apenas uma resposta correta. '.repeat(3):'Somente teste sintético de automação. '.repeat(5);
@@ -160,6 +160,41 @@ describe.skipIf(!url)('ponte editorial — PostgreSQL isolado',()=>{
     expect((await claimAgentWork(db!,new Date(),'Autor')).state).toBe('idle');
     const claims=await Promise.all(Array.from({length:4},()=>claimAgentWork(db!,new Date(),'Radar')));
     expect(claims.filter(x=>x.state==='claimed')).toHaveLength(1);
+  });
+  it.each(['missing','suspended'] as const)('prioridade de mapeamento exige contrato vigente e disciplina conhecida (%s)',async(contractState)=>{
+    const future=(days:number)=>new Date(Date.now()+days*86400000).toISOString().slice(0,10);
+    const waiting=await fixture(contractState==='missing',future(30));
+    const unknown=await fixture(false,future(30));
+    const ready=await fixture(false,future(60));
+    if(contractState==='suspended')await db!.update(schema.opportunityQuestionContracts).set({status:'suspended'})
+      .where(eq(schema.opportunityQuestionContracts.id,waiting.contractId));
+    await db!.update(schema.opportunityRequirements).set({subjectId:null,topicId:null})
+      .where(eq(schema.opportunityRequirements.id,unknown.requirement.id));
+    for(const f of [waiting,unknown,ready])await enqueueAgentWork(db!,`mapping:${f.requirement.id}`,'legal_mapping',f.payload);
+    // Uma mudança legal conserva precedência sobre qualquer mapeamento pronto.
+    const changeKey=`legal-change:${randomUUID()}`;
+    await enqueueAgentWork(db!,changeKey,'legal_change',discoveryPayload());
+    expect(await claimAgentWork(db!,new Date(),'Guardião')).toMatchObject({state:'claimed',job:{jobKey:changeKey}});
+    expect(await claimAgentWork(db!,new Date(),'Guardião')).toMatchObject({state:'claimed',job:{jobKey:`mapping:${ready.requirement.id}`}});
+    // Prioridade é ordenação, não exclusão nem reconstrução do pacote/hash.
+    for(const f of [waiting,unknown]){
+      const [work]=await db!.execute<{status:string;inputHash:string}>(sql`select status,input_hash as "inputHash"
+        from editorial_agent_work where job_key=${`mapping:${f.requirement.id}`}`);
+      expect(work).toMatchObject({status:'pending',inputHash:agentInputHash(f.payload)});
+    }
+    expect(await claimAgentWork(db!,new Date(),'Guardião')).toMatchObject({state:'claimed',job:{jobKey:`mapping:${waiting.requirement.id}`}});
+    expect(await claimAgentWork(db!,new Date(),'Guardião')).toMatchObject({state:'claimed',job:{jobKey:`mapping:${unknown.requirement.id}`}});
+  });
+  it('prontidão autoral do mapeamento não ultrapassa a faixa de produto',async()=>{
+    const waiting=await fixture(true),ready=await fixture();
+    await db!.insert(schema.contestStoreProducts).values([
+      {slug:`priority-draft-${randomUUID()}`,opportunityId:waiting.requirement.opportunityId},
+      {slug:`priority-released-${randomUUID()}`,opportunityId:ready.requirement.opportunityId,status:'released',
+        releasedAt:new Date(),releasedByUserId:ready.editor.id},
+    ]);
+    for(const f of [ready,waiting])await enqueueAgentWork(db!,`mapping:${f.requirement.id}`,'legal_mapping',f.payload);
+    expect(await claimAgentWork(db!,new Date(),'Guardião')).toMatchObject({state:'claimed',job:{jobKey:`mapping:${waiting.requirement.id}`}});
+    expect(await claimAgentWork(db!,new Date(),'Guardião')).toMatchObject({state:'claimed',job:{jobKey:`mapping:${ready.requirement.id}`}});
   });
   it('mudança de escopo do intake não substitui o lease ativo do Radar',async()=>{
     const slug=`intake-lease-${randomUUID()}`;

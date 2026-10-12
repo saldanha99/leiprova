@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 
 import { LegalDocument, LegalSection } from "@/components/legal/legal-document";
 import { SupplierIdentityBlock } from "@/components/legal/supplier-identity";
@@ -23,9 +24,10 @@ export const metadata: Metadata = {
   },
 };
 
-export default function TermsPage() {
+export default async function TermsPage() {
+  await connection();
   return (
-    <LegalDocument title="Termos de Uso" updatedAt="16 de agosto de 2026" notice="Documento da fase beta, pendente de revisão jurídica final. O checkout permanece bloqueado enquanto a identificação do fornecedor não estiver completa — a trava é aplicada pelo código, não apenas por configuração.">
+    <LegalDocument title="Termos de Uso" updatedAt="12 de outubro de 2026" notice="Documento pendente de revisão jurídica final. Consulte o escopo e as condições do plano na página da oferta; a identificação atual do fornecedor está apresentada abaixo.">
       <LegalSection title="1. Objeto e aceitação"><p>A Edital Lei Seca é uma ferramenta educacional para treino de literalidade de normas, revisão espaçada e acompanhamento de desempenho voltada à preparação para concursos públicos. Ao criar uma conta, o usuário concorda com estes termos e com a Política de Privacidade.</p><p>O serviço não presta consultoria jurídica e não substitui a consulta às fontes oficiais, aos editais nem a orientação de profissionais qualificados.</p></LegalSection>
       <LegalSection title="2. Conteúdo e fontes"><p>Os textos de normas são vinculados a fontes oficiais e recebem data de verificação. Questões, explicações, mapas e arranjos editoriais são produzidos pela Edital Lei Seca ou usados sob licença. A plataforma não afirma afiliação com bancas examinadoras.</p><p>Alterações legislativas podem exigir revisão e suspensão temporária de itens. A data e a versão exibidas devem sempre ser consideradas pelo usuário.</p></LegalSection>
       <LegalSection title="3. Conta e segurança"><p>O usuário deve fornecer dados verdadeiros, manter sua senha em sigilo e comunicar uso não autorizado. A conta é pessoal e não pode ser revendida, compartilhada em massa ou usada para extração automatizada do acervo.</p></LegalSection>
