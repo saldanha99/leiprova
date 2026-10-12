@@ -62,3 +62,24 @@ A primeira chamada manual usou `sh` por engano no script Bash: aprovou as quatro
 inéditas, mas parou na sintaxe de process substitution. Reexecutado pelo próprio
 shebang; importação e revisão idempotentes concluíram sem duplicar conteúdo.
 O cron existente usa o executável e não foi afetado por esse erro da chamada.
+
+## Atualização posterior — cadência de cinco minutos e apoio Flash
+
+Após o proprietário informar que ativou o Modo Maestro, a CLI ainda reconheceu
+a sessão como Autor. O ajuste foi então concluído pelo painel nativo
+**Arquivo > Rotinas**, editando as três entradas existentes. Radar, Guardião e
+Autor agora exibem **A cada 5 min**, habilitados, repetição Nunca, notificações
+desativadas e Pular se ocupado ativado. Somente o campo de intervalo foi alterado;
+nomes, alvos, comandos, pré-execução e conexões foram preservados. Não foram
+criadas rotinas ou nós. Os contadores da interface reiniciaram com o novo intervalo.
+
+Pré-execução real: Radar recolheu uma resposta às 19:32:40 UTC; Guardião recolheu
+às 19:33:05 e reservou às 19:33:10; Autor recolheu às 19:33:16 e reservou às
+19:33:21. Zero falhas de recolhimento nessas rodadas. Recibo privado:
+`.local/maestri/routines-five-minutes-ui-20261012.md`.
+
+A pedido do proprietário, o nó existente Vetor recebeu trabalho de apoio de
+produto, somente leitura, sobre a clareza da disponibilidade no catálogo.
+Modelo **Gemini 3.8 Flash · high** verificado no rodapé do terminal Antigravity
+durante execução, sem criar outro nó ou conectar API paga. Isso é apoio de QA,
+não aprovação jurídica nem autoria incorporada à fila principal.

@@ -10,8 +10,11 @@ não há fallback para API paga. Referências abaixo ao teto de 48 são históri
 Veja `docs/FILA-SEM-TETO-2026-10-12.md` para o recibo de implantação.
 Implantado `dd711733`: 50 reservas/24h observadas, três agentes entregaram,
 quatro inéditas novas publicadas no ENAC; total válido agora 289 questões
-em três preparações. Intervalo do Maestri permanece 20 minutos (ajuste negado
-por identidade Maestro/Autor divergente). Conferência às 16h12 BRT.
+em três preparações (conferência às 16h12 BRT). Atualização posterior: as três
+rotinas do Maestri foram alteradas pelo painel nativo para **cinco minutos**, com
+repetição contínua e proteção de agente ocupado. CLI com identidade divergente
+não foi usada para a alteração. Vetor/Antigravity Gemini 3.8 Flash high ativado
+em tarefa delimitada de apoio ao catálogo. Ver recibo no documento acima.
 
 **Abertura progressiva instalada em 12/10/2026, às 13h12 BRT:** decisão do
 proprietário registrada em `AGENTS.md`. Cron de liberação a cada 30 minutos;
