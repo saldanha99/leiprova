@@ -1,5 +1,14 @@
 # Operação do Edital Lei Seca
 
+**Heartbeat em 12/10/2026, 19h51 BRT:** seguem 3/84 preparações disponíveis
+(ENAM 146, ENAC 78, TC-DF 72). TRF-5 avançou para 25 válidas e TJ-RS para 10,
+ambos draft; a métrica diária de novas publicadas continua 16. Cinco últimas
+aprovações conferidas contra CF art. 5º, sem suspensão. PP-MA tem 24 requisitos
+do Monitor misturados ao programa do Inspetor: contrato permanece não admitido
+até correção auditada. PC-MA Investigador exige reconciliação do nome oficial.
+Mac bloqueado impediu coordenação pela tela; a ponte ainda registrou entregas.
+Veja [evidências e sequência pendente](CONTINUACAO-PRODUCAO-2026-10-12.md).
+
 **Continuação em 12/10/2026, 19h29 BRT:** correção `d9c3287` publicada;
 contrato objetivo do TJ-RS admitido pelo operador auditado (evento 13241,
 `owner_standing_authorization`, `humanReview:false`). Guardião e Autor foram

@@ -116,3 +116,50 @@ snapshot 458 (PC-MA Oficial Investigador). Deve propor identidade e escopo
 com páginas/trechos, sem alterar o cadastro divergente nem admitir contrato.
 Saídas esperadas: `pc-ma-investigador-scope-vetor.json` e `.md`, na pasta
 privada de continuação. Despacho não comprova entrega; verificar os arquivos.
+
+## Heartbeat de 19h46 BRT: entregas e bloqueios reconferidos
+
+Relatório somente leitura de 22h51m44 UTC: **3/84 disponíveis**, ENAM 146,
+ENAC 78 e TC-DF 72 (296 nas ofertas abertas). **TRF-5: 25 válidas** e
+**TJ-RS: 10 válidas**, ambos draft; faltam 43 e 58 para o piso, respectivamente.
+Produção diária distinta efetivamente publicada: 16. As 35 questões nos dois
+produtos draft ainda não contam como publicadas. Saúde pública: status ok.
+O disparo extraordinário da linha às 22h51 encontrou o lock ocupado e saiu
+sem duplicar execução; o cron vigente concluiu sua avaliação às 22h51m25.
+
+Maestro conferiu 25 aprovações posteriores à marca 22h22, sem erros, até
+22h40m14 UTC. Este heartbeat conferiu outras 5, audits 13412, 13414, 13416,
+13418, 13420, contra CF art. 5º XVII–XXI: gabarito único e distratores corretos,
+nenhuma suspensão. Marca d'água atual 22h50m07.764129 UTC. Conferências por
+agentes, sem revisão humana. Recibos privados na pasta de continuação.
+
+**PP-MA: não admitir contrato ainda.** Consulta atual encontrou 84 requisitos
+draft, zero contratos e nenhuma reserva desses requisitos. A prova independente
+dos bytes do snapshot 456 confirma 60 requisitos no trecho do Inspetor e 24
+extraídos do trecho do Monitor (IDs 1381–1404). O cargo 2 começa na p. 71;
+requisitos 1324 e 1376 atravessam páginas, com texto integral confirmado na
+concatenação das pp. 69–70 e 70–71; o futuro operador deve preservar essa prova.
+Não certificar os 24 do Monitor como programa do Inspetor, nem
+admitir contrato que permita alimentarem autoria. Preparar uma correção de
+escopo com preview, fingerprint, preservação das reservas e auditoria sob a
+autorização vigente; não houve alteração direta do banco neste diagnóstico.
+Evidências privadas: `heartbeat-2246-scope-state.jsonl` e
+`ppma-independent-scope-proof.json`.
+
+Vetor entregou a análise PC-MA Oficial Investigador. Checksum do snapshot 458,
+trecho de identidade na p. 1 e formato MC5 na p. 23 foram reconferidos contra os
+arquivos oficiais. O cadastro continua “Investigador de Polícia”, divergindo de
+“Oficial Investigador de Polícia”; não presumir equivalência ou admitir contrato
+antes da reconciliação auditada. Oportunidade 11/edição 29 tem 71 requisitos draft
+e nenhum contrato. A análise não alterou dados nem abriu produto.
+
+O acesso nativo ao Maestri falhou porque o Mac está bloqueado; desbloqueio foi
+solicitado ao proprietário. Não forjar socket nem interromper ocupados. A ponte
+registrou novas entregas e reservas de Guardião/Autor às 22h51 apesar da restrição
+da tela. Não concluir que a equipe parou, nem prometer execução futura sem host.
+
+Atualização deste heartbeat limitada a documentação e recibos privados.
+Lint, tipos e build passaram; suíte geral com 1.825 aprovados, 290 opcionais
+pulados e 3 timeouts de 5s em wrappers sob carga. Repetição isolada dos dois
+arquivos com um worker/20s: 9/9 passaram. Sem mudança de configuração de testes,
+código da aplicação, imagens, flags comerciais ou permissões dos agentes.
