@@ -60,3 +60,5 @@ Ferramentas d84ccf3 na VPS Everglades; app/worker permaneciam5f895e1. Backup ant
 Às12:41:25.883463UTC, a conferência read-only confirmou documentos53/caderno e54/gabarito, ambos approved/external_link/metadata_only, audits8151/8152 com humanReview:false. A referência aprovada é `99673938-48fd-4b27-823a-33fde69e34f3`, proposta8153/aprovada8154, também humanReview:false. Nenhuma questão de prova foi copiada, importada ou aprovada. Recibos privados em `/opt/leiprova/.local/editorial/pgeac-previous-exam-previews/`.
 
 Auditoria geral posterior às12:46:42.120UTC preservou três preparações/285 questões válidas. PGE-AC continua draft/zero questões; o registro dos PDFs oficiais e da edição não é recibo de curso pronto. O contrato MC5 e a autoria própria seguem etapas separadas.
+
+Contrato de formato efetivamente aplicado depois: MC5/FGV/objetiva/cargo Classe I, contrato `a427fa8c2f2ce6bf80552676139d7cd1d3dc7fd027a0d3d6408744d56d74eb20`, audit8156/humanReview:false, fonte30/snapshot1258/p.14§10.1/atribuição23/edição40. A ficha autoral é interna e específica ao cargo; não veio de provas de terceiros. Isso não cria questões nem libera produto.

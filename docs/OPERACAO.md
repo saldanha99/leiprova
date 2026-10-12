@@ -51,6 +51,18 @@ com PC-MA fechado/zero e MPMT draft/zero. QA geral1.747 testes e23 PostgreSQL
 reais passaram. O primeiro ciclo agendado das fontes complementares ocorreu
 às08:17:15UTC, auditoria7188; ver [contratos e recibos](CONTRATOS-DE-FORMATO-POR-CARGO.md)
 e [monitor horário](VERIFICACAO-HORARIA-DECRETO-2026-10-12.md).
+Em conferência posterior às13:34UTC, `84f5a99` e migração0054 estavam publicados.
+O Código Penal passou à versão112/current, com402 artigos reviewed, audit8308;
+cinco inéditas próprias ENAC tiveram fonte/rodapé/vínculos/certificações corrigidos,
+preservando três preparações/285 questões válidas e27 históricos suspensos.
+A primeira verificação owner da nova fonte passou, audit8309; monitor horário
+CP instalado no minuto47, com limites de memória/CPU e suspensão sem restauração.
+Ver [corte CP e recibos](CORTE-COORDENADO-CP-402-2026-10-12.md).
+429 requisitos de MPMT/MPRJ/PGEAC receberam disciplina, retornando a draft para
+nova revisão material dos mapas legais, sem questões/vendas liberadas; ver
+[classificação efetiva](CLASSIFICACAO-DISCIPLINAS-2026-10-12.md).
+PGEAC recebeu edição40 e PDFs externos aprovados53/54, referência/audits reais,
+ainda sem questões; ver [recibo PGE-AC](PROVA-ANTERIOR-PGEAC-2026-10-12.md).
 QA da revisão `3e9323a`: 1.623 testes aprovados,
 239 opcionais pulados. Em 12/10, o Search Console verificou automaticamente o novo
 domínio por DNS. O sitemap foi enviado e depois **processado**, com 23 páginas e zero vídeos.
