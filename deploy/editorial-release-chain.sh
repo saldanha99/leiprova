@@ -25,8 +25,8 @@ mkdir -p .local/editorial/release-runs
 RUN_DIR=$(mktemp -d .local/editorial/release-runs/"$(date -u +%Y%m%dT%H%M%SZ)".XXXXXX) || exit 1
 log() { echo "$(date -u +%FT%TZ) $*"; }
 sql_ro() {
-  docker exec -i -e PGOPTIONS='-c default_transaction_read_only=on' leiprova-db \
-    psql -X -v ON_ERROR_STOP=1 -U leiprova_owner -d leiprova -At -F ' ' -c "$1"
+  docker exec -e PGOPTIONS='-c default_transaction_read_only=on' leiprova-db \
+    psql -X -v ON_ERROR_STOP=1 -U leiprova_owner -d leiprova -At -F ' ' -c "$1" < /dev/null
 }
 fingerprint() {
   python3 -c 'import sys,json
