@@ -32,7 +32,8 @@ ENAM, PC-MA Delegado e TC-DF. As 16 questões novas aprovadas desde a conferênc
 anterior foram verificadas contra o corpus; nenhum erro identificado, nenhuma
 suspensão. Marcador privado atualizado até 01h03min13,313668s UTC.
 
-O Master atingiu a condição de três preparações elegíveis. ENAC segue com 52 e
+O Master atingiu a condição de três preparações elegíveis; seu checkout anual e o
+checkout mensal do TC-DF redirecionam para login com o retorno correto. ENAC segue com 52 e
 precisa de mais 16 para o mínimo comercial. O restante ainda não está pronto:
 o déficit mínimo remanescente de todo o catálogo é 5.456, considerando as
 quantidades válidas desta rodada; além disso faltam fontes e a implementação

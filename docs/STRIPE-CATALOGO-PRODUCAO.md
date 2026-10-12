@@ -1,5 +1,24 @@
 # Catálogo Stripe — aplicação de produção
 
+## Atualização de 11/10/2026
+
+O pedido de abrir checkout em produção foi conferido: runtime LIVE, conta autorizada
+confirmada e flags de cadastro, checkout por concurso e entrega já habilitadas.
+Sincronizados os nove concursos adicionados à vitrine: **84 concursos + Master,
+85 produtos Editalume ativos e 170 preços Editalume ativos**, sem divergência na
+verificação independente. Os preços e IDs anteriores foram preservados; não houve
+arquivamento, reativação, cobrança ou mudança de flag nesta rodada.
+
+Às 22h05 BRT, TC-DF alcançou 69 inéditas válidas e foi liberado pela linha autorizada.
+Com ENAM e PC-MA Delegado, há três produtos elegíveis: o Master abriu pela regra
+`auto`. Os checkouts públicos do TC-DF e Master anual encaminham para autenticação
+com o retorno correto. Isso valida a disponibilidade, não uma cobrança: compra de
+controle, webhook e estorno financeiros continuam sem homologação nesta rodada.
+Os 81 produtos restantes não são apresentados como prontos por terem preços LIVE.
+
+Escopo, backup e pendências: `docs/PREPARACOES-INTEGRAIS-2026-10-11.md`.
+Os estados de setembro abaixo são registros históricos.
+
 ## Estado verificado em 06/09/2026
 
 O proprietário solicitou retirar os produtos e checkouts antigos da conta
