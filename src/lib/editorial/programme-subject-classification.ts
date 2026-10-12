@@ -4,7 +4,7 @@ import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { z } from "zod";
 import * as schema from "../db/schema";
 import { OFFICIAL_COURSE_STANDING_REFERENCE } from "./official-course-dossier";
-import { parseOfficialOpportunityDocumentUrl } from "../opportunities/source-monitor-policy";
+import { ADDITIONAL_PROGRAMME_SUBJECTS, assertApprovedProgrammeSourceUrls } from "./programme-subject-admission";
 
 // Only these reviewed programmes. This operator neither admits another edition
 // nor chooses a speciality in a notice containing several careers.
@@ -26,8 +26,8 @@ export const programmeLiteralHeadingName = (line: string) => normalize(line).rep
 const sha = z.string().regex(/^[a-f0-9]{64}$/u);
 const id = z.number().int().positive().safe();
 
-// Deliberately no fuzzy aliases, combined subjects or "Legislação Especial"
-// fallback. The active catalogue must have this exact canonical discipline.
+// No fuzzy aliases or generic fallback. A composite discipline remains its
+// own exact catalogue entry; it is never split across simpler subjects.
 export const PROGRAMME_CANONICAL_SUBJECTS = ["Direito Constitucional", "Direito Administrativo", "Direito Civil",
   "Direito Processual Civil", "Direito Penal", "Direito Processual Penal", "Direito do Trabalho",
   "Direito Processual do Trabalho", "Direito Tributário", "Direitos Humanos", "Direito Empresarial", "Direito Eleitoral"] as const;
@@ -40,7 +40,12 @@ export const PROGRAMME_SECTION_HEADINGS = [...PROGRAMME_CANONICAL_SUBJECTS, "Dir
   "Princípios Institucionais do Ministério Público", "Direito Civil e Direito Empresarial", "Direito de Pessoal e Direito Previdenciário Público",
   "Direito Tributário e Processo Tributário", "Direito Financeiro"] as const;
 export function programmeCanonicalSubject(heading: string) {
-  return PROGRAMME_CANONICAL_SUBJECTS.find(subject => headingKey(subject) === headingKey(heading)) ?? null;
+  const base = PROGRAMME_CANONICAL_SUBJECTS.find(subject => headingKey(subject) === headingKey(heading));
+  if (base) return base;
+  const literal = headingKey(heading);
+  if (literal === headingKey("F) Direito Digital")) return ADDITIONAL_PROGRAMME_SUBJECTS["direito-digital"];
+  if (literal === headingKey("H) Direito da Antidiscriminação")) return ADDITIONAL_PROGRAMME_SUBJECTS["direito-da-antidiscriminacao"];
+  return Object.values(ADDITIONAL_PROGRAMME_SUBJECTS).find(subject => headingKey(subject) === literal) ?? null;
 }
 
 export const programmeClassificationInputSchema = z.object({
@@ -171,17 +176,18 @@ export async function classifyStandingProgrammeSubjects(db: PostgresJsDatabase<t
     if (rows.length !== ids.length || rows.some(row => row.opportunityId !== input.opportunityId)) throw new Error("Requisitos não pertencem integralmente ao alvo.");
     const [additional] = await tx.execute<{ used: boolean }>(sql`select exists(select 1 from opportunity_requirement_articles where requirement_id in(${list})) as used`);
     if (additional.used) throw new Error("Requisito já tem artigos adicionais; exige revisão de mapas própria.");
-    const sources = await tx.execute<{ id: number; sourceDocumentId: number; checksum: string; bytesChecksum: string; pageTexts: string[]; status: string; sourceStatus: string; policy: string; sourcePolicy: string; url: string; updatedAt: string; sourceStateFingerprint: string }>(sql`
+    const sources = await tx.execute<{ id: number; sourceDocumentId: number; checksum: string; bytesChecksum: string; pageTexts: string[]; status: string; sourceStatus: string; policy: string; sourcePolicy: string; url: string; sourceUrl: string; updatedAt: string; sourceStateFingerprint: string }>(sql`
       select s.id::int id,s.source_document_id::int as "sourceDocumentId",s.checksum_sha256 checksum,encode(sha256(s.document_bytes),'hex') as "bytesChecksum",s.page_texts as "pageTexts",s.status,d.status as "sourceStatus",
-        s.source_policy policy,d.source_policy as "sourcePolicy",s.document_url url,s.updated_at::text as "updatedAt",encode(sha256(convert_to(to_jsonb(d)::text,'UTF8')),'hex') as "sourceStateFingerprint"
+        s.source_policy policy,d.source_policy as "sourcePolicy",s.document_url url,d.source_url as "sourceUrl",s.updated_at::text as "updatedAt",encode(sha256(convert_to(to_jsonb(d)::text,'UTF8')),'hex') as "sourceStateFingerprint"
       from opportunity_document_snapshots s join opportunity_source_documents d on d.id=s.source_document_id and d.opportunity_id=${input.opportunityId}
       where s.id in(select source_snapshot_id from opportunity_requirements where id in(${list}))`);
     const subjects = await tx.execute<{ id: number; name: string; active: boolean }>(sql`select id::int id,name,is_active active from quiz_subjects
       where id in(${sql.join(input.requirements.map(row => sql`${row.subjectId}`), sql`, `)})`);
     for (const item of input.requirements) {
       const row = rows.find(row => row.id === item.requirementId)!, source = sources.find(source => source.id === row.snapshotId), subject = subjects.find(subject => subject.id === item.subjectId);
-      if (!source || source.sourceDocumentId !== row.sourceDocumentId || !subject || source.policy !== "official_document" || source.sourcePolicy !== "official_document" || !Array.isArray(source.pageTexts)) throw new Error("Snapshot/catálogo oficial ausente.");
-      parseOfficialOpportunityDocumentUrl(source.url, input.opportunitySlug === "sefaz-al-auditor-fiscal-2026" ? "cebraspe" : "fgv-conhecimento");
+      if (!source || source.sourceDocumentId !== row.sourceDocumentId || !subject || source.policy !== "official_document" || !["official_document", "metadata_only"].includes(source.sourcePolicy) || !Array.isArray(source.pageTexts)) throw new Error("Snapshot/catálogo oficial ausente.");
+      const expectedSource = input.opportunitySlug === "sefaz-al-auditor-fiscal-2026" ? "cebraspe" : "fgv-conhecimento";
+      assertApprovedProgrammeSourceUrls(source.sourceUrl, source.url, source.sourcePolicy, expectedSource);
       assertProgrammeSubjectEvidence(row, item, source, subject);
     }
     const changed = rows.filter(row => row.subjectId === null || row.status === "reviewed");

@@ -17,12 +17,24 @@ describe("classificação de disciplina sem aprovação legal", () => {
   it("aceita somente o cabeçalho canônico literal e texto integral nas páginas indicadas", () => {
     expect(() => assertProgrammeSubjectEvidence(state, item, source, subject)).not.toThrow();
     expect(programmeCanonicalSubject("direito  constitucional")).toBe("Direito Constitucional");
-    expect(programmeCanonicalSubject("DIREITO CIVIL E EMPRESARIAL")).toBeNull();
-    expect(programmeCanonicalSubject("Legislação Penal Extravagante")).toBeNull();
-    expect(programmeCanonicalSubject("Tutela Coletiva")).toBeNull();
+    expect(programmeCanonicalSubject("DIREITO CIVIL E EMPRESARIAL")).toBe("Direito Civil e Empresarial");
+    expect(programmeCanonicalSubject("Legislação Penal Extravagante")).toBe("Legislação Penal Extravagante");
+    expect(programmeCanonicalSubject("Tutela Coletiva")).toBe("Tutela Coletiva");
     const numbered = { ...source, pageTexts: source.pageTexts.map(text => text.replace("DIREITO CONSTITUCIONAL\n", "1.1– Direito Constitucional\n")) };
     expect(() => assertProgrammeSubjectEvidence(state, { ...item, headingQuote: "1.1– Direito Constitucional" }, numbered, subject)).not.toThrow();
     expect(() => assertProgrammeSubjectEvidence(state, item, numbered, subject)).toThrow(/Cabeçalho/);
+  });
+  it("mantém disciplina composta própria, rejeitando transferência para Civil ou Empresarial", () => {
+    const row = { ...state, locator: "Conteúdo programático, p. 33 · DIREITO CIVIL E EMPRESARIAL" };
+    const proof = { ...item, expectedRequirementFingerprint: programmeRequirementFingerprint(row), subjectName: "Direito Civil e Empresarial",
+      heading: "DIREITO CIVIL E EMPRESARIAL", headingQuote: "DIREITO CIVIL E EMPRESARIAL" };
+    const pages = { ...source, pageTexts: source.pageTexts.map(text => text.replace("DIREITO CONSTITUCIONAL", "DIREITO CIVIL E EMPRESARIAL")) };
+    expect(() => assertProgrammeSubjectEvidence(row, proof, pages, { ...subject, name: "Direito Civil e Empresarial" })).not.toThrow();
+    expect(() => assertProgrammeSubjectEvidence(row, proof, pages, { ...subject, name: "Direito Civil" })).toThrow(/Disciplina/);
+    expect(() => assertProgrammeSubjectEvidence(row, proof, pages, { ...subject, name: "Direito Empresarial" })).toThrow(/Disciplina/);
+    expect(programmeCanonicalSubject("F) DIREITO DIGITAL")).toBe("Direito Digital");
+    expect(programmeCanonicalSubject("H) DIREITO DA ANTIDISCRIMINAÇÃO")).toBe("Direito da Antidiscriminação");
+    expect(programmeCanonicalSubject("Especial tributária em geral")).toBeNull();
   });
   it("não aceita documento alterado, revogado ou hash de bytes divergente", () => {
     for (const patch of [{ bytesChecksum: "b".repeat(64) }, { status: "suspended" }, { sourceStatus: "rejected" }])

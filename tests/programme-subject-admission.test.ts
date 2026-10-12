@@ -1,5 +1,5 @@
 import {describe,it,expect} from 'vitest';
-import {ADDITIONAL_PROGRAMME_SUBJECTS,subjectAdmissionInputSchema,assertSubjectLabelProof} from '@/lib/editorial/programme-subject-admission';
+import {ADDITIONAL_PROGRAMME_SUBJECTS,subjectAdmissionInputSchema,assertSubjectLabelProof,assertApprovedProgrammeSourceUrls} from '@/lib/editorial/programme-subject-admission';
 const proof={opportunityId:7,roleName:'Juiz Federal Substituto',examEditionId:25,sourceDocumentId:10,snapshotId:356,url:'https://conhecimento.fgv.br/sites/default/files/synthetic.pdf',checksum:'a'.repeat(64),headingPage:1,headingQuote:'DIREITO PREVIDENCIÁRIO'};
 const input={schemaVersion:1,subjects:[{slug:'direito-previdenciario',name:'Direito Previdenciário',proofs:[proof]}]};
 describe('rótulos oficiais e admissão da taxonomia',()=>{
@@ -20,6 +20,15 @@ describe('rótulos oficiais e admissão da taxonomia',()=>{
  it('mantém disciplinas compostas distintas e não as reparte',()=>{
   expect(()=>assertSubjectLabelProof('direito-civil-e-empresarial','Direito Civil','Direito Civil')).toThrow();
   expect(()=>assertSubjectLabelProof('direito-civil-e-empresarial','Direito Civil e Empresarial','Direito Civil e Direito Empresarial')).toThrow();
+ });
+ it('distingue portal permitido e PDF oficial direto aprovado, recusando origens ou correlações falsas',()=>{
+  const pdf='https://conhecimento.fgv.br/sites/default/files/concursos/aviso-conteudo-programatico-concurso-xxxix.pdf';
+  expect(()=>assertApprovedProgrammeSourceUrls(pdf,pdf,'official_document','fgv-conhecimento')).not.toThrow();
+  expect(()=>assertApprovedProgrammeSourceUrls('https://conhecimento.fgv.br/concursos/pgeac',pdf,'metadata_only','fgv-conhecimento')).not.toThrow();
+  expect(()=>assertApprovedProgrammeSourceUrls(pdf,pdf,'metadata_only','fgv-conhecimento')).toThrow();
+  expect(()=>assertApprovedProgrammeSourceUrls(pdf,pdf+'x','official_document','fgv-conhecimento')).toThrow();
+  expect(()=>assertApprovedProgrammeSourceUrls('https://untrusted.invalid/a.pdf','https://untrusted.invalid/a.pdf','official_document','fgv-conhecimento')).toThrow();
+  expect(()=>assertApprovedProgrammeSourceUrls(pdf,pdf,'official_document','cebraspe')).toThrow();
  });
  it('rejeita duplicidade e campos externos ao contrato',()=>{
   expect(()=>subjectAdmissionInputSchema.parse({...input,subjects:[...input.subjects,...input.subjects]})).toThrow();

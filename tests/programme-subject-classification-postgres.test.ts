@@ -39,7 +39,7 @@ describe.skipIf(!url)("classificador de programa — PostgreSQL sintético", () 
       title: "Fixture sintética sem validade jurídica", summary: "Não representa edital real.", statusAsOf: "2026-10-12", editorialStatus: "draft", officialUrl: landing, sourceCheckedAt: new Date() }).returning();
     [source] = await db!.insert(schema.opportunitySourceDocuments).values({ publicId: randomUUID(), opportunityId: opportunity.id,
       documentType: "notice", title: "Fonte fictícia sem fetch", sourceUrl: landing, sourceHost: "conhecimento.fgv.br", observedAt: new Date(), lastSeenAt: new Date(),
-      httpStatus: 200, contentType: "application/pdf", sourcePolicy: "official_document", sourceContentStored: true, status: "approved", reviewedByUserId: actor.id, reviewedAt: new Date() }).returning();
+      httpStatus: 200, contentType: "application/pdf", sourcePolicy: "metadata_only", sourceContentStored: false, status: "approved", reviewedByUserId: actor.id, reviewedAt: new Date() }).returning();
     const bytes = "%PDF-synthetic-programme-no-legal-validity", text = "Fonte sintética exclusiva de teste, sem validade jurídica e sem fetch externo.\nDIREITO CONSTITUCIONAL\nConstituição e princípios fundamentais.";
     [snapshot] = await db!.insert(schema.opportunityDocumentSnapshots).values({ publicId: randomUUID(), sourceDocumentId: source.id,
       documentUrl: `https://conhecimento.fgv.br/sites/default/files/qa-synthetic-programme-${tag}.pdf`, sourceHost: "conhecimento.fgv.br", fileName: "synthetic.pdf", mimeType: "application/pdf",
@@ -70,6 +70,15 @@ describe.skipIf(!url)("classificador de programa — PostgreSQL sintético", () 
     expect(audit.kind).toBe("object"); expect(audit.metadata).toMatchObject({ humanReview: false, before: { status: "reviewed", reviewNotes: "Extração sintética admitida; mapas não aprovados." } });
     expect((await db!.select().from(schema.auditLogs).where(eq(schema.auditLogs.id, receipt.id)))[0].metadata).toEqual(receipt.metadata);
     await expect(classifyStandingProgrammeSubjects(db!, { ...request(), input: evidence, mode: "apply", expectedFingerprint: preview.fingerprint })).rejects.toThrow(/mudou/);
+  });
+  it("aceita portal metadata_only com PDF oficial aprovado, sem fingir corpo armazenado no portal", async () => {
+    const evidence=await input(),preview=await classifyStandingProgrammeSubjects(db!,{...request(),input:evidence});
+    await classifyStandingProgrammeSubjects(db!,{...request(),input:evidence,mode:"apply",expectedFingerprint:preview.fingerprint});
+    expect((await db!.select().from(schema.opportunityRequirements).where(eq(schema.opportunityRequirements.id,requirement.id)))[0].subjectId).toBe(subject.id);
+    expect((await db!.select().from(schema.opportunitySourceDocuments).where(eq(schema.opportunitySourceDocuments.id,source.id)))[0])
+      .toMatchObject({sourcePolicy:"metadata_only",sourceContentStored:false,status:"approved"});
+    expect((await db!.select().from(schema.opportunityDocumentSnapshots).where(eq(schema.opportunityDocumentSnapshots.id,snapshot.id)))[0])
+      .toMatchObject({sourcePolicy:"official_document",status:"approved"});
   });
   it("recusa lease ativa sem substituição nem perda de resposta", async () => {
     const evidence = await input(), lease = randomUUID();

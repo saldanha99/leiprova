@@ -45,6 +45,15 @@ describe.skipIf(!db)('admissão do catálogo — PostgreSQL sintético',()=>{
   const [audit]=await db!.execute<{kind:string;human:boolean}>(sql`select jsonb_typeof(metadata) kind,(metadata->>'humanReview')::boolean human from audit_logs where action=${SUBJECT_ADMISSION_ACTION}`);expect(audit).toEqual({kind:'object',human:false});
   const next=await admitProgrammeSubjects(db!,r);expect((await admitProgrammeSubjects(db!,{...r,mode:'apply',expectedFingerprint:next.fingerprint})).created).toBe(0);
  });
+ it('admite documento oficial direto aprovado, sem exigir que a URL do PDF seja um portal',async()=>{
+  const now=new Date(),tag=randomUUID(),pdf=`https://conhecimento.fgv.br/sites/default/files/concursos/qa-direct-document-${tag}.pdf`;
+  const [doc]=await db!.insert(schema.opportunitySourceDocuments).values({publicId:randomUUID(),opportunityId:7,documentType:'notice',title:'Edital sintético direto, sem validade jurídica',sourceUrl:pdf,sourceHost:'conhecimento.fgv.br',observedAt:now,lastSeenAt:now,httpStatus:200,sourcePolicy:'official_document',sourceContentStored:true,status:'approved',reviewedByUserId:actor.id,reviewedAt:now}).returning();
+  const {id:unusedId,publicId:unusedPublic,...values}=snapshot;void unusedId;void unusedPublic;
+  const [copy]=await db!.insert(schema.opportunityDocumentSnapshots).values({...values,publicId:randomUUID(),sourceDocumentId:doc.id,documentUrl:pdf,fileName:'direct-synthetic.pdf'}).returning();
+  const r=request();Object.assign(r.input.subjects[0].proofs[0],{sourceDocumentId:doc.id,snapshotId:copy.id,url:pdf});
+  const preview=await admitProgrammeSubjects(db!,r);
+  expect((await admitProgrammeSubjects(db!,{...r,mode:'apply',expectedFingerprint:preview.fingerprint})).created).toBe(1);
+ });
  it('recusa alteração do catálogo entre prévia e aplicação, sem cadastro/audit parcial',async()=>{
   const r=request(),preview=await admitProgrammeSubjects(db!,r);
   await db!.execute(sql`update quiz_subjects set updated_at=now() where id=(select min(id) from quiz_subjects)`);

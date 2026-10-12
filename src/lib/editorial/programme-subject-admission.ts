@@ -4,7 +4,7 @@ import type {PostgresJsDatabase} from 'drizzle-orm/postgres-js';
 import {z} from 'zod';
 import * as schema from '../db/schema';
 import {OFFICIAL_COURSE_STANDING_REFERENCE} from './official-course-dossier';
-import {parseOfficialOpportunityDocumentUrl,parseOfficialOpportunitySourceUrl} from '../opportunities/source-monitor-policy';
+import {parseOfficialOpportunityDocumentUrl,parseOfficialOpportunitySourceUrl,type OfficialOpportunitySourceId} from '../opportunities/source-monitor-policy';
 
 export const ADDITIONAL_PROGRAMME_SUBJECTS = {
  'direito-previdenciario':'Direito Previdenciário',
@@ -43,6 +43,17 @@ export function assertSubjectLabelProof(slug:keyof typeof ADDITIONAL_PROGRAMME_S
  const literal=slug==='direito-digital'?`F) ${expected}`:slug==='direito-da-antidiscriminacao'?`H) ${expected}`:expected;
  if(subjectNameKey(quote)!==subjectNameKey(literal)||!page.split(/\r?\n/u).some(line=>subjectNameKey(line)===subjectNameKey(quote)))throw Error('Rótulo literal completo ausente na página oficial; não inferir disciplina de prosa.');
 }
+export function assertApprovedProgrammeSourceUrls(docUrl:string,documentUrl:string,docPolicy:string,expected:OfficialOpportunitySourceId){
+ // An approved full-document source may itself be the exact PDF captured in
+ // its approved snapshot. A landing page remains subject to the portal policy.
+ if(docPolicy==='official_document'&&docUrl===documentUrl&&new URL(docUrl).pathname.toLowerCase().endsWith('.pdf')){
+  parseOfficialOpportunityDocumentUrl(docUrl,expected);
+ }else{
+  const primary=parseOfficialOpportunitySourceUrl(docUrl,expected);
+  if(primary.sourceId!==expected)throw Error('Portal primário não corresponde ao programa.');
+ }
+ parseOfficialOpportunityDocumentUrl(documentUrl,expected);
+}
 const digest=(value:unknown)=>createHash('sha256').update(JSON.stringify(value)).digest('hex');
 export async function admitProgrammeSubjects(db:PostgresJsDatabase<typeof schema>,request:{input:unknown;actorPublicId:string;approvalReference:string;mode:'preview'|'apply';expectedFingerprint?:string}){
  if(!['preview','apply'].includes(request.mode)||request.approvalReference!==OFFICIAL_COURSE_STANDING_REFERENCE||(request.mode==='apply'&&!/^[a-f0-9]{64}$/u.test(request.expectedFingerprint??'')))throw Error('Autorização, modo ou fingerprint inválidos.');
@@ -68,7 +79,7 @@ export async function admitProgrammeSubjects(db:PostgresJsDatabase<typeof schema
    if(collisions.some(c=>c.slug!==item.slug||c.name!==item.name||!c.active)||collisions.length>1)throw Error('Nome/slug já usado por outra disciplina ou entrada inativa; não renomear/reativar.');
    for(const p of item.proofs){const s=sources.find(s=>s.id===p.snapshotId);
     if(!s||s.docId!==p.sourceDocumentId||s.oppId!==p.opportunityId||s.role!==p.roleName||s.slug!==SUBJECT_ADMISSION_SLUGS[p.opportunityId]||s.year!==2026||s.edition!==p.examEditionId||s.oppStatus!=='reviewed'||s.status!=='approved'||s.docStatus!=='approved'||s.policy!=='official_document'||!['official_document','metadata_only'].includes(s.docPolicy)||s.url!==p.url||s.checksum!==p.checksum||s.bytesChecksum!==p.checksum||!Array.isArray(s.pages)||!s.pages[p.headingPage-1])throw Error('Fonte/cargo/edição/bytes/página divergentes.');
-    const primary=parseOfficialOpportunitySourceUrl(s.docUrl);parseOfficialOpportunityDocumentUrl(s.url,primary.sourceId);
+    assertApprovedProgrammeSourceUrls(s.docUrl,s.url,s.docPolicy,p.opportunityId===13?'cebraspe':'fgv-conhecimento');
     assertSubjectLabelProof(item.slug,p.headingQuote,s.pages[p.headingPage-1]);
    }
   }
