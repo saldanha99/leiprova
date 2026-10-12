@@ -17,6 +17,7 @@ grant select on
   legal_acts,
   legal_source_snapshots,
   legal_text_snapshots,
+  legal_cp_correction_evidence,
   legal_versions,
   legal_articles,
   questions,

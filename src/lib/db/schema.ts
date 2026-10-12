@@ -1355,7 +1355,7 @@ export const legalSourceSnapshots = pgTable(
     ),
     check(
       "legal_source_snapshots_url_check",
-      sql`${table.sourceUrl} ~ '^https://legis\\.senado\\.leg\\.br/norma/[0-9]+$'`,
+      sql`${table.sourceUrl} ~ '^https://legis\\.senado\\.leg\\.br/norma/[0-9]+$' or (${table.sourceUrl} = 'https://www2.camara.leg.br/legin/fed/declei/1940-1949/decreto-lei-2848-7-dezembro-1940-412868-normaatualizada-pe.html' and ${table.legalActId} = 17 and ${table.articleMarkerCount} = 402 and ${table.checksumSha256} = '7cd4ac2c76ca87f8032df0bd0c369dcfe7b1458038cd956bd01e5d7b68d8323d' and ${table.checksumSha256} = encode(sha256(convert_to(${table.normalizedContent},'UTF8')),'hex'))`,
     ),
     check(
       "legal_source_snapshots_checksum_check",
@@ -1445,7 +1445,7 @@ export const legalTextSnapshots = pgTable(
     ),
     check(
       "legal_text_snapshots_url_check",
-      sql`${table.sourceUrl} ~ '^https://legis\\.senado\\.leg\\.br/norma/[0-9]+/publicacao/[0-9]+$' or ${table.sourceUrl} in ('https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709compilado.htm', 'https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2021/lei/l14133.htm', 'https://www2.camara.leg.br/legin/fed/lei/2018/lei-13709-14-agosto-2018-787077-normaatualizada-pl.html', 'https://www2.camara.leg.br/legin/fed/lei/2021/lei-14133-1-abril-2021-791222-normaatualizada-pl.pdf')`,
+      sql`${table.sourceUrl} ~ '^https://legis\\.senado\\.leg\\.br/norma/[0-9]+/publicacao/[0-9]+$' or ${table.sourceUrl} in ('https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709compilado.htm', 'https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2021/lei/l14133.htm', 'https://www2.camara.leg.br/legin/fed/lei/2018/lei-13709-14-agosto-2018-787077-normaatualizada-pl.html', 'https://www2.camara.leg.br/legin/fed/lei/2021/lei-14133-1-abril-2021-791222-normaatualizada-pl.pdf') or (${table.sourceUrl} = 'https://www2.camara.leg.br/legin/fed/declei/1940-1949/decreto-lei-2848-7-dezembro-1940-412868-normaatualizada-pe.html' and ${table.legalActId} = 17 and ${table.articleCount} = 402 and ${table.parserVersion} = 'camara-cp-correction-preview-v1.0.0' and ${table.checksumSha256} = '7cd4ac2c76ca87f8032df0bd0c369dcfe7b1458038cd956bd01e5d7b68d8323d' and ${table.checksumSha256} = encode(sha256(convert_to(${table.normalizedContent},'UTF8')),'hex'))`,
     ),
     check(
       "legal_text_snapshots_checksum_check",
@@ -3805,3 +3805,5 @@ export type LegalSourceSnapshot = typeof legalSourceSnapshots.$inferSelect;
 export type LegalTextSnapshot = typeof legalTextSnapshots.$inferSelect;
 
 export { legalComplementarySources } from "./schema-complementary";
+
+export { legalCpCorrectionEvidence } from "./schema-cp-correction";
