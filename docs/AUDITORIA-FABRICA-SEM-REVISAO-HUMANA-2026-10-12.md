@@ -10,4 +10,8 @@ QA em cópia isolada na VPS Everglades, base16ff5c5 mais oito arquivos delimitad
 
 A primeira rodada PostgreSQL encontrou uma fixture sem os campos obrigatórios de originalidade e duas interferências de fixtures acumuladas. A fixture foi corrigida e o banco sintético foi recriado; os erros e logs anteriores foram preservados. Uma execução com variável de ambiente incorreta pulou os24 casos e não foi usada como evidência; a rodada efetiva posterior executou todos os24.
 
-Código e QA não comprovam publicação nem novas questões. Este recibo ainda não afirma deploy ou execução da linha em produção. As três preparações/285 questões válidas continuam sendo o último estado produtivo conferido.
+Código e QA não comprovam publicação nem novas questões. A seção seguinte distingue o deploy efetivo da execução da linha em produção. As três preparações/285 questões válidas continuam sendo o último estado produtivo conferido.
+
+## Publicação efetiva
+
+`5b2686f` foi publicado na VPS Everglades com `LEIPROVA_SKIP_SEED=1`, após backup validado `before-standing-audit-5b2686f-20261012.dump`. App/imagem de produção `sha256:88260d20511a7d1c613bd158106dec0f95c86d937fbdd4f1563705f224b50fa0`; app e três workers estavam running/zero reinícios. Auditoria read-only às12:05:05.361UTC confirmou ENAM146/ENAC70/TC-DF69, três preparações/285 questões válidas, e `/concursos` respondeu200. Isso comprova publicação do código, sem presumir nova execução editorial ou revisão de itens ainda pendentes.

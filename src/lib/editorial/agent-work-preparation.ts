@@ -89,7 +89,7 @@ export function authoringPreparationBatchQuery(batchSize: number) {
     where parent.kind='legal_mapping' and parent.status='prepared' and parent.result->>'outcome'='prepared'
       and case when jsonb_typeof(parent.result->'mappings')='array' then jsonb_array_length(parent.result->'mappings')>0 else false end
       and parent.payload->>'bank' is not null and parent.payload->>'role' is not null
-      and r.editorial_status in('draft','pending_review','reviewed') and o.editorial_status='reviewed' and d.status='approved' and s.status='approved'
+      and r.subject_id is not null and r.editorial_status in('draft','pending_review','reviewed') and o.editorial_status='reviewed' and d.status='approved' and s.status='approved'
       and parent.payload->'context'->>'sourceContextHash'=${REQUIREMENT_CONTEXT_HASH_SQL}
       and ${currentQuestionContractExists(sql`qc.id`,sql`o.id`)}
       and not exists (select 1 from jsonb_array_elements(parent.payload->'articles') candidate

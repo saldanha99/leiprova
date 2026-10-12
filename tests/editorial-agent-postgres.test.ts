@@ -528,6 +528,35 @@ describe.skipIf(!url)('ponte editorial — PostgreSQL isolado',()=>{
     expect(author.job.payload.parentKey).toBe(key);
     expect(author.job.payload.opportunityId).toBe(f.payload.opportunityId);
   },30000);
+  it('não prepara Autor sem disciplina e reprocessa o contexto após classificação draft legítima',async()=>{
+    const f=await fixture();
+    await db!.update(schema.opportunityRequirements).set({subjectId:null,topicId:null})
+      .where(eq(schema.opportunityRequirements.id,f.requirement.id));
+    const unclassifiedHash=await requirementContext(db!,f.requirement.id);
+    await prepareAgentWork(db!);
+    const key=`mapping:${f.requirement.id}`;
+    await db!.execute(sql`update editorial_agent_work set status='blocked' where job_key<>${key} and status='pending'`);
+    const claim=await claimAgentWork(db!,new Date(),'Guardião');if(claim.state!=='claimed')throw new Error('Reserva sintética ausente');
+    expect(claim.job.jobKey).toBe(key);
+    const article=claim.job.payload.articles[0];
+    await completeAgentWork(db!,{...claim.job,result:{...base,mappings:[{articleId:article.id,quote:article.text,rationale:'Vínculo sintético.'}]}});
+    expect((await prepareAgentWork(db!,new Date(),{followupsOnly:true})).authoring).toBe(0);
+    expect(await db!.execute(sql`select job_key from editorial_agent_work where job_key=${`author:${f.requirement.id}`}`)).toHaveLength(0);
+    await db!.update(schema.opportunityRequirements).set({subjectId:f.requirement.subjectId,updatedAt:new Date()})
+      .where(eq(schema.opportunityRequirements.id,f.requirement.id));
+    const classifiedHash=await requirementContext(db!,f.requirement.id);
+    expect(classifiedHash).not.toBe(unclassifiedHash);
+    // Parent still has the OLD context; classification cannot approve/replay it.
+    expect((await prepareAgentWork(db!,new Date(),{followupsOnly:true})).authoring).toBe(0);
+    await prepareAgentWork(db!);
+    await db!.execute(sql`update editorial_agent_work set status='blocked' where job_key<>${key} and status='pending'`);
+    const current=await claimAgentWork(db!,new Date(),'Guardião');if(current.state!=='claimed')throw new Error('Nova reserva sintética ausente');
+    expect(current.job.payload.context.sourceContextHash).toBe(classifiedHash);
+    const currentArticle=current.job.payload.articles[0];
+    await completeAgentWork(db!,{...current.job,result:{...base,mappings:[{articleId:currentArticle.id,quote:currentArticle.text,rationale:'Vínculo sintético atual.'}]}});
+    expect((await prepareAgentWork(db!,new Date(),{followupsOnly:true})).authoring).toBe(1);
+    expect((await db!.select().from(schema.opportunityRequirements).where(eq(schema.opportunityRequirements.id,f.requirement.id)))[0].editorialStatus).toBe('draft');
+  },30000);
   it('prepara, reserva e conclui com o papel restrito da aplicação',async()=>{
     const f=await fixture();
     const restrictedClient=postgres(url!,{max:1,prepare:false,connection:{options:'-c role=leiprova_app'}});
