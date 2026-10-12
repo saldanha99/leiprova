@@ -1,0 +1,4 @@
+# Edital Lei Seca: abertura progressiva autorizada em 12/10/2026.
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+10,40 * * * * root /opt/leiprova/deploy/editorial-release-chain.sh >> /var/log/leiprova-release-chain.log 2>&1

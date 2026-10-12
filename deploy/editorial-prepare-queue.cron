@@ -1,0 +1,4 @@
+# Edital Lei Seca: preparação determinística; não consome reservas de IA.
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+5,25,45 * * * * root /opt/leiprova/deploy/editorial-prepare-queue.sh >> /var/log/leiprova-prepare-queue.log 2>&1

@@ -1,5 +1,11 @@
 # Maestro central da Edital Lei Seca
 
+**Decisão posterior em 12/10:** abertura automática progressiva de todas as
+preparações, com conteúdo inicial validado e ampliação contínua. Não pedir nova
+confirmação para cada produto elegível. Leia o [fluxo e seus limites](ABERTURA-PROGRESSIVA-2026-10-12.md).
+Os horários de seis horas citados abaixo para liberação são históricos; o novo
+agendamento é de 30 minutos, com preparação determinística a cada 20 minutos.
+
 **Retomada de 12/10/2026, após 12h BRT:** leia primeiro
 [o estado reconferido](RETOMADA-2026-10-12.md) e o topo de `OPERACAO.md`.
 A oferta foi reconferida em três preparações/285 questões válidas; o PC-MA

@@ -46,14 +46,15 @@ type ProductState = PreparationEligibility & {
   previousExamLinked: boolean;
 };
 
-function parseArgs(argv: readonly string[]) {
+export function parseReleaseArgs(argv: readonly string[]) {
   const args = argv.filter((arg) => arg !== "--");
   const apply = args.includes("--apply");
-  const slugs = args.filter((arg) => arg !== "--apply");
-  if (!slugs.length || slugs.some((slug) => !SLUG.test(slug))) {
-    throw new Error("Informe ao menos um produto válido.");
+  const allDrafts = args.includes("--all-drafts");
+  const slugs = args.filter((arg) => arg !== "--apply" && arg !== "--all-drafts");
+  if ((!allDrafts && !slugs.length) || (allDrafts && slugs.length) || slugs.some((slug) => !SLUG.test(slug))) {
+    throw new Error("Informe produtos válidos ou --all-drafts, sem misturar os modos.");
   }
-  return { apply, slugs };
+  return { apply, allDrafts, slugs };
 }
 
 /** Cada motivo impede a liberação; lista vazia significa produto apto à venda. */
@@ -85,7 +86,7 @@ export function releaseBlockers(slug: string, state: ProductState, todayIso: str
 }
 
 async function main() {
-  const { apply, slugs } = parseArgs(process.argv.slice(2));
+  const { apply, allDrafts, slugs: requestedSlugs } = parseReleaseArgs(process.argv.slice(2));
   const reviewer = parseOpportunityApprovalReviewerIdentity({
     ADMIN_EMAILS: process.env.ADMIN_EMAILS,
     OPPORTUNITY_APPROVAL_REFERENCE: process.env.PRODUCT_RELEASE_REFERENCE?.trim(),
@@ -97,6 +98,11 @@ async function main() {
   const db = drizzle(client, { schema });
   const results: Record<string, unknown>[] = [];
   try {
+    // Inclui produtos ainda sem edição/conteúdo: o mesmo gate informa o bloqueio.
+    // Cada produto mantém sua transação e suas checagens de liberação.
+    const slugs = allDrafts
+      ? (await db.execute<{ slug: string }>(sql`select slug from contest_store_products where status='draft' order by slug`)).map(row => row.slug)
+      : requestedSlugs;
     for (const slug of slugs) {
       try {
         const result = await db.transaction(async (transaction) => {
@@ -172,8 +178,14 @@ async function main() {
         }, { isolationLevel: "serializable" });
         results.push({ mode: result.released ? "applied" : "blocked", ...result });
       } catch (error) {
-        if (!(error instanceof PreviewRollback)) throw error;
-        results.push({ mode: "preview", ...JSON.parse(error.message) });
+        if (error instanceof PreviewRollback) {
+          results.push({ mode: "preview", ...JSON.parse(error.message) });
+        } else {
+          // Uma falha operacional não impede avaliar os outros produtos. Não
+          // imprimir mensagens do driver, que podem incluir dados da conexão.
+          results.push({ mode: "failed", productSlug: slug, released: false, blockers: ["falha operacional; requer nova conferência"] });
+          process.exitCode = 1;
+        }
       }
     }
     console.log(JSON.stringify({

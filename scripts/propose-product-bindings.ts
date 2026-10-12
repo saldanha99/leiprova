@@ -120,7 +120,7 @@ async function main() {
           )
       `);
     });
-    if (!rows.length) {
+    if (!selectBindableQuestions(rows).length) {
       console.error(`Nenhuma questão revisada do Autor sem vínculo para ${productSlug}.`);
       process.exitCode = 3;
       return;

@@ -28,6 +28,14 @@ outros projetos. Nova autonomia não equivale a revisão humana de conteúdo jur
 Ele cobre onde o projeto está hospedado, como publicar, como subir o ambiente
 local e as armadilhas já conhecidas.
 
+**Abertura progressiva autorizada em 12/10/2026:** o proprietário escolheu
+"abertura automatica de todas" com conteúdo inicial validado e ampliação contínua.
+Avaliar automaticamente todos os produtos em rascunho e liberar cada um ao
+cumprir os gates existentes, sem nova confirmação por preparação. O piso de
+68 questões não significa cobertura integral. Essa decisão não altera o teto
+de 48 reservas/24h, não autoriza APIs pagas e não elimina provas de fonte,
+identidade, formato, vínculo ou direitos. Veja `docs/ABERTURA-PROGRESSIVA-2026-10-12.md`.
+
 Regras que valem sempre:
 
 - Nenhum segredo é versionado. O `.env` de produção vive só na VPS, com permissão `600`.

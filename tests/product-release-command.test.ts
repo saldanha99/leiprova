@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 
 import { describe, expect, it } from "vitest";
 
-import { releaseBlockers } from "../scripts/release-contest-product";
+import { parseReleaseArgs, releaseBlockers } from "../scripts/release-contest-product";
 
 const script = readFileSync(new URL("../scripts/release-contest-product.ts", import.meta.url), "utf8");
 const packageJson = readFileSync(new URL("../package.json", import.meta.url), "utf8");
@@ -27,6 +27,14 @@ const enam = {
 const slug = "enam-exame-nacional-da-magistratura-2026-2";
 
 describe("liberação comercial de produto", () => {
+  it("avalia todos os rascunhos em prévia por padrão, sem misturar seleções", () => {
+    expect(parseReleaseArgs(["--all-drafts"])).toEqual({ apply: false, allDrafts: true, slugs: [] });
+    expect(parseReleaseArgs(["--", "--apply", "--all-drafts"])).toEqual({ apply: true, allDrafts: true, slugs: [] });
+    expect(parseReleaseArgs([slug])).toEqual({ apply: false, allDrafts: false, slugs: [slug] });
+    expect(() => parseReleaseArgs(["--all-drafts", slug])).toThrow();
+    expect(() => parseReleaseArgs(["--all-drafts", "--force"])).toThrow();
+    expect(() => parseReleaseArgs([])).toThrow();
+  });
   it("libera o produto que cumpre tudo o que a venda exige", () => {
     expect(releaseBlockers(slug, enam, "2026-09-28")).toEqual([]);
   });

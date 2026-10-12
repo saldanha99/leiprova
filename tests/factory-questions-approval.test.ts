@@ -68,7 +68,7 @@ describe("conferência posterior e linha automática (decisão de 11/10/2026)", 
   it("aprova em modo permanente e não toca em flag comercial", () => {
     expect(chain).toContain("editorial:questions:approve -- --apply --standing");
     expect(chain).toContain('REF="owner-standing-2026-10-11:aprovar-sozinho"');
-    expect(chain).toContain('if [ "$status" = "draft" ]; then');
+    expect(chain).toContain("commerce:product:release -- --apply --all-drafts");
     expect(chain).toContain("flock -n 9");
     expect(chain).not.toMatch(/_ENABLED=|\.env\b|STRIPE_/u);
   });
