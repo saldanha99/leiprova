@@ -4,7 +4,7 @@ import type { CapturedOfficialDocument } from "@/lib/opportunities/official-docu
 import { extractOfficialSyllabusCandidates } from "@/lib/editorial/official-syllabus-extractor";
 
 export const OFFICIAL_COURSE_STANDING_REFERENCE =
-  "docs/AUTORIZACAO-FONTES-PROGRAMAS-2026-10-12.md";
+  "owner-standing-2026-10-12:official-sources-programs";
 
 type EvidenceClaim = Readonly<{ field: string; page: number; contains: readonly string[] }>;
 export type OfficialCourseDossierRecipe = Readonly<{

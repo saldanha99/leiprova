@@ -62,6 +62,7 @@ não são carregados como evidência fresca para aplicar.
 
 `MIGRATION_DATABASE_URL` deve ser acesso de manutenção `leiprova_owner` ao banco
 `leiprova`; não aceita a conexão normal da aplicação. A referência obrigatória é
+`owner-standing-2026-10-12:official-sources-programs`, documentada em
 `docs/AUTORIZACAO-FONTES-PROGRAMAS-2026-10-12.md`. A identidade exige administrador
 único. O operador trava o vínculo do produto e recusa produto que não seja draft,
 que já tenha edição ou cuja edição/cargo/ano já exista. O fluxo não sobrescreve
