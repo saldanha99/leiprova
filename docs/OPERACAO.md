@@ -8,6 +8,10 @@ exclusivas, expiração de 90 minutos, até três tentativas e validações edit
 continuam. Dependência do Maestri e limites das assinaturas permanecem;
 não há fallback para API paga. Referências abaixo ao teto de 48 são históricas.
 Veja `docs/FILA-SEM-TETO-2026-10-12.md` para o recibo de implantação.
+Implantado `dd711733`: 50 reservas/24h observadas, três agentes entregaram,
+quatro inéditas novas publicadas no ENAC; total válido agora 289 questões
+em três preparações. Intervalo do Maestri permanece 20 minutos (ajuste negado
+por identidade Maestro/Autor divergente). Conferência às 16h12 BRT.
 
 **Abertura progressiva instalada em 12/10/2026, às 13h12 BRT:** decisão do
 proprietário registrada em `AGENTS.md`. Cron de liberação a cada 30 minutos;
