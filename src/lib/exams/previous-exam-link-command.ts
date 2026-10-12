@@ -3,6 +3,9 @@ import { OFFICIAL_COURSE_STANDING_REFERENCE } from "@/lib/editorial/official-cou
 export const MPMT_PREVIOUS_EDITION_PUBLIC_ID = "mpmt-promotor-substituto-2026-objetiva";
 export const MPMT_PREVIOUS_PRODUCT_SLUG = "mpe-mt-promotor-de-justica-2026";
 
+export const PGEAC_PREVIOUS_EDITION_PUBLIC_ID = "pgeac-procurador-classe-i-viii-2026-objetiva";
+export const PGEAC_PREVIOUS_PRODUCT_SLUG = "pge-ac-procurador-do-estado-reta-final";
+
 type Pair = Readonly<{ productSlug: string; editionPublicId: string }>;
 export function parsePreviousExamLinkCommand(argv: readonly string[]) {
   let apply = false;
@@ -17,7 +20,8 @@ export function parsePreviousExamLinkCommand(argv: readonly string[]) {
     pairs.push({ productSlug: parts[0], editionPublicId: parts[1] });
   }
   if (!pairs.length || new Set(pairs.map((pair) => pair.productSlug)).size !== pairs.length) throw new Error("Informe pares únicos de produto/edição.");
-  if (standing && (pairs.length !== 1 || pairs[0].productSlug !== MPMT_PREVIOUS_PRODUCT_SLUG || pairs[0].editionPublicId !== MPMT_PREVIOUS_EDITION_PUBLIC_ID)) throw new Error("Standing delimitado ao MPMT 01/2026, prova objetiva de 14/06/2026.");
+  if (standing && (pairs.length !== 1 || !((pairs[0].productSlug === MPMT_PREVIOUS_PRODUCT_SLUG && pairs[0].editionPublicId === MPMT_PREVIOUS_EDITION_PUBLIC_ID)
+    || (pairs[0].productSlug === PGEAC_PREVIOUS_PRODUCT_SLUG && pairs[0].editionPublicId === PGEAC_PREVIOUS_EDITION_PUBLIC_ID)))) throw new Error("Standing delimitado aos pares exatos MPMT 01/2026 e PGE-AC VIII/2026; uma edição por execução.");
   return { apply, standing, pairs };
 }
 

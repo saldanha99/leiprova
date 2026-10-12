@@ -25,6 +25,7 @@ import {
 } from "../src/lib/opportunities/approval-command";
 import { saoPauloCalendarDate } from "../src/lib/opportunities/catalog-policy";
 
+import { PGEAC_OFFICIAL_PREVIOUS_EXAM } from "../src/lib/exams/pgeac-previous-exam-admission";
 import { MPMT_OFFICIAL_PREVIOUS_EXAM } from "../src/lib/exams/mpmt-previous-exam-admission";
 import { parsePreviousExamLinkCommand, previousExamApprovalBasis } from "../src/lib/exams/previous-exam-link-command";
 import { requireStandingCourseMaintenanceDatabaseUrl } from "../src/lib/editorial/official-course-admission";
@@ -54,14 +55,16 @@ async function main() {
   const results: Record<string, unknown>[] = [];
   try {
     for (const pair of pairs) {
+      const standingTarget=pair.productSlug===PGEAC_OFFICIAL_PREVIOUS_EXAM.productSlug?PGEAC_OFFICIAL_PREVIOUS_EXAM:MPMT_OFFICIAL_PREVIOUS_EXAM;
+      const registrationAction=pair.productSlug===PGEAC_OFFICIAL_PREVIOUS_EXAM.productSlug?"editorial.previous_exam.pgeac_metadata_registered":"editorial.previous_exam.mpmt_metadata_registered";
       const [edition] = await db
         .select({ id: examEditions.id, bankId: examEditions.bankId, examDate: examEditions.examDate, institution: examEditions.institutionAcronym, jurisdiction: examEditions.jurisdictionCode, sourcePolicy: examEditions.sourcePolicy, officialUrl: examEditions.officialUrl })
         .from(examEditions)
         .where(eq(examEditions.publicId, pair.editionPublicId))
         .limit(1);
       if (!edition) throw new Error(`Edição inexistente: ${pair.editionPublicId}.`);
-      if (standing && (edition.examDate !== MPMT_OFFICIAL_PREVIOUS_EXAM.examDate || edition.institution !== "MPMT" || edition.jurisdiction !== "MT"
-        || edition.sourcePolicy !== "metadata_only" || edition.officialUrl !== MPMT_OFFICIAL_PREVIOUS_EXAM.portalUrl)) throw new Error("Standing exige a prova MPMT 01/2026 exata, aplicada em 14/06/2026.");
+      if (standing && (edition.examDate !== standingTarget.examDate || edition.institution !== standingTarget.institution || edition.jurisdiction !== standingTarget.jurisdiction
+        || edition.sourcePolicy !== "metadata_only" || edition.officialUrl !== standingTarget.portalUrl)) throw new Error("Standing exige a identidade e data exatas da prova autorizada.");
       const pending = await db
         .select({ publicId: examEditionDocuments.publicId, documentType: examEditionDocuments.documentType })
         .from(examEditionDocuments)
@@ -77,7 +80,7 @@ async function main() {
       for (const document of [booklet, answerKey]) {
         const candidate = await loadDocumentReviewCandidate(db, document.publicId);
         if (!candidate) throw new Error(`Documento ausente: ${document.publicId}.`);
-        if (standing && (candidate.sourcePolicy !== "metadata_only" || candidate.sourceUrl !== MPMT_OFFICIAL_PREVIOUS_EXAM.documents.find(item=>item.documentType===candidate.documentType)?.url)) throw new Error("Standing exige caderno Tipo1 e gabarito definitivo oficiais exatos, como links externos.");
+        if (standing && (candidate.sourcePolicy !== "metadata_only" || candidate.sourceUrl !== standingTarget.documents.find(item=>item.documentType===candidate.documentType)?.url)) throw new Error("Standing exige caderno Tipo1 e gabarito definitivo oficiais exatos, como links externos.");
         const checked = await verifyOfficialExamUrl(candidate.bankSlug, candidate.sourceUrl);
         if (checked.finalUrl !== candidate.sourceUrl || checked.httpStatus < 200 || checked.httpStatus > 399 || !checked.isPdf) {
           throw new Error(`A URL oficial mudou ou deixou de entregar PDF: ${candidate.sourceUrl}.`);
@@ -176,10 +179,10 @@ async function main() {
           if (!scope) throw new Error("Não foi possível cruzar produto e prova.");
           if (standing) {
             const registrations = await transaction.select({ metadata:auditLogs.metadata }).from(auditLogs)
-              .where(and(eq(auditLogs.action,"editorial.previous_exam.mpmt_metadata_registered"),eq(auditLogs.entityId,pair.editionPublicId))).limit(2);
+              .where(and(eq(auditLogs.action,registrationAction),eq(auditLogs.entityId,pair.editionPublicId))).limit(2);
             if (registrations.length!==1 || registrations[0].metadata?.opportunityPublicId!==scope.opportunityPublicId
               || registrations[0].metadata?.approvalReference!==reviewer.approvalReference || registrations[0].metadata?.humanReview!==false
-              || scope.preparationMode!=="historical_training") throw new Error("Cadastro MPMT não corresponde à oportunidade histórica real; vínculo bloqueado.");
+              || scope.preparationMode!=="historical_training") throw new Error("Cadastro autorizado não corresponde à oportunidade histórica real; vínculo bloqueado.");
           }
           const decision = validateExamReferenceScope(scope, todayIso, { requireLicense: false });
           if (!decision.valid) throw new Error(decision.reason);
