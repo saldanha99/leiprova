@@ -1,5 +1,15 @@
 # Operação do Edital Lei Seca
 
+**Continuação em 12/10/2026, 19h29 BRT:** correção `d9c3287` publicada;
+contrato objetivo do TJ-RS admitido pelo operador auditado (evento 13241,
+`owner_standing_authorization`, `humanReview:false`). Guardião e Autor foram
+trocados nos mesmos nós para Claude e retomaram entregas; Maestro também usa
+Claude nesta sessão por erro de autenticação do Codex. Rotinas preservadas.
+TRF-5 já tem 15 vínculos válidos, ainda abaixo dos 68 para abertura; seguem
+3/84 preparações abertas, com 296 questões válidas. O Antigravity entregou
+análise preparatória de isolamento do cargo Inspetor no PP-MA, sem admissão.
+Veja [recibos e próxima sequência](CONTINUACAO-PRODUCAO-2026-10-12.md).
+
 **Produção e controle em 12/10/2026, 18h54 BRT:** publicado `88b28fe`, priorizando
 mapeamentos com contrato vigente e disciplina dentro da faixa do produto.
 Relatório somente leitura disponível em `bash deploy/editorial-owner-report.sh`:

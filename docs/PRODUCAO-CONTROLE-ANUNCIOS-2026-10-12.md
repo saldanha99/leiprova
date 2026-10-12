@@ -17,8 +17,11 @@ Os executores dependem do aplicativo/host abertos e das assinaturas disponíveis
 
 Cadências existentes: Guardião e Autor 1 minuto, Radar 5 minutos; preparação
 na VPS 5 minutos e liberação 10 minutos. Proteções de agente ocupado e locks
-permanecem. A identidade da CLI do Maestro ainda aparece como Autor; não usar
-essa identidade divergente para administrar nós ou rotinas.
+permanecem. Na continuação após 19h13, a CLI executada no shell do próprio nó
+Maestro reconheceu corretamente o time e preservou nós/rotinas nas trocas.
+Não transferir variáveis de identidade para outro terminal. Guardião e Autor
+agora usam Claude nesta sessão; Codex apresentou erro de autenticação.
+Veja [a continuação comprovada](CONTINUACAO-PRODUCAO-2026-10-12.md).
 
 O diagnóstico privado encontrou 881 mapas candidatos com contrato atual e
 disciplina definida; a seleção anterior consumia muitas rodadas sem contrato.
