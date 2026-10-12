@@ -99,3 +99,10 @@ home sem “12x de” e com cobrança única anual explícita; termos/reembolso
 com identificação atual do fornecedor e sem a declaração indevida de checkout
 fechado. Nenhuma compra foi realizada. O wrapper publicado executou com sucesso
 às 21:54:29 UTC e preservou a fotografia 3/84, 296 válidas, 16 novas no dia.
+
+Às 21:56:34 UTC o Guardião recolheu a entrega anterior com sucesso e reservou
+`legal-change:2772` (Licitações), cuja precedência foi preservada. O Autor voltou
+a responder ocioso às 21:56:44 após uma falha transitória de ponte às 21:55;
+não havia insumo autoral novo. App e três workers estavam running, sem reinícios.
+Não há ganho de vazão autoral comprovado ainda. O backup copiado para o Mac,
+em `.local/editorial/owner-control-20261012/`, teve SHA-256 idêntico ao da VPS.
