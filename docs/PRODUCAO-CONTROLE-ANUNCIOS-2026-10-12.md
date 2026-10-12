@@ -88,4 +88,14 @@ repositórios `leiprova-app` e `leiprova-editorial-automation`. Não há migraç
 de schema nesta mudança; retorno do código não deve restaurar o banco sobre
 as entregas editoriais posteriores. Recibos privados ficam no diretório de QA.
 
-Implantação em andamento; registrar revisão e conferência pública ao concluir.
+Implantado `88b28fe` com o fluxo normal `LEIPROVA_SKIP_SEED=1` em 12/10,
+às 21:54 UTC. App, banco, pooler e três workers saudáveis. Imagem do app:
+`84a5369e305713de5ddb6d5eecc0393200d8544c21491473e8ce010e5eabca33`;
+worker editorial:
+`3510d083807804c15f5d85af77cb08e55c92eaccb34043c10dd4bcf2d8dc8685`.
+
+Conferência pública: health, home, termos, reembolso e ENAM com HTTP 200;
+home sem “12x de” e com cobrança única anual explícita; termos/reembolso
+com identificação atual do fornecedor e sem a declaração indevida de checkout
+fechado. Nenhuma compra foi realizada. O wrapper publicado executou com sucesso
+às 21:54:29 UTC e preservou a fotografia 3/84, 296 válidas, 16 novas no dia.

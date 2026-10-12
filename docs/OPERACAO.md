@@ -1,5 +1,16 @@
 # Operação do Edital Lei Seca
 
+**Produção e controle em 12/10/2026, 18h54 BRT:** publicado `88b28fe`, priorizando
+mapeamentos com contrato vigente e disciplina dentro da faixa do produto.
+Relatório somente leitura disponível em `bash deploy/editorial-owner-report.sh`:
+3/84 preparações, 296 questões válidas, 16 novas publicadas no dia de São Paulo.
+Meta de 1.000/dia ainda não comprovada. Heartbeat horário de continuação instalado;
+WhatsApp aguarda identificação da integração pelo proprietário. Anúncios Meta e
+Google preparados, sem veiculação, aguardando login/orçamento. Corrigidas a
+apresentação do Master anual e a leitura do fornecedor em termos/reembolso.
+Lint, tipos, build, 1.819 testes gerais e 29 PostgreSQL passaram.
+Veja [recibos, operação e pendências](PRODUCAO-CONTROLE-ANUNCIOS-2026-10-12.md).
+
 **Aceleração posterior em 12/10/2026:** Guardião e Autor agora a cada **1 minuto**
 no Maestri; Radar permanece em 5. Preparação na VPS a cada **5 minutos** e
 liberação a cada **10 minutos**, com locks e validações preservados. Despacho
