@@ -22,7 +22,7 @@ const client = testUrl ? postgres(testUrl, { max: 4, prepare: false, onnotice: (
 const db = client ? drizzle(client, { schema }) : null;
 // Avança o relógio sintético além dos defaults now() gravados durante o setup.
 const clock = new Date(Date.now() + 60_000);
-const config = { from: "Editalume <acesso@example.invalid>", origin: "https://leiprova.2b.app.br" };
+const config = { from: "Edital Lei Seca <acesso@example.invalid>", origin: "https://leiprova.2b.app.br" };
 
 describe.skipIf(!db)("outbox de entrega — PostgreSQL sintético exclusivo", () => {
   beforeAll(async () => {

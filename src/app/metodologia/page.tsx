@@ -22,7 +22,7 @@ import { createPublicWebPageStructuredData } from "@/lib/seo/page-structured-dat
 const PAGE_PATH = "/metodologia";
 const PAGE_TITLE = "Como editais viram prioridades de estudo e simulados";
 const PAGE_DESCRIPTION =
-  "Entenda as regras da Editalume para detectar editais em fontes oficiais, validar a edição e seu responsável, analisar evidências e publicar simulados originais com revisão humana.";
+  "Entenda as regras da Edital Lei Seca para detectar editais em fontes oficiais, validar a edição e seu responsável, analisar evidências e publicar questões originais com aprovação editorial identificada.";
 
 export const metadata: Metadata = {
   title: PAGE_TITLE,
@@ -31,22 +31,22 @@ export const metadata: Metadata = {
   openGraph: {
     type: "article",
     url: PAGE_PATH,
-    title: `${PAGE_TITLE} | Editalume`,
+    title: `${PAGE_TITLE} | Edital Lei Seca`,
     description: PAGE_DESCRIPTION,
     images: [
       {
-        url: "/assets/leiprova-ecosystem.png",
-        width: 1586,
-        height: 992,
-        alt: "Interface de estudo da Editalume em notebook, tablet e celular",
+        url: "/brand/edital-lei-seca-social.png",
+        width: 1200,
+        height: 630,
+        alt: "Edital Lei Seca — lei seca guiada pelo edital",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: `${PAGE_TITLE} | Editalume`,
+    title: `${PAGE_TITLE} | Edital Lei Seca`,
     description: PAGE_DESCRIPTION,
-    images: ["/assets/leiprova-ecosystem.png"],
+    images: ["/brand/edital-lei-seca-social.png"],
   },
 };
 
@@ -62,7 +62,7 @@ export const methodologyStructuredData = createPublicWebPageStructuredData({
     "Monitoramento de editais",
     "Análise estatística de incidência em concursos",
     "Simulados autorais de lei seca",
-    "Revisão humana de conteúdo jurídico",
+    "Aprovação editorial de conteúdo jurídico",
   ],
 });
 
@@ -95,7 +95,7 @@ const PIPELINE = [
   {
     icon: ShieldCheck,
     title: "6. Revisar e publicar",
-    text: "A revisão humana confere fonte, vigência, gabarito, explicação, linguagem e limites estatísticos. Só então a página específica se torna pública e pode entrar no sitemap.",
+    text: "Fonte, vigência, gabarito e explicação são conferidos no fluxo editorial. As inéditas da fábrica seguem a liberação automática autorizada pelo proprietário, com conferência posterior. Essa aprovação não equivale a revisão humana independente de cada item.",
   },
 ] as const;
 
@@ -134,7 +134,7 @@ export default function MethodologyPage() {
                 {PAGE_TITLE}
               </h1>
               <p className="mt-6 max-w-4xl text-lg leading-8 text-slate-300">
-                O motor proposto separa três trabalhos: descobrir mudanças, medir evidências e publicar conteúdo. Automação acelera os dois primeiros; fonte oficial e revisão humana continuam sendo obrigatórias antes de qualquer edital, responsável, estimativa ou questão aparecer como informação pública.
+                O processo separa descoberta de fontes, análise de evidências e publicação. Editais e referências externas têm conferência própria; inéditas da fábrica seguem a linha automática autorizada pelo proprietário. Fonte oficial, cargo, edição e origem da aprovação devem permanecer identificados.
               </p>
               <p className="mt-5 text-sm leading-7 text-slate-400">
                 Esta página descreve a política de implementação. Ela não afirma que todos os conectores, análises históricas ou páginas específicas já estejam operando.
@@ -227,7 +227,7 @@ export default function MethodologyPage() {
                 <span className="text-xs font-extrabold uppercase tracking-[0.16em]">LexML no motor</span>
               </div>
               <p className="mt-5 text-sm leading-7 text-slate-300">
-                Os serviços e dados abertos da LexML podem ajudar a localizar registros, identificadores e relações entre atos. Essa integração funciona como apoio à descoberta e ao versionamento; a publicação jurídica continua vinculada à fonte oficial competente e à revisão humana.
+                Os serviços e dados abertos da LexML podem ajudar a localizar registros, identificadores e relações entre atos. Essa integração funciona como apoio à descoberta e ao versionamento; a publicação jurídica continua vinculada à fonte oficial competente e à aprovação editorial identificada.
               </p>
               <a className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-blue-300 hover:text-blue-200" href="https://projeto.lexml.gov.br/open-data" rel="noreferrer">
                 Conhecer os dados abertos da LexML
@@ -261,7 +261,7 @@ export default function MethodologyPage() {
               <article className="rounded-2xl border border-rose-300/15 bg-rose-300/[0.035] p-5">
                 <h3 className="font-semibold text-rose-200">Continua privado</h3>
                 <p className="mt-2 text-sm leading-7 text-slate-400">
-                  Pista de agregador, edital sem validação, banca herdada de ano anterior, estimativa sem amostra, questão sem direito de uso ou texto jurídico sem revisão independente.
+                  Pista de agregador, edital sem validação, banca herdada de ano anterior, estimativa sem amostra, questão sem direito de uso ou texto jurídico sem fonte e aprovação identificadas.
                 </p>
               </article>
             </div>

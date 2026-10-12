@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import {
   buildLicenseRequestDraft,
+  prepareExamLicenseRequests,
   dispatchDueExamLicenseRequests,
   type LicenseEmailSender,
 } from "@/lib/licensing/exam-license-automation";
@@ -36,10 +37,26 @@ describe("automação de pedidos de licença de provas", () => {
   });
 
   it("preserva texto e impressão digital dos pedidos individuais já enviados", () => {
-    // Valor anterior à consolidação por banca (28/09/2026); mudar exigiria novo contato.
-    expect(buildLicenseRequestDraft(source)?.fingerprint).toBe(
+    // O template da marca anterior deve continuar reproduzível sem reescrever pedidos enviados.
+    expect(buildLicenseRequestDraft(source, "Editalume")?.fingerprint).toBe(
       "25b1e8a69e0c2875b0fabffe3736eeac0c7d5790212793c55017c45f13bb6da7",
     );
+  });
+
+  it("não reabre um pedido enviado somente porque a marca mudou", async () => {
+    const execute = vi.fn().mockResolvedValueOnce([source]).mockResolvedValueOnce([{
+      publicId: "pedido-historico",
+      status: "awaiting_response",
+      scopeFingerprint: buildLicenseRequestDraft(source, "Editalume")!.fingerprint,
+    }]);
+    const insert = vi.fn();
+    const db = { execute, insert } as unknown as Parameters<typeof prepareExamLicenseRequests>[0];
+    const result = await prepareExamLicenseRequests(db, 1);
+
+    expect(result).toMatchObject({ unchanged: 1, created: 0, manualReview: 0 });
+    expect(execute).toHaveBeenCalledTimes(2);
+    expect(insert).not.toHaveBeenCalled();
+    expect(buildLicenseRequestDraft(source)?.subject).toContain("Edital Lei Seca");
   });
 
   it("usa o canal específico do ENAC", () => {
@@ -81,7 +98,7 @@ describe("envio dos acompanhamentos de licença", () => {
     status: "awaiting_response",
     bankId: 2,
     recipients: ["enac@fgv.br", "demanda.conhecimento@fgv.br"],
-    subject: "Pedido de autorização comercial — ENAC 2026.1 — Editalume",
+    subject: "Pedido de autorização comercial — ENAC 2026.1 — Edital Lei Seca",
     body: "Pedido original sintético.",
     fingerprint: "a".repeat(64),
     followUpCount: 0,
@@ -95,7 +112,7 @@ describe("envio dos acompanhamentos de licença", () => {
     ...dueRequest,
     publicId: "f0c70edc-989c-47ee-8257-73a5853a8670",
     recipients: ["examemagistratura@fgv.br", "demanda.conhecimento@fgv.br"],
-    subject: "Pedido de autorização comercial — ENAM 2026.1 — Editalume",
+    subject: "Pedido de autorização comercial — ENAM 2026.1 — Edital Lei Seca",
     fingerprint: "b".repeat(64),
     editionTitle: "ENAM 2026.1",
     bookletUrl: "https://conhecimento.fgv.br/sites/default/files/enam.pdf",
@@ -106,7 +123,7 @@ describe("envio dos acompanhamentos de licença", () => {
     status: "prepared",
     bankId: 3,
     recipients: ["sac@cebraspe.org.br"],
-    subject: `Pedido de autorização comercial — ${editionTitle} — Editalume`,
+    subject: `Pedido de autorização comercial — ${editionTitle} — Edital Lei Seca`,
     fingerprint: publicId.slice(0, 1).repeat(64),
     editionTitle,
     bookletUrl: `https://cdn.cebraspe.org.br/concursos/${publicId}/caderno.pdf`,
@@ -153,7 +170,7 @@ describe("envio dos acompanhamentos de licença", () => {
     expect(result).toEqual({ due: 2, sent: 2, deferred: 0, manualReview: 0, emails: 1 });
     const [message] = sender.mock.calls[0];
     expect(message.to).toBe("sac@cebraspe.org.br");
-    expect(message.subject).toBe("Pedido de autorização comercial — 2 provas anteriores — Editalume");
+    expect(message.subject).toBe("Pedido de autorização comercial — 2 provas anteriores — Edital Lei Seca");
     expect(message.text).toContain("1. PC-MA 2017 — Delegado");
     expect(message.text).toContain("2. PGM Manaus 2018 — Procurador");
     expect(message.text).toContain("https://cdn.cebraspe.org.br/concursos/pgm-manaus-procurador-2018/caderno.pdf");
@@ -165,7 +182,7 @@ describe("envio dos acompanhamentos de licença", () => {
 
     expect(result).toEqual({ due: 2, sent: 2, deferred: 0, manualReview: 0, emails: 3 });
     const shared = sender.mock.calls.find(([message]) => message.to === "demanda.conhecimento@fgv.br");
-    expect(shared?.[0].subject).toBe("Acompanhamento 1/3 — Pedido de autorização comercial — 2 provas anteriores — Editalume");
+    expect(shared?.[0].subject).toBe("Acompanhamento 1/3 — Pedido de autorização comercial — 2 provas anteriores — Edital Lei Seca");
     expect(shared?.[0].text).toContain("ENAC 2026.1");
     expect(shared?.[0].text).toContain("ENAM 2026.1");
     expect(sender.mock.calls.filter(([message]) => message.to === "enac@fgv.br")).toHaveLength(1);

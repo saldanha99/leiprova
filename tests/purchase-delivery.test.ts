@@ -16,7 +16,7 @@ import {
 const input = { userId: 7, scope: "contest" as const, purchaseId: "order_123", productSlug: "curso-um" };
 const id = purchaseDeliveryId(input);
 const fixedNow = new Date("2026-09-07T12:00:00Z");
-const config = { from: "Editalume <acesso@example.invalid>", origin: "https://leiprova.2b.app.br" };
+const config = { from: "Edital Lei Seca <acesso@example.invalid>", origin: "https://leiprova.2b.app.br" };
 const snapshot = { version: 1 as const, to: "aluna@example.invalid", name: "Ana Silva", productLabel: "Curso um", scope: "contest" as const, ...config };
 const job = (): ClaimedPurchaseDelivery => ({ ...input, id, attempts: 1, leaseToken: "lease_one", payload: null, payloadDigest: null, firstDispatchAt: null });
 const dialect = new PgDialect();

@@ -14,6 +14,8 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 FROM deps AS builder
 WORKDIR /app
 ARG LEIPROVA_BUILD_PROFILE=production
+ARG NEXT_PUBLIC_APP_URL=https://leiprova.2b.app.br
+ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
 COPY . .
 RUN case "$LEIPROVA_BUILD_PROFILE" in \
       production) pnpm build ;; \

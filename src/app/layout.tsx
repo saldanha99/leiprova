@@ -34,11 +34,11 @@ export const metadata: Metadata = {
   referrer: "origin-when-cross-origin",
   icons: {
     icon: [
-      { url: "/brand/editalume-icon-32.png", type: "image/png", sizes: "32x32" },
-      { url: "/brand/editalume-icon-192.png", type: "image/png", sizes: "192x192" },
+      { url: "/brand/edital-lei-seca-icon-32.png", type: "image/png", sizes: "32x32" },
+      { url: "/brand/edital-lei-seca-icon-192.png", type: "image/png", sizes: "192x192" },
     ],
     apple: [
-      { url: "/brand/editalume-icon-180.png", type: "image/png", sizes: "180x180" },
+      { url: "/brand/edital-lei-seca-icon-180.png", type: "image/png", sizes: "180x180" },
     ],
   },
   keywords: ["lei seca", "concursos públicos", "literalidade", "questões de direito", "revisão espaçada"],

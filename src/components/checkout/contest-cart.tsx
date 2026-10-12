@@ -480,7 +480,7 @@ export function ContestCart({
             <p>
               <strong>Pagamento processado pela Stripe</strong>Na próxima etapa,
               confirme o valor e informe os dados nos campos protegidos da
-              Stripe, nesta página. A Editalume não recebe os dados completos do seu cartão.
+              Stripe, nesta página. A Edital Lei Seca não recebe os dados completos do seu cartão.
             </p>
           </div>
           <p className={styles.terms}>

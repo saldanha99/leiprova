@@ -67,15 +67,17 @@ type LicenseItem = Pick<
   "editionTitle" | "bookletTitle" | "bookletUrl" | "answerKeyTitle" | "answerKeyUrl"
 >;
 
-const REQUEST_TERMS = [
+function requestTerms(brandName: string) {
+  return [
   "O uso pretendido compreende reprodução integral ou parcial dos enunciados e alternativas em banco autenticado; indexação por concurso, cargo, disciplina, assunto e dispositivo legal; comentários e estatísticas autorais; e, somente se autorizado, hospedagem de cópia do PDF.",
   "",
   "Pedimos que a resposta identifique o titular, os documentos e edições abrangidos, modalidades permitidas, atribuição exigida, prazo, território, preço, revogação, tratamento de questões anuladas e permissão ou vedação de armazenamento do PDF.",
   "",
-  `A ${BRAND_NAME} manterá fonte oficial, versão, data e hash de cada evidência e não publicará o material como licenciado antes da formalização e revisão.`,
+  `A ${brandName} manterá fonte oficial, versão, data e hash de cada evidência e não publicará o material como licenciado antes da formalização e revisão.`,
   "",
-  `Atenciosamente,\nResponsável legal da ${BRAND_NAME}`,
-];
+  `Atenciosamente,\nResponsável legal da ${brandName}`,
+  ];
+}
 
 function licenseItemLines(item: LicenseItem) {
   return [
@@ -98,27 +100,28 @@ export function buildConsolidatedLicenseText(items: readonly LicenseItem[]) {
       ...licenseItemLines(item),
       "",
     ]),
-    ...REQUEST_TERMS,
+    ...requestTerms(BRAND_NAME),
   ].join("\n");
 }
 
 export function buildLicenseRequestDraft(
   source: RequestSource,
+  brandName: string = BRAND_NAME,
 ): LicenseRequestDraft | null {
   const recipients = source.bankSlug === "fgv"
     ? fgvContacts(source.institutionAcronym)
     : [...(bankContacts[source.bankSlug] ?? [])];
   if (!recipients.length) return null;
 
-  const subject = `Pedido de autorização comercial — ${source.editionTitle} — ${BRAND_NAME}`;
+  const subject = `Pedido de autorização comercial — ${source.editionTitle} — ${brandName}`;
   const body = [
     "À equipe responsável,",
     "",
-    `A ${BRAND_NAME} é uma plataforma educacional de preparação para concursos. Solicitamos autorização expressa, não exclusiva e documentada para utilizar o caderno e o gabarito abaixo em produto digital pago:`,
+    `A ${brandName} é uma plataforma educacional de preparação para concursos. Solicitamos autorização expressa, não exclusiva e documentada para utilizar o caderno e o gabarito abaixo em produto digital pago:`,
     "",
     ...licenseItemLines(source),
     "",
-    ...REQUEST_TERMS,
+    ...requestTerms(brandName),
   ].join("\n");
   const fingerprint = canonicalFingerprint({
     version: "exam-license-request-v1",
@@ -223,7 +226,11 @@ export async function prepareExamLicenseRequests(
       created += 1;
       continue;
     }
-    if (existing.scopeFingerprint === draft.fingerprint) {
+    // A mudança de marca não altera o escopo nem reabre pedidos já enviados.
+    const sameHistoricalScope = ["Editalume", "LeiProva"].some(
+      (brand) => buildLicenseRequestDraft(source, brand)?.fingerprint === existing.scopeFingerprint,
+    );
+    if (existing.scopeFingerprint === draft.fingerprint || sameHistoricalScope) {
       unchanged += 1;
       continue;
     }

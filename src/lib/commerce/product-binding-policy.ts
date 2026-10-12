@@ -1,3 +1,5 @@
+import { isAuthorizedProductionOrigin } from "../deployment-origin";
+
 import { createHash } from "node:crypto";
 import { z } from "zod";
 
@@ -33,11 +35,11 @@ export function requireProductBindingTarget(connectionString: string | undefined
     (target.port === "55440" && target.pathname === "/leiprova_editorial_local") ||
     (target.port === "55441" && target.pathname === "/leiprova_binding_test")
   );
-  const production = nodeEnv === "production" && appUrl === "https://leiprova.2b.app.br" && approval === "import_pending_bindings" &&
+  const production = nodeEnv === "production" && isAuthorizedProductionOrigin(appUrl) && approval === "import_pending_bindings" &&
     ["leiprova-pooler", "pooler"].includes(target.hostname) && target.pathname === "/leiprova" &&
     target.username === "leiprova_app" && (!target.port || target.port === "5432");
   if (!["postgres:", "postgresql:"].includes(target.protocol) || target.search || target.hash || !target.username || (!local && !production)) {
-    throw new Error("Destino de curadoria não permitido; use o banco editorial local ou pooler restrito da Editalume.");
+    throw new Error("Destino de curadoria não permitido; use o banco editorial local ou pooler restrito da Edital Lei Seca.");
   }
   return { connectionString, database: target.pathname.slice(1), production };
 }

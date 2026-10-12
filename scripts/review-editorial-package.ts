@@ -1,3 +1,5 @@
+import { isAuthorizedProductionOrigin } from "../src/lib/deployment-origin";
+
 import { constants } from "node:fs";
 import { open, realpath } from "node:fs/promises";
 import path from "node:path";
@@ -62,7 +64,7 @@ function requireTarget(sourceBundleId: string) {
     target.pathname === "/leiprova_editorial_local";
   const approvedProduction =
     production &&
-    process.env.APP_URL === "https://leiprova.2b.app.br" &&
+    isAuthorizedProductionOrigin(process.env.APP_URL) &&
     process.env.LEIPROVA_REVIEW_PACKAGE_APPROVED ===
       `review-package:${sourceBundleId}` &&
     ["leiprova-pooler", "pooler"].includes(target.hostname) &&
@@ -77,7 +79,7 @@ function requireTarget(sourceBundleId: string) {
     (!local && !approvedProduction)
   ) {
     throw new LocalImportError(
-      "A revisão exige o banco editorial local ou o pooler restrito da Editalume com autorização exata do pacote.",
+      "A revisão exige o banco editorial local ou o pooler restrito da Edital Lei Seca com autorização exata do pacote.",
     );
   }
   return {

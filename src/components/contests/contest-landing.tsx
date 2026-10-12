@@ -34,6 +34,8 @@ import {
 import premium from "./course-experience.module.css";
 import styles from "./contest-landing.module.css";
 
+import { preparationModeLabels, preparationModeDescriptions, type PreparationMode } from "@/lib/commerce/preparation-mode";
+
 type ContestLandingProps = {
   opportunity: PublicContestOpportunity;
   jurisdictionName: string;
@@ -45,6 +47,7 @@ type ContestLandingProps = {
   previousExamWaiverReason?: string | null;
   productSlug?: string;
   productAvailable?: boolean;
+  preparationMode?: PreparationMode;
 };
 
 export function ContestLanding({
@@ -57,9 +60,11 @@ export function ContestLanding({
   previousExamWaiverReason = null,
   productSlug,
   productAvailable = false,
+  preparationMode = "current_notice",
 }: ContestLandingProps) {
   const direction = getCareerDirection(opportunity.categorySlug);
-  const status = getOpportunityLifecycleLabel(opportunity.lifecycleStatus);
+  const status = preparationMode === "current_notice"
+    ? getOpportunityLifecycleLabel(opportunity.lifecycleStatus) : preparationModeLabels[preparationMode];
   const registrationStart = formatOpportunityDate(
     opportunity.registrationStartsAt,
   );
@@ -114,6 +119,14 @@ export function ContestLanding({
       className={`${styles.landing} ${premium.page}`}
       data-theme={direction.theme}
     >
+      {preparationMode !== "current_notice" && (
+        <section className="mx-auto max-w-6xl px-5 py-8" aria-label="Programa de referência">
+          <h2 className="text-xl font-semibold">{preparationModeLabels[preparationMode]}</h2>
+          <p className="mt-3 leading-7">{preparationModeDescriptions[preparationMode]}</p>
+          <p className="mt-2">Edição de referência: {opportunity.institutionAcronym} · {opportunity.roleName} · {opportunity.cycleYear}.
+            Banca da edição de referência: {opportunity.bankName ?? "não confirmada"}.</p>
+        </section>
+      )}
       <CourseHero
         acronym={`${opportunity.institutionAcronym} ${opportunity.cycleYear}`}
         role={opportunity.roleName}
@@ -139,7 +152,7 @@ export function ContestLanding({
               <span className={styles.eyebrow}>
                 O SEU OBJETIVO, COM CONTEXTO
               </span>
-              <h2 id="edicao-title">Conheça esta edição.</h2>
+              <h2 id="edicao-title">{preparationMode === "current_notice" ? "Conheça esta edição." : "Conheça a edição de referência."}</h2>
             </div>
             <p>
               Informação oficial de um lado. Preparação editorial do outro. Cada

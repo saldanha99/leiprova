@@ -701,7 +701,7 @@ export function LicensedPreviousExamImportForm({
       <p className="text-[11px] leading-5 text-slate-500">
         O lote precisa ter exatamente o total do documento, ordens contínuas de
         1 até o fim, uma resposta correta e alternativas justificadas: duas em
-        certo/errado ou quatro/cinco em múltipla escolha. A Editalume não baixa
+        certo/errado ou quatro/cinco em múltipla escolha. A Edital Lei Seca não baixa
         nem raspa o PDF neste fluxo.
       </p>
       <label className="flex items-start gap-3 rounded-xl border border-amber-300/15 bg-amber-300/[.035] p-3 text-xs leading-5 text-amber-100">

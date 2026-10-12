@@ -22,7 +22,6 @@ import {
 import { JsonLd } from "@/components/seo/json-ld";
 import {
   CONSTITUTION_OFFICIAL_URL,
-  DEMO_CONTENT_PROVENANCE,
   DEMO_QUESTIONS,
 } from "@/lib/demo-content";
 import {
@@ -32,9 +31,9 @@ import {
 } from "@/lib/seo";
 
 const PAGE_PATH = "/fontes-e-atualizacao";
-const PAGE_TITLE = "Fontes, questões e atualização da Editalume";
+const PAGE_TITLE = "Fontes, questões e atualização da Edital Lei Seca";
 const PAGE_DESCRIPTION =
-  "Veja de onde vêm as leis e questões da Editalume, o que existe hoje no acervo e as regras de versionamento, revisão e licenciamento para manter o conteúdo confiável.";
+  "Veja de onde vêm as leis e questões da Edital Lei Seca, o que existe hoje no acervo e as regras de versionamento, revisão e licenciamento para manter o conteúdo confiável.";
 const PENAL_CODE_OFFICIAL_URL =
   "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848compilado.htm";
 
@@ -45,22 +44,22 @@ export const metadata: Metadata = {
   openGraph: {
     type: "article",
     url: PAGE_PATH,
-    title: `${PAGE_TITLE} | Editalume`,
+    title: `${PAGE_TITLE} | Edital Lei Seca`,
     description: PAGE_DESCRIPTION,
     images: [
       {
-        url: "/assets/leiprova-ecosystem.png",
-        width: 1586,
-        height: 992,
-        alt: "Ecossistema de estudo Editalume",
+        url: "/brand/edital-lei-seca-social.png",
+        width: 1200,
+        height: 630,
+        alt: "Edital Lei Seca — lei seca guiada pelo edital",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: `${PAGE_TITLE} | Editalume`,
+    title: `${PAGE_TITLE} | Edital Lei Seca`,
     description: PAGE_DESCRIPTION,
-    images: ["/assets/leiprova-ecosystem.png"],
+    images: ["/brand/edital-lei-seca-social.png"],
   },
 };
 
@@ -86,7 +85,7 @@ const structuredData = {
       description: PAGE_DESCRIPTION,
       inLanguage: "pt-BR",
       datePublished: "2026-08-17",
-      dateModified: "2026-08-17",
+      dateModified: "2026-10-11",
       isPartOf: { "@id": WEBSITE_ID },
       author: { "@id": ORGANIZATION_ID },
       publisher: { "@id": ORGANIZATION_ID },
@@ -133,7 +132,7 @@ const UPDATE_STEPS = [
   {
     icon: BadgeCheck,
     title: "4. Revisar e publicar",
-    text: "Uma pessoa revisora valida texto, vigência, gabarito e explicação. Só então o registro recebe a identificação dessa revisão humana e pode integrar a oferta comercial.",
+    text: "A publicação registra a origem da aprovação. As inéditas da fábrica passam pela linha automática autorizada pelo proprietário, com conferência posterior e suspensão de erros. Essa autorização não equivale a revisão humana independente de cada item.",
   },
 ] as const;
 
@@ -150,17 +149,17 @@ export default function SourcesAndUpdatesPage() {
                 Transparência editorial
               </p>
               <h1 className="mt-4 text-4xl font-semibold tracking-[-0.05em] text-white sm:text-6xl">
-                De onde vêm as leis e as questões da Editalume?
+                De onde vêm as leis e as questões da Edital Lei Seca?
               </h1>
               <p className="mt-6 max-w-4xl text-lg leading-8 text-slate-300">
-                No acervo persistido do quiz, a lei utilizada hoje é a Constituição consolidada no Portal da Legislação da Presidência da República. O monitor acompanha dez fontes federais oficiais e encaminha qualquer nova fotografia à revisão humana. As {DEMO_QUESTIONS.length} questões do beta são originais e assistidas por {DEMO_CONTENT_PROVENANCE.generatorModel}; ainda não existe revisão humana independente registrada. Não há questões anteriores licenciadas nem questões inéditas no estilo de banca publicadas.
+                As preparações usam normas obtidas em fontes oficiais e questões originais assistidas por IA. Cada edição tem programa, cargo e perfil editorial próprios. A disponibilidade aparece no catálogo; referências de provas anteriores apontam para o órgão ou a organizadora quando o arquivo oficial foi conferido. A aprovação automática das inéditas da fábrica é identificada e não representa revisão humana independente de cada item.
               </p>
               <div className="mt-7 flex flex-wrap gap-3 text-xs font-bold">
-                <span className="rounded-full border border-emerald-300/20 bg-emerald-300/8 px-4 py-2 text-emerald-200">1 norma no acervo persistido</span>
-                <span className="rounded-full border border-blue-300/20 bg-blue-300/8 px-4 py-2 text-blue-200">10 fontes federais monitoradas</span>
-                <span className="rounded-full border border-amber-300/20 bg-amber-300/8 px-4 py-2 text-amber-200">{DEMO_QUESTIONS.length} questões assistidas por IA</span>
-                <span className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-slate-300">0 questões anteriores licenciadas</span>
-                <span className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-slate-300">0 questões estilo banca publicadas</span>
+                <span className="rounded-full border border-emerald-300/20 bg-emerald-300/8 px-4 py-2 text-emerald-200">Fontes oficiais e versionadas</span>
+                <span className="rounded-full border border-blue-300/20 bg-blue-300/8 px-4 py-2 text-blue-200">Programa por cargo e edição</span>
+                <span className="rounded-full border border-amber-300/20 bg-amber-300/8 px-4 py-2 text-amber-200">Questões originais assistidas por IA</span>
+                <span className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-slate-300">Provas anteriores: referência oficial</span>
+                <span className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-slate-300">Disponibilidade no catálogo</span>
               </div>
             </div>
           </div>
@@ -169,16 +168,16 @@ export default function SourcesAndUpdatesPage() {
         <div className="mx-auto max-w-6xl space-y-20 px-5 py-16 sm:py-20">
           <section aria-labelledby="inventario-title" className="grid gap-8 lg:grid-cols-[1fr_.85fr]">
             <div>
-              <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-amber-300">Inventário atual</p>
+              <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-amber-300">Demonstração e acervo comercial</p>
               <h2 id="inventario-title" className="mt-3 text-3xl font-semibold tracking-[-0.045em] text-white sm:text-4xl">
-                Acervo persistido e microdemonstrações
+                A demonstração tem escopo próprio
               </h2>
               <div className="mt-6 space-y-5 text-sm leading-7 text-slate-400">
                 <p>
-                  O primeiro recorte é Direito Constitucional: arts. {articleSummary} da Constituição Federal. Cada questão guarda a URL oficial, a data de verificação, a alternativa literal, o tipo de alteração usado nos distratores e a explicação.
+                  A demonstração inicial apresenta um recorte de Direito Constitucional: arts. {articleSummary} da Constituição Federal. Cada questão guarda a URL oficial, a data de verificação, a alternativa literal, o tipo de alteração usado nos distratores e a explicação.
                 </p>
                 <p>
-                  A versão atual foi verificada em <strong className="font-semibold text-slate-200">16 de agosto de 2026</strong>. Essa data não significa que a Editalume substitui o Diário Oficial nem garante que nenhuma mudança tenha ocorrido depois dela; é o marco editorial que permite ao usuário avaliar a atualidade do item.
+                  A fonte desse recorte da demonstração foi verificada em <strong className="font-semibold text-slate-200">16 de agosto de 2026</strong>. Essa data não significa que a Edital Lei Seca substitui o Diário Oficial nem garante que nenhuma mudança tenha ocorrido depois dela; é o marco editorial desse exemplo. Nos produtos, considere a versão e a data de cada item.
                 </p>
                 <p>
                   Separadamente, o laboratório ilustrativo da página inicial contém três microexemplos não persistidos no quiz: Constituição, art. 5º, LIV; Constituição, art. 37, caput; e Código Penal, art. 1º. Esses trechos foram novamente conferidos nas páginas oficiais em 17 de agosto de 2026.
@@ -195,7 +194,7 @@ export default function SourcesAndUpdatesPage() {
                 <span className="grid size-12 place-items-center rounded-2xl bg-emerald-300/10 text-emerald-300">
                   <FileCheck2 aria-hidden="true" className="size-6" />
                 </span>
-                <span className="rounded-full bg-amber-300/10 px-3 py-1 text-xs font-bold text-amber-200">Beta · revisão humana pendente</span>
+                <span className="rounded-full bg-amber-300/10 px-3 py-1 text-xs font-bold text-amber-200">Recorte inicial da demonstração</span>
               </div>
               <dl className="mt-7 space-y-5 text-sm">
                 <div className="border-b border-white/8 pb-4">
@@ -219,7 +218,7 @@ export default function SourcesAndUpdatesPage() {
           </section>
 
           <aside className="rounded-2xl border border-amber-300/20 bg-amber-300/[0.045] p-5 text-sm leading-7 text-amber-100/80">
-            <strong className="text-amber-200">Pendência editorial declarada:</strong> as 12 questões do beta não possuem revisor humano independente registrado. Elas não devem ser apresentadas como conteúdo humano revisado nem usadas para abrir a oferta comercial antes dessa etapa.
+            <strong className="text-amber-200">Pendência editorial declarada:</strong> os {DEMO_QUESTIONS.length} itens do beta inicial não possuem revisão humana independente registrada. Esse recorte não descreve o inventário comercial. As inéditas da fábrica são liberadas pelo processo automático autorizado pelo proprietário em 11 de outubro de 2026, com conferência posterior e suspensão de inconsistências; não são anunciadas como revisão humana independente.
           </aside>
 
           <section aria-labelledby="hierarquia-title">
@@ -246,7 +245,7 @@ export default function SourcesAndUpdatesPage() {
                 },
                 {
                   title: "Normas estaduais e locais",
-                  text: "Assembleia Legislativa, governo e diário oficial do ente responsável. A Editalume não reutiliza automaticamente uma URL federal para outro ente.",
+                  text: "Assembleia Legislativa, governo e diário oficial do ente responsável. A Edital Lei Seca não reutiliza automaticamente uma URL federal para outro ente.",
                   href: null,
                   label: null,
                 },
@@ -258,7 +257,7 @@ export default function SourcesAndUpdatesPage() {
                 },
                 {
                   title: "Editais e conteúdo programático",
-                  text: "O portal oficial do órgão ou da organizadora é validado antes da captura. Somente editais e anexos oficiais podem ser armazenados; cada versão recebe checksum e uma decisão humana auditável, preferencialmente por revisor independente. Exceções do proprietário ficam identificadas. Provas, cadernos e gabaritos permanecem bloqueados.",
+                  text: "O portal oficial do órgão ou da organizadora é validado antes da captura. Somente editais e anexos oficiais podem ser armazenados; cada versão recebe checksum e uma decisão humana auditável, preferencialmente por revisor independente. Exceções do proprietário ficam identificadas. Cadernos e gabaritos podem ser referenciados por links oficiais conferidos; a cópia e a reutilização comercial seguem regras próprias de licença.",
                   href: null,
                   label: null,
                 },
@@ -282,7 +281,7 @@ export default function SourcesAndUpdatesPage() {
             <div className="max-w-4xl">
               <p className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-[0.16em] text-amber-300">
                 <RefreshCcw aria-hidden="true" className="size-4" />
-                Atualização contínua com trava humana
+                Atualização com decisão editorial auditável
               </p>
               <h2 id="atualizacao-title" className="mt-3 text-3xl font-semibold tracking-[-0.045em] text-white sm:text-4xl">
                 Como uma mudança legislativa deve chegar ao aplicativo
@@ -315,21 +314,21 @@ export default function SourcesAndUpdatesPage() {
                 <CheckCircle2 aria-hidden="true" className="size-6 text-emerald-300" />
                 <h3 className="mt-5 text-xl font-semibold text-white">Questões originais de lei seca assistidas por IA</h3>
                 <p className="mt-3 text-sm leading-7 text-slate-400">
-                  A alternativa correta reproduz o trecho oficial; os distratores recebem alterações controladas de palavra, prazo, condição, órgão ou alcance. Há 12 itens desse tipo no beta, ainda pendentes de revisão humana independente.
+                  A alternativa correta reproduz o trecho oficial; os distratores recebem alterações controladas de palavra, prazo, condição, órgão ou alcance. Cada item publicado deve ter fonte e referência conferíveis. O recorte do beta inicial é identificado separadamente dos produtos.
                 </p>
               </article>
               <article className="rounded-[1.5rem] border border-white/9 bg-[#0a1420] p-6">
                 <Scale aria-hidden="true" className="size-6 text-amber-300" />
                 <h3 className="mt-5 text-xl font-semibold text-white">Questões anteriores</h3>
                 <p className="mt-3 text-sm leading-7 text-slate-400">
-                  Hoje há zero. Só entrarão com autorização ou licença documentada, titular identificado, URL de origem, edição, número original e validade do direito de uso. Estar disponível para download não equivale a licença comercial.
+                  Os links oficiais de cadernos e gabaritos são referências para consulta. Incorporar questões anteriores ao treino exige autorização ou licença documentada, titular identificado, origem, edição e validade do direito de uso. Estar disponível para download não equivale a licença comercial.
                 </p>
               </article>
               <article className="rounded-[1.5rem] border border-white/9 bg-[#0a1420] p-6">
                 <Bot aria-hidden="true" className="size-6 text-blue-300" />
                 <h3 className="mt-5 text-xl font-semibold text-white">Questões inéditas no estilo da banca</h3>
                 <p className="mt-3 text-sm leading-7 text-slate-400">
-                  Hoje há zero publicados. A fábrica autoral já registra modelo e versão do processo, compara o enunciado com o acervo interno e exige revisão humana confirmada. A IA pode apoiar um rascunho; não publica diretamente.
+                  A fábrica registra modelo, versão do processo, fonte oficial e perfil de banca e cargo. A linha automática valida, aprova e vincula as inéditas sob autorização do proprietário. A conferência posterior pode suspender erros. A publicação só ocorre quando os controles da preparação são atendidos.
                 </p>
               </article>
             </div>
@@ -348,7 +347,7 @@ export default function SourcesAndUpdatesPage() {
                 A Lei nº 9.610/1998 exclui textos de leis, decretos, regulamentos, decisões judiciais e demais atos oficiais da proteção autoral prevista nessa lei. A mesma norma reserva ao autor os direitos de utilização, reprodução, adaptação, distribuição e inclusão em base de dados de obras protegidas. Por isso, tratamos texto normativo e caderno de prova como categorias distintas.
               </p>
               <p>
-                O Portal da Legislação também possui política própria de reutilização. A fonte, a URL e a data de acesso devem acompanhar o conteúdo. Os trechos exibidos na Editalume são meramente informativos e não oficiais e não substituem a publicação no Diário Oficial da União.
+                O Portal da Legislação também possui política própria de reutilização. A fonte, a URL e a data de acesso devem acompanhar o conteúdo. Os trechos exibidos na Edital Lei Seca são meramente informativos e não oficiais e não substituem a publicação no Diário Oficial da União.
               </p>
               <div className="flex flex-wrap gap-4">
                 <a className="inline-flex items-center gap-2 font-semibold text-amber-300 underline decoration-amber-300/30 underline-offset-4 hover:text-amber-200" href="https://www.planalto.gov.br/ccivil_03/leis/l9610.htm" rel="noreferrer">
@@ -364,7 +363,7 @@ export default function SourcesAndUpdatesPage() {
           </section>
 
           <section aria-labelledby="compromissos-title">
-            <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-amber-300">Padrão antes do lançamento</p>
+            <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-amber-300">Padrão de transparência</p>
             <h2 id="compromissos-title" className="mt-3 text-3xl font-semibold tracking-[-0.045em] text-white">
               O que todo item deverá permitir conferir
             </h2>
@@ -387,7 +386,7 @@ export default function SourcesAndUpdatesPage() {
 
           <GuideCta
             title="Confira a fonte dentro de uma questão real"
-            description="Enquanto a revisão humana estiver pendente, a demonstração pública apresenta somente o funcionamento do método, sem servir questões jurídicas. A liberação do treino exige revisão registrada e fonte oficial vigente."
+            description="Consulte as preparações disponíveis, o programa e as fontes indicadas. Questões, referências de provas anteriores e exemplos da demonstração têm suas próprias informações de origem e aprovação."
           />
         </div>
       </article>

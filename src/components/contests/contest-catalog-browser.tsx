@@ -11,7 +11,7 @@ import styles from "./contest-catalog.module.css";
 const tabs = [
   ["all", "Todas"], ["available", "Disponíveis"], ["new", "Novidades"],
   ["open", "Inscrições abertas"], ["upcoming", "Edital publicado"],
-  ["forecast", "Pré-edital"], ["closed", "Encerrados"], ["planning", "Em planejamento"],
+  ["forecast", "Pré-edital"], ["historical_training", "Treino histórico"], ["closed", "Encerrados"], ["planning", "Em planejamento"],
 ] as const;
 const normalize = (text: string) => text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
@@ -22,7 +22,9 @@ export function ContestCatalogBrowser({ cards }: { cards: ShowcaseCard[] }) {
   const [phase, setPhase] = useState("all");
   const [query, setQuery] = useState("");
   const matchesTab = (card: ShowcaseCard, key: string) => key === "all"
-    || (key === "available" ? card.available : key === "new" ? card.isNew : card.phase === key);
+    || (key === "available" ? card.available : key === "new" ? card.isNew
+      : key === "historical_training" ? card.preparationMode === "historical_training"
+      : key === "forecast" ? card.phase === "forecast" || card.preparationMode === "pre_notice" : card.phase === key);
   const banks = [...new Map(cards.filter((card) => card.bankSlug && card.bankName)
     .map((card) => [card.bankSlug!, card.bankName!])).entries()].sort((a, b) => a[1].localeCompare(b[1], "pt-BR"));
   const matches = cards.filter((card) => matchesTab(card, phase)
@@ -89,11 +91,11 @@ export function ContestCatalogBrowser({ cards }: { cards: ShowcaseCard[] }) {
             <p>{card.jurisdictionCodes.join(" / ")} · {card.edition}</p>
             <div className={styles.cardFacts}>
               <span className={styles.phaseBadge}>{card.phaseLabel}</span>
-              <p>Banca: {card.bankName ?? "a confirmar"}</p>
+              <p>{card.preparationMode && card.preparationMode !== "current_notice" ? "Banca da referência" : "Banca"}: {card.bankName ?? "a confirmar"}</p>
               {card.examDate && <p>Prova: {card.examDate.split("-").reverse().join("/")}</p>}
             </div>
             <p className={card.available ? styles.availableText : ""}>
-              {card.available ? <><BookOpen size={15} aria-hidden="true" /> Preparação disponível</>
+              {card.available ? <><BookOpen size={15} aria-hidden="true" /> {card.preparationMode && card.preparationMode !== "current_notice" ? card.preparationLabel : "Preparação disponível"}</>
                 : card.phase === "closed" ? "Edição encerrada · consulte o histórico"
                 : "Material em preparação"}
             </p>

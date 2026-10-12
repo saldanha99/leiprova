@@ -15,7 +15,7 @@ import { isCommerceOpen, isContactEnabled } from "@/lib/launch";
 import { JsonLd } from "@/components/seo/json-ld";
 import {
   getReviewedContestOpportunity,
-  listReviewedContestOpportunities,
+  getReleasedPreparationBaseOpportunity,
 } from "@/lib/db/contest-opportunities";
 import {
   getApprovedContestExamReference,
@@ -27,6 +27,7 @@ import {
   findExactProductForOpportunityPage,
   singleReleasedProductPath,
 } from "@/lib/commerce/product-page-association";
+import { preparationModeLabels, preparationModeDescriptions, type PreparationMode } from "@/lib/commerce/preparation-mode";
 import { isDatabaseConfigured } from "@/lib/db/client";
 import { getOpportunityJurisdictionBySlug } from "@/lib/opportunities/jurisdictions";
 import { WEBSITE_ID, absoluteUrl } from "@/lib/seo";
@@ -75,6 +76,7 @@ const getPageOpportunity = cache(
         opportunity,
         jurisdiction,
         productSlug: product?.slug,
+        preparationMode: (product?.preparationMode ?? "current_notice") as PreparationMode,
         referenceProductSlug,
       } as const;
     }
@@ -87,15 +89,14 @@ const getPageOpportunity = cache(
       return null;
     const product = released.find((item) => item.slug === opportunitySlug);
     if (!product) return null;
-    const linked = (
-      await listReviewedContestOpportunities({ categorySlug })
-    ).find((item) => item.publicId === product.opportunityPublicId);
+    const linked = await getReleasedPreparationBaseOpportunity(product.slug);
     return linked
       ? ({
           kind: "page",
           opportunity: linked,
           jurisdiction,
           productSlug: product.slug,
+          preparationMode: product.preparationMode as PreparationMode,
           referenceProductSlug: product.slug,
         } as const)
       : null;
@@ -142,8 +143,8 @@ export async function generateMetadata({
     ? catalogContestPath(product)
     : `/concursos/${categoria}/${uf}/${slug}`;
   return {
-    title: `${result.opportunity.title} — lei seca, método e planos`,
-    description: result.opportunity.summary,
+    title: `${result.opportunity.title} — ${preparationModeLabels[result.preparationMode]}`,
+    description: result.preparationMode === "current_notice" ? result.opportunity.summary : preparationModeDescriptions[result.preparationMode],
     alternates: { canonical: path },
     robots: { index: true, follow: true },
     openGraph: {
@@ -151,12 +152,12 @@ export async function generateMetadata({
       url: path,
       title: result.opportunity.title,
       description: result.opportunity.summary,
-      siteName: "Editalume",
+      siteName: "Edital Lei Seca",
       locale: "pt_BR",
       images: [
         {
           url: "/assets/contests/editorial-study-v2.webp",
-          alt: "Editalume — uma rotina de leitura, prática e revisão de lei seca",
+          alt: "Edital Lei Seca — uma rotina de leitura, prática e revisão de lei seca",
         },
       ],
     },
@@ -264,6 +265,7 @@ export default async function ContestOpportunityPage({
         previousExamWaiverReason={previousExamWaiverReason}
         productSlug={result.productSlug}
         productAvailable={Boolean(result.productSlug)}
+        preparationMode={result.preparationMode}
       />
     </PublicGuideShell>
   );

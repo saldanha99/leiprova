@@ -3,8 +3,11 @@ import type { MetadataRoute } from "next";
 import { absoluteUrl } from "@/lib/seo";
 
 const PRIVATE_PATHS = [
+  "/app$",
   "/app/",
+  "/admin$",
   "/admin/",
+  "/api$",
   "/api/",
 ];
 

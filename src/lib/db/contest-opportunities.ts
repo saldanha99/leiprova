@@ -6,6 +6,7 @@ import { alias } from "drizzle-orm/pg-core";
 import { getDb } from "@/lib/db/client";
 import {
   contestCategories,
+  contestStoreProducts,
   contestOpportunities,
   opportunityOrganizerAssignments,
   quizBanks,
@@ -277,4 +278,27 @@ export async function getReviewedContestOpportunity(input: {
     if (isOpportunityCatalogNotMigrated(error)) return null;
     throw error;
   }
+}
+
+/** Edição de referência de um produto explicitamente liberado. Não expõe
+ * editais históricos arbitrários como oportunidades atuais. A elegibilidade da
+ * oferta é conferida por listReleasedContestProducts antes desta consulta. */
+export async function getReleasedPreparationBaseOpportunity(productSlug: string) {
+  const [opportunity] = await getDb()
+    .select(publicOpportunitySelection)
+    .from(contestOpportunities)
+    .innerJoin(contestStoreProducts, and(
+      eq(contestStoreProducts.opportunityId, contestOpportunities.id),
+      eq(contestStoreProducts.slug, productSlug),
+      eq(contestStoreProducts.status, "released"),
+    ))
+    .innerJoin(contestCategories, eq(contestOpportunities.categoryId, contestCategories.id))
+    .innerJoin(quizCareerTracks, eq(contestOpportunities.careerTrackId, quizCareerTracks.id))
+    .leftJoin(primaryAssignments, and(eq(primaryAssignments.opportunityId, contestOpportunities.id), currentPrimaryResponsibleJoin))
+    .leftJoin(examinationProviderAssignments, and(eq(examinationProviderAssignments.opportunityId, contestOpportunities.id), currentExaminationProviderJoin))
+    .leftJoin(primaryBanks, eq(primaryAssignments.quizBankId, primaryBanks.id))
+    .leftJoin(examinationProviderBanks, eq(examinationProviderAssignments.quizBankId, examinationProviderBanks.id))
+    .where(eq(contestOpportunities.editorialStatus, "reviewed"))
+    .limit(1);
+  return opportunity ?? null;
 }

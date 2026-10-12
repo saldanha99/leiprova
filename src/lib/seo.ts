@@ -7,12 +7,12 @@ export const SITE_URL = (
 
 export const ORGANIZATION_ID = `${SITE_URL}/#organization`;
 export const WEBSITE_ID = `${SITE_URL}/#website`;
-export const SOCIAL_IMAGE_PATH = "/assets/leiprova-ecosystem.png";
+export const SOCIAL_IMAGE_PATH = "/brand/edital-lei-seca-social.png";
 export const SOCIAL_IMAGE = {
   url: SOCIAL_IMAGE_PATH,
-  width: 1586,
-  height: 992,
-  alt: `Interface de estudo da ${BRAND_NAME} em notebook, tablet e celular`,
+  width: 1200,
+  height: 630,
+  alt: `${BRAND_NAME} — lei seca guiada pelo edital`,
 } as const;
 
 export function absoluteUrl(path = "/") {
@@ -33,9 +33,9 @@ export const siteIdentityGraph = {
       url: absoluteUrl(),
       logo: {
         "@type": "ImageObject",
-        url: absoluteUrl("/brand/editalume-logo.png"),
-        width: 1774,
-        height: 887,
+        url: absoluteUrl("/brand/edital-lei-seca-logo.png"),
+        width: 1200,
+        height: 400,
       },
       description:
         "Plataforma educacional de treino ativo da literalidade de normas para concursos públicos.",

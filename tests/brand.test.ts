@@ -21,9 +21,9 @@ afterEach(() => {
   vi.unstubAllEnvs();
 });
 
-describe("identidade pública da Editalume", () => {
+describe("identidade pública da Edital Lei Seca", () => {
   it("mantém metadados e dados estruturados alinhados sem antecipar um domínio novo", () => {
-    expect(BRAND_NAME).toBe("Editalume");
+    expect(BRAND_NAME).toBe("Edital Lei Seca");
     expect(SITE_NAME).toBe(BRAND_NAME);
     expect(SITE_URL).toBe("https://leiprova.2b.app.br");
     expect(metadata.title).toEqual({
@@ -48,8 +48,8 @@ describe("identidade pública da Editalume", () => {
       start_url: "/app",
       display: "standalone",
       icons: [
-        { src: "/brand/editalume-icon-192.png" },
-        { src: "/brand/editalume-icon-512.png" },
+        { src: "/brand/edital-lei-seca-icon-192.png" },
+        { src: "/brand/edital-lei-seca-icon-512.png" },
       ],
     });
   });
@@ -58,23 +58,23 @@ describe("identidade pública da Editalume", () => {
     const platformLogo = renderToStaticMarkup(createElement(LeiProvaMark, { href: "/app" }));
     const landingLogo = renderToStaticMarkup(createElement(BrandMark));
 
-    expect(platformLogo).toContain('aria-label="Editalume — página inicial"');
+    expect(platformLogo).toContain('aria-label="Edital Lei Seca — página inicial"');
     expect(platformLogo).toContain('href="/app"');
-    expect(landingLogo).toContain('aria-label="Editalume — ir para o início"');
+    expect(landingLogo).toContain('aria-label="Edital Lei Seca — ir para o início"');
     for (const html of [platformLogo, landingLogo]) {
       expect(html).toContain(BRAND_TAGLINE.toLowerCase());
       expect(html).not.toMatch(/Lei\s*Prova/i);
     }
   });
 
-  it.each([true, false])("usa Editalume no e-mail de acesso (compra: %s), preservando o link", (purchase) => {
+  it.each([true, false])("usa Edital Lei Seca no e-mail de acesso (compra: %s), preservando o link", (purchase) => {
     const accessUrl = "https://leiprova.2b.app.br/ativar?token=ficticio";
     const email = buildAccountAccessEmail({ name: "Ana", accessUrl, purchase });
 
     expect(email.subject).toContain(BRAND_NAME);
     expect(email.text).toContain(BRAND_NAME);
     expect(email.text).toContain(accessUrl);
-    expect(email.html).toContain('alt="Editalume"');
+    expect(email.html).toContain('alt="Edital Lei Seca"');
     expect(email.html).toContain(`href="${accessUrl}"`);
     expect(email.html).toContain(BRAND_TAGLINE);
     expect(email.subject).not.toMatch(/Lei\s*Prova/i);
@@ -83,12 +83,14 @@ describe("identidade pública da Editalume", () => {
 
 describe("remetente com configuração legada", () => {
   it.each([
-    ["LeiProva <acesso@leiprova.example>", "Editalume <acesso@leiprova.example>"],
-    ["Lei Prova <acesso@example.com>", "Editalume <acesso@example.com>"],
-    ["leiprova Privacidade <lgpd@example.com>", "Editalume Privacidade <lgpd@example.com>"],
-    ['"LeiProva" <acesso@example.com>', '"Editalume" <acesso@example.com>'],
-    [' "Lei Prova Privacidade" <lgpd@example.com>', ' "Editalume Privacidade" <lgpd@example.com>'],
-    ["LeiProva<acesso@example.com>", "Editalume<acesso@example.com>"],
+    ["LeiProva <acesso@leiprova.example>", "Edital Lei Seca <acesso@leiprova.example>"],
+    ["Lei Prova <acesso@example.com>", "Edital Lei Seca <acesso@example.com>"],
+    ["leiprova Privacidade <lgpd@example.com>", "Edital Lei Seca Privacidade <lgpd@example.com>"],
+    ['"LeiProva" <acesso@example.com>', '"Edital Lei Seca" <acesso@example.com>'],
+    [' "Lei Prova Privacidade" <lgpd@example.com>', ' "Edital Lei Seca Privacidade" <lgpd@example.com>'],
+    ["LeiProva<acesso@example.com>", "Edital Lei Seca<acesso@example.com>"],
+    ["Editalume <acesso@example.com>", "Edital Lei Seca <acesso@example.com>"],
+    ['"Editalume Privacidade" <lgpd@example.com>', '"Edital Lei Seca Privacidade" <lgpd@example.com>'],
   ])("atualiza somente o nome de exibição de %s", (from, expected) => {
     expect(normalizeBrandEmailSender(from)).toBe(expected);
   });
@@ -97,7 +99,7 @@ describe("remetente com configuração legada", () => {
     "acesso@leiprova.example",
     "leiprova@example.com",
     "<leiprova@example.com>",
-    "Editalume <leiprova@example.com>",
+    "Edital Lei Seca <leiprova@example.com>",
     "Outra marca <leiprova@example.com>",
     "LeiProvaOutraMarca <acesso@example.com>",
     "Equipe LeiProva <acesso@example.com>",
@@ -115,10 +117,10 @@ describe("remetente com configuração legada", () => {
     );
     vi.stubGlobal("fetch", fetchMock);
 
-    expect(getTransactionalEmailConfig()?.from).toBe("Editalume <acesso@leiprova.example>");
+    expect(getTransactionalEmailConfig()?.from).toBe("Edital Lei Seca <acesso@leiprova.example>");
     await sendTransactionalEmail({
       to: "estudante@example.com",
-      subject: "Editalume",
+      subject: "Edital Lei Seca",
       html: "<p>Acesso de teste</p>",
       text: "Acesso de teste",
       idempotencyKey: "account-access/brand-test",
@@ -127,7 +129,7 @@ describe("remetente com configuração legada", () => {
     expect(fetchMock).toHaveBeenCalledOnce();
     const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
     expect(url).toBe("https://api.resend.com/emails");
-    expect(JSON.parse(String(init.body)).from).toBe("Editalume <acesso@leiprova.example>");
+    expect(JSON.parse(String(init.body)).from).toBe("Edital Lei Seca <acesso@leiprova.example>");
     expect(process.env.TRANSACTIONAL_EMAIL_FROM).toBe(originalFrom);
   });
 });

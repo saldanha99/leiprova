@@ -1,3 +1,5 @@
+import { isAuthorizedProductionOrigin } from "../src/lib/deployment-origin";
+
 import { createHash } from "node:crypto";
 
 import { sql } from "drizzle-orm";
@@ -43,7 +45,7 @@ function requireTarget(productSlug: string) {
   const connectionString = process.env.LEIPROVA_BINDING_REVIEW_DATABASE_URL;
   if (!connectionString) throw new ProductBindingReviewError("Defina LEIPROVA_BINDING_REVIEW_DATABASE_URL.");
   const target = new URL(connectionString);
-  const production = process.env.NODE_ENV === "production" && process.env.APP_URL === "https://leiprova.2b.app.br" &&
+  const production = process.env.NODE_ENV === "production" && isAuthorizedProductionOrigin(process.env.APP_URL) &&
     process.env.LEIPROVA_BINDING_REVIEW_APPROVED === `review-bindings:${productSlug}` &&
     ["leiprova-pooler", "pooler"].includes(target.hostname) && (!target.port || target.port === "5432") &&
     target.pathname === "/leiprova" && target.username === "leiprova_app";

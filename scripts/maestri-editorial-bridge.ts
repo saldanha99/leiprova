@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { constants } from "node:fs";
+import { constants, lstatSync, readFileSync } from "node:fs";
 import { mkdir, open, realpath, writeFile, lstat, readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -32,9 +32,24 @@ const claimSchema=z.object({state:z.literal("claimed"),agent:z.string(),job:z.ob
   leaseToken:z.uuid(),leaseExpiresAt:z.string(),
 })});
 
+// Destino privado e delimitado da ponte; a migração não muda os aliases de
+// outros projetos nem permite executar comandos contra hosts arbitrários.
+function bridgeHost() {
+  const config = path.join(root, ".local/maestri/remote-target.json");
+  try {
+    const info = lstatSync(config);
+    if (!info.isFile() || info.isSymbolicLink() || info.size > 4096) throw new Error("Arquivo de destino inválido.");
+    return z.object({ sshHost: z.enum(["wisewolf-vps", "everglades-vps"]) }).strict()
+      .parse(JSON.parse(readFileSync(config, "utf8"))).sshHost;
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") return "wisewolf-vps";
+    throw new Error("Arquivo de destino inválido.");
+  }
+}
+
 function remote(mode:"claim"|"complete"|"status",input?:unknown,agent?:string) {
   if(agent && !["Radar","Guardião","Autor"].includes(agent)) throw new Error("Papel incompatível.");
-  const child=spawnSync("ssh",["-o","BatchMode=yes","-o","ConnectTimeout=10","wisewolf-vps",
+  const child=spawnSync("ssh",["-o","BatchMode=yes","-o","ConnectTimeout=10",bridgeHost(),
     `docker exec ${input===undefined?"":"-i "}leiprova-editorial-automation ./node_modules/.bin/tsx --env-file-if-exists=.env scripts/editorial-agent-work.ts --mode=${mode}${agent?` --agent=${agent}`:""}`],
   {encoding:"utf8",timeout:120000,maxBuffer:1048576,input:input===undefined?undefined:JSON.stringify(input)});
   if(child.status!==0) throw new Error("Ponte indisponível: verifique SSH e worker. Não fazer fallback pago.");

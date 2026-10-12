@@ -51,7 +51,7 @@ export default async function ReviewMapsPage({ searchParams }: { searchParams: S
         <section className="mt-8 rounded-[1.75rem] border border-dashed border-white/10 bg-[#09131f] p-10 text-center">
           <BrainCircuit className="mx-auto size-8 text-slate-600" />
           <h2 className="mt-4 font-semibold">Nenhum mapa disponível neste acesso</h2>
-          <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-slate-500">A Editalume não cria resumos jurídicos sem fonte e revisão. Assim que um conjunto de artigos for liberado, o mapa passa a ser montado a partir dele.</p>
+          <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-slate-500">A Edital Lei Seca não cria resumos jurídicos sem fonte e revisão. Assim que um conjunto de artigos for liberado, o mapa passa a ser montado a partir dele.</p>
         </section>
       </main>
     );

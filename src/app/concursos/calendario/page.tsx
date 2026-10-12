@@ -35,7 +35,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     url: PAGE_PATH,
-    title: `${PAGE_TITLE} | Editalume`,
+    title: `${PAGE_TITLE} | Edital Lei Seca`,
     description: PAGE_DESCRIPTION,
   },
 };

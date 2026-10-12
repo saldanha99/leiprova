@@ -11,6 +11,7 @@ import { ContestCatalogBrowser } from "@/components/contests/contest-catalog-bro
 import { isDatabaseConfigured } from "@/lib/db/client";
 import { listContestCalendarOpportunities } from "@/lib/db/contest-opportunities";
 import { listReleasedContestProducts } from "@/lib/commerce/store";
+import type { PreparationMode } from "@/lib/commerce/preparation-mode";
 import { buildContestShowcase } from "@/lib/commerce/contest-showcase";
 import { saoPauloCalendarDate } from "@/lib/opportunities/catalog-policy";
 import { createPublicWebPageStructuredData } from "@/lib/seo/page-structured-data";
@@ -18,7 +19,7 @@ import { createPublicWebPageStructuredData } from "@/lib/seo/page-structured-dat
 const PAGE_PATH = "/concursos";
 const PAGE_TITLE = "Concursos organizados por categoria, estado e edição";
 const PAGE_DESCRIPTION =
-  "Encontre preparações de lei seca por carreira, banca e estado. Acompanhe novidades, inscrições abertas, pré-editais e provas realizadas na Editalume.";
+  "Encontre preparações de lei seca por carreira, banca e estado. Acompanhe novidades, inscrições abertas, pré-editais e provas realizadas na Edital Lei Seca.";
 
 export const metadata: Metadata = {
   title: PAGE_TITLE,
@@ -27,22 +28,22 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     url: PAGE_PATH,
-    title: `${PAGE_TITLE} | Editalume`,
+    title: `${PAGE_TITLE} | Edital Lei Seca`,
     description: PAGE_DESCRIPTION,
     images: [
       {
-        url: "/assets/leiprova-ecosystem.png",
-        width: 1586,
-        height: 992,
-        alt: "Interface de estudo da Editalume em notebook, tablet e celular",
+        url: "/brand/edital-lei-seca-social.png",
+        width: 1200,
+        height: 630,
+        alt: "Edital Lei Seca — lei seca guiada pelo edital",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: `${PAGE_TITLE} | Editalume`,
+    title: `${PAGE_TITLE} | Edital Lei Seca`,
     description: PAGE_DESCRIPTION,
-    images: ["/assets/leiprova-ecosystem.png"],
+    images: ["/brand/edital-lei-seca-social.png"],
   },
 };
 
@@ -68,7 +69,8 @@ export default async function ContestsPage() {
   const [opportunities, released] = isDatabaseConfigured()
     ? await Promise.all([listContestCalendarOpportunities(referenceDate), listReleasedContestProducts()])
     : [[], []];
-  const cards = buildContestShowcase(opportunities, released.map((item) => item.slug), saoPauloCalendarDate(referenceDate));
+  const cards = buildContestShowcase(opportunities, released.map((item) => item.slug), saoPauloCalendarDate(referenceDate),
+    Object.fromEntries(released.map((item) => [item.slug, item.preparationMode as PreparationMode])));
 
   return (
     <PublicGuideShell>

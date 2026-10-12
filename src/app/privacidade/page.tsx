@@ -9,18 +9,18 @@ import { SOCIAL_IMAGE, SOCIAL_IMAGE_PATH } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Política de Privacidade",
-  description: "Dados tratados, finalidades, segurança e direitos dos titulares na Editalume.",
+  description: "Dados tratados, finalidades, segurança e direitos dos titulares na Edital Lei Seca.",
   alternates: { canonical: "/privacidade" },
   openGraph: {
     url: "/privacidade",
-    title: "Política de Privacidade | Editalume",
-    description: "Dados tratados, finalidades, segurança e direitos dos titulares na Editalume.",
+    title: "Política de Privacidade | Edital Lei Seca",
+    description: "Dados tratados, finalidades, segurança e direitos dos titulares na Edital Lei Seca.",
     images: [SOCIAL_IMAGE],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Política de Privacidade | Editalume",
-    description: "Dados tratados, finalidades, segurança e direitos dos titulares na Editalume.",
+    title: "Política de Privacidade | Edital Lei Seca",
+    description: "Dados tratados, finalidades, segurança e direitos dos titulares na Edital Lei Seca.",
     images: [SOCIAL_IMAGE_PATH],
   },
 };

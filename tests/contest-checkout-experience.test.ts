@@ -114,7 +114,7 @@ describe("checkout editorial, explícito e personalizável", () => {
       expect($(`a[href='${href}']`).length).toBeGreaterThan(0);
     expect($("details")).toHaveLength(3);
     expect($.text()).toContain(
-      "A Editalume não recebe os dados completos do seu cartão",
+      "A Edital Lei Seca não recebe os dados completos do seu cartão",
     );
     expect($.text()).toContain(
       "Não há promessa de aprovação ou cobertura integral do edital",

@@ -29,16 +29,16 @@ describe("separação Stripe teste/produção", () => {
       ),
     ).toBe(true);
   });
-  it("domínio público recusa teste mesmo explicitamente", () => {
+  it.each(["https://leiprova.2b.app.br", "https://editaleiseca.com.br", "https://www.editaleiseca.com.br"])("domínio público %s recusa teste mesmo explicitamente", (origin) => {
     expect(
       expectedStripeMode({
-        APP_URL: "https://leiprova.2b.app.br",
+        APP_URL: origin,
         STRIPE_PAYMENTS_MODE: "test",
       }),
     ).toBeNull();
     expect(
       expectedStripeMode({
-        NEXT_PUBLIC_APP_URL: "https://leiprova.2b.app.br",
+        NEXT_PUBLIC_APP_URL: origin,
         STRIPE_PAYMENTS_MODE: "test",
       }),
     ).toBeNull();
@@ -85,6 +85,13 @@ describe("separação Stripe teste/produção", () => {
       expect(() =>
         validateStripeSyncTarget({ ...live, [missing]: undefined }),
       ).toThrow();
+  });
+  it("permite a nova origem exata sem aceitar aliases ou afrouxar banco e conta", () => {
+    expect(validateStripeSyncTarget({ ...live, appUrl: "https://editaleiseca.com.br" }).mode).toBe("live");
+    for (const appUrl of ["http://editaleiseca.com.br", "https://www.editaleiseca.com.br",
+      "https://editaleiseca.com.br/", "https://editaleiseca.com.br.evil.invalid", "https://homolog.leiprova.2b.app.br"]) {
+      expect(() => validateStripeSyncTarget({ ...live, appUrl })).toThrow();
+    }
   });
   it("recusa segredo test em live e banco de outro projeto", () => {
     expect(() =>

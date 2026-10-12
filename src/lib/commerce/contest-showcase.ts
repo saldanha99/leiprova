@@ -1,3 +1,4 @@
+import { preparationModeLabels, type PreparationMode } from "./preparation-mode";
 import { CONTEST_CATALOG, catalogContestPath } from "./catalog";
 import { contestCalendarPhase, daysUntil, isTerminalLifecycleStatus, type CalendarDates } from "../opportunities/calendar";
 import { saoPauloCalendarDate } from "../opportunities/catalog-policy";
@@ -33,6 +34,8 @@ export type ShowcaseCard = {
   available: boolean;
   href: string;
   examDate: string | null;
+  preparationMode?: PreparationMode;
+  preparationLabel?: string;
 };
 
 const labels: Record<ShowcasePhase, string> = {
@@ -47,6 +50,7 @@ export function buildContestShowcase(
   opportunities: readonly ShowcaseOpportunity[],
   releasedSlugs: readonly string[],
   todayIso: string,
+  releasedModes: Readonly<Record<string, PreparationMode>> = {},
 ): ShowcaseCard[] {
   const released = new Set(releasedSlugs);
   const eligible = opportunities.filter((item) => contestCalendarPhase(item, todayIso));
@@ -75,12 +79,20 @@ export function buildContestShowcase(
   const cards: ShowcaseCard[] = CONTEST_CATALOG.map((contest) => {
     const item = byProduct.get(contest.slug);
     const facts = evidence(item);
+    const preparationMode = releasedModes[contest.slug] ?? "current_notice";
+    const referenceBased = preparationMode !== "current_notice" && released.has(contest.slug);
     return {
       slug: contest.slug, acronym: contest.acronym, role: contest.role,
       edition: contest.editionLabel, categorySlug: contest.categorySlug,
       jurisdictionCodes: [...contest.jurisdictionCodes], ...facts,
-      available: facts.phase !== "closed" && released.has(contest.slug),
-      href: facts.phase === "closed" ? "/concursos/calendario#calendario-closed" : catalogContestPath(contest),
+      preparationMode, preparationLabel: preparationModeLabels[preparationMode],
+      ...(referenceBased ? {
+        phase: preparationMode === "historical_training" ? "closed" as const : "planning" as const,
+        phaseLabel: preparationMode === "historical_training" ? "Prova realizada" : "Pré-edital · programa de referência",
+        isNew: false,
+      } : {}),
+      available: referenceBased || (facts.phase !== "closed" && released.has(contest.slug)),
+      href: !referenceBased && facts.phase === "closed" ? "/concursos/calendario#calendario-closed" : catalogContestPath(contest),
     };
   });
   for (const item of eligible) {

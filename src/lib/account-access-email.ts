@@ -25,7 +25,7 @@ export function buildAccountAccessEmail({
   const safeName = escapeHtml(firstName);
   const safeUrl = escapeHtml(accessUrl);
   const safeLogoUrl = escapeHtml(
-    new URL("/brand/editalume-icon-180.png", accessUrl).toString(),
+    new URL("/brand/edital-lei-seca-icon-180.png", accessUrl).toString(),
   );
   const intro = purchase
     ? `Seu pagamento foi confirmado e o acesso à ${BRAND_NAME} já está liberado.`

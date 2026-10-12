@@ -13,8 +13,8 @@ export default function manifest(): MetadataRoute.Manifest {
     theme_color: "#060b13",
     lang: "pt-BR",
     icons: [
-      { src: "/brand/editalume-icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
-      { src: "/brand/editalume-icon-512.png", sizes: "512x512", type: "image/png", purpose: "any" },
+      { src: "/brand/edital-lei-seca-icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
+      { src: "/brand/edital-lei-seca-icon-512.png", sizes: "512x512", type: "image/png", purpose: "any" },
     ],
   };
 }

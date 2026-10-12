@@ -8,41 +8,41 @@ import { listReleasedContestProducts } from "@/lib/commerce/store";
 import { catalogContestPath, getCatalogContest } from "@/lib/commerce/catalog";
 
 const PUBLIC_PAGES = [
-  { path: "/", lastModified: "2026-08-17", changeFrequency: "weekly", priority: 1 },
+  { path: "/", lastModified: "2026-10-11", changeFrequency: "weekly", priority: 1 },
   {
     path: "/como-memorizar-lei-seca",
-    lastModified: "2026-08-17",
+    lastModified: "2026-10-11",
     changeFrequency: "monthly",
     priority: 0.9,
   },
   {
     path: "/fontes-e-atualizacao",
-    lastModified: "2026-08-17",
+    lastModified: "2026-10-11",
     changeFrequency: "monthly",
     priority: 0.9,
   },
   {
     path: "/concursos",
-    lastModified: "2026-09-01",
+    lastModified: "2026-10-11",
     changeFrequency: "weekly",
     priority: 0.9,
   },
   {
     path: "/concursos/calendario",
-    lastModified: "2026-09-28",
+    lastModified: "2026-10-11",
     changeFrequency: "daily",
     priority: 0.8,
   },
   {
     path: "/metodologia",
-    lastModified: "2026-09-01",
+    lastModified: "2026-10-11",
     changeFrequency: "monthly",
     priority: 0.8,
   },
-  { path: "/demo", lastModified: "2026-08-17", changeFrequency: "monthly", priority: 0.8 },
-  { path: "/termos", lastModified: "2026-08-16", changeFrequency: "yearly", priority: 0.2 },
-  { path: "/privacidade", lastModified: "2026-08-16", changeFrequency: "yearly", priority: 0.2 },
-  { path: "/reembolso", lastModified: "2026-08-16", changeFrequency: "yearly", priority: 0.2 },
+  { path: "/demo", lastModified: "2026-10-11", changeFrequency: "monthly", priority: 0.8 },
+  { path: "/termos", lastModified: "2026-10-11", changeFrequency: "yearly", priority: 0.2 },
+  { path: "/privacidade", lastModified: "2026-10-11", changeFrequency: "yearly", priority: 0.2 },
+  { path: "/reembolso", lastModified: "2026-10-11", changeFrequency: "yearly", priority: 0.2 },
 ] as const;
 
 export const dynamic = "force-dynamic";
@@ -79,5 +79,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ];
   });
 
-  return [...staticEntries, ...opportunityEntries];
+  return [...new Map([...staticEntries, ...opportunityEntries].map((entry) => [entry.url, entry])).values()];
 }

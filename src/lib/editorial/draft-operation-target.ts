@@ -1,3 +1,5 @@
+import { isAuthorizedProductionOrigin } from "../deployment-origin";
+
 import { importFingerprint, LocalImportError } from "./local-import-plan";
 import { requireLocalImportTarget } from "./local-import-target";
 
@@ -15,9 +17,9 @@ export function requireDraftOperationTarget(connectionString: string | undefined
 }) {
   if (environment.nodeEnv !== "production") return requireLocalImportTarget(connectionString);
   if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/u.test(environment.sourceBundleId) ||
-      environment.appUrl !== "https://leiprova.2b.app.br" ||
+      !isAuthorizedProductionOrigin(environment.appUrl) ||
       environment.approval !== `draft-only:${environment.sourceBundleId}` || !connectionString) {
-    throw new LocalImportError("Habilite explicitamente a importação somente de rascunhos para este pacote da Editalume.");
+    throw new LocalImportError("Habilite explicitamente a importação somente de rascunhos para este pacote da Edital Lei Seca.");
   }
   let target: URL;
   try { target = new URL(connectionString); } catch { throw new LocalImportError("Destino de rascunhos inválido."); }
@@ -25,7 +27,7 @@ export function requireDraftOperationTarget(connectionString: string | undefined
       !["leiprova-pooler", "pooler"].includes(target.hostname) ||
       (target.port && target.port !== "5432") || target.pathname !== "/leiprova" ||
       target.username !== "leiprova_app" || target.search || target.hash) {
-    throw new LocalImportError("Exige pooler interno, banco exclusivo da Editalume e papel restrito, sem redirecionamento.");
+    throw new LocalImportError("Exige pooler interno, banco exclusivo da Edital Lei Seca e papel restrito, sem redirecionamento.");
   }
   return { connectionString, database: "leiprova" };
 }

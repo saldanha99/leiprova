@@ -68,14 +68,16 @@ services:
     build:
       context: .
       target: runner
+      args:
+        NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-https://leiprova.2b.app.br}
     container_name: leiprova-app
     restart: unless-stopped
     cpus: 1.5
     mem_limit: 1g
     environment:
       NODE_ENV: production
-      APP_URL: https://leiprova.2b.app.br
-      NEXT_PUBLIC_APP_URL: https://leiprova.2b.app.br
+      APP_URL: ${APP_URL:-https://leiprova.2b.app.br}
+      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-https://leiprova.2b.app.br}
       DATABASE_URL: postgresql://${APP_DB_USER:-leiprova_app}:${APP_DB_PASSWORD}@pooler:5432/${POSTGRES_DB:-leiprova}
       DATABASE_POOL_SIZE: 10
       AUTH_COOKIE_NAME: leiprova_session
@@ -158,7 +160,7 @@ services:
       - exec env NODE_PATH=./node_modules/next/dist/compiled node --conditions=react-server --import tsx --env-file-if-exists=.env scripts/run-purchase-delivery.ts --run --loop --limit=10
     environment:
       NODE_ENV: production
-      APP_URL: https://leiprova.2b.app.br
+      APP_URL: ${APP_URL:-https://leiprova.2b.app.br}
       DATABASE_URL: postgresql://${APP_DB_USER:-leiprova_app}:${APP_DB_PASSWORD}@pooler:5432/${POSTGRES_DB:-leiprova}
       DATABASE_POOL_SIZE: 2
       PURCHASE_DELIVERY_ENABLED: ${PURCHASE_DELIVERY_ENABLED:-false}
@@ -294,7 +296,7 @@ services:
     command: ["pnpm", "editorial:operate", "--phase=import-preview"]
     environment:
       NODE_ENV: production
-      APP_URL: https://leiprova.2b.app.br
+      APP_URL: ${APP_URL:-https://leiprova.2b.app.br}
       LEIPROVA_EDITORIAL_OPERATION_DATABASE_URL: postgresql://${APP_DB_USER:-leiprova_app}:${APP_DB_PASSWORD}@leiprova-pooler:5432/${POSTGRES_DB:-leiprova}
       LEIPROVA_EDITORIAL_OPERATION_APPROVED: ${LEIPROVA_EDITORIAL_OPERATION_APPROVED:-}
     volumes:
@@ -320,7 +322,7 @@ services:
     command: ["pnpm", "editorial:drafts:import", "--mode=preview"]
     environment:
       NODE_ENV: production
-      APP_URL: https://leiprova.2b.app.br
+      APP_URL: ${APP_URL:-https://leiprova.2b.app.br}
       LEIPROVA_DRAFT_IMPORT_DATABASE_URL: postgresql://${APP_DB_USER:-leiprova_app}:${APP_DB_PASSWORD}@leiprova-pooler:5432/${POSTGRES_DB:-leiprova}
       LEIPROVA_DRAFT_IMPORT_APPROVED: ${LEIPROVA_DRAFT_IMPORT_APPROVED:-}
     volumes:
@@ -346,7 +348,7 @@ services:
     command: ["pnpm", "editorial:review:80", "--mode=preview"]
     environment:
       NODE_ENV: production
-      APP_URL: https://leiprova.2b.app.br
+      APP_URL: ${APP_URL:-https://leiprova.2b.app.br}
       LEIPROVA_REVIEW_80_DATABASE_URL: postgresql://${APP_DB_USER:-leiprova_app}:${APP_DB_PASSWORD}@leiprova-pooler:5432/${POSTGRES_DB:-leiprova}
       LEIPROVA_REVIEW_80_APPROVED: ${LEIPROVA_REVIEW_80_APPROVED:-}
     volumes:
@@ -368,7 +370,7 @@ services:
     command: ["pnpm", "editorial:bindings:import", "--mode=preview"]
     environment:
       NODE_ENV: production
-      APP_URL: https://leiprova.2b.app.br
+      APP_URL: ${APP_URL:-https://leiprova.2b.app.br}
       LEIPROVA_BINDING_DATABASE_URL: postgresql://${APP_DB_USER:-leiprova_app}:${APP_DB_PASSWORD}@leiprova-pooler:5432/${POSTGRES_DB:-leiprova}
       LEIPROVA_BINDING_IMPORT_APPROVED: ${LEIPROVA_BINDING_IMPORT_APPROVED:-}
     volumes:
@@ -391,4 +393,4 @@ networks:
     internal: true
   edge:
     external: true
-    name: forza
+    name: ${LEIPROVA_EDGE_NETWORK:-forza}

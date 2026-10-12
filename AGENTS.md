@@ -8,19 +8,21 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 <!-- END:nextjs-agent-rules -->
 
-# Editalume
+# Edital Lei Seca
 
 SaaS de memorização da literalidade da lei para concursos e OAB.
 Next.js 16, React 19, Tailwind 4, PostgreSQL 17 com Drizzle, Stripe, Docker + Traefik.
 
-**Marca atual: Editalume.** Use esse nome na comunicação, nos novos materiais e
-nas tarefas do time. Leia `docs/MARCA-EDITALUME.md` para distinguir a marca dos
-identificadores técnicos legados. `leiprova` continua sendo o nome do repositório,
-da pasta, do banco e dos recursos técnicos existentes; não os renomeie por uma
-troca de marca. Os domínios atuais continuam `leiprova.2b.app.br` e
-`homolog.leiprova.2b.app.br`. O domínio definitivo da Editalume ainda não foi
-comprado e sua extensão não está definida nesta orientação; não invente endereço
-nem altere DNS, redirecionamentos, e-mails ou webhooks para um domínio futuro.
+**Marca atual: Edital Lei Seca**, decidida pelo proprietário em 11/10/2026.
+Domínio adquirido e autorizado: `editaleiseca.com.br`. Leia
+`docs/MARCA-EDITALUME.md` para o histórico e a transição. `leiprova` permanece
+nome técnico do repositório, banco e recursos; não os renomeie pela marca.
+O proprietário autorizou migrar para a VPS do Everglades e configurar o domínio,
+DNS e Stripe pelo perfil conectado. A mudança de DNS só ocorre após validar a
+aplicação e o banco na VPS de destino, com backup e retorno definidos.
+As URLs legadas `leiprova.2b.app.br` e `homolog.leiprova.2b.app.br` permanecem
+registradas para transição e homologação; não apagar dados ou recursos de
+outros projetos. Nova autonomia não equivale a revisão humana de conteúdo jurídico.
 
 **Leia `docs/OPERACAO.md` antes de mexer em deploy, banco ou feature flags.**
 Ele cobre onde o projeto está hospedado, como publicar, como subir o ambiente

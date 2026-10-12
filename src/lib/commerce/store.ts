@@ -5,11 +5,15 @@ import { getDb } from "@/lib/db/client";
 import {
   contestStoreProducts,
   contestOpportunities,
+  contestCategories,
 } from "@/lib/db/schema";
 import { listReviewedContestOpportunities } from "@/lib/db/contest-opportunities";
 import { getCatalogContest } from "./catalog";
 import { minimumCourseContentSatisfied } from "./minimum-course-content";
 import { productPreviousExamRequirementMet } from "./previous-exam-content";
+import { preparationEligibilityBlocker } from "./preparation-mode";
+import { preparationProgramReviewSatisfied } from "./preparation-mode-query";
+import { saoPauloCalendarDate } from "../opportunities/catalog-policy";
 
 export const listReleasedContestProducts = cache(
   async function listReleasedContestProducts() {
@@ -25,14 +29,24 @@ export const listReleasedContestProducts = cache(
       .select({
         product: contestStoreProducts,
         opportunityPublicId: contestOpportunities.publicId,
+        categorySlug: contestCategories.slug,
+        opportunityUpdatedAt: contestOpportunities.updatedAt,
+        noticePublishedAt: contestOpportunities.noticePublishedAt,
+        lifecycleStatus: contestOpportunities.lifecycleStatus,
+        statusAsOf: contestOpportunities.statusAsOf,
+        registrationEndsAt: contestOpportunities.registrationEndsAt,
+        examDate: contestOpportunities.examDate,
       })
       .from(contestStoreProducts)
       .innerJoin(
         contestOpportunities,
         eq(contestStoreProducts.opportunityId, contestOpportunities.id),
       )
+      .innerJoin(contestCategories, eq(contestOpportunities.categoryId, contestCategories.id))
       .where(
         and(
+          eq(contestOpportunities.editorialStatus, "reviewed"),
+          preparationProgramReviewSatisfied(contestStoreProducts.slug),
           eq(contestStoreProducts.status, "released"),
           minimumCourseContentSatisfied(contestStoreProducts.slug, contestStoreProducts.opportunityId),
           productPreviousExamRequirementMet(
@@ -46,9 +60,11 @@ export const listReleasedContestProducts = cache(
         const opportunity = publicById.get(row.opportunityPublicId);
         const catalog = getCatalogContest(row.product.slug);
         return (
-          opportunity &&
           catalog &&
-          opportunity.categorySlug === catalog.categorySlug
+          row.categorySlug === catalog.categorySlug &&
+          (row.product.preparationMode === "current_notice"
+            ? Boolean(opportunity)
+            : !preparationEligibilityBlocker({ ...row.product, ...row }, saoPauloCalendarDate()))
         );
       })
       .map((row) => ({
@@ -77,6 +93,7 @@ export async function hasSellableContestProductCoverage(
         eq(contestStoreProducts.slug, productSlug),
         eq(contestStoreProducts.opportunityId, opportunityId),
         eq(contestStoreProducts.status, "released"),
+        preparationProgramReviewSatisfied(contestStoreProducts.slug),
         sql`${contestStoreProducts.releasedAt} is not null`,
         sql`${contestStoreProducts.releasedByUserId} is not null`,
         minimumCourseContentSatisfied(
@@ -112,6 +129,7 @@ export async function getMasterCatalogCoverageStatus(
         ${contestStoreProducts.opportunityId} is not null
         and ${contestStoreProducts.releasedAt} is not null
         and ${contestStoreProducts.releasedByUserId} is not null
+        and ${preparationProgramReviewSatisfied(contestStoreProducts.slug)}
         and ${minimumCourseContentSatisfied(
           contestStoreProducts.slug,
           contestStoreProducts.opportunityId,

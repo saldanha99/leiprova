@@ -15,7 +15,6 @@ import {
   requireOpportunityApprovalDatabaseUrl,
 } from "../src/lib/opportunities/approval-command";
 import {
-  isOpportunityFreshForPublicCatalog,
   saoPauloCalendarDate,
 } from "../src/lib/opportunities/catalog-policy";
 
@@ -28,7 +27,9 @@ const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/u;
 
 class PreviewRollback extends Error {}
 
-type ProductState = {
+import { preparationEligibilityBlocker, type PreparationEligibility } from "../src/lib/commerce/preparation-mode";
+
+type ProductState = PreparationEligibility & {
   status: string;
   stripeMode: string;
   stripeProductId: string | null;
@@ -61,18 +62,9 @@ export function releaseBlockers(slug: string, state: ProductState, todayIso: str
   if (state.status !== "draft") blockers.push(`status atual ${state.status}`);
   if (!state.opportunityId || state.editorialStatus !== "reviewed") {
     blockers.push("sem edital oficial revisado");
-  } else if (
-    !isOpportunityFreshForPublicCatalog(
-      {
-        lifecycleStatus: state.lifecycleStatus ?? "",
-        statusAsOf: state.statusAsOf ?? "",
-        registrationEndsAt: state.registrationEndsAt,
-        examDate: state.examDate,
-      },
-      todayIso,
-    )
-  ) {
-    blockers.push("edital fora do catálogo público (fase ou data vencida)");
+  } else {
+    const preparationBlocker = preparationEligibilityBlocker(state, todayIso);
+    if (preparationBlocker) blockers.push(preparationBlocker);
   }
   if (getCatalogContest(slug)?.categorySlug !== state.categorySlug) {
     blockers.push("categoria do catálogo diferente da do edital");
@@ -120,6 +112,13 @@ async function main() {
           await transaction.execute(sql`select public.lock_product_binding_review_product(${slug})`);
           const [state] = await transaction.execute<ProductState>(sql`
             select product.status,
+              product.preparation_mode as "preparationMode",
+              product.preparation_reviewed_at as "preparationReviewedAt",
+              product.preparation_reviewed_by_user_id::text as "preparationReviewedByUserId",
+              product.preparation_approval_reference as "preparationApprovalReference",
+              product.preparation_opportunity_updated_at as "preparationOpportunityUpdatedAt",
+              opportunity.updated_at as "opportunityUpdatedAt",
+              opportunity.notice_published_at::text as "noticePublishedAt",
               product.stripe_mode as "stripeMode",
               product.stripe_product_id as "stripeProductId",
               product.stripe_price_monthly as "monthlyPrice",
@@ -160,6 +159,8 @@ async function main() {
             metadata: {
               approvalReference: reviewer.approvalReference,
               questionCount: state.questionCount,
+              preparationMode: state.preparationMode,
+              preparationApprovalReference: state.preparationApprovalReference,
               previousExam: "official_link",
               stripeMode: state.stripeMode,
               executionSource: "server_cli",

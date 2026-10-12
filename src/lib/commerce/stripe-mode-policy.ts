@@ -1,3 +1,5 @@
+import { isAuthorizedProductionOrigin, isPublicProductionHostname } from "../deployment-origin";
+
 type StripeModeEnvironment = {
   STRIPE_PAYMENTS_MODE?: string;
   NODE_ENV?: string;
@@ -19,7 +21,7 @@ export function expectedStripeMode(
   ]) {
     if (!address) continue;
     try {
-      if (new URL(address).hostname === "leiprova.2b.app.br" && mode !== "live")
+      if (isPublicProductionHostname(new URL(address).hostname) && mode !== "live")
         return null;
     } catch {
       return null;
@@ -75,13 +77,13 @@ export function validateStripeSyncTarget(input: {
   if (
     input.mode === "live" &&
     (input.environment !== "production" ||
-      input.appUrl !== "https://leiprova.2b.app.br" ||
+      !isAuthorizedProductionOrigin(input.appUrl) ||
       target.pathname !== "/leiprova" ||
       !input.expectedAccount ||
       !/^acct_[A-Za-z0-9]+$/.test(input.expectedAccount))
   )
     throw new Error(
-      "Produção exige ambiente, domínio, banco exclusivo da Editalume e conta Stripe esperada explícitos.",
+      "Produção exige ambiente, domínio, banco exclusivo da Edital Lei Seca e conta Stripe esperada explícitos.",
     );
   return {
     mode: input.mode,

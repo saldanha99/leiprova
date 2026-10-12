@@ -47,21 +47,21 @@ import {
 } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: { absolute: "Editalume | Lei seca guiada pelo edital" },
+  title: { absolute: "Edital Lei Seca | Lei seca guiada pelo edital" },
   description:
     "Transforme a literalidade da lei em treinos de múltipla escolha, revisão espaçada e um roteiro de estudos que mostra o que revisar agora.",
   alternates: { canonical: "/" },
   openGraph: {
     type: "website",
     url: "/",
-    title: "Editalume | Lei seca guiada pelo edital",
+    title: "Edital Lei Seca | Lei seca guiada pelo edital",
     description:
       "Treine a literalidade da lei com questões originais, fonte oficial e revisão distribuída para concursos públicos.",
     images: [SOCIAL_IMAGE],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Editalume | Lei seca guiada pelo edital",
+    title: "Edital Lei Seca | Lei seca guiada pelo edital",
     description:
       "Treine a literalidade da lei com questões originais, fonte oficial e revisão distribuída para concursos públicos.",
     images: [SOCIAL_IMAGE_PATH],
@@ -126,25 +126,25 @@ const TRUST_ITEMS = [
     icon: FileCheck2,
     title: "Questões originais rastreáveis",
     description:
-      "Os 12 itens do beta foram assistidos por IA e conferidos contra a fonte; a revisão humana independente ainda está pendente.",
+      "As inéditas são assistidas por IA, vinculadas a fontes oficiais e liberadas por aprovação automática autorizada pelo proprietário, com conferência posterior. Isso não equivale a revisão humana independente de cada item.",
   },
 ] as const;
 
 const FAQS = [
   {
-    question: "A Editalume substitui a leitura da lei seca?",
+    question: "A Edital Lei Seca substitui a leitura da lei seca?",
     answer:
       "Não. A plataforma organiza a leitura e cria recuperação ativa logo depois dela. A proposta é fazer você voltar ao texto legal com direção e testar se a redação realmente permaneceu na memória.",
   },
   {
     question: "As alternativas são questões oficiais de concurso?",
     answer:
-      "Não no acervo atual. Hoje estão publicadas 12 questões originais de lei seca assistidas por IA, baseadas na Constituição Federal e ainda pendentes de revisão humana independente. Questões anteriores só serão exibidas com licença ou autorização documentada e procedência identificada.",
+      "O treino usa questões originais assistidas por IA, com perfil próprio de banca e cargo. Elas não são questões oficiais da organizadora. Cadernos e gabaritos anteriores têm links para as fontes oficiais quando conferidos; incorporar suas questões ao treino exige autorização ou licença documentada.",
   },
   {
     question: "Como acompanho atualizações na legislação?",
     answer:
-      "Cada item pode mostrar fonte e data de verificação. O banco registra versões e status editorial; o monitoramento automático periódico ainda não está ativo, por isso alterações precisam de conferência e revisão antes de uma nova publicação.",
+      "Consulte a fonte, a versão e a data de verificação do item. Alterações legislativas entram no fluxo editorial e podem exigir suspensão temporária de questões. A plataforma não substitui a conferência do Diário Oficial e do edital.",
   },
   {
     question: "Serve para concursos de nível médio e superior?",
@@ -165,7 +165,7 @@ const homeStructuredData = {
       "@type": "WebPage",
       "@id": `${absoluteUrl()}#webpage`,
       url: absoluteUrl(),
-      name: "Editalume | Lei seca guiada pelo edital",
+      name: "Edital Lei Seca | Lei seca guiada pelo edital",
       description:
         "Plataforma de treino ativo da literalidade da lei com questões originais, fonte oficial e revisão distribuída.",
       inLanguage: "pt-BR",
@@ -230,7 +230,7 @@ export default async function Home() {
                 <span>Comece a lembrar.</span>
               </h1>
               <p className="hero-lead">
-                A Editalume transforma artigos, prazos e exceções em rodadas de múltipla escolha que
+                A Edital Lei Seca transforma artigos, prazos e exceções em rodadas de múltipla escolha que
                 revelam onde a sua atenção falhou — e trazem o ponto de volta antes que você esqueça.
               </p>
 
@@ -260,12 +260,12 @@ export default async function Home() {
               </ul>
             </div>
 
-            <div className="hero-visual" aria-label="Prévia visual do ecossistema Editalume">
+            <div className="hero-visual" aria-label="Prévia visual do ecossistema Edital Lei Seca">
               <div className="hero-visual__halo" aria-hidden="true" />
               <Image
                 className="hero-visual__image"
                 src="/assets/leiprova-ecosystem.png"
-                alt="Editalume em notebook, celular e tablet com questões, texto legal e painel de desempenho"
+                alt="Edital Lei Seca em notebook, celular e tablet com questões, texto legal e painel de desempenho"
                 width={1586}
                 height={992}
                 preload
@@ -668,7 +668,7 @@ export default async function Home() {
             </h2>
             <p>
               {commerceOpen
-                ? "Escolha o plano e monte seu primeiro roteiro de literalidade na Editalume."
+                ? "Escolha o plano e monte seu primeiro roteiro de literalidade na Edital Lei Seca."
                 : "Veja o plano, o preço e a mecânica do treino antes da abertura do checkout."}
             </p>
             <div>
@@ -719,7 +719,7 @@ export default async function Home() {
         </div>
 
         <div className="site-container site-footer__bottom">
-          <p>© {new Date().getFullYear()} Editalume. Todos os direitos reservados.</p>
+          <p>© {new Date().getFullYear()} Edital Lei Seca. Todos os direitos reservados.</p>
           <p>
             Conteúdo meramente informativo e não oficial. A plataforma não presta consultoria jurídica nem substitui a publicação vigente no diário oficial.
           </p>

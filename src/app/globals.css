@@ -185,9 +185,9 @@ summary:focus-visible {
 }
 
 .editalume-logo__name {
-  font-size: 27px;
+  font-size: 22px;
   font-weight: 800;
-  letter-spacing: -0.022em;
+  letter-spacing: -0.035em;
 }
 
 .editalume-logo__name em {
@@ -3351,7 +3351,7 @@ summary:focus-visible {
   }
 
   .brand-mark .editalume-logo:not(.editalume-logo--compact) .editalume-logo__name {
-    font-size: 23px;
+    font-size: 19px;
   }
 
   .brand-mark .editalume-logo:not(.editalume-logo--compact) .editalume-logo__tagline {

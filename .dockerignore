@@ -19,3 +19,5 @@ backups
 *.dump
 *.dump.part
 tmp/pdfs
+
+.local

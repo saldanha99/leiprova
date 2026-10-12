@@ -1,0 +1,13 @@
+# Acrescentar ao Caddyfile existente somente depois de validar a aplicação.
+# O proxy Caddy precisa estar conectado à rede leiprova_edge.
+editaleiseca.com.br {
+  encode zstd gzip
+  header X-Edital-Lei-Seca-Origin "everglades-vps"
+  request_body {
+    max_size 1MB
+  }
+  reverse_proxy leiprova-app:3000
+}
+www.editaleiseca.com.br {
+  redir https://editaleiseca.com.br{uri} permanent
+}

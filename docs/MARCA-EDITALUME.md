@@ -1,5 +1,18 @@
 # Marca: Editalume
 
+## Decisão vigente — 11/10/2026, noite BRT
+
+O proprietário escolheu **Edital Lei Seca** como nova marca e adquiriu
+**editaleiseca.com.br**. Autorizou atualizar identidade visual, SEO/GEO/AEO,
+robots, domínio, Stripe e migrar o projeto para a VPS que hospeda Everglades.
+O painel Registro.br mostra o domínio publicado e criado em 11/10/2026.
+`leiprova` continua identificador técnico; não renomear banco, volume, IDs Stripe
+ou repositório. Referências de setembro abaixo são histórico.
+
+A implantação e a virada ainda precisam de recibos reais de backup, restauração,
+HTTPS, DNS, webhook e redirects. Autorização não comprova migração concluída.
+Não inventar contatos ou e-mails no domínio novo sem provisionamento e validação.
+
 > Identidade aprovada pelo responsável e adotada no produto em 01/09/2026. A
 > aplicação continua no domínio técnico atual enquanto busca formal de marca,
 > compra do domínio definitivo e plano de migração permanecem pendentes.

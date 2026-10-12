@@ -62,7 +62,7 @@ export function PublicGuideShell({
                 aria-hidden="true"
                 className="size-4 text-amber-300"
               />
-              Editalume
+              Edital Lei Seca
             </p>
             <p className="mt-2 max-w-xl leading-6">
               Conteúdo meramente informativo e não oficial. Consulte a

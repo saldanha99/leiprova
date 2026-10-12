@@ -139,7 +139,7 @@ export function getStripeClient(secretKey = readEnv("STRIPE_SECRET_KEY")) {
       apiVersion: STRIPE_API_VERSION,
       maxNetworkRetries: 2,
       appInfo: {
-        name: "Editalume",
+        name: "Edital Lei Seca",
         version: "0.1.0",
       },
     });

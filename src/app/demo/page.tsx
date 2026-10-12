@@ -22,21 +22,21 @@ import {
 export const metadata: Metadata = {
   title: "Demonstração gratuita",
   description:
-    "Conheça o treino de literalidade da lei: mecânica da sessão, correção imediata e fonte oficial. Conteúdo jurídico só é publicado após revisão humana registrada.",
+    "Conheça o treino de literalidade da lei: mecânica da sessão, correção imediata e fonte oficial. As questões desta demonstração exigem revisão humana registrada.",
   alternates: { canonical: "/demo" },
   openGraph: {
     type: "website",
     url: "/demo",
-    title: "Demonstração gratuita | Editalume",
+    title: "Demonstração gratuita | Edital Lei Seca",
     description:
-      "Veja a mecânica do treino de literalidade. O conteúdo jurídico só é publicado após revisão humana registrada.",
+      "Veja a mecânica do treino de literalidade. As questões desta demonstração exigem revisão humana registrada.",
     images: [SOCIAL_IMAGE],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Demonstração gratuita | Editalume",
+    title: "Demonstração gratuita | Edital Lei Seca",
     description:
-      "Veja a mecânica do treino de literalidade. O conteúdo jurídico só é publicado após revisão humana registrada.",
+      "Veja a mecânica do treino de literalidade. As questões desta demonstração exigem revisão humana registrada.",
     images: [SOCIAL_IMAGE_PATH],
   },
 };
@@ -81,9 +81,9 @@ const structuredData = {
   "@type": "WebPage",
   "@id": `${absoluteUrl("/demo")}#webpage`,
   url: absoluteUrl("/demo"),
-  name: "Demonstração gratuita da Editalume",
+  name: "Demonstração gratuita da Edital Lei Seca",
   description:
-    "Demonstração pública do treino de literalidade da lei. O conteúdo jurídico só é publicado após revisão humana registrada.",
+    "Demonstração pública do treino de literalidade da lei. As questões desta demonstração exigem revisão humana registrada.",
   inLanguage: "pt-BR",
   isPartOf: { "@id": WEBSITE_ID },
   about: { "@id": ORGANIZATION_ID },

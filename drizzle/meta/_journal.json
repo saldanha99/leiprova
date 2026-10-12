@@ -337,6 +337,13 @@
       "when": 1791760359229,
       "tag": "0047_requirement_articles",
       "breakpoints": true
+    },
+    {
+      "idx": 48,
+      "version": "7",
+      "when": 1791772200000,
+      "tag": "0048_preparation_modes",
+      "breakpoints": true
     }
   ]
 }

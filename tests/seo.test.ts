@@ -58,7 +58,7 @@ describe("fundação GEO e SEO", () => {
     const genericRule = Array.isArray(rules)
       ? rules.find((rule) => rule.userAgent === "*")
       : undefined;
-    expect(genericRule?.disallow).toEqual(["/app/", "/admin/", "/api/"]);
+    expect(genericRule?.disallow).toEqual(["/app$", "/app/", "/admin$", "/admin/", "/api$", "/api/"]);
   });
 
   it("serializa JSON-LD sem permitir fechamento de script por conteúdo", () => {
@@ -66,20 +66,20 @@ describe("fundação GEO e SEO", () => {
     expect(serializeJsonLd({ value: "</script>" })).toContain("\\u003c/script>");
   });
 
-  it("publica a identidade e o logotipo vigentes da Editalume", () => {
-    expect(SITE_NAME).toBe("Editalume");
+  it("publica a identidade e o logotipo vigentes da Edital Lei Seca", () => {
+    expect(SITE_NAME).toBe("Edital Lei Seca");
     expect(siteIdentityGraph["@graph"]).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           "@type": "Organization",
-          name: "Editalume",
+          name: "Edital Lei Seca",
           logo: expect.objectContaining({
-            url: "https://leiprova.2b.app.br/brand/editalume-logo.png",
-            width: 1774,
-            height: 887,
+            url: "https://leiprova.2b.app.br/brand/edital-lei-seca-logo.png",
+            width: 1200,
+            height: 400,
           }),
         }),
-        expect.objectContaining({ "@type": "WebSite", name: "Editalume" }),
+        expect.objectContaining({ "@type": "WebSite", name: "Edital Lei Seca" }),
       ]),
     );
   });

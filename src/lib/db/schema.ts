@@ -54,6 +54,12 @@ export const contestStoreProducts = pgTable(
       { onDelete: "restrict" },
     ),
     status: text("status").notNull().default("draft"),
+    preparationMode: text("preparation_mode").notNull().default("current_notice"),
+    preparationReviewedAt: timestamp("preparation_reviewed_at", { withTimezone: true }),
+    preparationReviewedByUserId: bigint("preparation_reviewed_by_user_id", { mode: "number" })
+      .references(() => users.id, { onDelete: "restrict" }),
+    preparationApprovalReference: text("preparation_approval_reference"),
+    preparationOpportunityUpdatedAt: timestamp("preparation_opportunity_updated_at", { withTimezone: true }),
     stripeProductId: text("stripe_product_id").unique(),
     stripePrice6m: text("stripe_price_6m").unique(),
     stripePrice12m: text("stripe_price_12m").unique(),
@@ -68,11 +74,19 @@ export const contestStoreProducts = pgTable(
   },
   (table) => [
     index("contest_store_opportunity_idx").on(table.opportunityId),
+    index("contest_store_preparation_reviewer_idx").on(table.preparationReviewedByUserId),
     index("contest_store_released_by_idx").on(table.releasedByUserId),
     check(
       "contest_store_status_check",
       sql`${table.status} in ('draft','released','retired')`,
     ),
+    check("contest_store_preparation_mode_check", sql`${table.preparationMode} in ('current_notice','historical_training','pre_notice')`),
+    check("contest_store_preparation_review_check", sql`${table.preparationMode} = 'current_notice' or (
+      ${table.opportunityId} is not null and ${table.preparationReviewedAt} is not null
+      and ${table.preparationReviewedByUserId} is not null and ${table.preparationOpportunityUpdatedAt} is not null
+      and ${table.preparationApprovalReference} is not null
+      and ${table.preparationApprovalReference} ~ '^[a-z0-9][a-z0-9._:/-]{0,159}$'
+    )`),
     check(
       "contest_store_mode_check",
       sql`${table.stripeMode} in ('test','live')`,

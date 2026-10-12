@@ -276,7 +276,7 @@ export default async function MaterialsPage() {
               Tente lembrar antes de revelar
             </h2>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
-              O comando de recuperação é original da Editalume; a resposta
+              O comando de recuperação é original da Edital Lei Seca; a resposta
               reproduz o dispositivo oficial verificado e oferece acesso à
               fonte.
             </p>

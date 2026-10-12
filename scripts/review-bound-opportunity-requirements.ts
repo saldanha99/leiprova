@@ -1,3 +1,5 @@
+import { isAuthorizedProductionOrigin } from "../src/lib/deployment-origin";
+
 import { createHash } from "node:crypto";
 
 import postgres from "postgres";
@@ -91,7 +93,7 @@ function requireTarget(opportunitySlug: string) {
   const target = new URL(connectionString);
   const production =
     process.env.NODE_ENV === "production" &&
-    process.env.APP_URL === "https://leiprova.2b.app.br" &&
+    isAuthorizedProductionOrigin(process.env.APP_URL) &&
     process.env.LEIPROVA_REQUIREMENT_REVIEW_APPROVED ===
       `review-requirements:${opportunitySlug}` &&
     ["leiprova-pooler", "pooler"].includes(target.hostname) &&
