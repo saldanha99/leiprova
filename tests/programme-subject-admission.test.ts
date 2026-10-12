@@ -21,6 +21,28 @@ describe('rótulos oficiais e admissão da taxonomia',()=>{
   expect(()=>assertSubjectLabelProof('direito-civil-e-empresarial','Direito Civil','Direito Civil')).toThrow();
   expect(()=>assertSubjectLabelProof('direito-civil-e-empresarial','Direito Civil e Empresarial','Direito Civil e Direito Empresarial')).toThrow();
  });
+ it.each([
+  ['etica-e-estatuto-juridico-da-magistratura-nacional','C) ÉTICA E ESTATUTO JURÍDICO DA MAGISTRATURA NACIONAL'],
+  ['direito-da-infancia-e-juventude','4.1 – Direito da Infância e Juventude'],
+  ['tutela-coletiva','4.2 – Tutela Coletiva'],
+  ['principios-institucionais-do-ministerio-publico','4.3 – Princípios Institucionais do Ministério Público'],
+  ['legislacao-penal-extravagante','1.3 – Legislação Penal Extravagante'],
+  ['legislacao-tributaria-estadual','LEGISLAÇÃO TRIBUTÁRIA ESTADUAL: 1 Lei Estadual nº 5.900/1996 (ICMS), e suas alterações. 2 Lei'],
+  ['reforma-tributaria','REFORMA TRIBUTÁRIA: 1 Emenda Constitucional nº 132/2023. 2 Lei Complementar nº 214/2025. 3 Lei'],
+  ['direito-civil-e-direito-empresarial','DIREITO CIVIL E DIREITO EMPRESARIAL - Ponto 1. Lei de Introdução às Normas do Direito Brasileiro (Decreto'],
+ ] as const)('prova a linha integral com sintaxe delimitada de %s',(slug,line)=>{
+  expect(()=>assertSubjectLabelProof(slug,line,`Cabeçalho\n${line}\nOutra linha`)).not.toThrow();
+  expect(()=>assertSubjectLabelProof(slug,line,`Esta prosa menciona ${line}`)).toThrow();
+  expect(()=>assertSubjectLabelProof(slug,line,`${line} texto adicional omitido da prova`)).toThrow();
+ });
+ it('não aceita número de seção diferente, título parcial ou menção genérica',()=>{
+  for(const [slug,line] of [
+   ['tutela-coletiva','4.3 – Tutela Coletiva'],
+   ['etica-e-estatuto-juridico-da-magistratura-nacional','F) Ética e Estatuto Jurídico da Magistratura Nacional'],
+   ['reforma-tributaria','Reforma Tributária: assunto citado no texto'],
+   ['direito-civil-e-direito-empresarial','Direito Civil e Direito Empresarial e Direito Penal - Ponto 1. Exemplo'],
+  ] as const)expect(()=>assertSubjectLabelProof(slug,line,line)).toThrow();
+ });
  it('distingue portal permitido e PDF oficial direto aprovado, recusando origens ou correlações falsas',()=>{
   const pdf='https://conhecimento.fgv.br/sites/default/files/concursos/aviso-conteudo-programatico-concurso-xxxix.pdf';
   expect(()=>assertApprovedProgrammeSourceUrls(pdf,pdf,'official_document','fgv-conhecimento')).not.toThrow();

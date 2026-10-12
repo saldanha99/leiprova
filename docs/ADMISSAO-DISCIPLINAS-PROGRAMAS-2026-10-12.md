@@ -25,3 +25,29 @@ A correção distingue um PDF oficial direto aprovado de uma página de portal.
 Mantém a validação da banca, URL, política, identidade, bytes e página. A
 classificação passa a reconhecer os 20 nomes exatos, preservando disciplinas
 compostas. Estes checks ainda não são recibo de aplicação em produção.
+
+
+A prévia da retomada expôs outro defeito que os exemplos sintéticos anteriores
+não cobriam: títulos com `C)`, numeração `4.1 –` e primeiro item na mesma linha
+estavam sendo recusados. A prova literal dos 24 títulos foi recapturada por
+leitura do banco e comparada linha a linha. A correção mantém a linha inteira
+na evidência, com sintaxe delimitada por disciplina e casos negativos para
+prosa, número de seção diferente e nomes compostos divergentes.
+
+A prévia read-only com essa correção validou os 20 nomes e indicou 20 criações,
+zero escritas/aprovações. Ela não equivale à aplicação. O backup anterior foi
+validado via `pg_restore --list` na VPS:
+`backups/leiprova-before-resume-subjects-20261012.dump`, SHA-256
+`be765a44f68429b044436852c4dcd82be0fcb06e0ea73ac6711c2d2f33cf4a12`.
+
+QA final da correção: lint e tipagem aprovados, 1.813 testes gerais aprovados
+(294 opcionais sem ambiente ignorados), 35 específicos aprovados, incluindo
+nove PostgreSQL em base sintética limpa. Build QA concluído, imagem
+`sha256:54f27c8ed07f36f802119e8fc580c19ddef9f7af7a7d6594d45ca70a5089544d`.
+Logs privados `focused-headings-v3.log`, `general-headings-v3.log`,
+`tests-headings-v4.log` e `build-headings-v4.log` no diretório QA acima.
+A primeira tentativa geral herdou URLs de homologação e falhou em quatro
+asserções de SEO; a suíte foi repetida integralmente sem essas variáveis e
+passou. A base sintética da tentativa com fixtures antigas foi preservada
+como `subject_fixture_before_resume_20261012` no contêiner QA, sem dados de
+produção. O backup copiado ao Mac tem o mesmo SHA-256 da VPS.

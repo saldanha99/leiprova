@@ -40,8 +40,22 @@ export const subjectAdmissionInputSchema=z.object({schemaVersion:z.literal(1),su
 export const subjectNameKey=(value:string)=>value.normalize('NFKC').replace(/\s+/gu,' ').trim().toLocaleUpperCase('pt-BR');
 export function assertSubjectLabelProof(slug:keyof typeof ADDITIONAL_PROGRAMME_SUBJECTS,quote:string,page:string){
  const expected=ADDITIONAL_PROGRAMME_SUBJECTS[slug];
- const literal=slug==='direito-digital'?`F) ${expected}`:slug==='direito-da-antidiscriminacao'?`H) ${expected}`:expected;
- if(subjectNameKey(quote)!==subjectNameKey(literal)||!page.split(/\r?\n/u).some(line=>subjectNameKey(line)===subjectNameKey(quote)))throw Error('Rótulo literal completo ausente na página oficial; não inferir disciplina de prosa.');
+ const prefixes:Partial<Record<keyof typeof ADDITIONAL_PROGRAMME_SUBJECTS,string>>={
+  'direito-digital':'F)', 'direito-da-antidiscriminacao':'H)',
+  'etica-e-estatuto-juridico-da-magistratura-nacional':'C)',
+ };
+ const sections:Partial<Record<keyof typeof ADDITIONAL_PROGRAMME_SUBJECTS,string>>={
+  'direito-da-infancia-e-juventude':'4.1', 'tutela-coletiva':'4.2',
+  'principios-institucionais-do-ministerio-publico':'4.3', 'legislacao-penal-extravagante':'1.3',
+ };
+ const key=subjectNameKey(quote),name=subjectNameKey(expected);
+ let matches=key===subjectNameKey(prefixes[slug]?`${prefixes[slug]} ${expected}`:expected);
+ if(sections[slug])matches ||= key===`${sections[slug]} – ${name}`;
+ // These approved programmes start item 1 on the heading's own line.
+ // Keep and prove that whole line; never accept an arbitrary prose mention.
+ if(slug==='legislacao-tributaria-estadual'||slug==='reforma-tributaria')matches ||= key.startsWith(`${name}: 1 `)&&key.length>`${name}: 1 `.length;
+ if(slug==='direito-civil-e-direito-empresarial')matches ||= key.startsWith(`${name} - PONTO 1. `)&&key.length>`${name} - PONTO 1. `.length;
+ if(!matches||!page.split(/\r?\n/u).some(line=>subjectNameKey(line)===key))throw Error('Rótulo literal completo ausente na página oficial; não inferir disciplina de prosa.');
 }
 export function assertApprovedProgrammeSourceUrls(docUrl:string,documentUrl:string,docPolicy:string,expected:OfficialOpportunitySourceId){
  // An approved full-document source may itself be the exact PDF captured in

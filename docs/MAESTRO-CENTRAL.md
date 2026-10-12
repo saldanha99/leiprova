@@ -1,5 +1,11 @@
 # Maestro central da Edital Lei Seca
 
+**Retomada de 12/10/2026, após 12h BRT:** leia primeiro
+[o estado reconferido](RETOMADA-2026-10-12.md) e o topo de `OPERACAO.md`.
+A oferta foi reconferida em três preparações/285 questões válidas; o PC-MA
+foi suspenso depois do relatório histórico abaixo. Notas antigas do canvas
+e o relatório do início da madrugada não representam o estado atual.
+
 Roteiro do agente que coordena a produção editorial no nó **Maestro LeiProva** do
 Maestri (workspace "LeiProva — Fábrica Editorial"). Desde 11/10/2026 o Maestro pode
 ser o **Codex**. Leia antes `AGENTS.md`, `docs/OPERACAO.md` (entradas do topo) e
