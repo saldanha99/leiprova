@@ -32,8 +32,10 @@ local e as armadilhas já conhecidas.
 "abertura automatica de todas" com conteúdo inicial validado e ampliação contínua.
 Avaliar automaticamente todos os produtos em rascunho e liberar cada um ao
 cumprir os gates existentes, sem nova confirmação por preparação. O piso de
-68 questões não significa cobertura integral. Essa decisão não altera o teto
-de 48 reservas/24h, não autoriza APIs pagas e não elimina provas de fonte,
+68 questões não significa cobertura integral. Em decisão posterior no mesmo dia,
+o proprietário pediu tarefas sem limite: removido o teto diário de 48 reservas.
+Reservas exclusivas, três tentativas e limites de concorrência permanecem.
+Isso não autoriza APIs pagas e não elimina provas de fonte,
 identidade, formato, vínculo ou direitos. Veja `docs/ABERTURA-PROGRESSIVA-2026-10-12.md`.
 
 Regras que valem sempre:

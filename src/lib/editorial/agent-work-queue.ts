@@ -46,25 +46,14 @@ export const AGENT_OPPORTUNITY_PRIORITY_CTES = sql`product_content as materializ
       from contest_opportunities opportunity
       left join opportunity_content content on content.opportunity_id = opportunity.id
     )`;
-const OPPORTUNITY_TIERS = sql`${AGENT_OPPORTUNITY_PRIORITY_CTES},
-    unsold_waiting as (
-      select exists (
-        select 1 from editorial_agent_work other
-        join opportunity_requirements waiting_requirement on waiting_requirement.id = ${sql.raw(requirementIdOf("other"))}
-        join opportunity_tier waiting on waiting.id = waiting_requirement.opportunity_id
-        where other.status = 'pending' and other.attempts < 3 and waiting.tier = 0
-      ) as value
-    )`;
-
 /** Dentro do mesmo tipo: faixa 0 primeiro, pela prova mais próxima (prova
  * passada ou sem data no fim da faixa) e, no mesmo edital, matéria conhecida
- * antes. O teto diário é compartilhado pelos três agentes: produto liberado só
- * reserva quando nenhum edital da faixa 0 tem tarefa na fila. Tarefa sem edital
- * não tem faixa e segue a ordem de chegada. */
+ * antes. A prioridade ordena as tarefas elegíveis do próprio agente, sem deixar
+ * um agente ocioso por pendências de outro. Tarefa sem edital não tem faixa e
+ * segue a ordem de chegada. */
 const CLAIM_FROM = sql.raw(`from editorial_agent_work work
     left join opportunity_requirements requirement on requirement.id = ${requirementIdOf("work")}
     left join opportunity_tier tier on tier.id = requirement.opportunity_id`);
-const RELEASED_WAITS_FOR_UNSOLD = sql.raw(`not (coalesce(tier.tier, 0) = 2 and (select value from unsold_waiting))`);
 const PRODUCT_DEADLINE_ORDER = sql.raw(`tier.tier nulls first, tier.upcoming_exam nulls last,
           (requirement.subject_id is null) nulls last`);
 
@@ -92,7 +81,7 @@ export async function enqueueAgentWork(db: AgentDatabase, key: string, kind: Age
   return rows.length > 0;
 }
 
-/** Serializa só a reserva, não a execução. Orçamento inclui quedas/tentativas. */
+/** Serializa só a reserva, não a execução. Todas as tentativas são auditadas. */
 export async function claimAgentWork(db: AgentDatabase, now = new Date(), agent?:string) {
   if(agent && !Object.values(AGENT_FOR_WORK).includes(agent)) throw new Error("Agente inválido.");
   const kinds=Object.entries(AGENT_FOR_WORK).filter(([,name])=>!agent||name===agent).map(([kind])=>kind);
@@ -103,23 +92,17 @@ export async function claimAgentWork(db: AgentDatabase, now = new Date(), agent?
         lease_token=null,lease_expires_at=null,last_error_code='lease_expired',updated_at=${now.toISOString()}::timestamptz
       where status='running' and lease_expires_at <= ${now.toISOString()}::timestamptz
     `);
-    const [budget] = await tx.execute<{ count: number }>(sql`
-      select count(*)::int count from editorial_agent_runs
-      where started_at >= ${new Date(now.getTime()-86400000).toISOString()}::timestamptz
-    `);
-    if (budget.count >= AGENT_WORK_DAILY_LIMIT) return { state: "budget_exhausted" as const };
     const leaseToken = randomUUID();
     const expires = new Date(now.getTime()+AGENT_WORK_LEASE_MINUTES*60000).toISOString();
     const [job] = await tx.execute<AgentWork>(sql`
       update editorial_agent_work set status='running',attempts=attempts+1,
         lease_token=${leaseToken}::uuid,lease_expires_at=${expires}::timestamptz,
         updated_at=${now.toISOString()}::timestamptz
-      where job_key=(with ${OPPORTUNITY_TIERS}
+      where job_key=(with ${AGENT_OPPORTUNITY_PRIORITY_CTES}
         select work.job_key ${CLAIM_FROM}
         where work.status='pending' and work.attempts<3
         and (work.kind<>'authoring' or ${currentQuestionContractExists(sql`work.payload->>'questionContractId'`,sql`requirement.opportunity_id`)})
         and work.kind in (${sql.join(kinds.map(kind=>sql`${kind}`),sql`,`)})
-        and ${RELEASED_WAITS_FOR_UNSOLD}
         order by case work.kind when 'legal_change' then 0 when 'authoring' then 1 when 'discovery' then 2 else 3 end,
           ${PRODUCT_DEADLINE_ORDER},
           work.created_at,work.job_key for update of work skip locked limit 1)

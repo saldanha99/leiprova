@@ -39,13 +39,13 @@ export default async function MotorsPage({searchParams}:{searchParams:Promise<Re
   const tone=(alert:boolean)=>alert?'border-amber-300/50 bg-amber-300/[.06]':'border-white/10 bg-white/[.025]';
   return <main className="mx-auto max-w-6xl px-5 py-10 md:px-8">
     <header className="border-b border-white/10 pb-8">
-      <p className="text-xs font-semibold uppercase tracking-[.22em] text-emerald-300">EDITALUME / CENTRAL EDITORIAL</p>
+      <p className="text-xs font-semibold uppercase tracking-[.22em] text-emerald-300">EDITAL LEI SECA / CENTRAL EDITORIAL</p>
       <h1 className="mt-4 font-serif text-4xl tracking-tight md:text-5xl">Motores em movimento.</h1>
       <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-400">Da fonte oficial ao rascunho, cada tarefa tem responsável e evidência.
-        Preparado não significa aprovado: a revisão humana continua antes da publicação e da entrega ao aluno.</p>
+        Preparado não significa aprovado: cada publicação passa pelas validações editoriais e pela autorização aplicável.</p>
       <div className="mt-5 flex flex-wrap gap-3 text-xs text-amber-200">
-        <span className="rounded-full border border-amber-200/20 px-3 py-2">Stripe pausado</span>
-        <span className="rounded-full border border-white/15 px-3 py-2 text-slate-300">{String(summary.budget.used??0)} / {summary.budget.limit} reservas nas últimas 24h</span>
+        <span className="rounded-full border border-amber-200/20 px-3 py-2">Publicação após validação</span>
+        <span className="rounded-full border border-white/15 px-3 py-2 text-slate-300">{String(summary.budget.used??0)} reservas nas últimas 24h · sem limite diário</span>
       </div>
     </header>
     <section aria-label="Saúde dos motores" className="mt-8 grid gap-3 md:grid-cols-2">

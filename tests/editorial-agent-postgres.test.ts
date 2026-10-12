@@ -5,7 +5,7 @@ import postgres from "postgres";
 import { beforeAll,beforeEach,afterAll,describe,it,expect } from "vitest";
 import * as schema from "@/lib/db/schema";
 import { AGENT_WORK_DAILY_LIMIT, AGENT_WORK_LEASE_MINUTES, AGENT_WORK_VERSION,agentInputHash,type AgentWorkPayload } from "@/lib/editorial/agent-work-contract";
-import { enqueueAgentWork,claimAgentWork,completeAgentWork,requirementContext } from "@/lib/editorial/agent-work-queue";
+import { enqueueAgentWork,claimAgentWork,completeAgentWork,requirementContext,agentWorkSummary } from "@/lib/editorial/agent-work-queue";
 import { AGENT_PREPARATION_CORPUS_HASH_SQL, mappingPreparationBatchQuery, prepareAgentWork } from "@/lib/editorial/agent-work-preparation";
 import { prepareCourseIntake } from "@/lib/editorial/course-intake";
 import { syntheticQuestionContract } from "./fixtures/question-contract";
@@ -194,11 +194,30 @@ describe.skipIf(!url)('ponte editorial — PostgreSQL isolado',()=>{
     expect((await claimAgentWork(db!,new Date(now.getTime()+3*afterLeaseMs))).state).toBe('idle');
     expect((await db!.execute<{status:string}>(sql`select status from editorial_agent_work`))[0].status).toBe('failed');
   });
-  it('teto diário é compartilhado e atômico',async()=>{
-    for(let i=0;i<AGENT_WORK_DAILY_LIMIT+1;i++)await enqueueAgentWork(db!,`test:${i}`,'discovery',discoveryPayload());
-    for(let i=0;i<AGENT_WORK_DAILY_LIMIT;i++)expect((await claimAgentWork(db!)).state).toBe('claimed');
-    expect((await claimAgentWork(db!)).state).toBe('budget_exhausted');
+  it('continua após 48 reservas e mantém auditoria sem limite diário',async()=>{
+    for(let i=0;i<50;i++)await enqueueAgentWork(db!,`test:${i}`,'discovery',discoveryPayload());
+    for(let i=0;i<48;i++)expect((await claimAgentWork(db!)).state).toBe('claimed');
+    const next=await Promise.all([claimAgentWork(db!),claimAgentWork(db!)]);
+    expect(next.map(item=>item.state)).toEqual(['claimed','claimed']);
+    expect(new Set(next.flatMap(item=>item.state==='claimed'?[item.job.jobKey]:[])).size).toBe(2);
+    expect((await claimAgentWork(db!)).state).toBe('idle');
+    expect(AGENT_WORK_DAILY_LIMIT).toBeNull();
+    expect((await agentWorkSummary(db!)).budget).toEqual({used:50,limit:null});
   },30000);
+  it('Autor trabalha em produto liberado mesmo com mapeamento de outro produto pendente',async()=>{
+    const author=await fixture(),waiting=await fixture();
+    await db!.insert(schema.contestStoreProducts).values([
+      {slug:`author-released-${randomUUID()}`,opportunityId:author.requirement.opportunityId,status:'released',
+        releasedAt:new Date(),releasedByUserId:author.editor.id},
+      {slug:`mapping-draft-${randomUUID()}`,opportunityId:waiting.requirement.opportunityId},
+    ]);
+    await enqueueAgentWork(db!,`mapping:${waiting.requirement.id}`,'legal_mapping',waiting.payload);
+    await enqueueAgentWork(db!,`author:${author.requirement.id}`,'authoring',author.payload);
+    const claim=await claimAgentWork(db!,new Date(),'Autor');
+    expect(claim).toMatchObject({state:'claimed',agent:'Autor',job:{jobKey:`author:${author.requirement.id}`}});
+    const [mapping]=await db!.execute<{status:string}>(sql`select status from editorial_agent_work where job_key=${`mapping:${waiting.requirement.id}`}`);
+    expect(mapping.status).toBe('pending');
+  });
   it('rejeita lei revogada durante a tarefa',async()=>{
     const f=await fixture();await enqueueAgentWork(db!,'mapping:test','legal_mapping',f.payload);
     const claim=await claimAgentWork(db!);if(claim.state!=='claimed')throw new Error('Reserva ausente');

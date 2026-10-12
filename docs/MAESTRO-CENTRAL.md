@@ -1,5 +1,14 @@
 # Maestro central da Edital Lei Seca
 
+**Decisão posterior de 12/10/2026 — tarefas sem teto diário:** o proprietário
+pediu “deixe sem limite de tarefas”. A fila usa `budget.limit: null`; a contagem
+de 24 horas é telemetria. Removida também a espera de um agente por pendências
+de outro papel, preservando a ordem de prioridade por produto. Reservas
+exclusivas, expiração de 90 minutos, até três tentativas e validações editoriais
+continuam. Dependência do Maestri e limites das assinaturas permanecem;
+não há fallback para API paga. Referências abaixo ao teto de 48 são históricas.
+Veja `docs/FILA-SEM-TETO-2026-10-12.md` para o recibo de implantação.
+
 **Decisão posterior em 12/10:** abertura automática progressiva de todas as
 preparações, com conteúdo inicial validado e ampliação contínua. Não pedir nova
 confirmação para cada produto elegível. Leia o [fluxo e seus limites](ABERTURA-PROGRESSIVA-2026-10-12.md).

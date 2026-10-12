@@ -11,8 +11,8 @@ describe("prioridade da fila dos agentes", () => {
     const transaction = {
       execute: vi.fn(async (query: SQL) => {
         queries.push(query);
-        // trava, expiração de reservas, orçamento e, por fim, a reserva (fila vazia).
-        return queries.length === 3 ? [{ count: 0 }] : [];
+        // trava, expiração e reserva; a contagem diária não limita o trabalho.
+        return [];
       }),
     };
     const db = { transaction: vi.fn(async (run: (tx: typeof transaction) => Promise<unknown>) => run(transaction)) };
@@ -24,7 +24,7 @@ describe("prioridade da fila dos agentes", () => {
 
     expect(await claimAgentWork(db, new Date("2026-10-01T15:00:00Z"))).toEqual({ state: "idle" });
 
-    const claim = new PgDialect().sqlToQuery(queries[3]);
+    const claim = new PgDialect().sqlToQuery(queries[2]);
     // Faixa por edital calculada uma vez: com 1.300 tarefas a versão por tarefa levava 50 s.
     expect(claim.sql).toContain("with product_content as materialized (");
     expect(claim.sql).toContain("opportunity_tier as materialized (");
@@ -48,8 +48,9 @@ describe("prioridade da fila dos agentes", () => {
     expect(claim.sql).toContain("work.job_key ~ '^(mapping|author):[0-9]{1,18}$' then split_part(work.job_key, ':', 2)::bigint");
     expect(claim.sql).not.toContain("payload->>'opportunityId'");
     expect(claim.sql).not.toContain("payload->>'requirementId'");
-    // O teto é compartilhado: produto liberado espera enquanto a faixa 0 tem tarefa.
-    expect(claim.sql).toContain("not (coalesce(tier.tier, 0) = 2 and (select value from unsold_waiting))");
+    // Pendências de outro papel não deixam o agente ocioso.
+    expect(claim.sql).not.toContain("unsold_waiting");
+    expect(queries).toHaveLength(3);
     const order = claim.sql.slice(claim.sql.indexOf("order by"));
     expect(order).toContain("tier.tier nulls first, tier.upcoming_exam nulls last");
     expect(order).toContain("(requirement.subject_id is null) nulls last");
