@@ -115,20 +115,25 @@ export function parsePlanaltoConsolidatedHtml(html: string, sourceUrl: string) {
 /** Conservative robots evaluation: a fetch failure is never permission. */
 export function assertPlanaltoRobotsAllowed(robots: string, sourceUrl: string) {
   if (!isAllowedPlanaltoConsolidatedUrl(sourceUrl)) throw new Error("Compilação do Planalto não permitida.");
+  return assertOfficialRobotsPathAllowed(robots, new URL(sourceUrl).pathname);
+}
+
+/** Shared policy evaluation; each provider must validate its own exact URL first. */
+export function assertOfficialRobotsPathAllowed(robots: string, pathname: string) {
   const rules: { agents: string[]; directives: { allow: boolean; path: string }[] }[] = [];
   let group = { agents: [] as string[], directives: [] as { allow: boolean; path: string }[] };
   for (const raw of robots.split(/\r?\n/u)) {
     const line = raw.replace(/#.*$/u, "").trim();
     if (!line) continue;
     const separator = line.indexOf(":");
-    if (separator < 0) throw new Error("O robots.txt do Planalto não pôde ser interpretado.");
+    if (separator < 0) throw new Error("O robots.txt da fonte oficial não pôde ser interpretado.");
     const key = line.slice(0, separator).trim().toLowerCase();
     const value = line.slice(separator + 1).trim();
     if (key === "user-agent") {
       if (group.directives.length) { rules.push(group); group = { agents: [], directives: [] }; }
       group.agents.push(value.toLowerCase());
     } else if (key === "allow" || key === "disallow") {
-      if (!group.agents.length) throw new Error("O robots.txt do Planalto não tem grupo de agente válido.");
+      if (!group.agents.length) throw new Error("O robots.txt da fonte oficial não tem grupo de agente válido.");
       if (value) group.directives.push({ allow: key === "allow", path: value });
     }
   }
@@ -136,7 +141,6 @@ export function assertPlanaltoRobotsAllowed(robots: string, sourceUrl: string) {
   const agent = "editaleiseca-officialsourcemonitor";
   const specific = rules.filter((entry) => entry.agents.some((name) => name !== "*" && agent.includes(name)));
   const applicable = specific.length ? specific : rules.filter((entry) => entry.agents.includes("*"));
-  const pathname = new URL(sourceUrl).pathname;
   let selected: { allow: boolean; weight: number } | null = null;
   for (const rule of applicable.flatMap((entry) => entry.directives)) {
     const escaped = rule.path.replace(/[.+?^{}()|[\]\\]/gu, "\\$&").replaceAll("*", ".*");
@@ -144,5 +148,5 @@ export function assertPlanaltoRobotsAllowed(robots: string, sourceUrl: string) {
     const weight = rule.path.replaceAll("*", "").replace(/\$$/u, "").length;
     if (!selected || weight > selected.weight || (weight === selected.weight && rule.allow)) selected = { allow: rule.allow, weight };
   }
-  if (selected && !selected.allow) throw new Error("O robots.txt do Planalto proíbe esta compilação.");
+  if (selected && !selected.allow) throw new Error("O robots.txt da fonte oficial proíbe esta compilação.");
 }

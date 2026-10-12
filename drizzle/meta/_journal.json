@@ -351,6 +351,13 @@
       "when": 1791775500000,
       "tag": "0049_planalto_consolidated_sources",
       "breakpoints": true
+    },
+    {
+      "idx": 50,
+      "version": "7",
+      "when": 1791846000000,
+      "tag": "0050_camara_lgpd_source",
+      "breakpoints": true
     }
   ]
 }

@@ -17,6 +17,7 @@ import {
 import {
   fetchOfficialConsolidatedLegalText,
   fetchOfficialLegalDocument,
+  type LegalTextProvider,
 } from "../src/lib/official-sources/fetch";
 import { getOfficialLegalSource } from "../src/lib/official-sources/legal-registry";
 import { parseConsolidatedLegalArticles } from "../src/lib/official-sources/legal-text";
@@ -41,8 +42,12 @@ export function parseLawLoadArgs(argv: readonly string[]) {
   const args = argv.filter((arg) => arg !== "--");
   const apply = args.includes("--apply");
   const captureOnly = args.includes("--capture-only");
+  const providerArgs = args.filter((arg) => arg.startsWith("--provider="));
+  if (providerArgs.length > 1) throw new Error("Informe somente um provedor de compilação.");
+  const provider = providerArgs[0]?.slice("--provider=".length);
+  if (provider !== undefined && !["camara", "planalto", "senado"].includes(provider)) throw new Error("Provedor de compilação inválido.");
   const slugs = args
-    .filter((arg) => arg !== "--apply" && arg !== "--capture-only")
+    .filter((arg) => arg !== "--apply" && arg !== "--capture-only" && !arg.startsWith("--provider="))
     .map((arg) => {
       const [verb, slug, extra] = arg.split("=");
       if (verb !== "lei" || extra !== undefined || !SLUG.test(slug ?? "")) {
@@ -53,13 +58,13 @@ export function parseLawLoadArgs(argv: readonly string[]) {
     });
   if (!slugs.length) throw new Error("Informe ao menos uma lei=<slug>.");
   if (new Set(slugs).size !== slugs.length) throw new Error("A mesma lei aparece mais de uma vez.");
-  return { apply, captureOnly, slugs };
+  return { apply, captureOnly, slugs, ...(provider ? { provider: provider as LegalTextProvider } : {}) };
 }
 
 class PreviewRollback extends Error {}
 
 async function main() {
-  const { apply, captureOnly, slugs } = parseLawLoadArgs(process.argv.slice(2));
+  const { apply, captureOnly, slugs, provider } = parseLawLoadArgs(process.argv.slice(2));
   const reviewer = parseOpportunityApprovalReviewerIdentity({
     ADMIN_EMAILS: process.env.ADMIN_EMAILS,
     OPPORTUNITY_APPROVAL_REFERENCE: process.env.LEGAL_LOAD_REFERENCE,
@@ -74,11 +79,11 @@ async function main() {
     for (const slug of slugs) {
       const source = getOfficialLegalSource(slug)!;
       if (getPlanaltoConsolidatedSource(source.monitorUrl) && !captureOnly) {
-        throw new Error("Compilações do Planalto exigem --capture-only e revisão posterior no painel; a autorização da fábrica não aprova fontes.");
+        throw new Error("Compilações alternativas do Planalto/Câmara exigem --capture-only e revisão posterior no painel; a autorização da fábrica não aprova fontes.");
       }
       // Rede fora da transação: a fonte é conferida de novo a cada execução.
       const monitor = await fetchOfficialLegalDocument(source.monitorUrl);
-      const captured = await fetchOfficialConsolidatedLegalText(source.monitorUrl);
+      const captured = await fetchOfficialConsolidatedLegalText(source.monitorUrl, { provider });
       const articles = parseConsolidatedLegalArticles(captured.normalizedContent);
       if (articles.length !== captured.articleCount || !articles.length) {
         throw new Error(`Contagem de artigos divergente em ${slug}: ${articles.length} de ${captured.articleCount}.`);

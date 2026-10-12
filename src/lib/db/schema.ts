@@ -1444,7 +1444,7 @@ export const legalTextSnapshots = pgTable(
     ),
     check(
       "legal_text_snapshots_url_check",
-      sql`${table.sourceUrl} ~ '^https://legis\\.senado\\.leg\\.br/norma/[0-9]+/publicacao/[0-9]+$' or ${table.sourceUrl} in ('https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709compilado.htm', 'https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2021/lei/l14133.htm')`,
+      sql`${table.sourceUrl} ~ '^https://legis\\.senado\\.leg\\.br/norma/[0-9]+/publicacao/[0-9]+$' or ${table.sourceUrl} in ('https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709compilado.htm', 'https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2021/lei/l14133.htm', 'https://www2.camara.leg.br/legin/fed/lei/2018/lei-13709-14-agosto-2018-787077-normaatualizada-pl.html')`,
     ),
     check(
       "legal_text_snapshots_checksum_check",

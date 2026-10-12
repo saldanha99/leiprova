@@ -1,4 +1,5 @@
 import { isAllowedPlanaltoConsolidatedUrl } from "./planalto-text";
+import { isAllowedCamaraConsolidatedUrl } from "./camara-text";
 
 export const OFFICIAL_LEGAL_SOURCES = [
   {
@@ -535,6 +536,7 @@ export function isAllowedOfficialLegalUrl(url: string) {
 }
 
 export function isAllowedOfficialLegalTextUrl(url: string) {
+  if (isAllowedCamaraConsolidatedUrl(url)) return true;
   if (isAllowedPlanaltoConsolidatedUrl(url)) return true;
   try {
     const parsed = new URL(url);

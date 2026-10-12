@@ -12,6 +12,7 @@ import {
 } from "./legal-text";
 import { normalizeOfficialText } from "./text-normalization";
 import { assertPlanaltoRobotsAllowed, decodePlanaltoHtml, getPlanaltoConsolidatedSource, parsePlanaltoConsolidatedHtml, PLANALTO_TEXT_PARSER_VERSION } from "./planalto-text";
+import { assertCamaraRobotsAllowed, CAMARA_LGPD_SOURCE, parseCamaraLgpdConsolidatedHtml } from "./camara-text";
 
 const USER_AGENT = "LeiProva-OfficialSourceMonitor/1.0 (+https://leiprova.2b.app.br/fontes-e-atualizacao)";
 const MAX_METADATA_BYTES = 131_072;
@@ -163,9 +164,14 @@ async function readStrictLimitedBody(response: Response, limit: number) {
   return result;
 }
 
-export async function fetchOfficialConsolidatedLegalText(monitorUrl: string) {
+export type LegalTextProvider = "senado" | "planalto" | "camara";
+
+export async function fetchOfficialConsolidatedLegalText(monitorUrl: string, options: { provider?: LegalTextProvider } = {}) {
+  if (options.provider === "camara" && monitorUrl !== CAMARA_LGPD_SOURCE.monitorUrl) throw new Error("A Câmara só foi configurada para a identidade exata da LGPD.");
+  if ((options.provider === "camara" || !options.provider) && monitorUrl === CAMARA_LGPD_SOURCE.monitorUrl) return fetchCamaraLgpdConsolidatedLegalText();
   const planalto = getPlanaltoConsolidatedSource(monitorUrl);
-  if (planalto) return fetchPlanaltoConsolidatedLegalText(planalto.url);
+  if (options.provider === "planalto" && !planalto) throw new Error("A identidade jurídica não tem compilação Planalto configurada.");
+  if (planalto && options.provider !== "senado") return fetchPlanaltoConsolidatedLegalText(planalto.url);
   const monitorResponse = await fetchWithTrustedRedirects(monitorUrl, validateLegalUrl, 0);
   if (!monitorResponse.ok) {
     throw new Error(`A fonte de monitoramento respondeu com HTTP ${monitorResponse.status}.`);
@@ -203,6 +209,24 @@ export async function fetchOfficialConsolidatedLegalText(monitorUrl: string) {
     parserVersion: LEGAL_TEXT_PARSER_VERSION,
     fetchedAt: new Date(),
   };
+}
+
+async function fetchCamaraLgpdConsolidatedLegalText() {
+  const headers = { "User-Agent": "EditalLeiSeca-OfficialSourceMonitor/1.0 (+https://editaleiseca.com.br/fontes-e-atualizacao)", Accept: "text/html,text/plain;q=0.9" };
+  const robotsResponse = await fetch("https://www2.camara.leg.br/robots.txt", { redirect: "manual", headers, signal: AbortSignal.timeout(20_000), cache: "no-store" });
+  if (robotsResponse.status !== 404 && !robotsResponse.ok) throw new Error("Não foi possível conferir o robots.txt da Câmara; captura bloqueada.");
+  const robotsBytes = await readStrictLimitedBody(robotsResponse, 64 * 1024);
+  if (robotsResponse.status !== 404) assertCamaraRobotsAllowed(new TextDecoder("utf-8", { fatal: true }).decode(robotsBytes), CAMARA_LGPD_SOURCE.url);
+  const response = await fetch(CAMARA_LGPD_SOURCE.url, { redirect: "manual", headers, signal: AbortSignal.timeout(20_000), cache: "no-store" });
+  if (!response.ok) throw new Error(`A compilação da Câmara respondeu com HTTP ${response.status}; não há contorno de bloqueio.`);
+  const contentType = response.headers.get("content-type");
+  if (!contentType?.toLowerCase().includes("html")) throw new Error("A compilação da Câmara não respondeu como HTML.");
+  const charset = /charset\s*=\s*["']?([^;\s"']+)/iu.exec(contentType)?.[1];
+  if (charset && !/^utf-?8$/iu.test(charset)) throw new Error("A compilação da Câmara não declarou a codificação UTF-8 esperada.");
+  const bytes = await readStrictLimitedBody(response, MAX_LEGAL_TEXT_BYTES);
+  const parsed = parseCamaraLgpdConsolidatedHtml(new TextDecoder("utf-8", { fatal: true }).decode(bytes), CAMARA_LGPD_SOURCE.url);
+  if (parsed.normalizedContent.length < 1_000) throw new Error("A compilação da Câmara não contém texto suficiente.");
+  return { sourceUrl: CAMARA_LGPD_SOURCE.url, checksumSha256: parsed.checksumSha256, normalizedContent: parsed.normalizedContent, contentLength: parsed.normalizedContent.length, articleCount: parsed.articles.length, parserVersion: CAMARA_LGPD_SOURCE.parserVersion, fetchedAt: new Date() };
 }
 
 async function fetchPlanaltoConsolidatedLegalText(sourceUrl: string) {

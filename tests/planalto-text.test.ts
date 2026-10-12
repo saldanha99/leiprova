@@ -71,7 +71,7 @@ describe("compilações exatas do Planalto, sem aprovação automática", () => 
   it("consulta robots antes da página e devolve captura com hash/data, sem escrever ou ativar corpus", async () => {
     const mocked = vi.fn().mockResolvedValueOnce(new Response("User-agent: *\nDisallow:", { headers: { "content-type": "text/plain" } })).mockResolvedValueOnce(new Response(page(lgpd), { headers: { "content-type": "text/html;charset=utf-8" } }));
     vi.stubGlobal("fetch", mocked);
-    const captured = await fetchOfficialConsolidatedLegalText(lgpd.monitorUrl);
+    const captured = await fetchOfficialConsolidatedLegalText(lgpd.monitorUrl, { provider: "planalto" });
     expect(mocked.mock.calls.map((call) => call[0])).toEqual(["https://www.planalto.gov.br/robots.txt", lgpd.url]);
     expect(captured.articleCount).toBe(64);
     expect(captured.fetchedAt).toBeInstanceOf(Date);
@@ -82,7 +82,7 @@ describe("compilações exatas do Planalto, sem aprovação automática", () => 
   it("não busca página quando robots falha ou proíbe, sem trocar user-agent para contornar", async () => {
     const mocked = vi.fn().mockResolvedValue(new Response("Proibido", { status: 403 }));
     vi.stubGlobal("fetch", mocked);
-    await expect(fetchOfficialConsolidatedLegalText(lgpd.monitorUrl)).rejects.toThrow(/bloqueada/u);
+    await expect(fetchOfficialConsolidatedLegalText(lgpd.monitorUrl, { provider: "planalto" })).rejects.toThrow(/bloqueada/u);
     expect(mocked).toHaveBeenCalledTimes(1);
   });
 });
