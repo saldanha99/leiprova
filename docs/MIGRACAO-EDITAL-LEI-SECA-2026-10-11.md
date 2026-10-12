@@ -65,6 +65,11 @@ na auditoria 6309 (`editorial.legal_text.approved`,
 `2189954871b10f2cdec1609149aa12ab2cd836343407fb8c26f2b1429c0fb490`.
 Esse recibo não libera automaticamente preparações sem programa e questões válidas.
 
+Após a conferência posterior do formato, são **3 preparações disponíveis e 285
+questões válidas**. As 82 questões PC-MA Delegado C/E foram suspensas porque
+a prova objetiva exige cinco alternativas. O número 4/367 acima é o retrato do
+corte, superado por essa suspensão; ver [recibo](FORMATO-PCMA-SUSPENSAO-2026-10-12.md).
+
 ### Recibos Google — 12/10/2026
 
 - **Titularidade:** o Search Console verificou automaticamente o novo domínio por
@@ -89,10 +94,10 @@ A solicitação de mudança foi aceita e o sitemap foi processado. **Indexação
 páginas, ranking e citações por IA não estão confirmados**; o processamento é um
 recibo de descoberta, não uma garantia de resultado.
 
-IndexNow está preparado por operador com preview como padrão, somente para URLs
-públicas do sitemap no domínio novo; arquivo de titularidade precisa ser publicado
-e conferido antes de `--apply`. **Ainda não houve notificação IndexNow.** Ver
-[operador e limites](INDEXNOW-DESCOBERTA-2026-10-12.md).
+IndexNow foi notificado uma vez em 12/10/2026, às 05h05 UTC (02h05 BRT), após
+conferir o arquivo público de titularidade e 23 URLs. O endpoint global respondeu
+**HTTP 202: recebimento aceito com validação da chave pendente**. Não comprova
+indexação, ranking nem citações. Ver [recibo e limites](INDEXNOW-DESCOBERTA-2026-10-12.md).
 
 
 ## Origem e destino

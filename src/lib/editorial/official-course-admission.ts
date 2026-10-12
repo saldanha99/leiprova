@@ -77,7 +77,7 @@ export async function admitStandingOfficialCourse(recipe: OfficialCourseDossierR
         values (${opportunityPublicId}, ${slug}, ${catalog[0].categoryId}, ${catalog[0].careerId}, 'MT', 'state', 2026,
           'MPMT', ${recipe.institution}, ${recipe.role}, '01/2026', 'MPMT — treino histórico da prova preambular objetiva 2026',
           'Programa do Edital 01/2026 compilado até 20/07/2026; legislação atual. Resultado definitivo da objetiva divulgado em 04/08/2026. Não anuncia edital futuro ou simulado de prova oral.',
-          'result_published', '2026-08-04', ${recipe.noticeUrl}, '2026-03-17', '2026-06-14', ${now}, 'reviewed', ${now}, ${actor}, ${now}, ${note}) returning id::text`;
+          'result_published', '2026-08-04', ${recipe.noticeUrl}, '2026-03-17', '2026-06-14', ${now}, 'draft', null, null, null, null) returning id::text`;
       const sourcePublicId = randomUUID();
       const [source] = await tx<{ id: string }[]>`
         insert into opportunity_source_documents (public_id, opportunity_id, document_type, title, source_url, source_host,
@@ -107,6 +107,11 @@ export async function admitStandingOfficialCourse(recipe: OfficialCourseDossierR
           organizer_slug, organizer_name, valid_from, status, reviewed_by_user_id, reviewed_at, review_notes)
         values (${opportunity.id}, null, ${source.id}, 'institutional_commission', 'primary_responsible', 'mpmt', 'Comissão de Concurso do MPMT', '2026-03-17', 'reviewed', ${actor}, ${now}, ${note}),
           (${opportunity.id}, ${catalog[0].bankId}, ${source.id}, 'external_organizer', 'examination_provider', 'fgv', 'Fundação Getulio Vargas', '2026-03-17', 'reviewed', ${actor}, ${now}, ${note})`;
+      // Publication triggers require its approved source and organizer to exist.
+      // The entire admission remains one transaction, so the draft is not exposed.
+      await tx`update contest_opportunities set editorial_status = 'reviewed', published_at = ${now},
+        reviewed_by_user_id = ${actor}, reviewed_at = ${now}, review_notes = ${note}, updated_at = ${now}
+        where id = ${opportunity.id} and editorial_status = 'draft'`;
       // Source programme review does not approve a mapping to any legal article.
       const requirementRows = preview.programmeRequirements.map((item) => ({ opportunity_id: opportunity.id, source_document_id: source.id,
         source_snapshot_id: snapshot.id, requirement_text: item.requirementText, source_locator: item.sourceLocator,

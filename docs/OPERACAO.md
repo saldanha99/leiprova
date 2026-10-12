@@ -5,7 +5,8 @@ Descreve onde as coisas estão, como publicar e quais armadilhas já custaram te
 
 **Produção migrada (12/10/2026, cerca de 01h23 BRT):** o endereço canônico agora é
 `https://editaleiseca.com.br`, na VPS Everglades (`everglades-vps`, `179.236.255.4`),
-com marca Edital Lei Seca; a revisão publicada após o corte é `3e9323a`. DNS autoritativo
+com marca Edital Lei Seca; após o corte foram publicadas `3e9323a`, `c6ef50f`
+e `da5e629`. DNS autoritativo
 `b.sec.dns.br` / `c.sec.dns.br`, registro A e TXT Google públicos; HTTPS válido,
 home e `/api/health` com HTTP 200, `www` com 301 para o host canônico. A cópia final
 foi restaurada e a conferência das 68 tabelas coincidiu. SHA-256 do dump:
@@ -20,8 +21,14 @@ foram iniciados e a instalação dos crons terminou com código 0; a ponte priva
 Maestri usa `everglades-vps`. Isso não comprova autoria contínua nem cobrança real
 homologada. A home Everglades continuou respondendo HTTP 200.
 
-O catálogo tem **4 de 84 preparações disponíveis, somando 367 questões com vínculos
-válidos** na conferência do corte. Produto/preço Stripe cadastrado não significa
+**Conferência posterior, 12/10/2026:** o catálogo passou a **3 de 84 preparações
+disponíveis, somando 285 questões com vínculos válidos**: ENAM 146, ENAC 70 e
+TC-DF 69. As 82 questões do PC-MA Delegado foram suspensas porque o edital exige
+cinco alternativas (p.24, §8.4), mas foram geradas em C/E. A suspensão fechou
+a venda por queda abaixo do piso; a reautoria exige contrato e perfil próprios
+por cargo/edição/etapa, sem alterar o Cebraspe C/E do TC-DF. O corte anterior
+registrava 4/367 e permanece histórico, sem representar o estado atual.
+Ver [correção e recibo](FORMATO-PCMA-SUSPENSAO-2026-10-12.md). Produto/preço Stripe cadastrado não significa
 curso pronto. A LGPD foi carregada com 72 artigos na versão legal 110; auditoria
 6309 (`editorial.legal_text.approved`), com aprovação permanente do proprietário
 e `humanReview: false`. QA da revisão `3e9323a`: 1.623 testes aprovados,
@@ -36,10 +43,10 @@ verificações de 301 e titularidade e foi confirmada no painel: **“Este site 
 sendo movido”**, início em 12/10. O processamento do sitemap não confirma que
 as páginas foram indexadas, ganharam ranking ou foram citadas por IA.
 
-IndexNow está preparado por operador com preview como padrão, somente para URLs
-públicas do sitemap no domínio novo; arquivo de titularidade precisa ser publicado
-e conferido antes de `--apply`. **Ainda não houve notificação IndexNow.** Ver
-[operador e limites](INDEXNOW-DESCOBERTA-2026-10-12.md).
+IndexNow foi notificado uma vez em 12/10/2026, às 05h05 UTC (02h05 BRT), após
+conferir o arquivo público de titularidade e 23 URLs. O endpoint global respondeu
+**HTTP 202: recebimento aceito com validação da chave pendente**. Não comprova
+indexação, ranking nem citações. Ver [recibo e limites](INDEXNOW-DESCOBERTA-2026-10-12.md).
 
 Recibos e retorno: [migração concluída e limites](MIGRACAO-EDITAL-LEI-SECA-2026-10-11.md).
 

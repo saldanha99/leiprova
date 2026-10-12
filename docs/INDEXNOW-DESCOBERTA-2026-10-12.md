@@ -1,4 +1,4 @@
-# Descoberta IndexNow — preparação em 12/10/2026
+# Descoberta IndexNow — envio em 12/10/2026
 
 Após a migração, as URLs canônicas mudaram para `editaleiseca.com.br`. IndexNow
 permite notificar mecanismos participantes sobre essas alterações, com um único
@@ -45,8 +45,13 @@ com validação de chave pendente. Nenhum dos dois prova indexação.
 - Testes com rede simulada verificam ausência de POST no preview, escopo de host,
   bloqueio de privados, prova inválida, `noindex`, canonical divergente, recebimento
   200/202 e ausência de retry em 429.
-- **Nenhum envio IndexNow executado nesta preparação.** Arquivo de titularidade
-  ainda precisa estar no deploy e ser conferido publicamente pelo operador.
+- **Envio real concluído às 05h05min29 UTC (02h05 BRT), em 12/10/2026:** 23 URLs
+  passaram pelas conferências públicas e foram enviadas uma vez ao endpoint global.
+  Resposta HTTP **202**, recebimento aceito com **validação da chave pendente**.
+  `indexed:false`; nenhuma indexação, posição ou citação por IA foi comprovada.
+- Recibo privado: `.local/migration-20261011/indexnow-submitted-20261012.json`.
+  O arquivo público de titularidade respondeu HTTP 200, texto simples e conteúdo
+  exato após corrigir a propriedade dos assets públicos no Docker (`da5e629`).
 
 Guardar o JSON do envio e o status HTTP em recibo privado quando executado. Depois
 medir indexação e tráfego separadamente. Notificar mudanças substanciais, sem repetir

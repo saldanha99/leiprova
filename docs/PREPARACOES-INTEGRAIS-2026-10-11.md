@@ -1,6 +1,23 @@
 # Edital Lei Seca — preparação integral do catálogo
 
-## Estado atual verificado — 11/10/2026, 23h23 BRT
+## Estado atual — 12/10/2026, após migração e conferência de formato
+
+Produção em `https://editaleiseca.com.br`, na VPS Everglades. Há **3 preparações
+ofertadas, com 285 questões válidas**: ENAM 146, ENAC 70 e TC-DF 69. As 82 do
+PC-MA Delegado foram suspensas por divergência com as cinco alternativas exigidas
+no edital (p.24, §8.4); a venda fecha pelo mesmo predicado de conteúdo usado pelo
+acesso. Nenhuma questão foi apagada. Ver
+[recibo da suspensão](FORMATO-PCMA-SUSPENSAO-2026-10-12.md).
+
+Os 84 produtos/preços LIVE continuam cadastrados; isso não conclui as outras
+81 preparações. O déficit mínimo passa a 5.508 questões válidas para que esses
+produtos alcancem 68 cada; o piso ainda não comprova cobertura de todo o programa.
+A LGPD tem 72 artigos revisados; a Lei 14.133 foi capturada com 191 artigos ainda
+pendentes de aprovação nesta conferência. Novos dossiês seguem separados dos
+programas efetivamente admitidos. Treino histórico e pré-edital continuam usando
+legislação atual, identificação da edição-base e revisão documentada.
+
+## Registro histórico — 11/10/2026, 23h23 BRT
 
 Consulta somente de leitura da origem ativa `wisewolf-vps`, com o predicado exato
 `approvedProductQuestionCount` e a condição de prova anterior da oferta:

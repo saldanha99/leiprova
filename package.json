@@ -24,6 +24,7 @@
     "legal:sources:check": "tsx --env-file-if-exists=.env scripts/check-official-sources.ts",
     "legal:laws:load": "tsx --env-file-if-exists=.env scripts/load-official-laws.ts",
     "legal:law:review:standing": "tsx --env-file-if-exists=.env scripts/review-standing-official-law.ts",
+    "legal:law:review:standing:procurement": "tsx --env-file-if-exists=.env scripts/review-standing-procurement-law.ts",
     "opportunities:sources:check": "tsx --env-file-if-exists=.env scripts/check-open-opportunities.ts",
     "opportunities:approve": "tsx --env-file-if-exists=.env scripts/approve-official-opportunities.ts",
     "editorial:automation": "tsx --env-file-if-exists=.env scripts/run-editorial-automation.ts",

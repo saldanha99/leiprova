@@ -6,6 +6,7 @@ describe('confirmação leve da ponte',()=>{
     const execute=vi.fn().mockResolvedValue([]);
     const result=await prepareAgentWork({execute} as unknown as AgentDatabase,new Date(),{followupsOnly:true});
     expect(execute).toHaveBeenCalledTimes(1);
-    expect(result).toEqual({mappings:0,authoring:0,discovery:0,legalChanges:0,humanReviewRequired:true,publicationAllowed:false});
+    expect(result).toEqual({mappings:0,authoring:0,discovery:0,legalChanges:0,batchSize:100,mappingExamined:0,authoringExamined:0,
+      mappingHasMore:false,authoringHasMore:false,hasMore:false,humanReviewRequired:true,publicationAllowed:false});
   });
 });

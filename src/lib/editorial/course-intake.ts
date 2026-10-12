@@ -76,7 +76,7 @@ export async function prepareCourseIntake(db: AgentDatabase) {
   `);
   await db.execute(sql`update editorial_agent_work w set status='superseded',lease_token=null,lease_expires_at=null,
     last_error_code='course_scope_changed',updated_at=now()
-    where w.kind='discovery' and w.payload->'context'->>'scope'='course_intake' and w.status in ('pending','running')
+    where w.kind='discovery' and w.payload->'context'->>'scope'='course_intake' and w.status='pending'
       and exists(select 1 from contest_store_products p where p.slug=w.payload->'context'->>'productSlug'
         and (p.opportunity_id is not null or p.status='retired'))`);
   const orders = buildCourseIntakeOrders(products);

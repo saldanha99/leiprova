@@ -1,7 +1,9 @@
+import { createHash } from "node:crypto";
 import { sql } from "drizzle-orm";
-import { AGENT_WORK_VERSION, agentWorkResultSchema, validateDiscoveryUrl, workPayloadSchema,
+import { AGENT_WORK_VERSION, agentInputHash, agentWorkResultSchema, validateDiscoveryUrl, workPayloadSchema,
   type AgentWorkPayload, type WorkArticle } from "./agent-work-contract";
-import { enqueueAgentWork, requirementContext, type AgentDatabase } from "./agent-work-queue";
+import { AGENT_OPPORTUNITY_PRIORITY_CTES, REQUIREMENT_CONTEXT_HASH_SQL, enqueueAgentWork, requirementContext, type AgentDatabase } from "./agent-work-queue";
+import { MINIMUM_COURSE_QUESTION_COUNT } from "@/lib/commerce/minimum-course-content";
 import { STYLE_PROFILE_SEEDS } from "./style-profiles";
 import { suggestLegalRequirementMapping, type MappingArticle } from "./legal-requirement-mapping";
 import { discoveryPortalPolicy } from "./discovery-policy";
@@ -9,10 +11,100 @@ import { prepareCourseIntake } from "./course-intake";
 
 type Requirement = { id:number; opportunityId:number; text:string; locator:string; title:string;
   role:string; year:number; jurisdiction:string; documentUrl:string; bank:string|null;
-  checksum:string; verifiedOn:string; };
+  checksum:string; verifiedOn:string; sourceContextHash:string; };
 
-export async function prepareAgentWork(db:AgentDatabase, now=new Date(), options:{followupsOnly?:boolean}={}) {
+export const AGENT_PREPARATION_BATCH_SIZE = 100;
+export const AGENT_PREPARATION_CACHE_ACTION = "automation.agent_requirement.preparation_cached";
+// Bump this when retrieval, instructions or matching semantics change.
+export const AGENT_PREPARATION_ALGORITHM_PROFILE_HASH = createHash("sha256").update(JSON.stringify({
+  version: "retrieval-preparation-v2", contract: AGENT_WORK_VERSION, profiles: STYLE_PROFILE_SEEDS,
+  retrieval: { language: "portuguese", words: 24, articles: 8, bytes: 220000, exactCitation: "legal-requirement-mapping-v1" },
+})).digest("hex");
+
+export function preparationBatchSize(input = AGENT_PREPARATION_BATCH_SIZE) {
+  if (!Number.isSafeInteger(input) || input < 1 || input > AGENT_PREPARATION_BATCH_SIZE) throw new Error("Lote de preparação precisa conter entre1 e100 requisitos.");
+  return input;
+}
+
+/** Normative fingerprint once per round, including text edits without timestamps,
+ * activation/revocation, legal rights and date-bound eligibility. No body is returned. */
+export const AGENT_PREPARATION_CORPUS_HASH_SQL = sql`
+  select encode(sha256(convert_to(coalesce(jsonb_agg(jsonb_build_array(a.id,a.legal_version_id,a.article_ref,
+    encode(sha256(convert_to(a.literal_text,'UTF8')),'hex'),a.editorial_status,a.source_rights,
+    v.status,v.checksum_sha256,v.source_url,v.valid_from,v.valid_until,v.verified_at::date,
+    l.id,l.title,l.short_title,l.act_type,l.act_number,l.act_year,l.jurisdiction,l.is_active) order by a.id)::text,'[]'),'UTF8')),'hex') hash
+  from legal_articles a join legal_versions v on v.id=a.legal_version_id join legal_acts l on l.id=v.legal_act_id
+  where a.editorial_status='reviewed' and a.source_rights='official_text' and v.status='current' and l.is_active
+    and (v.valid_from is null or v.valid_from<=current_date) and (v.valid_until is null or v.valid_until>=current_date)
+    and length(a.literal_text) between 20 and 80000`;
+
+export function mappingPreparationBatchQuery(corpusHash: string, batchSize: number) {
+  const limit = preparationBatchSize(batchSize) + 1;
+  return sql`with ${AGENT_OPPORTUNITY_PRIORITY_CTES}, eligible as materialized (
+    select r.id::int id,r.opportunity_id::int as "opportunityId",r.requirement_text text,r.source_locator locator,
+      o.title,o.role_name role,o.cycle_year as "year",o.jurisdiction_code jurisdiction,s.document_url as "documentUrl",
+      s.checksum_sha256 checksum,s.updated_at::date::text as "verifiedOn",${REQUIREMENT_CONTEXT_HASH_SQL} as "sourceContextHash",
+      (select b.slug from opportunity_organizer_assignments oa join quiz_banks b on b.id=oa.quiz_bank_id
+        where oa.opportunity_id=o.id and oa.status='reviewed' and oa.valid_until is null and b.is_active
+        order by case oa.role when 'examination_provider' then 0 else 1 end,oa.id limit 1) bank,
+      cache.metadata as cache,work.input_hash as "mappingInputHash",work.status as "mappingStatus",
+      case when content.opportunity_id is not null and coalesce(content.minimum_valid_question_count,0)<${MINIMUM_COURSE_QUESTION_COUNT}
+        then 0 when content.opportunity_id is null then 2 else 1 end priority,
+      case when o.exam_date>=(now() at time zone 'America/Sao_Paulo')::date then o.exam_date end deadline
+    from opportunity_requirements r join contest_opportunities o on o.id=r.opportunity_id
+    join opportunity_source_documents d on d.id=r.source_document_id join opportunity_document_snapshots s on s.id=r.source_snapshot_id
+    left join opportunity_content content on content.opportunity_id=o.id
+    left join editorial_agent_work work on work.job_key='mapping:'||r.id::text
+    left join lateral (select audit.metadata from audit_logs audit
+      where audit.entity_type='editorial_agent_preparation' and audit.entity_id=r.id::text and audit.action=${AGENT_PREPARATION_CACHE_ACTION}
+      order by audit.created_at desc,audit.id desc limit 1) cache on true
+    where r.editorial_status in('draft','pending_review','reviewed') and o.editorial_status='reviewed'
+      and d.status='approved' and s.status='approved' and coalesce(work.status,'')<>'running'
+  ), due as materialized (select * from eligible
+    where cache->>'sourceContextHash' is distinct from "sourceContextHash"
+      or cache->>'corpusHash' is distinct from ${corpusHash}
+      or cache->>'algorithmProfileHash' is distinct from ${AGENT_PREPARATION_ALGORITHM_PROFILE_HASH}
+      or cache->>'mappingInputHash' is distinct from "mappingInputHash"
+      or "mappingInputHash" is null
+  ), balanced as (select *,row_number() over(partition by "opportunityId" order by id) as position from due)
+  select * from balanced order by priority,position,deadline nulls last,id limit ${limit}`;
+}
+
+export function authoringPreparationBatchQuery(batchSize: number) {
+  return sql`with ${AGENT_OPPORTUNITY_PRIORITY_CTES}, due as materialized (
+    select parent.job_key key,parent.input_hash hash,parent.payload,parent.result,r.id,
+      r.opportunity_id as "opportunityId",case when content.opportunity_id is not null
+        and coalesce(content.minimum_valid_question_count,0)<${MINIMUM_COURSE_QUESTION_COUNT} then 0 else 1 end priority
+    from editorial_agent_work parent
+    join opportunity_requirements r on r.id=case when parent.payload->>'requirementId'~'^[0-9]{1,18}$' then(parent.payload->>'requirementId')::bigint end
+    join contest_opportunities o on o.id=r.opportunity_id join opportunity_source_documents d on d.id=r.source_document_id
+    join opportunity_document_snapshots s on s.id=r.source_snapshot_id
+    left join opportunity_content content on content.opportunity_id=o.id
+    left join editorial_agent_work author on author.job_key='author:'||r.id::text
+    where parent.kind='legal_mapping' and parent.status='prepared' and parent.result->>'outcome'='prepared'
+      and case when jsonb_typeof(parent.result->'mappings')='array' then jsonb_array_length(parent.result->'mappings')>0 else false end
+      and parent.payload->>'bank' is not null and parent.payload->>'role' is not null
+      and r.editorial_status in('draft','pending_review','reviewed') and o.editorial_status='reviewed' and d.status='approved' and s.status='approved'
+      and parent.payload->'context'->>'sourceContextHash'=${REQUIREMENT_CONTEXT_HASH_SQL}
+      and not exists (select 1 from jsonb_array_elements(parent.payload->'articles') candidate
+        where not exists (select 1 from legal_articles article join legal_versions version on version.id=article.legal_version_id
+          join legal_acts act on act.id=version.legal_act_id
+          where article.id=(candidate->>'id')::bigint and version.id=(candidate->>'versionId')::bigint
+            and version.checksum_sha256=candidate->>'checksum' and article.literal_text=candidate->>'text'
+            and article.editorial_status='reviewed' and article.source_rights='official_text' and version.status='current'
+            and act.is_active and (version.valid_from is null or version.valid_from<=current_date)
+            and (version.valid_until is null or version.valid_until>=current_date)))
+      and coalesce(author.status,'')<>'running'
+      and (author.job_key is null or author.payload->>'parentHash' is distinct from parent.input_hash
+        or author.payload->'context'->>'sourceContextHash' is distinct from parent.payload->'context'->>'sourceContextHash')
+  ), balanced as (select *,row_number() over(partition by "opportunityId" order by id,key) as position from due)
+  select key,hash,payload,result from balanced order by priority,position,id,key limit ${preparationBatchSize(batchSize) + 1}`;
+}
+
+export async function prepareAgentWork(db:AgentDatabase, now=new Date(), options:{followupsOnly?:boolean;batchSize?:number}={}) {
   let mappings=0, authoring=0, discovery=0, legalChanges=0;
+  const batchSize = preparationBatchSize(options.batchSize);
+  let corpusHash = "";
   // Requisito retirado ou suspenso (reextração do programa) não gasta reserva de agente.
   if(!options.followupsOnly) await db.execute(sql`
     update editorial_agent_work work set status='superseded',last_error_code='requirement_withdrawn',updated_at=now()
@@ -22,25 +114,19 @@ export async function prepareAgentWork(db:AgentDatabase, now=new Date(), options
         where requirement.id=(work.payload->>'requirementId')::bigint
           and requirement.editorial_status in ('draft','pending_review','reviewed'))
   `);
-  const requirements=options.followupsOnly ? [] : await db.execute<Requirement>(sql`
-    select r.id::int id,r.opportunity_id::int as "opportunityId",r.requirement_text text,r.source_locator locator,
-      o.title,o.role_name role,o.cycle_year as "year",o.jurisdiction_code jurisdiction,s.document_url as "documentUrl",
-      s.checksum_sha256 checksum,s.updated_at::date::text as "verifiedOn",
-      (select b.slug from opportunity_organizer_assignments oa join quiz_banks b on b.id=oa.quiz_bank_id
-        where oa.opportunity_id=o.id and oa.status='reviewed' and oa.valid_until is null and b.is_active
-        order by case oa.role when 'examination_provider' then 0 else 1 end,oa.id limit 1) bank
-    from opportunity_requirements r join contest_opportunities o on o.id=r.opportunity_id
-    join opportunity_source_documents d on d.id=r.source_document_id
-    join opportunity_document_snapshots s on s.id=r.source_snapshot_id
-    where r.editorial_status in ('draft','pending_review','reviewed') and o.editorial_status='reviewed'
-      and d.status='approved' and s.status='approved' order by r.id limit 2000
-  `);
+  if(!options.followupsOnly) {
+    const [corpus] = await db.execute<{hash:string}>(AGENT_PREPARATION_CORPUS_HASH_SQL);
+    if(!corpus || !/^[a-f0-9]{64}$/u.test(corpus.hash)) throw new Error("Fingerprint normativo indisponível; preparação não iniciada.");
+    corpusHash = corpus.hash;
+  }
+  const selectedRequirements=options.followupsOnly ? [] : await db.execute<Requirement>(mappingPreparationBatchQuery(corpusHash,batchSize));
+  const mappingHasMore = selectedRequirements.length > batchSize;
+  const requirements = selectedRequirements.slice(0,batchSize);
   for (const requirement of requirements) {
-    const sourceContextHash=await requirementContext(db,requirement.id);
+    const sourceContextHash=requirement.sourceContextHash;
     if (!sourceContextHash) continue;
     const search=(requirement.text.match(/[\p{L}]{5,}/gu)??[]).slice(0,24).join(" OR ");
-    if(!search) continue;
-    const retrieved=await db.execute<WorkArticle & {actId:number;actType:string;actNumber:string|null;actYear:number|null;jurisdiction:string;verifiedOn:string}>(sql`
+    const retrieved=search ? await db.execute<WorkArticle & {actId:number;actType:string;actNumber:string|null;actYear:number|null;jurisdiction:string;verifiedOn:string}>(sql`
       select a.id::int id,l.short_title act,a.article_ref as "articleRef",v.id::int as "versionId",
         v.checksum_sha256 checksum,a.literal_text text,v.source_url url,l.id::int as "actId",
         l.act_type as "actType",l.act_number as "actNumber",l.act_year as "actYear",l.jurisdiction,
@@ -52,7 +138,7 @@ export async function prepareAgentWork(db:AgentDatabase, now=new Date(), options
         and to_tsvector('portuguese',l.title||' '||a.literal_text) @@ websearch_to_tsquery('portuguese',${search})
       order by ts_rank(to_tsvector('portuguese',l.title||' '||a.literal_text),
         websearch_to_tsquery('portuguese',${search})) desc,a.id limit 8
-    `);
+    `) : [];
     let size=0;
     const bounded=retrieved.filter(article=>{size+=Buffer.byteLength(article.text);return size<=220000;});
     const articles:WorkArticle[]=bounded.map(({id,act,articleRef,versionId,checksum,text,url})=>({id,act,articleRef,versionId,checksum,text,url}));
@@ -80,11 +166,18 @@ export async function prepareAgentWork(db:AgentDatabase, now=new Date(), options
           last_error_code='official_corpus_missing',updated_at=now() where job_key=${`mapping:${requirement.id}`} and status='pending'`);
       }
     }
+    // Cache lives outside payload/inputHash. Concurrent claim/change cannot be
+    // called cached: only the exact non-running mapping records this receipt.
+    await db.execute(sql`insert into audit_logs(action,entity_type,entity_id,metadata)
+      select ${AGENT_PREPARATION_CACHE_ACTION},'editorial_agent_preparation',${String(requirement.id)},
+        ${JSON.stringify({sourceContextHash,corpusHash,algorithmProfileHash:AGENT_PREPARATION_ALGORITHM_PROFILE_HASH,
+          mappingInputHash:agentInputHash(payload),requirementId:requirement.id,policy:"retrieval_cache_only",humanReview:false,publicationAllowed:false})}::jsonb
+      from editorial_agent_work work where work.job_key=${`mapping:${requirement.id}`}
+        and work.input_hash=${agentInputHash(payload)} and work.status<>'running'`);
   }
-  const parents=await db.execute<{key:string; hash:string; payload:AgentWorkPayload; result:unknown}>(sql`
-    select job_key key,input_hash hash,payload,result from editorial_agent_work where kind='legal_mapping' and status='prepared'
-    order by created_at limit 2000
-  `);
+  const selectedParents=await db.execute<{key:string; hash:string; payload:AgentWorkPayload; result:unknown}>(authoringPreparationBatchQuery(batchSize));
+  const authoringHasMore = selectedParents.length > batchSize;
+  const parents = selectedParents.slice(0,batchSize);
   for(const parent of parents) {
     const payload=workPayloadSchema.parse(parent.payload);
     const result=agentWorkResultSchema.parse(parent.result);
@@ -100,16 +193,18 @@ export async function prepareAgentWork(db:AgentDatabase, now=new Date(), options
   }
   // A confirmação de uma resposta não deve repetir a busca completa no corpus.
   // A preparação integral continua no ciclo de seis horas da VPS.
-  if(options.followupsOnly) return {mappings,authoring,discovery,legalChanges,humanReviewRequired:true,publicationAllowed:false};
+  const batches = {batchSize,mappingExamined:requirements.length,authoringExamined:parents.length,mappingHasMore,authoringHasMore,hasMore:mappingHasMore||authoringHasMore};
+  if(options.followupsOnly) return {mappings,authoring,discovery,legalChanges,...batches,humanReviewRequired:true,publicationAllowed:false};
   const courseIntake=await prepareCourseIntake(db);
   const portals=await db.execute<{bank:string; url:string}>(sql`
     select b.slug bank,p.official_url url from exam_source_portals p join quiz_banks b on b.id=p.quiz_bank_id
-    where p.is_active and b.is_active order by b.slug
+    where p.is_active and b.is_active and b.slug in (${sql.join(STYLE_PROFILE_SEEDS.map(profile=>sql`${profile.bankSlug}`),sql`,`)})
+    order by b.slug
   `);
   const date=now.toISOString().slice(0,10);
   await db.execute(sql`update editorial_agent_work set status='superseded',lease_token=null,lease_expires_at=null,
     last_error_code='newer_discovery_window',updated_at=now()
-    where kind='discovery' and status in ('pending','running') and payload->'context'->>'date' < ${date}`);
+    where kind='discovery' and status='pending' and payload->'context'->>'date' < ${date}`);
   for(const portal of portals) {
     const policy=discoveryPortalPolicy(portal.bank,portal.url);
     const urls=policy.urls.map(validateDiscoveryUrl);
@@ -135,5 +230,5 @@ export async function prepareAgentWork(db:AgentDatabase, now=new Date(), options
       instructions:"Verifique a fonte normativa oficial usando agent-browser. Explique alteração ou ausência de mudança material, vigência e limitações. Não ativar versão, não marcar revisão humana nem publicar questões. Registre evidências e encaminhe à revisão administrativa.",
       context:{snapshotId:change.id,checksum:change.checksum,status:change.status,humanReviewRequired:true}})) legalChanges++;
   }
-  return {mappings,authoring,discovery,legalChanges,courseIntake,humanReviewRequired:true,publicationAllowed:false};
+  return {mappings,authoring,discovery,legalChanges,courseIntake,...batches,humanReviewRequired:true,publicationAllowed:false};
 }

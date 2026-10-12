@@ -4,9 +4,9 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import { beforeAll,beforeEach,afterAll,describe,it,expect } from "vitest";
 import * as schema from "@/lib/db/schema";
-import { AGENT_WORK_VERSION,type AgentWorkPayload } from "@/lib/editorial/agent-work-contract";
+import { AGENT_WORK_DAILY_LIMIT, AGENT_WORK_LEASE_MINUTES, AGENT_WORK_VERSION,type AgentWorkPayload } from "@/lib/editorial/agent-work-contract";
 import { enqueueAgentWork,claimAgentWork,completeAgentWork,requirementContext } from "@/lib/editorial/agent-work-queue";
-import { prepareAgentWork } from "@/lib/editorial/agent-work-preparation";
+import { AGENT_PREPARATION_CORPUS_HASH_SQL, mappingPreparationBatchQuery, prepareAgentWork } from "@/lib/editorial/agent-work-preparation";
 import { prepareCourseIntake } from "@/lib/editorial/course-intake";
 
 const url=process.env.LEIPROVA_TEST_DATABASE_URL;
@@ -77,22 +77,42 @@ describe.skipIf(!url)('ponte editorial — PostgreSQL isolado',()=>{
     const claims=await Promise.all(Array.from({length:4},()=>claimAgentWork(db!,new Date(),'Radar')));
     expect(claims.filter(x=>x.state==='claimed')).toHaveLength(1);
   });
-  it('alteração de entrada cancela resposta antiga',async()=>{
+  it('mudança de escopo do intake não substitui o lease ativo do Radar',async()=>{
+    const slug=`intake-lease-${randomUUID()}`;
+    await db!.insert(schema.contestStoreProducts).values({slug});await prepareCourseIntake(db!);
+    const key=`course-intake:${slug}`;
+    // Produto sintético sem pesquisa nasce bloqueado; a reserva abaixo testa
+    // somente concorrência/escopo, sem inventar fonte ou aprová-lo.
+    await db!.execute(sql`update editorial_agent_work set status='blocked' where status='pending' and job_key<>${key}`);
+    await db!.execute(sql`update editorial_agent_work set status='pending' where job_key=${key}`);
+    const claim=await claimAgentWork(db!,new Date(),'Radar');if(claim.state!=='claimed')throw new Error('Reserva ausente');
+    expect(claim.job.jobKey).toBe(key);
+    await db!.update(schema.contestStoreProducts).set({status:'retired'}).where(eq(schema.contestStoreProducts.slug,slug));
+    await prepareCourseIntake(db!);
+    const [work]=await db!.execute<{status:string;hash:string;token:string}>(sql`select status,input_hash hash,lease_token::text token from editorial_agent_work where job_key=${key}`);
+    expect(work).toMatchObject({status:'running',hash:claim.job.inputHash,token:claim.job.leaseToken});
+  });
+  it('não substitui uma reserva ativa e admite nova entrada somente depois da conclusão',async()=>{
     const payload=discoveryPayload();await enqueueAgentWork(db!,'test:1','discovery',payload);
     const claim=await claimAgentWork(db!);if(claim.state!=='claimed')throw new Error('Reserva ausente');
-    await enqueueAgentWork(db!,'test:1','discovery',{...payload,title:'Outra edição'});
-    await expect(completeAgentWork(db!,{...claim.job,result:base})).rejects.toThrow();
+    expect(await enqueueAgentWork(db!,'test:1','discovery',{...payload,title:'Outra edição'})).toBe(false);
+    const [running]=await db!.execute<{inputHash:string;leaseToken:string;status:string}>(sql`select input_hash as "inputHash",lease_token::text as "leaseToken",status from editorial_agent_work where job_key='test:1'`);
+    expect(running).toMatchObject({inputHash:claim.job.inputHash,leaseToken:claim.job.leaseToken,status:'running'});
+    await expect(completeAgentWork(db!,{...claim.job,result:base})).resolves.toMatchObject({state:'prepared'});
+    await expect(completeAgentWork(db!,{...claim.job,result:base})).resolves.toMatchObject({state:'prepared',replayed:true});
+    expect(await enqueueAgentWork(db!,'test:1','discovery',{...payload,title:'Outra edição'})).toBe(true);
     expect((await claimAgentWork(db!)).state).toBe('claimed');
   });
   it('retoma lease vencido e para após três tentativas',async()=>{
     await enqueueAgentWork(db!,'test:1','discovery',discoveryPayload());const now=new Date();
-    for(let i=0;i<3;i++)expect((await claimAgentWork(db!,new Date(now.getTime()+i*46*60000))).state).toBe('claimed');
-    expect((await claimAgentWork(db!,new Date(now.getTime()+3*46*60000))).state).toBe('idle');
+    const afterLeaseMs=(AGENT_WORK_LEASE_MINUTES+1)*60000;
+    for(let i=0;i<3;i++)expect((await claimAgentWork(db!,new Date(now.getTime()+i*afterLeaseMs))).state).toBe('claimed');
+    expect((await claimAgentWork(db!,new Date(now.getTime()+3*afterLeaseMs))).state).toBe('idle');
     expect((await db!.execute<{status:string}>(sql`select status from editorial_agent_work`))[0].status).toBe('failed');
   });
   it('teto diário é compartilhado e atômico',async()=>{
-    for(let i=0;i<26;i++)await enqueueAgentWork(db!,`test:${i}`,'discovery',discoveryPayload());
-    for(let i=0;i<24;i++)expect((await claimAgentWork(db!)).state).toBe('claimed');
+    for(let i=0;i<AGENT_WORK_DAILY_LIMIT+1;i++)await enqueueAgentWork(db!,`test:${i}`,'discovery',discoveryPayload());
+    for(let i=0;i<AGENT_WORK_DAILY_LIMIT;i++)expect((await claimAgentWork(db!)).state).toBe('claimed');
     expect((await claimAgentWork(db!)).state).toBe('budget_exhausted');
   },30000);
   it('rejeita lei revogada durante a tarefa',async()=>{
@@ -126,6 +146,32 @@ describe.skipIf(!url)('ponte editorial — PostgreSQL isolado',()=>{
     expect(mapping.payload.context.humanReviewRequired).toBe(true);
     const [blocked]=await db!.execute<{status:string}>(sql`select status from editorial_agent_work where kind='discovery' and payload->'context'->>'bank'='vunesp'`);
     expect(blocked.status).toBe('blocked');
+  },30000);
+  it('cache evita repetir retrieval e invalida texto legal, revogação e retificação do programa',async()=>{
+    const f=await fixture();await prepareAgentWork(db!);
+    const digest=async()=>((await db!.execute<{hash:string}>(AGENT_PREPARATION_CORPUS_HASH_SQL))[0]).hash;
+    const firstHash=await digest();
+    expect((await db!.execute<{id:number}>(mappingPreparationBatchQuery(firstHash,100))).some(row=>row.id===f.requirement.id)).toBe(false);
+    // Mesmo sem alterar updated_at, o corpo oficial diferente invalida o cache.
+    await db!.update(schema.legalArticles).set({literalText:f.article.literalText+' Informação sintética adicional.'}).where(eq(schema.legalArticles.id,f.article.id));
+    const changedHash=await digest();expect(changedHash).not.toBe(firstHash);
+    expect((await db!.execute<{id:number}>(mappingPreparationBatchQuery(changedHash,100))).some(row=>row.id===f.requirement.id)).toBe(true);
+    await prepareAgentWork(db!);
+    await db!.update(schema.legalVersions).set({status:'superseded'}).where(eq(schema.legalVersions.id,f.version.id));
+    const revokedHash=await digest();expect(revokedHash).not.toBe(changedHash);
+    expect((await db!.execute<{id:number}>(mappingPreparationBatchQuery(revokedHash,100))).some(row=>row.id===f.requirement.id)).toBe(true);
+    await prepareAgentWork(db!);
+    await db!.update(schema.opportunityRequirements).set({requirementText:'Programa retificado sintético.'}).where(eq(schema.opportunityRequirements.id,f.requirement.id));
+    expect((await db!.execute<{id:number}>(mappingPreparationBatchQuery(revokedHash,100))).some(row=>row.id===f.requirement.id)).toBe(true);
+  },30000);
+  it('hasMore conserva o próximo lote em vez de repetir somente os primeiros IDs',async()=>{
+    const f=await fixture();
+    await db!.insert(schema.opportunityRequirements).values(Array.from({length:101},(_,index)=>({opportunityId:f.requirement.opportunityId,
+      sourceDocumentId:f.requirement.sourceDocumentId,sourceSnapshotId:f.requirement.sourceSnapshotId,
+      subjectId:f.requirement.subjectId,requirementText:`Regra sintética de organizar cartões — requisito${index}.`,sourceLocator:'Página sintética1'})));
+    const first=await prepareAgentWork(db!,new Date(),{batchSize:100});expect(first.mappingExamined).toBe(100);expect(first.mappingHasMore).toBe(true);
+    const second=await prepareAgentWork(db!,new Date(),{batchSize:100});expect(second.mappingExamined).toBeGreaterThan(0);
+    expect(second.mappingHasMore).toBe(false);
   },30000);
   it('mapeamento concluído alimenta Autor automaticamente sem revisar o requisito',async()=>{
     const f=await fixture();await prepareAgentWork(db!);

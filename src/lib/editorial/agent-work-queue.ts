@@ -84,6 +84,7 @@ export async function enqueueAgentWork(db: AgentDatabase, key: string, kind: Age
       status='pending',attempts=0,lease_token=null,lease_expires_at=null,result=null,
       last_error_code=null,updated_at=now()
     where editorial_agent_work.input_hash <> excluded.input_hash
+      and editorial_agent_work.status <> 'running'
     returning job_key
   `);
   return rows.length > 0;
@@ -130,13 +131,16 @@ export async function claimAgentWork(db: AgentDatabase, now = new Date(), agent?
   });
 }
 
+/** Shared exact expression: batched preparation and locked completion agree. */
+export const REQUIREMENT_CONTEXT_HASH_SQL = sql`encode(sha256(convert_to(jsonb_build_array(to_jsonb(r),to_jsonb(o),
+      d.status,d.source_url,d.checksum_sha256,s.status,s.checksum_sha256,
+      (select jsonb_agg(to_jsonb(oa) order by oa.id) from opportunity_organizer_assignments oa
+        where oa.opportunity_id=o.id))::text,'UTF8')),'hex')`;
+
 /** Hash do contexto impede aceitar respostas depois de retificação/revogação. */
 export async function requirementContext(db: AgentDatabase, id: number, lock=false) {
   const [row] = await db.execute<{ hash: string }>(sql`
-    select encode(sha256(convert_to(jsonb_build_array(to_jsonb(r),to_jsonb(o),
-      d.status,d.source_url,d.checksum_sha256,s.status,s.checksum_sha256,
-      (select jsonb_agg(to_jsonb(oa) order by oa.id) from opportunity_organizer_assignments oa
-        where oa.opportunity_id=o.id))::text,'UTF8')),'hex') hash
+    select ${REQUIREMENT_CONTEXT_HASH_SQL} hash
     from opportunity_requirements r join contest_opportunities o on o.id=r.opportunity_id
     join opportunity_source_documents d on d.id=r.source_document_id
     join opportunity_document_snapshots s on s.id=r.source_snapshot_id
