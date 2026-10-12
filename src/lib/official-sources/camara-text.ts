@@ -9,7 +9,7 @@ import { normalizeOfficialText } from "./text-normalization";
 export const CAMARA_LGPD_SOURCE = {
   monitorUrl: "https://legis.senado.leg.br/norma/27457334",
   url: "https://www2.camara.leg.br/legin/fed/lei/2018/lei-13709-14-agosto-2018-787077-normaatualizada-pl.html",
-  parserVersion: "camara-lgpd-consolidated-v1.0.0",
+  parserVersion: "camara-lgpd-consolidated-v1.0.1",
 } as const;
 
 export function isAllowedCamaraConsolidatedUrl(url: string) {
@@ -62,10 +62,17 @@ export function parseCamaraLgpdConsolidatedHtml(html: string, url: string) {
   }
   const lines: string[] = [];
   let currentArticle: number | null = null;
+  let expectHeading = false;
   for (const paragraph of paragraphs) {
     if (/^Bras[ií]lia,/iu.test(paragraph)) break;
     const match = ARTICLE.exec(paragraph);
-    if (match) currentArticle = Number(match[1]);
+    if (/^(?:CAP[IÍ]TULO|SE[CÇ][AÃ]O|T[IÍ]TULO|SUBSE[CÇ][AÃ]O)\b/iu.test(paragraph)) { expectHeading = true; continue; }
+    if (expectHeading && !match) {
+      if (paragraph.startsWith("(") && paragraph.endsWith(")")) continue;
+      expectHeading = false;
+      continue;
+    }
+    if (match) { currentArticle = Number(match[1]); expectHeading = false; }
     if (currentArticle === null || currentArticle === 60) continue;
     if (/^(?:CAP[IÍ]TULO|SE[CÇ][AÃ]O|T[IÍ]TULO|SUBSE[CÇ][AÃ]O)\b/iu.test(paragraph) || (!match && paragraph === paragraph.toUpperCase() && /[A-ZÀ-ÖØ-Þ]{3}/u.test(paragraph) && !/^(?:[IVXLCDM]+\s*[-–—]|§)/u.test(paragraph))) continue;
     if (ONLY_WITHDRAWN.test(paragraph) || /^\([^()]*\b(?:VETAD[OA]|REVOGAD[OA])\b[^()]*\)\.?$/iu.test(paragraph)) continue;

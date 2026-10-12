@@ -1,5 +1,12 @@
 # LGPD da Câmara: captura pendente
 
+**Correção em 12/10/2026:** a revisão posterior encontrou 14 títulos de seção
+anexados ao artigo anterior em v1.0.0. Não aprovar o hash inicial abaixo. Parser
+v1.0.1 corrige esse defeito; a nova revisão automatizada delimitada e a decisão
+posterior do proprietário estão em `REVISAO-AUTOMATICA-LGPD-2026-10-12.md`.
+O estado e os hashes seguintes descrevem a preparação inicial, preservada como
+histórico, não uma aprovação válida.
+
 Implementação para Edital Lei Seca em 11/10/2026 (BRT). Não autoriza aprovação de
 fonte, versão vigente, autoria ou venda. A exceção de aprovação automática das
 inéditas não se aplica às fotografias de legislação.

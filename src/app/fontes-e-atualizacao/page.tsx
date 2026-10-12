@@ -132,7 +132,7 @@ const UPDATE_STEPS = [
   {
     icon: BadgeCheck,
     title: "4. Revisar e publicar",
-    text: "A publicação registra a origem da aprovação. As inéditas da fábrica passam pela linha automática autorizada pelo proprietário, com conferência posterior e suspensão de erros. Essa autorização não equivale a revisão humana independente de cada item.",
+    text: "A publicação registra a origem da aprovação. Normas, editais, programas e inéditas podem seguir a revisão automatizada autorizada pelo proprietário, com conferência posterior e suspensão de erros. Esse caminho não equivale a revisão humana independente de cada item.",
   },
 ] as const;
 
@@ -152,7 +152,7 @@ export default function SourcesAndUpdatesPage() {
                 De onde vêm as leis e as questões da Edital Lei Seca?
               </h1>
               <p className="mt-6 max-w-4xl text-lg leading-8 text-slate-300">
-                As preparações usam normas obtidas em fontes oficiais e questões originais assistidas por IA. Cada edição tem programa, cargo e perfil editorial próprios. A disponibilidade aparece no catálogo; referências de provas anteriores apontam para o órgão ou a organizadora quando o arquivo oficial foi conferido. A aprovação automática das inéditas da fábrica é identificada e não representa revisão humana independente de cada item.
+                As preparações usam normas obtidas em fontes oficiais e questões originais assistidas por IA. Cada edição tem programa, cargo e perfil editorial próprios. A disponibilidade aparece no catálogo; referências de provas anteriores apontam para o órgão ou a organizadora quando o arquivo oficial foi conferido. A origem da aprovação fica identificada. O caminho de revisão automatizada autorizado para normas, editais, programas e inéditas não representa revisão humana independente de cada item.
               </p>
               <div className="mt-7 flex flex-wrap gap-3 text-xs font-bold">
                 <span className="rounded-full border border-emerald-300/20 bg-emerald-300/8 px-4 py-2 text-emerald-200">Fontes oficiais e versionadas</span>
@@ -257,7 +257,7 @@ export default function SourcesAndUpdatesPage() {
                 },
                 {
                   title: "Editais e conteúdo programático",
-                  text: "O portal oficial do órgão ou da organizadora é validado antes da captura. Somente editais e anexos oficiais podem ser armazenados; cada versão recebe checksum e uma decisão humana auditável, preferencialmente por revisor independente. Exceções do proprietário ficam identificadas. Cadernos e gabaritos podem ser referenciados por links oficiais conferidos; a cópia e a reutilização comercial seguem regras próprias de licença.",
+                  text: "O portal oficial do órgão ou da organizadora é validado antes da captura. Somente editais e anexos oficiais podem ser armazenados; cada versão recebe checksum e uma decisão editorial auditável. O caminho automatizado autorizado pelo proprietário registra sua origem e a ausência de revisão humana independente. Cadernos e gabaritos podem ser referenciados por links oficiais conferidos; a cópia e a reutilização comercial seguem regras próprias de licença.",
                   href: null,
                   label: null,
                 },

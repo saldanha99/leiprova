@@ -38,6 +38,13 @@ Regras que valem sempre:
   aprovadas, vinculadas e liberadas pela linha automática
   `deploy/editorial-release-chain.sh`, sem conferência humana do item (auditoria
   `owner_standing_authorization`); o Maestro confere depois e suspende o que tiver erro.
+  Em 12/10/2026, o proprietário estendeu explicitamente a revisão e liberação
+  automatizadas às fontes, editais e programas oficiais. Esse caminho deve
+  registrar `owner_standing_authorization` e `humanReview: false`, com fonte
+  primária verificada, identidade exata da edição/cargo/banca, versão e evidências
+  auditadas. Resultado `prepared` continua sendo apenas proposta. Acesso bloqueado,
+  fonte/identidade incerta e ausência de direitos de uso impedem liberação; não
+  contornar nem converter a autorização em declaração de revisão humana.
   Não faça scraping nem reutilize questões de terceiros sem licença escrita.
 - Scripts novos que rodem por `tsx` precisam de `--env-file-if-exists=.env`;
   o projeto não tem `dotenv`.
@@ -73,9 +80,9 @@ Regras que valem sempre:
   rascunhos. O Maestro coordena os nós existentes, sem duplicá-los.
 - Use a ponte delimitada por SSH existente; nunca copie credenciais para agentes
   ou notas. `.local/maestri/queue` é privada e não entra em Git ou Docker.
-- Resultado `prepared` não é aprovação: quem aprova as inéditas da fábrica é a linha
-  de liberação (exceção acima); fora dela, publicação e vínculo comercial continuam
-  exigindo revisão humana efetiva. Stripe está em modo live só para a venda já aberta;
+- Resultado `prepared` não é aprovação: as inéditas passam pela linha de liberação;
+  fontes/editais/programas passam pelo caminho auditado autorizado em 12/10/2026.
+  Fora desses caminhos, continua exigida revisão humana efetiva. Stripe está em modo live só para a venda já aberta;
   não altere flags comerciais.
 - **Maestro central** (nó "Maestro LeiProva", pode ser Claude ou Codex): siga
   `docs/MAESTRO-CENTRAL.md` — saúde, conferência das aprovadas, suspensão de erros e

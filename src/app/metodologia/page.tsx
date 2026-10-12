@@ -134,7 +134,7 @@ export default function MethodologyPage() {
                 {PAGE_TITLE}
               </h1>
               <p className="mt-6 max-w-4xl text-lg leading-8 text-slate-300">
-                O processo separa descoberta de fontes, análise de evidências e publicação. Editais e referências externas têm conferência própria; inéditas da fábrica seguem a linha automática autorizada pelo proprietário. Fonte oficial, cargo, edição e origem da aprovação devem permanecer identificados.
+                O processo separa descoberta de fontes, análise de evidências e publicação. Normas, editais, programas e inéditas têm conferência própria e podem seguir revisão automatizada autorizada pelo proprietário, com auditoria e suspensão de erros; não se presume revisão humana independente. Fonte oficial, cargo, edição e origem da aprovação devem permanecer identificados.
               </p>
               <p className="mt-5 text-sm leading-7 text-slate-400">
                 Esta página descreve a política de implementação. Ela não afirma que todos os conectores, análises históricas ou páginas específicas já estejam operando.
@@ -255,7 +255,7 @@ export default function MethodologyPage() {
               <article className="rounded-2xl border border-emerald-300/18 bg-emerald-300/[0.045] p-5">
                 <h3 className="font-semibold text-emerald-200">Pode ser publicado</h3>
                 <p className="mt-2 text-sm leading-7 text-slate-400">
-                  Página com fonte oficial aprovada, edição identificada, responsável corretamente classificado, situação conferida, conteúdo visível coerente com o schema e revisão humana registrada.
+                  Página com fonte oficial aprovada, edição identificada, responsável corretamente classificado, situação conferida, conteúdo visível coerente com o schema e aprovação editorial com sua origem registrada.
                 </p>
               </article>
               <article className="rounded-2xl border border-rose-300/15 bg-rose-300/[0.035] p-5">

@@ -3,7 +3,38 @@
 Documento de contexto para quem for continuar o projeto — pessoa ou assistente de IA.
 Descreve onde as coisas estão, como publicar e quais armadilhas já custaram tempo.
 
-**Nova marca e migração em preparação (11/10/2026, noite BRT):** o proprietário
+**Produção migrada (12/10/2026, cerca de 01h23 BRT):** o endereço canônico agora é
+`https://editaleiseca.com.br`, na VPS Everglades (`everglades-vps`, `179.236.255.4`),
+com marca Edital Lei Seca e código publicado `1b5bc146`. DNS autoritativo
+`b.sec.dns.br` / `c.sec.dns.br`, registro A e TXT Google públicos; HTTPS válido,
+home e `/api/health` com HTTP 200, `www` com 301 para o host canônico. A cópia final
+foi restaurada e a conferência das 68 tabelas coincidiu. SHA-256 do dump:
+`3a39b1f6f2d2ab3eab16cbc5c401eed5243bc2cec3ea3dfcd002d3d1d32e50fd`.
+
+App e workers antigos estão parados; banco e pooler da origem foram preservados.
+O proxy legado encaminha páginas para a URL equivalente nova com 301 e encaminha
+POST do webhook à aplicação nova. O endpoint Stripe LIVE
+`we_1ULXBMBkl6797u2uZyCIYjSM` foi atualizado para o domínio novo e está ativo,
+com seus 18 eventos e versão API preservados. Os três serviços de worker do destino
+foram iniciados e a instalação dos crons terminou com código 0; a ponte privada do
+Maestri usa `everglades-vps`. Isso não comprova autoria contínua nem cobrança real
+homologada. A home Everglades continuou respondendo HTTP 200.
+
+O catálogo tem **4 de 84 preparações disponíveis, somando 367 questões com vínculos
+válidos** na conferência do corte. Produto/preço Stripe cadastrado não significa
+curso pronto. O novo parser LGPD e o fluxo de autorização de programa ainda
+não estão ativos na imagem publicada. QA dessa imagem: 1.605 testes aprovados,
+239 opcionais pulados. Em 12/10, o Search Console verificou automaticamente o novo
+domínio por DNS. O sitemap foi enviado, mas seu primeiro status foi **“Não foi
+possível buscar”**; a conferência externa com Googlebot recebeu HTTP 200 e XML com
+23 URLs válidas no domínio novo. A mudança de endereço da propriedade exata
+`https://leiprova.2b.app.br/` para `sc-domain:editaleiseca.com.br` passou pelas
+verificações de 301 e titularidade e foi confirmada no painel: **“Este site está
+sendo movido”**, início em 12/10. Leitura do sitemap pelo Google, indexação e
+ranking ainda não estão confirmados.
+Recibos e retorno: [migração concluída e limites](MIGRACAO-EDITAL-LEI-SECA-2026-10-11.md).
+
+**Registro histórico de preparação (11/10/2026, noite BRT; superado pelo corte acima):** o proprietário
 escolheu Edital Lei Seca e adquiriu `editaleiseca.com.br`. Código `f789d9b` publicado
 na origem, com logo, SEO e modos explícitos. A VPS Everglades (`everglades-vps`,
 `179.236.255.4`) já tem clone, banco de ensaio restaurado, migrações 0048/0049,
@@ -746,51 +777,78 @@ sem aplicação na VPS ou aprovação/publicação das 160 questões do lote.
 
 | Ambiente | Endereço | Observação |
 |---|---|---|
-| Repositório | https://github.com/saldanha99/leiprova | Público. Commits assinados como `saldanhaClaw`, conta dona é `saldanha99`. |
-| Produção | https://leiprova.2b.app.br | VPS Hostinger `srv1801171.hstgr.cloud`, IP `187.127.46.251`. |
-| Acesso SSH | `ssh wisewolf-vps` | Alias já configurado, usuário `root`. |
-| Diretório na VPS | `/opt/leiprova` | Clone de `origin/main`. |
+| Repositório | https://github.com/saldanha99/leiprova | Identificador técnico preservado; origem Git do projeto. |
+| Produção | https://editaleiseca.com.br | VPS compartilhada com Everglades, IP `179.236.255.4`. |
+| Alias público | https://www.editaleiseca.com.br | Redireciona com 301 para o domínio canônico. |
+| Acesso SSH de produção | `ssh everglades-vps` | Alias autorizado para o destino atual. |
+| Diretório na VPS | `/opt/leiprova` | Clone do projeto; `.env` privado e banco continuam leiprova. |
+| Origem preservada | https://leiprova.2b.app.br | VPS `187.127.46.251`, alias `wisewolf-vps`; páginas redirecionam, webhook legado é encaminhado. Não usar para deploy de produção. |
 
-A VPS é **compartilhada**: roda cerca de 28 contêineres de vários projetos
-(Supabase completo, Forza, Hermes2, Wise Wolf, FisioAgenda), todos atrás de um
-único Traefik na 80/443. Por isso o `docker-compose.yml` entra na rede externa
-`forza` em vez de subir o próprio proxy. Verifique espaço em disco antes de
-builds grandes — a máquina é dividida com os outros projetos.
+A VPS de produção é **compartilhada com Everglades**. O Caddy existente recebe
+os hosts deste projeto na rede `leiprova_edge`; o banco e o pooler ficam na rede
+privada `leiprova_internal`. App e banco não publicam portas próprias. O compose
+usa `LEIPROVA_EDGE_NETWORK=leiprova_edge`, domínio e origens configurados no `.env`;
+não substituir essas variáveis pelos defaults legados nem modificar o proxy de
+outros sites. Verifique espaço e memória antes de builds. O build da migração
+rodou na VPS de 16 GB, sem build concorrente no Mac.
 
 Contêineres do projeto: `leiprova-app` (Next), `leiprova-pooler` (PgBouncer
-1.25.2), `leiprova-db` (postgres:17.10-alpine), `leiprova-legal-monitor`
-(fontes jurídicas) e `leiprova-editorial-automation` (editais e fila).
+1.25.2), `leiprova-db` (PostgreSQL 17), `leiprova-legal-monitor`
+(fontes jurídicas), `leiprova-editorial-automation` (editais e fila) e
+`leiprova-purchase-delivery` (entrega). Workers e crons de escrita executam
+**somente no destino**. Na origem, app e workers permanecem parados; banco,
+pooler e arquivos foram preservados para recuperação. A homologação legada
+não foi migrada para o novo domínio como parte desse corte.
 
 ## Publicar em produção
 
 ```bash
 git push origin main
-ssh wisewolf-vps 'cd /opt/leiprova && LEIPROVA_SKIP_SEED=1 ./deploy/pull-deploy.sh'
+ssh everglades-vps 'cd /opt/leiprova && LEIPROVA_SKIP_SEED=1 ./deploy/pull-deploy.sh'
 ```
 
 O `pull-deploy.sh` traz a ref por fast-forward e encadeia o `deploy.sh`, que
-compila as imagens, sobe banco e pool, roda migrations, reaplica privilégios e
+compila as imagens, sobe banco e pooler, roda migrations, reaplica privilégios e
 recria app e workers quando necessário. Banco e pooler permanecem de pé.
 Use `LEIPROVA_SKIP_SEED=1` em atualizações para preservar o acervo; sem essa
 variável o script também executa o seed. Homologação usa seu compose e suas
 imagens fixadas, não o comando de produção. Há uma breve janela de reinício do app.
 
+Preserve `APP_URL` e `NEXT_PUBLIC_APP_URL` como `https://editaleiseca.com.br` no
+destino: a origem pública também é argumento de build do Next. A rede de entrada
+continua `leiprova_edge`. Não reativar a cópia de origem nem executar o mesmo
+deploy em ambas as VPS. Mudanças no Caddy exigem validar a configuração e preservar
+os blocos de Everglades; o deploy do app não autoriza recriar o proxy compartilhado.
+
 O script **aborta** se encontrar alteração local não commitada em
 `/opt/leiprova`. Isso é proposital: até 2026-08-23 o deploy era cópia manual de
-arquivos do Mac, e o servidor divergiu do código-fonte sem ninguém perceber —
-havia uma versão antiga de `tests/stripe-connect.test.ts` e dois arquivos órfãos
-(`route.ts`, `stripe-connect.ts`) largados na raiz por um hotfix. Se o script
-reclamar, leve a correção para o repositório em vez de forçar.
+arquivos do Mac, e o servidor divergiu do código-fonte sem ninguém perceber.
+Se o script reclamar, leve a correção para o repositório em vez de forçar.
 
 `/opt/leiprova/.env` **não é versionado** e sobrevive a qualquer deploy.
-Permissão `600`, dono `root`. `backups/` está em `.git/info/exclude`.
+Permissão `600`, dono `root`. Backups, recibos e dados privados não entram no Git.
+As chaves Stripe foram preservadas, e o endpoint ativo usa
+`https://editaleiseca.com.br/api/stripe/webhook`; não criar endpoint duplicado por
+uma atualização normal da aplicação.
 
 Verificações após publicar:
 
 ```bash
-ssh wisewolf-vps 'docker ps --filter name=leiprova'
-curl --fail https://leiprova.2b.app.br/api/health
+ssh everglades-vps 'docker ps --filter name=leiprova'
+curl --fail https://editaleiseca.com.br/api/health
+curl --fail -I https://editaleiseca.com.br/
+curl -I https://www.editaleiseca.com.br/concursos
+curl -I https://leiprova.2b.app.br/concursos
+curl --fail https://editaleiseca.com.br/robots.txt
+curl --fail https://editaleiseca.com.br/sitemap.xml
+curl --fail https://editaleiseca.com.br/llms.txt
 ```
+
+Conferir também uma página de curso, autenticação e a saúde de Everglades.
+Os aliases devem redirecionar ao caminho equivalente em um salto. O webhook
+legado deve ser encaminhado, sem 301/302 no POST. No corte, um POST sem assinatura
+recebeu 400 da aplicação nova; essa checagem comprova roteamento e rejeição da
+assinatura ausente, sem equivaler a uma cobrança Stripe aprovada.
 
 ## Rodar localmente
 
@@ -804,16 +862,17 @@ pnpm db:seed
 pnpm dev
 ```
 
-Comandos de verificação — todos passando na última checagem
-(56 testes em 11 arquivos):
+Comandos de verificação. A imagem publicada no corte de 12/10/2026 teve lint,
+tipagem e build aprovados, 1.605 testes aprovados e 239 opcionais pulados:
 
 ```bash
 pnpm lint && pnpm typecheck && pnpm test && pnpm build
 ```
 
-O `pnpm build` funciona **sem `.env`**: nada lê variável de ambiente em tempo de
-import, e o `src/lib/db/client.ts` só conecta em runtime. Não é preciso banco
-para compilar.
+Para o build de produção, configure `NEXT_PUBLIC_APP_URL` com a origem canônica
+correta: parte dos metadados e recursos públicos usa essa variável na compilação.
+A conexão do banco é criada em runtime; não fornecer um banco de produção ao Mac
+como requisito para gerar o build. Builds grandes desta migração rodaram na VPS.
 
 ### Armadilha: scripts executados por tsx não liam o .env
 
@@ -901,15 +960,15 @@ caso, configure `SUPPLIER_EMAIL` com a URL HTTPS do formulário e mantenha
 ## Backups
 
 `deploy/backup.sh` roda diariamente às 03:17 UTC, grava em
-`/opt/leiprova/backups` e mantém 14 dias. Os dumps são pequenos porque o banco
-de produção ainda está praticamente vazio (~11 MB). Copie periodicamente para
-outro servidor ou armazenamento de objetos — hoje o backup vive na mesma
-máquina que ele protege, o que não cobre perda do servidor.
+`/opt/leiprova/backups` e mantém 14 dias. A instalação dos crons no destino foi concluída no corte de 12/10/2026.
+Conferir o recibo de cada execução e copiar periodicamente os dumps para outro
+servidor ou armazenamento de objetos; backup na própria VPS não cobre perda dela.
+A cópia final da migração também permanece na VPS de origem preservada.
 
 Dump manual antes de uma mudança arriscada:
 
 ```bash
-ssh wisewolf-vps 'docker exec leiprova-db pg_dump -U leiprova_owner -d leiprova -Fc' > pre-mudanca.dump
+ssh everglades-vps 'docker exec leiprova-db pg_dump -U leiprova_owner -d leiprova -Fc' > pre-mudanca.dump
 ```
 
 ## Estado do conteúdo

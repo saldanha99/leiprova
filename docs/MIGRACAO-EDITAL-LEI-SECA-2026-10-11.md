@@ -5,6 +5,82 @@ usar editaleiseca.com.br e atualizar marca, Stripe e descoberta pública. Domín
 registrado em 11/10, válido até 11/10/2027. Não cancelar a VPS de origem nem apagar
 seus volumes/arquivos como consequência automática da migração.
 
+## Corte concluído — 12/10/2026, cerca de 01h23 BRT
+
+Registro baseado nas verificações efetivas do operador de migração. Produção agora
+em **https://editaleiseca.com.br**, na VPS Everglades. A revisão publicada é
+`1b5bc146`; QA da imagem: 1.605 testes aprovados e 239 opcionais pulados. Os dados
+abaixo descrevem o corte, não uma homologação financeira nem a conclusão dos 84 cursos.
+
+| Conferência | Resultado registrado |
+| --- | --- |
+| DNS autoritativo | `b.sec.dns.br` e `c.sec.dns.br`; A raiz `179.236.255.4` e TXT Google visíveis publicamente. |
+| HTTPS canônico | Certificado válido; home HTTP 200 e `/api/health` HTTP 200. |
+| Alias `www` | HTTP 301 para o domínio canônico. |
+| Banco final | Restauração concluída; conferência das 68 tabelas coincidiu entre origem e destino. |
+| Serviços de origem | App e workers parados; banco, pooler, volumes e arquivos preservados. |
+| Serviços de destino | App serve produção; os três workers foram iniciados e a instalação dos crons terminou com código 0. |
+| Ponte do Maestri | Configuração privada aponta para `everglades-vps`. |
+| Domínio legado | GET `/concursos` respondeu 301 para `https://editaleiseca.com.br/concursos`. |
+| Webhook legado | POST é encaminhado à aplicação nova, sem redirecionamento; um POST sem assinatura recebeu HTTP 400. |
+| Everglades | Home continuou HTTP 200 após a mudança. |
+
+A resposta 400 do webhook sem assinatura confirma o roteamento e a rejeição do
+pedido não assinado. Não comprova uma transação paga nem entrega financeira completa.
+A partida dos workers e a instalação dos crons não garantem autoria contínua: os
+agentes continuam dependentes dos terminais, reservas, quotas e recibos de execução.
+
+### Recibos da cópia final
+
+- Origem: `/opt/leiprova/backups/final-migration-20261011/final.dump` e `counts.txt`
+  no mesmo diretório.
+- Destino: `/opt/leiprova-migration-20261011/final.dump`.
+- Conferência: `/opt/leiprova-migration-20261011/source-final-counts.txt` e
+  `/opt/leiprova-migration-20261011/destination-final-counts.txt`.
+- SHA-256 do dump final:
+  `3a39b1f6f2d2ab3eab16cbc5c401eed5243bc2cec3ea3dfcd002d3d1d32e50fd`.
+- `.env`, logs, dumps e recibos continuam privados; não incorporar esses arquivos
+  ao Git nem copiar credenciais para prompts ou notas.
+
+### Stripe após o corte
+
+O endpoint existente `we_1ULXBMBkl6797u2uZyCIYjSM` foi alterado no painel para
+`https://editaleiseca.com.br/api/stripe/webhook`, identificado como Edital Lei Seca
+e conferido **ativo**. Foram preservados o segredo de assinatura, os 18 eventos
+e a versão API. Não foi criado endpoint duplicado. A conta e os IDs comerciais
+continuam os existentes. Compra real de controle e estorno permanecem pendentes;
+checkout LIVE configurado não equivale a homologação financeira concluída.
+
+### Conteúdo e descoberta ainda pendentes
+
+No corte havia **4 preparações disponíveis entre 84 planejadas**, com **367 questões
+com vínculos válidos**: ENAM, PC-MA Delegado, TC-DF e ENAC. Os produtos e preços LIVE
+cadastrados para os demais concursos não indicam que seu conteúdo esteja pronto.
+Treino histórico e pré-edital precisam de programa identificado e legislação atual;
+o novo parser LGPD e o fluxo de autorização de programa ainda não estão ativos
+na imagem publicada `1b5bc146`.
+
+### Recibos Google — 12/10/2026
+
+- **Titularidade:** o Search Console verificou automaticamente o novo domínio por
+  DNS; não permanece pendente a confirmação da propriedade nova.
+- **Sitemap enviado:** `https://editaleiseca.com.br/sitemap.xml`, em 12/10. O primeiro
+  status no painel foi **“Não foi possível buscar”**. Uma consulta externa com
+  Googlebot recebeu HTTP 200 e XML contendo 23 URLs válidas, todas no domínio novo.
+  Esse acesso externo não comprova que o Search Console já leu o arquivo; acompanhar
+  seu processamento e investigar se o erro persistir.
+- **Mudança de endereço confirmada:** propriedade de origem exata
+  `https://leiprova.2b.app.br/` → `sc-domain:editaleiseca.com.br`. As verificações de
+  redirecionamento 301 e titularidade passaram. O painel confirmou **“Este site está
+  sendo movido”**, com data de início em 12/10/2026.
+- **Capturas privadas:** `google-change-address-confirmed.png` e
+  `google-sitemap-submitted.png`; manter fora do Git.
+
+A solicitação de mudança foi aceita, mas leitura do sitemap pelo Google,
+indexação, ranking e citações por IA **não estão confirmados**. A auditoria pública
+completa após o corte deve ter recibo próprio; a auditoria de 24 URLs no domínio
+antigo e o HTML conferido privadamente no destino são evidências anteriores.
+
 ## Origem e destino
 
 | Recurso | Origem | Destino |
@@ -46,7 +122,7 @@ e os blocos de host deste projeto. Saúde externa Everglades permaneceu 200.
 - A conferência independente da nova marca no catálogo LIVE passou: 84 produtos
   individuais e Master, 170 preços do projeto, quatro preços legados preservados.
 
-## Corte controlado
+## Procedimento executado no corte (referência para futuras migrações)
 
 1. Confirmar resolução A/CNAME e TLS válido para os hosts novos; domínio novo pode
    continuar em manutenção enquanto o site de origem opera normalmente.
@@ -76,15 +152,16 @@ e os blocos de host deste projeto. Saúde externa Everglades permaneceu 200.
     recebimento de notificações por indexadores quando executadas e relatar limites.
     Não chamar disponibilidade técnica de cobrança financeira homologada.
 
-## Retorno
+## Retorno após o corte
 
-Antes de novas gravações no destino, falha de validação permite manter Caddy novo
-em manutenção, restaurar crons/serviços da origem e conservar o site legado ativo.
-Após o destino receber clientes/pagamentos, não iniciar a cópia antiga: primeiro
-parar gravações, tirar novo checkpoint e transportar os dados atuais de volta.
+O destino já serve produção e seus workers foram iniciados. **Não iniciar a cópia
+antiga como se ainda fosse o banco atual.** Para retornar, primeiro parar as
+gravações no destino, guardar um checkpoint novo e transportar os dados atuais
+de volta antes de reativar app e workers na origem. Reverter DNS, Caddy e endpoint
+Stripe somente em uma sequência coordenada, após conferir a instância restaurada.
 Evitar dois bancos com gravação em paralelo e preservar eventos Stripe pendentes.
 
-As cópias, logs, envs e recibos são privados em /opt/leiprova-migration-20261011 e
-.local/migration-20261011. Os registros históricos abaixo do topo de OPERACAO.md
-não comprovam estado atual do domínio novo. Atualizar este roteiro somente com
-recibos efetivos, sem marcar passos tentados como concluídos.
+As cópias, logs, envs e recibos são privados em `/opt/leiprova-migration-20261011`
+e `.local/migration-20261011`. As evidências de ensaio acima e os registros
+históricos abaixo do topo de OPERACAO.md não substituem o recibo do corte.
+Atualizar este documento somente com verificações efetivas.

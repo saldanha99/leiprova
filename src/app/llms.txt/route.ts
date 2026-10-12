@@ -37,6 +37,7 @@ export function GET() {
     "",
     "- As normas têm fonte oficial, referência e versão. Consulte a data de verificação de cada item; a plataforma não substitui o Diário Oficial nem o edital.",
     "- As inéditas da fábrica autoral são assistidas por IA e passam pela linha de validação e liberação autorizada pelo proprietário. Essa aprovação automática não equivale a revisão humana independente de cada questão. Inconsistências podem levar à suspensão do item.",
+    "- Normas, editais e programas também podem seguir a revisão automatizada autorizada pelo proprietário, com origem da aprovação registrada, sem presumir revisão humana independente e com suspensão posterior de erros.",
     "- Referências externas, editais e licenças seguem seus próprios controles de conferência e aprovação. O material de outras plataformas não integra o acervo sem direito de uso.",
     "- Exemplos da demonstração têm escopo e origem próprios e não representam o inventário completo dos produtos.",
     "- O serviço é educacional, sem afiliação presumida com organizadoras ou promessa de aprovação.",

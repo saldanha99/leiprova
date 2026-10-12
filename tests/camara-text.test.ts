@@ -58,6 +58,14 @@ describe("captura pendente da LGPD atualizada da Câmara", () => {
     expect(() => parseCamaraLgpdConsolidatedHtml(html() + "\ufffd", url)).toThrow(/decodificação/u);
   });
 
+  it("não anexa títulos de seção em capitalização normal ao artigo anterior", () => {
+    const source = html().replace("<p><font>Art.\n7.", "<p>Seção I</p><p>(Seção com redação dada pela Lei nº 1)</p><p>Dos Requisitos para o Tratamento de Dados Pessoais</p><p><font>Art.\n7.");
+    const result = parseCamaraLgpdConsolidatedHtml(source, url);
+    expect(result.articles.find((article) => article.path === "art-6")?.literalText).not.toContain("Dos Requisitos");
+    expect(result.normalizedContent).not.toContain("Dos Requisitos");
+    expect(result.articles.find((article) => article.path === "art-7")?.literalText).toContain("Texto sintético");
+  });
+
   it("confere robots e rejeita acesso vedado ou política inválida", () => {
     expect(() => assertCamaraRobotsAllowed("User-agent: *\nDisallow: /legin/", url)).toThrow(/proíbe/u);
     expect(() => assertCamaraRobotsAllowed("User-agent: *\nDisallow: /*login_form", url)).not.toThrow();
