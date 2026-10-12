@@ -1,5 +1,15 @@
 # Operação do Edital Lei Seca
 
+**Abertura progressiva instalada em 12/10/2026, às 13h12 BRT:** decisão do
+proprietário registrada em `AGENTS.md`. Cron de liberação a cada 30 minutos;
+preparação determinística de até seis páginas a cada 20 minutos. A rodada real
+terminou às 16:12:44 UTC, sem falhas, avaliando os 80 produtos draft e mantendo
+seus bloqueios. As três preparações/285 questões válidas foram preservadas;
+PC-MA tem status técnico released, mas acesso/venda continuam fechados pelo
+gate de conteúdo. Código `eb22728`; ferramentas TS compiladas em `c73980a` (mesmo
+código TS). A atualização inicial da fila foi iniciada em unidade transitória,
+sem comprovar autoria nova. [Recibos e limites](ABERTURA-PROGRESSIVA-2026-10-12.md).
+
 Documento de contexto para quem for continuar o projeto — pessoa ou assistente de IA.
 Descreve onde as coisas estão, como publicar e quais armadilhas já custaram tempo.
 

@@ -56,3 +56,39 @@ Retorno: restaurar o cron anterior salvo no backup operacional e remover apenas
 o cron novo de preparação, preservando recibos e dados. Restaurar as imagens
 anteriores se necessário. Não reabrir conteúdo suspenso nem reverter aprovações
 por atualização direta do banco.
+
+## Execução conferida
+
+- Código publicado: `eb22728`, após `a41a896` e `c73980a`. Imagens das duas
+  ferramentas reconstruídas em `c73980a`; as mudanças seguintes são do wrapper.
+  App e demais workers não foram recriados: nenhuma alteração de interface,
+  migração, seed, flag comercial ou Stripe foi necessária.
+- Cron ativo e ambos os arquivos instalados com root:root/644, sem duplicatas
+  observadas. A rodada manual real de 16:12:13–16:12:44 UTC terminou com sucesso.
+  Recibos em `.local/editorial/release-runs/20261012T161213Z.wnKjT1/`, na VPS.
+- Foram avaliados 80 produtos draft, todos bloqueados e nenhum liberado nessa
+  rodada. O catálogo tem outros quatro produtos com status técnico released:
+  três disponíveis e PC-MA Delegado fechado pelo gate, devido à suspensão das
+  questões. Não confundir status persistido com disponibilidade comercial.
+- Nos 80 drafts: 67 sem edição revisada, 80 sem o piso de questões, 71 sem
+  referência de prova anterior/dispensa e três com fase/data incompatível com o
+  modo atual. Motivos se sobrepõem. Admitir fontes e produzir conteúdo continua
+  necessário; frequência do cron não resolve esses bloqueios.
+- ENAM tem 33 vínculos antigos pending_review cujo timestamp de questão diverge.
+  Eles foram preservados, sem aprovação. O wrapper só chama a revisão quando
+  há vínculos com a versão atual; as pendências antigas exigem nova conferência.
+- A preparação inicial começou às 16:12:45 UTC na unidade transitória
+  `leiprova-progressive-prepare-20261012.service`; recibos em
+  `.local/editorial/preparation-runs/20261012T161245Z.qauULl/`. Início da unidade
+  não comprova conclusão de todas as páginas nem geração de questões.
+- Lint, tipagem e build passaram na VPS; 1.814 testes gerais passaram e 294
+  opcionais foram pulados por ausência de ambiente específico. Sete cenários
+  executados com comandos simulados verificaram fim da fila, limite de páginas,
+  erro, JSON inválido, catálogo sem questões, preservação da leitura de múltiplos
+  produtos e falha de liberação. Logs em `/opt/leiprova-qa-progressive-20261012/`;
+  harness/recibos privados locais em `.local/editorial/progressive-20261012/`.
+- Backup validado por `pg_restore --list`, preservado na VPS e copiado ao Mac:
+  `/opt/leiprova/backups/progressive-20261012/database.dump`, SHA-256
+  `1241ff0ed3dd750dec5e53ec32bb38fd4737fd2aed5a25ad4ac8a4a9d5bb6268`.
+  Cron anterior salvo no mesmo diretório e imagens antigas com tag
+  `before-progressive-20261012`. Saúde pública retornou `status:ok` após instalação.
