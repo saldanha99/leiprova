@@ -20,6 +20,7 @@ import {
 } from "../src/lib/official-sources/fetch";
 import { getOfficialLegalSource } from "../src/lib/official-sources/legal-registry";
 import { parseConsolidatedLegalArticles } from "../src/lib/official-sources/legal-text";
+import { getPlanaltoConsolidatedSource } from "../src/lib/official-sources/planalto-text";
 import {
   parseOpportunityApprovalReviewerIdentity,
   requireOpportunityApprovalDatabaseUrl,
@@ -30,7 +31,8 @@ import {
 // compilação consolidada do Senado e ativa a versão com os artigos em texto
 // oficial — os mesmos passos e registros de /admin/fontes-oficiais. A contagem
 // de artigos do parser precisa bater com a da captura.
-// Uso: tsx scripts/load-official-laws.ts [--apply] lei=<slug> ...
+// Uso: tsx scripts/load-official-laws.ts [--apply] [--capture-only] lei=<slug> ...
+// Planalto: somente --capture-only, sem aprovação ou ativação de corpus.
 // Sem --apply, tudo roda numa transação desfeita ao final (prévia).
 
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/u;
@@ -38,8 +40,9 @@ const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/u;
 export function parseLawLoadArgs(argv: readonly string[]) {
   const args = argv.filter((arg) => arg !== "--");
   const apply = args.includes("--apply");
+  const captureOnly = args.includes("--capture-only");
   const slugs = args
-    .filter((arg) => arg !== "--apply")
+    .filter((arg) => arg !== "--apply" && arg !== "--capture-only")
     .map((arg) => {
       const [verb, slug, extra] = arg.split("=");
       if (verb !== "lei" || extra !== undefined || !SLUG.test(slug ?? "")) {
@@ -50,13 +53,13 @@ export function parseLawLoadArgs(argv: readonly string[]) {
     });
   if (!slugs.length) throw new Error("Informe ao menos uma lei=<slug>.");
   if (new Set(slugs).size !== slugs.length) throw new Error("A mesma lei aparece mais de uma vez.");
-  return { apply, slugs };
+  return { apply, captureOnly, slugs };
 }
 
 class PreviewRollback extends Error {}
 
 async function main() {
-  const { apply, slugs } = parseLawLoadArgs(process.argv.slice(2));
+  const { apply, captureOnly, slugs } = parseLawLoadArgs(process.argv.slice(2));
   const reviewer = parseOpportunityApprovalReviewerIdentity({
     ADMIN_EMAILS: process.env.ADMIN_EMAILS,
     OPPORTUNITY_APPROVAL_REFERENCE: process.env.LEGAL_LOAD_REFERENCE,
@@ -70,6 +73,9 @@ async function main() {
   try {
     for (const slug of slugs) {
       const source = getOfficialLegalSource(slug)!;
+      if (getPlanaltoConsolidatedSource(source.monitorUrl) && !captureOnly) {
+        throw new Error("Compilações do Planalto exigem --capture-only e revisão posterior no painel; a autorização da fábrica não aprova fontes.");
+      }
       // Rede fora da transação: a fonte é conferida de novo a cada execução.
       const monitor = await fetchOfficialLegalDocument(source.monitorUrl);
       const captured = await fetchOfficialConsolidatedLegalText(source.monitorUrl);
@@ -130,7 +136,7 @@ async function main() {
               set: { lastSeenAt: monitor.fetchedAt, httpStatus: monitor.httpStatus },
             })
             .returning({ id: legalSourceSnapshots.id, publicId: legalSourceSnapshots.publicId, status: legalSourceSnapshots.status });
-          if (monitorRow.status === "pending_review") {
+          if (monitorRow.status === "pending_review" && !captureOnly) {
             await transaction
               .update(legalSourceSnapshots)
               .set({ status: "superseded" })
@@ -150,7 +156,7 @@ async function main() {
               entityId: monitorRow.publicId,
               metadata: { notes, approvalMode: "owner_authorization", approvalReference: reviewer.approvalReference, executionSource: "server_cli", legalActSlug: slug },
             });
-          } else if (monitorRow.status !== "approved") {
+          } else if (monitorRow.status !== "approved" && (!captureOnly || monitorRow.status !== "pending_review")) {
             throw new Error(`A fotografia de ${slug} foi ${monitorRow.status} antes; exige nova revisão no painel.`);
           }
 
@@ -171,10 +177,25 @@ async function main() {
             })
             .returning({ id: legalTextSnapshots.id, publicId: legalTextSnapshots.publicId, status: legalTextSnapshots.status });
           if (textRow.status === "approved") {
-            return { slug, articles: articles.length, monitor: monitorRow.status, text: "unchanged" };
+            const summary = { slug, articles: articles.length, monitor: monitorRow.status, text: "unchanged" };
+            if (!apply) throw new PreviewRollback(JSON.stringify(summary));
+            return summary;
           }
           if (textRow.status !== "pending_review") {
             throw new Error(`A compilação de ${slug} foi ${textRow.status} antes; exige nova revisão no painel.`);
+          }
+
+          if (captureOnly) {
+            await transaction.insert(auditLogs).values({
+              actorUserId: operatorId,
+              action: "editorial.legal_text.captured",
+              entityType: "legal_text_snapshot",
+              entityId: textRow.publicId,
+              metadata: { legalActSlug: slug, sourceUrl: captured.sourceUrl, checksum: captured.checksumSha256, articleCount: articles.length, parserVersion: captured.parserVersion, status: "pending_review", executionSource: "server_cli", captureReference: reviewer.approvalReference, humanReview: false },
+            });
+            const summary = { slug, articles: articles.length, monitor: monitorRow.status, text: "pending_review", versionsActivated: 0 };
+            if (!apply) throw new PreviewRollback(JSON.stringify(summary));
+            return summary;
           }
 
           await transaction

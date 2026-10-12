@@ -26,10 +26,24 @@ describe("prioridade da fila dos agentes", () => {
 
     const claim = new PgDialect().sqlToQuery(queries[3]);
     // Faixa por edital calculada uma vez: com 1.300 tarefas a versão por tarefa levava 50 s.
-    expect(claim.sql).toContain("with opportunity_tier as (");
-    expect(claim.sql).toContain("product.status = 'released'\n          ) then 2");
+    expect(claim.sql).toContain("with product_content as materialized (");
+    expect(claim.sql).toContain("opportunity_tier as materialized (");
+    expect(claim.sql).toContain("coalesce(content.has_released_product, false)");
+    expect(claim.sql).toContain("and not coalesce(content.has_draft_product, false) then 2");
     expect(claim.sql).toContain("::date + 14");
-    expect(claim.sql).toContain("question.editorial_status <> 'suspended'\n            ) >= 68 then 1");
+    expect(claim.sql).toMatch(/coalesce\(content.minimum_valid_question_count, 0\) >= \$\d+ then 1/u);
+    expect(claim.params).toContain(68);
+    expect(claim.sql).toContain("min(valid_question_count)");
+    expect(claim.sql).toContain("count(distinct content_binding.question_id)");
+    expect(claim.sql).toContain("content_binding.product_slug = priority_product.slug");
+    expect(claim.sql).toContain("binding.product_slug = priority_product.slug");
+    expect(claim.sql).toContain("binding.opportunity_id = priority_product.opportunity_id");
+    expect(claim.sql).toContain("q.editorial_status = 'reviewed'");
+    expect(claim.sql).toContain("requirement.editorial_status = 'reviewed'");
+    expect(claim.sql).toContain("source.status = 'approved'");
+    expect(claim.sql).toContain("version.status = 'current'");
+    expect(claim.sql).not.toContain("from question_opportunities link");
+    expect(claim.sql).not.toContain("question.editorial_status <> 'suspended'");
     // O requisito sai da chave da tarefa; o payload (artigos candidatos) não é lido.
     expect(claim.sql).toContain("work.job_key ~ '^(mapping|author):[0-9]{1,18}$' then split_part(work.job_key, ':', 2)::bigint");
     expect(claim.sql).not.toContain("payload->>'opportunityId'");

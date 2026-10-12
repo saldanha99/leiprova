@@ -1,4 +1,17 @@
+import { isAllowedPlanaltoConsolidatedUrl } from "./planalto-text";
+
 export const OFFICIAL_LEGAL_SOURCES = [
+  {
+    slug: "lei-geral-protecao-dados-2018",
+    title: "Lei nº 13.709, de 14 de agosto de 2018 — Lei Geral de Proteção de Dados Pessoais",
+    shortTitle: "LGPD",
+    actType: "lei",
+    actNumber: "13.709",
+    actYear: 2018,
+    lexmlUrn: "urn:lex:br:federal:lei:2018-08-14;13709",
+    officialUrl: "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709compilado.htm",
+    monitorUrl: "https://legis.senado.leg.br/norma/27457334",
+  },
   {
     slug: "constituicao-federal-1988",
     title: "Constituição da República Federativa do Brasil de 1988",
@@ -111,8 +124,8 @@ export const OFFICIAL_LEGAL_SOURCES = [
   },
   // Leis especiais dos editais abertos (02/10/2026): norma e data conferidas na API
   // de dados abertos do Senado, URN no próprio registro da norma e página do
-  // Planalto aberta pela VPS. O texto vem da publicação consolidada do Senado; LGPD e Lei 12.737/2012
-  // ficam de fora enquanto o Senado não publicar a compilação em texto.
+  // Planalto aberta pela VPS. Lei 12.737/2012 é alteradora; o mérito penal vigente
+  // deve ser lido no Código Penal consolidado, nunca na redação original alteradora.
   {
     slug: "lei-drogas-2006",
     title: "Lei nº 11.343, de 23 de agosto de 2006 — Lei de Drogas",
@@ -522,6 +535,7 @@ export function isAllowedOfficialLegalUrl(url: string) {
 }
 
 export function isAllowedOfficialLegalTextUrl(url: string) {
+  if (isAllowedPlanaltoConsolidatedUrl(url)) return true;
   try {
     const parsed = new URL(url);
     if (

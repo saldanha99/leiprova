@@ -11,6 +11,7 @@ import {
   parseConsolidatedLegalArticles,
 } from "./legal-text";
 import { normalizeOfficialText } from "./text-normalization";
+import { assertPlanaltoRobotsAllowed, decodePlanaltoHtml, getPlanaltoConsolidatedSource, parsePlanaltoConsolidatedHtml, PLANALTO_TEXT_PARSER_VERSION } from "./planalto-text";
 
 const USER_AGENT = "LeiProva-OfficialSourceMonitor/1.0 (+https://leiprova.2b.app.br/fontes-e-atualizacao)";
 const MAX_METADATA_BYTES = 131_072;
@@ -163,6 +164,8 @@ async function readStrictLimitedBody(response: Response, limit: number) {
 }
 
 export async function fetchOfficialConsolidatedLegalText(monitorUrl: string) {
+  const planalto = getPlanaltoConsolidatedSource(monitorUrl);
+  if (planalto) return fetchPlanaltoConsolidatedLegalText(planalto.url);
   const monitorResponse = await fetchWithTrustedRedirects(monitorUrl, validateLegalUrl, 0);
   if (!monitorResponse.ok) {
     throw new Error(`A fonte de monitoramento respondeu com HTTP ${monitorResponse.status}.`);
@@ -200,6 +203,22 @@ export async function fetchOfficialConsolidatedLegalText(monitorUrl: string) {
     parserVersion: LEGAL_TEXT_PARSER_VERSION,
     fetchedAt: new Date(),
   };
+}
+
+async function fetchPlanaltoConsolidatedLegalText(sourceUrl: string) {
+  const headers = { "User-Agent": "EditalLeiSeca-OfficialSourceMonitor/1.0 (+https://editaleiseca.com.br/fontes-e-atualizacao)", Accept: "text/html,text/plain;q=0.9" };
+  const robotsResponse = await fetch("https://www.planalto.gov.br/robots.txt", { redirect: "manual", headers, signal: AbortSignal.timeout(20_000), cache: "no-store" });
+  if (robotsResponse.status !== 404 && !robotsResponse.ok) throw new Error("Não foi possível conferir o robots.txt do Planalto; captura bloqueada.");
+  const robotsBytes = await readStrictLimitedBody(robotsResponse, 64 * 1024);
+  if (robotsResponse.status !== 404) assertPlanaltoRobotsAllowed(new TextDecoder("utf-8", { fatal: true }).decode(robotsBytes), sourceUrl);
+  const response = await fetch(sourceUrl, { redirect: "manual", headers, signal: AbortSignal.timeout(20_000), cache: "no-store" });
+  if (!response.ok) throw new Error(`A compilação do Planalto respondeu com HTTP ${response.status}; não há contorno de bloqueio.`);
+  const contentType = response.headers.get("content-type");
+  if (!contentType?.toLowerCase().includes("html")) throw new Error("A compilação do Planalto não respondeu como HTML.");
+  const bytes = await readStrictLimitedBody(response, MAX_LEGAL_TEXT_BYTES);
+  const parsed = parsePlanaltoConsolidatedHtml(decodePlanaltoHtml(bytes, contentType), sourceUrl);
+  if (parsed.normalizedContent.length < 1_000) throw new Error("A compilação do Planalto não contém texto suficiente.");
+  return { sourceUrl, checksumSha256: parsed.checksumSha256, normalizedContent: parsed.normalizedContent, contentLength: parsed.normalizedContent.length, articleCount: parsed.articles.length, parserVersion: PLANALTO_TEXT_PARSER_VERSION, fetchedAt: new Date() };
 }
 
 export async function verifyOfficialExamUrl(bankSlug: string, input: string) {

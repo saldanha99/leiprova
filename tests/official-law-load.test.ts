@@ -13,6 +13,7 @@ describe("carga de leis do registro oficial", () => {
   it("aceita só leis do registro, sem repetição, e roda em prévia por padrão", () => {
     expect(parseLawLoadArgs(["--", "lei=lei-drogas-2006", "lei=lei-tortura-1997"])).toEqual({
       apply: false,
+      captureOnly: false,
       slugs: ["lei-drogas-2006", "lei-tortura-1997"],
     });
     expect(parseLawLoadArgs(["--apply", "lei=lei-drogas-2006"]).apply).toBe(true);
@@ -33,7 +34,17 @@ describe("carga de leis do registro oficial", () => {
     expect(new Set(slugs).size).toBe(slugs.length);
     expect(new Set(monitors).size).toBe(monitors.length);
     expect(slugs).toContain("lei-drogas-2006");
-    expect(slugs).not.toContain("lei-geral-protecao-dados-2018");
+    expect(slugs).toContain("lei-geral-protecao-dados-2018");
+    expect(slugs).not.toContain("lei-crimes-informaticos-2012");
+  });
+
+  it("captura Planalto somente como pendente, sem ativar fontes pela exceção de questões", () => {
+    expect(parseLawLoadArgs(["--capture-only", "lei=lei-geral-protecao-dados-2018"])).toEqual({ apply: false, captureOnly: true, slugs: ["lei-geral-protecao-dados-2018"] });
+    expect(script).toContain("getPlanaltoConsolidatedSource(source.monitorUrl) && !captureOnly");
+    const pendingBranch = script.slice(script.indexOf("if (captureOnly) {"), script.indexOf("versionsActivated: 0") + 22);
+    expect(pendingBranch).toContain('status: "pending_review"');
+    expect(pendingBranch).toContain("humanReview: false");
+    expect(pendingBranch).not.toContain("legalVersions");
   });
 
   it("confere os artigos, aprova com a base da autorização e só grava com --apply", () => {

@@ -344,6 +344,13 @@
       "when": 1791772200000,
       "tag": "0048_preparation_modes",
       "breakpoints": true
+    },
+    {
+      "idx": 49,
+      "version": "7",
+      "when": 1791775500000,
+      "tag": "0049_planalto_consolidated_sources",
+      "breakpoints": true
     }
   ]
 }

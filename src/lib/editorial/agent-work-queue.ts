@@ -4,6 +4,7 @@ import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import * as schema from "@/lib/db/schema";
 import { findMostSimilarQuestion, ORIGINALITY_REJECTION_THRESHOLD_BPS } from "./originality";
 import { deterministicNoticeQuestionUuid } from "./notice-question-generator";
+import { approvedProductQuestionCount, MINIMUM_COURSE_QUESTION_COUNT } from "@/lib/commerce/minimum-course-content";
 import { AGENT_FOR_WORK, AGENT_WORK_DAILY_LIMIT, AGENT_WORK_LEASE_MINUTES,
   agentInputHash, agentWorkKindSchema, validateAgentWorkResult, workPayloadSchema,
   agentWorkResultSchema,
@@ -14,36 +15,44 @@ import { AGENT_FOR_WORK, AGENT_WORK_DAILY_LIMIT, AGENT_WORK_LEASE_MINUTES,
 const requirementIdOf = (alias: "work" | "other") =>
   `case when ${alias}.job_key ~ '^(mapping|author):[0-9]{1,18}$' then split_part(${alias}.job_key, ':', 2)::bigint end`;
 
-/** Faixa de cada edital, calculada uma vez por reserva (antes era por tarefa e
- * a reserva levava 50 s com 1.300 tarefas): 0 = ainda pode vender a tempo (sem
- * produto liberado, prova a 14 dias ou mais e menos de 68 questões ligadas);
- * 1 = demais editais sem venda; 2 = produto liberado. */
-const OPPORTUNITY_TIERS = sql.raw(`opportunity_tier as (
+/** Faixa por edição, calculada uma vez por reserva: o alvo é conteúdo válido
+ * por produto, não rascunhos ligados à edição. Um curso com 68 rascunhos mas
+ * somente 67 vínculos válidos continua prioritário até completar o piso. */
+export const AGENT_OPPORTUNITY_PRIORITY_CTES = sql`product_content as materialized (
+      select priority_product.opportunity_id, priority_product.status,
+        ${approvedProductQuestionCount(sql`priority_product.slug`, sql`priority_product.opportunity_id`)} as valid_question_count
+      from contest_store_products priority_product
+      where priority_product.opportunity_id is not null and priority_product.status <> 'retired'
+    ),
+    opportunity_content as materialized (
+      select opportunity_id,
+        bool_or(status = 'released') as has_released_product,
+        bool_or(status = 'draft') as has_draft_product,
+        min(valid_question_count) as minimum_valid_question_count
+      from product_content group by opportunity_id
+    ),
+    opportunity_tier as materialized (
       select opportunity.id,
         case
-          when exists (
-            select 1 from contest_store_products product
-            where product.opportunity_id = opportunity.id and product.status = 'released'
-          ) then 2
+          when coalesce(content.has_released_product, false)
+            and not coalesce(content.has_draft_product, false) then 2
           when opportunity.exam_date < (now() at time zone 'America/Sao_Paulo')::date + 14
-            or (
-              select count(*) from question_opportunities link
-              join questions question on question.id = link.question_id
-              where link.opportunity_id = opportunity.id and question.editorial_status <> 'suspended'
-            ) >= 68 then 1
+            or coalesce(content.minimum_valid_question_count, 0) >= ${MINIMUM_COURSE_QUESTION_COUNT} then 1
           else 0 end as tier,
         case when opportunity.exam_date >= (now() at time zone 'America/Sao_Paulo')::date
           then opportunity.exam_date end as upcoming_exam
       from contest_opportunities opportunity
-    ),
+      left join opportunity_content content on content.opportunity_id = opportunity.id
+    )`;
+const OPPORTUNITY_TIERS = sql`${AGENT_OPPORTUNITY_PRIORITY_CTES},
     unsold_waiting as (
       select exists (
         select 1 from editorial_agent_work other
-        join opportunity_requirements waiting_requirement on waiting_requirement.id = ${requirementIdOf("other")}
+        join opportunity_requirements waiting_requirement on waiting_requirement.id = ${sql.raw(requirementIdOf("other"))}
         join opportunity_tier waiting on waiting.id = waiting_requirement.opportunity_id
         where other.status = 'pending' and other.attempts < 3 and waiting.tier = 0
       ) as value
-    )`);
+    )`;
 
 /** Dentro do mesmo tipo: faixa 0 primeiro, pela prova mais próxima (prova
  * passada ou sem data no fim da faixa) e, no mesmo edital, matéria conhecida
