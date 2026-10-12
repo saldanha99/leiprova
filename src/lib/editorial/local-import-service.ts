@@ -3,6 +3,7 @@ import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 
 import * as schema from "../db/schema";
 import { lockApprovalScope, type ApprovalExecutor } from "./approval-lock";
+import { lockQuestionContracts, readQuestionContractById } from "./question-contract-service";
 import {
   checkImportOriginality, importFingerprint, LocalImportError, localQuestionUuid,
   parseLocalImport, prepareLocalImport, type LocalImportInput,
@@ -33,7 +34,13 @@ export async function readLocalImportContext(transaction: ApprovalExecutor, inpu
     version: schema.questionStyleProfiles.version,
   }).from(schema.quizBanks).innerJoin(schema.questionStyleProfiles, eq(schema.questionStyleProfiles.quizBankId, schema.quizBanks.id))
     .where(inArray(schema.quizBanks.slug, input.batches.map((batch) => batch.bankSlug)));
-  return { articles, topics, banks };
+  const contracts=[];
+  if(input.mapping.schemaVersion===3) for(const item of input.mapping.contracts) {
+    const scoped=await readQuestionContractById(transaction,item.contractId);
+    if(!scoped) throw new LocalImportError("Contrato oficial de cargo, edição e etapa indisponível.");
+    contracts.push(scoped);
+  }
+  return { articles, topics, banks, contracts };
 }
 
 async function actor(transaction: ApprovalExecutor, publicId: string) {
@@ -83,6 +90,7 @@ export async function importLocalDrafts(db: Db, request: {
     await transaction.execute(sql`set local statement_timeout = '30s'`);
     await transaction.execute(sql`set local lock_timeout = '5s'`);
     if (request.mode === "apply") {
+      if(input.mapping.schemaVersion===3) await lockQuestionContracts(transaction,input.mapping.contracts.map(item=>item.contractId));
       // Serializa somente estes importadores; outros canais fazem sua própria revisão de similaridade.
       await transaction.execute(sql`select pg_advisory_xact_lock(1279873106, 1)`);
       const ids = input.batches.flatMap((batch) => batch.questions.map((question) => localQuestionUuid(input.sources.id, question.id)));

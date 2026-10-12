@@ -21,6 +21,7 @@ import { currentLegalSourceExists, lockApprovalScope } from "../src/lib/editoria
 import { EDITORIAL_BATCH_LIMIT, isGeneratedAuthorshipMethod } from "../src/lib/editorial/clean-room";
 import { buildDossierFingerprint } from "../src/lib/editorial/dossier-fingerprint";
 import { findMostSimilarQuestion } from "../src/lib/editorial/originality";
+import { readOfficialQuestionContract } from "../src/lib/editorial/question-contract-service";
 import {
   parseOpportunityApprovalReviewerIdentity,
   requireOpportunityApprovalDatabaseUrl,
@@ -95,6 +96,7 @@ async function main() {
             type: questions.type,
             legalArticleId: questions.legalArticleId,
             styleBankId: questions.styleBankId,
+            questionContractId: questions.questionContractId,
             questionSourceRights: questions.sourceRights,
             authorshipMethod: questions.authorshipMethod,
             generatorModel: questions.generatorModel,
@@ -164,7 +166,15 @@ async function main() {
           similarityReferencePublicId: string | null; generatorModel: string | null; promptVersion: string | null }> = [];
 
         for (const draft of drafts) {
-          const own = options.filter((option) => option.questionId === draft.id);
+          const own = options.filter((option) => option.questionId === draft.id).sort((a,b)=>a.optionKey.localeCompare(b.optionKey));
+          if (!draft.questionContractId) {
+            skipped.push({publicId:draft.publicId,reason:"Falta contrato oficial exato de cargo, edição e etapa; perfil global não autoriza aprovação da fábrica."});
+            continue;
+          }
+          const [scope]=await transaction.execute<{opportunityId:number}>(sql`select c.opportunity_id::int as "opportunityId"
+            from opportunity_question_contracts c join contest_opportunities o on o.id=c.opportunity_id
+            where c.id=${draft.questionContractId} and o.slug=${contestSlug}`);
+          const scoped=scope ? await readOfficialQuestionContract(transaction,scope.opportunityId,draft.questionContractId) : null;
           if (!isGeneratedAuthorshipMethod(draft.authorshipMethod) || !draft.generatorModel || !draft.promptVersion) {
             skipped.push({ publicId: draft.publicId, reason: "Procedência autoral incompleta." });
             continue;
@@ -175,6 +185,8 @@ async function main() {
           );
           const evaluation = evaluateOriginalQuestionApproval({
             ...draft,
+            questionContract:scoped?.contract,questionContractIsCurrent:!!scoped,
+            options:own.map(option=>({key:option.optionKey,text:option.text,correct:option.isCorrect})),
             status: "pending_review",
             creatorUserId: operatorId,
             cleanRoomAttestedAt: now,

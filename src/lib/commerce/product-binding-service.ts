@@ -3,6 +3,8 @@ import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { z } from "zod";
 import * as schema from "../db/schema";
 import { bindingFingerprint, containsVerbatimQuote, productBindingPackageSchema } from "./product-binding-policy";
+import { readOfficialQuestionContract } from "../editorial/question-contract-service";
+import { validateQuestionAgainstContract } from "../editorial/official-question-contract";
 
 export class ProductBindingError extends Error {}
 type Db = PostgresJsDatabase<typeof schema>;
@@ -69,13 +71,18 @@ async function prepare(transaction: Transaction, item: Proposal, actorUserId: nu
   const profile = question.styleBankId === null ? null : (await transaction.select().from(schema.questionStyleProfiles)
     .where(eq(schema.questionStyleProfiles.quizBankId, question.styleBankId)))[0];
   const blockers: string[] = ["Revisão humana de aderência ao produto ainda não realizada."];
+  const scoped=await readOfficialQuestionContract(transaction,opportunity.id);
+  if(!scoped || (question.questionContractId && question.questionContractId!==scoped.id) ||
+    !validateQuestionAgainstContract(scoped?.contract,{type:question.type,options:options.map(option=>({key:option.optionKey,text:option.text,correct:option.isCorrect}))}).allowed) {
+    blockers.push("Falta contrato oficial exato de formato para cargo, edição e etapa, ou a questão não corresponde a ele.");
+  }
   if (product.opportunityId === null) blockers.push("Produto ainda sem vínculo editorial aprovado com esta oportunidade.");
   if (question.editorialStatus !== "reviewed") blockers.push("Questão ainda sem revisão editorial aprovada.");
   if (opportunity.editorialStatus !== "reviewed") blockers.push("Oportunidade ainda sem revisão aprovada.");
   if (source.status !== "approved" || (snapshot && snapshot.status !== "approved")) blockers.push("Documento ou captura ainda sem aprovação.");
   // O vínculo se apoia no artigo e na matéria; tópico do catálogo é opcional (só precisa coincidir).
   if (requirement.editorialStatus !== "reviewed" || !requirement.legalArticleId || !requirement.subjectId) blockers.push("Requisito ainda exige mapeamento e revisão humana.");
-  if (question.quizMode === "original_style" && (!organizer || organizer.quizBankId !== question.styleBankId || !profile?.isActive || profile.format !== question.type)) {
+  if (question.quizMode === "original_style" && (!organizer || organizer.quizBankId !== question.styleBankId || !scoped || scoped.contract.bankId!==question.styleBankId)) {
     blockers.push("Banca organizadora/perfil de estilo não corresponde à questão.");
   }
   const evidence = {
@@ -85,6 +92,7 @@ async function prepare(transaction: Transaction, item: Proposal, actorUserId: nu
     legalArticleText: legal.article.literalText, legalSourceUrl: legal.version.sourceUrl,
     sourceUrl: source.sourceUrl, sourcePublicId: source.publicId,
     bankProfileVersion: profile?.version ?? null, organizerAssignmentId: organizer?.id ?? null,
+    questionContractId:scoped?.id??null,
     observedStates: { question: question.editorialStatus, requirement: requirement.editorialStatus, source: source.status,
       snapshot: snapshot?.status ?? null, opportunity: opportunity.editorialStatus, product: product.status },
     blockers,

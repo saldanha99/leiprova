@@ -3,6 +3,7 @@ import "server-only";
 import { and, asc, desc, eq, inArray, isNotNull, isNull, lte, or, sql } from "drizzle-orm";
 
 import { getDb } from "@/lib/db/client";
+import { originalQuestionContractExists } from "../study/original-question-contract-query";
 import { editionHasOriginalTraining } from "@/lib/quiz/original-style-query";
 import {
   examEditions,
@@ -112,6 +113,7 @@ export async function listOriginalStyleSimulationCoverage() {
       eq(legalArticles.sourceRights, "official_text"),
       eq(legalVersions.status, "current"),
       eq(legalActs.isActive, true),
+      originalQuestionContractExists(questions.id,questions.type,questions.styleBankId,questions.questionContractId),
     ))
     .groupBy(quizBanks.id, quizSubjects.id)
     .orderBy(desc(sql`count(distinct ${questions.id})`), asc(quizBanks.name), asc(quizSubjects.name));

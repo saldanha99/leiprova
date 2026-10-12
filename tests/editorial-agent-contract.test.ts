@@ -1,10 +1,15 @@
 import { describe,it,expect } from "vitest";
 import { AGENT_WORK_LEASE_MINUTES,AGENT_WORK_VERSION,agentInputHash,validateAgentWorkResult,validateDiscoveryUrl,
   type AgentWorkPayload } from "@/lib/editorial/agent-work-contract";
+import { syntheticQuestionContract } from "./fixtures/question-contract";
+import { questionContractFingerprint } from "@/lib/editorial/official-question-contract";
+
+const scoped=syntheticQuestionContract();
 
 const payload:AgentWorkPayload={version:AGENT_WORK_VERSION,title:"Concurso sintético",instructions:"Somente teste.",
   context:{requirement:"Regra sintética",sourceContextHash:"a".repeat(64)},requirementId:1,opportunityId:1,
   bank:"vunesp",role:"Cargo sintético",sourceUrls:["https://conhecimento.fgv.br/concursos/exemplo"],
+  questionContract:scoped,questionContractId:questionContractFingerprint(scoped),
   articles:[{id:1,act:"Regra sintética",articleRef:"Art. 1",versionId:1,checksum:"b".repeat(64),
     text:"No exercício fictício, a equipe deve organizar os cartões antes da atividade.",url:"https://www.planalto.gov.br/exemplo"}]};
 const base={schemaVersion:1,publicationAllowed:false,outcome:"prepared",summary:"Proposta para revisão humana.",limitations:[],evidence:[]};
@@ -40,6 +45,10 @@ describe("contrato da ponte editorial",()=>{
   });
   it("valida autoria sem publicar",()=>{
     expect(validateAgentWorkResult("authoring",payload,{...base,generatorModel:"synthetic-test",questions:[question()]}).questions).toHaveLength(1);
+  });
+  it('bloqueia autoria sem fonte oficial de formato mesmo com banca conhecida',()=>{
+    expect(()=>validateAgentWorkResult('authoring',{...payload,questionContract:undefined,questionContractId:undefined},
+      {...base,generatorModel:'synthetic-test',questions:[question()]})).toThrow('contrato oficial');
   });
   it("rejeita cargo, banco, modelo, resposta ou alternativas incorretos",()=>{
     const q=question();

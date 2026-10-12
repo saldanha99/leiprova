@@ -79,7 +79,7 @@ function exactHistoricalScopeConditions() {
     and opportunity.jurisdiction_code = exam_edition.jurisdiction_code
     and exam_edition.status in ('held', 'published')
     and exam_edition.exam_date < (current_timestamp at time zone 'America/Sao_Paulo')::date
-    and (opportunity.exam_date is null or exam_edition.exam_date < opportunity.exam_date)
+    and (exam_product.preparation_mode = 'historical_training' or opportunity.exam_date is null or exam_edition.exam_date < opportunity.exam_date)
     and ${freshnessSatisfied(sql`exam_edition.source_checked_at`)}
     and ${officialExamUrlAllowed(sql`exam_bank.slug`, sql`exam_edition.official_url`)}
     and exam_bank.is_active = true
@@ -122,7 +122,7 @@ function exactHistoricalScopeConditions() {
           )
         )
         and newer_edition.exam_date < (current_timestamp at time zone 'America/Sao_Paulo')::date
-        and (opportunity.exam_date is null or newer_edition.exam_date < opportunity.exam_date)
+        and (exam_product.preparation_mode = 'historical_training' or opportunity.exam_date is null or newer_edition.exam_date < opportunity.exam_date)
     )`;
 }
 

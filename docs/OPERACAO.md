@@ -36,6 +36,16 @@ auditoria 6727: **182 artigos reviewed e nove pending_review**, sem liberar as
 pendências de valores/ADI/transição. Código `46d3dc1`, lint/tipos/build aprovados,
 1.664 testes aprovados e 249 opcionais pulados; os 14 testes PostgreSQL adicionais
 passaram em base sintética isolada. Ver [recibo parcial](REVISAO-PARCIAL-LICITACOES-2026-10-12.md).
+O programa histórico MPMT foi efetivamente admitido na oportunidade 19, com
+354 requisitos e auditoria 6877, mantendo o produto draft e zero questões/vendas
+liberadas; ver [recibo MPMT](ADMISSAO-MPMT-RECIBO-2026-10-12.md).
+O app publicado posteriormente usa `8017e64`. A imagem de ferramentas/entrega
+recebeu `c08b6b4`: fontes pertencem a root com grupo node e leitura/execução de
+grupo, permitindo manutenção com capacidades removidas e worker UID1000.
+O worker de entrega passou a executar ciclos reais, com zero reinícios na
+conferência posterior; ciclos sem itens não comprovam cobrança ou envio de email.
+As migrações 0052/0053 e os contratos específicos ainda estavam em QA isolado
+nesse recibo; testes de unidade aprovados não comprovam aplicação em produção.
 QA da revisão `3e9323a`: 1.623 testes aprovados,
 239 opcionais pulados. Em 12/10, o Search Console verificou automaticamente o novo
 domínio por DNS. O sitemap foi enviado e depois **processado**, com 23 páginas e zero vídeos.

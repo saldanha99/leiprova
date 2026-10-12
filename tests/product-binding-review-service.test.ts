@@ -24,6 +24,8 @@ function fixture() {
       statements.push(statement);
       if (statement.includes("select id::integer as id, role, email from users")) return [{ id: 1, role, email: "reviewer@example.invalid" }];
       if (statement.includes("as dossier")) return [{ dossier: structuredClone(dossier) }];
+      if (statement.includes('select b.id,c.id as "contractId"')) return [{id:input.bindingIds[0],contractId:'c'.repeat(64),contentHash:'d'.repeat(64)}];
+      if (statement.includes('from question_contract_certifications where binding_id=')) return [{contractId:'c'.repeat(64),contentHash:'d'.repeat(64),status:'approved'}];
       if (/^\s*update public.contest_product_question_bindings/u.test(statement)) return Array.from({ length: updatedCount }, () => ({ id: input.bindingIds[0] }));
       if (statement.includes("from contest_product_question_bindings candidate order by candidate.id")) return [{ id: input.bindingIds[0], valid }];
       if (statement.includes("status='rejected' as valid")) return [{ id: input.bindingIds[0], valid }];

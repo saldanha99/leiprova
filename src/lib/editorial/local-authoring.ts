@@ -88,6 +88,7 @@ export function validateLocalAuthoring(
   rawSources: unknown,
   rawBatches: readonly unknown[],
   existingCorpus: readonly { publicId: string; prompt: string }[] = [],
+  scopedFormats?: Readonly<Record<string,"multiple_choice"|"true_false">>,
 ) {
   const sources = localSourceBundleSchema.parse(rawSources);
   const batches = rawBatches.map((batch) => localAuthoringBatchSchema.parse(batch));
@@ -109,7 +110,7 @@ export function validateLocalAuthoring(
     batchIds.add(batch.batchId);
     seenBanks.add(batch.bankSlug);
     if (batch.batchId !== `${sources.id}-${batch.bankSlug}`) issues.push(`Identidade de lote incompatível: ${batch.batchId}.`);
-    const format = getStyleProfileSeed(batch.bankSlug)?.format;
+    const format = scopedFormats?.[batch.bankSlug] ?? getStyleProfileSeed(batch.bankSlug)?.format;
     const sourceIds = new Set<string>();
     const answerCounts: Record<string, number> = Object.fromEntries(
       (format === "true_false" ? ["C", "E"] : ["A", "B", "C", "D", "E"]).map((key) => [key, 0]),

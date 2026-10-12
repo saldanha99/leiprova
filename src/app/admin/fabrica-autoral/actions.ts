@@ -43,6 +43,7 @@ import {
 import { buildDossierFingerprint } from "@/lib/editorial/dossier-fingerprint";
 import { toQuestionDossier } from "@/lib/db/editorial-admin";
 import { currentLegalSourceExists, lockApprovalScope } from "@/lib/editorial/approval-lock";
+import { readQuestionContractById } from "@/lib/editorial/question-contract-service";
 
 
 
@@ -699,6 +700,8 @@ export async function reviewOriginalQuestionAction(
           difficulty: questions.difficulty,
           type: questions.type,
           questionSourceRights: questions.sourceRights,
+          questionContractId: questions.questionContractId,
+          styleBankId: questions.styleBankId,
           articleRef: legalArticles.articleRef,
           literalText: legalArticles.literalText,
           articleStatus: legalArticles.editorialStatus,
@@ -740,8 +743,11 @@ export async function reviewOriginalQuestionAction(
           );
         }
 
+        const scoped=await readQuestionContractById(transaction,question.questionContractId);
         const approval = evaluateOriginalQuestionApproval({
           ...question,
+          questionContract:scoped?.contract,questionContractIsCurrent:!!scoped,
+          options:[...optionRows].sort((a,b)=>a.optionKey.localeCompare(b.optionKey)).map(option=>({key:option.optionKey,text:option.text,correct:option.isCorrect})),
           optionTotal: optionRows.length,
           optionCorrect: optionRows.filter((option) => option.isCorrect).length,
         });
@@ -935,6 +941,8 @@ export async function approveOriginalQuestionBatchAction(
           difficulty: questions.difficulty,
           type: questions.type,
           questionSourceRights: questions.sourceRights,
+          questionContractId: questions.questionContractId,
+          styleBankId: questions.styleBankId,
           articleRef: legalArticles.articleRef,
           literalText: legalArticles.literalText,
           articleStatus: legalArticles.editorialStatus,
@@ -999,8 +1007,11 @@ export async function approveOriginalQuestionBatchAction(
 
       for (const candidate of candidateRows) {
         const options = optionsByQuestion.get(candidate.id) ?? [];
+        const scoped=await readQuestionContractById(transaction,candidate.questionContractId);
         const approval = evaluateOriginalQuestionApproval({
           ...candidate,
+          questionContract:scoped?.contract,questionContractIsCurrent:!!scoped,
+          options:[...options].sort((a,b)=>a.optionKey.localeCompare(b.optionKey)).map(option=>({key:option.optionKey,text:option.text,correct:option.isCorrect})),
           optionTotal: options.length,
           optionCorrect: options.filter((option) => option.isCorrect).length,
         });

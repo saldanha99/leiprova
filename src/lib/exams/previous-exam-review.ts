@@ -94,7 +94,9 @@ export async function loadReferenceScope(
   const [scope] = await database
     .select({
       productStatus: contestStoreProducts.status,
+      preparationMode: contestStoreProducts.preparationMode,
       opportunityId: contestOpportunities.id,
+      opportunityPublicId: contestOpportunities.publicId,
       opportunityEditorialStatus: contestOpportunities.editorialStatus,
       opportunityExamDate: contestOpportunities.examDate,
       opportunityInstitutionAcronym: contestOpportunities.institutionAcronym,
@@ -166,7 +168,7 @@ export async function loadReferenceScope(
               and newer_edition.id > ${examEditions.id}
             )
           )
-          and newer_edition.exam_date < coalesce(${contestOpportunities.examDate}, ${todayIso}::date)
+          and newer_edition.exam_date < case when ${contestStoreProducts.preparationMode} = 'historical_training' then ${todayIso}::date else coalesce(${contestOpportunities.examDate}, ${todayIso}::date) end
           and newer_edition.exam_date < ${todayIso}::date
       )`.mapWith(Boolean),
     })

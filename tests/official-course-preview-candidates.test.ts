@@ -1,11 +1,24 @@
 import { describe, expect, it } from "vitest";
 
-import { composeDossierProgramme, extractDossierSubjectSections, type ProgrammeSection } from "../src/lib/editorial/official-course-preview-candidates";
+import { composeDossierProgramme, extractDossierSubjectSections, NEXT_OFFICIAL_COURSE_RECIPES, type ProgrammeSection } from "../src/lib/editorial/official-course-preview-candidates";
 import { parseNextOfficialDossierArgs } from "../scripts/prepare-next-official-course-dossiers";
 
 const section = (subject: string, documentKey: string): ProgrammeSection => ({ subject, documentKey, checksumSha256: "a".repeat(64), sourceUrl: "https://conhecimento.fgv.br/programme.pdf", fragments: [{ page: 1, text: "Ponto1. Tema preservado." }] });
 
 describe("bounded next official dossier composition", () => {
+  it("records actual notice application dates and the latest MPRJ edition without inventing a definitive key", () => {
+    const [mprj,pgeac]=NEXT_OFFICIAL_COURSE_RECIPES;
+    expect(mprj.examDate).toBe("2026-05-31");
+    expect(mprj.identityClaims).toContainEqual({document:"mprj-notice",page:21,contains:["11.1","31 de maio de 2026","prova preambular"]});
+    expect(pgeac.examDate).toBe("2026-05-24");
+    expect(pgeac.identityClaims).toContainEqual({document:"pgeac-notice",page:14,contains:["9.1","24 de maio de 2026","Procurador do Estado","Classe I"]});
+    expect(mprj.previousExam.examDate).toBe(mprj.examDate);
+    expect(mprj.previousExam.definitiveAnswerKeyAvailable).toBe(false);
+    expect(mprj.previousExam.documents).toHaveLength(1);
+    expect(mprj.previousExam.documents[0].url).toContain("promotor-de-justica-substituto-cns001-tipo-1.pdf");
+    expect(pgeac.previousExam.definitiveAnswerKeyAvailable).toBe(true);
+    expect(pgeac.previousExam.documents.find(doc=>doc.type==="answer_key")?.url).toContain("gabarito-definitivo-pge-ac.pdf");
+  });
   it("replaces superseded disciplines rather than accumulating obsolete versions", () => {
     const result = composeDossierProgramme([section("Direito Penal", "base"), section("Direito Civil", "base")], [{ sections: [section("Direito Penal", "corrected")], expectedSubjects: ["Direito Penal"] }]);
     expect(result.sections.map((item) => item.documentKey)).toEqual(["corrected", "base"]);

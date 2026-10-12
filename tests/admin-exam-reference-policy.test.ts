@@ -76,6 +76,17 @@ const validScope: ExamReferenceScope = {
 };
 
 describe("identidade da última prova por produto", () => {
+  it("permite própria edição realizada somente no treino histórico, com todos os demais gates", () => {
+    const same = {...validScope,opportunityExamDate:"2024-11-10",preparationMode:"historical_training"};
+    expect(validateExamReferenceScope(same,"2026-09-12").valid).toBe(true);
+    expect(validateExamReferenceScope({...same,preparationMode:"current_notice"},"2026-09-12").valid).toBe(false);
+    expect(validateExamReferenceScope({...same,preparationMode:"pre_notice"},"2026-09-12").valid).toBe(false);
+    expect(validateExamReferenceScope({...same,preparationMode:undefined},"2026-09-12").valid).toBe(false);
+    for(const changed of [{editionExamDate:"2026-09-12"},{editionExamDate:"2026-09-13"},{newerEligibleEditionExists:true},{editionCareerTrackId:10},{editionJurisdictionCode:"MT"},{editionInstitutionAcronym:"MPMT"}])
+      expect(validateExamReferenceScope({...same,...changed},"2026-09-12").valid).toBe(false);
+    expect(reviewQueriesSource).toContain("preparationMode: contestStoreProducts.preparationMode");
+    expect(reviewQueriesSource).toContain("case when ${contestStoreProducts.preparationMode} = 'historical_training' then ${todayIso}::date");
+  });
   it("aceita apenas o mesmo órgão, cargo e especialidade, com a banca do edital confirmada", () => {
     expect(validateExamReferenceScope(validScope, "2026-09-12")).toEqual({
       valid: true,

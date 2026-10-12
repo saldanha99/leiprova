@@ -4,6 +4,7 @@ import postgres from "postgres";
 
 import { OFFICIAL_COURSE_STANDING_REFERENCE } from "@/lib/editorial/official-course-dossier";
 import { buildNextOfficialCoursePreview, NEXT_OFFICIAL_COURSE_RECIPES, type NextOfficialCourseRecipe, type ProgrammeSection } from "@/lib/editorial/official-course-preview-candidates";
+import { saoPauloCalendarDate } from "@/lib/opportunities/catalog-policy";
 import { parseOpportunityApprovalReviewerIdentity } from "@/lib/opportunities/approval-command";
 import { requireStandingCourseMaintenanceDatabaseUrl, assertStandingCourseProductUpdate, assertStandingCourseStageMetadata } from "@/lib/editorial/official-course-admission";
 import type { CapturedOfficialDocument } from "@/lib/opportunities/official-document-fetch";
@@ -92,6 +93,7 @@ export async function admitCompositeOfficialCourse(input: Readonly<{
   expectedHashes: ReadonlyMap<string, string>; expectedProgrammeHash: string;
 }>) {
   const { target, recipe } = compositeCourseTarget(input.productSlug);
+  if (!/^\d{4}-\d{2}-\d{2}$/u.test(recipe.examDate) || recipe.examDate >= saoPauloCalendarDate(new Date())) throw new Error("Histórico exige data civil de prova passada comprovada no edital.");
   assertCompositeHashes(recipe, input.expectedHashes, input.expectedProgrammeHash);
   if (process.env.OPPORTUNITY_APPROVAL_REFERENCE !== OFFICIAL_COURSE_STANDING_REFERENCE) throw new Error("Referência exata da decisão de fontes/programas obrigatória.");
   const databaseUrl = requireStandingCourseMaintenanceDatabaseUrl(process.env.MIGRATION_DATABASE_URL);
@@ -133,11 +135,11 @@ export async function admitCompositeOfficialCourse(input: Readonly<{
       const opportunityPublicId = randomUUID();
       const [opportunity] = await tx<{ id: string }[]>`insert into contest_opportunities (public_id, slug, category_id, career_track_id, jurisdiction_code, scope, cycle_year,
         institution_acronym, institution_name, role_name, official_notice_number, title, summary, lifecycle_status, status_as_of, official_url,
-        notice_published_at, source_checked_at, editorial_status)
+        notice_published_at, exam_date, source_checked_at, editorial_status)
         values (${opportunityPublicId}, ${target.slug}, ${catalog[0].categoryId}, ${catalog[0].careerId}, ${recipe.jurisdiction}, 'state', 2026,
           ${target.acronym}, ${recipe.institution}, ${recipe.role}, ${target.notice}, ${`${target.acronym} — treino histórico objetivo ${recipe.cycle}`},
           ${`Programa composto com retificações/republicações oficiais. ${recipe.stage}. Treino histórico objetivo; legislação atual e inéditas exigem preparação própria. Não anuncia edição futura.`},
-          'result_published', ${target.statusDate}, ${recipe.documents[0].url}, ${target.noticeDate}, ${now}, 'draft') returning id::text`;
+          'result_published', ${target.statusDate}, ${recipe.documents[0].url}, ${target.noticeDate}, ${recipe.examDate}, ${now}, 'draft') returning id::text`;
       const identities = new Map<string, { sourceId: string; snapshotId: string; sourcePublicId: string; snapshotPublicId: string }>();
       for (const doc of recipe.documents) {
         const capture = input.captures.get(doc.key)!;
@@ -187,7 +189,7 @@ export async function admitCompositeOfficialCourse(input: Readonly<{
       assertStandingCourseProductUpdate(updated, recipe.productSlug);
       const metadata = { approvalBasis: "owner_standing_authorization", approvalReference: reviewer.approvalReference, humanReview: false, executionSource: "server_cli",
         productSlug: recipe.productSlug, opportunityPublicId, sources: [...identities.entries()].map(([key, ids]) => ({ key, ...ids, checksumSha256: input.captures.get(key)!.checksumSha256 })),
-        stageSourcePublicIds, stageEvidence: evidence.stages, bankScope: recipe.bankScope, objectiveStageAlreadyHeld: true,
+        examDate: recipe.examDate, examDateEvidence: recipe.examDateEvidence, stageSourcePublicIds, stageEvidence: evidence.stages, bankScope: recipe.bankScope, objectiveStageAlreadyHeld: true,
         programmeChecksumSha256: preview.programme.checksumSha256, effectiveSubjects: preview.programme.sections.length, supersededSections: preview.programme.superseded,
         requirements: count, legalMappingsApproved: 0, questionsApproved: 0, productsReleased: 0, productStatus: "draft", preparationMode: "historical_training",
         previousExam: preview.previousExam, snapshotStorageApprovalBasis: "owner_override", snapshotCaptureScope: "owner-approval-2026-09-01" };

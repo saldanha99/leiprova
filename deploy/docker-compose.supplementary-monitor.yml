@@ -1,0 +1,12 @@
+# Override usado somente pelo wrapper. Não recria o LegalMonitor diário.
+services:
+  opportunity-approver:
+    image: leiprova-opportunity-approver
+    pull_policy: never
+    mem_limit: 384m
+    cpus: 0.35
+    pids_limit: 64
+    environment:
+      NODE_OPTIONS: --max-old-space-size=256
+    labels:
+      io.leiprova.supplementary-monitor: decree-12807-hourly-v1

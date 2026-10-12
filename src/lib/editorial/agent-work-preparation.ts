@@ -8,6 +8,8 @@ import { STYLE_PROFILE_SEEDS } from "./style-profiles";
 import { suggestLegalRequirementMapping, type MappingArticle } from "./legal-requirement-mapping";
 import { discoveryPortalPolicy } from "./discovery-policy";
 import { prepareCourseIntake } from "./course-intake";
+import { officialQuestionContractSchema, questionContractFingerprint } from "./official-question-contract";
+import { currentQuestionContractExists } from "./question-contract-query";
 
 type Requirement = { id:number; opportunityId:number; text:string; locator:string; title:string;
   role:string; year:number; jurisdiction:string; documentUrl:string; bank:string|null;
@@ -17,7 +19,7 @@ export const AGENT_PREPARATION_BATCH_SIZE = 100;
 export const AGENT_PREPARATION_CACHE_ACTION = "automation.agent_requirement.preparation_cached";
 // Bump this when retrieval, instructions or matching semantics change.
 export const AGENT_PREPARATION_ALGORITHM_PROFILE_HASH = createHash("sha256").update(JSON.stringify({
-  version: "retrieval-preparation-v2", contract: AGENT_WORK_VERSION, profiles: STYLE_PROFILE_SEEDS,
+  version: "retrieval-preparation-v3-scoped-format", contract: AGENT_WORK_VERSION, profiles: STYLE_PROFILE_SEEDS,
   retrieval: { language: "portuguese", words: 24, articles: 8, bytes: 220000, exactCitation: "legal-requirement-mapping-v1" },
 })).digest("hex");
 
@@ -73,12 +75,15 @@ export function mappingPreparationBatchQuery(corpusHash: string, batchSize: numb
 export function authoringPreparationBatchQuery(batchSize: number) {
   return sql`with ${AGENT_OPPORTUNITY_PRIORITY_CTES}, due as materialized (
     select parent.job_key key,parent.input_hash hash,parent.payload,parent.result,r.id,
+      qc.id as "questionContractId",qc.payload as "questionContract",
       r.opportunity_id as "opportunityId",case when content.opportunity_id is not null
         and coalesce(content.minimum_valid_question_count,0)<${MINIMUM_COURSE_QUESTION_COUNT} then 0 else 1 end priority
     from editorial_agent_work parent
     join opportunity_requirements r on r.id=case when parent.payload->>'requirementId'~'^[0-9]{1,18}$' then(parent.payload->>'requirementId')::bigint end
     join contest_opportunities o on o.id=r.opportunity_id join opportunity_source_documents d on d.id=r.source_document_id
     join opportunity_document_snapshots s on s.id=r.source_snapshot_id
+    join opportunity_question_contracts qc on qc.opportunity_id=o.id
+    join quiz_banks qb on qb.id=qc.bank_id and qb.slug=parent.payload->>'bank'
     left join opportunity_content content on content.opportunity_id=o.id
     left join editorial_agent_work author on author.job_key='author:'||r.id::text
     where parent.kind='legal_mapping' and parent.status='prepared' and parent.result->>'outcome'='prepared'
@@ -86,6 +91,7 @@ export function authoringPreparationBatchQuery(batchSize: number) {
       and parent.payload->>'bank' is not null and parent.payload->>'role' is not null
       and r.editorial_status in('draft','pending_review','reviewed') and o.editorial_status='reviewed' and d.status='approved' and s.status='approved'
       and parent.payload->'context'->>'sourceContextHash'=${REQUIREMENT_CONTEXT_HASH_SQL}
+      and ${currentQuestionContractExists(sql`qc.id`,sql`o.id`)}
       and not exists (select 1 from jsonb_array_elements(parent.payload->'articles') candidate
         where not exists (select 1 from legal_articles article join legal_versions version on version.id=article.legal_version_id
           join legal_acts act on act.id=version.legal_act_id
@@ -96,9 +102,10 @@ export function authoringPreparationBatchQuery(batchSize: number) {
             and (version.valid_until is null or version.valid_until>=current_date)))
       and coalesce(author.status,'')<>'running'
       and (author.job_key is null or author.payload->>'parentHash' is distinct from parent.input_hash
+        or author.payload->>'questionContractId' is distinct from qc.id
         or author.payload->'context'->>'sourceContextHash' is distinct from parent.payload->'context'->>'sourceContextHash')
   ), balanced as (select *,row_number() over(partition by "opportunityId" order by id,key) as position from due)
-  select key,hash,payload,result from balanced order by priority,position,id,key limit ${preparationBatchSize(batchSize) + 1}`;
+  select key,hash,payload,result,"questionContractId","questionContract" from balanced order by priority,position,id,key limit ${preparationBatchSize(batchSize) + 1}`;
 }
 
 export async function prepareAgentWork(db:AgentDatabase, now=new Date(), options:{followupsOnly?:boolean;batchSize?:number}={}) {
@@ -175,21 +182,25 @@ export async function prepareAgentWork(db:AgentDatabase, now=new Date(), options
       from editorial_agent_work work where work.job_key=${`mapping:${requirement.id}`}
         and work.input_hash=${agentInputHash(payload)} and work.status<>'running'`);
   }
-  const selectedParents=await db.execute<{key:string; hash:string; payload:AgentWorkPayload; result:unknown}>(authoringPreparationBatchQuery(batchSize));
+  const selectedParents=await db.execute<{key:string; hash:string; payload:AgentWorkPayload; result:unknown;questionContractId:string;questionContract:unknown}>(authoringPreparationBatchQuery(batchSize));
   const authoringHasMore = selectedParents.length > batchSize;
   const parents = selectedParents.slice(0,batchSize);
   for(const parent of parents) {
     const payload=workPayloadSchema.parse(parent.payload);
     const result=agentWorkResultSchema.parse(parent.result);
+    const scoped=officialQuestionContractSchema.safeParse(parent.questionContract);
+    if(!scoped.success || questionContractFingerprint(scoped.data)!==parent.questionContractId ||
+      scoped.data.opportunityId!==payload.opportunityId || scoped.data.roleName!==payload.role) continue;
     if(!payload.bank || !payload.role || !payload.requirementId ||
       await requirementContext(db,payload.requirementId)!==payload.context.sourceContextHash) continue;
     const ids=new Set(result.mappings.map(item=>item.articleId));
     const selected=payload.articles.filter(article=>ids.has(article.id));
     if(!selected.length) continue;
     if(await enqueueAgentWork(db,`author:${payload.requirementId}`,"authoring",{...payload,
+      questionContractId:parent.questionContractId,questionContract:scoped.data,
       parentKey:parent.key,parentHash:parent.hash,articles:selected,
-      instructions:"Crie até cinco questões originais de literalidade/aplicação da lei, por banca E cargo deste pacote, com resposta única e justificativa de cada alternativa. Fundamento somente nos artigos versionados fornecidos. Não consultar simulados/provas. Perfil interno, não material oficial da banca. São propostas para revisão humana: publicationAllowed false. Não altere banco ou conteúdo público.",
-      context:{...payload.context,mappingProposals:result.mappings,humanReviewRequired:true}})) authoring++;
+      instructions:"Crie até cinco questões originais de literalidade/aplicação da lei, por banca E cargo deste pacote, com resposta única e justificativa de cada alternativa. Use exatamente questionContract.format e questionContract.optionKeys; nunca inferir formato pelo nome da banca. C/E usa internamente A=Certo e B=Errado, preservando os códigos oficiais C/E no contrato. Fundamento somente nos artigos versionados fornecidos. Não consultar simulados/provas. Perfil interno, não material oficial da banca. São propostas para revisão editorial: publicationAllowed false. Não altere banco ou conteúdo público.",
+      context:{...payload.context,profile:scoped.data.profile,mappingProposals:result.mappings,humanReviewRequired:true}})) authoring++;
   }
   // A confirmação de uma resposta não deve repetir a busca completa no corpus.
   // A preparação integral continua no ciclo de seis horas da VPS.

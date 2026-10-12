@@ -1,7 +1,9 @@
-import { and, eq, isNull, ne } from "drizzle-orm";
+import { and, eq, isNull, ne, sql } from "drizzle-orm";
 import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 
 import * as schema from "@/lib/db/schema";
+import { lockQuestionContracts, readOfficialQuestionContract } from "./question-contract-service";
+import { validateQuestionAgainstContract } from "./official-question-contract";
 import {
   auditLogs,
   contestOpportunities,
@@ -146,11 +148,8 @@ export async function generateNoticeQuestionDraftForRequirement(
       "Vincule e revise a banca organizadora antes de gerar a questão.",
     );
   }
-  if (assignment.format !== "multiple_choice" && assignment.format !== "true_false") {
-    throw new NoticeDraftGenerationError(
-      "O perfil editorial da banca possui um formato incompatível.",
-    );
-  }
+  const scoped=await readOfficialQuestionContract(db,requirement.opportunityId);
+  if(!scoped || scoped.contract.bankId!==assignment.bankId) throw new NoticeDraftGenerationError("Falta contrato oficial exato de cargo, edição e etapa; formato da banca não é presumido.");
 
   // Identidade vem antes da similaridade: repetir não pode rejeitar o próprio rascunho.
   const publicId = deterministicNoticeQuestionUuid(
@@ -160,6 +159,7 @@ export async function generateNoticeQuestionDraftForRequirement(
       requirement.requirementText,
       requirement.literalText,
       assignment.bankId,
+      scoped.id,
     ].join("|"),
   );
   const [existing] = await db.select({ publicId: questions.publicId }).from(questions)
@@ -170,7 +170,7 @@ export async function generateNoticeQuestionDraftForRequirement(
   try {
     generated = buildNoticeQuestionDraft({
       bankSlug: assignment.bankSlug,
-      format: assignment.format,
+      format: scoped.contract.format,
       requirementText: requirement.requirementText,
       sourceLocator: requirement.sourceLocator,
       topicName: requirement.topicName,
@@ -182,6 +182,10 @@ export async function generateNoticeQuestionDraftForRequirement(
     throw new NoticeDraftGenerationError(
       error instanceof Error ? error.message : "A geração segura falhou.",
     );
+  }
+  const generatedOptions=generated.options.map(option=>({...option,key:generated.type==='true_false' ? (option.key==='C'?'A':'B') : option.key}));
+  if(!validateQuestionAgainstContract(scoped.contract,{type:generated.type,options:generatedOptions.map(option=>({key:option.key,text:option.text,correct:option.isCorrect}))}).allowed) {
+    throw new NoticeDraftGenerationError("O rascunho não corresponde ao contrato oficial do cargo.");
   }
 
   const existingQuestions = await db
@@ -197,6 +201,9 @@ export async function generateNoticeQuestionDraftForRequirement(
 
   const now = new Date();
   const created = await db.transaction(async (transaction) => {
+    await lockQuestionContracts(transaction,[scoped.id]);
+    if(!await readOfficialQuestionContract(transaction,requirement.opportunityId,scoped.id)) throw new NoticeDraftGenerationError("Contrato oficial mudou durante a geração.");
+    await transaction.execute(sql`select public.lock_editorial_agent_context(${requirementId}::bigint,array[${requirement.legalArticleId}]::bigint[])`);
     const [question] = await transaction
       .insert(questions)
       .values({
@@ -206,6 +213,7 @@ export async function generateNoticeQuestionDraftForRequirement(
         topicId: requirement.topicId,
         quizMode: "original_style",
         styleBankId: assignment.bankId,
+        questionContractId:scoped.id,
         type: generated.type,
         prompt: generated.prompt,
         explanation: generated.explanation,
@@ -234,7 +242,7 @@ export async function generateNoticeQuestionDraftForRequirement(
     if (!question) return false;
 
     await transaction.insert(questionOptions).values(
-      generated.options.map((option, sortOrder) => ({
+      generatedOptions.map((option, sortOrder) => ({
         questionId: question.id,
         optionKey: option.key,
         text: option.text,

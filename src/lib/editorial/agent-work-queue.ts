@@ -4,6 +4,8 @@ import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import * as schema from "@/lib/db/schema";
 import { findMostSimilarQuestion, ORIGINALITY_REJECTION_THRESHOLD_BPS } from "./originality";
 import { deterministicNoticeQuestionUuid } from "./notice-question-generator";
+import { readOfficialQuestionContract, lockQuestionContracts } from "./question-contract-service";
+import { currentQuestionContractExists } from "./question-contract-query";
 import { approvedProductQuestionCount, MINIMUM_COURSE_QUESTION_COUNT } from "@/lib/commerce/minimum-course-content";
 import { AGENT_FOR_WORK, AGENT_WORK_DAILY_LIMIT, AGENT_WORK_LEASE_MINUTES,
   agentInputHash, agentWorkKindSchema, validateAgentWorkResult, workPayloadSchema,
@@ -115,6 +117,7 @@ export async function claimAgentWork(db: AgentDatabase, now = new Date(), agent?
       where job_key=(with ${OPPORTUNITY_TIERS}
         select work.job_key ${CLAIM_FROM}
         where work.status='pending' and work.attempts<3
+        and (work.kind<>'authoring' or ${currentQuestionContractExists(sql`work.payload->>'questionContractId'`,sql`requirement.opportunity_id`)})
         and work.kind in (${sql.join(kinds.map(kind=>sql`${kind}`),sql`,`)})
         and ${RELEASED_WAITS_FOR_UNSOLD}
         order by case work.kind when 'legal_change' then 0 when 'authoring' then 1 when 'discovery' then 2 else 3 end,
@@ -178,11 +181,26 @@ export async function completeAgentWork(db: AgentDatabase,
     }
     const payload = workPayloadSchema.parse(job.payload);
     const result = validateAgentWorkResult(job.kind,payload,request.result);
+    if (job.kind === 'authoring' && result.outcome === 'prepared' && payload.questionContractId) {
+      // Contrato/oportunidade precedem requisito e fontes, como na aprovação.
+      await lockQuestionContracts(tx,[payload.questionContractId]);
+    }
     await tx.execute(sql`select public.lock_editorial_agent_context(${payload.requirementId??null}::bigint,
       ${`{${payload.articles.map(article=>article.id).join(',')}}`}::bigint[])`);
     let current = true;
     if (payload.requirementId) {
       current = await requirementContext(tx as unknown as AgentDatabase,payload.requirementId,true) === payload.context.sourceContextHash;
+    }
+    if (job.kind === 'authoring' && result.outcome === 'prepared') {
+      if (!payload.questionContractId || !payload.opportunityId) current = false;
+      else {
+        const scoped=await readOfficialQuestionContract(tx,payload.opportunityId,payload.questionContractId);
+        if (!scoped) current=false;
+        else {
+          const [bank]=await tx.execute<{id:number}>(sql`select id::int id from quiz_banks where slug=${payload.bank??''} and is_active`);
+          if (!bank || scoped.contract.bankId!==bank.id) current=false;
+        }
+      }
     }
     for (const article of payload.articles) {
       const [live] = await tx.execute(sql`
@@ -224,7 +242,8 @@ export async function completeAgentWork(db: AgentDatabase,
         if(similarity.scoreBps>=ORIGINALITY_REJECTION_THRESHOLD_BPS) throw new Error("Enunciado próximo do acervo; lote não importado.");
         const [saved]=await tx.insert(schema.questions).values({publicId,
           legalArticleId:article.id,subjectId:context.subjectId,topicId:context.topicId,
-          quizMode:'original_style',styleBankId:context.bankId,type:payload.bank==='cebraspe'?'true_false':'multiple_choice',
+          quizMode:'original_style',styleBankId:context.bankId,questionContractId:payload.questionContractId,
+          type:payload.questionContract!.format,
           prompt:question.prompt,explanation:question.explanation,learningObjective:String(payload.context.requirement??payload.title),
           topic:context.topic.slice(0,2000),difficulty:{easy:1,medium:3,hard:5}[question.difficulty],
           examBoardStyle:payload.bank,editorialStatus:'draft',sourceRights:'original_authorial',

@@ -1,4 +1,5 @@
 import { sql, type SQLWrapper } from "drizzle-orm";
+import { approvedBindingQuestionContractExists } from "../editorial/question-contract-query";
 
 /** Direito por produto, não por carreira/oportunidade. Uma proposta nunca libera acesso.
  * Revalida fonte/programa/versão e a revisão exata; suspensão ou edição posterior fecha o vínculo. */
@@ -6,6 +7,7 @@ export function approvedProductQuestionExists(
   productSlug: SQLWrapper,
   questionId: SQLWrapper,
   opportunityId?: SQLWrapper,
+  bindingId?: SQLWrapper,
 ) {
   return sql`exists (
     select 1 from contest_product_question_bindings binding
@@ -20,6 +22,7 @@ export function approvedProductQuestionExists(
     join legal_acts act on act.id = version.legal_act_id
     where binding.product_slug = ${productSlug} and binding.question_id = ${questionId}
       ${opportunityId ? sql`and binding.opportunity_id = ${opportunityId}` : sql``}
+      ${bindingId ? sql`and binding.id = ${bindingId}` : sql``}
       and binding.status = 'approved' and binding.reviewed_by_user_id is not null
       and binding.reviewed_at is not null
       and product.opportunity_id = binding.opportunity_id
@@ -57,23 +60,6 @@ export function approvedProductQuestionExists(
       and version.status = 'current' and version.checksum_sha256 = binding.legal_version_checksum
       and binding.evidence->>'legalSourceUrl' = version.source_url
       and act.is_active = true
-      and (q.quiz_mode = 'dry_law' or exists (
-        select 1 from opportunity_organizer_assignments assignment
-        join quiz_banks bank on bank.id = assignment.quiz_bank_id
-        join question_style_profiles profile on profile.quiz_bank_id = bank.id
-        where assignment.opportunity_id = binding.opportunity_id
-          and assignment.status = 'reviewed' and assignment.valid_until is null
-          and assignment.quiz_bank_id = q.style_bank_id and bank.is_active = true
-          and profile.is_active = true and profile.format = q.type
-          and binding.evidence->'bankProfileVersion' = to_jsonb(profile.version)
-          and binding.evidence->'organizerAssignmentId' = to_jsonb(assignment.id)
-          and (assignment.role = 'examination_provider' or (
-            assignment.role = 'primary_responsible' and not exists (
-              select 1 from opportunity_organizer_assignments examiner
-              where examiner.opportunity_id = binding.opportunity_id and examiner.role = 'examination_provider'
-                and examiner.status = 'reviewed' and examiner.valid_until is null
-            )
-          ))
-      ))
+      and ${approvedBindingQuestionContractExists(sql`binding.id`, sql`q.id`, sql`binding.opportunity_id`)}
   )`;
 }

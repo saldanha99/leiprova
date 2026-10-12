@@ -3,6 +3,7 @@ import { z } from "zod";
 import { parseOfficialOpportunitySourceUrl } from "@/lib/opportunities/source-monitor-policy";
 import { discoveryPathBlocked } from "./discovery-policy";
 import { isVerifiedCourseDiscoveryUrl } from "./course-discovery-sources";
+import { officialQuestionContractSchema, questionContractFingerprint, validateQuestionAgainstContract } from "./official-question-contract";
 
 export const AGENT_WORK_VERSION = "editalume-agents-v1";
 // A resposta só é recolhida na rodada seguinte da rotina (20 min) e a rotina não
@@ -34,6 +35,8 @@ export const workPayloadSchema = z.object({
   opportunityId: z.number().int().positive().optional(),
   bank: z.enum(["fgv", "fcc", "vunesp", "cebraspe"]).optional(),
   role: boundedText.optional(),
+  questionContractId: z.string().regex(/^[a-f0-9]{64}$/u).optional(),
+  questionContract: officialQuestionContractSchema.optional(),
   parentKey: z.string().max(220).optional(),
   parentHash: z.string().regex(/^[a-f0-9]{64}$/).optional(),
 }).strict();
@@ -104,7 +107,13 @@ export function validateAgentWorkResult(kind: AgentWorkKind, payload: AgentWorkP
     if (Date.parse(discovery.observedAt) > Date.now() + 300_000) throw new Error("Observação no futuro.");
   }
   for (const question of result.questions) {
-    const keys = payload.bank === "cebraspe" ? ["A", "B"] : ["A", "B", "C", "D", "E"];
+    const scoped = payload.questionContract;
+    if (!scoped || payload.questionContractId !== questionContractFingerprint(scoped) ||
+      scoped.opportunityId !== payload.opportunityId || scoped.roleName !== payload.role ||
+      !validateQuestionAgainstContract(scoped, { type: scoped.format, options: question.options }).allowed) {
+      throw new Error("Questão sem contrato oficial exato de cargo, edição e etapa ou com formato incompatível.");
+    }
+    const keys = scoped.optionKeys;
     if (!result.generatorModel || !payload.bank || !payload.role || question.options.length !== keys.length ||
         question.options.some((option, index) => option.key !== keys[index]) ||
         question.options.filter(option => option.correct).length !== 1 ||

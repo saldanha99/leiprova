@@ -5,6 +5,7 @@ import {
 
 export type ExamReferenceScope = {
   productStatus: string;
+  preparationMode?: string;
   opportunityEditorialStatus: string;
   opportunityExamDate: string | null;
   opportunityInstitutionAcronym: string;
@@ -271,7 +272,7 @@ export function validateExamReferenceScope(
     };
   }
 
-  const cutoff = scope.opportunityExamDate ?? todayIso;
+  const cutoff = scope.preparationMode === "historical_training" ? todayIso : (scope.opportunityExamDate ?? todayIso);
   if (
     !/^\d{4}-\d{2}-\d{2}$/.test(scope.editionExamDate) ||
     !/^\d{4}-\d{2}-\d{2}$/.test(cutoff) ||

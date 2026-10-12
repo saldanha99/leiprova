@@ -3,6 +3,9 @@ import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { z } from "zod";
 import * as schema from "../db/schema";
 import { approvedProductQuestionExists } from "./product-binding-query";
+import { currentQuestionContractExists, questionContractContentHash, questionOptionsMatchContract } from "../editorial/question-contract-query";
+import { certifyProductBindingContracts } from "../editorial/question-contract-service";
+import { OFFICIAL_COURSE_STANDING_REFERENCE } from "../editorial/official-course-dossier";
 import {
   assertProductBindingReviewDecision, assertProductBindingReviewScope,
   productBindingReviewDossierSchema, productBindingReviewFingerprint, productBindingReviewSchema,
@@ -25,6 +28,16 @@ function candidateCte(input: ProductBindingReviewInput, simulateReview: boolean,
         'reviewed_at','2000-01-01T00:00:00Z','review_notes',${input.notes}::text)` : sql``}
     )).* from public.contest_product_question_bindings original_binding
     where original_binding.id = any(${idsSql(input.bindingIds)})
+  ), question_contract_certifications as (
+    select cert.* from public.question_contract_certifications cert where cert.binding_id=any(${idsSql(input.bindingIds)})
+    union all
+    select b.id,c.id,${questionContractContentHash(sql`q.id`)},'approved','preview-official-format-contract',false,${actorId}::bigint,'2000-01-01T00:00:00Z'::timestamptz
+    from public.contest_product_question_bindings b join questions q on q.id=b.question_id
+    join opportunity_question_contracts c on c.opportunity_id=b.opportunity_id
+    where b.id=any(${idsSql(input.bindingIds)})
+      and not exists(select 1 from public.question_contract_certifications existing where existing.binding_id=b.id)
+      and ${currentQuestionContractExists(sql`c.id`,sql`b.opportunity_id`)}
+      and ${questionOptionsMatchContract(sql`q.id`,sql`q.type`,sql`c.id`)}
   )`;
 }
 
@@ -50,6 +63,7 @@ async function loadDossiers(transaction: Transaction, input: ProductBindingRevie
         'question',to_jsonb(q), 'options',coalesce((select jsonb_agg(to_jsonb(o) order by o.sort_order,o.id)
           from question_options o where o.question_id=q.id),'[]'::jsonb),
         'article',to_jsonb(article), 'version',to_jsonb(version), 'act',to_jsonb(act),
+        'questionContract',(select to_jsonb(c) from opportunity_question_contracts c where c.opportunity_id=b.opportunity_id and c.status='approved'),
         'organizers',coalesce((select jsonb_agg(jsonb_build_object('assignment',to_jsonb(a),'bank',to_jsonb(bank),'profile',to_jsonb(profile)) order by a.id)
           from opportunity_organizer_assignments a left join quiz_banks bank on bank.id=a.quiz_bank_id
           left join question_style_profiles profile on profile.quiz_bank_id=bank.id
@@ -141,6 +155,7 @@ export async function reviewProductQuestionBindings(db: Db, request: {
       returning id
     `);
     if (updated.length !== input.bindingIds.length) throw new ProductBindingReviewError("O lote mudou durante a decisão; a transação será revertida.");
+    if(approved) await certifyProductBindingContracts(transaction,input.bindingIds,actor.id,OFFICIAL_COURSE_STANDING_REFERENCE);
     const validations = approved ? await transaction.execute<{ id: string; valid: boolean }>(sql`${candidateCte(input, false, actor.id)}
       select candidate.id, ${approvedProductQuestionExists(sql`candidate.product_slug`, sql`candidate.question_id`, sql`candidate.opportunity_id`)} as valid
       from contest_product_question_bindings candidate order by candidate.id

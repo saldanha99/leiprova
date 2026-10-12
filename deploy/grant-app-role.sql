@@ -22,6 +22,8 @@ grant select on
   questions,
   question_options,
   question_style_profiles,
+  opportunity_question_contracts,
+  question_contract_certifications,
   quiz_banks,
   quiz_career_tracks,
   quiz_career_specializations,
@@ -105,6 +107,7 @@ grant insert (
   id,
   public_id,
   legal_article_id,
+  question_contract_id,
   subject_id,
   topic_id,
   quiz_mode,
@@ -148,6 +151,10 @@ grant insert (
   created_at,
   updated_at
 ) on questions to :app_user;
+
+grant insert (binding_id,contract_id,question_content_hash,status,approval_reference,human_review,reviewed_by_user_id,reviewed_at)
+  on question_contract_certifications to :app_user;
+grant execute on function public.lock_question_contract_context(text[]) to :app_user;
 
 grant update (
   editorial_status,
@@ -747,5 +754,8 @@ grant usage on
   opportunity_requirements_id_seq,
   opportunity_analysis_snapshots_id_seq
 to :app_user;
+
+-- Fontes complementares: somente leitura aprovada e fresca pela RLS.
+grant select on legal_complementary_sources to :app_user;
 
 commit;

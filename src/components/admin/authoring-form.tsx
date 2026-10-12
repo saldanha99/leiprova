@@ -119,6 +119,7 @@ export function AuthoringForm({ profiles, articles, subjects, topics }: Authorin
             <span className="text-xs text-slate-400">perfil abstrato v1</span>
           </div>
           <p className="mt-2 text-sm leading-6 text-slate-300">{profile.commandStyle}</p>
+          <p className="mt-2 text-xs leading-5 text-slate-400">Formato deste perfil interno genérico. Para uma preparação, o contrato oficial de cargo, edição e etapa define o formato e o perfil de autoria.</p>
         </div>
       ) : null}
 

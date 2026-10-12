@@ -4,6 +4,7 @@ import { z } from "zod";
 import { localAuthoringBatchSchema, localSourceBundleSchema, validateLocalAuthoring } from "./local-authoring";
 import { findMostSimilarQuestion, ORIGINALITY_REJECTION_THRESHOLD_BPS } from "./originality";
 import { clauseEquivalenceSchema, verifyOfficialClause } from "./official-clause-equivalence";
+import { type OfficialQuestionContract, questionContractFingerprint, validateQuestionAgainstContract } from "./official-question-contract";
 
 export const LOCAL_IMPORT_VERSION = "local-subscription-drafts-v1";
 const id = z.number().int().positive().safe();
@@ -18,6 +19,10 @@ export const localImportMappingSchema = z.discriminatedUnion("schemaVersion", [z
   schemaVersion: z.literal(2),
   sourceBundleId: z.string().min(1).max(160),
   bindings: z.array(bindingSchema.extend({ equivalence: clauseEquivalenceSchema }).strict()).min(1).max(250),
+}).strict(), z.object({
+  schemaVersion:z.literal(3),sourceBundleId:z.string().min(1).max(160),
+  bindings:z.array(bindingSchema.extend({equivalence:clauseEquivalenceSchema.optional()}).strict()).min(1).max(250),
+  contracts:z.array(z.object({bankSlug:z.enum(["fgv","fcc","vunesp","cebraspe"]),contractId:z.string().regex(/^[a-f0-9]{64}$/u)}).strict()).min(1).max(4),
 }).strict()]);
 
 export class LocalImportError extends Error {}
@@ -41,11 +46,15 @@ export function parseLocalImport(rawSources: unknown, rawBatches: readonly unkno
   if (batches.reduce((sum, batch) => sum + batch.questions.length, 0) > 250) {
     throw new LocalImportError("Uma importação comporta no máximo 250 questões.");
   }
-  const validation = validateLocalAuthoring(sources, batches);
+  // Só checagem mecânica neste ponto; elegibilidade do contrato vem do banco depois.
+  const formats=mapping.schemaVersion===3 ? Object.fromEntries(batches.map(batch=>[batch.bankSlug,batch.questions[0].type])) : undefined;
+  const validation = validateLocalAuthoring(sources, batches,[],formats);
+  if(mapping.schemaVersion===3 && (new Set(mapping.contracts.map(item=>item.bankSlug)).size!==mapping.contracts.length ||
+    batches.some(batch=>!mapping.contracts.some(item=>item.bankSlug===batch.bankSlug)))) throw new LocalImportError("Contrato do cargo ausente ou duplicado no pacote.");
   if (!validation.valid) throw new LocalImportError("O pacote falhou na validação editorial local.");
   if (mapping.sourceBundleId !== sources.id || mapping.bindings.length !== sources.sources.length ||
       new Set(mapping.bindings.map((binding) => binding.sourceId)).size !== mapping.bindings.length ||
-      new Set(mapping.bindings.map((binding) => "equivalence" in binding
+      new Set(mapping.bindings.map((binding) => "equivalence" in binding && binding.equivalence
         ? `${binding.legalArticleId}:${binding.equivalence.inciso}` : String(binding.legalArticleId))).size !== mapping.bindings.length ||
       sources.sources.some((source) => !mapping.bindings.some((binding) => binding.sourceId === source.id))) {
     throw new LocalImportError("Mapeamento incompleto, duplicado ou pertencente a outro pacote.");
@@ -62,6 +71,7 @@ export type LocalImportContext = {
   }[];
   topics: readonly { id: number; subjectId: number; name: string; isActive: boolean; subjectIsActive: boolean }[];
   banks: readonly { id: number; slug: string; isActive: boolean; profileIsActive: boolean; format: string; version: number }[];
+  contracts?: readonly {id:string;contract:OfficialQuestionContract}[];
 };
 
 /** Mapeamento explícito: nunca escolhe artigo por aproximação textual, ano ou banca. */
@@ -72,13 +82,15 @@ export function prepareLocalImport(input: LocalImportInput, context: LocalImport
     const article = context.articles.find((candidate) => candidate.id === binding.legalArticleId);
     const topic = context.topics.find((candidate) => candidate.id === binding.topicId);
     const bank = context.banks.find((candidate) => candidate.slug === batch.bankSlug);
+    const contractId=input.mapping.schemaVersion===3 ? input.mapping.contracts.find(item=>item.bankSlug===batch.bankSlug)?.contractId : undefined;
+    const scoped=contractId ? context.contracts?.find(item=>item.id===contractId) : undefined;
     if (!article || article.versionId !== binding.legalVersionId || article.versionChecksum !== binding.versionChecksum ||
         article.articleStatus !== "reviewed" || article.sourceRights !== "official_text" ||
         article.versionStatus !== "current" || !article.actIsActive) {
       throw new LocalImportError(`A fonte ${source.id} não corresponde a um dispositivo exato, vigente e revisado no banco.`);
     }
     let sourceEvidence: ReturnType<typeof verifyOfficialClause> | undefined;
-    if ("equivalence" in binding) {
+    if ("equivalence" in binding && binding.equivalence) {
       try { sourceEvidence = verifyOfficialClause({ equivalence: clauseEquivalenceSchema.parse(binding.equivalence), source, bundle: input.sources, article }); }
       catch { throw new LocalImportError(`Equivalência oficial inválida para ${source.id}; confira o inciso completo e o caput.`); }
     } else if (article.articleRef !== source.articleRef || normalize(article.literalText) !== normalize(source.text) ||
@@ -88,20 +100,26 @@ export function prepareLocalImport(input: LocalImportInput, context: LocalImport
     if (!topic || topic.subjectId !== binding.subjectId || !topic.isActive || !topic.subjectIsActive) {
       throw new LocalImportError(`Matéria/tópico inválido para ${source.id}.`);
     }
-    if (!bank || !bank.isActive || !bank.profileIsActive || bank.format !== question.type) {
+    if (!bank || !bank.isActive || (!scoped && (!bank.profileIsActive || bank.format !== question.type))) {
       throw new LocalImportError(`Perfil de banca indisponível: ${batch.bankSlug}.`);
+    }
+    const normalizedOptions=question.options.map(option=>({...option,key:question.type==='true_false' ? (option.key==='C'?'A':'B') : option.key}));
+    if(contractId && (!scoped || questionContractFingerprint(scoped.contract)!==contractId || scoped.contract.bankId!==bank.id ||
+      !validateQuestionAgainstContract(scoped.contract,{type:question.type,options:normalizedOptions.map(option=>({key:option.key,text:option.text,correct:option.isCorrect}))}).allowed)) {
+      throw new LocalImportError("Contrato oficial ausente, alterado ou incompatível com o cargo/edição/etapa deste pacote.");
     }
     const publicId = localQuestionUuid(input.sources.id, question.id);
     const values = {
       publicId, legalArticleId: article.id, subjectId: binding.subjectId, topicId: topic.id,
       quizMode: "original_style", styleBankId: bank.id, examEditionId: null,
+      ...(contractId?{questionContractId:contractId}:{}),
       type: question.type, prompt: question.prompt, explanation: question.explanation,
       learningObjective: question.learningObjective, topic: topic.name, difficulty: question.difficulty,
       sourceRights: "original_authorial", sourceTitle: `${input.sources.title} — ${source.articleRef}`,
       sourceUrl: input.sources.officialUrl, authorshipMethod: "ai_assisted",
       generatorModel: batch.generator.model, promptVersion: LOCAL_IMPORT_VERSION, examBoardStyle: batch.bankSlug,
     };
-    const options = question.options.map((option, sortOrder) => ({
+    const options = (contractId?normalizedOptions:question.options).map((option, sortOrder) => ({
       optionKey: option.key, text: option.text, isCorrect: option.isCorrect, rationale: option.rationale, sortOrder,
     }));
     const receipt = {
@@ -111,6 +129,7 @@ export function prepareLocalImport(input: LocalImportInput, context: LocalImport
       supportingQuote: question.supportingQuote, generator: batch.generator,
       legalVersionId: article.versionId, versionChecksum: article.versionChecksum,
       profileVersion: bank.version, publicationAllowed: false,
+      ...(contractId?{questionContractId:contractId,questionContractFingerprint:contractId}:{}),
       ...(sourceEvidence ? { sourceEvidence } : {}),
     };
     return { publicId, values, options, receipt, sourceVerifiedAt: article.verifiedAt };

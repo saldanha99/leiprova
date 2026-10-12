@@ -7,12 +7,12 @@ const FGV_FILES = "https://conhecimento.fgv.br/sites/default/files/concursos/";
 export type PreviewDocumentRecipe = Readonly<{ key: string; url: string; title: string; pages: number; programmePages: readonly [number, number] | null }>;
 export type NextOfficialCourseRecipe = Readonly<{
   productSlug: string; institution: string; role: string; jurisdiction: string; cycle: string; bankScope: string;
-  portalUrl: string; stage: string; stageObservedOn: string; proposedMode: "historical_training";
+  portalUrl: string; examDate: string; examDateEvidence: Readonly<{ documentKey: string; page: number; item: string; quote: string; actualDayIndependentlyVerified: boolean; corroboratingUrl: string | null; limitation: string | null }>; stage: string; stageObservedOn: string; proposedMode: "historical_training";
   documents: readonly PreviewDocumentRecipe[];
   expectedSubjects: number;
   overlays: readonly Readonly<{ key: string; subjects: readonly string[] }>[];
   identityClaims: readonly Readonly<{ document: string; page: number; contains: readonly string[] }>[];
-  previousExam: Readonly<{ cycle: string; role: string; portalUrl: string; documents: readonly Readonly<{ type: "question_booklet" | "answer_key"; title: string; url: string }>[] }>;
+  previousExam: Readonly<{ cycle: string; role: string; portalUrl: string; examDate: string; definitiveAnswerKeyAvailable: boolean; documents: readonly Readonly<{ type: "question_booklet" | "answer_key"; title: string; url: string }>[] }>;
   limitations: readonly string[];
 }>;
 
@@ -20,7 +20,7 @@ export const NEXT_OFFICIAL_COURSE_RECIPES: readonly NextOfficialCourseRecipe[] =
   {
     productSlug: "mpe-rj-promotor-de-justica-2026", institution: "Ministério Público do Estado do Rio de Janeiro", role: "Promotor de Justiça Substituto",
     jurisdiction: "RJ", cycle: "XXXIX — 2026", bankScope: "FGV: inscrições provisórias/elaboração/aplicação da preambular; MPRJ: discursivas em diante, com apoio logístico FGV",
-    portalUrl: "https://conhecimento.fgv.br/concursos/mprjpromotor2026", stage: "Discursivas com resultado em02/10/2026; inscrição definitiva, exame de higidez e fases posteriores em andamento",
+    portalUrl: "https://conhecimento.fgv.br/concursos/mprjpromotor2026", examDate: "2026-05-31", examDateEvidence: { documentKey: "mprj-notice", page: 21, item: "11.1", quote: "com aplicação prevista para o dia 31 de maio de 2026 (domingo)", actualDayIndependentlyVerified: true, corroboratingUrl: "https://www.mprj.mp.br/visualizar?noticiaId=224001", limitation: null }, stage: "Discursivas com resultado em02/10/2026; inscrição definitiva, exame de higidez e fases posteriores em andamento",
     stageObservedOn: "2026-10-12", proposedMode: "historical_training", expectedSubjects: 13,
     documents: [
       { key: "mprj-notice", url: `${FGV_FILES}edital-xxxix-concurso.pdf`, title: "Edital do XXXIX Concurso MPRJ", pages: 47, programmePages: null },
@@ -34,20 +34,20 @@ export const NEXT_OFFICIAL_COURSE_RECIPES: readonly NextOfficialCourseRecipe[] =
     ],
     identityClaims: [
       { document: "mprj-notice", page: 1, contains: ["XXXIX", "ESTADO DO RIO DE JANEIRO", "Promotor de Justiça Substituto", "2026"] },
+      { document: "mprj-notice", page: 21, contains: ["11.1", "31 de maio de 2026", "prova preambular"] },
       { document: "mprj-notice", page: 2, contains: ["responsabilidade da Fundação Getulio Vargas", "executado pelo próprio Ministério Público"] },
       { document: "mprj-inclusion", page: 1, contains: ["15.358", "XXXIX", "Direito Penal"] },
       { document: "mprj-civil-correction", page: 1, contains: ["por incorreção", "Direito Processual Civil", "17.03.26"] },
     ],
-    previousExam: { cycle: "XXXVIII — 2025", role: "Promotor de Justiça Substituto — prova preambular", portalUrl: "https://conhecimento.fgv.br/concursos/mprjpromotor2025", documents: [
-      { type: "question_booklet", title: "MPRJ XXXVIII — caderno Tipo1", url: `${FGV_FILES}promotor-de-justica-substitutocns001-tipo-1_0.pdf` },
-      { type: "answer_key", title: "MPRJ XXXVIII — gabarito oficial definitivo", url: `${FGV_FILES}v2gabarito-definito-mprj-promotor.pdf` },
+    previousExam: { cycle: "XXXIX — 2026, preambular já realizada", role: "Promotor de Justiça Substituto — prova preambular", portalUrl: "https://conhecimento.fgv.br/concursos/mprjpromotor2026", examDate: "2026-05-31", definitiveAnswerKeyAvailable: false, documents: [
+      { type: "question_booklet", title: "MPRJ XXXIX — caderno Tipo1", url: `${FGV_FILES}promotor-de-justica-substituto-cns001-tipo-1.pdf` },
     ] },
-    limitations: ["O programa não está no edital47p: AnexoI é aviso de privacidade.", "Quatro disciplinas do aviso17/03 foram substituídas em09/04; não usar versão original isolada.", "Treino histórico preambular com legislação atual; não simulado oral, discursivo ou edição futura.", "Não inferir número de alternativas a partir do edital; perfil específico precisa análise própria.", "Lei15.358/2026 e demais normas citadas exigem comparação com texto oficial atual antes de vínculos/questões."],
+    limitations: ["O programa não está no edital47p: AnexoI é aviso de privacidade.", "Última preambular é XXXIX2026; portal publicou apenas gabarito preliminar, definitivo público não localizado. Não usar XXXVIII2025 como última prova nem aprovar referência incompleta.", "Quatro disciplinas do aviso17/03 foram substituídas em09/04; não usar versão original isolada.", "Treino histórico preambular com legislação atual; não simulado oral, discursivo ou edição futura.", "Não inferir número de alternativas a partir do edital; perfil específico precisa análise própria.", "Lei15.358/2026 e demais normas citadas exigem comparação com texto oficial atual antes de vínculos/questões."],
   },
   {
     productSlug: "pge-ac-procurador-do-estado-reta-final", institution: "Procuradoria-Geral do Estado do Acre", role: "Procurador do Estado — Classe I",
     jurisdiction: "AC", cycle: "VIII — 2026", bankScope: "Fundação Getulio Vargas, sob comissão do VIII Concurso PGE-AC",
-    portalUrl: "https://conhecimento.fgv.br/concursos/pgeac", stage: "Objetiva com resultado definitivo15/07/2026; resultado preliminar prova escrita subjetiva05/10/2026",
+    portalUrl: "https://conhecimento.fgv.br/concursos/pgeac", examDate: "2026-05-24", examDateEvidence: { documentKey: "pgeac-notice", page: 14, item: "9.1", quote: "de 24 de maio de 2026, das 8h às 13h", actualDayIndependentlyVerified: false, corroboratingUrl: null, limitation: "Data constante do edital; fase objetiva realizada confirmada por resultado posterior. Dia efetivo não confirmado por anúncio independente nesta conferência." }, stage: "Objetiva com resultado definitivo15/07/2026; resultado preliminar prova escrita subjetiva05/10/2026",
     stageObservedOn: "2026-10-12", proposedMode: "historical_training", expectedSubjects: 10,
     documents: [
       { key: "pgeac-notice", url: `${FGV_FILES}pge-ac-edital-26.02.v.final_.pdf`, title: "Edital PGE-AC publicado26/02/2026", pages: 40, programmePages: [31, 38] },
@@ -61,11 +61,12 @@ export const NEXT_OFFICIAL_COURSE_RECIPES: readonly NextOfficialCourseRecipe[] =
     identityClaims: [
       { document: "pgeac-notice", page: 1, contains: ["VIII", "ESTADO DO ACRE", "10 vagas", "Fundação Getulio Vargas"] },
       { document: "pgeac-notice", page: 2, contains: ["Classe I"] },
+      { document: "pgeac-notice", page: 14, contains: ["9.1", "24 de maio de 2026", "Procurador do Estado", "Classe I"] },
       { document: "pgeac-notice", page: 31, contains: ["ANEXO I", "CONTEÚDO PROGRAMÁTICO"] },
       { document: "pgeac-correction-1", page: 1, contains: ["1ª RETIFICAÇÃO", "Conteúdo Programático", "DIREITO ADMINISTRATIVO"] },
       { document: "pgeac-correction-2", page: 1, contains: ["2ª RETIFICAÇÃO", "Conteúdo Programático", "15.190/2025"] },
     ],
-    previousExam: { cycle: "VIII — 2026, objetiva já realizada", role: "Procurador do Estado do Acre — Classe I", portalUrl: "https://conhecimento.fgv.br/concursos/pgeac", documents: [
+    previousExam: { cycle: "VIII — 2026, objetiva já realizada", role: "Procurador do Estado do Acre — Classe I", portalUrl: "https://conhecimento.fgv.br/concursos/pgeac", examDate: "2026-05-24", definitiveAnswerKeyAvailable: true, documents: [
       { type: "question_booklet", title: "PGE-AC VIII — caderno Tipo1", url: `${FGV_FILES}procurador-do-estado-do-acre-cns001-tipo-1.pdf` },
       { type: "answer_key", title: "PGE-AC VIII — gabarito oficial definitivo", url: `${FGV_FILES}gabarito-definitivo-pge-ac.pdf` },
     ] },
@@ -136,12 +137,12 @@ export function buildNextOfficialCoursePreview(recipe: NextOfficialCourseRecipe,
   if (programme.sections.length !== recipe.expectedSubjects) throw new Error("Programa incompleto; número de disciplinas diverge.");
   return {
     schemaVersion: 1, mode: "preview", productSlug: recipe.productSlug, observedAt,
-    identity: { institution: recipe.institution, role: recipe.role, jurisdiction: recipe.jurisdiction, cycle: recipe.cycle, bankScope: recipe.bankScope },
+    identity: { institution: recipe.institution, role: recipe.role, jurisdiction: recipe.jurisdiction, cycle: recipe.cycle, examDate: recipe.examDate, examDateEvidence: recipe.examDateEvidence, bankScope: recipe.bankScope },
     officialPortal: recipe.portalUrl, status: { description: recipe.stage, observedOn: recipe.stageObservedOn, officialPortalLabel: "Em Andamento", objectiveStageAlreadyHeld: true },
     proposedPreparationMode: recipe.proposedMode, proposedScope: "objective_training_current_legislation", legislationUpdatedAndMapped: false,
     captures: recipe.documents.map((doc) => { const capture = captures.get(doc.key)!; return { key: doc.key, sourceUrl: capture.documentUrl, checksumSha256: capture.checksumSha256, pageCount: capture.pageCount, byteLength: capture.byteLength, programmePages: doc.programmePages }; }),
     programme: { ...programme, checksumSha256: createHash("sha256").update(JSON.stringify(programme.sections)).digest("hex"), extraction: "verbatim_source_fragments_per_subject_with_exact_overlay" },
-    previousExam: { ...recipe.previousExam, distributionMode: "external_link", sourceContentStored: false, metadata: previousMetadata, approvedForProduct: false, thirdPartyQuestionsImported: 0 },
+    previousExam: { ...recipe.previousExam, distributionMode: "external_link", sourceContentStored: false, metadata: previousMetadata, approvedForProduct: false, admissionBlocker: recipe.previousExam.definitiveAnswerKeyAvailable ? null : "Definitive official answer key for latest historical edition not publicly verified", thirdPartyQuestionsImported: 0 },
     review: { proposedApprovalBasis: "owner_standing_authorization", approvalReference: OFFICIAL_COURSE_STANDING_REFERENCE, humanReview: false, applied: false },
     limitations: recipe.limitations, databaseWrites: 0, admissionApplied: false, applySupported: false, questionsGenerated: 0, productsReleased: 0, publicationAllowed: false,
   };

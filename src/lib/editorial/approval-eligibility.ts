@@ -1,5 +1,6 @@
 import { validateHumanReview } from "@/lib/editorial/clean-room";
 import { ORIGINALITY_REJECTION_THRESHOLD_BPS } from "@/lib/editorial/originality";
+import { questionContractFingerprint, validateQuestionAgainstContract, officialQuestionContractSchema } from "./official-question-contract";
 
 /**
  * Critério único de aprovação editorial de questão autoral.
@@ -32,6 +33,11 @@ export type OriginalQuestionApprovalCandidate = {
   readonly bankIsActive: boolean | null;
   readonly optionTotal: number;
   readonly optionCorrect: number;
+  readonly questionContractId?: string | null;
+  readonly questionContract?: unknown;
+  readonly questionContractIsCurrent?: boolean;
+  readonly styleBankId?: number | null;
+  readonly options?: readonly { key: string; text: string; correct: boolean }[];
 };
 
 export type ApprovalEvaluation =
@@ -45,6 +51,15 @@ export function expectedOptionCount(type: string) {
 export function evaluateOriginalQuestionApproval(
   candidate: OriginalQuestionApprovalCandidate,
 ): ApprovalEvaluation {
+  if (candidate.questionContractId) {
+    const contract=officialQuestionContractSchema.safeParse(candidate.questionContract);
+    if (!candidate.questionContractIsCurrent || !contract.success ||
+      questionContractFingerprint(contract.data)!==candidate.questionContractId ||
+      candidate.styleBankId!==contract.data.bankId || !candidate.options ||
+      !validateQuestionAgainstContract(contract.data,{type:candidate.type,options:candidate.options}).allowed) {
+      return {allowed:false,reason:`O contrato oficial de cargo, edição e etapa da questão ${candidate.publicId} não está elegível.`};
+    }
+  }
   const humanReview = validateHumanReview({
     status: candidate.status,
     creatorUserId: candidate.creatorUserId,
@@ -67,9 +82,9 @@ export function evaluateOriginalQuestionApproval(
   }
 
   if (
-    !candidate.profileIsActive ||
+    (!candidate.questionContractId && !candidate.profileIsActive) ||
     !candidate.bankIsActive ||
-    candidate.profileFormat !== candidate.type
+    (!candidate.questionContractId && candidate.profileFormat !== candidate.type)
   ) {
     return {
       allowed: false,

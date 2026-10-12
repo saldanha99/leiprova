@@ -14,6 +14,14 @@ import {
 } from "../src/lib/commerce/previous-exam-content";
 
 describe("conteúdo real licenciado por produto", () => {
+  it("usa corte civil de hoje para treino histórico sem afrouxar órgão, cargo, licença ou última edição", () => {
+    const query=new PgDialect().sqlToQuery(approvedProductPreviousExamReferenceExists(sql`${"mpmt"}`));
+    expect(query.sql).toContain("exam_product.preparation_mode = 'historical_training' or opportunity.exam_date is null or exam_edition.exam_date < opportunity.exam_date");
+    expect(query.sql).toContain("exam_product.preparation_mode = 'historical_training' or opportunity.exam_date is null or newer_edition.exam_date < opportunity.exam_date");
+    expect(query.sql).toContain("exam_edition.exam_date < (current_timestamp at time zone 'America/Sao_Paulo')::date");
+    expect(query.sql).toContain("opportunity.career_track_id = exam_edition.career_track_id");
+    expect(query.sql).toContain("and not exists");
+  });
   it("mantém a constante visual legada e usa frescor de 30 dias", () => {
     expect(MINIMUM_LICENSED_PREVIOUS_EXAM_QUESTION_COUNT).toBe(1);
     expect(PREVIOUS_EXAM_SOURCE_FRESHNESS_DAYS).toBe(30);

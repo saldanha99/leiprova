@@ -120,13 +120,15 @@ describe("bounded MPRJ/PGEAC composite admission", () => {
     const transaction=syntheticTransaction();
     try {
       const result=await admitCompositeOfficialCourse(syntheticAdmission());
-      expect(result).toMatchObject({productStatus:"draft",legalMappingsApproved:0,questionsApproved:0,productsReleased:0,humanReview:false,requirements:13});
+      expect(result).toMatchObject({productStatus:"draft",examDate:"2026-05-31",legalMappingsApproved:0,questionsApproved:0,productsReleased:0,humanReview:false,requirements:13});
       expect(transaction.committed()).toBe(true);
       const reviewed=transaction.queries.findIndex(q=>q.startsWith("update contest_opportunities"));
       expect(transaction.queries.findIndex(q=>q.startsWith("insert into opportunity_source_documents"))).toBeLessThan(reviewed);
       expect(transaction.queries.findIndex(q=>q.startsWith("insert into opportunity_organizer_assignments"))).toBeLessThan(reviewed);
       expect(transaction.queries.find(q=>q.startsWith("update contest_store_products"))).not.toContain("set status");
       expect(result.previousExam.approvedForProduct).toBe(false);
+      expect(result.previousExam.admissionBlocker).toContain("Definitive");
+      expect(transaction.queries.find(q=>q.startsWith("insert into contest_opportunities"))).toContain("exam_date");
       // Driver helper must receive arrays/objects, never pre-encoded JSON strings.
       expect(transaction.json).toHaveBeenCalledTimes(recipe.documents.length+1);
       expect(transaction.json.mock.calls.slice(0,recipe.documents.length).every(([value])=>Array.isArray(value))).toBe(true);

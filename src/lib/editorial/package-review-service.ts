@@ -65,6 +65,7 @@ export async function reviewImportedPackage(db: PostgresJsDatabase<typeof schema
       const question = stored.find((row) => row.publicId === item.publicId)!;
       const article = context.articles.find((row) => row.id === question.legalArticleId)!;
       const bank = context.banks.find((row) => row.id === question.styleBankId)!;
+      const scoped=context.contracts.find(row=>row.id===question.questionContractId);
       const similarity = checkImportOriginality(question.publicId, question.prompt, corpus);
       const dossierFingerprint = buildDossierFingerprint({ ...question, options: item.options,
         articleRef: article.articleRef, literalText: article.literalText, sourceUrl: article.sourceUrl, sourceVerifiedAt: article.verifiedAt });
@@ -88,6 +89,8 @@ export async function reviewImportedPackage(db: PostgresJsDatabase<typeof schema
         articleStatus: article.articleStatus, articleSourceRights: article.sourceRights, versionStatus: article.versionStatus,
         sourceUrl: article.sourceUrl, actIsActive: article.actIsActive, profileFormat: bank.format,
         profileIsActive: bank.profileIsActive, bankIsActive: bank.isActive,
+        questionContractId:question.questionContractId,questionContract:scoped?.contract,questionContractIsCurrent:!!scoped,
+        styleBankId:question.styleBankId,options:item.options.map(option=>({key:option.optionKey,text:option.text,correct:option.isCorrect})),
         optionTotal: item.options.length, optionCorrect: item.options.filter((option) => option.isCorrect).length,
       });
       if (!approval.allowed) throw new LocalImportError(approval.reason);

@@ -2,6 +2,7 @@ import { and, eq, isNotNull, sql, type SQLWrapper } from "drizzle-orm";
 
 import { legalActs, legalArticles, legalVersions, questions } from "@/lib/db/schema";
 import { resolveOriginalStyleEligibility } from "@/lib/quiz/original-style-eligibility";
+import { originalQuestionContractExists } from "../study/original-question-contract-query";
 
 function authorialSourceConditions(bankId: number | SQLWrapper) {
   return and(
@@ -11,6 +12,7 @@ function authorialSourceConditions(bankId: number | SQLWrapper) {
     isNotNull(questions.legalArticleId), eq(legalArticles.editorialStatus, "reviewed"),
     eq(legalArticles.sourceRights, "official_text"), eq(legalVersions.status, "current"),
     eq(legalActs.isActive, true),
+    originalQuestionContractExists(questions.id,questions.type,questions.styleBankId,questions.questionContractId),
   );
 }
 
@@ -40,7 +42,8 @@ export function originalStyleConditions(selection: { bankId: number | null }, ex
   if (!eligibility.eligible) return sql`false`;
   const legalSource = authorialSourceConditions(eligibility.bankId);
   return eligibility.scope === "general_bank"
-    ? legalSource : and(legalSource, exactEditionRequirementExists(eligibility.examEditionId));
+    ? legalSource : and(legalSource, exactEditionRequirementExists(eligibility.examEditionId),
+      originalQuestionContractExists(questions.id,questions.type,questions.styleBankId,questions.questionContractId,eligibility.examEditionId));
 }
 
 /** Não oferece prova futura apenas porque a oportunidade foi revisada.
@@ -54,5 +57,6 @@ export function editionHasOriginalTraining(examEditionId: number | SQLWrapper, b
     join ${legalActs} on ${legalActs.id} = ${legalVersions.legalActId}
     where ${authorialSourceConditions(bankId)}
       and ${exactEditionRequirementExists(examEditionId)}
+      and ${originalQuestionContractExists(questions.id,questions.type,questions.styleBankId,questions.questionContractId,examEditionId)}
   )`;
 }

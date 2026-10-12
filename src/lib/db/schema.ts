@@ -1,4 +1,5 @@
 import { sql } from "drizzle-orm";
+import type { OfficialQuestionContract } from "../editorial/official-question-contract";
 import {
   bigint,
   boolean,
@@ -2331,6 +2332,44 @@ export const contestOpportunityPlans = pgTable(
   ],
 );
 
+// Contrato oficial de formato por cargo/edição/etapa, independente do perfil global da banca.
+export const opportunityQuestionContracts = pgTable("opportunity_question_contracts", {
+  id: text("id").primaryKey(),
+  opportunityId: bigint("opportunity_id", { mode: "number" }).notNull().references(() => contestOpportunities.id, { onDelete: "restrict" }),
+  examEditionId: bigint("exam_edition_id", { mode: "number" }).notNull().references(() => examEditions.id, { onDelete: "restrict" }),
+  bankId: bigint("bank_id", { mode: "number" }).notNull().references(() => quizBanks.id, { onDelete: "restrict" }),
+  organizerAssignmentId: bigint("organizer_assignment_id", { mode: "number" }).notNull().references(() => opportunityOrganizerAssignments.id, { onDelete: "restrict" }),
+  roleName: text("role_name").notNull(), specializationId: bigint("specialization_id", { mode: "number" }),
+  cycleYear: integer("cycle_year").notNull(), noticeNumber: text("notice_number").notNull(),
+  stageKey: text("stage_key").notNull(), scope: text("scope").notNull(),
+  sourceDocumentId: bigint("source_document_id", { mode: "number" }).notNull().references(() => opportunitySourceDocuments.id, { onDelete: "restrict" }),
+  sourceSnapshotId: bigint("source_snapshot_id", { mode: "number" }).notNull().references(() => opportunityDocumentSnapshots.id, { onDelete: "restrict" }),
+  sourceSnapshotChecksum: text("source_snapshot_checksum").notNull(), sourceUrl: text("source_url").notNull(),
+  format: text("format").notNull(), optionKeys: jsonb("option_keys").$type<string[]>().notNull(),
+  payload: jsonb("payload").$type<OfficialQuestionContract>().notNull(),
+  status: text("status").notNull().default("approved"),
+  approvalReference: text("approval_reference").notNull(),
+  approvalBasis: text("approval_basis").notNull().default("owner_standing_authorization"),
+  humanReview: boolean("human_review").notNull().default(false),
+  reviewedByUserId: bigint("reviewed_by_user_id", { mode: "number" }).notNull().references(() => users.id, { onDelete: "restrict" }),
+  reviewedAt: timestamp("reviewed_at", { withTimezone: true }).notNull(),
+  ...timestamps,
+}, table => [
+  uniqueIndex("opportunity_question_contracts_active_scope_uidx").on(table.opportunityId, table.stageKey).where(sql`${table.status}='approved'`),
+  index("opportunity_question_contracts_edition_idx").on(table.examEditionId),
+  index("opportunity_question_contracts_bank_idx").on(table.bankId),
+  index("opportunity_question_contracts_assignment_idx").on(table.organizerAssignmentId),
+  index("opportunity_question_contracts_source_idx").on(table.sourceDocumentId),
+  index("opportunity_question_contracts_snapshot_idx").on(table.sourceSnapshotId),
+  index("opportunity_question_contracts_reviewer_idx").on(table.reviewedByUserId),
+  check("opportunity_question_contracts_hash_check", sql`${table.id} ~ '^[a-f0-9]{64}$' and ${table.sourceSnapshotChecksum} ~ '^[a-f0-9]{64}$'`),
+  check("opportunity_question_contracts_scope_check", sql`${table.stageKey}='objective' and ${table.scope}='single_role'`),
+  check("opportunity_question_contracts_status_check", sql`${table.status} in ('approved','suspended','superseded')`),
+  check("opportunity_question_contracts_format_check", sql`(${table.format}='multiple_choice' and ${table.optionKeys}='["A","B","C","D","E"]'::jsonb) or (${table.format}='true_false' and ${table.optionKeys}='["A","B"]'::jsonb)`),
+  check("opportunity_question_contracts_audit_check", sql`${table.approvalBasis}='owner_standing_authorization' and not ${table.humanReview} and char_length(${table.approvalReference}) between 10 and 250`),
+  check("opportunity_question_contracts_payload_check", sql`jsonb_typeof(${table.payload})='object' and octet_length(${table.payload}::text)<65536 and ${table.payload}->>'format'=${table.format} and ${table.payload}->'optionKeys'=${table.optionKeys} and ${table.payload}->>'sourceSnapshotChecksum'=${table.sourceSnapshotChecksum}`),
+]);
+
 export const questions = pgTable(
   "questions",
   {
@@ -2355,6 +2394,7 @@ export const questions = pgTable(
       },
     ),
     quizMode: text("quiz_mode").notNull().default("dry_law"),
+    questionContractId: text("question_contract_id").references(() => opportunityQuestionContracts.id, { onDelete: "restrict" }),
     styleBankId: bigint("style_bank_id", { mode: "number" }).references(
       () => quizBanks.id,
       {
@@ -2427,6 +2467,7 @@ export const questions = pgTable(
   },
   (table) => [
     index("questions_article_id_idx").on(table.legalArticleId),
+    index("questions_question_contract_idx").on(table.questionContractId),
     index("questions_subject_id_idx").on(table.subjectId),
     index("questions_topic_id_idx").on(table.topicId),
     index("questions_style_bank_id_idx").on(table.styleBankId),
@@ -2763,6 +2804,24 @@ export const contestProductQuestionBindings = pgTable(
     check("contest_product_bindings_review_check", sql`(${table.status} = 'pending_review' and ${table.reviewedByUserId} is null and ${table.reviewedAt} is null and ${table.reviewNotes} is null) or (${table.status} <> 'pending_review' and ${table.reviewedByUserId} is not null and ${table.reviewedAt} is not null and ${table.reviewNotes} is not null and char_length(btrim(${table.reviewNotes})) between 20 and 2000)`),
   ],
 );
+
+// Certificação adicional: preserva a fotografia e a revisão histórica do vínculo.
+export const questionContractCertifications = pgTable("question_contract_certifications", {
+  bindingId: text("binding_id").primaryKey().references(() => contestProductQuestionBindings.id, { onDelete: "restrict" }),
+  contractId: text("contract_id").notNull().references(() => opportunityQuestionContracts.id, { onDelete: "restrict" }),
+  questionContentHash: text("question_content_hash").notNull(),
+  status: text("status").notNull().default("approved"),
+  approvalReference: text("approval_reference").notNull(),
+  humanReview: boolean("human_review").notNull().default(false),
+  reviewedByUserId: bigint("reviewed_by_user_id", { mode: "number" }).notNull().references(() => users.id, { onDelete: "restrict" }),
+  reviewedAt: timestamp("reviewed_at", { withTimezone: true }).notNull(),
+}, table => [
+  index("question_contract_certifications_contract_idx").on(table.contractId),
+  index("question_contract_certifications_reviewer_idx").on(table.reviewedByUserId),
+  check("question_contract_certifications_hash_check", sql`${table.questionContentHash} ~ '^[a-f0-9]{64}$'`),
+  check("question_contract_certifications_status_check", sql`${table.status} in ('approved','suspended')`),
+  check("question_contract_certifications_audit_check", sql`not ${table.humanReview} and char_length(${table.approvalReference}) between 10 and 250`),
+]);
 
 export const questionOptions = pgTable(
   "question_options",
@@ -3744,3 +3803,5 @@ export type QuestionOption = typeof questionOptions.$inferSelect;
 export type QuestionStyleProfile = typeof questionStyleProfiles.$inferSelect;
 export type LegalSourceSnapshot = typeof legalSourceSnapshots.$inferSelect;
 export type LegalTextSnapshot = typeof legalTextSnapshots.$inferSelect;
+
+export { legalComplementarySources } from "./schema-complementary";

@@ -1,4 +1,5 @@
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, inArray,or } from "drizzle-orm";
+import { originalQuestionContractExists } from "./original-question-contract-query";
 
 import { questions } from "@/lib/db/schema";
 
@@ -8,5 +9,6 @@ export function authorialStudyRightsConditions() {
   return and(
     inArray(questions.quizMode, ["dry_law", "original_style"]),
     eq(questions.sourceRights, "original_authorial"),
+    or(eq(questions.quizMode,'dry_law'),originalQuestionContractExists(questions.id,questions.type,questions.styleBankId,questions.questionContractId)),
   );
 }

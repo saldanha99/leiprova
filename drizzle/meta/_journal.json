@@ -365,6 +365,20 @@
       "when": 1791846000001,
       "tag": "0051_camara_procurement_pdf",
       "breakpoints": true
+    },
+    {
+      "idx": 52,
+      "version": "7",
+      "when": 1791846000002,
+      "tag": "0052_scoped_question_contracts",
+      "breakpoints": true
+    },
+    {
+      "idx": 53,
+      "version": "7",
+      "when": 1791846000003,
+      "tag": "0053_legal_complementary_sources",
+      "breakpoints": true
     }
   ]
 }

@@ -38,10 +38,14 @@ A responsabilidade primária é institucional, com comissão do concurso. A FGV
 recebe vínculo de prestadora da etapa objetiva, fundamentado no edital de cada
 cargo. O MPRJ conduz etapas posteriores com apoio logístico da FGV. Essa admissão
 não define formato de futuras inéditas, número de alternativas ou perfil de
-oral/discursiva. Caderno e gabarito definitivo de prova anterior são verificados
-pelo verificador oficial existente, sem armazenar/extrair seu conteúdo; permanecem
-links externos **pendentes de aprovação para o produto**. Direitos de reprodução
-não são presumidos.
+oral/discursiva. Para PGE-AC VIII/2026, caderno e gabarito definitivo são verificados
+pelo verificador oficial existente. Para MPRJ, a última edição é XXXIX/2026:
+somente o caderno Tipo1 está confirmado; o portal FGV oferece gabarito
+**preliminar**, e o definitivo público não foi localizado. A receita não usa
+XXXVIII/2025 como última prova nem transforma preliminar em definitivo.
+`definitiveAnswerKeyAvailable:false` e bloqueio explícito mantêm a referência
+MPRJ incompleta. Todos permanecem links externos **pendentes de aprovação para o
+produto**, sem armazenamento/extração ou licença presumida.
 
 A prévia é padrão e não lê/conecta banco:
 
@@ -98,3 +102,20 @@ manual, array/objeto para o helper. Zero writes; produção não acessada. Recib
 privado `.local/qa-agent-20261012/jsonb-driver-readonly.log`. O teste da admissão
 agora verifica que cada snapshot envia array e a auditoria envia objeto ao helper;
 9/9 testes do módulo passaram novamente, com ESLint limpo.
+
+Correção posterior de datas: a admissão grava `exam_date` explicitamente. MPRJ
+`2026-05-31`, edital47p SHAa42655899f7c0dcb5aef49164d7b2c0cbd6f7e6ede663fadb31887096b8aad62,
+p.21, §11.1: “com aplicação prevista para o dia 31 de maio de 2026 (domingo)”.
+A [notícia oficial do MPRJ](https://www.mprj.mp.br/visualizar?noticiaId=224001),
+publicada em31/05/2026, confirma a realização da preambular naquele domingo.
+PGE-AC `2026-05-24`, edital40p SHA954c921cf9e5601accbf688e7f29697bfdae4257f1f264862aed3efaa9bbfac4,
+p.14, §9.1: “de 24 de maio de 2026, das 8h às 13h”. Retificações1/2 capturadas
+não mudam essa data. O resultado posterior confirma que a objetiva ocorreu;
+a conferência não localizou anúncio independente do dia efetivo PGE-AC, e essa
+limitação fica explícita em `examDateEvidence`. A publicação do caderno não é
+usada para inferir a aplicação. Claims de página/data são conferidas antes do
+INSERT, com corte civil de São Paulo, sem aceitar data ausente ou futura.
+Os hashes de `programme.sections` e os389/96requisitos permanecem iguais.
+A referência operacional agora é
+`owner-standing-2026-10-12:official-sources-programs`; o documento da decisão
+continua sendo a evidência, sem usar caminho com maiúsculas na coluna SQL.

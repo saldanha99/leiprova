@@ -25,42 +25,29 @@ import {
 } from "../src/lib/opportunities/approval-command";
 import { saoPauloCalendarDate } from "../src/lib/opportunities/catalog-policy";
 
+import { MPMT_OFFICIAL_PREVIOUS_EXAM } from "../src/lib/exams/mpmt-previous-exam-admission";
+import { parsePreviousExamLinkCommand, previousExamApprovalBasis } from "../src/lib/exams/previous-exam-link-command";
+import { requireStandingCourseMaintenanceDatabaseUrl } from "../src/lib/editorial/official-course-admission";
+import { safeOfficialCourseDossierError } from "./prepare-official-course-dossiers";
+
 // Aprova o link oficial da última prova (caderno + gabarito) e o vínculo com o
 // produto, com as mesmas consultas e a mesma política de /admin/provas-anteriores.
 // Uso: tsx scripts/approve-previous-exam-links.ts [--apply] produto=edição ...
 // Sem --apply, tudo roda numa transação desfeita ao final (prévia).
 
-type Pair = Readonly<{ productSlug: string; editionPublicId: string }>;
-
-const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/u;
-
 class PreviewRollback extends Error {}
 
-function parseArgs(argv: readonly string[]) {
-  const args = argv.filter((arg) => arg !== "--");
-  const apply = args.includes("--apply");
-  const pairs: Pair[] = args
-    .filter((arg) => arg !== "--apply")
-    .map((arg) => {
-      const [productSlug, editionPublicId, extra] = arg.split("=");
-      if (extra !== undefined || !SLUG.test(productSlug ?? "") || !SLUG.test(editionPublicId ?? "")) {
-        throw new Error(`Par inválido: ${arg}. Use produto=edição.`);
-      }
-      return { productSlug, editionPublicId };
-    });
-  if (!pairs.length) throw new Error("Informe ao menos um par produto=edição.");
-  return { apply, pairs };
-}
-
 async function main() {
-  const { apply, pairs } = parseArgs(process.argv.slice(2));
+  const { apply, standing, pairs } = parsePreviousExamLinkCommand(process.argv.slice(2));
   const reference = process.env.PREVIOUS_EXAM_APPROVAL_REFERENCE?.trim();
   const reviewer = parseOpportunityApprovalReviewerIdentity({
     ADMIN_EMAILS: process.env.ADMIN_EMAILS,
     OPPORTUNITY_APPROVAL_REFERENCE: reference,
   });
+  const approvalBasis = previousExamApprovalBasis(standing, reviewer.approvalReference);
   const client = postgres(
-    requireOpportunityApprovalDatabaseUrl({ MIGRATION_DATABASE_URL: process.env.MIGRATION_DATABASE_URL }),
+    standing ? requireStandingCourseMaintenanceDatabaseUrl(process.env.MIGRATION_DATABASE_URL)
+      : requireOpportunityApprovalDatabaseUrl({ MIGRATION_DATABASE_URL: process.env.MIGRATION_DATABASE_URL }),
     { max: 1, prepare: false },
   );
   const db = drizzle(client, { schema });
@@ -68,11 +55,13 @@ async function main() {
   try {
     for (const pair of pairs) {
       const [edition] = await db
-        .select({ id: examEditions.id, bankId: examEditions.bankId })
+        .select({ id: examEditions.id, bankId: examEditions.bankId, examDate: examEditions.examDate, institution: examEditions.institutionAcronym, jurisdiction: examEditions.jurisdictionCode, sourcePolicy: examEditions.sourcePolicy, officialUrl: examEditions.officialUrl })
         .from(examEditions)
         .where(eq(examEditions.publicId, pair.editionPublicId))
         .limit(1);
       if (!edition) throw new Error(`Edição inexistente: ${pair.editionPublicId}.`);
+      if (standing && (edition.examDate !== MPMT_OFFICIAL_PREVIOUS_EXAM.examDate || edition.institution !== "MPMT" || edition.jurisdiction !== "MT"
+        || edition.sourcePolicy !== "metadata_only" || edition.officialUrl !== MPMT_OFFICIAL_PREVIOUS_EXAM.portalUrl)) throw new Error("Standing exige a prova MPMT 01/2026 exata, aplicada em 14/06/2026.");
       const pending = await db
         .select({ publicId: examEditionDocuments.publicId, documentType: examEditionDocuments.documentType })
         .from(examEditionDocuments)
@@ -88,6 +77,7 @@ async function main() {
       for (const document of [booklet, answerKey]) {
         const candidate = await loadDocumentReviewCandidate(db, document.publicId);
         if (!candidate) throw new Error(`Documento ausente: ${document.publicId}.`);
+        if (standing && (candidate.sourcePolicy !== "metadata_only" || candidate.sourceUrl !== MPMT_OFFICIAL_PREVIOUS_EXAM.documents.find(item=>item.documentType===candidate.documentType)?.url)) throw new Error("Standing exige caderno Tipo1 e gabarito definitivo oficiais exatos, como links externos.");
         const checked = await verifyOfficialExamUrl(candidate.bankSlug, candidate.sourceUrl);
         if (checked.finalUrl !== candidate.sourceUrl || checked.httpStatus < 200 || checked.httpStatus > 399 || !checked.isPdf) {
           throw new Error(`A URL oficial mudou ou deixou de entregar PDF: ${candidate.sourceUrl}.`);
@@ -108,7 +98,9 @@ async function main() {
             throw new Error("A aprovação exige exatamente um administrador identificado.");
           }
           const operatorId = operators[0].id;
-          const notes = `Aprovado sob autorização do proprietário (${reviewer.approvalReference}); link oficial conferido na origem, sem cópia do PDF.`;
+          const notes = standing
+            ? `Revisão automatizada sob owner_standing_authorization (${reviewer.approvalReference}); humanReview:false. Link oficial conferido, sem cópia do PDF ou aprovação de conteúdo/questões.`
+            : `Aprovado sob autorização do proprietário (${reviewer.approvalReference}); link oficial conferido na origem, sem cópia do PDF.`;
 
           await transaction.execute(sql`select public.lock_exam_document_review_edition(${edition.id})`);
           for (const document of [booklet, answerKey]) {
@@ -166,8 +158,7 @@ async function main() {
               metadata: {
                 sourceUrl: candidate.sourceUrl,
                 dossierFingerprint: buildExamDocumentReviewFingerprint(candidate),
-                reviewBasis: "owner_authorization",
-                approvalReference: reviewer.approvalReference,
+                ...approvalBasis,
                 executionSource: "server_cli",
                 notes,
               },
@@ -183,6 +174,13 @@ async function main() {
           };
           const scope = await loadReferenceScope(transaction, input, todayIso);
           if (!scope) throw new Error("Não foi possível cruzar produto e prova.");
+          if (standing) {
+            const registrations = await transaction.select({ metadata:auditLogs.metadata }).from(auditLogs)
+              .where(and(eq(auditLogs.action,"editorial.previous_exam.mpmt_metadata_registered"),eq(auditLogs.entityId,pair.editionPublicId))).limit(2);
+            if (registrations.length!==1 || registrations[0].metadata?.opportunityPublicId!==scope.opportunityPublicId
+              || registrations[0].metadata?.approvalReference!==reviewer.approvalReference || registrations[0].metadata?.humanReview!==false
+              || scope.preparationMode!=="historical_training") throw new Error("Cadastro MPMT não corresponde à oportunidade histórica real; vínculo bloqueado.");
+          }
           const decision = validateExamReferenceScope(scope, todayIso, { requireLicense: false });
           if (!decision.valid) throw new Error(decision.reason);
 
@@ -223,7 +221,7 @@ async function main() {
               entityType: "contest_product_exam_reference",
               entityId: referencePublicId,
               metadata: { ...input, relationship: "latest_previous_exam", accessMode: "official_external_link",
-                approvalReference: reviewer.approvalReference, executionSource: "server_cli", notes },
+                ...approvalBasis, executionSource: "server_cli", notes },
             });
           }
           const summary = { ...pair, documentsApproved: 2, editionPublished: true, referencePublicId };
@@ -236,14 +234,14 @@ async function main() {
         results.push({ mode: "preview", ...JSON.parse(error.message) });
       }
     }
-    console.log(JSON.stringify({ approvalReference: reviewer.approvalReference, sourcePolicy: "metadata_only",
+    console.log(JSON.stringify({ ...approvalBasis, sourcePolicy: "metadata_only",
       sourceContentStored: false, productsReleased: 0, results }, null, 2));
   } finally {
     await client.end();
   }
 }
 
-void main().catch((error: unknown) => {
-  console.error("Falha na aprovação dos links oficiais.", error instanceof Error ? error.message : "Erro desconhecido.");
+if (process.argv[1]?.endsWith("approve-previous-exam-links.ts")) void main().catch((error: unknown) => {
+  console.error("Falha na aprovação dos links oficiais.", safeOfficialCourseDossierError(error));
   process.exitCode = 1;
 });
