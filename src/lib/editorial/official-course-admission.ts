@@ -100,7 +100,7 @@ export async function admitStandingOfficialCourse(recipe: OfficialCourseDossierR
           source_policy, authorization_scope, authorized_at, authorized_by_user_id, status, approval_basis, reviewed_by_user_id, reviewed_at, review_notes)
         values (${snapshotPublicId}, ${source.id}, ${document.documentUrl}, ${document.sourceHost}, ${document.fileName}, 'application/pdf',
           ${document.documentBytes}, ${document.checksumSha256}, ${document.byteLength}, ${document.pageCount}, ${document.extractedText},
-          ${JSON.stringify(document.pageTexts)}::jsonb, ${document.textLength}, ${document.parserVersion}, 'official_document',
+          ${tx.json(document.pageTexts)}, ${document.textLength}, ${document.parserVersion}, 'official_document',
           'owner-approval-2026-09-01', ${now}, ${actor}, 'approved', 'owner_override', ${actor}, ${now}, ${note}) returning id::text`;
       await tx`
         insert into opportunity_organizer_assignments (opportunity_id, quiz_bank_id, source_document_id, responsible_type, role,
@@ -130,7 +130,7 @@ export async function admitStandingOfficialCourse(recipe: OfficialCourseDossierR
         historicalScope: "objective_preambular_current_legislation", stageEvidenceUrl, stageMetadataObservedAt: stage.observedAt, stageHttpStatus: stage.httpStatus,
         stageEtag: stage.etag, stageLastModified: stage.lastModified, stageContentStored: false };
       const [audit] = await tx<{ id: string }[]>`insert into audit_logs (actor_user_id, action, entity_type, entity_id, metadata)
-        values (${actor}, 'editorial.official_course.standing_admitted', 'contest_opportunity', ${opportunityPublicId}, ${JSON.stringify(metadata)}::jsonb) returning id::text`;
+        values (${actor}, 'editorial.official_course.standing_admitted', 'contest_opportunity', ${opportunityPublicId}, ${tx.json(metadata)}) returning id::text`;
       return { mode: "applied", ...metadata, auditId: audit.id };
     });
   } finally { await client.end(); }

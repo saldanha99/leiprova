@@ -2,7 +2,26 @@
 
 O operador `scripts/review-standing-procurement-law.ts` é distinto do operador LGPD e somente aceita a Lei 14.133/2021, seu monitor Senado `33382036`, o PDF compilado exato da Câmara e o parser `camara-procurement-pdf-unpdf1.8.1-v1.0.0`. Ele prepara uma versão com **191 artigos preservados**, dos quais **182 recebem `reviewed` e nove permanecem `pending_review`**. A captura textual é marcada aprovada com notas e auditoria explicitamente **parciais**; isso não equivale a aprovação dos 191 artigos para treino/autoria.
 
-Autorização: `owner-standing-2026-10-12:official-sources-programs`, documentada em `AUTORIZACAO-FONTES-PROGRAMAS-2026-10-12.md`. Auditoria `owner_standing_authorization`, `humanReview:false`; conferência posterior permanece necessária. Este documento descreve código, não um recibo de execução em produção.
+Autorização: `owner-standing-2026-10-12:official-sources-programs`, documentada em `AUTORIZACAO-FONTES-PROGRAMAS-2026-10-12.md`. Auditoria `owner_standing_authorization`, `humanReview:false`; conferência posterior permanece necessária. A execução em produção foi concluída após preview e QA, na VPS Everglades.
+
+## Recibo aplicado
+
+- Código publicado: `46d3dc1`; lint e tipos passaram, 1.664 testes aprovados,
+  249 opcionais pulados; adicionalmente 14 testes PostgreSQL reais passaram em
+  uma base sintética isolada na VPS. Build de produção passou.
+- Snapshot textual: `8cbdfb38-07e9-40c8-b81b-9e026c08bb60`, checksum
+  `27087b4f3c79a0e0cfa77943d2288188f81e86c33d7d6da15e8f14b483f5a20f`.
+- Fingerprint: `14496772f3bae129addb5011c38afdf068dd42b186d33b81d51db670fab98251`.
+- Monitor: `83ce101a-0541-4f79-ae6d-cb49aacbce81`.
+- Versão legal **111**, auditoria **6727** (`editorial.legal_text.partially_approved`).
+- Conferência somente de leitura posterior confirmou **182 reviewed e nove
+  pending_review** nessa versão atual, com metadata JSONB objeto,
+  `humanReview:false`, sem aprovação de questões ou criação de vínculos.
+- Recibos privados na VPS em `/opt/leiprova/backups/`:
+  `licitacoes-capture-20261012.log`, `licitacoes-standing-inspect-20261012.log`,
+  `licitacoes-standing-preview-20261012.log`, `licitacoes-standing-applied-20261012.log`.
+  Backup anterior: `before-partial-procurement-20261012.dump`.
+
 
 ## Pendências efetivamente preservadas
 
@@ -50,4 +69,4 @@ O Senado e o PDF Câmara são buscados fora da transação. Robots Câmara é co
 
 A auditoria `editorial.legal_text.partially_approved` registra 191 capturados,182 revisados,9 pendentes, motivos, rawPDF, dossiê e prova dos11 vetos. O snapshot usa `approved` somente acompanhado de nota explícita de revisão parcial; a disponibilidade depende dos estados dos artigos. Um recibo exato e uma versão atual com 182 reviewed/9 pending iguais permitem `unchanged`. Alteração de direitos, texto, ordem, estados, razões, corpus, provas ou versão impede repetição; não restaura suspensões nem libera os nove pendentes.
 
-Não aprova questões, programas, vínculos comerciais ou produtos e não cria prova de cobrança Stripe. Nenhum apply ou escrita de banco foi executado durante a implementação.
+Não aprova questões, programas, vínculos comerciais ou produtos e não cria prova de cobrança Stripe. O recibo acima comprova somente a execução parcial delimitada; as nove pendências continuam preservadas.

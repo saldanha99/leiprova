@@ -16,7 +16,13 @@ export const OFFICIAL_OPPORTUNITY_SOURCE_POLICIES = [
     publisher: "FGV Conhecimento",
     allowedHosts: ["conhecimento.fgv.br"],
     allowedPathPrefixes: ["/concursos/", "/exames/"],
-    allowedExactPaths: ["/sites/default/files/concursos/comunicado_n_05_2026_resultado_definitivo_p_objetiva_04_08_2026_assinado.pdf"],
+    allowedExactPaths: [
+      "/sites/default/files/concursos/comunicado_n_05_2026_resultado_definitivo_p_objetiva_04_08_2026_assinado.pdf",
+      // Composite MPRJ/PGEAC admissions: metadata only, no candidate lists stored/extracted.
+      "/sites/default/files/concursos/05.10-aviso-relacao-de-habilitados-a-inscricao-definitiva-republicacao.pdf",
+      "/sites/default/files/concursos/529_pge-ac-resultado-definitivo-prova-objetiva-2026-07-06.pdf",
+      "/sites/default/files/concursos/529_pge-ac_resultado-preliminar-discursiva-2026-09-29_0.pdf",
+    ],
   },
   {
     id: "governo-bahia",

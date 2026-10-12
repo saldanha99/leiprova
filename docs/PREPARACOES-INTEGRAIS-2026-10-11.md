@@ -12,8 +12,8 @@ acesso. Nenhuma questão foi apagada. Ver
 Os 84 produtos/preços LIVE continuam cadastrados; isso não conclui as outras
 81 preparações. O déficit mínimo passa a 5.508 questões válidas para que esses
 produtos alcancem 68 cada; o piso ainda não comprova cobertura de todo o programa.
-A LGPD tem 72 artigos revisados; a Lei 14.133 foi capturada com 191 artigos ainda
-pendentes de aprovação nesta conferência. Novos dossiês seguem separados dos
+A LGPD tem 72 artigos revisados; a Lei 14.133 recebeu revisão parcial: 191 artigos capturados, 182 revisados e
+nove pendentes na versão 111, auditoria 6727. Novos dossiês seguem separados dos
 programas efetivamente admitidos. Treino histórico e pré-edital continuam usando
 legislação atual, identificação da edição-base e revisão documentada.
 

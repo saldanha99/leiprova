@@ -31,7 +31,12 @@ registrava 4/367 e permanece histórico, sem representar o estado atual.
 Ver [correção e recibo](FORMATO-PCMA-SUSPENSAO-2026-10-12.md). Produto/preço Stripe cadastrado não significa
 curso pronto. A LGPD foi carregada com 72 artigos na versão legal 110; auditoria
 6309 (`editorial.legal_text.approved`), com aprovação permanente do proprietário
-e `humanReview: false`. QA da revisão `3e9323a`: 1.623 testes aprovados,
+e `humanReview: false`. A Lei 14.133 recebeu revisão **parcial** na versão 111,
+auditoria 6727: **182 artigos reviewed e nove pending_review**, sem liberar as
+pendências de valores/ADI/transição. Código `46d3dc1`, lint/tipos/build aprovados,
+1.664 testes aprovados e 249 opcionais pulados; os 14 testes PostgreSQL adicionais
+passaram em base sintética isolada. Ver [recibo parcial](REVISAO-PARCIAL-LICITACOES-2026-10-12.md).
+QA da revisão `3e9323a`: 1.623 testes aprovados,
 239 opcionais pulados. Em 12/10, o Search Console verificou automaticamente o novo
 domínio por DNS. O sitemap foi enviado e depois **processado**, com 23 páginas e zero vídeos.
 O erro inicial de busca foi superado no painel. A auditoria pública confirmou
