@@ -1,5 +1,12 @@
 # Operação do Edital Lei Seca
 
+**Aceleração posterior em 12/10/2026:** Guardião e Autor agora a cada **1 minuto**
+no Maestri; Radar permanece em 5. Preparação na VPS a cada **5 minutos** e
+liberação a cada **10 minutos**, com locks e validações preservados. Despacho
+explicita os textos integrais; duas recusas indevidas retornaram à fila com
+auditoria, e três novos rascunhos já foram recolhidos. As cadências abaixo são
+históricas. Veja [recibos e limites](ACELERACAO-EDITORIAL-2026-10-12.md).
+
 **Decisão posterior de 12/10/2026 — tarefas sem teto diário:** o proprietário
 pediu “deixe sem limite de tarefas”. A fila usa `budget.limit: null`; a contagem
 de 24 horas é telemetria. Removida também a espera de um agente por pendências

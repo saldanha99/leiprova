@@ -10,7 +10,7 @@
 # O Maestro (Codex) confere depois o que foi aprovado e suspende o que tiver erro
 # (docs/MAESTRO-CENTRAL.md). Não mexe em feature flag, Stripe ou checkout.
 # Agendada em /etc/cron.d/leiprova-release-chain:
-#   10,40 * * * * root /opt/leiprova/deploy/editorial-release-chain.sh >> /var/log/leiprova-release-chain.log 2>&1
+#   */10 * * * * root /opt/leiprova/deploy/editorial-release-chain.sh >> /var/log/leiprova-release-chain.log 2>&1
 set -uo pipefail
 cd /opt/leiprova || exit 1
 

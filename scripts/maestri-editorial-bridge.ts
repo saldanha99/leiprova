@@ -7,6 +7,7 @@ import { z } from "zod";
 import { agentWorkKindSchema, validateAgentWorkResult, workPayloadSchema, AGENT_FOR_WORK } from "../src/lib/editorial/agent-work-contract";
 import { settleLocalAgentResults } from "../src/lib/editorial/local-agent-results";
 import { hasPendingLocalAgentLease, withLocalAgentLock } from "../src/lib/editorial/local-agent-dispatch";
+import { agentTaskHandoff } from "../src/lib/editorial/agent-task-handoff";
 
 const root=fileURLToPath(new URL("../",import.meta.url));
 const queueRoot=path.join(root,".local/maestri/queue");
@@ -101,7 +102,7 @@ async function main() {
     await writeFile(packet,JSON.stringify(claim,null,2),{mode:0o600,flag:"wx"});
     const responsePath=path.join(directory,"response.json");
     console.log(JSON.stringify({agent:claim.agent,jobKey:claim.job.jobKey,packet,responsePath,
-      instruction:"Leia docs/MAESTRI-MOTORES-AUTOMATICOS.md. Execute somente esta tarefa e salve response.json no contrato indicado. Não publicar, não modificar banco, não compartilhar segredos."}));
+      ...agentTaskHandoff(claim.job.kind,claim.job.payload)}));
     });
     if(!dispatch.acquired){console.log(JSON.stringify({state:"idle",reason:"agent_dispatch_locked"}));process.exitCode=3;}
   } else if(mode==="--mode=complete" && process.argv.length===4) {
