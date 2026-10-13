@@ -1,5 +1,61 @@
 # Continuação editorial em 13/10/2026
 
+## Bloqueio de fonte CP identificado às 06h03 de São Paulo
+
+Relatório das 08h59m06 UTC mantém seis preparações elegíveis/595 válidas e143
+novas distintas publicadas hoje. Zero novas aprovações desde a marca privada
+06h40m07 UTC; marca preservada. Saúde pública ok, linha agendada terminou às
+08h50m54 UTC sem falha. Autor continua com reserva author:1321 até09h38 UTC,
+sem response.json nesta fotografia; não foi interrompido nem duplicado.
+
+Recolhido pelo protocolo existente o resultado pronto do Guardião mapping:1346:
+attempted1/completed1/failed0, outcome blocked, zero vínculos e questões. A resposta
+explicita ausência dos tipos penais de incolumidade pública no pacote. O diagnóstico
+somente leitura confirmou que o Código Penal/ato17 não tem versão current:
+versão63 superseded, versão112 pending_review. Os402 artigos da112 continuam
+reviewed/official_text, mas o estado da versão impede seu uso. Não confundir
+quantidade de artigos armazenados com fonte atualmente elegível para autoria.
+
+Recibo CP1 suspended pelo audit10902 em12/10 às20h47m33 UTC (17h47 BRT), após
+última verificação bem-sucedida às19h47 UTC. Motivo auditado genérico:
+`official_capture_unavailable_changed_or_current_corpus_divergent`, hashes de
+captura null. Não foi comprovada qual dessas causas ocorreu naquela chamada.
+O cron continua recusando a fonte suspensa; último log08h47 UTC. Isso explica
+um bloqueio de insumo penal, não prova a causa da demora do terminal Autor.
+
+**Prova fresca às09h03m22 UTC:** a função de captura oficial existente, executada
+na VPS sem writes no banco, conferiu normalmente robots/TLS/URL/hash/MIME e
+CP+Lei15.517. Hash bruto57547f… e corpus integral
+`7cd4ac2c76ca87f8032df0bd0c369dcfe7b1458038cd956bd01e5d7b68d8323d` coincidem
+com o perfil conhecido. Consulta read-only reproduziu esse mesmo checksum nos
+402 artigos armazenados da112. Cinco questões próprias1285–1289 continuam
+ligadas à versão pendente; os27 artigos suspensos da63 permanecem suspensos.
+A disponibilidade da captura não reativa o recibo encerrado.
+
+Executada somente a prévia do operador de corte existente, com saída nova
+`cp-reconciliation-20261013-0858`, sem --apply. Capturas preservadas privadamente
+na VPS; saída1, “Identidade/versão corrente CP63 divergente.” O guard corresponde
+à operação inicial já concluída. Não alterar sua premissa, reativar63, forçar112
+current ou reaplicar o fingerprint para contornar essa recusa.
+
+**Pendência prioritária de reconciliação:** preparar um caminho auditado para o
+estado posterior à suspensão, separado do corte inicial. Deve exigir evidência
+primária fresca e comparação integral402, preservar o recibo suspenso e os27
+artigos antigos, conferir as cinco dependências e todos os gates atuais,
+projetar impactos por produto e validar em clone antes de qualquer aplicação.
+As cinco dependências são questões antigas, não autoria nova; uma futura
+readmissão não pode recontá-las na meta diária como inéditas novas.
+Não há operador de recuperação aplicado nesta rodada. O [contrato do corte](CORTE-COORDENADO-CP-402-2026-10-12.md)
+explicita: “Nova conferência bem-sucedida não reativa um registro suspenso.”
+Esta proposta de reconciliação não é fonte aprovada nem revisão humana.
+
+Recibos, diagnóstico e teste fresco estão na pasta privada de continuação.
+Nenhuma nova oferta/campanha/envio WhatsApp, API paga, migração ou deploy de
+código; gates e flags preservados. Integração WhatsApp e contas/orçamento de
+anúncios continuam pendentes. A fábrica pode usar os demais insumos elegíveis.
+Lint, typecheck, 1.848 testes passando/292 condicionais pulados e build
+concluídos nesta rodada. Alteração pública limitada à documentação.
+
 ## Conferência às 04h09 de São Paulo
 
 Relatório somente leitura de 07h09m49 UTC, após as suspensões: **6/84 elegíveis**,

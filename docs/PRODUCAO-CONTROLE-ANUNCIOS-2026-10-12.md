@@ -7,6 +7,13 @@ Mantêm-se fontes oficiais, identidade por cargo/edição, contratos atuais,
 originalidade, piso de conteúdo e a auditoria da autorização permanente.
 Resultados prepared continuam propostas. Não usar APIs pagas como alternativa.
 
+Atualização em13/10 às06h03 BRT: produção publicada permanece6/84 e143 novas
+no dia. Identificado insumo CP suspenso desde12/10 às17h47 BRT; captura oficial
+fresca coincide com402 artigos, mas o recibo encerrado não foi reativado. A prévia
+do corte inicial recusou o estado posterior; reconciliação auditada específica
+permanece pendente. Guardião teve uma resposta blocked recolhida sem importações.
+Sem nova oferta/anúncio/envio WhatsApp. [Evidências](CONTINUACAO-PRODUCAO-2026-10-13.md).
+
 Atualização em 13/10 às 04h09 BRT: **6/84 elegíveis**, 595 válidas nas ofertas
 e **143 novas distintas publicadas hoje**. PC-MA avançou para124 válidas;
 PP-MA Inspetor tem13/draft. Conferidas65 aprovações; quatro suspensões auditadas,

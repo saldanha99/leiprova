@@ -1,5 +1,14 @@
 # Operação do Edital Lei Seca
 
+**Heartbeat em 13/10/2026, 06h03 BRT:** sem novas aprovações; seis ofertas,
+595 válidas/143 novas publicadas hoje. Recolhida uma resposta blocked do Guardião
+sem importações. Diagnóstico encontrou CP112 pending_review/recibo1 suspended,
+audit10902 de12/10 às17h47 BRT. Captura oficial fresca voltou a coincidir com os
+402 artigos, mas isso não restaura fonte. Prévia do corte inicial recusou estado
+CP63 já superado; nenhuma reativação/aplicação. Reconciliação posterior à suspensão
+é pendência prioritária, preservando recibo e gates; Autor mantém reserva atual.
+[Provas e limites](CONTINUACAO-PRODUCAO-2026-10-13.md).
+
 **Heartbeat em 13/10/2026, 04h09 BRT:** seis preparações elegíveis, 595 válidas
 nas ofertas e 143 novas distintas publicadas hoje. PC-MA Oficial Investigador
 124; PP-MA Inspetor 13/draft/faltam55. Conferidas 65 novas aprovações; quatro
