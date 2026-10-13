@@ -1,5 +1,62 @@
 # Continuação editorial em 13/10/2026
 
+## MPMT novamente elegível — conferência às15h53 BRT
+
+Relatório read-only das18h53m21 UTC: **9/84 elegíveis**, **973 válidas nas
+ofertas**, **521 novas distintas publicadas hoje** em São Paulo. MPMT77/released/
+elegível; PGE-AC36/draft/faltam32 ao piso68, único bloqueio deste produto nessa
+leitura. A página pública MPMT foi reconferida pela VPS: HTTP200 e “Conteúdo
+liberado”, escopo **treino histórico da prova preambular objetiva2026 com
+legislação atualizada**. Não é inscrição vigente nem cobertura integral.
+
+Conferidas15 novas aprovações desde o watermark17h50 até18h30m17 UTC: enunciados,
+opções, gabaritos, explicações, justificativas e recortes. Uma retenção aplicada
+pelo operador existente, `mode: applied`, sem faltantes: audit18089,
+`a3cd7e52-0580-5cee-9993-3774ce36215d`, referência
+`maestro-conferencia-20261013-1834-18089`. O comentário de CF37§5 generaliza
+imprescritibilidade aos “atos dolosos”, sem delimitar ato doloso tipificado na
+LIA; o caso menciona relatório do Tribunal de Contas. O gabarito literal não é
+negado: retenção para corrigir caso e explicação. Tema897 exige tipificação na
+LIA; Tema899 trata de pretensão fundada em decisão de Tribunal de Contas.
+
+Fontes primárias: [STF,Tema897](https://portal.stf.jus.br/jurisprudenciaRepercussao/verAndamentoProcesso.asp?classeProcesso=RE&incidente=4670950&numeroProcesso=852475&numeroTema=897),
+[STF,Tema899](https://portal.stf.jus.br/jurisprudenciaRepercussao/verAndamentoProcesso.asp?classeProcesso=RE&incidente=4046531&numeroProcesso=636886&numeroTema=899).
+Também conferido LGPD5VIII: redação atual usa **Agência Nacional**, conforme
+Lei15.352/2026 no [Planalto](https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm).
+Não suspender o item18085 por compará-lo à denominação antiga.
+Conferência automatizada, humanReview:false; watermark só avançou após os
+15 itens lidos e recibo confirmado. Cinco aprovações posteriores não incluídas
+nessa conferência permanecem para o próximo ciclo; contagem do relatório não
+é declaração de conferência manual de cada item.
+
+Recibos privados em `.local/editorial/continuation-20261012/`:
+`heartbeat-1834-approved.jsonl`, `heartbeat-1834-suspend-results.json`,
+`heartbeat-1834-owner-final.json`, `heartbeat-1834-mpmt-public.html`.
+Autor/Guardião com novos claims e settlements pelo fluxo normal; nenhuma reserva
+forçada ou nó duplicado. Linha18h30 concluída18h32m36 UTC, saúde preservada.
+
+Prism terminou o diagnóstico privado
+`.local/maestri/cp-reconciliation-prism-20261013.md`, após duas consultas adicionais
+read-only inspecionadas e aprovadas uma única vez, sem always-allow. CP112 segue
+pending_review/recibo1 suspenso. O relatório propõe novo recibo e transação
+auditada; isso ainda não é operador testado ou restauração aplicada. Sua hipótese
+de timeout inicial não está comprovada só pelo rawSha null; disponibilidade de
+captura e pins precisa ser novamente verificada na futura reconciliação. Contagens
+“sete ofertas” do diagnóstico são antigas: consultar catálogo atual.
+Encaminhado ao mesmo Prism apenas preview read-only, em arquivos novos isolados,
+sem apply, escrita no banco, restauração, alteração de pin ou deploy. Root confere
+resultado/testes antes de qualquer extensão. Relatório previsto privado
+`.local/maestri/cp-reconciliation-preview-prism-20261013.md`.
+
+Rascunhos Meta/Google MPMT adicionados a
+`.local/commerce/campanhas-20261012/anuncios-mpmt-historico-meta-google.md`;
+títulos <=30 e descrições <=90 caracteres verificados, ZIP privado24 entradas
+íntegro. Sem campanha/gasto, promessa de prova futura ou atribuição à banca.
+Revalidar elegibilidade/menu/checkout antes de veicular. WhatsApp aguarda
+integração identificada, sem envio. Piloto pago já consumiu a amostra100; nenhuma
+chamada paga ou ampliação contínua autorizada nesta rodada. Notas do canvas
+atualizadas preservando histórico; app/worker/flags continuam os existentes.
+
 ## Estado final às15h24 BRT
 
 Relatório read-only das18h24m30 UTC, após seis suspensões efetivas nesta rodada:

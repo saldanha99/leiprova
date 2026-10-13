@@ -1,5 +1,16 @@
 # Produção, controle do proprietário e anúncios
 
+**Heartbeat em 13/10/2026, 15h53 BRT:** **9/84 elegíveis**, **973 válidas nas
+ofertas** e **521 novas distintas publicadas hoje** no relatório18h53 UTC.
+MPMT voltou a liberar e chegou77: treino histórico preambular objetivo2026,
+legislação atualizada. PGE-AC36/draft/faltam32 após uma retenção efetiva nesta
+rodada. Conferidas15 novas aprovações até18h30m17 UTC; itens posteriores ainda
+aguardam conferência. Prism entregou diagnóstico CP; preview de reconciliação
+encaminhado ao mesmo nó, sem restauração autorizada por esse resultado ou aplicada.
+Anúncios MPMT acrescentados ao pacote privado, sem gasto. Menu, checkout,
+WhatsApp e contas/orçamento continuam pendentes. Sem chamadas pagas, mudança de
+flags ou runtime nesta rodada. [Conferência e recibos](CONTINUACAO-PRODUCAO-2026-10-13.md).
+
 **Estado final em13/10/2026,15h24 BRT:** **8/84 elegíveis**, **896 válidas nas
 ofertas** e **444 novas distintas publicadas hoje**. MPMT67/falta1: a nona oferta
 abriu, mas fechou novas vendas automaticamente após três retenções. PGE-AC27/draft/
