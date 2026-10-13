@@ -1,5 +1,15 @@
 # Editalume — contrato dos motores automáticos
 
+**Conferência em13/10,14h40 BRT:** Lei9784/1999 tem âmbito federal; caso
+estadual exige suporte da aplicação subsidiária/lacuna local (STJ,Súmula633),
+sem presumir incidência pelo programa. Fazenda Pública usa CPC535; CPC525§14
+foi declarado inconstitucional na AR2876QO: decisão STF anterior/posterior admite
+arguição salvo preclusão/modulação. Minifúndio não é latifúndio; todos os
+distratores e comentários precisam resolver a unicidade. Não preencher
+`generatorModel` com identidade inventada; registrar o provedor/modelo efetivo.
+Sem contexto oficial suficiente, bloquear o recorte ou usar outro sustentado.
+[Conferência e fontes](CONTINUACAO-PRODUCAO-2026-10-13.md).
+
 **Conferência em13/10,13h24 BRT:** LIA12§1 não restringe a perda da função a
 vínculo original/art9: observar o poder-dever e a exceção conforme o julgamento
 STF/ADI7156 de24.6.2026. LIA17B§3 foi declarado inconstitucional; não ensinar

@@ -1,5 +1,24 @@
 # Operação do Edital Lei Seca
 
+**Estado final em13/10/2026,15h24 BRT:** **8/84 elegíveis**, **896 válidas nas
+ofertas** e **444 novas distintas publicadas hoje**. MPMT67/falta1: a nona oferta
+abriu, mas fechou novas vendas automaticamente após três retenções. PGE-AC27/draft/
+faltam41, após outras três suspensões com recibos. Conferidas30 novas aprovações.
+Autor/Guardião retomados com entregas e novos claims normais; falha da ponte18h22
+UTC recuperada18h24, sem forçar reservas. CP/Prism, menu, checkout, WhatsApp e
+contas/orçamento de anúncios seguem pendentes. Sem chamadas pagas nesta rodada.
+[Conferência e recibos](CONTINUACAO-PRODUCAO-2026-10-13.md).
+
+**Heartbeat em13/10/2026,14h40 BRT:** MPMT abriu com70, mas três retenções
+na conferência de20 aprovações reduziram a67 e fecharam automaticamente novas
+vendas. Saldo atual **8/84 elegíveis**, **896 válidas nas ofertas**, **444 novas
+distintas publicadas hoje**; falta1 ao MPMT, PGE-AC20/draft/faltam48. Autor e
+Guardião retomados após espera de cota, com respostas recolhidas e novos claims
+normais. Prism desbloqueado em duas consultas read-only pontuais; CP ainda
+suspenso. Retenção de três novos drafts PGE-AC pendente por restrição de
+atribuição autoral, sem contorno. Não anunciar a nona oferta enquanto inelegível.
+[Conferência, fontes e recibos](CONTINUACAO-PRODUCAO-2026-10-13.md).
+
 **Piloto API concluído em13/10/2026:** chave exclusiva conectada, expira14/10
 às14h BRT; teto do pilotoR$30total/US$3na chave, semrecarga/reset. Gerados100
 rascunhos:55retidos pelo contrato e45encaminhados à revisão assistida, **zero
