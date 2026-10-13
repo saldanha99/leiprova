@@ -38,6 +38,15 @@ Reservas exclusivas, três tentativas e limites de concorrência permanecem.
 Isso não autoriza APIs pagas e não elimina provas de fonte,
 identidade, formato, vínculo ou direitos. Veja `docs/ABERTURA-PROGRESSIVA-2026-10-12.md`.
 
+**Exceção pontual em 13/10/2026:** o proprietário autorizou um piloto de até
+100 questões com OpenRouter e avaliação opcional por Jev, com **teto total de
+R$30**, sem renovação diária ou recarga automática. O teto inclui todos os
+provedores, tentativas, taxas e conversão; configurar parada preventiva antes
+de chamadas que possam excedê-lo. Não é autorização para operação paga contínua.
+Preservar gates, fontes oficiais e isolamento; nenhum material privado de
+terceiros vai ao provedor. Acesso/créditos e execução precisam de recibos reais.
+Veja `docs/PILOTO-API-EDITORIAL-2026-10-13.md`.
+
 Regras que valem sempre:
 
 - Nenhum segredo é versionado. O `.env` de produção vive só na VPS, com permissão `600`.

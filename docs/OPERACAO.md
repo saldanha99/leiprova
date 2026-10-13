@@ -1,5 +1,12 @@
 # Operação do Edital Lei Seca
 
+**Piloto autorizado em13/10/2026:** até100questões com API, **R$30 no total**,
+sem orçamento diário ou recarga automática. Exceção limitada registrada em
+AGENTS.md. OpenRouter autenticado/saldoUS$0,61; chave exclusiva proposta aguarda
+confirmação pontual da ferramenta. Jev saldozero. Executor/controle de gasto
+ainda não implantados, nenhuma chamada paga. Equipe atual preservada.
+[Escopo e pendências](PILOTO-API-EDITORIAL-2026-10-13.md).
+
 **Heartbeat em 13/10/2026, 13h24 BRT:** permanecem **8/84 abertas**, **896
 válidas nas ofertas** e **444 novas distintas publicadas no dia**. MPMT chegou
 a **55 válidas/draft**, faltam13 ao piso68; PGE-AC **15/draft**, faltam53.
