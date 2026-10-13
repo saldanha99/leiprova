@@ -159,9 +159,18 @@ export async function reconcileOfficialRoleScope(db: PostgresJsDatabase<typeof s
         if (changed.length !== 24) throw new Error("Unexpected suspension scope; rolled back.");
       }
       if (plan.renamedRole) {
-        const changed = await tx.execute(sql`update contest_opportunities set role_name=${plan.renamedRole},updated_at=now()
-          where id=${expected.opportunityId} and role_name=${expected.role} returning id`);
+        // Reviewed identity is immutable. Return it to review and revalidate the
+        // bounded official evidence in this same transaction, without disabling
+        // the database's mutation/publication guards or exposing an interim state.
+        const changed = await tx.execute(sql`update contest_opportunities set role_name=${plan.renamedRole},
+          editorial_status='pending_review',reviewed_by_user_id=null,reviewed_at=null,updated_at=now()
+          where id=${expected.opportunityId} and role_name=${expected.role} and editorial_status='reviewed' returning id`);
         if (changed.length !== 1) throw new Error("Unexpected role correction scope; rolled back.");
+        const revalidated = await tx.execute(sql`update contest_opportunities set editorial_status='reviewed',
+          reviewed_by_user_id=${actor.id},reviewed_at=now(),updated_at=now(),
+          review_notes=${`owner_standing_authorization; humanReview:false; revisão automatizada exclusivamente do nome oficial p.1 snapshot458; ${request.approvalReference}`}
+          where id=${expected.opportunityId} and role_name=${plan.renamedRole} and editorial_status='pending_review' returning id`);
+        if (revalidated.length !== 1) throw new Error("Role revalidation did not complete; rolled back.");
       }
       if (plan.supersede.length) {
         const changed = await tx.execute(sql`update editorial_agent_work set status='superseded',last_error_code='official_role_scope_corrected',updated_at=now()
@@ -172,7 +181,9 @@ export async function reconcileOfficialRoleScope(db: PostgresJsDatabase<typeof s
         entityType: "contest_opportunity", entityId: String(expected.opportunityId), metadata: {
           recipe, fingerprint, approvalReference: request.approvalReference, approvalBasis: "owner_standing_authorization", humanReview: false,
           sourceSnapshotId: expected.snapshotId, sourceSnapshotChecksum: expected.sha, plan,
-          before: { role: expected.role, requirements: requirements.filter(r => plan.suspend.includes(r.id)).map(r => r.data),
+          reviewTransition: plan.renamedRole ? ["reviewed", "pending_review", "reviewed"] : null,
+          before: { role: expected.role, opportunity: plan.renamedRole ? source?.data.opportunity : null,
+            requirements: requirements.filter(r => plan.suspend.includes(r.id)).map(r => r.data),
             pendingJobs: jobs.filter(j => plan.supersede.includes(j.key)).map(j => ({ key: j.key, inputHash: j.data.input_hash })) },
           after: { role: plan.renamedRole ?? expected.role, suspendedRequirements: plan.suspend, supersededJobs: plan.supersede }, publicationAllowed: false,
         } }).returning({ id: schema.auditLogs.id });

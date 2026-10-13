@@ -28,7 +28,14 @@ prévia e transação serializable. Travamentos preservam a exclusividade da fil
 (advisory621743/37), fonte e requisitos. Trabalhos pending do Monitor são
 superados no PP-MA; no PC-MA, apenas pending do contexto da oportunidade corrigida.
 Auditoria `editorial.official_role_scope.corrected` guarda evidência, estado
-anterior e alteração. Contratos de formato permanecem uma admissão separada.
+anterior e alteração. No PC-MA, a trava existente de identidade revisada exige retornar a oportunidade
+para pending_review antes da correção. O operador revalida somente o nome oficial
+e retorna a reviewed dentro da mesma transação, com auditoria explícita das três
+etapas e revisão automatizada, sem estado intermediário público nem desativação
+de triggers. A gravação direta inicialmente foi recusada/rollback pela trava.
+O teste PostgreSQL reproduz a função real de imutabilidade e a guarda de
+publicação da migração, e comprova a recusa direta e a transição correta.
+Contratos de formato permanecem uma admissão separada.
 
 Execução pelo acesso de manutenção existente, sem imprimir credenciais:
 
@@ -39,7 +46,7 @@ node node_modules/tsx/dist/cli.mjs --env-file-if-exists=.env \
 # Depois de conferir a prévia: mesmos argumentos, --apply --fingerprint=SHA256.
 ```
 
-Validação:20 testes do recorte e12 cenários reais em PostgreSQL17 isolado,
+Validação:20 testes do recorte e13 cenários reais em PostgreSQL17 isolado,
 com fixtures sintéticas e evidência dos dois PDFs oficiais públicos. Nenhum
 usuário, questão ou dump de produção foi importado no teste. Exercitados
 literalidade multipágina, mistura de cargos na mesma página, preview sem escrita,
@@ -47,7 +54,7 @@ fingerprint alterado, dependências, reserva ativa, ator não administrador,
 bytes divergentes, programa revisado e preservação de outra oportunidade.
 A suíte geral passou com1.848 testes e290 opcionais pulados; lint, tipos e build
 passaram. Rodada final após a correção de alias SQL: os mesmos1.848 testes gerais,
-20 testes do recorte, lint, tipos e build passaram;12 cenários PostgreSQL
+20 testes do recorte, lint, tipos e build passaram;13 cenários PostgreSQL
 passaram com a versão corrigida.
 
 ## Limite dos executores nesta retomada
@@ -64,3 +71,11 @@ recolhimento antes de esperar essa cota, impedindo novas reservas desperdiçadas
 Antigravity não foi incluído na detecção de executores do preflight enquanto o
 piloto não entregar resposta válida. Não declarar autoria contínua nem recorrer
 a API paga. Conta Pro preparada ainda depende de conexão pelo proprietário.
+
+## Primeiro recibo em produção
+
+`8d4722c` implantado sem seed; saúde pública ok. PP-MA aplicado pelo
+fingerprint da prévia, audit14164:24 requisitos Monitor suspensos,60 Inspetor
+preservados,24 tarefas pending do Monitor superseded. O PC-MA foi recusado
+pela trava de identidade reviewed; nenhuma alteração foi gravada nessa tentativa.
+A correção da transição foi validada em13 cenários reais antes de nova publicação.
