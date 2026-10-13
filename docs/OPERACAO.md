@@ -1,11 +1,13 @@
 # Operação do Edital Lei Seca
 
-**Piloto autorizado em13/10/2026:** até100questões com API, **R$30 no total**,
-sem orçamento diário ou recarga automática. Exceção limitada registrada em
-AGENTS.md. OpenRouter autenticado/saldoUS$0,61; chave exclusiva proposta aguarda
-confirmação pontual da ferramenta. Jev saldozero. Executor/controle de gasto
-ainda não implantados, nenhuma chamada paga. Equipe atual preservada.
-[Escopo e pendências](PILOTO-API-EDITORIAL-2026-10-13.md).
+**Piloto API concluído em13/10/2026:** chave exclusiva conectada, expira14/10
+às14h BRT; teto do pilotoR$30total/US$3na chave, semrecarga/reset. Gerados100
+rascunhos:55retidos pelo contrato e45encaminhados à revisão assistida, **zero
+publicados**. Consumo do provedorUS$0,22199975; não é custoBRL homologado.
+Seletor de citação exata preparado após a amostra, testado localmente e ainda
+não retestado emgeração paga. Equipe/linha existentes preservadas; nenhum
+novo daemon/API contínua ouapp/worker/flag alterados.
+[Resultado, QA e limites](PILOTO-API-EDITORIAL-2026-10-13.md).
 
 **Heartbeat em 13/10/2026, 13h24 BRT:** permanecem **8/84 abertas**, **896
 válidas nas ofertas** e **444 novas distintas publicadas no dia**. MPMT chegou
