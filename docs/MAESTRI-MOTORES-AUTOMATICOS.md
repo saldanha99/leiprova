@@ -14,6 +14,40 @@ substitui a antiga restrição de apenas documentar o diagnóstico. **Stripe con
 pausado.** Este arquivo descreve o contrato; a seção de publicação no relatório
 operacional deve confirmar quais componentes foram efetivamente ativados.
 
+## Recortes retidos na conferência de 13/10/2026
+
+Guardião e Autor devem consultar a conferência atual em
+`docs/CONTINUACAO-PRODUCAO-2026-10-13.md` ao trabalhar nos temas abaixo. Esta
+orientação não modifica o corpus versionado nem o hash de pacote reservado:
+
+- CPP art. 3º-B §2º/28caput e LIA art. 1º §8º/12§1º: não apresentar o literal
+  isolado como aplicação vigente sem a interpretação judicial pertinente.
+  Se o pacote não trouxer contexto oficial suficiente para essa afirmação,
+  usar `blocked` pelo contrato existente ou trabalhar somente em outro recorte
+  que o requisito e os artigos recebidos efetivamente suportem. Não inventar
+  anotação judicial nem afirmar que esta orientação atualizou a versão legal.
+- Lei 8.112: delimitar o regime federal nas hipóteses de servidor. Cargo estadual
+  não torna a lei federal seu estatuto funcional; previsão no programa permite
+  estudo do diploma, sem aplicação direta presumida ao cargo estadual.
+- LIA art. 11: uma hipótese concreta de improbidade deve explicitar os elementos
+  subjetivos pertinentes; citar apenas o inciso não sana a ausência de finalidade
+  exigida pelo §1º. Evitar casos que presumam tipicidade pelo mero descumprimento.
+- PAD do servidor: não transformar contraditório/ampla defesa em exigência
+  constitucional genérica de advogado; distinguir PAD funcional de execução
+  penal. Sem contexto recebido suficiente, limitar a justificativa ao texto
+  constitucional suportado pelo pacote.
+- Lei 9.455: distinguir modalidades antes de generalizar penas ou benefícios.
+  A modalidade omissiva tem pena própria; rito do Juizado e suspensão condicional
+  do processo usam critérios distintos. Não afirmar concessão automática.
+- Lei 9.605 arts. 14/15: conferir o conteúdo e número de cada inciso citado
+  também nas justificativas de distratores. Não inserir primariedade no rol
+  textual do art. 14 nem trocar comunicação prévia com reparação espontânea.
+
+As retenções e fontes primárias estão na conferência citada. Gabarito certo não
+compensa justificativa incorreta. As propostas continuam rascunhos e seguem a
+linha de liberação; nenhuma revisão humana é presumida. O efeito desta orientação
+em entregas futuras ainda precisa ser observado nos recibos reais.
+
 ## Responsabilidades
 
 ### Entrada por curso e novos produtos (07/09/2026)

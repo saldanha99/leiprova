@@ -1,5 +1,15 @@
 # Operação do Edital Lei Seca
 
+**Heartbeat em 13/10/2026, 04h09 BRT:** seis preparações elegíveis, 595 válidas
+nas ofertas e 143 novas distintas publicadas hoje. PC-MA Oficial Investigador
+124; PP-MA Inspetor 13/draft/faltam55. Conferidas 65 novas aprovações; quatro
+suspensas por recorte ou justificativas imprecisas (duas PC-MA e duas PP-MA).
+Saúde ok, oferta PC-MA 200/“Conteúdo liberado”, linha às07h00 concluída sem falha.
+Autor/Guardião têm reservas ativas sem resposta nesta fotografia; preflight idle
+não comprova cota esgotada. Mac bloqueado impede inspeção nativa, sem interromper
+ou duplicar os nós. Runtime/gates/flags preservados, sem novo código ou campanha.
+[Conferência e pendências](CONTINUACAO-PRODUCAO-2026-10-13.md).
+
 **Heartbeat em 13/10/2026, 03h07 BRT:** PC-MA Oficial Investigador aberto
 automaticamente; 76 válidas após quatro suspensões auditadas. Agora **6/84
 preparações elegíveis**, 547 válidas nas ofertas e 95 novas distintas publicadas

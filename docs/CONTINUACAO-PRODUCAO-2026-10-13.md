@@ -1,5 +1,63 @@
 # Continuação editorial em 13/10/2026
 
+## Conferência às 04h09 de São Paulo
+
+Relatório somente leitura de 07h09m49 UTC, após as suspensões: **6/84 elegíveis**,
+595 questões válidas nas ofertas, **143 novas distintas publicadas no dia 13**.
+PC-MA Oficial Investigador tem 124 válidas; ENAM 146, ENAC 78, TC-DF 72,
+TJ-RS 105 e TRF-5 70. Crescimento líquido de 48 publicadas desde o retrato de
+03h07. **PP-MA Inspetor tem 13 válidas, draft/faltam 55 ao piso 68**; esses
+itens ainda não contam como novas publicadas em produto aberto. Nenhuma sétima
+preparação elegível nesta fotografia. Fonte, contrato, vínculos e piso preservados.
+
+Conferidas integralmente **65 novas aprovações** às 06h10–06h40 UTC: enunciado,
+explicação, alternativas, gabarito e justificativas contra o corpus recebido,
+com pesquisa primária nos recortes duvidosos. Quatro suspensões pelo operador
+existente, sem revisão humana e sem reescrever os rascunhos originais:
+
+- Audit 15124 (PP-MA): caso de revelação de segredo presume improbidade sem
+  explicitar a finalidade específica de proveito/benefício indevido do art. 11
+  §1º da LIA. Retenção conservadora do caso até delimitar o elemento subjetivo.
+- Audit 15126 (PP-MA): justificativa ambiguamente exige defesa técnica no PAD
+  do servidor sem delimitar a ausência de obrigatoriedade constitucional de
+  advogado. [Súmula Vinculante 5, fonte primária](https://portal.stf.jus.br/jurisprudencia/sumariosumulas.asp?base=26&sumula=1199).
+- Audit 15228 (PC-MA): justificativa generaliza penas e impedimento de suspensão
+  condicional do processo sem distinguir a tortura omissiva, cuja pena mínima
+  recebida é de um ano. [Art. 89 da Lei 9.099](https://www.planalto.gov.br/ccivil_03/leis/l9099.htm)
+  usa a pena mínima, inclusive fora do rito dos Juizados. Não se afirmou
+  concessão automática de benefício; item retido até delimitar modalidade.
+- Audit 15341 (PC-MA): justificativas incluem primariedade no art. 14 III da
+  Lei 9.605 e trocam os incisos da comunicação prévia e do arrependimento.
+  [Texto primário dos arts. 14/15](https://www.planalto.gov.br/ccivil_03/leis/l9605.htm).
+
+Referências `maestro-conferencia-20261013-0703-15124`, `-15126`, `-15228`,
+`-15341`, todas com recibo applied. Marca privada avançada após terminar todos
+os itens: `2026-10-13T06:40:07.397045+00:00`. Demais itens sem erro identificado
+no recorte conferido, sem atestar cobertura integral ou revisão humana.
+Não confundir as suspensões conservadoras de justificativa com mudança de lei.
+
+Saúde pública ok, oferta PC-MA HTTP200 e “Conteúdo liberado” após suspensões.
+Linha agendada terminou às 07h00m55 UTC sem falha. Teto diário continua null
+(308 reservas em 24h é telemetria). Inspeção local identificou reservas ativas
+sem response.json: Guardião mapping:1326 até 07h40 UTC; Autor author:1458 até
+08h07 UTC. Preflight está devolvendo idle durante essas reservas; isso não prova
+fila vazia, cota esgotada ou conclusão. Mac bloqueado confirmado pelo controle
+nativo; não foi possível inspecionar terminais. Nós, reservas e rotinas foram
+preservados, sem interrupção, duplicação ou tomada de lease.
+
+Contexto judicial para autoria e recorte federal/estadual continuam pendentes
+conforme a seção anterior. O contrato documental dos motores recebeu orientações
+para delimitar esses recortes e as justificativas retidas; falta de contexto
+suficiente deve produzir blocked, sem inventar atualização judicial. A orientação
+será lida nas futuras tarefas conforme o fluxo existente; seu efeito ainda não
+foi comprovado em nova entrega. Nenhum hash ou pacote reservado foi alterado. Não houve
+novo deploy de código, mudança de schema, flags, anúncios ativos, gasto ou envio
+WhatsApp. As seis ofertas já têm rascunhos de anúncios; sem duplicar campanhas.
+Integração WhatsApp, contas e orçamento de anúncios continuam pendentes.
+Validação local desta rodada: lint, typecheck, 1.848 testes passando/292
+condicionais pulados e build concluído. Apenas documentação pública alterada;
+relatórios, propostas e recibos continuam privados.
+
 ## Abertura PC-MA e conferência às 03h07 de São Paulo
 
 Relatório de 06h07m18 UTC: **6/84 preparações editorialmente elegíveis**, com

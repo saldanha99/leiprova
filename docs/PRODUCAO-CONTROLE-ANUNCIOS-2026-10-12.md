@@ -7,6 +7,14 @@ Mantêm-se fontes oficiais, identidade por cargo/edição, contratos atuais,
 originalidade, piso de conteúdo e a auditoria da autorização permanente.
 Resultados prepared continuam propostas. Não usar APIs pagas como alternativa.
 
+Atualização em 13/10 às 04h09 BRT: **6/84 elegíveis**, 595 válidas nas ofertas
+e **143 novas distintas publicadas hoje**. PC-MA avançou para124 válidas;
+PP-MA Inspetor tem13/draft. Conferidas65 aprovações; quatro suspensões auditadas,
+duas em cada produto. Oferta PC-MA pública conferida, sem nova preparação aberta
+ou anúncios duplicados. Reservas de Autor/Guardião preservadas; Mac bloqueado
+impede inspeção dos terminais. WhatsApp, contas e orçamento permanecem pendentes.
+[Recibos e limites](CONTINUACAO-PRODUCAO-2026-10-13.md).
+
 Atualização em 13/10 às 03h07 BRT: **6/84 elegíveis**, 547 válidas nas ofertas
 e 95 novas distintas publicadas hoje. PC-MA Oficial Investigador abriu pela
 linha e ficou com 76 válidas após quatro suspensões. Conferidas 40 novas
