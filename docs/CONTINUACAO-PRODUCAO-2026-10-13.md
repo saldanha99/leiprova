@@ -58,6 +58,29 @@ Publicação limitada ao worker editorial; sem migration, seed, alteração do a
 flags, banco de outro projeto ou reinício dos nós Maestri. Conferir implantação
 e recibos abaixo; código/testes aprovados não comprovam entrega do novo alvo.
 
+**Implantação e execução conferidas às11h36 BRT:** commit `ac8e627` publicado
+somente no worker, imagem
+`sha256:4234d59f14ae3cc75b8ad05cc089d09c2e30fd245efb544c67281ca6a24bbf4c`,
+running e zero reinícios na inspeção. Runtime do app permanece `3b6f2163`.
+O diagnóstico prévio usou `docker top -eo args`, que falhou por ausência do
+campo PID; portanto não comprova ausência de RPC durante a troca. Houve evento
+`bridge_failed` do Autor às14h27m03 UTC, seguido de `idle_or_budget` normal às
+14h28m34 UTC. O script privado foi corrigido para incluir PID nas próximas
+inspeções; não houve segundo deploy nem recuperação forçada de reservas.
+
+A rotina normal confirmou a nova prioridade: Guardião reservou MPMT2017 e
+devolveu `blocked`, recolhido às14h35m39 UTC, por fontes centrais do requisito
+ausentes no pacote e temas doutrinários; não forçou vínculo. Em seguida reservou
+MPMT2018, às14h35m43 UTC, ainda em execução na inspeção. TCE1171 anterior também
+teve recibo `blocked`. Esses recibos confirmam mudança de alvo, não questões
+novas ou abertura de MPMT. Acompanhar corpus de artigos pertinentes como próximo
+gargalo; fontes novas exigem o caminho auditado e não se aprova por equivalência
+para satisfazer volume. TCE1171 foi recolhido às14h31m38 UTC.
+Rotinas reais6237b5/cc6e9e/56cefb enabled, intervalos Radar5min e Guardião/Autor1min.
+Relatório read-only às14h35m48 UTC mantém8/84,896 válidas e444 novas publicadas;
+health público respondeu `ok`. Prism existente continua diagnóstico CP112;
+sem recibo de reconciliação concluída. WhatsApp e orçamento de anúncios pendentes.
+
 ## Conferência e retomada às 10h25 de São Paulo
 
 Relatório somente leitura de13h25m03 UTC: **7/84 elegíveis**, **818 válidas nas
