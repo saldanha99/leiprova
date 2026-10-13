@@ -297,3 +297,50 @@ novamente o acesso nativo antes do envio do comando no Maestro. Ler este estado
 mais recente antes das notas históricas. Não forjar identidade/socket para
 atalhar esse bloqueio; preservar agentes já ocupados. Rascunhos de anúncios
 TRF-5 adicionados ao pacote privado, com limites de títulos/descrições conferidos.
+
+## Heartbeat de 13-10: conferência e duplicatas
+
+Às04h01 UTC, relatório somente leitura:5/84 preparações,472 válidas,20 novas
+publicadas desde00h00 de São Paulo. Conferência das20 aprovações entre a marca
+02h50m15.421306 UTC e03h00m10.214805 UTC incluiu enunciado, gabarito, todos os
+distratores, explicação e justificativas contra o literal oficial armazenado.
+Um item foi suspenso: `a62845a9-a5e8-5786-8975-a063bda6c6c6`, audit14413.
+A explicação chama de legitimidade extraordinária a representação associativa
+na ação ordinária descrita. A classificação exige correção antes de nova
+liberação; conferida a distinção de representação no RE573232/Tema82 do STF.
+Operador `editorial:questions:suspend --apply`, referência
+`maestro-conferencia-20261013-0401`, retornou applied/um suspenso.
+`humanReview:false`; não houve revisão humana presumida.
+
+A fotografia final às04h06m54 UTC (01h06 BRT) é5/84,471 válidas,19 novas
+publicadas no dia13: ENAM146,ENAC78,TC-DF72,TJ-RS105,TRF-5 70.
+PC-MA Oficial Investigador tem4 válidas e permanece draft/abaixo de68.
+Não recontar as publicações do dia12 na métrica diária do dia13.
+
+Autor estava retido desde02h59 UTC no `author:1405`, pacote
+`56d1d356-8a10-40fb-b32f-c01791dfe506`, por três falhas do mesmo digest na
+liquidação. A resposta era válida localmente, mas seus quatro enunciados eram
+idênticos aos itens já aprovados nos audits14348/14350/14352/14354; a importação
+não poderia cumprir originalidade. Original preservado no diretório privado
+como `response.rejected-exact-duplicates-20261013.json`. Maestro registrou
+novo resultado exclusivamente diagnóstico, outcome blocked/zero questões,
+modelo `codex-maestro-operational-diagnostic`, pelo protocolo existente e inalterado de
+complete. Recibo blocked/zero importadas; sem reset de tentativas, criação de
+reserva, bypass de similaridade ou declaração de entrega autoral nova. O digest
+anterior e suas três tentativas foram preservados. A rotina existente voltou
+a claimed às04h06m34.264 UTC, confirmando a remoção da retenção local.
+
+Radar voltou a entregar após03h30 UTC; Guardião continuou recolhendo entregas.
+Saúde pública ok. Mac novamente bloqueado: nenhuma atualização de notas do
+canvas ou mensagem de agente realizada nesta rodada, nem identidade forjada.
+Nenhum código de aplicação/runtime, fonte, contrato ou flag comercial alterado.
+As rotinas e a linha existente continuam; não inferir autoria ininterrupta.
+Não houve campanha, gasto ou WhatsApp. Anúncios das cinco ofertas continuam
+preparados; pendências de integração/contas/orçamento preservadas.
+
+Recibos privados: `.local/editorial/continuation-20261012/heartbeat-0401-*`:
+relatórios inicial/final, conferência, suspensão, estado do Autor, prova das
+quatro duplicatas e recibo blocked. Marca de conferência avançada somente após
+comparar o lote, para03h00m10.214805 UTC. Validação local desta rodada: lint, typecheck,1.848 testes e build passaram;
+290 testes opcionais pulados. Esta rodada alterou apenas documentação e
+registros operacionais privados, sem deploy de runtime.

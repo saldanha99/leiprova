@@ -1,5 +1,17 @@
 # Operação do Edital Lei Seca
 
+**Heartbeat em 13/10/2026, 01h06 BRT:** cinco preparações abertas,471 questões
+válidas nas ofertas e19 novas distintas publicadas desde a meia-noite de São
+Paulo. TJ-RS105; ENAM146,ENAC78,TC-DF72,TRF-5 70. Conferidas20 novas aprovações:
+um item TJ-RS suspenso por imprecisão na explicação sobre representação
+associativa (audit14413), pelo operador existente. Autor foi destravado sem
+importar duplicatas: quatro enunciados PC-MA repetiam exatamente itens já
+aprovados; resposta original preservada e entrega encerrada como blocked
+pelo protocolo existente. Rotina voltou a reservar às04h06m34 UTC. Radar
+retomou entregas após a cota; Guardião segue entregando. Mac bloqueado impede
+apenas coordenação nativa nesta rodada. Gates, tentativas, reservas e flags
+preservados. [Recibos](CONTINUACAO-PRODUCAO-2026-10-12.md#heartbeat-de-13-10-conferencia-e-duplicatas).
+
 **Retomada Pro em 12/10/2026, 23h44 BRT:** Autor e Guardião usam Antigravity
 Gemini 3.8 Flash High nos mesmos nós, com `--dangerously-skip-permissions`
 restaurado após confirmação específica do proprietário. Login nativo concluído
