@@ -1,5 +1,85 @@
 # Continuação editorial em 13/10/2026
 
+## Conferência e fila às 09h18 de São Paulo
+
+Relatório somente leitura de 12h18m34 UTC, após nove suspensões: **7/84
+preparações elegíveis**, **768 questões válidas nas ofertas**, **316 novas
+distintas publicadas no dia 13**. ENAM146, ENAC78, PC-MA Oficial Investigador148,
+PP-MA Inspetor116, TC-DF72, TJ-RS145→138 e TRF-5 70. SEFAZ-AL Auditor29/draft,
+faltam39 ao piso; seus rascunhos não entram na métrica publicada. Crescimento
+líquido de71 publicadas desde a fotografia anterior de08h11. Sem oitava oferta.
+
+Conferidas integralmente70 aprovações entre11h20 e12h00 UTC, incluindo todas
+as justificativas dos distratores e cotejo com os dispositivos vinculados.
+Pesquisa primária nos recortes duvidosos. Nove suspensões pelo operador existente,
+referências `maestro-conferencia-20261013-1206-<audit>`, motivos registrando
+conferência automatizada e `humanReview:false`:
+
+- 16295: caso CPC239 não delimita esgotamento do prazo de defesa, mas afirma
+  revelia automática pela rejeição da nulidade. STJ exige distinguir os marcos
+  processuais e a ausência de contestação dentro do prazo.
+- 16309: comentários transformam o limite de10 testemunhas por parte em teto
+  global somando todos os litigantes do processo.
+- 16317: invoca CPC535§7º para afastar impugnação por decisão STF posterior ao
+  trânsito; a AR2876QO declarou o dispositivo inconstitucional, ressalvando
+  preclusão e efeitos temporais.
+- 16319: comentário veda qualquer solidariedade em improbidade, sem o recorte
+  de ressarcimento ao erário fixado nas ADIs7156/7236.
+- 16331: comentário diz que RPV não impugnada admite honorários genericamente,
+  ignorando Tema1190/STJ e sua modulação para cumprimentos posteriores a01/07/2024.
+- 16418: comentário e alternativa generalizam impedimento de escritura com
+  filhos incapazes, sem a possibilidade após solução judicial de guarda,
+  visitação e alimentos prevista pelo CNJ. Gravidez/falta de advogado do caso
+  continuam impedimentos; a retenção não autoriza escritura nesse caso concreto.
+- 16426: comentário atribui ao STJ crimes de responsabilidade de Governadores,
+  embora CF105 I a lhes atribua apenas crimes comuns nesse rol.
+- 16497: narra concurso já expirado e aceita prorrogação posterior como válida;
+  necessário delimitar ato de prorrogação dentro da vigência.
+- 16501: comentário restringe acumulação de professor a outro cargo técnico ou
+  científico, texto superado pela EC138/2025. O próprio literal recebido já traz
+  “outro de qualquer natureza”; não é prova de corpus CF37 desatualizado.
+
+Fontes: [STJ, REsp1930225/SP](https://scon.stj.jus.br/SCON/GetInteiroTeorDoAcordao?dt_publicacao=15%2F06%2F2021&num_registro=202002409008),
+[TJPR, limite por parte](https://portal.tjpr.jus.br/jurisprudencia/j/4100000034858231/Ac%C3%B3rd%C3%A3o-0096564-49.2025.8.16.0000),
+[STF, AR2876QO](https://portal.stf.jus.br/textos/verTexto.asp?pagina=casos_notorios_2025&servico=jurisprudenciaPesquisaGeral),
+[STF, ADIs7156/7236](https://noticias.stf.jus.br/postsnoticias/stf-invalida-novos-dispositivos-da-reforma-da-lei-de-improbidade/),
+[STJ, Tema1190](https://processo.stj.jus.br/jurisprudencia/externo/informativo/?livre=%40CNOT%3D020809),
+[CNJ, Res35 art34](https://atos.cnj.jus.br/atos/detalhar/179),
+[STJ, concurso vigente](https://scon.stj.jus.br/SCON/GetInteiroTeorDoAcordao?dt_publicacao=23%2F04%2F2026&num_registro=202403831150),
+[EC138 no Planalto](https://www.planalto.gov.br/ccivil_03/constituicao/emendas/emc/emc138.htm).
+CF100§5º conferido com EC136/2025:1º de fevereiro é redação atual; não foi
+indevidamente retido como regra superada. LIA17§19 I/II permanece compatível com
+a conferência oficial, sem afirmação de dispensa de documentos ordenados pelo juiz.
+PAD funcional novo não repete exigência genérica de advogado. Publicidade CF37
+inclui promoção pessoal no caso e comentário. Marca privada avançada após ler
+os70 itens para `2026-10-13T12:00:09.219278+00:00`; aprovações posteriores ficam para a próxima
+conferência, não foram incluídas por suposição. Não é revisão humana.
+
+**Diagnóstico do Guardião:** Maestri voltou a permitir inspeção nativa. Inventário
+lido pela CLI na própria sessão Maestro, sem copiar identidade/socket. Guardião
+em Gemini3.8Flash high, esperando; tela mostra resposta blocked sobre conceitos
+doutrinários Estado/Governo/Administração. A resposta mapping:1270 já tem receipt
+privado e foi recolhida às11h11. Outra reserva, mapping:1271, está running/attempt1
+até12h41m47 UTC; seu packet não foi encontrado nas duas árvores documentadas.
+Causa dessa divergência não comprovada. Não reconstituir token/pacote, forçar
+encerramento nem duplicar claim; preservar expiração e tentativas pelo fluxo normal.
+Autor continua entregando, com recibos recentes às12h06/12h10/12h12. Teto null;
+418 reservas em24h na primeira fotografia são telemetria, não publicações.
+
+Saúde pública ok e linha agendada continua ampliando as ofertas. Documentação
+ampliada para evitar comentários desatualizados; não modifica hashes dos pacotes,
+versões legais ou os gates. CP112/recibo1 suspenso, reconciliação específica ainda
+pendente. Sem nova oferta/anúncio duplicado, WhatsApp ou gasto; contas/orçamento,
+integração e sincronização dos selos do menu continuam pendentes. Não declarar
+checkout ou pagamento homologados nesta rodada. Recibos e propostas privados.
+
+Atualizadas por edição de prefixo as três notas existentes PROJECT-CONTEXT,
+EDITORIAL-QUEUE e QUALITY-GATES na sessão nativa do Maestro. Recibos OK e
+inspeção da tela confirmam três blocos atuais; histórico, nomes, conexões e IDs
+preservados. Notas não aprovam conteúdo nem alteram o corpus. Lint, typecheck,
+1.848 testes passando/292 condicionais pulados e build concluídos. Somente
+documentação pública alterada; runtime preservado.
+
 ## PP-MA aberta e conferência às 08h11 de São Paulo
 
 Relatório somente leitura de 11h11m46 UTC, após suspensões: **7/84 preparações

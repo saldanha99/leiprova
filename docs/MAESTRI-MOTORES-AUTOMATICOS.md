@@ -52,6 +52,20 @@ orientação não modifica o corpus versionado nem o hash de pacote reservado:
   destinado ao uso pessoal. Sem contexto oficial suficiente no pacote, bloquear
   esse recorte ou trabalhar somente em hipótese efetivamente sustentada.
 
+- CPC239/357/535/85: casos concretos precisam delimitar prazo de defesa,
+  limite de testemunhas por parte e interpretação vigente de inexigibilidade/
+  honorários. Não ensinar CPC535§7º isolado após AR2876QO nem regra antiga de
+  honorários em RPV após Tema1190; observar as modulações dos precedentes.
+- LIA17-C§2º: distinguir individualização de sanções de ressarcimento solidário
+  conforme ADIs7156/7236. A vedação textual não sustenta toda afirmação prática.
+- Divórcio extrajudicial: considerar Res35/CNJ alterada por Res571/2024 para
+  filhos menores/incapazes, sem presumir resolução prévia da guarda/alimentos
+  nem afastar o impedimento por gravidez no caso concreto.
+- CF37/105: verificar comentário contra literal recebido. EC138/2025 ampliou
+  o recorte professor/outro cargo; não repetir texto técnico/científico superado.
+  Governadores não estão no rol de crimes de responsabilidade do STJ em105 I a.
+  Prorrogação de concurso requer ato dentro da vigência, não depois de expirado.
+
 As retenções e fontes primárias estão na conferência citada. Gabarito certo não
 compensa justificativa incorreta. As propostas continuam rascunhos e seguem a
 linha de liberação; nenhuma revisão humana é presumida. O efeito desta orientação

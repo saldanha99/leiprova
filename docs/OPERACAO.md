@@ -1,5 +1,15 @@
 # Operação do Edital Lei Seca
 
+**Heartbeat em 13/10/2026, 09h18 BRT:** sete preparações elegíveis/768 válidas
+nas ofertas e316 novas distintas publicadas hoje. Conferidas70 novas aprovações,
+nove suspensões com evidência; TJ-RS138, PP-MA116, PC-MA Oficial Investigador148.
+SEFAZ-AL29/draft/faltam39. Guardião nativo esperando; resposta exibida já recolhida,
+mas outra reserva mapping:1271 segue ativa até12h41 UTC, sem packet encontrado nas
+árvores esperadas. Causa não comprovada, sem reconstrução/duplicação; Autor entregando.
+CP suspenso/reconciliação, selos do menu, WhatsApp e contas/orçamento continuam
+pendentes. Saúde ok; gates/flags preservados.
+[Conferência e recibos](CONTINUACAO-PRODUCAO-2026-10-13.md).
+
 **Heartbeat em 13/10/2026, 08h11 BRT:** PP-MA Inspetor aberta automaticamente,
 83 válidas após a conferência; agora **7/84 elegíveis**, 697 válidas nas ofertas e
 245 novas distintas publicadas hoje. Conferidas 90 aprovações, cinco suspensões
