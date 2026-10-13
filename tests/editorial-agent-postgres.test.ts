@@ -276,6 +276,41 @@ describe.skipIf(!url)('ponte editorial — PostgreSQL isolado',()=>{
     const [requirement]=await db!.select().from(schema.opportunityRequirements).where(eq(schema.opportunityRequirements.id,f.requirement.id));
     expect(requirement.editorialStatus).toBe('draft');expect(requirement.legalArticleId).toBeNull();
   });
+  it.each(['acervo','lote'] as const)('bloqueio de originalidade no %s encerra a reserva sem importar parte do lote',async(origin)=>{
+    const f=await fixture();
+    const question={prompt:`Cenário inteiramente sintético ${randomUUID()} ${randomUUID()}: qual tarefa organiza os cartões?`,
+      articleId:f.article.id,quote:f.article.literalText,
+      explanation:'A regra sintética exige organizar os cartões antes da atividade fictícia.',difficulty:'easy',
+      options:['Organizar cartões','Ignorar preparo','Adiar tudo','Destruir cartões','Cancelar atividade'].map((text,i)=>({
+        key:'ABCDE'[i],text,correct:i===0,rationale:'Justificativa sintética de software, sem validade jurídica.'}))};
+    if(origin==='acervo') {
+      await enqueueAgentWork(db!,`author:${f.requirement.id}`,'authoring',f.payload);
+      const seed=await claimAgentWork(db!,new Date(),'Autor');if(seed.state!=='claimed')throw new Error('Reserva ausente');
+      expect((await completeAgentWork(db!,{...seed.job,result:{...base,generatorModel:'synthetic-test',questions:[question]}})).state).toBe('prepared');
+    }
+    const current=await fixture();
+    await enqueueAgentWork(db!,`author:${current.requirement.id}`,'authoring',current.payload);
+    const claim=await claimAgentWork(db!,new Date(),'Autor');if(claim.state!=='claimed')throw new Error('Reserva ausente');
+    const fresh={...question,articleId:current.article.id,quote:current.article.literalText,
+      prompt:`Experimento novo exclusivo ${randomUUID()} ${randomUUID()}: como preparar esta rodada fictícia?`};
+    const duplicate=origin==='acervo'?{...question,articleId:current.article.id,quote:current.article.literalText}
+      :{...fresh,prompt:`${fresh.prompt} Adicional.`};
+    const result={...base,generatorModel:'synthetic-test',questions:[fresh,duplicate]};
+    const before=await db!.select({id:schema.questions.id}).from(schema.questions);
+    expect(await completeAgentWork(db!,{...claim.job,result})).toMatchObject({state:'blocked',importedQuestionPublicIds:[],publicationAllowed:false});
+    expect(await db!.select({id:schema.questions.id}).from(schema.questions)).toHaveLength(before.length);
+    const [work]=await db!.select().from(schema.editorialAgentWork).where(eq(schema.editorialAgentWork.jobKey,claim.job.jobKey));
+    expect(work).toMatchObject({status:'blocked',attempts:1,leaseToken:null,leaseExpiresAt:null,lastErrorCode:'originality_rejected'});
+    expect(work.result).toMatchObject({outcome:'blocked',questions:[],publicationAllowed:false});
+    const [audit]=await db!.select().from(schema.auditLogs).where(eq(schema.auditLogs.entityId,claim.job.jobKey));
+    expect(audit.metadata).toMatchObject({outcome:'blocked',rejectionReason:'originality_rejected',
+      submittedQuestions:2,rejectedQuestionIndex:1,questions:0,importedQuestionPublicIds:[]});
+    expect(await completeAgentWork(db!,{...claim.job,result})).toMatchObject({state:'blocked',replayed:true,importedQuestionPublicIds:[]});
+    await expect(completeAgentWork(db!,{...claim.job,result:{...result,summary:'Resposta sintética alterada'}})).rejects.toThrow();
+    const next=await fixture();
+    await enqueueAgentWork(db!,`author:${next.requirement.id}`,'authoring',next.payload);
+    expect(await claimAgentWork(db!,new Date(),'Autor')).toMatchObject({state:'claimed',job:{jobKey:`author:${next.requirement.id}`}});
+  });
   it('não reserva autoria com banca conhecida mas sem contrato oficial',async()=>{
     const f=await fixture();
     await enqueueAgentWork(db!,`author:${f.requirement.id}`,'authoring',{...f.payload,questionContractId:undefined,questionContract:undefined});

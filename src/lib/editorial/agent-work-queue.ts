@@ -236,6 +236,33 @@ export async function completeAgentWork(db: AgentDatabase,
       `);
       if(!context?.subjectId || !payload.opportunityId) throw new Error("Disciplina/cargo ausente: importação não aplicada.");
       const existing=await tx.select({publicId:schema.questions.publicId,prompt:schema.questions.prompt}).from(schema.questions);
+      // Conferir o lote inteiro antes de inserir: um item recusado não pode
+      // deixar rascunhos parciais nem prender o Autor até o lease expirar.
+      const compared=[...existing];
+      for(const [index,question] of result.questions.entries()) {
+        const similarity=findMostSimilarQuestion(question.prompt,compared);
+        if(similarity.scoreBps>=ORIGINALITY_REJECTION_THRESHOLD_BPS) {
+          const blocked=agentWorkResultSchema.parse({...result,outcome:'blocked',
+            summary:'Lote bloqueado pelo controle de originalidade; nenhuma questão importada.',
+            limitations:[...result.limitations.slice(0,18),
+              'Enunciado próximo do acervo ou repetido no próprio lote. Exige nova proposta original.',
+              'A resposta original permanece no arquivo local; este recibo não aprova conteúdo.'],
+            questions:[],mappings:[],discoveries:[]});
+          await tx.execute(sql`update editorial_agent_work set status='blocked',result=${JSON.stringify(blocked)}::jsonb,
+            lease_token=null,lease_expires_at=null,last_error_code='originality_rejected',updated_at=now()
+            where job_key=${job.jobKey}`);
+          await tx.insert(schema.auditLogs).values({action:'automation.agent.prepared',entityType:'editorial_agent_work',
+            entityId:job.jobKey,metadata:{kind:job.kind,inputHash:job.inputHash,outcome:'blocked',
+              questions:0,mappings:0,discoveries:0,submittedQuestions:result.questions.length,
+              rejectionReason:'originality_rejected',rejectedQuestionIndex:index,
+              similarityMaxBps:similarity.scoreBps,similarityReferencePublicId:similarity.referencePublicId,
+              publicationAllowed:false,humanReviewRequired:true,importedQuestionPublicIds:[],
+              completionTokenHash,resultHash}});
+          return {state:'blocked',importedQuestionPublicIds:[],publicationAllowed:false,humanReviewRequired:true};
+        }
+        compared.push({publicId:deterministicNoticeQuestionUuid(`${job.jobKey}:${job.inputHash}:${index}:${question.prompt}`),
+          prompt:question.prompt});
+      }
       for(const [index,question] of result.questions.entries()) {
         const article=payload.articles.find(item=>item.id===question.articleId)!;
         const [version]=await tx.execute<{verifiedAt:string}>(sql`select verified_at::text as "verifiedAt" from legal_versions where id=${article.versionId}`);
