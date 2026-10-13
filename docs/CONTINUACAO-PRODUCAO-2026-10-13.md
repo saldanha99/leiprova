@@ -1,5 +1,63 @@
 # Continuação editorial em 13/10/2026
 
+## SEFAZ-AL aberta e mapas que alimentam autoria — 11h21 BRT
+
+Relatório somente leitura de14h21m39 UTC: **8/84 elegíveis**, **896 válidas nas
+ofertas**, **444 novas distintas publicadas no dia13**. SEFAZ-AL AFTE aberta
+progressivamente pelo audit17332 de14h01m42 UTC (11h01 BRT),78 válidas após
+suspensão de um item. As outras sete ofertas
+mantêm818 no total. Não confundir questões de produto draft com novas publicações.
+Não é cobertura integral. Oferta pública em
+`/concursos/fiscal-e-controle/alagoas/sefaz-al-auditor-fiscal-2026` respondeu200,
+mostrou “Conteúdo liberado” e escolha de planos. Menu ainda “Em preparação”;
+checkout/pagamento não homologados nesta rodada. Textos de duas peças Meta e
+anúncio Google com10 títulos/4 descrições preparados privadamente, limites de
+caracteres e ZIP íntegro conferidos. Sem campanha criada, conta ou gasto ativados.
+Referência da prova anterior2021 não é autoria histórica de questões2026.
+
+Conferidas20 aprovações até14h10m08 UTC, com leitura de enunciados, explicações,
+alternativas/gabaritos/justificativas e cotejo dos recortes legais. Uma suspensão,
+audit17296, referência `maestro-conferencia-20261013-1410-17296`: explicações da
+LIA1§8 generalizam exclusão de improbidade por divergência interpretativa, sem
+jurisprudência qualificada e ressalvas de dolo/erro grosseiro da interpretação
+conforme nas [ADIs7156/7236](https://portal.stf.jus.br/processos/detalhe.asp?incidente=6396615).
+As demais19 não tiveram erro identificado nesse recorte. CF37§5 apenas cobra
+literal, sem afirmar imprescritibilidade universal de ressarcimento; não foi
+indevidamente retida. Marca privada atualizada para
+`2026-10-13T14:10:08.208778+00:00` somente após ler os20. Não é revisão humana.
+
+**Gargalo observado:** depois da abertura SEFAZ, Guardião voltou a mapas TCE-MA
+sem contrato autoral, enquanto Autor ficou idle. A preferência por contrato
+valia apenas dentro da mesma faixa. MPMT/PGE-AC possuem contratos atuais e
+requisitos com disciplinas, mas seus modos históricos colocam-nos na faixa1,
+depois de TCE-MA na faixa0. Mapas TCE-MA prepared permanecem propostas: cargos
+agregados ainda impedem autoria; nenhuma aprovação por equivalência.
+
+A correção move a preferência de contrato atual + disciplina conhecida para
+antes da faixa **somente na ordenação dos mapas**. Entre mapas aptos, preserva
+prioridade de abertura, data e ordem existente. Mudanças legais continuam
+precedendo mapas; Autor/Radar mantêm a ordenação anterior. Tarefas sem contrato
+ou disciplina não são excluídas; nenhum payload/hash, lease, tentativa, fonte,
+contrato ou regra de liberação é alterado. Consulta read-only com a seleção nova
+confirmou próximos candidatos2017–2021; não foram reservados manualmente.
+
+QA: lint/typecheck/build e1.848 testes gerais passaram (293 condicionais sem
+ambiente). Banco **novo isolado** `leiprova_automation_test`, sem rede de produção,
+confirmou32 testes reais PostgreSQL e5 unitários de ordenação. A primeira preparação
+falhou por ausência de papel sintético leiprova_app; criada somente no banco de
+QA e reaplicados os grants do próprio teste, antes da rodada completa aprovada.
+Preservados teste da precedência legal, contratos ausentes/suspensos, disciplina
+nula, prioridade entre duas ofertas com contrato, exclusividade da reserva e
+validação posterior de contexto. Logs privados em `heartbeat-1410-priority`.
+
+Backup de produção específico validado por pg_restore --list; SHA256
+`ea10992f72c673ee5dc5c8cd4c63f8489b89bdb919224dffc7532b48135ee488`.
+Imagem anterior do worker preservada com tag
+`leiprova-editorial-automation:before-mapping-readiness-20261013`.
+Publicação limitada ao worker editorial; sem migration, seed, alteração do app,
+flags, banco de outro projeto ou reinício dos nós Maestri. Conferir implantação
+e recibos abaixo; código/testes aprovados não comprovam entrega do novo alvo.
+
 ## Conferência e retomada às 10h25 de São Paulo
 
 Relatório somente leitura de13h25m03 UTC: **7/84 elegíveis**, **818 válidas nas

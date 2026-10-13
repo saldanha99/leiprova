@@ -185,7 +185,7 @@ describe.skipIf(!url)('ponte editorial — PostgreSQL isolado',()=>{
     expect(await claimAgentWork(db!,new Date(),'Guardião')).toMatchObject({state:'claimed',job:{jobKey:`mapping:${waiting.requirement.id}`}});
     expect(await claimAgentWork(db!,new Date(),'Guardião')).toMatchObject({state:'claimed',job:{jobKey:`mapping:${unknown.requirement.id}`}});
   });
-  it('prontidão autoral do mapeamento não ultrapassa a faixa de produto',async()=>{
+  it('mapa que alimenta autoria precede produto sem contrato mesmo em faixa posterior',async()=>{
     const waiting=await fixture(true),ready=await fixture();
     await db!.insert(schema.contestStoreProducts).values([
       {slug:`priority-draft-${randomUUID()}`,opportunityId:waiting.requirement.opportunityId},
@@ -193,8 +193,19 @@ describe.skipIf(!url)('ponte editorial — PostgreSQL isolado',()=>{
         releasedAt:new Date(),releasedByUserId:ready.editor.id},
     ]);
     for(const f of [ready,waiting])await enqueueAgentWork(db!,`mapping:${f.requirement.id}`,'legal_mapping',f.payload);
-    expect(await claimAgentWork(db!,new Date(),'Guardião')).toMatchObject({state:'claimed',job:{jobKey:`mapping:${waiting.requirement.id}`}});
     expect(await claimAgentWork(db!,new Date(),'Guardião')).toMatchObject({state:'claimed',job:{jobKey:`mapping:${ready.requirement.id}`}});
+    expect(await claimAgentWork(db!,new Date(),'Guardião')).toMatchObject({state:'claimed',job:{jobKey:`mapping:${waiting.requirement.id}`}});
+  });
+  it('entre mapas com contrato vigente mantém prioridade de abertura sobre ampliação',async()=>{
+    const opening=await fixture(),expansion=await fixture();
+    await db!.insert(schema.contestStoreProducts).values([
+      {slug:`ready-draft-${randomUUID()}`,opportunityId:opening.requirement.opportunityId},
+      {slug:`ready-released-${randomUUID()}`,opportunityId:expansion.requirement.opportunityId,status:'released',
+        releasedAt:new Date(),releasedByUserId:expansion.editor.id},
+    ]);
+    for(const f of [expansion,opening])await enqueueAgentWork(db!,`mapping:${f.requirement.id}`,'legal_mapping',f.payload);
+    expect(await claimAgentWork(db!,new Date(),'Guardião')).toMatchObject({state:'claimed',job:{jobKey:`mapping:${opening.requirement.id}`}});
+    expect(await claimAgentWork(db!,new Date(),'Guardião')).toMatchObject({state:'claimed',job:{jobKey:`mapping:${expansion.requirement.id}`}});
   });
   it('mudança de escopo do intake não substitui o lease ativo do Radar',async()=>{
     const slug=`intake-lease-${randomUUID()}`;

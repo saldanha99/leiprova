@@ -1,5 +1,15 @@
 # Operação do Edital Lei Seca
 
+**Heartbeat em13/10/2026,11h21 BRT:** SEFAZ-AL Auditor Fiscal aberta pela
+linha automática e elegível com78 questões após uma suspensão. São **8/84
+preparações**, **896 válidas nas ofertas** e **444 novas distintas publicadas
+hoje**. Conferidas20 novas aprovações; LIA1§8 retida por omitir interpretação
+conforme do STF. Oferta pública200/“Conteúdo liberado”; anúncios privados
+Meta/Google preparados sem gasto. Corrigida a ordem dos mapas: contrato atual
+com disciplina precede a faixa de produto para alimentar autoria, sem eliminar
+outros mapas, mudar reservas ou dispensar gates. CP/Prism, menu, WhatsApp e
+contas/orçamento continuam pendentes. [Recibos](CONTINUACAO-PRODUCAO-2026-10-13.md).
+
 **Heartbeat em 13/10/2026, 10h25 BRT:** sete preparações elegíveis/818 válidas
 nas ofertas e366 novas distintas publicadas hoje, após cinco suspensões na
 conferência de70 aprovações. PP-MA124, TRF-5 112; demais ofertas preservadas.

@@ -52,7 +52,7 @@ describe("prioridade da fila dos agentes", () => {
     expect(claim.sql).not.toContain("unsold_waiting");
     expect(queries).toHaveLength(3);
     const order = claim.sql.slice(claim.sql.indexOf("order by"));
-    expect(order).toMatch(/tier\.tier nulls first,\s+case when work\.kind='legal_mapping'[\s\S]+?then 0 else 1 end,\s+tier\.upcoming_exam nulls last/u);
+    expect(order).toMatch(/case when work\.kind='legal_mapping'[\s\S]+?then 0 else 1 end,\s+tier\.tier nulls first,\s+tier\.upcoming_exam nulls last/u);
     expect(order).toContain("(requirement.subject_id is null) nulls last");
     expect(order).toContain("work.created_at,work.job_key for update of work skip locked limit 1");
     expect(claim.params.filter((param) => param instanceof Date)).toEqual([]);
@@ -77,7 +77,7 @@ describe("prioridade da fila dos agentes", () => {
     expect(selection).not.toContain("mapping_readiness");
     const order = claim.sql.slice(claim.sql.indexOf("order by case work.kind"));
     expect(order).toContain("when 'legal_change' then 0 when 'authoring' then 1 when 'discovery' then 2 else 3 end");
-    expect(order).toMatch(/tier\.tier nulls first,[\s\S]+coalesce\(mapping_readiness.has_current_contract, false\)[\s\S]+requirement\.subject_id is not null then 0 else 1 end,[\s\S]+tier\.upcoming_exam nulls last/u);
+    expect(order).toMatch(/coalesce\(mapping_readiness.has_current_contract, false\)[\s\S]+requirement\.subject_id is not null then 0 else 1 end,\s+tier\.tier nulls first,[\s\S]+tier\.upcoming_exam nulls last/u);
     expect(order).toContain("for update of work skip locked limit 1");
   });
 

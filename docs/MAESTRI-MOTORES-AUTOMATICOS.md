@@ -1,5 +1,11 @@
 # Editalume — contrato dos motores automáticos
 
+**Fila em13/10, após11h BRT:** prontidão autoral (contrato atual e disciplina
+conhecida) passa a preceder a faixa de produto na ordenação de mapeamentos.
+Não elimina tarefas sem contrato, não muda hashes/reservas nem os gates;
+mudança legal mantém precedência. Entre mapas prontos, abertura e data continuam
+prioritárias. Ver [diagnóstico e QA](CONTINUACAO-PRODUCAO-2026-10-13.md).
+
 **Conferência de13/10, 10h25 BRT:** justificar também os distratores com precisão.
 CPP70 aplicado a roubo precisa respeitar STJ Súmula582; CPP78IV não elimina a
 separação comum/militar de CPP79I. CF5XXIV não autoriza negar CF243 em comentários.

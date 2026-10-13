@@ -56,8 +56,10 @@ const MAPPING_CONTRACT_READINESS_CTE = sql`mapping_contract_readiness as materia
       ) as has_current_contract
       from contest_opportunities mapping_opportunity
     )`;
-/** Dentro do mesmo tipo: faixa 0 primeiro; nos mapeamentos, contrato vigente
- * e matéria conhecida precedem a data da prova dentro da faixa. Depois, prova
+/** Nos mapeamentos, contrato vigente
+ * e matéria conhecida precedem a faixa de produto: um mapa sem contrato não
+ * pode abastecer autoria, mesmo em uma edição com prova próxima. Depois, faixa
+ * 0 primeiro e prova
  * mais próxima (passada ou sem data no fim) e matéria conhecida no mesmo edital.
  * A prioridade ordena as tarefas elegíveis do próprio agente, sem deixar
  * um agente ocioso por pendências de outro. Tarefa sem edital não tem faixa e
@@ -100,9 +102,9 @@ export async function claimAgentWork(db: AgentDatabase, now = new Date(), agent?
   const mappingReadiness = prioritizesMappings ? sql`, ${MAPPING_CONTRACT_READINESS_CTE}` : sql``;
   const mappingJoin = prioritizesMappings ? sql`left join mapping_contract_readiness mapping_readiness
     on mapping_readiness.id = requirement.opportunity_id` : sql``;
-  const productOrder = prioritizesMappings ? sql`tier.tier nulls first,
-          case when work.kind='legal_mapping' and coalesce(mapping_readiness.has_current_contract, false)
+  const productOrder = prioritizesMappings ? sql`case when work.kind='legal_mapping' and coalesce(mapping_readiness.has_current_contract, false)
             and requirement.subject_id is not null then 0 else 1 end,
+          tier.tier nulls first,
           tier.upcoming_exam nulls last, (requirement.subject_id is null) nulls last` : PRODUCT_DEADLINE_ORDER;
   return db.transaction(async tx => {
     await tx.execute(sql`select pg_advisory_xact_lock(621743,37)`);
