@@ -1,5 +1,12 @@
 # Editalume — contrato dos motores automáticos
 
+**Conferência em13/10,19h19 BRT:** LIA1§3 afasta responsabilidade pelo mero
+exercício funcional **sem comprovação de ato doloso com fim ilícito**; preservar
+a condição também nos comentários. LIA1§8 exige os parâmetros STF já registrados.
+Desapropriação é aquisição originária: não ensinar registro como transmissão
+derivada, preservados seus requisitos registrais. Gabarito literal não sana
+comentário incorreto. [Conferência](CONTINUACAO-PRODUCAO-2026-10-13.md).
+
 **Conferência em13/10,18h11 BRT:** comentários de distratores também precisam
 de precisão. Lei14.133: concurso licitatório não é seleção de servidores; art80
 não dispensa automaticamente todo documento validado; art79 inclui comércio

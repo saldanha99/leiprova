@@ -1,5 +1,57 @@
 # Continuação editorial em 13/10/2026
 
+## Heartbeat 13/10, 19h19 BRT — décima preparação
+
+Relatório22h19m05 UTC: **10/84 elegíveis**, **1.066 válidas nas ofertas** e
+**614 novas distintas publicadas hoje em São Paulo**. PGE-AC88/released,
+MPMT82; PC-MA Delegado13 permanece inelegível. Página PGE-AC respondeu200,
+mostra “Conteúdo liberado” e “Treino histórico · legislação atualizada”,
+ediçãoVIII/2026, cargoClasseI e perfilFGV. Não anunciar inscrição atual,
+reprodução de questões históricas, cobertura integral ou endosso da banca.
+
+Conferidas60 aprovações entre21h20 e22h10 UTC: enunciados, alternativas,
+gabaritos, explicações e recortes do corpus. Três suspensões com recibo
+`mode:applied`, sem ausentes, pelo operador existente:
+
+- Audit18330: explicação generaliza registro como essencial à eficácia
+  translativa na desapropriação, aquisição originária. Gabarito LRP167I34
+  preservado; reter para remover/fundamentar suplemento sem negar dever registral.
+- Audit18357: caso LIA1§8 generaliza exclusão por qualquer jurisprudência não
+  pacificada, omitindo jurisprudência qualificada e dolo/erro grosseiro da ADI7156.
+- Audit18359: gabarito LIA1§2 preservado; comentário E omite condição LIA1§3
+  “sem comprovação de ato doloso com fim ilícito” ao afastar responsabilidade.
+
+Fontes primárias: [TJSP, aquisição originária por desapropriação](https://extrajudicial.tjsp.jus.br/pexPtl/visualizarDetalhesPublicacao.do?cdTipopublicacao=5&nuSeqpublicacao=5200),
+[STF, decisão ADI7156](https://portal.stf.jus.br/processos/detalhe.asp?incidente=6396615)
+e [LIA compilada](https://www.planalto.gov.br/ccivil_03/leis/l8429compilada.htm).
+O registro não dispensa especialidade; a retenção não declara dispensável
+o registro. Consulta oficial STF confirmou a interpretação; notícia bloqueada
+nesta rodada, sem contorno. Corpus e hashes preservados, `humanReview:false`.
+CPC520 conferido com§4: restituição do incisoII não desfaz transferência real
+já realizada; reparação permanece. Gabarito da responsabilidade preservado.
+
+Recibos privados em `.local/editorial/continuation-20261012/`:
+`heartbeat-2215-owner-final.json`, `heartbeat-2215-approved.jsonl`,
+`heartbeat-2215-holds.json`, `heartbeat-2215-suspension-results.jsonl`,
+`heartbeat-2215-conference-result.json` e `heartbeat-2215-pge-public.html`.
+Watermark avançado somente após conferência/recibos a22h10m09.192528 UTC;
+itens posteriores ficam para o próximo ciclo. Autor/Guardião seguem entregando
+e recebendo claims, sem interrupção ou duplicação de reservas. CP/Prism pendente.
+
+Textos Meta/Google preparados privadamente em
+`.local/commerce/campanhas-20261012/anuncios-pgeac-historico-meta-google.md`.
+Menu ainda mistura “Em preparação”, checkout não homologado, contas/orçamento
+pendentes: não veicular campanha. WhatsApp ainda sem integração identificada
+e validada; nenhum envio. Sem nova chamada paga, runtime ou flags alterados.
+
+Verificação local desta rodada documental: lint/typecheck/build passaram.
+Suíte padrão e repetição com2workers:1.856 passaram/293 condicionais ignorados;
+três testes dos wrappers CP/monitor excederam5s. Os dois arquivos (nove testes)
+passaram isoladamente com1worker e timeout30s; nenhum código/teste/gate editado.
+Não declarar a suíte padrão verde: permanece a limitação temporal observada
+no host, com recibos `heartbeat-2215-tests-two-workers.log`,
+`heartbeat-2215-targeted-tests.log` e `heartbeat-2215-build.log` privados.
+
 ## Retomada às18h11 BRT
 
 Relatório21h11m26 UTC:9/84 elegíveis,973 válidas nas ofertas,521 novas distintas
