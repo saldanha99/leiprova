@@ -240,3 +240,60 @@ contrato válido/audit7414; reconferência não é admissão nova. Permanecem4/8
 377 válidas e97 distintas novas publicadas no dia; TRF-5draft65. Codex CLI
 sem autenticação, Antigravity esgotado sem entrega nova e Mac novamente
 bloqueado. [Recibos e continuidade](CORRECAO-ESCOPO-CARGOS-2026-10-12.md).
+
+## Retomada Pro e abertura do TRF-5
+
+Em 12/10/2026, após 23h30 BRT, concluída a autenticação nativa do Autor na
+conta Pro confirmada pelo proprietário. A CLI havia retornado à conta anterior
+num reinício, embora o IDE já estivesse na Pro. Guardião carregou Pro após
+reinício; ambos responderam `CONEXAO_OK` nas sessões definitivas. Os dois nós
+usam `agy --dangerously-skip-permissions --model gemini-3.8-flash-high`, mediante
+confirmação específica do proprietário, preservando IDs, papéis e conexões.
+Código de autenticação entrou somente no campo nativo; nenhum segredo em
+prompt de IA, shell, nota ou Git. Nenhuma API paga usada.
+
+Retomadas as reservas ainda válidas, sem novo claim: `author:863`, pacote
+`a5f99388-4dc6-40a3-abb9-d526f902fe21`, e `mapping:1405`, pacote
+`36dd1c69-8879-481e-9401-e5837952645d`. Ambos produziram resposta e recibo
+prepared; cinco questões importadas como rascunho. Rotinas existentes fizeram
+settle com zero falhas e reservaram novas tarefas. A segunda rodada importou
+quatro inéditas PC-MA Oficial Investigador e registrou bloqueio fundamentado
+para `mapping:1406` por corpus incompatível/insuficiente. Bloqueio é entrega
+válida do diagnóstico, sem vínculo artificial ou publicação. Nove rascunhos
+não equivalem a nove novas questões publicadas.
+
+A linha autorizada de liberação executou de 02h42m18 a 02h43m40 UTC (23h42–23h43
+BRT), sem falha. Recibos VPS: `.local/editorial/release-runs/20261013T024218Z.55mhH3`.
+Aprovou as cinco inéditas TRF-5 (audits14313/14315/14317/14319/14321), importou e
+revisou cinco vínculos e um requisito, e abriu `trf-5-juiz-federal-5-regiao` com
+70 vínculos válidos. Conferência por agente contra CPC489, Lei9.784 art.2º e
+CF5º, incluindo distratores, sem erro encontrado ou suspensão; `humanReview:false`.
+Marca de conferência: `2026-10-13T02:42:23.964712+00:00`.
+
+Relatório às 02h44m10 UTC confirmou cinco preparações: ENAM146, ENAC78,
+TC-DF72, TJ-RS81 e TRF-5 70; total447, com167 distintas publicadas no dia
+12/10 em São Paulo. O aumento diário inclui os65 rascunhos anteriores do TRF-5
+que passaram a contar com a abertura, não70 questões novas criadas pela conexão.
+Oferta pública TRF-5 HTTP200. Pagamento não homologado por esta rodada.
+
+Preflight voltou a admitir AGY, preservando TTY e cwd exato do papel.
+Autor56cefb/Guardiãocc6e9e permanecem em1min, Radar6237b5 em5min; VPS preparação
+5min/liberação10min. Radar aguarda cota Claude às00h30 BRT. Codex dos terminais
+continua sem autenticação; a troca dos dois executores não corrige essa conta.
+Não declarar execução ininterrupta ou meta1.000/dia atingida. WhatsApp aguarda
+integração identificada; Meta/Google sem orçamento/contas, sem gasto.
+
+Recibos privados Mac: `pro-auth-pilot-receipt-20261012.json`,
+`pro-auth-final-*-dispatch.txt`, `pro-auth-conference.json`,
+`pro-auth-published-owner-report.json` e notas/rotinas no diretório privado
+correspondente. Validação local: lint e tipos passaram; suíte geral1846 passou,
+290 opcionais pulados, dois testes shell excederam5s sob carga. Os nove testes
+dos dois arquivos passaram em reexecução focal com um worker e timeout20s;
+build passou. Nenhuma alteração de código/runtime nesta reconexão.
+
+A atualização final das cinco notas do canvas está preparada privadamente em
+`.local/maestri/pro-auth-final-notes.cjs`, mas não foi executada: o Mac bloqueou
+novamente o acesso nativo antes do envio do comando no Maestro. Ler este estado
+mais recente antes das notas históricas. Não forjar identidade/socket para
+atalhar esse bloqueio; preservar agentes já ocupados. Rascunhos de anúncios
+TRF-5 adicionados ao pacote privado, com limites de títulos/descrições conferidos.

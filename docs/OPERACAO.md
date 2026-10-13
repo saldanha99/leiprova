@@ -1,5 +1,19 @@
 # Operação do Edital Lei Seca
 
+**Retomada Pro em 12/10/2026, 23h44 BRT:** Autor e Guardião usam Antigravity
+Gemini 3.8 Flash High nos mesmos nós, com `--dangerously-skip-permissions`
+restaurado após confirmação específica do proprietário. Login nativo concluído
+na conta Pro; ambos responderam ao piloto e entregaram sem pedir aprovação de
+ferramentas. Duas rodadas por papel já recolhidas: nove inéditas importadas
+(cinco TRF-5 e quatro PC-MA), um mapeamento preparado e um bloqueio por corpus
+insuficiente. **TRF-5 abriu com 70 válidas; agora 5/84 preparações, 447 questões
+válidas nas ofertas e 167 distintas publicadas no dia de São Paulo.** A abertura
+inclui 65 rascunhos anteriores; reconexão não criou todas as 70 questões.
+Cinco novas aprovações conferidas contra fonte oficial armazenada, sem suspensão.
+Rotinas existentes, reservas, gates e flags preservados. WhatsApp e veiculação
+continuam aguardando integração/contas/orçamento.
+[Recibos da retomada](CONTINUACAO-PRODUCAO-2026-10-12.md#retomada-pro-e-abertura-do-trf-5).
+
 **Continuação em 12/10/2026, 21h58 BRT:** runtime `3b54e3e` publicado e saúde
 pública ok. PP-MA:24 requisitos do Monitor suspensos,60 do Inspetor preservados,
 audit14164; PC-MA: nome Oficial Investigador reconciliado e71 requisitos

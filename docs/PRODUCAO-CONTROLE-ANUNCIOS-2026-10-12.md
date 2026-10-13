@@ -7,6 +7,14 @@ Mantêm-se fontes oficiais, identidade por cargo/edição, contratos atuais,
 originalidade, piso de conteúdo e a auditoria da autorização permanente.
 Resultados prepared continuam propostas. Não usar APIs pagas como alternativa.
 
+Atualização às 23h44 BRT: **5/84 disponíveis**, com 447 questões válidas nas
+ofertas e 167 distintas publicadas no dia de São Paulo. TRF-5 abriu pela linha
+existente com 70 válidas. Autor/Guardião na conta Pro entregaram nove rascunhos;
+cinco TRF-5 já aprovados e publicados, quatro PC-MA ainda em rascunho nesta
+fotografia. Permissões restauradas por confirmação específica, sem remover
+validações editoriais. A oferta TRF-5 respondeu 200; anúncios preparados sem
+veiculação. Não há prazo comprovado para as 84. Valores anteriores são históricos.
+
 Atualização às 20h57 BRT: **4/84 disponíveis**, com 377 questões válidas nas
 ofertas abertas e 97 distintas novas publicadas hoje. TJ-RS Juiz de Direito
 Substituto abriu pela linha automática (audit 13845); oferta pública conferida
