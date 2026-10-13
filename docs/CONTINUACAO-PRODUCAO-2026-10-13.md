@@ -1,5 +1,65 @@
 # Continuação editorial em 13/10/2026
 
+## Conferência e retomada às 10h25 de São Paulo
+
+Relatório somente leitura de13h25m03 UTC: **7/84 elegíveis**, **818 válidas nas
+ofertas**, **366 novas distintas publicadas hoje**, após cinco suspensões.
+ENAM146, ENAC78, PC-MA Oficial Investigador148, PP-MA Inspetor124, TC-DF72,
+TJ-RS138 e TRF-5 112. Crescimento líquido de50 publicadas desde09h18 BRT;
+não houve oitava oferta. Rascunhos SEFAZ-AL não contam como publicação.
+
+Conferidas70 aprovações posteriores à marca anterior, até12h50m08 UTC, com
+leitura dos enunciados, gabaritos, explicações e todas as justificativas, cotejo
+com o recorte dos dispositivos vinculados e pesquisa primária nas dúvidas.
+Cinco suspensões pelo operador existente, referências
+`maestro-conferencia-20261013-1310-<audit>`, motivos explicitando conferência
+automatizada e `humanReview:false`:
+
+- 16650: consumação do roubo deslocada para posse pacífica após transporte a
+  outro município; STJ Súmula582 dispensa posse mansa e pacífica.
+- 16658: aplicação de CPP78IV ao concurso comum/militar ignora a separação
+  obrigatória de CPP79I.
+- 16823: comentário do distrator afirma vedação constitucional absoluta de
+  desapropriação sem indenização; CF243 é exceção expressa.
+- 16910: explicação aplica participação nos resultados ao caso exclusivamente
+  hidrelétrico; CF231§3 delimita participação nos resultados da lavra.
+- 16912: comentário afasta genericamente indenização de terra nua contra União,
+  sem delimitar ocupação/esbulho em1988, boa-fé e reassentamento do Tema1031 itemV.
+
+Fontes: [STJ Súmula582](https://scon.stj.jus.br/SCON/sumstj/toc.jsp?livre=sumula+e+%27582%27.num.),
+[CPP79 no Planalto](https://www.planalto.gov.br/ccivil_03/decreto-lei/del3689.htm),
+[CF231/243 no Planalto](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm)
+e [STF Tema1031](https://portal.stf.jus.br/jurisprudenciarepercussao/verAndamentoProcesso.asp?classeProcesso=RE&incidente=5109720&numeroProcesso=1017365&numeroTema=1031).
+Não retidos por inferência: CPP5 requisição judicial não equivale ao inquérito
+judicial direto; CPP310§2 cobra comando literal em caso com elementos concretos,
+sem declarar dispensa dos requisitos cautelares; ECA4§1 é redação atual após
+Lei15240/2025, não erro por antigo parágrafo único. Marca privada avançada
+somente depois da leitura para `2026-10-13T12:50:08.175693+00:00`.
+Aprovações posteriores ficam para a próxima conferência; não é revisão humana.
+
+**Guardião recuperado:** inspecionadas tela nativa esperando tarefa, ausência de
+processos de preflight/ponte ativos, pacotes sem reserva ativa e status remoto
+sem running. A trava `.dispatch-Guardião.lock` estava vazia e abandonada;
+removida apenas com `rmdir`. Não alterados lease/token/tentativas nem forçado claim.
+A rotina existente reservou trabalho às13h16m05 UTC. Recibos reais: mapping1268
+prepared13h18m05, mapping1269 prepared13h20m09, mapping1271 blocked13h22m35
+(conceitos doutrinários sem literalidade) e mapping1272 prepared13h25m09.
+O banco confirmou os respectivos estados; mapping1271 usou attempt2 pelo
+fluxo normal após expiração. A causa do abandono original não foi comprovada.
+Autor retomou claim13h18m34 e author1268 chegou prepared13h22m04 no banco;
+rascunhos continuam dependentes da linha de liberação. Sem interrupção de ocupado,
+API paga, troca de conta/modelo ou redução de aprovações nesta rodada.
+
+CP112/recibo1 segue suspenso; nova reconciliação auditada posterior é pendente.
+Não reativar recibo encerrado, v63 ou questões antigas para contar como novas.
+Oferta pública saudável e linha agendada preservada. Sem nova oferta/anúncio
+ou envio WhatsApp; selos do menu, integração, contas e orçamento seguem pendentes.
+Recibos, pacotes e telefone permanecem privados. Atualização apenas documental
+nas notas existentes, com histórico e nomes preservados. Três recibos OK e
+inspeção nativa confirmaram os prefixos atualizados sem acrescentar blocos
+repetidos. Lint, typecheck, 1.848 testes passando/292 condicionais pulados e
+build concluídos. Apenas documentação pública alterada; runtime preservado.
+
 ## Conferência e fila às 09h18 de São Paulo
 
 Relatório somente leitura de 12h18m34 UTC, após nove suspensões: **7/84

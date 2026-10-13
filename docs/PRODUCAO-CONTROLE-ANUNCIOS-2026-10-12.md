@@ -1,5 +1,15 @@
 # Produção, controle do proprietário e anúncios
 
+**Heartbeat em 13/10/2026, 10h25 BRT:** sete preparações elegíveis/818 válidas
+nas ofertas e366 novas distintas publicadas hoje, após cinco suspensões na
+conferência de70 aprovações. PP-MA124, TRF-5 112; demais ofertas preservadas.
+Guardião retomado: trava local vazia abandonada removida somente após inspeção
+de processos, tela, pacotes e reservas; três propostas prepared e uma blocked
+recolhidas com recibos. Autor também voltou a entregar rascunhos. Prepared não é
+publicação. CP suspenso/reconciliação, selos do menu, WhatsApp e contas/orçamento
+continuam pendentes. Saúde ok; gates/flags preservados.
+[Conferência e recibos](CONTINUACAO-PRODUCAO-2026-10-13.md).
+
 **Heartbeat em 13/10/2026, 09h18 BRT:** sete preparações elegíveis/768 válidas
 nas ofertas e316 novas distintas publicadas hoje. Conferidas70 novas aprovações,
 nove suspensões com evidência; TJ-RS138, PP-MA116, PC-MA Oficial Investigador148.

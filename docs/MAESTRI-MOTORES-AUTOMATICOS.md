@@ -1,5 +1,13 @@
 # Editalume — contrato dos motores automáticos
 
+**Conferência de13/10, 10h25 BRT:** justificar também os distratores com precisão.
+CPP70 aplicado a roubo precisa respeitar STJ Súmula582; CPP78IV não elimina a
+separação comum/militar de CPP79I. CF5XXIV não autoriza negar CF243 em comentários.
+CF231§3 fala de participação nos resultados da lavra; não ampliar esse recorte
+para hidrelétricas. Indenização de terras indígenas demanda distinguir as
+condições do Tema1031/STF, sem negação absoluta de terra nua pela União.
+Ver [recibos da conferência](CONTINUACAO-PRODUCAO-2026-10-13.md).
+
 **Decisão posterior de 12/10/2026 — tarefas sem teto diário:** o proprietário
 pediu “deixe sem limite de tarefas”. A fila usa `budget.limit: null`; a contagem
 de 24 horas é telemetria. Removida também a espera de um agente por pendências
