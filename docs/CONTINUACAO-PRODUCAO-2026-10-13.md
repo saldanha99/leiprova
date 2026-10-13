@@ -1,5 +1,41 @@
 # Continuação editorial em 13/10/2026
 
+## Retomada de entregas e PP-MA às 07h02 de São Paulo
+
+Relatório somente leitura de10h02m56 UTC: **6/84 preparações elegíveis**,595
+questões válidas nas ofertas,143 novas distintas publicadas no dia13. **PP-MA
+Inspetor avançou de13 para43 válidas**, permanece draft/faltam25 ao piso68.
+Os30 itens adicionais ainda não contam na métrica publicada do proprietário.
+Demais ofertas: ENAM146,ENAC78,PC-MA Oficial Investigador124,TC-DF72,TJ-RS105,
+TRF-5 70. Sem sétima preparação elegível nessa fotografia.
+
+Conferidas integralmente30 novas aprovações,15 às09h50 e15 às10h00 UTC:
+enunciado, explicação, cinco alternativas, gabarito e justificativas. Recortes
+CF1/5/37/40/144,CTN78,LIA1§§1–4/10caput/11III cotejados com o corpus oficial
+armazenado. Sem erro identificado no recorte e sem nova suspensão. Os novos
+casos LIA11 incluem beneficiamento no enunciado; não se repetiu a retenção
+anterior por ausência desse elemento no caso narrado. Não é revisão humana
+nem atestado de cobertura integral. Marca privada avançada somente ao terminar
+a leitura: `2026-10-13T10:00:08.69625+00:00`.
+
+Preflight voltou a registrar entregas efetivas do Autor às09h55/09h59 e novas
+reservas; Guardião também teve settled1/failed0 às09h53/09h56. Nenhum nó foi
+interrompido, substituído ou duplicado nesta retomada. A causa da demora anterior
+não foi comprovada; não afirmar troca de conta/permissão ou esgotamento de cota.
+Fila às10h00:47 autorias pending, um Autor running; teto diário null,348 reservas
+em24h como telemetria. Esses números não atestam autoria nova ou publicação.
+Saúde pública ok. A linha agendada10h00 concluiu os vínculos/avaliação do PP-MA
+sem abrir abaixo do piso; não foi necessário disparo duplicado.
+
+CP112/recibo1 permanece suspenso conforme o diagnóstico anterior; o monitor
+às09h47 UTC recusou a verificação do recibo encerrado. Nenhuma nova captura,
+reativação, mudança de corpus ou aplicação de reconciliação foi presumida nesta
+rodada. A pendência de caminho auditado posterior à suspensão continua separada
+do corte inicial. Sem nova oferta/campanha/envio WhatsApp ou alteração de flags;
+contas/orçamento e integração continuam pendentes. Lint, typecheck,1.848 testes
+passando/292 condicionais pulados e build concluídos nesta rodada. Apenas
+documentação pública alterada; recibos e textos das propostas continuam privados.
+
 ## Bloqueio de fonte CP identificado às 06h03 de São Paulo
 
 Relatório das 08h59m06 UTC mantém seis preparações elegíveis/595 válidas e143

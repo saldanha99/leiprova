@@ -7,6 +7,12 @@ Mantêm-se fontes oficiais, identidade por cargo/edição, contratos atuais,
 originalidade, piso de conteúdo e a auditoria da autorização permanente.
 Resultados prepared continuam propostas. Não usar APIs pagas como alternativa.
 
+Atualização em13/10 às07h02 BRT: Autor/Guardião voltaram a entregar. PP-MA
+Inspetor43 válidas/draft, faltam25;30 novas aprovações conferidas sem suspensão.
+Seguem6/84 abertas,595 válidas nas ofertas e143 novas distintas publicadas no dia;
+PP-MA ainda não entra nessa métrica. CP suspenso/reconciliação pendente, sem nova
+oferta/campanha/envio WhatsApp. [Estado auditado](CONTINUACAO-PRODUCAO-2026-10-13.md).
+
 Atualização em13/10 às06h03 BRT: produção publicada permanece6/84 e143 novas
 no dia. Identificado insumo CP suspenso desde12/10 às17h47 BRT; captura oficial
 fresca coincide com402 artigos, mas o recibo encerrado não foi reativado. A prévia

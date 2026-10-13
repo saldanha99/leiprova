@@ -1,5 +1,13 @@
 # Operação do Edital Lei Seca
 
+**Heartbeat em13/10/2026,07h02 BRT:** entregas de Autor/Guardião retomadas com
+recibos. Conferidas30 novas aprovações, sem suspensão; PP-MA Inspetor43/draft,
+faltam25 ao piso68. Seis ofertas/595 válidas e143 novas distintas publicadas hoje;
+os itens PP-MA ainda não contam em produto aberto. Saúde ok, reservas/gates/flags
+preservados. CP112/recibo1 segue suspenso; caminho de reconciliação posterior
+permanece pendente. Sem nova campanha ou WhatsApp.
+[Recibos e conferência](CONTINUACAO-PRODUCAO-2026-10-13.md).
+
 **Heartbeat em 13/10/2026, 06h03 BRT:** sem novas aprovações; seis ofertas,
 595 válidas/143 novas publicadas hoje. Recolhida uma resposta blocked do Guardião
 sem importações. Diagnóstico encontrou CP112 pending_review/recibo1 suspended,
