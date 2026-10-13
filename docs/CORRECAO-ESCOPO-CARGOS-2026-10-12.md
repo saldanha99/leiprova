@@ -79,3 +79,54 @@ fingerprint da prévia, audit14164:24 requisitos Monitor suspensos,60 Inspetor
 preservados,24 tarefas pending do Monitor superseded. O PC-MA foi recusado
 pela trava de identidade reviewed; nenhuma alteração foi gravada nessa tentativa.
 A correção da transição foi validada em13 cenários reais antes de nova publicação.
+
+## Recibo final — 21h58 BRT
+
+Runtime `3b54e3e` implantado pelo fluxo normal, sem seed. App e três workers
+saudáveis; `/api/health` respondeu200/status ok. Lint, tipos, build e1.848 testes
+gerais passaram novamente após a correção da transição;290 opcionais pulados.
+Os20 testes do recorte estão incluídos na suíte geral;13 cenários PostgreSQL
+isolados passaram separadamente, incluindo as funções reais de guarda.
+
+PC-MA aplicado, audit**14235** às00h42m17 UTC de13/10 (21h42 BRT de12/10):
+role_name Oficial Investigador de Polícia, status final reviewed,71 requisitos
+draft preservados,71 tarefas pending do contexto antigo superseded. Transição
+reviewed/pending_review/reviewed registrada; humanReview:false. Não houve
+alteração persistida na tentativa recusada anterior.
+
+Contratos novos efetivamente admitidos:
+
+| Cargo | Formato | Audit | Contrato |
+| --- | --- | --- | --- |
+| PP-MA Inspetor | MC5 | 14186 | d14bdb3893196be46b55427892097303bbd30c03f6a4fe0cc02d2bc46b1e5707 |
+| PC-MA Oficial Investigador | MC5 | 14236 | 1d9dd31a5e7fa0ed52fcf13485c7a3d19063242c4188229eef13445c598deb21 |
+
+Ambos registram owner_standing_authorization/humanReview:false. Nenhuma questão
+ou vínculo certificado nessas admissões. O formato C/E da SEFAZ-AL foi
+reconferido contra o edital retificado p.1/p.24 e bytesSHA-256
+bb92f0062d239b113ed82b6d19d09f30085991aedc46b5df4bbcd71c8cfea9ec.
+O contrato b15c2809537c243da506fad2a6233657115ef4e3914d0fea0bbd6943a70b97f2
+já estava aprovado desde o audit7414, às09h12 UTC: a aplicação idempotente
+preservou esse registro, sem nova aprovação ou produção contabilizada.
+
+`deploy/editorial-prepare-queue.sh` completou às00h52m26 UTC: fila já atualizada,
+zero enfileiramentos novos e nenhum claim/IA. Relatório somente leitura às
+00h53m28 UTC (21h53 BRT):4/84 disponíveis,377 válidas e97 novas publicadas no
+dia12/10 de São Paulo; TRF-5draft65/faltam3. Sem novas aprovações de questões
+após a marca23h56m12.101778 UTC. Marca recuperada dos117 itens já conferidos,
+sem recontá-los como produção.
+
+Backup anterior à manutenção, catálogoPG17 e cópia local conferidos:
+`/opt/leiprova-qa-owner-control-20261012/before-role-scope-maintenance.dump`,
+SHA-256 d467980d718f9f95e6260fdba51377e12ae3bfac53db4c2a11a9f37c3ad621ba.
+Imagens anteriores preservadas nas tags before-role-scope-20261012 e
+before-role-governance-20261012. Não restaurar dump sobre entregas posteriores
+para retornar código. Base sintética encerrada, fontes públicas/fixtures
+preservadas somente na área privada deQA.
+
+Recibos locais em `.local/editorial/continuation-20261012/`: scope-preview/apply,
+contract-preview/apply, role-scope-post-state.jsonl, role-scope-qa.log,
+role-scope-governance-*.log e role-scope-owner-report-final.json.
+O Mac voltou a bloquear o acesso nativo; novos despachos dependem de desbloqueio
+e autenticação/cota válida. A conta Pro preparada ainda não foi conectada.
+WhatsApp e anúncios mantêm as pendências anteriores, sem envio ou gasto.

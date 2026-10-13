@@ -1,5 +1,18 @@
 # Operação do Edital Lei Seca
 
+**Continuação em 12/10/2026, 21h58 BRT:** runtime `3b54e3e` publicado e saúde
+pública ok. PP-MA:24 requisitos do Monitor suspensos,60 do Inspetor preservados,
+audit14164; PC-MA: nome Oficial Investigador reconciliado e71 requisitos
+preservados, audit14235, com retorno à revisão dentro da mesma transação.
+Contratos MC5 novos admitidos pelos audits14186/14236, sem revisão humana.
+SEFAZ-AL C/E já tinha contrato/audit7414 e foi apenas reconferida. Seguem
+**4/84 disponíveis,377 válidas,97 novas publicadas no dia de São Paulo**;
+TRF-5draft65/faltam3. Fila atualizada pelo wrapper existente, sem novas reservas
+ou autoria nessa rodada. Codex dos terminais tem autenticação inválida e AGY
+atingiu cota sem entregar; Mac voltou a bloquear o acesso nativo. Retomada
+aguarda conexão da conta Pro ou login dos terminais, sem API paga.
+[Correção, validação e recibos](CORRECAO-ESCOPO-CARGOS-2026-10-12.md).
+
 **Heartbeat em 12/10/2026, 20h57 BRT:** TJ-RS Juiz de Direito Substituto
 aberto automaticamente, audit 13845 às 23h31 UTC. Agora **4/84 disponíveis**:
 ENAM 146, ENAC 78, TC-DF 72 e TJ-RS 81, total 377. Produção diária distinta

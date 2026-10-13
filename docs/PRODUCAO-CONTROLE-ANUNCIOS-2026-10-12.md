@@ -13,6 +13,16 @@ Substituto abriu pela linha automática (audit 13845); oferta pública conferida
 e anúncios adicionados ao pacote privado. TRF-5 tem 65 válidas/faltam 3 ao piso.
 Os valores anteriores abaixo são históricos. Não há prazo comprovado para84.
 
+Atualização às 21h58 BRT: dois contratos novos de autoria MC5 admitidos para
+PP-MA Inspetor e PC-MA Oficial Investigador após correção auditada de escopo e
+identidade. São insumos para autoria, não novas ofertas. SEFAZ-AL C/E foi
+reconferida, preservando o contrato já aprovado no audit7414. Relatório às
+21h53 BRT confirmou4/84,377 válidas e97 novas distintas publicadas no dia;
+TRF-5segue65/draft. Autoria dos terminais está bloqueada por autenticação/cota,
+e o Mac voltou a bloquear a coordenação nativa. Conta Pro precisa ser conectada
+pelo proprietário; não contar início de CLI, reaprovação ou preparação como
+produção. [Recibos](CORRECAO-ESCOPO-CARGOS-2026-10-12.md).
+
 ## Continuação automática
 
 Heartbeat do Codex `produ-o-edital-lei-seca`, ativo, de hora em hora, ligado a
@@ -26,7 +36,9 @@ na VPS 5 minutos e liberação 10 minutos. Proteções de agente ocupado e locks
 permanecem. Na continuação após 19h13, a CLI executada no shell do próprio nó
 Maestro reconheceu corretamente o time e preservou nós/rotinas nas trocas.
 Não transferir variáveis de identidade para outro terminal. Guardião e Autor
-agora usam Claude nesta sessão; Codex apresentou erro de autenticação.
+passaram por Claude e Antigravity nos mesmos nós; ambos atingiram cota nesta
+retomada e o Codex dos terminais segue sem autenticação. Nenhuma troca comprovou
+entrega nova após o último lote de23h56 UTC.
 Veja [a continuação comprovada](CONTINUACAO-PRODUCAO-2026-10-12.md).
 
 O diagnóstico privado encontrou 881 mapas candidatos com contrato atual e

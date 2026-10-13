@@ -231,3 +231,12 @@ mapping:881 até 01h23, além de duas reservas anteriores. Não reenviar, cancel
 ou duplicar. Inatividade entre disparos não comprova limite diário.
 Input privado do contrato PP-MA preparado com identidade atual e marcado
 `not-ready`; aplicação continua proibida até a correção auditada de escopo.
+
+## Retomada do proprietário — 21h58 BRT
+
+Publicado3b54e3e, corrigidos PP-MA/PC-MA pelos audits14164/14235 e admitidos
+seus contratos pelos audits14186/14236, humanReview:false. A SEFAZ-AL já tinha
+contrato válido/audit7414; reconferência não é admissão nova. Permanecem4/84,
+377 válidas e97 distintas novas publicadas no dia; TRF-5draft65. Codex CLI
+sem autenticação, Antigravity esgotado sem entrega nova e Mac novamente
+bloqueado. [Recibos e continuidade](CORRECAO-ESCOPO-CARGOS-2026-10-12.md).
