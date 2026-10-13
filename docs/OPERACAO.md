@@ -1,5 +1,14 @@
 # Operação do Edital Lei Seca
 
+**Heartbeat em 13/10/2026, 13h24 BRT:** permanecem **8/84 abertas**, **896
+válidas nas ofertas** e **444 novas distintas publicadas no dia**. MPMT chegou
+a **55 válidas/draft**, faltam13 ao piso68; PGE-AC **15/draft**, faltam53.
+Conferidas50 novas aprovações; três itens LIA retidos com recibos por ignorar
+julgamento do STF. Linha das16h20 UTC concluída, Autor/Guardião com novas
+entregas e reservas preservadas. Não há nona abertura comprovada. CP/Prism,
+menu, WhatsApp e contas/orçamento seguem pendentes.
+[Conferência e recibos](CONTINUACAO-PRODUCAO-2026-10-13.md).
+
 **Heartbeat em 13/10/2026, 12h18 BRT:** produção publicada permanece **8/84
 preparações**, **896 válidas nas ofertas** e **444 novas distintas no dia**.
 MPMT entrou em autoria após a prioridade corrigida: **23 válidas/draft**, faltam

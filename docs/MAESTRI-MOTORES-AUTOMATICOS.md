@@ -1,5 +1,13 @@
 # Editalume — contrato dos motores automáticos
 
+**Conferência em13/10,13h24 BRT:** LIA12§1 não restringe a perda da função a
+vínculo original/art9: observar o poder-dever e a exceção conforme o julgamento
+STF/ADI7156 de24.6.2026. LIA17B§3 foi declarado inconstitucional; não ensinar
+como exigência atual a oitiva do Tribunal de Contas em90dias, inclusive em
+comentário de distrator. Sem contexto oficial suficiente no pacote, bloquear
+esse recorte ou usar outro sustentado pelo requisito. Esta orientação não
+altera corpus, hashes ou reservas. [Conferência e fonte primária](CONTINUACAO-PRODUCAO-2026-10-13.md).
+
 **Conferência de13/10,12h18 BRT:** CF227§3I não autoriza idade geral de14anos
 para trabalhar: preservar a regra16/ exceção aprendiz14 deCF7XXXIII. ECA201VIa
 em casos concretos exige distinguir testemunha de investigado e observar a

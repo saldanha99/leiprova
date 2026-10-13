@@ -1,5 +1,56 @@
 # Continuação editorial em 13/10/2026
 
+## MPMT55 e PGE-AC15 — conferência às13h24 BRT
+
+Relatório read-only de16h24m07 UTC: **8/84 abertas**, **896 válidas nas ofertas**,
+**444 novas distintas publicadas no dia**. MPMT55/draft/faltam13 ao piso68;
+PGE-AC15/draft/faltam53. Quantidade em draft não entra na métrica diária publicada.
+Não há nona abertura comprovada, cobertura integral ou novo prazo para as84.
+
+Conferidas50 aprovações desde15h10 até16h20 UTC: leitura dos enunciados,
+explicações, opções, gabaritos e justificativas com cotejo dos recortes pertinentes.
+Três suspensões pelo operador existente, referências
+`maestro-conferencia-20261013-1612-<audit>`, humanReview:false:
+
+- audit17733: gabarito veda extensão da perda de função em art10 e limita a art9.
+ O julgamento afastou essa limitação e atribuiu poder-dever à extensão,
+ ressalvadas circunstâncias excepcionais.
+- audit17737: gabarito exige oitiva do Tribunal de Contas em90dias por LIA17B§3,
+ dispositivo declarado inconstitucional.
+- audit17731: comentário C ainda atribui ao mesmo §3 o papel normativo do
+ Tribunal de Contas. Retenção pelo comentário desatualizado; requisitos do §1
+ e homologação judicial não foram invalidados nesta conferência.
+
+Fonte primária: [STF, ADI7156, decisão de24.6.2026](https://portal.stf.jus.br/processos/detalhe.asp?incidente=6396615).
+Acesso direto retornou403; usado conteúdo indexado da página oficial, sem
+contornar bloqueio. Não confundir o julgamento com a cautelar antiga de2022.
+Dez itens posteriores mantidos sem erro identificado no recorte conferido:
+CF14/5§3/170/173 e LC64art1Ic; prazo atualizado cotejado com
+[TSE, LC219/2025](https://www.tse.jus.br/legislacao/compilada/lei/complementar/lei-complementar-no-219-de-29-de-setembro-de-2025).
+[AIME/TSE](https://www.tse.jus.br/comunicacao/noticias/2024/Dezembro/conheca-as-diferencas-entre-aime-e-aije-na-justica-eleitoral)
+confirma legitimidade do MP e segredo da tramitação, com julgamento público.
+Nenhum item afirma segredo do julgamento. Marca privada avançada somente após
+leitura/recibos para `2026-10-13T16:20:16.630866+00:00`.
+
+Recibos privados `heartbeat-1612-approved*.jsonl`, `heartbeat-1612-suspend-results.jsonl`
+e `heartbeat-1612-stf-evidence.json`. Três recibos applied confirmados.
+Duas tentativas de relatório falharam por não configurar DATABASE_URL no serviço
+que recebe MIGRATION_DATABASE_URL. Correção só no ambiente do processo, sem
+imprimir/copiar segredo; terceira tentativa read-only concluiu normalmente.
+
+Linha regular das16h20 concluiu às16h22m38 UTC. Autor/Guardião registraram novas
+entregas e claimed às16h22, sem reinício/interrupção/duplicação de reservas.
+Health público ok. Não foi necessário repetir manualmente a linha nesta rodada.
+
+Prism segue consulta read-only de diagnóstico CP112 com aprovação pontual pendente;
+relatório final privado ausente. Janela nativa observável, mas tentativas de
+ativação não produziram coordenação/arquivo de saída verificáveis. Não presumir
+aprovação, edição de notas ou reconciliação. Canvas mostrou cota esgotada no Vetor;
+Autor/Guardião continuam entregando, sem extrapolar assinatura ou trocar conta.
+Documentação atualizada não comprova contexto atualizado de nó ocupado.
+Menu/checkout, WhatsApp e contas/orçamento continuam pendentes, sem veiculação,
+novo envio, flags comerciais, schema ou código alterados.
+
 ## MPMT em autoria e conferência — 12h18 BRT
 
 Relatório read-only de15h18m35 UTC confirma8/84 abertas,896 válidas nas ofertas
