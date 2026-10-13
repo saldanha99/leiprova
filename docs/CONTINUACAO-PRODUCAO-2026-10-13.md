@@ -1,5 +1,65 @@
 # Continuação editorial em 13/10/2026
 
+## Abertura PC-MA e conferência às 03h07 de São Paulo
+
+Relatório de 06h07m18 UTC: **6/84 preparações editorialmente elegíveis**, com
+547 questões válidas nas ofertas e **95 novas distintas publicadas no dia 13**.
+PC-MA Oficial Investigador abriu automaticamente pela linha existente e tem
+76 válidas após as suspensões abaixo. ENAM 146, ENAC 78, TC-DF 72, TJ-RS 105,
+TRF-5 70. Os valores da seção de 02h25 são históricos. A primeira fotografia
+às 05h56 UTC tinha PC-MA 70/total 541/89 novas; o relatório posterior inclui
+mais dez aprovações e exclui quatro suspensas, sem recontar reaprovações.
+
+Conferidas integralmente **40 novas aprovações**: 30 às 05h40/05h50 UTC e dez
+às 06h00 UTC, incluindo alternativas, gabarito, explicações e justificativas.
+Quatro suspensões pelo operador auditado existente, sem revisão humana:
+
+- Audit 14870: justificativa generaliza a proteção por divergência interpretativa
+  da LIA art. 1º §8º, sem os parâmetros fixados pelo STF.
+- Audit 14888: resposta ensina a restrição da perda da função pública ao vínculo
+  de mesma qualidade/natureza e extensão excepcional por enriquecimento ilícito,
+  omitindo o julgamento da LIA art. 12 §1º.
+- Audits 14876/14880: aplicação direta do art. 116 da Lei 8.112/1990 ao Oficial
+  Investigador estadual, sem delimitar hipótese federal ou comparação. Suspensão
+  conservadora por ambiguidade do regime; não invalida o estudo abstrato da lei
+  federal expressamente indicado no programa.
+
+Fontes primárias: [parâmetros de divergência interpretativa](https://noticias.stf.jus.br/postsnoticias/stf-avanca-em-discussao-sobre-mudancas-na-lei-de-improbidade-administrativa/),
+[perda de função pública](https://noticias.stf.jus.br/postsnoticias/stf-invalida-novos-dispositivos-da-reforma-da-lei-de-improbidade/)
+e [conclusão das ADIs 7156/7236 em 01/07/2026](https://noticias.stf.jus.br/postsnoticias/stf-invalida-reducao-de-prazo-de-prescricao-prevista-na-reforma-da-lei-de-improbidade-administrativa/).
+Não tratar a cautelar de 2022 como único estado judicial vigente.
+Referências de suspensão `maestro-conferencia-20261013-0555-lia` e
+`maestro-conferencia-20261013-0555-escopo`; recibos applied com os quatro UUIDs
+na pasta privada de continuação. Marca avançada somente após a conferência:
+`2026-10-13T06:00:09.103578+00:00`. Demais itens não tiveram erro identificado
+no recorte conferido; isso não atesta cobertura integral do edital.
+
+Página PC-MA HTTP 200 após as suspensões, com “Conteúdo liberado”, escopo inicial,
+planos e CTA. Checkout/pagamento não homologados nesta rodada. O selo do menu
+continuou “Em preparação”, divergência de atualização a reconferir antes da
+veiculação. Textos Meta/Google preparados privadamente para a oferta verificada:
+duas variações Meta, dez títulos e quatro descrições Google com limites de
+caracteres conferidos, UTMs e palavras-chave. ZIP privado ampliado com os textos
+PC-MA e TRF-5, integridade conferida. Sem campanha criada ou gasto.
+WhatsApp continua sem integração identificada; contas e orçamento de anúncios
+continuam pendentes. Não há prazo comprovado para 84 ou capacidade de 1.000/dia.
+
+**Pendência de contexto para autoria:** acrescentar as interpretações judiciais
+LIA art. 1º §8º e art. 12 §1º aos recortes CPP já registrados, e delimitar regime
+federal nas hipóteses de servidor estadual. Nenhum pacote reservado, hash de
+contexto ou conteúdo de fonte foi alterado para simular a correção. Manter
+conferência e suspensão de recorrências pelo fluxo existente. A equipe continua
+entregando nos mesmos nós; Mac bloqueado impede coordenação nativa nesta rodada.
+Linha agendada terminou às 05h51 UTC sem falha. Não houve deploy de código,
+migração, nova reserva, alteração comercial ou API paga nesta rodada.
+
+Bloqueios restantes no relatório (sobrepostos, não somar): 78 produtos abaixo
+do piso, 67 sem edital/programa revisados, 71 sem prova anterior aprovada ou
+dispensa, três fora do catálogo por fase/data. Isso impede calcular prazo para
+as 84 apenas pela velocidade de autoria. Validação local desta rodada: lint,
+typecheck, 1.848 testes passando/292 condicionais pulados e build concluído.
+Apenas documentação pública mudou; recibos, relatórios e anúncios seguem privados.
+
 ## Estado às02h25 de São Paulo
 
 Relatório somente leitura às05h25m29 UTC: **5/84 preparações abertas**,471

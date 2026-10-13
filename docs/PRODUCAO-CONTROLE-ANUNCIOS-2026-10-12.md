@@ -7,6 +7,14 @@ Mantêm-se fontes oficiais, identidade por cargo/edição, contratos atuais,
 originalidade, piso de conteúdo e a auditoria da autorização permanente.
 Resultados prepared continuam propostas. Não usar APIs pagas como alternativa.
 
+Atualização em 13/10 às 03h07 BRT: **6/84 elegíveis**, 547 válidas nas ofertas
+e 95 novas distintas publicadas hoje. PC-MA Oficial Investigador abriu pela
+linha e ficou com 76 válidas após quatro suspensões. Conferidas 40 novas
+aprovações; página PC-MA 200/“Conteúdo liberado”, menu ainda desatualizado.
+Textos Meta/Google da nova oferta preparados, sem campanha ou gasto. Contexto
+judicial para autoria continua pendente. WhatsApp, contas e orçamento sem
+mudança. [Estado auditado](CONTINUACAO-PRODUCAO-2026-10-13.md).
+
 Atualização em13/10 às02h25 BRT: **5/84 abertas**,471 válidas nas ofertas e19
 novas publicadas hoje. PC-MA Oficial Investigador avançou para40 válidas, ainda
 draft/faltam28. Corrigida retenção do Autor após recusa por originalidade e

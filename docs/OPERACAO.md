@@ -1,5 +1,16 @@
 # Operação do Edital Lei Seca
 
+**Heartbeat em 13/10/2026, 03h07 BRT:** PC-MA Oficial Investigador aberto
+automaticamente; 76 válidas após quatro suspensões auditadas. Agora **6/84
+preparações elegíveis**, 547 válidas nas ofertas e 95 novas distintas publicadas
+no dia de São Paulo. Conferidas 40 aprovações; duas suspensas por contexto
+judicial LIA e duas por ambiguidade de aplicação federal ao cargo estadual.
+Oferta pública PC-MA 200/“Conteúdo liberado”; selo do menu ainda desatualizado,
+checkout não homologado. Textos Meta/Google preparados sem veiculação. Contexto
+judicial para autoria permanece pendente; nenhum pacote reservado alterado.
+Runtime 3b6f2163 e gates/flags preservados. WhatsApp aguarda integração;
+anúncios aguardam contas e orçamento. [Recibos e pendências](CONTINUACAO-PRODUCAO-2026-10-13.md).
+
 **Heartbeat em13/10/2026,02h25 BRT:** runtime `3b6f2163` publicado. Lotes
 recusados por originalidade agora encerram a reserva com recibo blocked e zero
 importações, sem rascunhos parciais; dois casos reais já recolhidos sem falha.
