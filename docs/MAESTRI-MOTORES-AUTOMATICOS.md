@@ -1,5 +1,14 @@
 # Editalume — contrato dos motores automáticos
 
+**Conferência em13/10,18h11 BRT:** comentários de distratores também precisam
+de precisão. Lei14.133: concurso licitatório não é seleção de servidores; art80
+não dispensa automaticamente todo documento validado; art79 inclui comércio
+eletrônico/Sicx (Lei15.266/2025), delimitar recorte quando só usar I-III; moeda
+real admite exceção art12II/art52. Art92: índices quando não há nem dedicação
+exclusiva nem predominância de mão de obra; qualquer dessas características
+aponta para repactuação. Gabaritos literais não dispensam comentários corretos.
+Fonte e recibos em [conferência atual](CONTINUACAO-PRODUCAO-2026-10-13.md).
+
 **Conferência em13/10,14h40 BRT:** Lei9784/1999 tem âmbito federal; caso
 estadual exige suporte da aplicação subsidiária/lacuna local (STJ,Súmula633),
 sem presumir incidência pelo programa. Fazenda Pública usa CPC535; CPC525§14

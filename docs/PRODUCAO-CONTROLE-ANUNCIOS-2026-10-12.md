@@ -1,5 +1,14 @@
 # Produção, controle do proprietário e anúncios
 
+**Retomada em13/10/2026,18h11 BRT:** **9/84 elegíveis**, **973 válidas nas
+ofertas**, **521 novas distintas publicadas hoje**. PGE-AC51/draft/faltam17 após
+conferir10 aprovações e reter5 itens. Autor/Guardião novamente com claims e
+settlements reais. Reserva Guardião mapping2775 recuperada do registro ativo
+exato, sem nova reserva ou escrita no banco; trava local vazia abandonada
+removida após inspeção, entrega recolhida com recibo. Linha pontual concluída
+21h09m17 UTC. CP/Prism continua pendente; flags/runtime/limites preservados,
+sem API paga. [Conferência e recibos](CONTINUACAO-PRODUCAO-2026-10-13.md).
+
 **Fechamento em13/10/2026,16h58 BRT:** relatório19h58m15 UTC confirma
 **9/84 elegíveis**, **973 válidas nas ofertas**, **521 novas distintas publicadas
 hoje**. MPMT77/elegível; PGE-AC avançou a46/draft/faltam22 ao piso. Conferência

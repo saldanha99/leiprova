@@ -1,5 +1,62 @@
 # Continuação editorial em 13/10/2026
 
+## Retomada às18h11 BRT
+
+Relatório21h11m26 UTC:9/84 elegíveis,973 válidas nas ofertas,521 novas distintas
+publicadas hoje. PGE-AC51/draft/faltam17, após10 aprovações e5 retenções com
+`mode: applied`, sem faltantes. Watermark21h07m27 UTC após leitura de todos
+os10 enunciados, opções, justificativas, gabaritos e explicações. Conferência
+automatizada,humanReview:false. A contagem diária exclui PGE enquanto inelegível.
+
+Retenções `maestro-aceleracao-20261013-<audit>`:
+
+-18250: comentário confunde concurso público de provas com modalidade
+ licitatória; distinguir seleção de servidores e trabalho técnico/científico/artístico.
+-18252: dispensa de documentos na pré-qualificação é faculdade condicionada ao
+ registro cadastral, não dispensa automática de todo documento já validado.
+-18254: explicitar recorte I-III ou incluir art79IV/comércio eletrônico/Sicx,
+ Lei15.266/2025. As três hipóteses enumeradas são válidas; o problema é o alcance
+ do enunciado/explicação, não negar o gabarito por conter hipóteses existentes.
+-18258: moeda real admite exceção art12II/art52; comentário absoluto exige correção.
+-18264: índices quando não há NEM dedicação exclusiva NEM predominância de mão
+ de obra; qualquer delas aponta para repactuação. Esta é a negação abrangente
+ pretendida pela razão de suspensão, sem alterar o recibo histórico.
+
+Fonte primária: [Planalto,Lei14.133](https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2021/lei/l14133.htm).
+Recibos privados `acceleration-approved.jsonl`, `acceleration-suspend-results.jsonl`,
+`acceleration-conference-result.json` e `acceleration-owner-final.json` em
+`.local/editorial/continuation-20261012/`. Linha pontual com flock concluída
+21h09m17 UTC; avaliações preservaram o piso e gates, sem alteração comercial.
+
+Autor entregou author2772, recusado por originalidade pelo fluxo existente;
+não contar as cinco propostas como publicadas. Author2777 foi preparado e
+recolhido com recibo; novos claims author2778 e posteriores confirmados. A
+primeira tentativa pontual de settle encontrou trava ativa e não interferiu;
+o fluxo normal recolheu as respostas. Não repetir reaprovações na meta diária.
+
+Guardião tinha trava vazia abandonada desde20h02 UTC, sem processos de ponte
+ativos; mapping2775 continuava reservado no servidor até21h32, mas seu pacote
+local dessa reserva não havia sido gravado. A inspeção cobriu árvores privada e
+de papéis, tela ociosa e consultas read-only. Recuperado o registro real exato
+(state/agent/job/payload/hash/token/prazo), validado pelo contrato, para a pasta
+do mesmo leaseToken com criação exclusiva e600. Nenhuma nova reserva, mudança
+no servidor ou conteúdo fabricado. Depois de gravar o pacote, removida apenas
+a trava vazia abandonada; o pacote ativo impediu reserva concorrente. Retomada
+única no mesmo nó, resultado prepared com três mapas de Lei14.133, recolhido
+pelo operador existente: attempted1/completed1/failed0. Novos claims/settlements
+Guardião21h08/21h10 comprovam retomada. Proposta não é aprovação de programa.
+
+Recibos privados `.local/maestri/acceleration-guardiao-recovery.json`,
+`acceleration-guardiao-settle.json`, `acceleration-resume-Guardião-dispatch.txt`.
+A primeira recuperação recusou prosseguir por indicação de processo ativo;
+nenhum arquivo ou trava alterado nessa tentativa. Inspeção independente seguida
+da execução por arquivo privado confirmou ausência de processos concorrentes.
+Prism avançou em mais duas consultas de catálogo read-only aprovadas pontualmente,
+mas ainda sem código/QA de reconciliação entregue ou restauração CP aplicada.
+Não usar contagens simplificadas de vínculos como predicado comercial válido.
+App/worker/flags, contas, quotas e caminhos de liberação preservados; sem APIs
+pagas, campanhas ativadas ou WhatsApp conectado presumidos.
+
 **Fechamento em13/10/2026,16h58 BRT:** relatório19h58m15 UTC confirma
 **9/84 elegíveis**, **973 válidas nas ofertas**, **521 novas distintas publicadas
 hoje**. MPMT77/elegível; PGE-AC avançou a46/draft/faltam22 ao piso. Conferência
