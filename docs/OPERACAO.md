@@ -1,5 +1,14 @@
 # Operação do Edital Lei Seca
 
+**Heartbeat em 13/10/2026, 08h11 BRT:** PP-MA Inspetor aberta automaticamente,
+83 válidas após a conferência; agora **7/84 elegíveis**, 697 válidas nas ofertas e
+245 novas distintas publicadas hoje. Conferidas 90 aprovações, cinco suspensões
+com evidência. Oferta PP-MA pública conferida; textos Meta/Google adicionados ao
+pacote privado, sem gasto. Menu ainda mostra “Em preparação”: sincronização é
+pendência antes da veiculação. CP suspenso/reconciliação, WhatsApp e contas/orçamento
+continuam pendentes. Reservas, gates e flags preservados.
+[Conferência e recibos](CONTINUACAO-PRODUCAO-2026-10-13.md).
+
 **Heartbeat em13/10/2026,07h02 BRT:** entregas de Autor/Guardião retomadas com
 recibos. Conferidas30 novas aprovações, sem suspensão; PP-MA Inspetor43/draft,
 faltam25 ao piso68. Seis ofertas/595 válidas e143 novas distintas publicadas hoje;

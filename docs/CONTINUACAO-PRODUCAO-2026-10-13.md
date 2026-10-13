@@ -1,5 +1,66 @@
 # Continuação editorial em 13/10/2026
 
+## PP-MA aberta e conferência às 08h11 de São Paulo
+
+Relatório somente leitura de 11h11m46 UTC, após suspensões: **7/84 preparações
+elegíveis**, **697 questões válidas nas ofertas** e **245 novas distintas
+publicadas no dia 13**. A linha automática abriu **PP-MA Inspetor de Polícia Penal**,
+que permanece elegível com **83 válidas**. A abertura tem audit15912,
+de 10h31m21 UTC (07h31 BRT), com 80 questões no momento da liberação e referência
+`owner-standing-2026-10-12:abertura-progressiva-84`. PC-MA Oficial Investigador tem 143;
+ENAM 146, ENAC 78, TC-DF 72, TJ-RS 105 e TRF-5 70. SEFAZ-AL Auditor tem
+19 válidas, ainda draft/faltam 49 ao piso; não conta como publicada.
+
+Conferidas integralmente **90 novas aprovações**: 80 entre 10h10 e 11h00 UTC,
+mais 10 às 11h10, com enunciados, explicações, alternativas, gabaritos e
+justificativas. Cotejo com os dispositivos oficiais vinculados e pesquisa
+primária nos recortes judiciais. Cinco suspensões aplicadas pelo operador existente,
+com referências `maestro-conferencia-20261013-1103-<audit>` e motivos que identificam
+conferência automatizada, `humanReview:false`:
+
+- Audit 15702: alternativa correta amplia a exceção constitucional de prisão
+  para crime militar genericamente; falta o qualificador “propriamente militar”
+  da CF art. 5º LXI.
+- Audit 15704: comentário cita LXXIII como fundamento da gratuidade de habeas
+  corpus; esse inciso trata de ação popular. Gratuidade HC/HD está no LXXVII.
+- Audit 15803: comentário refuta o reinício integral do prazo de prescrição da
+  LIA usando a redução pela metade do art. 23 §5º. O STF afastou essa redução
+  nas ADIs 7156/7236 em 01/07/2026; a justificativa compromete a unicidade da resposta.
+- Audit 16076: caso policial de porte para consumo não identifica a substância,
+  mas comentários generalizam o tratamento penal do Juizado. Necessário delimitar
+  o caso diante do Tema 506 para cannabis, sem presumir natureza penal universal.
+- Audit 16100: comentários transformam CF art. 37 §1º em proibição categórica de
+  qualquer nome/símbolo de autoridade, omitindo que caracterizem promoção pessoal.
+
+Fontes primárias: [Constituição no Planalto](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm),
+[conclusão das ADIs 7156/7236](https://noticias.stf.jus.br/postsnoticias/stf-invalida-reducao-de-prazo-de-prescricao-prevista-na-reforma-da-lei-de-improbidade-administrativa/)
+e [Tema 506 no STF](https://portal.stf.jus.br/jurisprudenciaRepercussao/verAndamentoProcesso.asp?classeProcesso=RE&incidente=4034145&numeroProcesso=635659&numeroTema=506).
+Não é revisão humana nem cobertura integral. LIA17 que apenas atribui legitimidade
+ao MP, sem afirmar exclusividade, não foi suspensa por omissão de enumeração.
+Hipótese art. 48 explicitamente enquadrada no art. 28, sem afirmação universal
+sobre substância concreta, também não foi equiparada ao caso ambíguo retido.
+Os dez itens adicionais (Lei12.850 e CF173) não tiveram erro identificado no recorte.
+Marca privada avançada após a leitura para `2026-10-13T11:10:14.302048+00:00`.
+
+Página pública PP-MA respondeu HTTP200 e mostrou “Conteúdo liberado”, planos
+mensal/anual e CTA de escolha. Checkout/pagamento não homologados nesta rodada.
+O menu ainda mostra “Em preparação” para PP-MA e PC-MA; sincronização da navegação
+é pendência antes da veiculação. Preparados privadamente dois textos Meta,
+dez títulos e quatro descrições Google para Inspetor (não Monitor); limites de
+caracteres conferidos, pacote ZIP atualizado e íntegro. Nenhuma campanha/gasto,
+envio WhatsApp ou alteração de flags. Contas/orçamento e integração seguem pendentes.
+
+Autor e Guardião seguem entregando nos nós existentes: registros settled1/failed0
+no preflight e reservas ativas no relatório. Não houve nova reserva manual,
+interrupção, troca ou duplicação. Linha agendada concluiu às11h02 UTC; a abertura
+foi automática. Teto diário null; 394 reservas em24h na primeira fotografia são
+telemetria, não questões publicadas. Saúde pública ok. CP112/recibo1 continua
+suspenso; reconciliação auditada posterior permanece pendente e não foi aplicada.
+A orientação dos recortes foi ampliada em documentação para futuras tarefas;
+efeito em entregas futuras não presumido. Recibos privados preservados.
+Lint, typecheck, 1.848 testes passando/292 condicionais pulados e build
+concluídos nesta rodada. Apenas documentação pública alterada; runtime preservado.
+
 ## Retomada de entregas e PP-MA às 07h02 de São Paulo
 
 Relatório somente leitura de10h02m56 UTC: **6/84 preparações elegíveis**,595

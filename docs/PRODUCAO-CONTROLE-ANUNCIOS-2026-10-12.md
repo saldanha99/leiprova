@@ -1,5 +1,14 @@
 # Produção, controle do proprietário e anúncios
 
+**Heartbeat em 13/10/2026, 08h11 BRT:** PP-MA Inspetor aberta automaticamente,
+83 válidas após a conferência; agora **7/84 elegíveis**, 697 válidas nas ofertas e
+245 novas distintas publicadas hoje. Conferidas 90 aprovações, cinco suspensões
+com evidência. Oferta PP-MA pública conferida; textos Meta/Google adicionados ao
+pacote privado, sem gasto. Menu ainda mostra “Em preparação”: sincronização é
+pendência antes da veiculação. CP suspenso/reconciliação, WhatsApp e contas/orçamento
+continuam pendentes. Reservas, gates e flags preservados.
+[Conferência e recibos](CONTINUACAO-PRODUCAO-2026-10-13.md).
+
 Decisão de 12/10/2026: maximizar a produção diária, buscando 1.000 questões
 válidas publicadas/dia, e abrir progressivamente as preparações elegíveis.
 1.000 é uma meta de capacidade, não um teto, resultado comprovado ou prazo.

@@ -20,7 +20,7 @@ Guardião e Autor devem consultar a conferência atual em
 `docs/CONTINUACAO-PRODUCAO-2026-10-13.md` ao trabalhar nos temas abaixo. Esta
 orientação não modifica o corpus versionado nem o hash de pacote reservado:
 
-- CPP art. 3º-B §2º/28caput e LIA art. 1º §8º/12§1º: não apresentar o literal
+- CPP art. 3º-B §2º/28caput e LIA art. 1º §8º/12§1º/23§5º: não apresentar o literal
   isolado como aplicação vigente sem a interpretação judicial pertinente.
   Se o pacote não trouxer contexto oficial suficiente para essa afirmação,
   usar `blocked` pelo contrato existente ou trabalhar somente em outro recorte
@@ -42,6 +42,15 @@ orientação não modifica o corpus versionado nem o hash de pacote reservado:
 - Lei 9.605 arts. 14/15: conferir o conteúdo e número de cada inciso citado
   também nas justificativas de distratores. Não inserir primariedade no rol
   textual do art. 14 nem trocar comunicação prévia com reparação espontânea.
+
+- CF arts. 5º/37: preservar qualificadores materiais também nas alternativas e
+  comentários; crime “propriamente militar” não equivale a qualquer crime militar,
+  e publicidade com nomes/símbolos exige o recorte da promoção pessoal. Conferir
+  cada inciso citado: LXXIII é ação popular, LXXVII é gratuidade de HC/HD.
+- Lei 11.343 art. 48 em casos concretos: delimitar a substância e considerar o
+  Tema 506 quando houver cannabis. Não generalizar natureza penal para todo porte
+  destinado ao uso pessoal. Sem contexto oficial suficiente no pacote, bloquear
+  esse recorte ou trabalhar somente em hipótese efetivamente sustentada.
 
 As retenções e fontes primárias estão na conferência citada. Gabarito certo não
 compensa justificativa incorreta. As propostas continuam rascunhos e seguem a
