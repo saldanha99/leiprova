@@ -1,5 +1,15 @@
 # Operação do Edital Lei Seca
 
+**Heartbeat em13/10/2026,02h25 BRT:** runtime `3b6f2163` publicado. Lotes
+recusados por originalidade agora encerram a reserva com recibo blocked e zero
+importações, sem rascunhos parciais; dois casos reais já recolhidos sem falha.
+Importador de vínculos reconstruído após ausência da imagem; linha voltou a
+executar. PC-MA Oficial Investigador40 válidas/draft/faltam28. Seguem5/84 abertas,
+471 válidas nas ofertas e19 novas publicadas no dia13. Conferidas37 aprovações,
+um item PC-MA suspenso por omitir interpretação das ADIs sobre CPP3º-B§2º.
+Backup, testes e recibos em [continuação do dia13](CONTINUACAO-PRODUCAO-2026-10-13.md).
+Gates, reservas, três tentativas e flags preservados. WhatsApp/ads sem mudança.
+
 **Heartbeat em 13/10/2026, 01h06 BRT:** cinco preparações abertas,471 questões
 válidas nas ofertas e19 novas distintas publicadas desde a meia-noite de São
 Paulo. TJ-RS105; ENAM146,ENAC78,TC-DF72,TRF-5 70. Conferidas20 novas aprovações:

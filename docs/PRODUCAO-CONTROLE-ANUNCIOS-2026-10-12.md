@@ -7,6 +7,13 @@ Mantêm-se fontes oficiais, identidade por cargo/edição, contratos atuais,
 originalidade, piso de conteúdo e a auditoria da autorização permanente.
 Resultados prepared continuam propostas. Não usar APIs pagas como alternativa.
 
+Atualização em13/10 às02h25 BRT: **5/84 abertas**,471 válidas nas ofertas e19
+novas publicadas hoje. PC-MA Oficial Investigador avançou para40 válidas, ainda
+draft/faltam28. Corrigida retenção do Autor após recusa por originalidade e
+restaurada imagem do importador; ambas as retomadas têm recibos reais. Conferidas
+37 aprovações, uma suspensão por dependência judicial omitida. Sem nova oferta,
+veiculação ou WhatsApp. [Estado e pendências](CONTINUACAO-PRODUCAO-2026-10-13.md).
+
 Atualização em13/10 às01h06 BRT: **5/84 disponíveis**,471 válidas e19 novas
 publicadas no dia13 em São Paulo. TJ-RS105 após suspensão de um item com
 explicação imprecisa; lote de20 conferido. Autor retomou reservas depois de
