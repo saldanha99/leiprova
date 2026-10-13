@@ -1,5 +1,54 @@
 # Continuação editorial em 13/10/2026
 
+## MPMT em autoria e conferência — 12h18 BRT
+
+Relatório read-only de15h18m35 UTC confirma8/84 abertas,896 válidas nas ofertas
+e444 novas distintas publicadas no dia. MPMT passou de zero a25 vínculos válidos,
+ficando com **23/draft** após duas retenções; faltam45 ao piso68. Os itens deste
+produto não entram na contagem diária de publicações em ofertas abertas.
+PGE-AC continua zero. Não há nona abertura comprovada nem promessa de prazo.
+
+Conferidas25 aprovações desde14h10m08 até15h10m08 UTC: enunciados, explicações,
+gabaritos, todas as alternativas e justificativas, com cotejo dos recortes.
+Quinze itens iniciais mantidos; dez posteriores tiveram duas retenções pelo
+operador existente, referências `maestro-conferencia-20261013-1507-<audit>`:
+
+- audit17485: comentário C fixa idade mínima geral de trabalho em14anos,
+ sem condição de aprendiz. [CF7XXXIII](https://www4.planalto.gov.br/legislacao/portal-legis/legislacao-1/constituicao)
+ exige16como regra e14apenas para aprendiz; CF227§3I remete ao dispositivo.
+- audit17475: dúvida de aplicação do ECA201VIa ao dirigente investigado por
+ desvio de verbas, convocado para depoimento pessoal, sem delimitar testemunha
+ ou garantia contra autoincriminação. Retenção não declara ECA201 não recepcionado
+ nem vedação universal de condução no inquérito civil. [ADPF395/444](https://noticias.stf.jus.br/postsnoticias/plenario-declara-a-impossibilidade-da-conducao-coercitiva-de-reu-ou-investigado-para-interrogatorio/)
+ e [Res87/CSMPF](https://www.mpf.mp.br/o-mpf/orgaos-superiores/conselho-superior/resolucoes/resolucoes-consolidadas/consolidada-resolucao-ndeg-87-inquerito-civil-publico-249.pdf)
+ fundamentam delimitar o papel e contexto antes de nova liberação.
+
+CF24§4 mantém suspensão no que contrário, sem revogação integral. Lei9504art73§5
+cobra sujeição à cassação, não cassação automática; [TSE](https://www.tse.jus.br/legislacao/codigo-eleitoral/lei-das-eleicoes/lei-das-eleicoes-lei-nb0-9.504-de-30-de-setembro-de-1997).
+CF227§6 foi mantido por proibir discriminação de filiação, sem afirmar que todo
+testamento deve distribuir cotas idênticas da parte disponível.
+Marca privada avançada somente após a leitura dos25 para
+`2026-10-13T15:10:08.537638+00:00`; conferência automatizada/humanReview:false.
+
+Recibos privados em `heartbeat-1507-approved*.jsonl` e `heartbeat-1507-suspend*`.
+Primeiro comando Docker leu o restante do stdin do script SSH, deixando a segunda
+suspensão sem execução; constatado por ausência do recibo, corrigido com
+redirecionamento `/dev/null` e aplicado somente o segundo item, com recibo real.
+Não contar tentativa como suspensão.
+
+Linha pontual de15h12m11 a15h13m19 UTC concluiu avaliação, sem eliminar bloqueios;
+relatório privado em `heartbeat-1507-release-chain.log`. Execução serializada
+existente preservada. Autor/Guardião continuam com eventos claimed/settled reais,
+sem reinício, claims manuais ou novos nós. Health público ok.
+
+Prism continua diagnóstico do CP112; leituras SSH pontuais autorizadas, sem
+ampliar permissões ou presumir reconciliação. Entrada da janela nativa voltou
+a funcionar após Raise da janela Maestri; tentativas anteriores de coordenação
+sem arquivos de saída não são recibos. Relatório final ainda ausente na inspeção.
+Menu/checkout continuam pendentes antes de veicular anúncios; nenhuma campanha
+ou gasto novo. WhatsApp aguarda integração existente identificada pelo proprietário.
+Sem alteração de código, schema, feature flags ou dados de outros projetos.
+
 ## SEFAZ-AL aberta e mapas que alimentam autoria — 11h21 BRT
 
 Relatório somente leitura de14h21m39 UTC: **8/84 elegíveis**, **896 válidas nas

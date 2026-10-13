@@ -1,5 +1,13 @@
 # Operação do Edital Lei Seca
 
+**Heartbeat em 13/10/2026, 12h18 BRT:** produção publicada permanece **8/84
+preparações**, **896 válidas nas ofertas** e **444 novas distintas no dia**.
+MPMT entrou em autoria após a prioridade corrigida: **23 válidas/draft**, faltam
+45 ao piso, depois de duas retenções na conferência de25 novas aprovações.
+Não contar esses itens como publicados em oferta aberta. Linha pontual concluída
+com recibo; gates/flags preservados. CP/Prism, menu, WhatsApp e contas/orçamento
+seguem pendentes. [Conferência e recibos](CONTINUACAO-PRODUCAO-2026-10-13.md).
+
 **Heartbeat em13/10/2026,11h21 BRT:** SEFAZ-AL Auditor Fiscal aberta pela
 linha automática e elegível com78 questões após uma suspensão. São **8/84
 preparações**, **896 válidas nas ofertas** e **444 novas distintas publicadas

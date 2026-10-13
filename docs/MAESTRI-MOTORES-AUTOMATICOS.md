@@ -1,5 +1,12 @@
 # Editalume — contrato dos motores automáticos
 
+**Conferência de13/10,12h18 BRT:** CF227§3I não autoriza idade geral de14anos
+para trabalhar: preservar a regra16/ exceção aprendiz14 deCF7XXXIII. ECA201VIa
+em casos concretos exige distinguir testemunha de investigado e observar a
+proteção contra autoincriminação; não generalizar condução coercitiva do dirigente
+investigado por desvio de verbas. Retenções não alteram a norma versionada nem
+os pacotes reservados. [Conferência](CONTINUACAO-PRODUCAO-2026-10-13.md).
+
 **Fila em13/10, após11h BRT:** prontidão autoral (contrato atual e disciplina
 conhecida) passa a preceder a faixa de produto na ordenação de mapeamentos.
 Não elimina tarefas sem contrato, não muda hashes/reservas nem os gates;
