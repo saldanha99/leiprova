@@ -1,5 +1,16 @@
 # Produção, controle do proprietário e anúncios
 
+**Heartbeat em 13/10/2026, 20h24 BRT:** **10/84 elegíveis**, **1.075 válidas
+nas ofertas** e **623 novas distintas publicadas hoje**, após conferir 60 novas
+aprovações e suspender sete com recibos. PGE-AC97/elegível; PC-MA Delegado47/
+inelegível/faltam21 ao piso. Conferência até22h50m16.768135 UTC; posteriores
+aguardam o próximo ciclo. Guardião corrigiu a resposta de mapping1516 na mesma
+reserva; validação e recolhimento reais às23h27 UTC, seguidos de nova reserva.
+Não houve reinício do contador nem nova tentativa do conteúdo rejeitado.
+CP/Prism, menu, checkout, WhatsApp e contas/orçamento de anúncios continuam
+pendentes. Saúde app/banco/pooler ok; sem API paga, runtime ou flags alterados.
+[Conferência e recibos](CONTINUACAO-PRODUCAO-2026-10-13.md).
+
 **Heartbeat em 13/10/2026, 19h19 BRT:** PGE-AC liberada automaticamente e
 elegível com **88 válidas**, após três retenções na conferência de60 aprovações.
 São **10/84 elegíveis**, **1.066 válidas nas ofertas** e **614 novas distintas

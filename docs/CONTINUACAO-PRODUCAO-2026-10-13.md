@@ -1,5 +1,74 @@
 # Continuação editorial em 13/10/2026
 
+## Heartbeat 13/10, 20h24 BRT — conferência e recuperação da fila
+
+Relatório23h24m09 UTC: **10/84 elegíveis**, **1.075 válidas nas ofertas** e
+**623 novas distintas publicadas hoje em São Paulo**. PGE-AC97/elegível;
+PC-MA Delegado47/inelegível/faltam21 ao piso68. Abertura progressiva não
+significa cobertura integral; não contar rascunhos ou reaprovações como produção.
+
+Conferidas60 novas aprovações até22h50m16.768135 UTC: enunciados, opções,
+gabaritos, explicações e corpus. Sete suspensões pelo operador existente, todas
+com recibo `mode:applied` e nenhuma ausente, mantendo `humanReview:false`:
+
+- Audit18703: Lei11.101, art161§2 protege créditos não sujeitos ao plano;
+  art163 permite vincular não signatários abrangidos. Não confundir os grupos.
+- Audit18765: CPC300§1 admite dispensar caução se hipossuficiente não puder
+  prestá-la; comentário transforma a faculdade literal em dever automático.
+- Audit18820: explicação do CF5XXXIII generaliza segurança estatal/social
+  como único sigilo, ignorando intimidade/privacidade e dados pessoais.
+- Audit18822: comentário de CF37XIX generaliza registro civil a toda fundação
+  pública, sem distinguir regime público/autárquico do privado.
+- Audit18826: falta unicidade no caso CF61IIe: distrator sobre regime de
+  servidores e PPA também remete à iniciativa do Executivo; delimitar o recorte.
+- Audit18887: caso LIA17§20 ensina defesa obrigatória pela assessoria jurídica,
+  ignorando STF/ADI7042 e7043, que afastam obrigatoriedade.
+- Audit18919: comentário LGPD50 transforma “poderão” formular regras em dever
+  universal; §3 obriga divulgação/atualização das regras efetivamente adotadas.
+
+Fontes primárias: [Lei11.101](https://www.planalto.gov.br/ccivil_03/_ato2004-2006/2005/lei/l11101.htm),
+[CPC](https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13105.htm),
+[Constituição](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm),
+[Manual federal de estruturas](https://manual-estruturas.gestao.gov.br/pt-br/latest/Organizacao/index.html),
+[STF/ADI7042](https://portal.stf.jus.br/processos/detalhe.asp?incidente=6315955)
+e [LGPD atualizada/Câmara](https://www2.camara.leg.br/legin/fed/lei/2018/lei-13709-14-agosto-2018-787077-normaatualizada-pl.html).
+O resultado oficial de busca STF foi consultado; abertura direta falhou, sem
+contorno. CF227§3I foi preservado quando a explicação remetia corretamente ao
+aprendiz/CF7XXXIII. Não suspender item só porque um distrator incorreto usa
+nome anterior da ANPD. Gabaritos literais não sanam comentários incorretos.
+
+Recibos privados em `.local/editorial/continuation-20261012/`:
+`heartbeat-2313-approved.jsonl`, `heartbeat-2313-holds.json`,
+`heartbeat-2313-suspension-results.jsonl`, `heartbeat-2313-conference-result.json`
+e `heartbeat-2313-owner-final.json`. Watermark avançado só após leitura e sete
+recibos; aprovações posteriores aguardam conferência.
+
+Guardião estava ocioso com mapping1516 ainda reservado: três tentativas do
+mesmo digest falharam porque o fundamento inseria reticências fora do corpus.
+Consulta read-only confirmou lease válido até00h03 UTC. Correção enviada uma
+vez ao mesmo nó, na mesma reserva; citações contíguas e identidade real do
+modelo corrigidas. Nova resposta recebeu validação e recibo `prepared` às23h27;
+digest diferente, uma tentativa normal, sem apagar marcador ou alterar lease.
+Nova reserva às23h27m07 UTC confirma fluxo retomado. Prepared não é aprovação.
+Recibos privados em `.local/maestri/heartbeat-2313-correct-guardiao-*`, pacote
+real preservado em `.maestri/roles/` e status final da ponte em
+`heartbeat-2313-bridge-status-final.json`.
+
+App, banco e pooler saudáveis; linha automática concluiu23h21m20 UTC. As três
+notas PROJECT-CONTEXT/EDITORIAL-QUEUE/QUALITY-GATES foram atualizadas com três
+recibos OK, preservando histórico. CP/Prism permanece no preview pendente;
+consulta de27 linhas inspecionada integralmente e liberada uma vez, somente
+leitura, sem autorização persistente ou restauração de conteúdo. Menu/checkout,
+WhatsApp e contas/orçamento de anúncios seguem pendentes. Nenhuma chamada
+paga, alteração de runtime ou flags nesta rodada; documentação operacional
+atualizada para orientar a equipe.
+
+QA desta rodada documental: lint/typecheck/build passaram. Suíte padrão:
+1.856 passaram/293 condicionais ignorados; os mesmos três testes dos wrappers
+CP/monitor excederam5s. Não declarar suíte padrão verde nem alterar timeout/gates;
+repetição isolada da rodada anterior já passou nove testes com30s/um worker.
+Recibos privados `heartbeat-2313-tests.log` e `heartbeat-2313-build.log`.
+
 ## Heartbeat 13/10, 19h19 BRT — décima preparação
 
 Relatório22h19m05 UTC: **10/84 elegíveis**, **1.066 válidas nas ofertas** e

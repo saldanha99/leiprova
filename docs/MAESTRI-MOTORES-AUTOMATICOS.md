@@ -1,5 +1,16 @@
 # Editalume — contrato dos motores automáticos
 
+**Conferência em13/10,20h24 BRT:** comentários também passam pelos gates.
+Lei11.101 distingue não signatários de créditos não sujeitos; CPC300§1 não
+transforma dispensa de caução em dever automático; CF5XXXIII não esgota sigilo
+pessoal; fundações públicas têm regimes distintos. As opções devem resolver
+unicidade também em iniciativa legislativa. LIA17§20: STF afastou defesa
+obrigatória. LGPD50 usa faculdade de formular regras, com divulgação/atualização
+obrigatórias quando adotadas. Fundamentos da ponte devem ser recortes contíguos
+reais do corpus, sem inserir reticências. Resposta corrigida na mesma reserva
+pode seguir o fluxo normal; nunca apagar contador para repetir digest rejeitado.
+[Conferência e fontes](CONTINUACAO-PRODUCAO-2026-10-13.md).
+
 **Conferência em13/10,19h19 BRT:** LIA1§3 afasta responsabilidade pelo mero
 exercício funcional **sem comprovação de ato doloso com fim ilícito**; preservar
 a condição também nos comentários. LIA1§8 exige os parâmetros STF já registrados.
