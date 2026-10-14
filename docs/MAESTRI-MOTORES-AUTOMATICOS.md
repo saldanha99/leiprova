@@ -1,5 +1,14 @@
 # Editalume — contrato dos motores automáticos
 
+**Conferência em13/10,22h25 BRT:** LIA17 não dá exclusividade ao MP após
+ADI7042/7043. CPC525§14/535§7 invalidados na AR2876QO: inexigibilidade pode
+usar decisão STF anterior ou posterior, salvo preclusão, com modulação própria.
+Inalistável não significa apenas não alistado. CF38III é exceção adicional de
+acumulação; CF71§2 prevê atuação TCU após90dias, sustação não é desconstituição.
+Gabarito de recorte literal não sana comentário geral incorreto ou decisão
+invalidada apresentada como regra atual.
+[Conferência e fontes](CONTINUACAO-PRODUCAO-2026-10-13.md).
+
 **Conferência em13/10,21h18 BRT:** casos concretos LIA10 exigem dolo e dano
 efetivo/comprovado, também em incisosII/XV; não presumir pela irregularidade
 formal. CF149A/EC132 amplia contribuição municipal à expansão/melhoria de

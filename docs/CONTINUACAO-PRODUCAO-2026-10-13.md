@@ -1,5 +1,61 @@
 # Continuação editorial em 13/10/2026
 
+## Heartbeat13/10,22h25 BRT — ampliação e conferência
+
+Relatório14/10 01h25m12 UTC, calendário13/10 São Paulo: **11/84 elegíveis**,
+**1.198 válidas nas ofertas**, **746 novas distintas publicadas hoje**. PC-MA
+Delegado123/released/elegível; demais dez ofertas preservadas. Fonte atual é
+o relatório final, após suspensões e o ciclo que importou novos vínculos.
+
+Conferidas55 aprovações: prompts, alternativas, gabaritos, explicações,
+comentários e correspondência normativa do corpus. Seis suspensões efetivas
+com recibos `mode:applied`, sem ausentes, pelo operador existente:
+
+-19284: comentários ensinam legitimidade exclusiva do MP na LIA17; STF/ADI7042
+ e7043 restabeleceu concorrência/disjunção com pessoas jurídicas interessadas.
+-19344: exige rescisória e nega impugnação se decisão STF posterior; AR2876QO
+ admite inexigibilidade anterior/posterior ao trânsito, salvo preclusão.
+-19350: ensina como vigente requisito temporal CPC525§14 declarado inconstitucional
+ na AR2876QO; atualizar questão/gabarito/comentários, preservando modulação.
+-19408: explicação confunde inalistáveis com pessoas ainda não alistadas; distinguir
+ incapacidade de alistar-se e falta da condição de elegibilidade alistamento.
+-19465: nega toda acumulação fora de CF37XVI, ignorando CF38III/vereador; delimitar
+ comentário ao recorte sem negar outras exceções constitucionais.
+-19477: afirma competência privativa legislativa para desconstituir contratos;
+ sustação difere de anulação e CF71§2 admite atuação TCU após inércia de90dias.
+
+Fontes primárias: [STF/ADI7042 e7043](https://portal.stf.jus.br/processos/detalhe.asp?incidente=6315955),
+[STF/AR2876QO](https://noticias.stf.jus.br/postsnoticias/limites-para-acoes-rescisorias-com-base-em-decisoes-do-stf-serao-definidos-caso-a-caso/),
+[Constituição](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm)
+e [STF,CF71](https://portal.stf.jus.br/constituicao-supremo/artigo.asp?abrirArtigo=71&abrirBase=CF).
+Resultados de busca oficiais confirmaram julgamentos; abertura direta das duas
+notícias STF falhou, sem contorno. LC64g/h conferida na compilação com LC219/2025:
+sem mudança nessas alíneas, não reter apenas por citar LC135/2010.
+Paráfrase fiel não equivale a erro só por não repetir transcrição contígua.
+
+Recibos privados `.local/editorial/continuation-20261012/heartbeat-0120-*`:
+owner inicial/final,55 aprovações, seis holds/recibos e conference-result.
+Watermark01h20m08.268162 UTC avançado somente após leitura e seis recibos;
+aprovações posteriores aguardam conferência. `humanReview:false`, nenhum corpus,
+hash, reserva ou contador adulterado para liberação.
+
+Autor/Guardião entregando e recebendo reservas normais. Radar concluiu pesquisa
+sem aprovar fonte por inferência. Prism está implementando preview CP e corrigindo
+seus testes; arquivos novos pertencem ao seu trabalho ativo, sem edição concorrente
+ou publicação pelo Maestro. Não contar preview ou arquivo untracked como correção
+aplicada. App/banco/pooler saudáveis; linha concluiu01h22m07 UTC.
+
+Sem novo anúncio de preparação, chamada paga, mudança de runtime ou flags.
+Menu/checkout, WhatsApp e contas/orçamento de anúncios seguem pendentes.
+
+QA do checkout compartilhado encontrou problemas nos arquivos novos ainda ativos
+do Prism: lint com três `no-explicit-any` no teste; build falhou por fixtures sem
+campos do contrato `CpCorrectionArticle`. O Maestro não editou nem incluiu esses
+arquivos no commit documental. Não declarar preview validado ou implantado.
+Sincronização das notas do canvas preparada privadamente, mas não confirmada
+nesta rodada: controle da janela interrompido por alteração do usuário; preservar
+notas atuais e consultar os topos documentais. Sem permissão persistente nova.
+
 ## Heartbeat13/10,21h18 BRT — PC-MA Delegado liberada
 
 Relatório00h18m33 UTC de14/10, calendário13/10 em São Paulo: **11/84 elegíveis**,

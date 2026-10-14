@@ -1,5 +1,15 @@
 # Produção, controle do proprietário e anúncios
 
+**Heartbeat em13/10/2026,22h25 BRT:** **11/84 elegíveis**, **1.198 válidas
+nas ofertas**, **746 novas distintas publicadas hoje**. PC-MA Delegado123/elegível,
+após55 aprovações conferidas e seis suspensões com recibos. Watermark01h20m08.268162
+UTC de14/10, ainda dia13 em São Paulo; posteriores aguardam próximo ciclo.
+Autor/Guardião com entregas e reservas reais; Prism implementa preview CP e QA,
+ainda sem restauração aplicada. App/banco/pooler saudáveis; linha concluiu01h22 UTC.
+Menu/checkout, WhatsApp e contas/orçamento de anúncios continuam pendentes.
+Sem API paga, runtime ou flags alterados.
+[Conferência e recibos](CONTINUACAO-PRODUCAO-2026-10-13.md).
+
 **Heartbeat em13/10/2026,21h18 BRT:** **PC-MA Delegado liberada e elegível
 com74 válidas**, após quatro retenções na conferência de40 aprovações. São
 **11/84 elegíveis**, **1.149 válidas nas ofertas** e **697 novas distintas
