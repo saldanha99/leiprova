@@ -1,5 +1,59 @@
 # Continuação editorial em 13/10/2026
 
+## Heartbeat13/10,21h18 BRT — PC-MA Delegado liberada
+
+Relatório00h18m33 UTC de14/10, calendário13/10 em São Paulo: **11/84 elegíveis**,
+**1.149 válidas nas ofertas**, **697 novas distintas publicadas hoje**. PC-MA
+Delegado74/released/elegível, após quatro suspensões. PGE-AC97 preservada.
+Página pública200 e “Conteúdo liberado”, cargo Delegado de Polícia Civil–3ªClasse,
+perfil Cebraspe, inscrições encerradas. Piso68 não é cobertura integral.
+
+Conferidas40 novas aprovações: enunciados, todas as alternativas/comentários,
+gabaritos, explicações e correspondência com o corpus. Quatro suspensões com
+recibos `mode:applied`, sem ausentes, pelo operador existente:
+
+-19008: comentário C restringe contribuição municipal ao custeio da iluminação
+ e previdência; CF149A/EC132 inclui expansão/melhoria e monitoramento para segurança
+ e preservação de logradouros. Gabarito CIDE preservado.
+-19016: caso LIA10II assume improbidade pela cessão informal dolosa; comentário A
+ refuta ausência de dano apenas pela previsão do inciso. Exigir dano efetivo e
+ comprovado, sem presunção pelo descumprimento formal.
+-19083: caso LIA10XV de rateio sem dotação não demonstra dolo nem dano efetivo;
+ explicar requisitos do caput/art1§2, sem subsunção automática da irregularidade.
+-19170: explicação e comentário D generalizam que só o Judiciário produz coisa
+ julgada material sobre litígios, ignorando sentença arbitral/Lei9307art31.
+ Delimitar contraste às decisões administrativas; inafastabilidade preservada.
+
+Fontes: [CF atualizada](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm),
+[LIA compilada](https://www.planalto.gov.br/ccivil_03/leis/l8429compilada.htm)
+e [Lei de Arbitragem](https://www.planalto.gov.br/ccivil_03/leis/l9307.htm).
+Paráfrases normativas de resposta não foram retidas só por não serem transcrições
+contíguas. Lei8112 foi conferida com seu âmbito federal; item19143 pergunta sob
+essa lei e não declara aplicação direta ao estatuto estadual, sem presumir
+identidade estadual apenas pelo cenário genérico. Contratos/gates preservados.
+
+Recibos privados `.local/editorial/continuation-20261012/heartbeat-0014-*`:
+owner inicial/final,40 aprovadas, quatro holds, quatro suspensões aplicadas,
+conference-result e HTML público. Watermark avançado após todos os recibos a
+00h10m08.286727 UTC; aprovações posteriores aguardam o próximo ciclo.
+
+Ponte com reservas novas reais para Autor, Guardião e Radar, respeitando leases,
+90min e três tentativas. Preparações ainda bloqueadas não foram forçadas.
+Textos Meta/Google privados em
+`.local/commerce/campanhas-20261012/anuncios-pcma-delegado-meta-google.md`,
+com títulos/descrições nos limites. Menu ainda “Em preparação”, checkout não
+homologado, contas/orçamento pendentes: não veicular. WhatsApp sem integração
+identificada/validada, nenhum envio. Sem API paga, runtime ou flags alterados.
+
+App/banco/pooler saudáveis; linha concluiu00h22m03 UTC. Três notas existentes
+PROJECT-CONTEXT/EDITORIAL-QUEUE/QUALITY-GATES atualizadas com três recibos OK,
+preservando histórico. Prism retomou a verificação local após liberação pontual
+de `pnpm typecheck`, sem permissão persistente e sem restauração aplicada.
+QA documental: lint/typecheck/build passaram; suíte padrão1.856 passaram,
+293 condicionais ignorados e os mesmos três timeouts de5s nos wrappers CP/monitor.
+Não declarar suíte padrão verde; nenhum código ou gate editado para contornar.
+Logs privados `heartbeat-0014-tests.log` e `heartbeat-0014-build.log`.
+
 ## Heartbeat 13/10, 20h24 BRT — conferência e recuperação da fila
 
 Relatório23h24m09 UTC: **10/84 elegíveis**, **1.075 válidas nas ofertas** e

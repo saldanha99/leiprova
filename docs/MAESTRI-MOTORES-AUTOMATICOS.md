@@ -1,5 +1,13 @@
 # Editalume — contrato dos motores automáticos
 
+**Conferência em13/10,21h18 BRT:** casos concretos LIA10 exigem dolo e dano
+efetivo/comprovado, também em incisosII/XV; não presumir pela irregularidade
+formal. CF149A/EC132 amplia contribuição municipal à expansão/melhoria de
+iluminação e monitoramento de logradouros. Jurisdição una não elimina arbitragem:
+Lei9307art31 dá à sentença arbitral os efeitos da judicial. Contrastar decisões
+administrativas sem afirmar exclusividade geral do Judiciário para coisa julgada.
+[Conferência e fontes](CONTINUACAO-PRODUCAO-2026-10-13.md).
+
 **Conferência em13/10,20h24 BRT:** comentários também passam pelos gates.
 Lei11.101 distingue não signatários de créditos não sujeitos; CPC300§1 não
 transforma dispensa de caução em dever automático; CF5XXXIII não esgota sigilo
