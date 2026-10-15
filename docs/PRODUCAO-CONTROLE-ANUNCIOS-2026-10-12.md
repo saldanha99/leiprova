@@ -1,5 +1,16 @@
 # Produção, controle do proprietário e anúncios
 
+**Operação em 15/10/2026, 13h22 BRT:** **11/84 elegíveis**, **1.799 válidas
+nas ofertas**, **108 novas distintas publicadas no dia de São Paulo**. Código
+`791e8ef` publicado após QA; migração 0055 validada em PostgreSQL descartável e
+aplicada. Preview CP real verificou 402 artigos e ENAC102→107, somente proposta:
+CP112/recibo1 continuam suspensos, sem reabilitação ou autoria nova. Preview
+MPRJ real passou, mas o cadastro foi recusado por fingerprint do HTML variável;
+nenhuma edição criada. Correção delimitada encaminhada ao Forge. Contrato MC5
+MPRJ ainda exige evidência própria de formato. Flags, limites e gates preservados;
+checkout, WhatsApp e contas/orçamento de anúncios seguem pendentes.
+[Recibos, validação e próximos passos](CONTINUACAO-PRODUCAO-2026-10-15.md).
+
 **Heartbeat em13/10/2026,22h25 BRT:** **11/84 elegíveis**, **1.198 válidas
 nas ofertas**, **746 novas distintas publicadas hoje**. PC-MA Delegado123/elegível,
 após55 aprovações conferidas e seis suspensões com recibos. Watermark01h20m08.268162
