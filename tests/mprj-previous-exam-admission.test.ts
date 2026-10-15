@@ -233,6 +233,37 @@ describe("cadastro MPRJ XXXIX/2026 por evidência final composta", () => {
     }
   });
 
+  it("canonicaliza somente as âncoras verificadas, ignorando nonce/template transitório", () => {
+    const transient = `<div class="template-status" data-nonce="rotativo-1">atualizado</div>${html}`;
+    const baselineEvidence = assertMprjOfficialAnchors(html);
+    const transientEvidence = assertMprjOfficialAnchors(
+      transient.replace('data-nonce="rotativo-1"', 'data-nonce="rotativo-2"'),
+    );
+    expect(transient).not.toBe(html);
+    expect(transientEvidence).toEqual(baselineEvidence);
+    expect(baselineEvidence).toMatchObject({
+      h1: H1_INGRESSO,
+      notice: { url: target.noticeUrl, label: "Edital do XXXIX Concurso" },
+      documents: target.documents.map((document) => ({
+        documentType: document.documentType,
+        url: document.url,
+        label: document.label,
+        publishedOn: document.publishedOn,
+      })),
+      definitiveAnswerKeyDocument: null,
+    });
+  });
+
+  it("bloqueia alteração de identidade, rótulo, documento ou data em vez de canonicalizá-la", () => {
+    const changedIdentity = html.replace(H1_INGRESSO, `${H1_INGRESSO} — retificado`);
+    const changedLabel = html.replace("Tipo 1", "Tipo 2");
+    const changedDate = html.replace("2026-06-01T12:00:00Z", "2026-06-02T12:00:00Z");
+    const changedDocument = html.replace(target.documents[1].url, target.documents[0].url);
+    for (const changed of [changedIdentity, changedLabel, changedDate, changedDocument]) {
+      expect(() => assertMprjOfficialAnchors(changed)).toThrow();
+    }
+  });
+
   it("recusa a evidência composta se o portal anunciar gabarito definitivo da preambular", () => {
     const withDefinitive =
       `${html}<div class="paragraph--type--texto-data"><time datetime="2026-07-01T12:00:00Z"></time>` +
@@ -401,7 +432,7 @@ describe("cadastro MPRJ XXXIX/2026 por evidência final composta", () => {
       "answerKeyProvenance",
       "definitiveAnswerKeyDocument",
       "questionCountCorroboration",
-      "portalHtmlSha256",
+      "portalEvidence",
       "robotsSha256",
       "snapshots",
       "identity",
@@ -411,6 +442,7 @@ describe("cadastro MPRJ XXXIX/2026 por evidência final composta", () => {
     }
     expect(fingerprintPayload).toContain("documentType");
     expect(fingerprintPayload).toContain("publishedOn");
+    expect(moduleSource).toContain("portalHtmlSha256: preview.portalHtmlSha256");
   });
 
   it("standing aceita o par MPRJ só com a evidência composta e preserva as recusas anteriores", () => {

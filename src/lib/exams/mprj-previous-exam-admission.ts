@@ -35,6 +35,8 @@ import { saoPauloCalendarDate } from "@/lib/opportunities/catalog-policy";
 // metadados de link e âncoras do HTML oficial. O produto permanece `draft`.
 
 const FGV_FILES = "https://conhecimento.fgv.br/sites/default/files/concursos/";
+const normalizeOfficialAnchorText = (value: string) =>
+  value.normalize("NFKC").replace(/\s+/gu, " ").trim();
 
 export const MPRJ_OFFICIAL_PREVIOUS_EXAM = {
   productSlug: MPRJ_PREVIOUS_PRODUCT_SLUG,
@@ -143,15 +145,14 @@ export function assertMprjAnswerKeyEvidence() {
 export function assertMprjOfficialAnchors(html: string) {
   const $ = load(html);
   const target = MPRJ_OFFICIAL_PREVIOUS_EXAM;
+  const headings = $("h1");
+  const heading = normalizeOfficialAnchorText(headings.text());
   // O portal de servidores do MPRJ (/concursos/mprj2025) responde 200 e é outro
   // certame; só o h1 do concurso de ingresso é aceito.
   if (
-    !$("h1")
-      .text()
-      .replace(/\s+/gu, " ")
-      .includes(
-        "XXXIX Concurso para Ingresso na Classe Inicial da Carreira do Ministério Público do Estado do Rio de Janeiro",
-      )
+    headings.length !== 1 ||
+    heading !==
+      "XXXIX Concurso para Ingresso na Classe Inicial da Carreira do Ministério Público do Estado do Rio de Janeiro"
   ) {
     throw new Error("Portal de outro certame/órgão; cadastro bloqueado.");
   }
@@ -161,6 +162,7 @@ export function assertMprjOfficialAnchors(html: string) {
   if (notice.length !== 1 || !/edital/iu.test(notice.text())) {
     throw new Error("Portal não referencia o edital XXXIX esperado; cadastro bloqueado.");
   }
+  const noticeLabel = normalizeOfficialAnchorText(notice.text());
   // A finalidade composta só existe porque não há gabarito definitivo da
   // preambular. Se a FGV publicar um, este operador deixa de valer e recusa aqui,
   // antes de qualquer fingerprint.
@@ -173,18 +175,20 @@ export function assertMprjOfficialAnchors(html: string) {
       "Portal anuncia gabarito definitivo da preambular; a evidência composta deixou de ser o caminho e exige decisão própria.",
     );
   }
+  const documentEvidence = [];
   for (const document of target.documents) {
     const matches = $("a").filter(
       (_, anchor) => $(anchor).attr("href") === document.url,
     );
     if (
       matches.length !== 1 ||
-      matches.text().replace(/\s+/gu, " ").trim() !== document.label
+      normalizeOfficialAnchorText(matches.text()) !== document.label
     ) {
       throw new Error("Anchor oficial ausente, duplicado ou com rótulo diferente.");
     }
     const block = matches.closest(".paragraph--type--texto-data");
-    if (block.find("time").attr("datetime")?.slice(0, 10) !== document.publishedOn) {
+    const publishedOn = block.find("time").attr("datetime")?.slice(0, 10);
+    if (publishedOn !== document.publishedOn) {
       throw new Error("Data de publicação do link diverge da fonte oficial.");
     }
     const blockText = block.text().replace(/\s+/gu, " ");
@@ -194,13 +198,29 @@ export function assertMprjOfficialAnchors(html: string) {
     ) {
       throw new Error("Caderno de cargo/etapa diferente.");
     }
+    const role = document.documentType === "question_booklet" ? target.role : null;
+    const stage = document.documentType === "question_booklet" ? "Prova Preambular" : null;
     if (
       document.documentType === "answer_key" &&
       (!/prelimin/iu.test(document.label) || /definitiv/iu.test(document.label))
     ) {
       throw new Error("Gabarito preliminar não pode ser rotulado como definitivo.");
     }
+    documentEvidence.push({
+      documentType: document.documentType,
+      url: document.url,
+      label: normalizeOfficialAnchorText(matches.text()),
+      publishedOn,
+      role,
+      stage,
+    });
   }
+  return {
+    h1: heading,
+    notice: { url: target.noticeUrl, label: noticeLabel },
+    documents: documentEvidence,
+    definitiveAnswerKeyDocument: null,
+  };
 }
 
 async function boundedOfficialText(url: string, limit: number, fetcher: typeof fetch) {
@@ -263,7 +283,7 @@ export async function previewMprjPreviousExam(
     4 * 1024 * 1024,
     options.fetcher ?? fetch,
   );
-  assertMprjOfficialAnchors(portal.text);
+  const portalEvidence = assertMprjOfficialAnchors(portal.text);
   const documents = [];
   for (const document of target.documents) {
     const metadata = await (options.verifier ?? verifyOfficialExamUrl)("fgv", document.url);
@@ -292,6 +312,7 @@ export async function previewMprjPreviousExam(
     portalUrl: target.portalUrl,
     portalHttpStatus: portal.httpStatus,
     portalHtmlSha256: createHash("sha256").update(portal.text).digest("hex"),
+    portalEvidence,
     robotsSha256: createHash("sha256").update(robots.text).digest("hex"),
     examDate: target.examDate,
     documents,
@@ -534,7 +555,7 @@ export async function reviewMprjPreviousExamRegistration(
         assignments,
         actor,
         reference: reviewer.approvalReference,
-        portalHtmlSha256: preview.portalHtmlSha256,
+        portalEvidence: preview.portalEvidence,
         robotsSha256: preview.robotsSha256,
         answerKeyFinality: preview.answerKeyFinality,
         answerKeyProvenance: preview.answerKeyProvenance,
@@ -619,6 +640,7 @@ export async function reviewMprjPreviousExamRegistration(
     documentPublicIds: documentIds,
     noticeSha256: expectedNoticeSha256,
     portalHtmlSha256: preview.portalHtmlSha256,
+    portalEvidence: preview.portalEvidence,
     fingerprint,
     examDate: target.examDate,
     expectedQuestionCount: target.expectedQuestionCount,
