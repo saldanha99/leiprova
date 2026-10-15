@@ -96,3 +96,48 @@ Meta/Google Ads seguem sem orçamento e contas prontos para veiculação.
 Recibos privados desta rodada: prefixo
 `.local/editorial/continuation-20261012/heartbeat-20261015-1553-` e relatórios
 `.local/maestri/heartbeat-20261015-1553-*`. Nenhuma credencial foi incluída aqui.
+
+
+## Avanço confirmado em14h07 BRT
+
+`070577b` corrigiu o fingerprint MPRJ para usar evidências oficiais canônicas
+validadas, mantendo o hash bruto em auditoria. A raiz capturou duas respostas
+reais: todas as linhas fora da28 eram idênticas; a única linha variável era o
+script de telemetria BOOMR/Akamai (identificador de requisição, porta, tempo e
+valores da própria telemetria). Nenhuma mudança nas âncoras foi descartada para
+forçar identidade. Duas prévias reais pelo bundle e uma pela imagem publicada
+produziram `66564b534cb9ecebe38cd4b627b7949e9a854227fb79de4a6110a98b1fa19358`.
+Regressões continuam recusando mudanças reais de identidade, URL, data, rótulo,
+duplicação ou anúncio de gabarito definitivo. PDFs continuam metadata_only;
+esta correção não acrescenta hash integral ou extração de cadernos.
+
+Lint, typecheck, 1.957 testes passaram (294 opcionais pulados) e build passou.
+O teste PostgreSQL opcional não foi reexecutado nesta alteração de extração;
+a execução real da rodada anterior permanece registrada. Backup novo conferido
+por pg_restore no container: SHA256
+`d3290374ac2c451d0ebfeba8ac99a27cd2b8f3eff7bb18ea41ea7107f7cf4ae2`.
+A primeira verificação tentou pg_restore no host, que não o tinha; foi corrigida
+para o binário do container e só então o deploy prosseguiu. Deploy pelo fluxo
+normal sem seed; health ok e catálogo HTTP200.
+
+Apply audit24109 cadastrou exatamente a edição MPRJ41, sem conteúdo de questões.
+Após preview com rollback, o operador standing aprovou os três documentos
+metadata_only (audits24128–24130) e a referência anterior
+`93a703d1-7b9e-4f6b-b071-ad0f71f65cf6` (audit24132). Todas as decisões registram
+owner_standing_authorization e humanReview:false. Estado conferido no banco:
+uma edição, três documentos aprovados e uma referência aprovada. Nenhum produto
+liberado por essas operações.
+
+Relatório17h07m09UTC:11/84,108 novas distintas válidas hoje, MPRJdraft0/68.
+Contrato de formato ainda precisa de evidência de instruções delimitada;
+o regulamento oficial só confirmou múltipla escolha, sem resolver MC5.
+Não armazenar PDF completo para suprir isso. A validade corrente do contrato
+também deve conferir qualquer nova evidência, além do operador de aprovação.
+CP112pending_review e recibo1suspended preservados. Consulta de novas questões
+retornou zero; watermark não avançou artificialmente.
+
+O Mac estava bloqueado e a ferramenta não conseguiu desbloqueá-lo. A próxima
+tarefa do Maestri ficou preparada privadamente, não enviada; não declarar
+redistribuição ou execução sem recibo. Operação VPS continuou disponível.
+Recibos desta rodada: prefixo privado heartbeat-20261015-1655 em
+.local/editorial/continuation-20261012/ e tarefa privada em .local/maestri/.

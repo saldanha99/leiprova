@@ -1,5 +1,17 @@
 # Operação do Edital Lei Seca
 
+**Operação em15/10/2026,14h07 BRT:** **11/84 elegíveis**, **108 novas distintas
+publicadas hoje**, sem nova preparação aberta nesta rodada. Código `070577b`
+publicado após lint, typecheck, 1.957 testes e build. Destravado o cadastro MPRJ:
+edição41, três links oficiais aprovados e referência aprovada audit24132, sem
+copiar questões. Produto segue draft0/68; contrato de formato ainda pendente.
+Duas capturas mostraram variação apenas na telemetria Akamai do HTML; evidência
+oficial canônica permaneceu igual e três previews reais tiveram o mesmo
+fingerprint antes do apply. CP112/recibo1 continuam retidos. Mac bloqueado
+impediu redistribuir a próxima tarefa no Maestri; tarefa preparada, ainda não
+enviada. Nenhuma API paga, alteração de flags, WhatsApp ou anúncios ativados.
+[Recibos e limite atual](CONTINUACAO-PRODUCAO-2026-10-15.md).
+
 **Operação em 15/10/2026, 13h22 BRT:** **11/84 elegíveis**, **1.799 válidas
 nas ofertas**, **108 novas distintas publicadas no dia de São Paulo**. Código
 `791e8ef` publicado após QA; migração 0055 validada em PostgreSQL descartável e
