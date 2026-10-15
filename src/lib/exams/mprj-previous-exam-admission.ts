@@ -492,8 +492,8 @@ export async function reviewMprjPreviousExamRegistration(
     }[]
   >`select snapshot.checksum_sha256 as checksum, snapshot.page_count as pages, snapshot.id::text as "snapshotId", source.id::text as "sourceId",
       snapshot.updated_at::text as "snapshotUpdatedAt", encode(sha256(convert_to(to_jsonb(source)::text,'UTF8')),'hex') as "sourceStateFingerprint",
-      snapshot.page_texts->>${target.noticePages.identity - 1} as "identityPage",
-      snapshot.page_texts->>${target.noticePages.examDate - 1} as "datePage"
+      snapshot.page_texts->>(${target.noticePages.identity - 1}::int) as "identityPage",
+      snapshot.page_texts->>(${target.noticePages.examDate - 1}::int) as "datePage"
     from opportunity_document_snapshots snapshot join opportunity_source_documents source on source.id=snapshot.source_document_id
     where source.opportunity_id=${identity.opportunityId} and source.status='approved' and source.source_url=${target.noticeUrl}
       and snapshot.status='approved' and snapshot.checksum_sha256=${expectedNoticeSha256} and source.checksum_sha256=snapshot.checksum_sha256
