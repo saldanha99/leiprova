@@ -259,7 +259,11 @@ const createDocumentSchema = z
       .string()
       .trim()
       .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/u),
-    documentType: z.enum(["question_booklet", "answer_key"]),
+    documentType: z.enum([
+      "question_booklet",
+      "answer_key",
+      "answer_key_decision",
+    ]),
     title: z.string().trim().min(3).max(500),
     sourceUrl: z.url().max(2_000),
     sourcePolicy: z.enum(["metadata_only", "licensed_content"]),
@@ -279,6 +283,18 @@ const createDocumentSchema = z
     licenseExpiresAt: optionalDate,
   })
   .superRefine((value, context) => {
+    // O ato que mantém os gabaritos é ato administrativo consultado na fonte:
+    // nunca conteúdo licenciado, nunca cópia hospedada.
+    if (
+      value.documentType === "answer_key_decision" &&
+      value.sourcePolicy !== "metadata_only"
+    ) {
+      context.addIssue({
+        code: "custom",
+        message:
+          "O ato de manutenção de gabaritos vale apenas como link externo oficial, sem licença de conteúdo.",
+      });
+    }
     if (
       (value.documentType === "question_booklet") !==
       (value.expectedQuestionCount !== undefined)
@@ -735,6 +751,9 @@ export async function createProductExamReferenceAction(
     examPublicId: formData.get("examPublicId"),
     documentPublicId: formData.get("documentPublicId"),
     answerKeyDocumentPublicId: formData.get("answerKeyDocumentPublicId"),
+    // Terceiro documento: só vem quando a edição declara finalidade composta.
+    answerKeyDecisionDocumentPublicId:
+      formData.get("answerKeyDecisionDocumentPublicId") ?? undefined,
   });
   if (
     !parsed.success ||
@@ -763,6 +782,11 @@ export async function createProductExamReferenceAction(
         primaryDocumentType: "question_booklet",
         answerKeyDocumentId: scope.answerKeyDocumentId,
         answerKeyDocumentType: "answer_key",
+        answerKeyDecisionDocumentId:
+          scope.answerKeyDecisionDocumentId ?? null,
+        answerKeyDecisionDocumentType: scope.answerKeyDecisionDocumentId
+          ? "answer_key_decision"
+          : null,
         relationship: "latest_previous_exam",
         selectionVerifiedAt: now,
         status: "pending_review",
@@ -779,6 +803,8 @@ export async function createProductExamReferenceAction(
           documentPublicId: parsed.data.documentPublicId,
           answerKeyDocumentPublicId:
             parsed.data.answerKeyDocumentPublicId,
+          answerKeyDecisionDocumentPublicId:
+            parsed.data.answerKeyDecisionDocumentPublicId ?? null,
           relationship: "latest_previous_exam",
         },
       });

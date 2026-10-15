@@ -127,7 +127,12 @@ describe("bounded MPRJ/PGEAC composite admission", () => {
       expect(transaction.queries.findIndex(q=>q.startsWith("insert into opportunity_organizer_assignments"))).toBeLessThan(reviewed);
       expect(transaction.queries.find(q=>q.startsWith("update contest_store_products"))).not.toContain("set status");
       expect(result.previousExam.approvedForProduct).toBe(false);
-      expect(result.previousExam.admissionBlocker).toContain("Definitive");
+      // A lacuna do MPRJ é normativa: sem gabarito definitivo autônomo, a evidência
+      // é composta (preliminar + ato de 22/06 que mantém todos os gabaritos) e está
+      // completa. Vínculo e liberação continuam fora desta admissão.
+      expect(result.previousExam.answerKeyFinality).toBe("preliminary_plus_maintenance_act");
+      expect(result.previousExam.admissionBlocker).toBeNull();
+      expect(JSON.stringify(result.previousExam)).not.toMatch(/definitiv/iu);
       expect(transaction.queries.find(q=>q.startsWith("insert into contest_opportunities"))).toContain("exam_date");
       // Driver helper must receive arrays/objects, never pre-encoded JSON strings.
       expect(transaction.json).toHaveBeenCalledTimes(recipe.documents.length+1);

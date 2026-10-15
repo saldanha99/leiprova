@@ -1,5 +1,10 @@
 import { saoPauloCalendarDate } from "@/lib/opportunities/catalog-policy";
 import { isOfficialExamUrl } from "@/lib/official-sources/exam-registry";
+import {
+  answerKeyDocumentTypeLabel,
+  isAnswerKeyFinality,
+  requiresAnswerKeyMaintenanceAct,
+} from "@/lib/exams/answer-key-finality";
 import { isOfficialExamSourceFresh } from "@/lib/exams/previous-exam-policy";
 
 export const PUBLIC_EXAM_LICENSE_LABELS = {
@@ -9,10 +14,13 @@ export const PUBLIC_EXAM_LICENSE_LABELS = {
 
 export type PublicExamDocument = {
   publicId: string;
-  documentType: "question_booklet" | "answer_key";
+  documentType: "question_booklet" | "answer_key" | "answer_key_decision";
   title: string;
   officialUrl: string;
   accessType: "external_link";
+  /** Rótulo derivado do tipo do documento. O ato de manutenção nunca é
+   * apresentado como gabarito, e o preliminar nunca como definitivo. */
+  roleLabel: string;
   licenseLabel: (typeof PUBLIC_EXAM_LICENSE_LABELS)[keyof typeof PUBLIC_EXAM_LICENSE_LABELS];
   sourceCheckedAt: Date;
   questionCount: number | null;
@@ -28,6 +36,8 @@ export type PublicContestExamReference = {
       name: string;
     };
   };
+  /** Como a finalidade do gabarito desta edição se comprova. */
+  answerKeyFinality: "definitive_document" | "preliminary_plus_maintenance_act";
   questionBooklet: PublicExamDocument;
   answerKeys: PublicExamDocument[];
 };
@@ -39,6 +49,7 @@ export type PublicExamReferenceCandidateRow = {
   relationship: string;
   primaryDocumentId: number;
   answerKeyDocumentId: number;
+  answerKeyDecisionDocumentId: number | null;
   referenceReviewedByUserId: number | null;
   referenceReviewedAt: Date | null;
   selectionVerifiedAt: Date;
@@ -53,6 +64,7 @@ export type PublicExamReferenceCandidateRow = {
   opportunityJurisdictionCode: string;
   editionInstitutionAcronym: string | null;
   editionJurisdictionCode: string | null;
+  editionAnswerKeyFinality: string | null;
   bankSlug: string;
   bankName: string;
   documentId: number;
@@ -125,7 +137,9 @@ export function toPublicExamDocument(
     row.documentReviewedByUserId === null ||
     !toValidDate(row.documentReviewedAt) ||
     row.documentExamEditionId !== row.editionId ||
-    !["question_booklet", "answer_key"].includes(row.documentType) ||
+    !["question_booklet", "answer_key", "answer_key_decision"].includes(
+      row.documentType,
+    ) ||
     !isNonEmpty(row.documentPublicId) ||
     !isNonEmpty(row.documentTitle) ||
     !Number.isInteger(row.httpStatus) ||
@@ -185,12 +199,16 @@ export function toPublicExamDocument(
     return null;
   }
 
+  const roleLabel = answerKeyDocumentTypeLabel(row.documentType);
+  if (!roleLabel) return null;
+
   return {
     publicId: row.documentPublicId.trim(),
     documentType: row.documentType as PublicExamDocument["documentType"],
     title: row.documentTitle.trim(),
     officialUrl: officialUrl.toString(),
     accessType: "external_link",
+    roleLabel,
     licenseLabel: PUBLIC_EXAM_LICENSE_LABELS[row.sourcePolicy],
     sourceCheckedAt: row.sourceCheckedAt,
     questionCount:
@@ -238,6 +256,31 @@ export function buildPublicContestExamReference(
   )?.document;
   if (!answerKey || answerKey.publicId === questionBooklet.publicId) return null;
 
+  const finality = first.editionAnswerKeyFinality ?? "definitive_document";
+  if (!isAnswerKeyFinality(finality)) return null;
+  const answerKeys = [answerKey];
+  if (requiresAnswerKeyMaintenanceAct(finality)) {
+    // Sem o ato, o gabarito preliminar ficaria sozinho na página como se fosse
+    // final. Falha fechada: a seção não aparece.
+    const decision = documents.find(
+      ({ row, document }) =>
+        row.documentId === first.answerKeyDecisionDocumentId &&
+        document.documentType === "answer_key_decision",
+    )?.document;
+    if (
+      !decision ||
+      first.answerKeyDecisionDocumentId === null ||
+      decision.publicId === questionBooklet.publicId ||
+      decision.publicId === answerKey.publicId
+    ) {
+      return null;
+    }
+    answerKeys.push(decision);
+  } else if (first.answerKeyDecisionDocumentId !== null) {
+    // Ato pendurado em edição com gabarito definitivo: estado incoerente.
+    return null;
+  }
+
   return {
     edition: {
       publicId: first.editionPublicId.trim(),
@@ -248,7 +291,8 @@ export function buildPublicContestExamReference(
         name: first.bankName.trim(),
       },
     },
+    answerKeyFinality: finality,
     questionBooklet,
-    answerKeys: [answerKey],
+    answerKeys,
   };
 }

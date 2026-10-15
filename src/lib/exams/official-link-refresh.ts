@@ -85,7 +85,8 @@ export async function refreshApprovedOfficialExamLinks(
           select 1 from contest_product_exam_references reference
           where reference.status = 'approved'
             and (reference.primary_document_id = document.id
-              or reference.answer_key_document_id = document.id)
+              or reference.answer_key_document_id = document.id
+              or reference.answer_key_decision_document_id = document.id)
         )
         and greatest(document.source_checked_at, document.link_verified_at)
           < now() - make_interval(days => ${OFFICIAL_LINK_REFRESH_AFTER_DAYS})

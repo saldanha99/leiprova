@@ -1,8 +1,9 @@
-import { mkdtemp, mkdir, writeFile, rm, symlink } from "node:fs/promises";
+import { mkdtemp, mkdir, writeFile, rm, symlink, readFile, stat } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { afterEach, expect, it, vi } from "vitest";
 import { hasPendingLocalAgentLease, withLocalAgentLock } from "@/lib/editorial/local-agent-dispatch";
+import { writePrivateFileAtomically } from "@/lib/editorial/atomic-private-file";
 
 const roots: string[] = [];
 async function setup() {
@@ -59,4 +60,25 @@ it("falha fechado diante de pacote parcial ou simbólico", async () => {
   await writeFile(file, "{"); await expect(hasPendingLocalAgentLease([root], "Autor")).rejects.toThrow();
   await rm(file); await symlink(path.join(dir, "response.json"), file);
   await expect(hasPendingLocalAgentLease([root], "Autor")).rejects.toThrow("Arquivo de reserva inválido");
+});
+it("grava atomicamente em modo privado e mantém o destino íntegro se o rename falhar", async () => {
+  const root = await mkdtemp(path.join(tmpdir(), "editalume-atomic-")); roots.push(root);
+  const target = path.join(root, "private.json");
+  await writePrivateFileAtomically(target, "first");
+  expect(await readFile(target, "utf8")).toBe("first");
+  expect((await stat(target)).mode & 0o777).toBe(0o600);
+
+  const directoryTarget = path.join(root, "directory"); await mkdir(directoryTarget);
+  await expect(writePrivateFileAtomically(directoryTarget, "replacement")).rejects.toThrow();
+  expect(await stat(directoryTarget).then(info => info.isDirectory())).toBe(true);
+  expect((await (await import("node:fs/promises")).readdir(root)).filter(name => name.endsWith(".tmp"))).toEqual([]);
+});
+it("grava conteúdo concorrente como um arquivo completo, nunca como prefixo truncado", async () => {
+  const root = await mkdtemp(path.join(tmpdir(), "editalume-atomic-race-")); roots.push(root);
+  const target = path.join(root, "receipt.json");
+  const candidates = Array.from({ length: 12 }, (_, index) => JSON.stringify({ index, body: "x".repeat(4000) }));
+  await Promise.all(candidates.map(contents => writePrivateFileAtomically(target, contents)));
+  const saved = await readFile(target, "utf8");
+  expect(candidates).toContain(saved);
+  expect(() => JSON.parse(saved)).not.toThrow();
 });

@@ -27,6 +27,14 @@ export const answerKeyDocuments = alias(
   "answer_key_exam_document",
 );
 
+/** Terceiro documento: o ato oficial que, julgados os recursos, mantém todos os
+ * gabaritos. Só existe quando a edição declara finalidade composta; por isso
+ * entra por `leftJoin` e todos os campos dele são anuláveis no escopo. */
+export const answerKeyDecisionDocuments = alias(
+  examEditionDocuments,
+  "answer_key_decision_exam_document",
+);
+
 export async function loadDocumentReviewCandidate(
   database: PreviousExamReader,
   publicId: string,
@@ -84,6 +92,7 @@ export const referenceSchema = z.object({
     .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/u),
   documentPublicId: z.string().uuid(),
   answerKeyDocumentPublicId: z.string().uuid(),
+  answerKeyDecisionDocumentPublicId: z.string().uuid().optional(),
 });
 
 export async function loadReferenceScope(
@@ -113,6 +122,7 @@ export async function loadReferenceScope(
       editionCareerTrackId: examEditions.careerTrackId,
       editionSpecializationId: examEditions.specializationId,
       editionBankId: examEditions.bankId,
+      editionAnswerKeyFinality: examEditions.answerKeyFinality,
       bankSlug: quizBanks.slug,
       documentId: examEditionDocuments.id,
       documentStatus: examEditionDocuments.status,
@@ -137,6 +147,7 @@ export async function loadReferenceScope(
       answerKeyDocumentId: answerKeyDocuments.id,
       answerKeyDocumentStatus: answerKeyDocuments.status,
       answerKeyDocumentType: answerKeyDocuments.documentType,
+      answerKeyDocumentTitle: answerKeyDocuments.title,
       answerKeyDocumentExamEditionId: answerKeyDocuments.examEditionId,
       answerKeyDocumentHttpStatus: answerKeyDocuments.httpStatus,
       answerKeyDocumentContentType: answerKeyDocuments.contentType,
@@ -152,6 +163,24 @@ export async function loadReferenceScope(
         answerKeyDocuments.licenseEvidenceCheckedAt,
       answerKeyDocumentLicensedAt: answerKeyDocuments.licensedAt,
       answerKeyDocumentLicenseExpiresAt: answerKeyDocuments.licenseExpiresAt,
+      answerKeyDecisionDocumentId: answerKeyDecisionDocuments.id,
+      answerKeyDecisionDocumentStatus: answerKeyDecisionDocuments.status,
+      answerKeyDecisionDocumentType: answerKeyDecisionDocuments.documentType,
+      answerKeyDecisionDocumentTitle: answerKeyDecisionDocuments.title,
+      answerKeyDecisionDocumentExamEditionId:
+        answerKeyDecisionDocuments.examEditionId,
+      answerKeyDecisionDocumentHttpStatus: answerKeyDecisionDocuments.httpStatus,
+      answerKeyDecisionDocumentContentType:
+        answerKeyDecisionDocuments.contentType,
+      answerKeyDecisionDocumentSourceUrl: answerKeyDecisionDocuments.sourceUrl,
+      answerKeyDecisionDocumentSourceCheckedAt:
+        answerKeyDecisionDocuments.sourceCheckedAt,
+      answerKeyDecisionDocumentSourcePolicy:
+        answerKeyDecisionDocuments.sourcePolicy,
+      answerKeyDecisionDocumentDistributionMode:
+        answerKeyDecisionDocuments.distributionMode,
+      answerKeyDecisionDocumentExpectedQuestionCount:
+        answerKeyDecisionDocuments.expectedQuestionCount,
       newerEligibleEditionExists: sql<boolean>`exists (
         select 1
         from exam_editions newer_edition
@@ -196,6 +225,15 @@ export async function loadReferenceScope(
         eq(answerKeyDocuments.examEditionId, examEditions.id),
       ),
     )
+    // Sem o terceiro documento, `publicId = null` nunca casa e todas as colunas
+    // do ato voltam nulas: é o caminho `definitive_document`, inalterado.
+    .leftJoin(
+      answerKeyDecisionDocuments,
+      and(
+        eq(answerKeyDecisionDocuments.examEditionId, examEditions.id),
+        sql`${answerKeyDecisionDocuments.publicId} = ${input.answerKeyDecisionDocumentPublicId ?? null}`,
+      ),
+    )
     .where(eq(contestStoreProducts.slug, input.productSlug))
     .limit(1);
   if (!scope) return null;
@@ -237,5 +275,12 @@ export async function loadReferenceScope(
       scope.bankSlug,
       scope.answerKeyDocumentSourceUrl,
     ),
+    answerKeyDecisionDocumentIsOfficialSource:
+      scope.answerKeyDecisionDocumentSourceUrl === null
+        ? null
+        : isOfficialExamUrl(
+            scope.bankSlug,
+            scope.answerKeyDecisionDocumentSourceUrl,
+          ),
   };
 }

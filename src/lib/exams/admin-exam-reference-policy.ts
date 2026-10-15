@@ -1,4 +1,9 @@
 import {
+  answerKeyTitleFitsRole,
+  isAnswerKeyFinality,
+  requiresAnswerKeyMaintenanceAct,
+} from "@/lib/exams/answer-key-finality";
+import {
   isOfficialExamSourceFresh,
   OFFICIAL_EXAM_SOURCE_MAX_AGE_DAYS,
 } from "@/lib/exams/previous-exam-policy";
@@ -22,6 +27,9 @@ export type ExamReferenceScope = {
   editionCareerTrackId: number;
   editionSpecializationId: number | null;
   editionBankId: number;
+  /** Nulo nas edições anteriores à migração 0055; equivale a
+   * `definitive_document` para efeito de validação. */
+  editionAnswerKeyFinality?: string | null;
   documentId: number;
   documentStatus: string;
   documentType: string;
@@ -43,6 +51,7 @@ export type ExamReferenceScope = {
   answerKeyDocumentId: number;
   answerKeyDocumentStatus: string;
   answerKeyDocumentType: string;
+  answerKeyDocumentTitle?: string | null;
   answerKeyDocumentExamEditionId: number;
   answerKeyDocumentHttpStatus: number;
   answerKeyDocumentContentType: string | null;
@@ -56,6 +65,18 @@ export type ExamReferenceScope = {
   answerKeyDocumentLicenseEvidenceCheckedAt: Date | string | null;
   answerKeyDocumentLicensedAt: Date | string | null;
   answerKeyDocumentLicenseExpiresAt: Date | string | null;
+  answerKeyDecisionDocumentId?: number | null;
+  answerKeyDecisionDocumentStatus?: string | null;
+  answerKeyDecisionDocumentType?: string | null;
+  answerKeyDecisionDocumentTitle?: string | null;
+  answerKeyDecisionDocumentExamEditionId?: number | null;
+  answerKeyDecisionDocumentHttpStatus?: number | null;
+  answerKeyDecisionDocumentContentType?: string | null;
+  answerKeyDecisionDocumentSourceCheckedAt?: Date | string | null;
+  answerKeyDecisionDocumentIsOfficialSource?: boolean | null;
+  answerKeyDecisionDocumentSourcePolicy?: string | null;
+  answerKeyDecisionDocumentDistributionMode?: string | null;
+  answerKeyDecisionDocumentExpectedQuestionCount?: number | null;
   newerEligibleEditionExists: boolean;
 };
 
@@ -108,6 +129,103 @@ function hasCurrentLicensedEvidence(
         !Number.isNaN(expiresAt.getTime()) &&
         expiresAt >= endOfToday))
   );
+}
+
+/**
+ * Finalidade do gabarito da edição.
+ *
+ * `definitive_document` (ou nulo, nas edições anteriores à migração 0055) exige a
+ * **ausência** do ato: nenhum ato pode ser pendurado numa edição que já tem
+ * gabarito definitivo próprio. `preliminary_plus_maintenance_act` exige o ato
+ * presente, aprovado, oficial, fresco e com título que não o apresente como
+ * gabarito definitivo.
+ *
+ * Esta é a metade de aplicação da coerência que o banco não impõe: o CHECK de
+ * `contest_product_exam_references` garante o formato do par de colunas, mas a
+ * correspondência com `exam_editions.answer_key_finality` envolve duas tabelas.
+ */
+function validateAnswerKeyFinalityScope(
+  scope: ExamReferenceScope,
+  todayIso: string,
+  requireLicense: boolean,
+): ExamReferenceScopeDecision {
+  const finality = scope.editionAnswerKeyFinality ?? "definitive_document";
+  if (!isAnswerKeyFinality(finality)) {
+    return {
+      valid: false,
+      reason: "A finalidade do gabarito desta edição não é reconhecida.",
+    };
+  }
+  const hasDecisionDocument =
+    scope.answerKeyDecisionDocumentId !== null &&
+    scope.answerKeyDecisionDocumentId !== undefined;
+
+  if (!requiresAnswerKeyMaintenanceAct(finality)) {
+    if (hasDecisionDocument) {
+      return {
+        valid: false,
+        reason:
+          "Esta edição tem gabarito definitivo próprio e não admite ato de manutenção de gabaritos.",
+      };
+    }
+    // Caminho inalterado: o rótulo do gabarito definitivo continua sendo conferido
+    // na revisão do documento, não aqui. Nenhum requisito novo para MPMT/PGE-AC.
+    return { valid: true };
+  }
+
+  if (requireLicense) {
+    return {
+      valid: false,
+      reason:
+        "Evidência composta vale apenas como link externo oficial, sem licença de conteúdo.",
+    };
+  }
+  if (!hasDecisionDocument) {
+    return {
+      valid: false,
+      reason:
+        "Sem gabarito definitivo, o vínculo exige também o ato oficial que manteve todos os gabaritos.",
+    };
+  }
+  if (
+    scope.answerKeyDecisionDocumentExamEditionId !== scope.editionId ||
+    scope.answerKeyDecisionDocumentId === scope.documentId ||
+    scope.answerKeyDecisionDocumentId === scope.answerKeyDocumentId ||
+    scope.answerKeyDecisionDocumentType !== "answer_key_decision" ||
+    scope.answerKeyDecisionDocumentStatus !== "approved" ||
+    (scope.answerKeyDecisionDocumentHttpStatus ?? 0) < 200 ||
+    (scope.answerKeyDecisionDocumentHttpStatus ?? 0) > 399 ||
+    scope.answerKeyDecisionDocumentContentType
+      ?.split(";", 1)[0]
+      ?.trim()
+      .toLowerCase() !== "application/pdf" ||
+    scope.answerKeyDecisionDocumentIsOfficialSource !== true ||
+    scope.answerKeyDecisionDocumentSourcePolicy !== "metadata_only" ||
+    scope.answerKeyDecisionDocumentDistributionMode !== "external_link" ||
+    scope.answerKeyDecisionDocumentExpectedQuestionCount !== null ||
+    !scope.answerKeyDecisionDocumentSourceCheckedAt ||
+    !isFreshSourceCheck(scope.answerKeyDecisionDocumentSourceCheckedAt, todayIso)
+  ) {
+    return {
+      valid: false,
+      reason: `O ato oficial que manteve os gabaritos precisa estar aprovado, acessível como PDF externo e verificado nos últimos ${OFFICIAL_EXAM_SOURCE_MAX_AGE_DAYS} dias.`,
+    };
+  }
+  // Nenhum dos dois documentos pode ser apresentado com o papel do outro.
+  if (
+    !answerKeyTitleFitsRole("preliminary_answer_key", scope.answerKeyDocumentTitle ?? "") ||
+    !answerKeyTitleFitsRole(
+      "answer_key_maintenance_act",
+      scope.answerKeyDecisionDocumentTitle ?? "",
+    )
+  ) {
+    return {
+      valid: false,
+      reason:
+        "Os títulos precisam declarar o papel real de cada documento: gabarito preliminar e ato de manutenção, nunca gabarito definitivo.",
+    };
+  }
+  return { valid: true };
 }
 
 /** Validação fechada da identidade banca + cargo/especialidade + edição. */
@@ -262,6 +380,12 @@ export function validateExamReferenceScope(
           : "Selecione o gabarito oficial exato, aprovado e vigente desta edição.",
     };
   }
+  const finalityDecision = validateAnswerKeyFinalityScope(
+    scope,
+    todayIso,
+    requireLicense,
+  );
+  if (!finalityDecision.valid) return finalityDecision;
   if (
     !Number.isInteger(scope.documentExpectedQuestionCount) ||
     (scope.documentExpectedQuestionCount ?? 0) < 1

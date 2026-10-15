@@ -37,6 +37,7 @@ function approvedRow(): PublicExamReferenceCandidateRow {
     relationship: "latest_previous_exam",
     primaryDocumentId: 2,
     answerKeyDocumentId: 3,
+    answerKeyDecisionDocumentId: null,
     referenceReviewedByUserId: 3,
     referenceReviewedAt: new Date("2026-09-10T12:00:00.000Z"),
     selectionVerifiedAt: new Date("2026-09-10T12:00:00.000Z"),
@@ -51,6 +52,7 @@ function approvedRow(): PublicExamReferenceCandidateRow {
     opportunityJurisdictionCode: "BA",
     editionInstitutionAcronym: "PCBA",
     editionJurisdictionCode: "BA",
+    editionAnswerKeyFinality: null,
     bankSlug: "cebraspe",
     bankName: "Cebraspe",
     documentId: 2,
@@ -148,5 +150,19 @@ describe("consulta pública da última prova", () => {
     await expect(
       getApprovedContestExamReference("concurso-teste"),
     ).rejects.toThrow("conexão indisponível");
+  });
+});
+
+describe("terceiro documento da evidência composta na consulta pública", () => {
+  it("entra no mesmo join por id e traz a finalidade da edição", () => {
+    expect(dalSource).toContain(
+      "answerKeyDecisionDocumentId:\n    contestProductExamReferences.answerKeyDecisionDocumentId",
+    );
+    expect(dalSource).toContain(
+      "editionAnswerKeyFinality: examEditions.answerKeyFinality",
+    );
+    expect(dalSource).toContain(
+      "contestProductExamReferences.answerKeyDecisionDocumentId,\n            ),\n          ),",
+    );
   });
 });

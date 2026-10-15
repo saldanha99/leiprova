@@ -2,6 +2,11 @@ import { createHash } from "node:crypto";
 
 import type { CapturedOfficialDocument } from "@/lib/opportunities/official-document-fetch";
 import { OFFICIAL_COURSE_STANDING_REFERENCE } from "@/lib/editorial/official-course-dossier";
+import {
+  requiredAnswerKeyDocumentTypes,
+  type AnswerKeyDocumentType,
+  type AnswerKeyFinality,
+} from "@/lib/exams/answer-key-finality";
 
 const FGV_FILES = "https://conhecimento.fgv.br/sites/default/files/concursos/";
 export type PreviewDocumentRecipe = Readonly<{ key: string; url: string; title: string; pages: number; programmePages: readonly [number, number] | null }>;
@@ -12,9 +17,27 @@ export type NextOfficialCourseRecipe = Readonly<{
   expectedSubjects: number;
   overlays: readonly Readonly<{ key: string; subjects: readonly string[] }>[];
   identityClaims: readonly Readonly<{ document: string; page: number; contains: readonly string[] }>[];
-  previousExam: Readonly<{ cycle: string; role: string; portalUrl: string; examDate: string; definitiveAnswerKeyAvailable: boolean; documents: readonly Readonly<{ type: "question_booklet" | "answer_key"; title: string; url: string }>[] }>;
+  previousExam: Readonly<{ cycle: string; role: string; portalUrl: string; examDate: string; answerKeyFinality: AnswerKeyFinality; documents: readonly Readonly<{ type: AnswerKeyDocumentType; title: string; url: string }>[] }>;
   limitations: readonly string[];
 }>;
+
+/** A evidência final do gabarito precisa estar completa: um documento definitivo
+ * autônomo, ou o par preliminar + ato de manutenção. Faltando um papel, a admissão
+ * fica bloqueada e o motivo é declarado. */
+export function previousExamAdmissionBlocker(
+  previousExam: NextOfficialCourseRecipe["previousExam"],
+) {
+  const required = requiredAnswerKeyDocumentTypes(previousExam.answerKeyFinality);
+  const present = new Set(previousExam.documents.map((document) => document.type));
+  const missing = required.filter((type) => !present.has(type));
+  if (missing.length) {
+    return `Answer key evidence incomplete for ${previousExam.answerKeyFinality}: missing ${missing.join(", ")}`;
+  }
+  if (previousExam.documents.length !== required.length) {
+    return `Answer key evidence has unexpected documents for ${previousExam.answerKeyFinality}`;
+  }
+  return null;
+}
 
 export const NEXT_OFFICIAL_COURSE_RECIPES: readonly NextOfficialCourseRecipe[] = [
   {
@@ -39,8 +62,13 @@ export const NEXT_OFFICIAL_COURSE_RECIPES: readonly NextOfficialCourseRecipe[] =
       { document: "mprj-inclusion", page: 1, contains: ["15.358", "XXXIX", "Direito Penal"] },
       { document: "mprj-civil-correction", page: 1, contains: ["por incorreção", "Direito Processual Civil", "17.03.26"] },
     ],
-    previousExam: { cycle: "XXXIX — 2026, preambular já realizada", role: "Promotor de Justiça Substituto — prova preambular", portalUrl: "https://conhecimento.fgv.br/concursos/mprjpromotor2026", examDate: "2026-05-31", definitiveAnswerKeyAvailable: false, documents: [
+    // Sem gabarito definitivo autônomo: o Edital XXXIX não tem o subitem 11.7.3 do
+    // XXXVIII. A finalidade é composta (preliminar + ato de 22/06 que mantém todos
+    // os gabaritos); ver docs/ADMISSAO-COMPOSTA-MPRJ-PGEAC-2026-10-12.md.
+    previousExam: { cycle: "XXXIX — 2026, preambular já realizada", role: "Promotor de Justiça Substituto — prova preambular", portalUrl: "https://conhecimento.fgv.br/concursos/mprjpromotor2026", examDate: "2026-05-31", answerKeyFinality: "preliminary_plus_maintenance_act", documents: [
       { type: "question_booklet", title: "MPRJ XXXIX — caderno Tipo1", url: `${FGV_FILES}promotor-de-justica-substituto-cns001-tipo-1.pdf` },
+      { type: "answer_key", title: "MPRJ XXXIX — gabarito oficial preliminar da prova preambular", url: `${FGV_FILES}mprj-promotor-2026-gabaritos-para-publicacao.pdf` },
+      { type: "answer_key_decision", title: "MPRJ XXXIX — aviso de 22/06/2026: julgados os recursos, mantidos os gabaritos", url: `${FGV_FILES}22.06-recursos-gabarito-preambular.pdf` },
     ] },
     limitations: ["O programa não está no edital47p: AnexoI é aviso de privacidade.", "Última preambular é XXXIX2026; portal publicou apenas gabarito preliminar, definitivo público não localizado. Não usar XXXVIII2025 como última prova nem aprovar referência incompleta.", "Quatro disciplinas do aviso17/03 foram substituídas em09/04; não usar versão original isolada.", "Treino histórico preambular com legislação atual; não simulado oral, discursivo ou edição futura.", "Não inferir número de alternativas a partir do edital; perfil específico precisa análise própria.", "Lei15.358/2026 e demais normas citadas exigem comparação com texto oficial atual antes de vínculos/questões."],
   },
@@ -66,7 +94,7 @@ export const NEXT_OFFICIAL_COURSE_RECIPES: readonly NextOfficialCourseRecipe[] =
       { document: "pgeac-correction-1", page: 1, contains: ["1ª RETIFICAÇÃO", "Conteúdo Programático", "DIREITO ADMINISTRATIVO"] },
       { document: "pgeac-correction-2", page: 1, contains: ["2ª RETIFICAÇÃO", "Conteúdo Programático", "15.190/2025"] },
     ],
-    previousExam: { cycle: "VIII — 2026, objetiva já realizada", role: "Procurador do Estado do Acre — Classe I", portalUrl: "https://conhecimento.fgv.br/concursos/pgeac", examDate: "2026-05-24", definitiveAnswerKeyAvailable: true, documents: [
+    previousExam: { cycle: "VIII — 2026, objetiva já realizada", role: "Procurador do Estado do Acre — Classe I", portalUrl: "https://conhecimento.fgv.br/concursos/pgeac", examDate: "2026-05-24", answerKeyFinality: "definitive_document", documents: [
       { type: "question_booklet", title: "PGE-AC VIII — caderno Tipo1", url: `${FGV_FILES}procurador-do-estado-do-acre-cns001-tipo-1.pdf` },
       { type: "answer_key", title: "PGE-AC VIII — gabarito oficial definitivo", url: `${FGV_FILES}gabarito-definitivo-pge-ac.pdf` },
     ] },
@@ -142,7 +170,7 @@ export function buildNextOfficialCoursePreview(recipe: NextOfficialCourseRecipe,
     proposedPreparationMode: recipe.proposedMode, proposedScope: "objective_training_current_legislation", legislationUpdatedAndMapped: false,
     captures: recipe.documents.map((doc) => { const capture = captures.get(doc.key)!; return { key: doc.key, sourceUrl: capture.documentUrl, checksumSha256: capture.checksumSha256, pageCount: capture.pageCount, byteLength: capture.byteLength, programmePages: doc.programmePages }; }),
     programme: { ...programme, checksumSha256: createHash("sha256").update(JSON.stringify(programme.sections)).digest("hex"), extraction: "verbatim_source_fragments_per_subject_with_exact_overlay" },
-    previousExam: { ...recipe.previousExam, distributionMode: "external_link", sourceContentStored: false, metadata: previousMetadata, approvedForProduct: false, admissionBlocker: recipe.previousExam.definitiveAnswerKeyAvailable ? null : "Definitive official answer key for latest historical edition not publicly verified", thirdPartyQuestionsImported: 0 },
+    previousExam: { ...recipe.previousExam, distributionMode: "external_link", sourceContentStored: false, metadata: previousMetadata, approvedForProduct: false, admissionBlocker: previousExamAdmissionBlocker(recipe.previousExam), thirdPartyQuestionsImported: 0 },
     review: { proposedApprovalBasis: "owner_standing_authorization", approvalReference: OFFICIAL_COURSE_STANDING_REFERENCE, humanReview: false, applied: false },
     limitations: recipe.limitations, databaseWrites: 0, admissionApplied: false, applySupported: false, questionsGenerated: 0, productsReleased: 0, publicationAllowed: false,
   };

@@ -27,6 +27,8 @@ import { saoPauloCalendarDate } from "../src/lib/opportunities/catalog-policy";
 
 import { PGEAC_OFFICIAL_PREVIOUS_EXAM } from "../src/lib/exams/pgeac-previous-exam-admission";
 import { MPMT_OFFICIAL_PREVIOUS_EXAM } from "../src/lib/exams/mpmt-previous-exam-admission";
+import { MPRJ_OFFICIAL_PREVIOUS_EXAM } from "../src/lib/exams/mprj-previous-exam-admission";
+import { requiresAnswerKeyMaintenanceAct } from "../src/lib/exams/answer-key-finality";
 import { parsePreviousExamLinkCommand, previousExamApprovalBasis } from "../src/lib/exams/previous-exam-link-command";
 import { requireStandingCourseMaintenanceDatabaseUrl } from "../src/lib/editorial/official-course-admission";
 import { safeOfficialCourseDossierError } from "./prepare-official-course-dossiers";
@@ -55,32 +57,45 @@ async function main() {
   const results: Record<string, unknown>[] = [];
   try {
     for (const pair of pairs) {
-      const standingTarget=pair.productSlug===PGEAC_OFFICIAL_PREVIOUS_EXAM.productSlug?PGEAC_OFFICIAL_PREVIOUS_EXAM:MPMT_OFFICIAL_PREVIOUS_EXAM;
-      const registrationAction=pair.productSlug===PGEAC_OFFICIAL_PREVIOUS_EXAM.productSlug?"editorial.previous_exam.pgeac_metadata_registered":"editorial.previous_exam.mpmt_metadata_registered";
+      const standingTarget = pair.productSlug === PGEAC_OFFICIAL_PREVIOUS_EXAM.productSlug ? PGEAC_OFFICIAL_PREVIOUS_EXAM
+        : pair.productSlug === MPRJ_OFFICIAL_PREVIOUS_EXAM.productSlug ? MPRJ_OFFICIAL_PREVIOUS_EXAM
+        : MPMT_OFFICIAL_PREVIOUS_EXAM;
+      const registrationAction = pair.productSlug === PGEAC_OFFICIAL_PREVIOUS_EXAM.productSlug ? "editorial.previous_exam.pgeac_metadata_registered"
+        : pair.productSlug === MPRJ_OFFICIAL_PREVIOUS_EXAM.productSlug ? "editorial.previous_exam.mprj_metadata_registered"
+        : "editorial.previous_exam.mpmt_metadata_registered";
       const [edition] = await db
-        .select({ id: examEditions.id, bankId: examEditions.bankId, examDate: examEditions.examDate, institution: examEditions.institutionAcronym, jurisdiction: examEditions.jurisdictionCode, sourcePolicy: examEditions.sourcePolicy, officialUrl: examEditions.officialUrl })
+        .select({ id: examEditions.id, bankId: examEditions.bankId, examDate: examEditions.examDate, institution: examEditions.institutionAcronym, jurisdiction: examEditions.jurisdictionCode, sourcePolicy: examEditions.sourcePolicy, officialUrl: examEditions.officialUrl, answerKeyFinality: examEditions.answerKeyFinality })
         .from(examEditions)
         .where(eq(examEditions.publicId, pair.editionPublicId))
         .limit(1);
       if (!edition) throw new Error(`Edição inexistente: ${pair.editionPublicId}.`);
       if (standing && (edition.examDate !== standingTarget.examDate || edition.institution !== standingTarget.institution || edition.jurisdiction !== standingTarget.jurisdiction
         || edition.sourcePolicy !== "metadata_only" || edition.officialUrl !== standingTarget.portalUrl)) throw new Error("Standing exige a identidade e data exatas da prova autorizada.");
+      // Sem gabarito definitivo, a edição declara finalidade composta e traz um
+      // terceiro pendente: o ato que manteve todos os gabaritos. Nas demais
+      // edições o conjunto continua sendo exatamente caderno + gabarito.
+      const compositeEvidence = requiresAnswerKeyMaintenanceAct(edition.answerKeyFinality);
       const pending = await db
         .select({ publicId: examEditionDocuments.publicId, documentType: examEditionDocuments.documentType })
         .from(examEditionDocuments)
         .where(and(eq(examEditionDocuments.examEditionId, edition.id), eq(examEditionDocuments.status, "pending_review")));
       const booklet = pending.find((document) => document.documentType === "question_booklet");
       const answerKey = pending.find((document) => document.documentType === "answer_key");
-      if (!booklet || !answerKey || pending.length !== 2) {
-        throw new Error(`A edição ${pair.editionPublicId} precisa de exatamente um caderno e um gabarito pendentes.`);
+      const answerKeyDecision = pending.find((document) => document.documentType === "answer_key_decision");
+      const expectedPending = compositeEvidence ? 3 : 2;
+      if (!booklet || !answerKey || pending.length !== expectedPending || Boolean(answerKeyDecision) !== compositeEvidence) {
+        throw new Error(compositeEvidence
+          ? `A edição ${pair.editionPublicId} declara evidência composta e precisa de exatamente um caderno, um gabarito preliminar e um ato de manutenção pendentes.`
+          : `A edição ${pair.editionPublicId} precisa de exatamente um caderno e um gabarito pendentes.`);
       }
+      const pendingDocuments = answerKeyDecision ? [booklet, answerKey, answerKeyDecision] : [booklet, answerKey];
 
       // A URL é consultada de novo antes da decisão, como no painel.
       const checks = new Map<string, Awaited<ReturnType<typeof verifyOfficialExamUrl>>>();
-      for (const document of [booklet, answerKey]) {
+      for (const document of pendingDocuments) {
         const candidate = await loadDocumentReviewCandidate(db, document.publicId);
         if (!candidate) throw new Error(`Documento ausente: ${document.publicId}.`);
-        if (standing && (candidate.sourcePolicy !== "metadata_only" || candidate.sourceUrl !== standingTarget.documents.find(item=>item.documentType===candidate.documentType)?.url)) throw new Error("Standing exige caderno Tipo1 e gabarito definitivo oficiais exatos, como links externos.");
+        if (standing && (candidate.sourcePolicy !== "metadata_only" || candidate.sourceUrl !== standingTarget.documents.find(item=>item.documentType===candidate.documentType)?.url)) throw new Error("Standing exige exatamente os documentos oficiais do alvo autorizado, como links externos: caderno Tipo 1 e a evidência final declarada pela edição.");
         const checked = await verifyOfficialExamUrl(candidate.bankSlug, candidate.sourceUrl);
         if (checked.finalUrl !== candidate.sourceUrl || checked.httpStatus < 200 || checked.httpStatus > 399 || !checked.isPdf) {
           throw new Error(`A URL oficial mudou ou deixou de entregar PDF: ${candidate.sourceUrl}.`);
@@ -106,7 +121,7 @@ async function main() {
             : `Aprovado sob autorização do proprietário (${reviewer.approvalReference}); link oficial conferido na origem, sem cópia do PDF.`;
 
           await transaction.execute(sql`select public.lock_exam_document_review_edition(${edition.id})`);
-          for (const document of [booklet, answerKey]) {
+          for (const document of pendingDocuments) {
             const candidate = await loadDocumentReviewCandidate(transaction, document.publicId);
             const checked = checks.get(document.publicId);
             if (!candidate || candidate.status !== "pending_review" || !checked) {
@@ -174,6 +189,7 @@ async function main() {
             examPublicId: pair.editionPublicId,
             documentPublicId: booklet.publicId,
             answerKeyDocumentPublicId: answerKey.publicId,
+            ...(answerKeyDecision ? { answerKeyDecisionDocumentPublicId: answerKeyDecision.publicId } : {}),
           };
           const scope = await loadReferenceScope(transaction, input, todayIso);
           if (!scope) throw new Error("Não foi possível cruzar produto e prova.");
@@ -198,6 +214,8 @@ async function main() {
               primaryDocumentType: "question_booklet",
               answerKeyDocumentId: scope.answerKeyDocumentId,
               answerKeyDocumentType: "answer_key",
+              answerKeyDecisionDocumentId: scope.answerKeyDecisionDocumentId ?? null,
+              answerKeyDecisionDocumentType: scope.answerKeyDecisionDocumentId ? "answer_key_decision" : null,
               relationship: "latest_previous_exam",
               selectionVerifiedAt: now,
               status: "pending_review",
@@ -227,7 +245,7 @@ async function main() {
                 ...approvalBasis, executionSource: "server_cli", notes },
             });
           }
-          const summary = { ...pair, documentsApproved: 2, editionPublished: true, referencePublicId };
+          const summary = { ...pair, documentsApproved: pendingDocuments.length, answerKeyFinality: edition.answerKeyFinality ?? "definitive_document", editionPublished: true, referencePublicId };
           if (!apply) throw new PreviewRollback(JSON.stringify(summary));
           return summary;
         }, { isolationLevel: "serializable" });

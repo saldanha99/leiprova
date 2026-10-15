@@ -351,7 +351,7 @@ export function ContestLanding({
                 >
                   <FileCheck2 size={20} aria-hidden="true" />
                   <span>
-                    <small>GABARITO · LINK EXTERNO</small>
+                    <small>{answerKey.roleLabel} · LINK EXTERNO</small>
                     <strong>{answerKey.title}</strong>
                     <em>{answerKey.licenseLabel}</em>
                   </span>

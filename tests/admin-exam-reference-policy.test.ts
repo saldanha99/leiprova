@@ -296,3 +296,171 @@ describe("identidade da última prova por produto", () => {
     );
   });
 });
+
+describe("finalidade do gabarito no escopo do vínculo", () => {
+  // Escopo sem licença, como o caminho de link externo oficial usa.
+  const externalScope: ExamReferenceScope = {
+    ...validScope,
+    documentSourcePolicy: "metadata_only",
+    documentRightsHolder: null,
+    documentLicenseBasis: null,
+    documentLicenseReference: null,
+    documentLicenseEvidenceChecksumSha256: null,
+    documentLicenseEvidenceCheckedAt: null,
+    documentLicensedAt: null,
+    documentLicenseExpiresAt: null,
+    answerKeyDocumentSourcePolicy: "metadata_only",
+    answerKeyDocumentRightsHolder: null,
+    answerKeyDocumentLicenseBasis: null,
+    answerKeyDocumentLicenseReference: null,
+    answerKeyDocumentLicenseEvidenceChecksumSha256: null,
+    answerKeyDocumentLicenseEvidenceCheckedAt: null,
+    answerKeyDocumentLicensedAt: null,
+    answerKeyDocumentLicenseExpiresAt: null,
+  };
+
+  const compositeScope: ExamReferenceScope = {
+    ...externalScope,
+    editionAnswerKeyFinality: "preliminary_plus_maintenance_act",
+    answerKeyDocumentTitle: "Gabarito oficial preliminar da prova preambular",
+    answerKeyDecisionDocumentId: 103,
+    answerKeyDecisionDocumentStatus: "approved",
+    answerKeyDecisionDocumentType: "answer_key_decision",
+    answerKeyDecisionDocumentTitle:
+      "Aviso de 22/06/2026: julgados os recursos, mantidos os gabaritos da prova preambular",
+    answerKeyDecisionDocumentExamEditionId: 77,
+    answerKeyDecisionDocumentHttpStatus: 200,
+    answerKeyDecisionDocumentContentType: "application/pdf",
+    answerKeyDecisionDocumentSourceCheckedAt: "2026-09-11T12:00:00.000Z",
+    answerKeyDecisionDocumentIsOfficialSource: true,
+    answerKeyDecisionDocumentSourcePolicy: "metadata_only",
+    answerKeyDecisionDocumentDistributionMode: "external_link",
+    answerKeyDecisionDocumentExpectedQuestionCount: null,
+  };
+
+  it("não muda nada para edições com gabarito definitivo próprio (MPMT, PGE-AC e anteriores)", () => {
+    // Campo ausente, como nas edições anteriores à migração 0055.
+    expect(validateExamReferenceScope(validScope, "2026-09-12")).toEqual({ valid: true });
+    expect(
+      validateExamReferenceScope(
+        { ...validScope, editionAnswerKeyFinality: "definitive_document" },
+        "2026-09-12",
+      ),
+    ).toEqual({ valid: true });
+    expect(
+      validateExamReferenceScope(externalScope, "2026-09-12", { requireLicense: false }),
+    ).toEqual({ valid: true });
+  });
+
+  it("recusa ato de manutenção pendurado em edição com gabarito definitivo", () => {
+    for (const finality of [undefined, "definitive_document"]) {
+      const decision = validateExamReferenceScope(
+        {
+          ...externalScope,
+          editionAnswerKeyFinality: finality,
+          answerKeyDecisionDocumentId: 103,
+          answerKeyDecisionDocumentType: "answer_key_decision",
+        },
+        "2026-09-12",
+        { requireLicense: false },
+      );
+      expect(decision.valid).toBe(false);
+      expect(decision).toMatchObject({ reason: expect.stringContaining("não admite ato") });
+    }
+  });
+
+  it("aceita o escopo composto completo e recusa a ausência do ato", () => {
+    expect(
+      validateExamReferenceScope(compositeScope, "2026-09-12", { requireLicense: false }),
+    ).toEqual({ valid: true });
+    const withoutAct = validateExamReferenceScope(
+      {
+        ...compositeScope,
+        answerKeyDecisionDocumentId: null,
+        answerKeyDecisionDocumentType: null,
+      },
+      "2026-09-12",
+      { requireLicense: false },
+    );
+    expect(withoutAct.valid).toBe(false);
+    expect(withoutAct).toMatchObject({
+      reason: expect.stringContaining("ato oficial que manteve todos os gabaritos"),
+    });
+  });
+
+  it("recusa ato de outra edição, duplicado, não aprovado, não PDF, vencido ou com licença", () => {
+    const changes: Partial<ExamReferenceScope>[] = [
+      { answerKeyDecisionDocumentExamEditionId: 78 },
+      { answerKeyDecisionDocumentId: compositeScope.documentId },
+      { answerKeyDecisionDocumentId: compositeScope.answerKeyDocumentId },
+      { answerKeyDecisionDocumentType: "answer_key" },
+      { answerKeyDecisionDocumentStatus: "pending_review" },
+      { answerKeyDecisionDocumentHttpStatus: 404 },
+      { answerKeyDecisionDocumentContentType: "text/html" },
+      { answerKeyDecisionDocumentIsOfficialSource: false },
+      { answerKeyDecisionDocumentSourcePolicy: "licensed_content" },
+      { answerKeyDecisionDocumentDistributionMode: "hosted_copy" },
+      { answerKeyDecisionDocumentExpectedQuestionCount: 100 },
+      { answerKeyDecisionDocumentSourceCheckedAt: "2026-07-01T12:00:00.000Z" },
+      { answerKeyDecisionDocumentSourceCheckedAt: null },
+    ];
+    for (const change of changes) {
+      expect(
+        validateExamReferenceScope({ ...compositeScope, ...change }, "2026-09-12", {
+          requireLicense: false,
+        }).valid,
+      ).toBe(false);
+    }
+    // Evidência composta vale só como link externo: exigir licença invalida.
+    expect(
+      validateExamReferenceScope(compositeScope, "2026-09-12", { requireLicense: true }).valid,
+    ).toBe(false);
+  });
+
+  it("recusa relabelamento dos títulos nos dois sentidos", () => {
+    const relabeledKey = validateExamReferenceScope(
+      {
+        ...compositeScope,
+        answerKeyDocumentTitle:
+          "Gabarito definitivo, provisório até o julgamento dos recursos",
+      },
+      "2026-09-12",
+      { requireLicense: false },
+    );
+    expect(relabeledKey.valid).toBe(false);
+    expect(relabeledKey).toMatchObject({
+      reason: expect.stringContaining("papel real de cada documento"),
+    });
+    for (const title of [
+      "Gabarito oficial definitivo da prova preambular",
+      "Resultado final do concurso",
+    ]) {
+      expect(
+        validateExamReferenceScope(
+          { ...compositeScope, answerKeyDecisionDocumentTitle: title },
+          "2026-09-12",
+          { requireLicense: false },
+        ).valid,
+      ).toBe(false);
+    }
+  });
+
+  it("recusa finalidade desconhecida gravada na edição", () => {
+    expect(
+      validateExamReferenceScope(
+        { ...externalScope, editionAnswerKeyFinality: "gabarito_mantido" },
+        "2026-09-12",
+        { requireLicense: false },
+      ).valid,
+    ).toBe(false);
+  });
+
+  it("a consulta de escopo carrega o terceiro documento por leftJoin e a finalidade da edição", () => {
+    expect(reviewQueriesSource).toContain("export const answerKeyDecisionDocuments = alias(");
+    expect(reviewQueriesSource).toContain("editionAnswerKeyFinality: examEditions.answerKeyFinality");
+    expect(reviewQueriesSource).toContain(".leftJoin(");
+    expect(reviewQueriesSource).toContain("answerKeyDecisionDocumentPublicId: z.string().uuid().optional()");
+    expect(actionsSource).toContain('"answer_key_decision"');
+    expect(actionsSource).toContain("answerKeyDecisionDocumentId:");
+  });
+});

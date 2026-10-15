@@ -18,6 +18,7 @@ function candidate(
     relationship: "latest_previous_exam",
     primaryDocumentId: 21,
     answerKeyDocumentId: 23,
+    answerKeyDecisionDocumentId: null,
     referenceReviewedByUserId: 91,
     referenceReviewedAt: new Date("2026-09-11T12:00:00.000Z"),
     selectionVerifiedAt: new Date("2026-09-10T12:00:00.000Z"),
@@ -32,6 +33,7 @@ function candidate(
     opportunityJurisdictionCode: "BA",
     editionInstitutionAcronym: "PCBA",
     editionJurisdictionCode: "BA",
+    editionAnswerKeyFinality: null,
     bankSlug: "cebraspe",
     bankName: "Cebraspe",
     documentId: 21,
@@ -97,12 +99,14 @@ describe("política pública da última prova", () => {
         examDate: "2022-07-24",
         bank: { slug: "cebraspe", name: "Cebraspe" },
       },
+      answerKeyFinality: "definitive_document",
       questionBooklet: {
         publicId: "pc-ba-2022-caderno",
         documentType: "question_booklet",
         title: "Caderno de questões — Delegado",
         officialUrl: "https://cdn.cebraspe.org.br/pc-ba-2022/prova.pdf",
         accessType: "external_link",
+        roleLabel: "CADERNO DE QUESTÕES",
         licenseLabel: "Licença de uso registrada",
         sourceCheckedAt: new Date("2026-09-10T13:00:00.000Z"),
         questionCount: 100,
@@ -110,12 +114,80 @@ describe("política pública da última prova", () => {
       answerKeys: [
         expect.objectContaining({
           publicId: "gabarito-final",
+          roleLabel: "GABARITO",
           licenseLabel: "Licença de uso registrada",
         }),
       ],
     });
     expect(JSON.stringify(result)).not.toContain("CONTRATO-INTERNO");
     expect(JSON.stringify(result)).not.toContain("Titular contratual");
+  });
+
+  it("entrega dois itens com papéis distintos quando a edição declara evidência composta", () => {
+    const composite = {
+      editionAnswerKeyFinality: "preliminary_plus_maintenance_act" as const,
+      answerKeyDecisionDocumentId: 25,
+      sourcePolicy: "metadata_only" as const,
+      rightsHolder: null,
+      licenseBasis: null,
+      licenseReference: null,
+      licenseEvidenceChecksumSha256: null,
+      licenseEvidenceCheckedAt: null,
+      licensedAt: null,
+      licenseExpiresAt: null,
+    };
+    const rows = [
+      candidate(composite),
+      candidate({
+        ...composite,
+        documentId: 23,
+        documentPublicId: "gabarito-preliminar",
+        documentType: "answer_key",
+        expectedQuestionCount: null,
+        documentTitle: "Gabarito oficial preliminar da prova preambular",
+        sourceUrl: "https://cdn.cebraspe.org.br/pc-ba-2022/preliminar.pdf",
+      }),
+      candidate({
+        ...composite,
+        documentId: 25,
+        documentPublicId: "ato-manutencao",
+        documentType: "answer_key_decision",
+        expectedQuestionCount: null,
+        documentTitle: "Aviso: julgados os recursos, mantidos os gabaritos",
+        sourceUrl: "https://cdn.cebraspe.org.br/pc-ba-2022/recursos.pdf",
+      }),
+    ];
+    const result = buildPublicContestExamReference(rows, now);
+    expect(result?.answerKeyFinality).toBe("preliminary_plus_maintenance_act");
+    expect(result?.answerKeys.map((item) => item.publicId)).toEqual([
+      "gabarito-preliminar",
+      "ato-manutencao",
+    ]);
+    // O rótulo vem do tipo do documento: o ato nunca é anunciado como gabarito.
+    expect(result?.answerKeys.map((item) => item.roleLabel)).toEqual([
+      "GABARITO",
+      "DECISÃO SOBRE O GABARITO",
+    ]);
+    expect(JSON.stringify(result)).not.toMatch(/definitiv/iu);
+
+    // Sem o ato, o preliminar não aparece sozinho como se fosse final.
+    expect(buildPublicContestExamReference(rows.slice(0, 2), now)).toBeNull();
+    // Ato pendurado em edição com gabarito definitivo é estado incoerente.
+    expect(
+      buildPublicContestExamReference(
+        rows.map((row) => ({ ...row, editionAnswerKeyFinality: null })),
+        now,
+      ),
+    ).toBeNull();
+  });
+
+  it("recusa finalidade desconhecida gravada na edição", () => {
+    expect(
+      buildPublicContestExamReference(
+        [candidate({ editionAnswerKeyFinality: "gabarito_oficial_definitivo" })],
+        now,
+      ),
+    ).toBeNull();
   });
 
   it("não publica cópia hospedada enquanto não existe entrega autenticada", () => {

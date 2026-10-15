@@ -45,6 +45,8 @@ const publicExamReferenceSelection = {
   relationship: contestProductExamReferences.relationship,
   primaryDocumentId: contestProductExamReferences.primaryDocumentId,
   answerKeyDocumentId: contestProductExamReferences.answerKeyDocumentId,
+  answerKeyDecisionDocumentId:
+    contestProductExamReferences.answerKeyDecisionDocumentId,
   referenceReviewedByUserId:
     contestProductExamReferences.reviewedByUserId,
   referenceReviewedAt: contestProductExamReferences.reviewedAt,
@@ -60,6 +62,7 @@ const publicExamReferenceSelection = {
   opportunityJurisdictionCode: contestOpportunities.jurisdictionCode,
   editionInstitutionAcronym: examEditions.institutionAcronym,
   editionJurisdictionCode: examEditions.jurisdictionCode,
+  editionAnswerKeyFinality: examEditions.answerKeyFinality,
   bankSlug: quizBanks.slug,
   bankName: quizBanks.name,
   documentId: examEditionDocuments.id,
@@ -152,6 +155,11 @@ export async function getApprovedContestExamReference(
             eq(
               examEditionDocuments.id,
               contestProductExamReferences.answerKeyDocumentId,
+            ),
+            // Terceiro slot da evidência composta; nulo nas demais edições.
+            eq(
+              examEditionDocuments.id,
+              contestProductExamReferences.answerKeyDecisionDocumentId,
             ),
           ),
         ),

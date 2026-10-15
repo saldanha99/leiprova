@@ -45,11 +45,14 @@ describe('cadastro delimitado PGE-AC VIII/2026',()=>{
     expect(parsePgeacPreviousExamArgs(['--apply',...identity,'--expected-fingerprint='+'a'.repeat(64)]).apply).toBe(true);
     expect(()=>assertPgeacRegistrationRequest({mode:'preview',opportunityPublicId:'0f7ba2b8-797e-4939-a86f-57077eea58a5',expectedNoticeSha256:target.noticeSha256})).toThrow();
   });
-  it('standing aceita somente os dois pares oficiais exclusivos; não MPRJ/preliminar/mistura',()=>{
+  it('standing aceita só pares oficiais exatos; MPRJ-objetiva, preliminar e mistura continuam recusados',()=>{
     const pge=`${target.productSlug}=${target.editionPublicId}`,mp='mpe-mt-promotor-de-justica-2026=mpmt-promotor-substituto-2026-objetiva';
     expect(parsePreviousExamLinkCommand(['--standing',pge]).standing).toBe(true);expect(parsePreviousExamLinkCommand(['--standing',mp]).standing).toBe(true);
     for(const pairs of [pge.replace('viii-2026','vii-2025'),'mpe-rj-promotor-de-justica-2026=mprj-promotor-substituto-xxxix-2026-objetiva',pge+'-preliminar'])expect(()=>parsePreviousExamLinkCommand(['--standing',pairs])).toThrow();
     expect(()=>parsePreviousExamLinkCommand(['--standing',pge,mp])).toThrow();
+    // O par MPRJ só passou a valer com a evidência composta e o identificador
+    // `…-preambular`; a asserção acima continua provando que `…-objetiva` lança.
+    expect(parsePreviousExamLinkCommand(['--standing','mpe-rj-promotor-de-justica-2026=mprj-promotor-substituto-xxxix-2026-preambular']).standing).toBe(true);
   });
   it('fonte primária admite exatamente o notice aprovado sem abrir diretório FGV inteiro',()=>{
     expect(parseOfficialOpportunitySourceUrl(target.noticeUrl).sourceId).toBe('fgv-conhecimento');

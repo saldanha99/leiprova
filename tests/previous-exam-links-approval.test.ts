@@ -18,6 +18,30 @@ describe("aprovação de links oficiais de prova anterior por comando", () => {
     expect(script).toContain('isolationLevel: "serializable"');
   });
 
+  it("aceita três pendentes apenas quando a edição declara evidência composta", () => {
+    expect(script).toContain(
+      "const compositeEvidence = requiresAnswerKeyMaintenanceAct(edition.answerKeyFinality)",
+    );
+    expect(script).toContain("const expectedPending = compositeEvidence ? 3 : 2");
+    expect(script).toContain(
+      "pending.length !== expectedPending || Boolean(answerKeyDecision) !== compositeEvidence",
+    );
+    expect(script).toContain(
+      'pending.find((document) => document.documentType === "answer_key_decision")',
+    );
+    // O terceiro slot é gravado, com o tipo explícito, e fica nulo nas demais.
+    expect(script).toContain("answerKeyDecisionDocumentId: scope.answerKeyDecisionDocumentId ?? null");
+    expect(script).toContain(
+      'answerKeyDecisionDocumentType: scope.answerKeyDecisionDocumentId ? "answer_key_decision" : null',
+    );
+    expect(script).toContain("answerKeyDecisionDocumentPublicId: answerKeyDecision.publicId");
+    // A decisão continua passando pela mesma política, sem licença.
+    expect(script).toContain(
+      "validateExamReferenceScope(scope, todayIso, { requireLicense: false })",
+    );
+    expect(script).toContain("documentsApproved: pendingDocuments.length");
+  });
+
   it("desfaz a prévia e não libera produto nem conteúdo licenciado", () => {
     expect(script).toContain("if (!apply) throw new PreviewRollback");
     expect(script).toContain("productsReleased: 0");

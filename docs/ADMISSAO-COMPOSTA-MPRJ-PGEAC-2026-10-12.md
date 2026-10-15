@@ -134,3 +134,78 @@ Os hashes de `programme.sections` e os389/96requisitos permanecem iguais.
 A referência operacional agora é
 `owner-standing-2026-10-12:official-sources-programs`; o documento da decisão
 continua sendo a evidência, sem usar caminho com maiúsculas na coluna SQL.
+
+## Evidência final composta do gabarito MPRJ (migração 0055, 15/10/2026)
+
+**Escrito, revisável e não aplicado.** Nada foi migrado, gravado em produção nem
+liberado; a prévia é somente leitura e a admissão continua exigindo prévia e
+fingerprint auditáveis. `prepared` não é abertura.
+
+A lacuna é **normativa, não operacional**. O Edital XXXVIII/2025 tinha o subitem
+11.7.3 (“com a divulgação dos novos gabaritos, se for o caso”); o **XXXIX/2026 não
+tem esse subitem**: vai do gabarito provisório (11.7) ao resultado definitivo
+(11.8.2), e 11.1.5 usa “gabarito oficial definitivo” apenas como critério de
+pontuação. Logo **não existe gabarito definitivo autônomo da preambular** e ele não
+vai existir. A finalidade se comprova por dois documentos oficiais:
+
+| Papel | Documento | Publicado |
+|---|---|---|
+| Caderno Tipo 1 (100 questões) | `promotor-de-justica-substituto-cns001-tipo-1.pdf` | 01/06/2026 |
+| Gabarito Oficial **Preliminar** da Prova Preambular | `mprj-promotor-2026-gabaritos-para-publicacao.pdf` | 01/06/2026 |
+| Aviso de 22/06 — julgados os recursos, **mantidos todos os gabaritos** | `22.06-recursos-gabarito-preambular.pdf` | 22/06/2026 |
+
+O aviso de 22/06 invoca o art. 38, IV, da Deliberação CSMP nº 86/2025 e declara
+manutenção integral: zero anulação, zero alteração. O aviso de 25/06 (recurso de
+nota desprovido sob 11.8.2) é consistente com isso. Prova aplicada em 31/05/2026.
+
+**Modelagem.** Tipo próprio `answer_key_decision` em `exam_edition_documents`,
+coluna `exam_editions.answer_key_finality`
+(`definitive_document` | `preliminary_plus_maintenance_act`, anulável para as
+edições anteriores) e terceiro slot anulável
+`contest_product_exam_references.answer_key_decision_document_id` + `…_type`, com
+FK composto `(id, exam_edition_id, document_type)`. Alternativas recusadas: deixar
+o ato só na auditoria (não entraria na reconferência de link nem na página) e
+cadastrá-lo como um segundo `answer_key` (mentiria sobre o tipo e acionaria o
+rótulo errado na interface — o relabelamento proibido por via indireta).
+
+**O que o banco não garante.** A coerência entre `answer_key_finality` e o conjunto
+de documentos presentes envolve duas tabelas e **não é expressável em CHECK de
+tabela única**. Ela é imposta por `src/lib/exams/answer-key-finality.ts` (política
+pura), por `validateAnswerKeyFinalityScope` em
+`src/lib/exams/admin-exam-reference-policy.ts`, pelo operador
+`src/lib/exams/mprj-previous-exam-admission.ts` e pelos testes. O comentário da
+migração diz isso onde alguém vá procurar.
+
+**Rótulo derivado do tipo.** `ANSWER_KEY_DOCUMENT_TYPE_LABELS` dá
+`GABARITO` ao gabarito e `DECISÃO SOBRE O GABARITO` ao ato; nenhum valor contém
+“definitivo”. A página deixou de imprimir `GABARITO` fixo para todo item de
+`answerKeys` (`contest-landing.tsx`). Sem o ato, a camada pública **não** mostra o
+preliminar sozinho: falha fechada.
+
+**Guardas acrescentadas.** O `--standing` passou a aceitar o par
+`mpe-rj-promotor-de-justica-2026=mprj-promotor-substituto-xxxix-2026-preambular`
+**somente** enquanto a evidência composta se sustenta na política; o identificador
+antigo `…-objetiva`, o sufixo `-preliminar`, a XXXVIII/2025 e qualquer mistura
+continuam recusados. Se a FGV publicar um gabarito definitivo da preambular, o
+`assertMprjOfficialAnchors` recusa a prévia na hora, antes do fingerprint — o caso
+deixa de ser composto e exige decisão própria. Ato com alteração ou anulação de
+questão é recusado, não adaptado: é o caso real do XXXVIII/2025 (cinco anulações).
+
+**Sem licença e sem cópia.** Os três documentos são `external_link` +
+`metadata_only`, com `source_content_stored: false`; o CHECK novo impede que o ato
+seja `hosted_copy` ou `licensed_content`. Nenhuma questão, alternativa, letra de
+gabarito ou PDF é copiado, extraído ou armazenado. A quantidade de 100 questões é
+metadado declarado com proveniência (`MPRJ_QUESTION_COUNT_CORROBORATION`, capa do
+caderno lida em 14/10/2026), **não** extraída do edital nesta execução.
+
+**Grants.** `deploy/grant-app-role.sql` ganhou as duas colunas novas no
+`grant insert` de `contest_product_exam_references`. O `grant select` é por tabela
+e já alcança colunas novas; o `grant insert` de `exam_edition_documents` já inclui
+`document_type`, então o tipo novo não exige grant próprio.
+
+**Pendente, em execução separada e com recibo:** prévia real do operador,
+conferência do fingerprint, `--apply`, e depois
+`pnpm exams:links:approve --standing` para os três documentos. A migração vai a
+produção pelo caminho normal (`deploy/pull-deploy.sh` encadeia as migrations);
+nada aqui autoriza rodá-la. O produto segue `draft`, com as 68 questões válidas
+ainda exigidas por outro caminho.

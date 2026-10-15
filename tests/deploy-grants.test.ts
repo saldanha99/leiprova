@@ -80,10 +80,20 @@ describe("privilégios do app em produção", () => {
       /grant update \(\s*http_status,\s*source_checked_at,\s*link_verified_at,\s*status,\s*reviewed_by_user_id,\s*reviewed_at,\s*review_notes,\s*updated_at\s*\) on exam_edition_documents to :app_user;/,
     );
     expect(grants).toMatch(
-      /grant insert \(\s*public_id,\s*product_slug,\s*exam_edition_id,\s*primary_document_id,\s*primary_document_type,\s*answer_key_document_id,\s*answer_key_document_type,\s*relationship,\s*selection_verified_at,\s*initiated_by_user_id\s*\) on contest_product_exam_references to :app_user;/,
+      /grant insert \(\s*public_id,\s*product_slug,\s*exam_edition_id,\s*primary_document_id,\s*primary_document_type,\s*answer_key_document_id,\s*answer_key_document_type,\s*answer_key_decision_document_id,\s*answer_key_decision_document_type,\s*relationship,\s*selection_verified_at,\s*initiated_by_user_id\s*\) on contest_product_exam_references to :app_user;/,
     );
     expect(grants).toMatch(
       /grant update \(\s*selection_verified_at,\s*status,\s*reviewed_by_user_id,\s*reviewed_at,\s*review_notes,\s*updated_at\s*\) on contest_product_exam_references to :app_user;/,
+    );
+
+    // O terceiro slot entra na proposta e não é alterável na revisão: o grant de
+    // update do vínculo continua sem nenhuma coluna de documento.
+    const decisionSlotUpdateGrant =
+      grants.match(
+        /grant update \([^;]+\) on contest_product_exam_references to :app_user;/,
+      )?.[0] ?? "";
+    expect(decisionSlotUpdateGrant).not.toMatch(
+      /answer_key_decision_document_id|answer_key_decision_document_type|primary_document_id/,
     );
 
     const documentReviewGrant =

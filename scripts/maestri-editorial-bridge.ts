@@ -8,6 +8,7 @@ import { agentWorkKindSchema, validateAgentWorkResult, workPayloadSchema, AGENT_
 import { settleLocalAgentResults } from "../src/lib/editorial/local-agent-results";
 import { hasPendingLocalAgentLease, withLocalAgentLock } from "../src/lib/editorial/local-agent-dispatch";
 import { agentTaskHandoff } from "../src/lib/editorial/agent-task-handoff";
+import { writePrivateFileAtomically } from "../src/lib/editorial/atomic-private-file";
 
 const root=fileURLToPath(new URL("../",import.meta.url));
 const queueRoot=path.join(root,".local/maestri/queue");
@@ -75,7 +76,7 @@ async function completePacket(packet:string) {
     await readPrivateJson(path.join(path.dirname(packet),"response.json")));
   const receipt=remote("complete",{jobKey:claim.job.jobKey,inputHash:claim.job.inputHash,
     leaseToken:claim.job.leaseToken,result});
-  await writeFile(path.join(path.dirname(packet),"receipt.json"),JSON.stringify(receipt,null,2),{mode:0o600});
+  await writePrivateFileAtomically(path.join(path.dirname(packet),"receipt.json"),JSON.stringify(receipt,null,2));
   return receipt;
 }
 async function main() {
@@ -114,7 +115,8 @@ async function main() {
     const queues=[queueRoot,(await roleQueues())[agent]].filter((value):value is string=>Boolean(value));
     const summary={attempted:0,completed:0,failed:0};
     for(const directory of queues) {
-      const next=await settleLocalAgentResults(directory,agent,completePacket,3-summary.attempted);
+      const next=await settleLocalAgentResults(directory,agent,completePacket,3-summary.attempted,undefined,
+        diagnostic=>console.error(JSON.stringify({agent,diagnostic})));
       summary.attempted+=next.attempted;summary.completed+=next.completed;summary.failed+=next.failed;
     }
     console.log(JSON.stringify(summary));

@@ -16,6 +16,7 @@
     "content:verify": "tsx scripts/verify-content.ts",
     "content:feed:real": "tsx --env-file-if-exists=.env scripts/feed-available-real-data.ts",
     "exams:links:approve": "tsx --env-file-if-exists=.env scripts/approve-previous-exam-links.ts",
+    "exams:mprj:register": "tsx --env-file-if-exists=.env scripts/register-mprj-previous-exam-links.ts",
     "commerce:preparation:review": "tsx --env-file-if-exists=.env scripts/review-preparation-mode.ts",
     "commerce:course:dossier": "tsx --env-file-if-exists=.env scripts/prepare-official-course-dossiers.ts",
     "commerce:product:release": "tsx --env-file-if-exists=.env scripts/release-contest-product.ts",

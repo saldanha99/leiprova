@@ -1,4 +1,8 @@
 import { OFFICIAL_COURSE_STANDING_REFERENCE } from "@/lib/editorial/official-course-dossier";
+import {
+  MPRJ_XXXIX_PREAMBULAR_ANSWER_KEY_EVIDENCE,
+  reviewAnswerKeyEvidence,
+} from "@/lib/exams/answer-key-finality";
 
 export const MPMT_PREVIOUS_EDITION_PUBLIC_ID = "mpmt-promotor-substituto-2026-objetiva";
 export const MPMT_PREVIOUS_PRODUCT_SLUG = "mpe-mt-promotor-de-justica-2026";
@@ -6,7 +10,34 @@ export const MPMT_PREVIOUS_PRODUCT_SLUG = "mpe-mt-promotor-de-justica-2026";
 export const PGEAC_PREVIOUS_EDITION_PUBLIC_ID = "pgeac-procurador-classe-i-viii-2026-objetiva";
 export const PGEAC_PREVIOUS_PRODUCT_SLUG = "pge-ac-procurador-do-estado-reta-final";
 
+/** Prova preambular do XXXIX, com evidência final composta. O identificador diz
+ * `preambular`: `…-objetiva` nunca foi criado e continua recusado. */
+export const MPRJ_PREVIOUS_EDITION_PUBLIC_ID = "mprj-promotor-substituto-xxxix-2026-preambular";
+export const MPRJ_PREVIOUS_PRODUCT_SLUG = "mpe-rj-promotor-de-justica-2026";
+
+/** O par MPRJ só entra no standing enquanto a evidência composta se sustenta na
+ * política pura: gabarito preliminar + ato que mantém todos os gabaritos, na
+ * edição exata. Sem isso, o standing recusa o MPRJ como antes de 0055. */
+export function mprjCompositeAnswerKeyEvidenceStands() {
+  const review = reviewAnswerKeyEvidence(MPRJ_XXXIX_PREAMBULAR_ANSWER_KEY_EVIDENCE);
+  return (
+    review.valid &&
+    review.evidence.finality === "preliminary_plus_maintenance_act" &&
+    review.evidence.edition.publicId === MPRJ_PREVIOUS_EDITION_PUBLIC_ID &&
+    review.evidence.maintenanceAct.decisionEffect === "all_keys_maintained"
+  );
+}
+
 type Pair = Readonly<{ productSlug: string; editionPublicId: string }>;
+
+function standingPairAllowed(pair: Pair) {
+  if (pair.productSlug === MPMT_PREVIOUS_PRODUCT_SLUG) return pair.editionPublicId === MPMT_PREVIOUS_EDITION_PUBLIC_ID;
+  if (pair.productSlug === PGEAC_PREVIOUS_PRODUCT_SLUG) return pair.editionPublicId === PGEAC_PREVIOUS_EDITION_PUBLIC_ID;
+  if (pair.productSlug === MPRJ_PREVIOUS_PRODUCT_SLUG) {
+    return pair.editionPublicId === MPRJ_PREVIOUS_EDITION_PUBLIC_ID && mprjCompositeAnswerKeyEvidenceStands();
+  }
+  return false;
+}
 export function parsePreviousExamLinkCommand(argv: readonly string[]) {
   let apply = false;
   let standing = false;
@@ -20,8 +51,7 @@ export function parsePreviousExamLinkCommand(argv: readonly string[]) {
     pairs.push({ productSlug: parts[0], editionPublicId: parts[1] });
   }
   if (!pairs.length || new Set(pairs.map((pair) => pair.productSlug)).size !== pairs.length) throw new Error("Informe pares únicos de produto/edição.");
-  if (standing && (pairs.length !== 1 || !((pairs[0].productSlug === MPMT_PREVIOUS_PRODUCT_SLUG && pairs[0].editionPublicId === MPMT_PREVIOUS_EDITION_PUBLIC_ID)
-    || (pairs[0].productSlug === PGEAC_PREVIOUS_PRODUCT_SLUG && pairs[0].editionPublicId === PGEAC_PREVIOUS_EDITION_PUBLIC_ID)))) throw new Error("Standing delimitado aos pares exatos MPMT 01/2026 e PGE-AC VIII/2026; uma edição por execução.");
+  if (standing && (pairs.length !== 1 || !standingPairAllowed(pairs[0]))) throw new Error("Standing delimitado aos pares exatos MPMT 01/2026, PGE-AC VIII/2026 e MPRJ XXXIX/2026 preambular com evidência composta; uma edição por execução.");
   return { apply, standing, pairs };
 }
 

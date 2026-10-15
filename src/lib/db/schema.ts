@@ -551,6 +551,9 @@ export const examEditions = pgTable(
     sourcePageTitle: text("source_page_title"),
     sourceHttpStatus: integer("source_http_status"),
     sourceCheckedAt: timestamp("source_checked_at", { withTimezone: true }),
+    // Como a finalidade do gabarito desta edição se comprova. Anulável para as
+    // edições anteriores a 0055; preenchida explicitamente nas novas.
+    answerKeyFinality: text("answer_key_finality"),
     createdByUserId: bigint("created_by_user_id", {
       mode: "number",
     }).references(() => users.id, {
@@ -647,6 +650,10 @@ export const examEditions = pgTable(
       "exam_editions_source_http_status_check",
       sql`${table.sourceHttpStatus} is null or ${table.sourceHttpStatus} between 100 and 599`,
     ),
+    check(
+      "exam_editions_answer_key_finality_check",
+      sql`${table.answerKeyFinality} is null or ${table.answerKeyFinality} in ('definitive_document', 'preliminary_plus_maintenance_act')`,
+    ),
   ],
 );
 
@@ -737,7 +744,7 @@ export const examEditionDocuments = pgTable(
     ),
     check(
       "exam_edition_documents_type_check",
-      sql`${table.documentType} in ('question_booklet', 'answer_key')`,
+      sql`${table.documentType} in ('question_booklet', 'answer_key', 'answer_key_decision')`,
     ),
     check(
       "exam_edition_documents_title_check",
@@ -781,8 +788,18 @@ export const examEditionDocuments = pgTable(
         and ${table.expectedQuestionCount} is not null
         and ${table.expectedQuestionCount} between 1 and 300
       ) or (
-        ${table.documentType} = 'answer_key'
+        ${table.documentType} in ('answer_key', 'answer_key_decision')
         and ${table.expectedQuestionCount} is null
+      )`,
+    ),
+    // O ato que mantém os gabaritos é sempre link externo com metadados.
+    check(
+      "exam_edition_documents_decision_external_check",
+      sql`${table.documentType} <> 'answer_key_decision' or (
+        ${table.distributionMode} = 'external_link'
+        and ${table.sourcePolicy} = 'metadata_only'
+        and ${table.storageKey} is null
+        and ${table.byteLength} is null
       )`,
     ),
     check(
@@ -1082,6 +1099,12 @@ export const contestProductExamReferences = pgTable(
     answerKeyDocumentType: text("answer_key_document_type")
       .notNull()
       .default("answer_key"),
+    // Terceiro slot explícito: o ato oficial que, julgados os recursos, mantém
+    // todos os gabaritos. Nulo quando a edição tem gabarito definitivo próprio.
+    answerKeyDecisionDocumentId: bigint("answer_key_decision_document_id", {
+      mode: "number",
+    }),
+    answerKeyDecisionDocumentType: text("answer_key_decision_document_type"),
     relationship: text("relationship")
       .notNull()
       .default("latest_previous_exam"),
@@ -1128,6 +1151,19 @@ export const contestProductExamReferences = pgTable(
       ],
       name: "contest_product_exam_references_answer_key_scope_fk",
     }).onDelete("restrict"),
+    foreignKey({
+      columns: [
+        table.answerKeyDecisionDocumentId,
+        table.examEditionId,
+        table.answerKeyDecisionDocumentType,
+      ],
+      foreignColumns: [
+        examEditionDocuments.id,
+        examEditionDocuments.examEditionId,
+        examEditionDocuments.documentType,
+      ],
+      name: "contest_product_exam_references_answer_key_decision_scope_fk",
+    }).onDelete("restrict"),
     uniqueIndex("contest_product_exam_references_active_identity_uidx")
       .on(
         table.productSlug,
@@ -1158,6 +1194,11 @@ export const contestProductExamReferences = pgTable(
       table.examEditionId,
       table.answerKeyDocumentType,
     ),
+    index("contest_product_exam_references_answer_key_decision_idx").on(
+      table.answerKeyDecisionDocumentId,
+      table.examEditionId,
+      table.answerKeyDecisionDocumentType,
+    ),
     index("contest_product_exam_references_initiated_by_idx").on(
       table.initiatedByUserId,
     ),
@@ -1173,6 +1214,22 @@ export const contestProductExamReferences = pgTable(
       sql`${table.primaryDocumentType} = 'question_booklet'
         and ${table.answerKeyDocumentType} = 'answer_key'
         and ${table.answerKeyDocumentId} <> ${table.primaryDocumentId}`,
+    ),
+    // Ambas nulas, ou ambas preenchidas com o tipo do ato e id distinto dos
+    // outros dois. A coerência com exam_editions.answer_key_finality envolve
+    // duas tabelas e fica com o operador e os testes, não com o banco.
+    check(
+      "contest_product_exam_references_answer_key_decision_check",
+      sql`(
+        ${table.answerKeyDecisionDocumentId} is null
+        and ${table.answerKeyDecisionDocumentType} is null
+      ) or (
+        ${table.answerKeyDecisionDocumentId} is not null
+        and ${table.answerKeyDecisionDocumentType} is not null
+        and ${table.answerKeyDecisionDocumentType} = 'answer_key_decision'
+        and ${table.answerKeyDecisionDocumentId} <> ${table.primaryDocumentId}
+        and ${table.answerKeyDecisionDocumentId} <> ${table.answerKeyDocumentId}
+      )`,
     ),
     check(
       "contest_product_exam_references_relationship_check",

@@ -422,6 +422,8 @@ grant insert (
   primary_document_type,
   answer_key_document_id,
   answer_key_document_type,
+  answer_key_decision_document_id,
+  answer_key_decision_document_type,
   relationship,
   selection_verified_at,
   initiated_by_user_id
