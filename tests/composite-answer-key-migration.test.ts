@@ -21,8 +21,9 @@ const schema = readFileSync(
 describe("migração 0055 — evidência final composta do gabarito", () => {
   it("entra no journal depois da 0054, sem renumerar a migração alheia", () => {
     const entries = journal.entries;
-    const last = entries.at(-1);
-    const previous = entries.at(-2);
+    const position = entries.findIndex((entry) => entry.idx === 55);
+    const last = entries[position];
+    const previous = entries[position - 1];
     expect(last?.idx).toBe(55);
     expect(last?.tag).toBe("0055_composite_answer_key_evidence");
     expect(previous?.idx).toBe(54);

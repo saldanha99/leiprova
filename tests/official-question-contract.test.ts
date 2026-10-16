@@ -12,6 +12,14 @@ import { approvedBindingQuestionContractExists, currentQuestionContractExists, q
 
 const options=['A','B','C','D','E'].map((key,index)=>({key,text:`Alternativa sintética ${index}`,correct:index===0}));
 describe('contrato oficial por cargo/edição/etapa',()=>{
+  it('reconhece a instrução MC5 sem aceitar negação ou apenas palavras soltas',()=>{
+    const clause='As questões objetivas têm 5 (cinco) opções de resposta (A, B, C, D e E) e somente uma delas está correta.';
+    expect(officialFormatEvidenceMatches('multiple_choice',clause)).toBe(true);
+    expect(officialFormatEvidenceMatches('multiple_choice',clause.replace('e somente','e não somente'))).toBe(false);
+    expect(officialFormatEvidenceMatches('multiple_choice','Não é verdade que '+clause)).toBe(false);
+    expect(officialFormatEvidenceMatches('multiple_choice',clause.replace('está correta','não está correta'))).toBe(false);
+    expect(officialFormatEvidenceMatches('multiple_choice','Cinco opções. Somente uma delas está correta.')).toBe(false);
+  });
   it('só admite cláusula que confirma o formato, sem misturar objetiva e outra etapa',()=>{
     expect(officialFormatEvidenceMatches('multiple_choice','Cada questão terá cinco opções A, B, C, D e E. Marque um, e somente um campo.')).toBe(true);
     expect(officialFormatEvidenceMatches('multiple_choice','A prova contém 5 (cinco) alternativas e apenas uma resposta correta.')).toBe(true);

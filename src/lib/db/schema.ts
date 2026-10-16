@@ -2427,6 +2427,69 @@ export const opportunityQuestionContracts = pgTable("opportunity_question_contra
   check("opportunity_question_contracts_payload_check", sql`jsonb_typeof(${table.payload})='object' and octet_length(${table.payload}::text)<65536 and ${table.payload}->>'format'=${table.format} and ${table.payload}->'optionKeys'=${table.optionKeys} and ${table.payload}->>'sourceSnapshotChecksum'=${table.sourceSnapshotChecksum}`),
 ]);
 
+
+export const officialQuestionFormatEvidence = pgTable("official_question_format_evidence", {
+  id: text("id").primaryKey(),
+  opportunityId: bigint("opportunity_id", { mode: "number" }).notNull().references(() => contestOpportunities.id, { onDelete: "restrict" }),
+  examEditionId: bigint("exam_edition_id", { mode: "number" }).notNull().references(() => examEditions.id, { onDelete: "restrict" }),
+  bankId: bigint("bank_id", { mode: "number" }).notNull().references(() => quizBanks.id, { onDelete: "restrict" }),
+  roleName: text("role_name").notNull(),
+  institutionAcronym: text("institution_acronym").notNull(),
+  jurisdictionCode: text("jurisdiction_code").notNull(),
+  examEditionDocumentId: bigint("exam_edition_document_id", { mode: "number" }).notNull(),
+  documentType: text("document_type").notNull(),
+  documentPublicId: text("document_public_id").notNull(),
+  sourceUrl: text("source_url").notNull(),
+  documentUpdatedAt: timestamp("document_updated_at", { withTimezone: true }).notNull(),
+  opportunityUpdatedAt: timestamp("opportunity_updated_at", { withTimezone: true }).notNull(),
+  editionUpdatedAt: timestamp("edition_updated_at", { withTimezone: true }).notNull(),
+  verificationDate: date("verification_date").notNull(),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  sourceSha256: text("source_sha256").notNull(),
+  robotsSha256: text("robots_sha256").notNull(),
+  pageNumber: smallint("page_number").notNull(),
+  pageTextSha256: text("page_text_sha256").notNull(),
+  parserVersion: text("parser_version").notNull(),
+  format: text("format").notNull(),
+  optionCount: smallint("option_count").notNull(),
+  singleCorrect: boolean("single_correct").notNull(),
+  questionCount: integer("question_count").notNull(),
+  status: text("status").notNull().default("approved"),
+  approvalReference: text("approval_reference").notNull(),
+  approvalBasis: text("approval_basis").notNull().default("owner_standing_authorization"),
+  humanReview: boolean("human_review").notNull().default(false),
+  reviewedByUserId: bigint("reviewed_by_user_id", { mode: "number" }).notNull().references(() => users.id, { onDelete: "restrict" }),
+  reviewedAt: timestamp("reviewed_at", { withTimezone: true }).notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+}, table => [
+  foreignKey({ name: "official_question_format_evidence_document_scope_fk", columns: [table.examEditionDocumentId,table.examEditionId,table.documentType], foreignColumns: [examEditionDocuments.id,examEditionDocuments.examEditionId,examEditionDocuments.documentType] }).onDelete("restrict"),
+  uniqueIndex("official_question_format_evidence_active_document_uidx").on(table.examEditionDocumentId).where(sql`${table.status}='approved'`),
+  index("official_question_format_evidence_scope_idx").on(table.opportunityId,table.examEditionId,table.bankId,table.status),
+  index("official_question_format_evidence_document_idx").on(table.examEditionDocumentId),
+  index("official_question_format_evidence_edition_idx").on(table.examEditionId),
+  index("official_question_format_evidence_bank_idx").on(table.bankId),
+  index("official_question_format_evidence_reviewer_idx").on(table.reviewedByUserId),
+  check("official_question_format_evidence_identity_check", sql`
+    ${table.opportunityId} = 20 AND ${table.examEditionId} = 41 AND ${table.roleName} = 'Promotor de Justiça Substituto'
+    AND ${table.institutionAcronym} = 'MPRJ' AND ${table.jurisdictionCode} = 'RJ'`),
+  check("official_question_format_evidence_hash_check", sql`
+    ${table.id} ~ '^[a-f0-9]{64}$' AND ${table.sourceSha256} ~ '^[a-f0-9]{64}$'
+    AND ${table.robotsSha256} ~ '^[a-f0-9]{64}$' AND ${table.pageTextSha256} ~ '^[a-f0-9]{64}$'`),
+  check("official_question_format_evidence_facts_check", sql`
+    ${table.documentType} = 'question_booklet' AND ${table.documentPublicId} ~ '^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'
+    AND ${table.sourceUrl} = 'https://conhecimento.fgv.br/sites/default/files/concursos/promotor-de-justica-substituto-cns001-tipo-1.pdf'
+    AND ${table.pageNumber} = 1 AND ${table.parserVersion} = 'mprj-type1-cover-mc5-v1'
+    AND ${table.format} = 'multiple_choice' AND ${table.optionCount} = 5 AND ${table.singleCorrect} AND ${table.questionCount} = 100`),
+  check("official_question_format_evidence_status_check", sql`${table.status} IN ('approved','suspended','superseded')`),
+  check("official_question_format_evidence_authorization_check", sql`
+    ${table.expiresAt} = (${table.verificationDate} + 2)::timestamp AT TIME ZONE 'UTC'
+    AND ${table.reviewedAt} >= ${table.verificationDate}::timestamp AT TIME ZONE 'UTC'
+    AND ${table.reviewedAt} < (${table.verificationDate} + 1)::timestamp AT TIME ZONE 'UTC'
+    AND ${table.approvalReference} = 'owner-standing-2026-10-12:official-sources-programs'
+    AND ${table.approvalBasis} = 'owner_standing_authorization' AND NOT ${table.humanReview}`),
+]);
+
 export const questions = pgTable(
   "questions",
   {

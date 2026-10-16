@@ -4,29 +4,60 @@ import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { z } from "zod";
 import * as schema from "../db/schema";
 import { approvedProductQuestionExists } from "../commerce/product-binding-query";
-import { officialQuestionContractSchema, questionContractFingerprint,officialFormatEvidenceMatches } from "./official-question-contract";
+import { officialQuestionContractInputSchema, officialQuestionContractSchema, MPRJ_PROMOTOR_MULTIPLE_CHOICE_PROFILE, type OfficialQuestionContract, questionContractFingerprint,officialFormatEvidenceMatches } from "./official-question-contract";
 import { OFFICIAL_COURSE_STANDING_REFERENCE } from "./official-course-dossier";
 import { currentQuestionContractExists, questionContractContentHash, questionOptionsMatchContract } from "./question-contract-query";
 import { certifyProductBindingContracts, lockQuestionContracts } from "./question-contract-service";
 import { parseOfficialOpportunitySourceUrl,parseOfficialOpportunityDocumentUrl } from "../opportunities/source-monitor-policy";
 import { lockApprovalScope } from "./approval-lock";
 
-const inputSchema=z.object({contract:officialQuestionContractSchema,productSlug:z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/u).optional()}).strict();
+import { observeMprjMc5Cover } from "./mprj-format-evidence";
+import { planMprjFormatEvidence, readMprjFormatDocument } from "./mprj-format-admission";
+
+const inputSchema=z.object({contract:officialQuestionContractInputSchema,productSlug:z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/u).optional()}).strict();
 const normalize=(text:string)=>text.normalize("NFKC").replace(/\s+/gu," ").trim();
 const fingerprint=(value:unknown)=>createHash("sha256").update(JSON.stringify(value)).digest("hex");
+const requestSchema=z.object({input:z.unknown(),actorPublicId:z.uuid(),approvalReference:z.literal(OFFICIAL_COURSE_STANDING_REFERENCE),
+  mode:z.enum(['preview','apply']),expectedFingerprint:z.string().regex(/^[a-f0-9]{64}$/u).optional(),refreshMprjEvidence:z.boolean().optional()}).strict();
+
+/** A fresh observation of identical format facts must not change the authorship contract. */
+export function sameMprjContractFacts(previous:OfficialQuestionContract,next:OfficialQuestionContract) {
+  const {formatEvidence:oldEvidence,...oldBase}=previous;
+  const {formatEvidence:newEvidence,...newBase}=next;
+  if(!oldEvidence || !newEvidence || questionContractFingerprint(oldBase)!==questionContractFingerprint(newBase)) return false;
+  const stable=(e:NonNullable<OfficialQuestionContract['formatEvidence']>)=>[
+    e.documentPublicId,e.sourceUrl,e.sourceSha256,e.pageTextSha256,e.pageNumber,e.parserVersion,
+    e.format,e.optionCount,e.singleCorrect,e.questionCount,
+  ];
+  return JSON.stringify(stable(oldEvidence))===JSON.stringify(stable(newEvidence));
+}
 
 /** Operador de manutenção: nunca expor em formulário público nem usar credenciais do pacote. */
 export async function reviewOfficialQuestionContract(db:PostgresJsDatabase<typeof schema>,request:{
-  input:unknown;actorPublicId:string;approvalReference:string;mode:"preview"|"apply";expectedFingerprint?:string;
+  input:unknown;actorPublicId:string;approvalReference:string;mode:"preview"|"apply";expectedFingerprint?:string;refreshMprjEvidence?:boolean;
 }) {
+  request=requestSchema.parse(request);
   if(!["preview","apply"].includes(request.mode) || request.approvalReference!==OFFICIAL_COURSE_STANDING_REFERENCE ||
     (request.mode==='apply'&&!/^[a-f0-9]{64}$/u.test(request.expectedFingerprint??''))) throw new Error("Modo, autorização ou impressão da prévia inválidos.");
-  const input=inputSchema.parse(request.input),contract=input.contract,contractId=questionContractFingerprint(contract);
-  if(!officialFormatEvidenceMatches(contract.format,contract.sourceQuote)) throw new Error("Cláusula oficial não confirma o formato declarado, ou contém formatos ambíguos; revise etapa/caderno.");
-  const primary=parseOfficialOpportunitySourceUrl(contract.sourceDocumentUrl);
-  parseOfficialOpportunityDocumentUrl(contract.sourceUrl,primary.sourceId);
+  const input=inputSchema.parse(request.input);
+  const isMprj=input.contract.opportunityId===20;
+  if(request.refreshMprjEvidence!==undefined && typeof request.refreshMprjEvidence!=="boolean") throw new Error("Refresh deve ser booleano explícito.");
+  if(request.refreshMprjEvidence && !isMprj) throw new Error("Refresh delimitado ao MPRJ.");
+  // The edital must still explicitly establish the objective multiple-choice stage.
+  if(isMprj && (JSON.stringify(input.contract.profile)!==JSON.stringify(MPRJ_PROMOTOR_MULTIPLE_CHOICE_PROFILE) || input.productSlug || input.contract.examEditionId!==41 || input.contract.format!=="multiple_choice" ||
+    !/múltipla escolha/iu.test(input.contract.sourceQuote) || !/100\s*\(cem\)\s*questões/iu.test(input.contract.sourceQuote) ||
+    /não|nao/iu.test(input.contract.sourceQuote))) throw new Error("MPRJ exige edital literal MC/100 e admissão isolada, sem produto.");
+  if(!isMprj && !officialFormatEvidenceMatches(input.contract.format,input.contract.sourceQuote)) throw new Error("Cláusula oficial não confirma o formato declarado, ou contém formatos ambíguos; revise etapa/caderno.");
+  const primary=parseOfficialOpportunitySourceUrl(input.contract.sourceDocumentUrl);
+  parseOfficialOpportunityDocumentUrl(input.contract.sourceUrl,primary.sourceId);
   const actorPublicId=z.uuid().parse(request.actorPublicId);
+  // Network/PDF processing is bounded and outside the database transaction, on BOTH modes.
+  const observation=isMprj ? await observeMprjMc5Cover() : null;
+  const observedAt=Date.now();
+  const verificationDate=new Date(observedAt).toISOString().slice(0,10);
   return db.transaction(async tx=>{
+    let contract:OfficialQuestionContract=input.contract;
+    let evidencePlan:ReturnType<typeof planMprjFormatEvidence>|null=null;
     await tx.execute(sql`set local statement_timeout='30s'`);
     await tx.execute(sql`set local lock_timeout='5s'`);
     const [actor]=await tx.execute<{id:number;role:string}>(sql`select id::int id,role from users where public_id=${actorPublicId}
@@ -41,12 +72,12 @@ export async function reviewOfficialQuestionContract(db:PostgresJsDatabase<typeo
     const [source]=await tx.execute<{role:string;specializationId:number|null;editionId:number|null;cycleYear:number;notice:string|null;institution:string;
       opportunityStatus:string;sourceStatus:string;snapshotStatus:string;sourceUrl:string;documentUrl:string;snapshotChecksum:string;
       sourceDocumentChecksum:string|null;bytesChecksum:string;pageText:string|null;identityText:string|null;bankId:number;assignmentStatus:string;assignmentRole:string;
-      validUntil:string|null;bankActive:boolean;preferred:boolean;opportunityUpdatedAt:string;snapshotUpdatedAt:string}>(sql`
+      validUntil:string|null;bankActive:boolean;preferred:boolean;opportunityUpdatedAt:string;snapshotUpdatedAt:string;sourceReviewedAt:string|null;assignmentUpdatedAt:string;bankUpdatedAt:string}>(sql`
       select o.role_name role,o.specialization_id::int as "specializationId",o.exam_edition_id::int as "editionId",o.cycle_year as "cycleYear",
         o.official_notice_number notice,o.institution_acronym institution,o.editorial_status as "opportunityStatus",
         d.status as "sourceStatus",s.status as "snapshotStatus",d.source_url as "sourceUrl",d.checksum_sha256 as "sourceDocumentChecksum",s.document_url as "documentUrl",
         s.checksum_sha256 as "snapshotChecksum",encode(sha256(s.document_bytes),'hex') as "bytesChecksum",
-        s.page_texts->>(${contract.sourcePage}-1) as "pageText",s.page_texts->>(${contract.identityPage}-1) as "identityText",
+        s.page_texts->>((${contract.sourcePage}::int)-1) as "pageText",s.page_texts->>((${contract.identityPage}::int)-1) as "identityText",
         a.quiz_bank_id::int as "bankId",a.status as "assignmentStatus",a.role as "assignmentRole",a.valid_until::text as "validUntil",
         (b.is_active and a.valid_from<=(now() at time zone 'America/Sao_Paulo')::date
           and e.status not in ('draft','canceled','archived') and e.bank_id=a.quiz_bank_id
@@ -54,7 +85,7 @@ export async function reviewOfficialQuestionContract(db:PostgresJsDatabase<typeo
         (a.role='examination_provider' or (a.role='primary_responsible' and not exists(
           select 1 from opportunity_organizer_assignments examiner where examiner.opportunity_id=o.id
             and examiner.role='examination_provider' and examiner.status='reviewed' and examiner.valid_until is null))) preferred,
-        o.updated_at::text as "opportunityUpdatedAt",s.updated_at::text as "snapshotUpdatedAt"
+        o.updated_at::text as "opportunityUpdatedAt",s.updated_at::text as "snapshotUpdatedAt",d.reviewed_at::text as "sourceReviewedAt",a.updated_at::text as "assignmentUpdatedAt",b.updated_at::text as "bankUpdatedAt"
       from contest_opportunities o join opportunity_source_documents d on d.opportunity_id=o.id and d.id=${contract.sourceDocumentId}
       join opportunity_document_snapshots s on s.source_document_id=d.id and s.id=${contract.sourceSnapshotId}
       join opportunity_organizer_assignments a on a.opportunity_id=o.id and a.id=${contract.organizerAssignmentId}
@@ -69,9 +100,40 @@ export async function reviewOfficialQuestionContract(db:PostgresJsDatabase<typeo
       !normalize(source.pageText).includes(normalize(contract.sourceQuote)) || !normalize(source.identityText).includes(normalize(contract.identityQuote))) {
       throw new Error("Identidade, cargo único, etapa, fonte, bytes ou trechos oficiais não confirmados; contrato não admitido. TCE-MA exige trilhas próprias.");
     }
-    const other=await tx.execute(sql`select id from opportunity_question_contracts where opportunity_id=${contract.opportunityId}
+    if(observation) {
+      const [identity]=await tx.execute<{name:string;username:string}>(sql`select current_database() as name,current_user as username`);
+      if(identity?.name!=='leiprova' || identity.username!=='leiprova_owner') throw new Error("Evidência MPRJ exige leiprova_owner no banco leiprova.");
+      const document=await readMprjFormatDocument(tx,request.mode==='apply');
+      evidencePlan=planMprjFormatEvidence(contract,document,observation,verificationDate);
+      contract=officialQuestionContractSchema.parse({...contract,formatEvidence:evidencePlan.evidence});
+    }
+    let contractId=questionContractFingerprint(contract);
+    const evidenceId=evidencePlan?.evidence.evidenceId;
+    const activeEvidence=evidencePlan ? await tx.execute<{id:string;status:string;expired:boolean;state:unknown}>(sql`
+      select id,status,expires_at<=now() as expired,to_jsonb(official_question_format_evidence) as state from official_question_format_evidence where opportunity_id=20
+      order by id ${request.mode==='apply'?sql`for update`:sql``}`) : [];
+    let other:Array<{id:string;payload:OfficialQuestionContract}>=await tx.execute<{id:string;payload:OfficialQuestionContract}>(sql`select id,payload from opportunity_question_contracts where opportunity_id=${contract.opportunityId}
       and stage_key='objective' and status='approved' and id<>${contractId}`);
-    if(other.length) throw new Error("Já existe outro contrato ativo; não substituir evidência ou aprovação implicitamente.");
+    if(evidencePlan && request.refreshMprjEvidence && other.length===1) {
+      const previous=officialQuestionContractSchema.safeParse(other[0].payload);
+      if(previous.success && other[0].id===questionContractFingerprint(previous.data) && sameMprjContractFacts(previous.data,contract) && activeEvidence.some(row=>
+        row.id===previous.data.formatEvidence?.evidenceId && ['approved','superseded'].includes(row.status))) {
+        // Keep existing questions/certificates attached to their original immutable contract.
+        // The SQL gate independently requires a fresh, equivalent approved observation.
+        contract=previous.data;
+        contractId=other[0].id;
+        other=[];
+      }
+    }
+    if(other.length && !(evidencePlan && request.refreshMprjEvidence && other.every(row=>
+      row.payload.formatEvidence && row.payload.examEditionId===41 &&
+      activeEvidence.some(e=>e.id===row.payload.formatEvidence?.evidenceId && e.status==='approved')))) throw new Error("Já existe outro contrato ativo; não substituir evidência ou aprovação implicitamente.");
+    if(evidencePlan) {
+      const same=activeEvidence.find(row=>row.id===evidenceId);
+      if(same && (same.status!=='approved' || same.expired)) throw new Error("Evidência encerrada não pode ser reaberta.");
+      if(activeEvidence.some(row=>row.status==='approved' && row.id!==evidenceId) && !request.refreshMprjEvidence)
+        throw new Error("Renovação exige refresh explícito após novo preview.");
+    }
     const [existing]=await tx.execute<{status:string}>(sql`select status from opportunity_question_contracts where id=${contractId}`);
     if(existing && existing.status!=='approved') throw new Error("Contrato suspenso/superado não é reaberto por este operador.");
     if(request.mode==='apply' && existing) await lockQuestionContracts(tx,[contractId]);
@@ -123,10 +185,42 @@ export async function reviewOfficialQuestionContract(db:PostgresJsDatabase<typeo
         if(live?.hash!==row.contentHash) throw new Error("Conteúdo mudou durante a reserva da certificação; confira outra prévia.");
       }
     }
-    const operationFingerprint=fingerprint({contractId,source,actorPublicId,approvalReference:request.approvalReference,
+    const operationFingerprint=fingerprint({contractId,source,actorPublicId,actorId:actor.id,approvalReference:request.approvalReference,
+      evidencePlan,activeEvidence,other,existing:existing??null,refreshMprjEvidence:request.refreshMprjEvidence??false,
       productSlug:input.productSlug??null,certificates});
     if(request.mode==='apply') {
       if(request.expectedFingerprint!==operationFingerprint) throw new Error("Fonte, contrato ou vínculos mudaram após o preview.");
+      if(evidencePlan) {
+        if(Date.now()-observedAt>60_000 || new Date().toISOString().slice(0,10)!==verificationDate) throw new Error("Observação transitória expirou; repetir preview e apply.");
+        const previous=activeEvidence.filter(row=>row.status==='approved' && row.id!==evidenceId);
+        if(previous.length && !request.refreshMprjEvidence) throw new Error("Renovação exige refresh explícito após novo preview.");
+        const same=activeEvidence.find(row=>row.id===evidenceId);
+        if(same && (same.status!=='approved' || same.expired)) throw new Error("Evidência encerrada não pode ser reaberta.");
+        if(other.length) {
+          await lockQuestionContracts(tx,other.map(row=>row.id));
+          await tx.execute(sql`update opportunity_question_contracts set status='superseded',updated_at=now()
+            where opportunity_id=20 and exam_edition_id=41 and status='approved' and id<>${contractId}`);
+        }
+        if(previous.length) await tx.execute(sql`update official_question_format_evidence set status='superseded',updated_at=now()
+          where opportunity_id=20 and status='approved' and id<>${evidencePlan.evidence.evidenceId}`);
+        if(!same) {
+          const {document:d,evidence:f}=evidencePlan;
+          await tx.insert(schema.officialQuestionFormatEvidence).values({
+            id:f.evidenceId,opportunityId:20,examEditionId:41,bankId:contract.bankId,roleName:contract.roleName,
+            institutionAcronym:'MPRJ',jurisdictionCode:'RJ',examEditionDocumentId:d.id,documentType:'question_booklet',
+            documentPublicId:d.publicId,sourceUrl:f.sourceUrl,documentUpdatedAt:sql`${d.documentUpdatedAt}::text::timestamptz`,
+            editionUpdatedAt:sql`${d.editionUpdatedAt}::text::timestamptz`,opportunityUpdatedAt:sql`${d.opportunityUpdatedAt}::text::timestamptz`,
+            verificationDate,expiresAt:new Date(Date.parse(verificationDate+'T00:00:00Z')+2*86_400_000),
+            sourceSha256:f.sourceSha256,robotsSha256:f.robotsSha256,pageNumber:1,pageTextSha256:f.pageTextSha256,
+            parserVersion:f.parserVersion,format:f.format,optionCount:f.optionCount,singleCorrect:true,questionCount:100,
+            approvalReference:request.approvalReference,reviewedByUserId:actor.id,reviewedAt:new Date(observedAt),
+          });
+          await tx.insert(schema.auditLogs).values({actorUserId:actor.id,action:'editorial.mprj_format_evidence.approved',
+            entityType:'official_question_format_evidence',entityId:f.evidenceId,metadata:{before:{evidence:previous,contracts:other.map(row=>row.id)},
+              after:f,operationFingerprint,approvalReference:request.approvalReference,approvalBasis:'owner_standing_authorization',humanReview:false,
+              sourceTextStored:false,publicationAllowed:false}});
+        }
+      }
       if(!existing) {
         await tx.insert(schema.opportunityQuestionContracts).values({...contract,id:contractId,payload:contract,
           approvalReference:request.approvalReference,reviewedByUserId:actor.id,reviewedAt:new Date()});
@@ -141,7 +235,7 @@ export async function reviewOfficialQuestionContract(db:PostgresJsDatabase<typeo
       }
       if(certificates.length) await certifyProductBindingContracts(tx,certificates.map(row=>row.id),actor.id,request.approvalReference);
     }
-    return {mode:request.mode,fingerprint:operationFingerprint,contractId,contract,legacyFormats,
+    return {mode:request.mode,fingerprint:operationFingerprint,contractId,contract,evidencePlan,refreshRequired:other.length>0,legacyFormats,
       certificates,validQuestionCount:new Set(certificates.map(row=>row.questionId)).size,
       approvalBasis:'owner_standing_authorization',humanReview:false,publicationAllowed:false};
   },request.mode==='preview'?{isolationLevel:'repeatable read',accessMode:'read only'}:{isolationLevel:'serializable'});

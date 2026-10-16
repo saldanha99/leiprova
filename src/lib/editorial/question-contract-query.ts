@@ -11,6 +11,9 @@ export function currentQuestionContractExists(contractId: SQLWrapper, opportunit
     join opportunity_organizer_assignments contract_current_assignment on contract_current_assignment.id=current_scoped_contract.organizer_assignment_id
     join quiz_banks contract_current_bank on contract_current_bank.id=current_scoped_contract.bank_id
     where current_scoped_contract.id=${contractId} ${opportunityId ? sql`and current_scoped_contract.opportunity_id=${opportunityId}` : sql``}
+      and (case when current_scoped_contract.opportunity_id=20 then
+        public.mprj_question_format_evidence_current(current_scoped_contract.payload,current_scoped_contract.opportunity_id,current_scoped_contract.exam_edition_id,current_scoped_contract.bank_id)
+        else not (current_scoped_contract.payload ? 'formatEvidence') end)
       and current_scoped_contract.status='approved' and current_scoped_contract.stage_key='objective' and current_scoped_contract.scope='single_role'
       and current_scoped_contract.role_name=contract_current_opportunity.role_name and current_scoped_contract.exam_edition_id=contract_current_opportunity.exam_edition_id
       and current_scoped_contract.specialization_id is not distinct from contract_current_opportunity.specialization_id
