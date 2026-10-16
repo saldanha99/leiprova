@@ -1,5 +1,48 @@
 # Produção, controle do proprietário e anúncios
 
+**Operação em16/10/2026,15h10 BRT:** **11/84 elegíveis**, **1.807 válidas somadas
+nas ofertas** e **8 novas distintas publicadas hoje** (relatório18h10 UTC).
+Contrato MC5 MPRJ admitido em produção, audits24759/24760, `humanReview:false`;
+MPRJ permanece draft0/68, sem nova preparação aberta. São389 mapeamentos MPRJ
+pendentes,288 com matéria identificada. Código `cb200d6`, migração0056 aplicada;
+lint, tipos,2.019 testes e build aprovados, além de PostgreSQL descartável.
+Ponte voltou ao fonte validado; três travas locais vazias abandonadas foram
+removidas após inspeção, preservando reservas/tentativas. Autor mantém reserva
+atual; Mac bloqueado impede conferir sua tela e encaminhar a próxima tarefa.
+Desbloqueio solicitado ao proprietário; VPS e site saudáveis. CP112/recibo1
+retidos, sem APIs pagas, flags, WhatsApp ou anúncios alterados.
+[Recibos e próxima renovação MPRJ](CONTINUACAO-PRODUCAO-2026-10-16.md).
+
+**Renovação MPRJ nas retomadas:** evidência atual expira em18/10 às00hUTC.
+Conferir a janela; ao restarem menos de24h, renovar automaticamente pelo mesmo
+operador autorizado com `--refresh` em preview/apply e fingerprint fresco. Entrada
+privada na VPS em `.local/editorial/mprj-format-20261016/input.json`; ator e método
+em [contrato MPRJ](CONTRATO-FORMATO-MPRJ.md). Mesmos bytes/fatos preservam o contrato
+e os certificados originais. Mudança material ou suspensão impede esse reaproveitamento.
+Não declarar MPRJ liberado antes do piso e dos demais gates.
+
+**Operação em 16/10/2026, 14h19 BRT:** **11/84 elegíveis**, **1.807 válidas
+somadas nas ofertas** e **8 novas distintas efetivamente publicadas hoje**,
+após conferir dez aprovações e suspender duas com recibos. Nenhuma nova preparação
+aberta. Autor/Guardião retomaram reservas e entregas reais; removida uma trava
+local vazia abandonada após inspeção, sem reiniciar leases ou tentativas. Ponte
+segue no bundle privado do runtime publicado `070577b`. Forge retomou a evidência
+de formato MPRJ; Prism entregou revisão somente leitura, com correções ainda a
+conferir. Migração/contrato MPRJ continuam sem aplicação e produto draft0/68.
+CP112/recibo1 retidos; app/banco/pooler saudáveis. Sem API paga, flags, WhatsApp ou
+anúncios ativados. [Conferência e pendências](CONTINUACAO-PRODUCAO-2026-10-16.md).
+
+**Retomada após desbloqueio do Mac em15/10:** coordenação Maestri acessível;
+Forge implementa evidência de formato MPRJ (ainda sem QA/aplicação/publicação),
+Prism conclui diagnóstico PCAL/TCE-MA com trilhas por cargo. Duas travas locais
+abandonadas foram removidas após inspeção de processos/diretórios; recibo perdido
+recuperado por replay idempotente, sem novo conteúdo, e Guardião voltou a reservar.
+Ponte operacional temporariamente usa bundle privado do código publicado070577b
+para isolar as edições em andamento. Antes de restaurar o caminho de desenvolvimento,
+validar import/focais: há correção Zod4 encaminhada ao Forge. Detalhes privados em
+`.local/maestri/resume-20261015-operation-checkpoint.json`. Sem nova preparação
+liberada nesta retomada; último relatório conferido11/84 e108novas distintas hoje.
+
 **Operação em15/10/2026,14h07 BRT:** **11/84 elegíveis**, **108 novas distintas
 publicadas hoje**, sem nova preparação aberta nesta rodada. Código `070577b`
 publicado após lint, typecheck, 1.957 testes e build. Destravado o cadastro MPRJ:

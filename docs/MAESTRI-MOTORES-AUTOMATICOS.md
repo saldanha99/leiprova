@@ -1,5 +1,13 @@
 # Editalume — contrato dos motores automáticos
 
+**Conferência16/10:** CPC966§2 admite rescisão de certas decisões sem mérito;
+não generalizar requisito de mérito ao justificar a ação anulatória do§4. Em caso
+concreto sobre fundação estatal, explicitar natureza pública/autárquica ou privada
+antes de aplicar criação ou autorização legal. Delimitar também comentários e
+distratores. Sem suporte oficial suficiente no pacote, bloquear o recorte ou
+escolher outro sustentado. Esta orientação não muda corpus, hashes ou reservas.
+[Conferência e fontes](CONTINUACAO-PRODUCAO-2026-10-16.md).
+
 **Conferência em13/10,22h25 BRT:** LIA17 não dá exclusividade ao MP após
 ADI7042/7043. CPC525§14/535§7 invalidados na AR2876QO: inexigibilidade pode
 usar decisão STF anterior ou posterior, salvo preclusão, com modulação própria.
