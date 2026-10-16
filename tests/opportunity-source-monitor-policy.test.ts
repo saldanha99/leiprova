@@ -8,6 +8,13 @@ import {
 } from "@/lib/opportunities/source-monitor-policy";
 
 describe("allowlist de fontes oficiais de oportunidades", () => {
+  it("admite o edital MPRJ aprovado sem liberar cadernos ou outro edital", () => {
+    const url="https://conhecimento.fgv.br/sites/default/files/concursos/edital-xxxix-concurso.pdf";
+    expect(parseOfficialOpportunitySourceUrl(url,"fgv-conhecimento").url).toBe(url);
+    expect(()=>parseOfficialOpportunitySourceUrl(url.replace('xxxix','xxxviii'),"fgv-conhecimento")).toThrow();
+    expect(()=>parseOfficialOpportunitySourceUrl(url.replace('edital-xxxix-concurso','promotor-de-justica-substituto-cns001-tipo-1'),"fgv-conhecimento")).toThrow();
+    expect(()=>parseOfficialOpportunitySourceUrl(url,"cnj")).toThrow();
+  });
   it("admite somente o edital MPMT compilado aprovado, sem abrir cadernos ou outros PDFs", () => {
     const url = "https://conhecimento.fgv.br/sites/default/files/concursos/edital_n_01_2026_compilado_ate_a_1_a_retificacao_de_20_07_2026-1.pdf";
     expect(parseOfficialOpportunitySourceUrl(url, "fgv-conhecimento").url).toBe(url);

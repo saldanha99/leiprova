@@ -22,6 +22,8 @@ export const OFFICIAL_OPPORTUNITY_SOURCE_POLICIES = [
       "/sites/default/files/concursos/comunicado_n_05_2026_resultado_definitivo_p_objetiva_04_08_2026_assinado.pdf",
       // PGE-AC approved original notice: exact source path for its VIII/2026 contract.
       "/sites/default/files/concursos/pge-ac-edital-26.02.v.final_.pdf",
+      // MPRJ notice25 / approved snapshot1254: exact source for XXXIX/2026.
+      "/sites/default/files/concursos/edital-xxxix-concurso.pdf",
       // Composite MPRJ/PGEAC admissions: metadata only, no candidate lists stored/extracted.
       "/sites/default/files/concursos/05.10-aviso-relacao-de-habilitados-a-inscricao-definitiva-republicacao.pdf",
       "/sites/default/files/concursos/529_pge-ac-resultado-definitivo-prova-objetiva-2026-07-06.pdf",
