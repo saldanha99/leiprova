@@ -1,5 +1,18 @@
 # Produção, controle do proprietário e anúncios
 
+**Conferência em 25/10/2026, 06h20 BRT:** **11/84 elegíveis**, **8 novas distintas
+publicadas hoje** e **1.824 válidas somadas nas ofertas**. MPRJ avançou para
+**57/68**, ainda em rascunho. Conferidas 25 aprovações: 21 mantidas e quatro
+suspensas por referências/generalizações incorretas nos comentários, audits
+26047–26050. Linha das 09h10 UTC concluída; health público OK. Uma nova trava
+com proprietário identificado ficou abandonada durante a coleta. Após provar a
+conclusão remota e a substituição do contexto, arquivados a trava e o pacote
+antigo completos; nenhuma reserva, tentativa ou resposta foi apagada ou reiniciada.
+Autor voltou a reservar pela rotina normal. Forge recebeu a continuação da
+engenharia em cópia isolada; nenhuma correção nova foi integrada nesta rodada.
+GitHub aguarda a autenticação já solicitada. Sem nova preparação aberta, mudança
+de flags ou gasto. [Recibos e conferência](CONTINUACAO-PRODUCAO-2026-10-25.md).
+
 **Conferência em25/10/2026,05h12 BRT:** **11/84 elegíveis**, **8 novas distintas
 publicadas hoje**, **1.824 válidas somadas nas ofertas**; MPRJ**38/68**, ainda draft.
 Dez aprovações conferidas sem novas suspensões. Integrado localmente o hardening

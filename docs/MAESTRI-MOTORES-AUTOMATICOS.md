@@ -1,5 +1,13 @@
 # Editalume — contrato dos motores automáticos
 
+**Conferência de 25/10, 06h20 BRT:** conferir também as referências nos
+comentários. CF5XLVII não contém vedação textual a confisco geral; distinguir
+XLVI,b e CF243. LEP112§5º/HC118533 não são o enunciado da SV59 (regime aberto e
+substituição com requisitos próprios). Não negar genericamente prisão
+administrativa sob a CF1988 ao justificar caso municipal: preservar CF5LXI e
+as hipóteses militares. Não ampliar a orientação para afastar o gabarito de caso
+correto; delimitar cada justificativa. [Retenções e fontes](CONTINUACAO-PRODUCAO-2026-10-25.md).
+
 **Conferência25/10:** lei penal hipotética deve ser expressamente identificada
 como hipótese, sem atribuir a2024 pena2–10 para estelionato eletrônico: Lei14.155/2021
 introduziu art171§2-A com4–8. CF5XLIII prevê responsabilização de omissivos;

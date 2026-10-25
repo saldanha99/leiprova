@@ -141,3 +141,59 @@ recibos do integrador em `.local/maestri/heartbeat-20261025-0802-*`. QA guarda c
 isolada para auditoria; não possui `.env` de produção. Mudança ativa só na ponte
 local; nenhum deploy da VPS. Autenticação GitHub continua inválida conforme nova
 checagem; commits permanecem locais até login do proprietário, já solicitado.
+
+## Conferência às 06h20 BRT e reconciliação de coleta
+
+Relatório das 09h19m53 UTC: 11/84 elegíveis, oito novas questões distintas
+publicadas hoje e 1.824 válidas somadas nas ofertas. MPRJ passou de 38 para
+57/68; segue em rascunho. A linha das 09h10 UTC terminou às 09h11m24 UTC,
+recibo `20261025T091001Z.t6fipM`, e o health público retornou `ok`.
+
+Conferidas 25 novas aprovações, incluindo alternativas e comentários. Mantidas
+21 e suspensas quatro pelo operador de preview/apply:
+
+- Audits 26047/26048, questões `d803e335-4f15-54d0-b9be-ffb2bb0ee9c1` e
+  `d2c3d1e6-ba89-5b48-8a73-49342faa8652`: os comentários atribuem ao art.5º,XLVII
+  proibição textual de confisco geral, ausente desse rol. Distinguir a perda de
+  bens de XLVI,b e o art.243. Fonte: [Constituição no Planalto](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm).
+- Audit 26049, questão `cd17a6ae-a9a2-5f0e-add3-72c94685089c`: distinguir a
+  regra de não hediondez de LEP112§5º/HC118533 do enunciado da
+  [Súmula Vinculante 59](https://portal.stf.jus.br/jurisprudencia/sumariosumulas.asp?base=26&sumula=8161),
+  que trata de regime aberto e substituição sob requisitos próprios. A resposta
+  estatutária correta não sana a atribuição inexata do fundamento.
+- Audit 26050, questão `c5ccd48a-f69c-5f7c-a180-3b1ecd85ea18`: comentário nega
+  genericamente prisão administrativa sob a CF1988. O caso de fiscalização
+  municipal não permite negar as hipóteses militares ressalvadas em CF5LXI.
+  [Fonte primária do STF](https://portal.stf.jus.br/jurisprudenciaRepercussao/verPronunciamento.asp?pronunciamento=4764090).
+
+Os demais recortes foram conferidos contra CF, LEP112 e CPP310/312 vigentes.
+O item que menciona júri trata da jurisdição complementar do TPI, não de execução
+imediata da condenação. O relaxamento da prisão ilegal não impede novo título
+cautelar autônomo nos requisitos próprios. Watermark privado avançado somente
+até 08h40m07.854627 UTC, último lote efetivamente conferido.
+
+Nova trava do Autor tinha proprietário PID83187, criado às08h29m58 UTC, já
+ausente. A telemetria do preflight registrava início da coleta sem retorno;
+isso não comprova a causa do encerramento. Audit25941 prova a aplicação de
+`author:2408` às08h30m06 UTC; o contexto remoto foi depois substituído. Conferidos
+estado remoto, processos e identidade estável da trava antes de arquivá-la
+inteira. A coleta normal rejeitou o contexto antigo, preservando contadores.
+
+O pacote local ainda bloqueava outra reserva até09h57 apesar de já aplicado.
+Reconciliação operacional sob a mesma exclusão mútua comparou no servidor o
+inputHash, completionTokenHash e resultHash exatos do audit25941, confirmou estado
+atual pending sem lease e contexto diferente. Arquivado o diretório inteiro fora
+do padrão ativo UUID, com packet, response e markers intactos. Não foi fabricado
+receipt de conclusão nem cancelada reserva vigente. Às09h21m05 UTC a rotina
+normal do Autor fez novo claim; claim continua não sendo publicação.
+
+Forge estava ocioso e recebeu uma vez a continuação da engenharia local:
+coleta resistente ao encerramento do pré-run e reconciliação auditada de respostas
+aplicadas sem recibo. Execução confirmada no mesmo nó/sessão/modelo. Entrega apenas
+em patch/cópia isolada, sem alterar fila viva ou módulos da raiz durante a tarefa.
+Integração e QA completo ficam para o Maestro após revisão. GitHub continua
+aguardando a autenticação já solicitada; nenhum novo pedido ou deploy nesta rodada.
+
+Recibos privados: `.local/maestri/heartbeat-20261025-0910-*`.
+CP112/recibo1, contratos PCAL/TCE-MA, WhatsApp e orçamento/contas de anúncios
+permanecem com as restrições anteriores. Nenhuma API paga, flag ou gasto ativado.
