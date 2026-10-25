@@ -1,5 +1,16 @@
 # Produção, controle do proprietário e anúncios
 
+**Conferência em25/10/2026,04h05 BRT:** **11/84 elegíveis**, **8 novas distintas
+publicadas hoje** e **1.824 válidas somadas nas ofertas**. MPRJ está em**28/68**,
+ainda draft. Cinco novas aprovações conferidas sem suspensão. Liberação concluída
+às07h01 UTC; health saudável. Trava vazia do Autor desde06h19 UTC removida após
+inspeção; settlement encontrou resultado já com três tentativas, sem recibo novo.
+Contadores e reserva preservados, sem repetir o digest. **Forge retomado no mesmo
+nó/sessão**, tarefa recebida e execução confirmada para corrigir locks/settlement
+local; não editar esses módulos concorrentemente. Sem commit/deploy do Forge antes
+da revisão. Três notas compartilhadas atualizadas com recibos reais.
+[Estado e próxima integração](CONTINUACAO-PRODUCAO-2026-10-25.md).
+
 **Conferência em25/10/2026,03h07 BRT:** **11/84 elegíveis**, **1.824 válidas
 somadas nas ofertas** e **8 novas distintas publicadas hoje**. MPRJ avançou para
 **23/68 vínculos válidos**, ainda em rascunho; não anunciar como preparação aberta.
