@@ -225,8 +225,11 @@ inventário encontrou30 no Autor,91 no Guardião e81 no Radar, incluindo histór
 sem resposta. Não ativar esse preflight isoladamente nem arquivar o inventário
 por inferência. A autenticação GitHub já solicitada continua pendente. Forge
 recebeu a continuação no mesmo nó: alternativa privada pontual fora do grupo do
-pré-run, compatível com o protocolo atual. Entrega e validação continuam pendentes;
-nenhum serviço, rotina ou agente adicional foi criado.
+pré-run, compatível com o protocolo atual. A entrega posterior foi diagnóstica: detached isolado não evita a corrida entre
+resposta tardia de pacote vencido e poll atual. Os16 testes incluem esse
+contraexemplo esperado; o protótipo permanece desabilitado e **não deve ser ativado**.
+É necessária coordenação atômica no protocolo local. Nenhum serviço, rotina ou
+agente adicional foi criado.
 
 Travas com dono ausente reapareceram nos dois agentes. Inspecionados PID/inode,
 metadados e conclusão remota antes de arquivar cada diretório inteiro. Audits26072
