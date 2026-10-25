@@ -1,12 +1,12 @@
 # Operação do Edital Lei Seca
 
-**Conferência em 25/10/2026, 19h03 BRT:** **12/84 elegíveis**, **173 novas distintas
-válidas publicadas hoje**, **1.989 válidas somadas nas ofertas**; MPRJ**73**. Cinco
-aprovações conferidas, uma suspensa (audit26979: responsabilidade pessoal de LRF82
-não se reduz ao IDPJ). Inventário somente leitura encontrou2.043 packets legados:
-o novo coletor permanece privado até plano de reconciliação auditado, sem purge.
+**Conferência em 25/10/2026, 20h08 BRT:** **12/84 elegíveis**, **177 novas distintas
+válidas publicadas hoje**, **1.993 válidas somadas nas ofertas**; MPRJ**73**. Cinco
+aprovações conferidas, uma suspensa (audit27030: identidade do alienante no
+CTN133II). Mutex morto do Autor arquivado com prova remota exata, sem replay da
+resposta de contexto substituído. Renovação MPRJ preparada para após26/10 às00hUTC.
 Mac/GitHub continuam pendentes; sem deploy, flags, API paga ou gasto.
-[Conferência e inventário](CONTINUACAO-PRODUCAO-2026-10-25.md).
+[Conferência e próximos passos](CONTINUACAO-PRODUCAO-2026-10-25.md).
 
 **Conferência em 25/10/2026, 17h52 BRT:** **12/84 elegíveis**, **165 novas distintas
 válidas publicadas hoje**, **1.981 válidas somadas nas ofertas**; MPRJ**73**, treino

@@ -1,5 +1,12 @@
 # Editalume — contrato dos motores automáticos
 
+**Conferência de 25/10, 20h08 BRT:** manter a mesma pessoa jurídica/física como
+alienante em todo o caso de CTN133II: retomada por empresário individual distinto
+da sociedade alienante não demonstra a retomada pelo próprio alienante. Exatidão
+do texto legal não resolve premissa contraditória. Resposta de contexto substituído
+não pode ser repetida como válida; prova histórica só permitiu arquivar o mutex
+local morto. [Recibos e limites](CONTINUACAO-PRODUCAO-2026-10-25.md).
+
 **Conferência de 25/10, 19h03 BRT:** LRF82-A veda extensão da falência, mas não
 elimina responsabilidade pessoal própria de sócios/controladores/administradores
 apurada na ação de LRF82, nem a indisponibilidade do§2. Não afirmar que somente
