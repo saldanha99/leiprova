@@ -282,3 +282,51 @@ A dica de12 requisitos e a edição futura da rotina ainda estão **preparadas**
 sem recibo de aplicação por bloqueio do Mac. Nenhum operador deve declará-las ativas.
 Rascunhos de anúncios do MPRJ foram preparados com o modo histórico explícito;
 continuam sem contas/orçamento/gasto e exigem nova conferência antes de ativação.
+
+## Conferência às08h19 BRT
+
+Relatório11h19m41 UTC:12/84 elegíveis,103 novas distintas publicadas hoje e1.919
+válidas somadas nas ofertas. MPRJ73, histórico, permanece liberado. Trinta
+aprovações da fotografia inicial foram examinadas integralmente;26 mantidas e4
+suspensas após preview/apply, sem revisão humana presumida:
+
+- Audit26367, questão `310514f6-4dd5-5771-b017-61b85f51df0d`: o comentário
+  universalizava CPP397 e dizia superar a especialidade pelo394§4. O
+  [STJ distingue o rito do júri](https://scon.stj.jus.br/SCON/GetInteiroTeorDoAcordao?dt_publicacao=30%2F09%2F2016&num_registro=201602174676),
+  sem aplicação do397. Delimitar compatibilidade, não apenas reproduzir literal.
+- Audit26368, questão `bd333b17-49ac-50bd-bc75-f539a1566ffe`: delimitar
+  expressamente a base consentimento no tratamento infantil. A exigência parental
+  dessa base não elimina as demais hipóteses de7/11 reconhecidas pelo
+  [Enunciado1/2023 da ANPD](https://bibliotecadigital.mj.gov.br/bitstream/1/10215/2/Enunciado_ANPD_2023_1.html),
+  sempre com prevalência do melhor interesse. Retenção para evitar generalização.
+- Audit26370, questão `a63dae61-8080-5cc7-afff-de3dfddf0eb8`: o comentário
+  chamava de decadencial o prazo de saneamento do vício. Distinguir o conserto
+  de30dias de18§1 da decadência da reclamação em26 do
+  [CDC](https://www.planalto.gov.br/ccivil_03/leis/l8078compilado.htm).
+- Audit26371, questão `4ccc2071-89dd-5cd8-be3f-78b6969d46a3`: o comentário
+  dizia indeclinável a assinatura de duas testemunhas em instrumentos físicos.
+  O [STJ admite mitigação excepcional](https://scon.stj.jus.br/SCON/GetInteiroTeorDoAcordao?dt_publicacao=18%2F09%2F2025&num_registro=202500190805)
+  por outros meios idôneos. Delimitar a regra e o caso, sem negar a exceção.
+
+Mantido o item da soberania do júri no contexto de apelação ordinária, sem estender
+seu limite à revisão criminal. O item de título estrangeiro trata de crédito
+extrajudicial; não universalizar requisitos homologatórios para assuntos alheios
+ao caso. CDC4 foi mantido para relação de consumo já admitida no enunciado, sem
+presumir que qualquer empresa seja consumidora. LRP167II17, CC1367, CPC533,
+ECA28/148/201, LF193-A e MCI7/11 conferidos nos respectivos recortes. Watermark
+avançado só até11h00m09.411018 UTC, última aprovação desta fotografia.
+
+Travas Autor/Guardião com owner ausente foram arquivadas inteiras só após conferir
+PID/inode/metadados e audits26304/26185, mesmo contexto e sem lease remota nesses dois trabalhos.
+Coleta normal retornou1tentativa/1completado/0falhas nos dois papéis. Recibos
+replay não são nova publicação; reservas e contadores intactos. Não foi implantada
+recuperação automática. A telemetria voltou a registrar dois settle_started do
+Autor com quatro segundos de intervalo; isso merece diagnóstico do agendador,
+mas ainda não prova a causa externa do encerramento.
+
+Health público retornouok e a linha das11h concluiu sem falha. CUA confirmou o
+Mac ainda bloqueado; pedido anterior de desbloqueio permanece pendente, sem
+repetição. A rotina com dica de cobertura continua apenas preparada. GitHub
+reconferido: conta ativa esperada continua inválida, sem trocar conta, credenciais
+ou repetir notificação. Nenhuma nova integração de código/deploy/QA global nesta
+rodada operacional. Recibos: `.local/maestri/heartbeat-20261025-1108-*`.

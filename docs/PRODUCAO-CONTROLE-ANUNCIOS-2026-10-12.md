@@ -1,17 +1,14 @@
 # Produção, controle do proprietário e anúncios
 
-**Publicação em 25/10/2026, 07h39 BRT:** **MPRJ liberado em treino histórico**
-pelo programa do XXXIX/2026, com **69 questões válidas** e legislação atualizada;
-**12/84 preparações elegíveis**, **77 novas distintas publicadas hoje** e **1.893
-válidas somadas nas ofertas**. Audit26179, às10h37m31 UTC. Não é reprodução da
-prova passada nem cobertura integral. Página pública conferida, checkout direciona
-a login; pagamento segue sem homologação completa. Conferidas25 aprovações nesta
-rodada,3 retidas por comentários, incluindo ANPP após início da ação penal.
-Código do coletor passou QA isolado (2.046 testes), sem integração ou deploy;
-rollout ainda depende de protocolo remoto e tratamento do legado. Mac bloqueado
-impediu aplicar a instrução de priorização preparada no Maestri; desbloqueio
-solicitado. Sem flags alteradas, API paga, WhatsApp ou anúncios ativados.
-[Conferência e próximos passos](CONTINUACAO-PRODUCAO-2026-10-25.md).
+**Conferência em 25/10/2026, 08h19 BRT:** **12/84 elegíveis**, **103 novas distintas
+publicadas hoje**, **1.919 válidas somadas nas ofertas**; MPRJ**73**, em treino
+histórico, permanece liberado. Conferidas30 aprovações:26 mantidas e4 suspensas
+por precisão nos comentários, audits26367/26368/26370/26371. Dois settlements
+recuperados por replay auditado, sem nova importação contabilizada nem reset.
+Site e linha da VPS saudáveis. Mac permanece bloqueado; a dica preparada de
+priorização não foi aplicada. GitHub continua com autenticação inválida, sem
+repetir o pedido já feito. Nenhum código, deploy, flag, API paga ou gasto alterado.
+[Conferência e fontes](CONTINUACAO-PRODUCAO-2026-10-25.md).
 
 **Conferência em25/10/2026,05h12 BRT:** **11/84 elegíveis**, **8 novas distintas
 publicadas hoje**, **1.824 válidas somadas nas ofertas**; MPRJ**38/68**, ainda draft.

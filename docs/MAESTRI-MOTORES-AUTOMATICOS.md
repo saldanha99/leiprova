@@ -1,5 +1,12 @@
 # Editalume — contrato dos motores automáticos
 
+**Conferência de 25/10, 08h19 BRT:** CPP394§4 não autoriza apresentar CPP397
+como universal, ignorando o rito do júri. LGPD14: delimitar a base consentimento
+sem negar as demais hipóteses legais de ANPD1/2023. CDC18: prazo de conserto não
+é decadência de CDC26. CPC784III: não dizer indeclinável a dupla testemunha em
+papel, pois o STJ admite mitigação excepcional por outros meios idôneos. Precisão
+vale também nos comentários. [Retenções e fontes](CONTINUACAO-PRODUCAO-2026-10-25.md).
+
 **Conferência de 25/10, 07h39 BRT:** ANPP não permite negar genericamente
 processo em curso ou condenação ainda não definitiva: observar HC185913/STF e
 os marcos/condições da tese. Não converter recorte pré-processual em afirmação
