@@ -1,5 +1,18 @@
 # Editalume — contrato dos motores automáticos
 
+**Conferência de 25/10, 07h39 BRT:** ANPP não permite negar genericamente
+processo em curso ou condenação ainda não definitiva: observar HC185913/STF e
+os marcos/condições da tese. Não converter recorte pré-processual em afirmação
+universal nos comentários. [Retenções e fontes](CONTINUACAO-PRODUCAO-2026-10-25.md).
+
+**Conferência de 25/10, 07h13 BRT:** Lei9.605 art7 exige os incisos I e II:
+não apresentar apenas o critério objetivo como condição suficiente da substituição.
+Se perguntar somente o inciso I, delimitar isso expressamente. Cada reserva nova
+exige autoria original: não reaproveitar response de outra reserva ou repetir itens
+já importados para o mesmo requisito. Distinguir novo cenário/recorte sustentado
+de mera paráfrase; originalidade e revisão continuam na linha própria. Fontes e
+recibos em [conferência de 25/10](CONTINUACAO-PRODUCAO-2026-10-25.md).
+
 **Conferência de 25/10, 06h20 BRT:** conferir também as referências nos
 comentários. CF5XLVII não contém vedação textual a confisco geral; distinguir
 XLVI,b e CF243. LEP112§5º/HC118533 não são o enunciado da SV59 (regime aberto e

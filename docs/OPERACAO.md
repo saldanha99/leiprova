@@ -1,17 +1,17 @@
 # Operação do Edital Lei Seca
 
-**Conferência em 25/10/2026, 06h20 BRT:** **11/84 elegíveis**, **8 novas distintas
-publicadas hoje** e **1.824 válidas somadas nas ofertas**. MPRJ avançou para
-**57/68**, ainda em rascunho. Conferidas 25 aprovações: 21 mantidas e quatro
-suspensas por referências/generalizações incorretas nos comentários, audits
-26047–26050. Linha das 09h10 UTC concluída; health público OK. Uma nova trava
-com proprietário identificado ficou abandonada durante a coleta. Após provar a
-conclusão remota e a substituição do contexto, arquivados a trava e o pacote
-antigo completos; nenhuma reserva, tentativa ou resposta foi apagada ou reiniciada.
-Autor voltou a reservar pela rotina normal. Forge recebeu a continuação da
-engenharia em cópia isolada; nenhuma correção nova foi integrada nesta rodada.
-GitHub aguarda a autenticação já solicitada. Sem nova preparação aberta, mudança
-de flags ou gasto. [Recibos e conferência](CONTINUACAO-PRODUCAO-2026-10-25.md).
+**Publicação em 25/10/2026, 07h39 BRT:** **MPRJ liberado em treino histórico**
+pelo programa do XXXIX/2026, com **69 questões válidas** e legislação atualizada;
+**12/84 preparações elegíveis**, **77 novas distintas publicadas hoje** e **1.893
+válidas somadas nas ofertas**. Audit26179, às10h37m31 UTC. Não é reprodução da
+prova passada nem cobertura integral. Página pública conferida, checkout direciona
+a login; pagamento segue sem homologação completa. Conferidas25 aprovações nesta
+rodada,3 retidas por comentários, incluindo ANPP após início da ação penal.
+Código do coletor passou QA isolado (2.046 testes), sem integração ou deploy;
+rollout ainda depende de protocolo remoto e tratamento do legado. Mac bloqueado
+impediu aplicar a instrução de priorização preparada no Maestri; desbloqueio
+solicitado. Sem flags alteradas, API paga, WhatsApp ou anúncios ativados.
+[Conferência e próximos passos](CONTINUACAO-PRODUCAO-2026-10-25.md).
 
 **Conferência em25/10/2026,05h12 BRT:** **11/84 elegíveis**, **8 novas distintas
 publicadas hoje**, **1.824 válidas somadas nas ofertas**; MPRJ**38/68**, ainda draft.

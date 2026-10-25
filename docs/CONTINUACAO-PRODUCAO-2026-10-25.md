@@ -197,3 +197,85 @@ aguardando a autenticação já solicitada; nenhum novo pedido ou deploy nesta r
 Recibos privados: `.local/maestri/heartbeat-20261025-0910-*`.
 CP112/recibo1, contratos PCAL/TCE-MA, WhatsApp e orçamento/contas de anúncios
 permanecem com as restrições anteriores. Nenhuma API paga, flag ou gasto ativado.
+
+## Conferência das 07h13 BRT e revisão do coletor
+
+Dez aprovações posteriores ao watermark foram examinadas; nove mantidas e uma
+suspensa pelo operador de preview/apply. Questão
+`ae9162ae-54eb-52b7-add3-7b425a7cd00d`: o enunciado pergunta genericamente pelas
+hipóteses de substituição, mas a resposta apresenta só o requisito objetivo de
+[Lei9.605 art7,I](https://www.planalto.gov.br/ccivil_03/leis/l9605.htm), sem o
+requisito cumulativo do incisoII. Delimitar o recorte ou incluir a condição.
+Cinco aprovações adicionais das10h25 foram conferidas e mantidas: CF5XL e
+Lei12.850 arts2/4, com a validação de perda/interdição da
+[ADI5567/STF](https://portal.stf.jus.br/noticias/verNoticiaDetalhe.asp?idConteudo=520247&tip=UN).
+Watermark avançado só até10h25m44.772577 UTC. Conferência automatizada, sem
+atribuição de revisão humana.
+
+O Forge entregou o protocolo de consulta do ACK auditado exato e coleta limitada,
+em patch isolado de dez arquivos. O Maestro aplicou somente na cópia de QA e
+validou lint, tipos, **2.046 testes** (302 pulados) e build. A consulta SQL renderizada
+do módulo foi executada em transação somente leitura no PostgreSQL real e
+reconheceu os audits26072/26102 pelos hashes exatos. Nenhum endpoint novo foi
+publicado e nenhum desses dez arquivos foi integrado à raiz.
+
+A implantação precisa de protocolo remoto publicado antes do coletor novo e de
+executor separado revisado. A guarda proposta considera legados sem recibo:
+inventário encontrou30 no Autor,91 no Guardião e81 no Radar, incluindo históricos
+sem resposta. Não ativar esse preflight isoladamente nem arquivar o inventário
+por inferência. A autenticação GitHub já solicitada continua pendente. Forge
+recebeu a continuação no mesmo nó: alternativa privada pontual fora do grupo do
+pré-run, compatível com o protocolo atual. Entrega e validação continuam pendentes;
+nenhum serviço, rotina ou agente adicional foi criado.
+
+Travas com dono ausente reapareceram nos dois agentes. Inspecionados PID/inode,
+metadados e conclusão remota antes de arquivar cada diretório inteiro. Audits26072
+(blocked por originalidade) e26102(prepared) foram recuperados por settlement
+normal, um completado/zero falhas em cada papel. Outro caso do Autor teve
+aplicação remota audit26106, mas o settlement retornou falha: o operador comparou
+input/token/result hashes exatos, confirmou estado preparado sem lease e arquivou
+o pacote inteiro. Nenhum receipt fabricado ou tentativa reiniciada. O diagnóstico
+não identifica ainda a causa externa dos encerramentos.
+
+A linha extra das10h25m39 terminou às10h27m28 UTC, recibo
+`20261025T102539Z.pUesHm`. Cinco questões aprovadas produziram apenas **um** novo
+vínculo MPRJ: a proposta preserva a cobertura já admitida de requisito mapeado.
+Volume na biblioteca não comprova aproveitamento no produto. Preparada fotografia
+privada somente leitura de12 requisitos revisados, com hash de contexto e IDs de
+artigos admitidos; dica expira em duas horas e só permite priorizar a interseção
+com o pacote reservado, sem ampliar mapeamentos ou alterar gates.
+
+A instrução futura do Autor foi preparada para usar essa dica apenas se fresca e
+com contexto idêntico, produzir cenários originais e evitar respostas reaproveitadas.
+**Não aplicada:** o Mac bloqueou durante a tentativa de controle, e a ferramenta
+não conseguiu desbloqueá-lo. Desbloqueio solicitado ao proprietário. Acesso SSH,
+linha da VPS e verificações independentes continuam. Recibos privados desta rodada:
+`.local/maestri/heartbeat-20261025-1013-*`. Hints e resposta pronta não são produção
+publicada; WhatsApp, anúncios e flags continuam com as restrições anteriores.
+
+### MPRJ liberado às07h37 BRT
+
+A segunda linha extra terminou às10h37m38 UTC. O produto MPRJ foi efetivamente
+liberado pelo audit26179, às10h37m31.434169 UTC, modo `historical_training`.
+Relatório posterior às duas retenções abaixo, às10h39m32 UTC: **12/84**, **77 novas
+distintas publicadas hoje**, **1.893 válidas somadas nas ofertas**, **MPRJ69**.
+A página canônica retornou200 e identifica treino histórico, legislação vigente,
+questões inéditas e conteúdo liberado. Checkout retorna307 para autenticação;
+isso não homologa pagamento. Não anunciar inscrições ou prova futura.
+
+Dez aprovações adicionais das10h35 foram conferidas: oito mantidas, duas suspensas
+(audits26183/26184). Questões `ae032228-0641-5652-b5b3-4a6f71c9812e` e
+`66562289-08de-5181-8015-af7a4ec782a9` negavam genericamente processo/condenação
+no ANPP nos comentários. O [HC185913/STF](https://noticias.stf.jus.br/postsnoticias/stf-define-limites-da-retroatividade-dos-acordos-de-nao-persecucao-penal/)
+admite análise em ações em curso e condenação não definitiva, sob as condições
+da tese. Gabarito literal não sana a generalização. CPP14-A/28-A e CF5 dos demais
+itens foram mantidos dentro dos respectivos recortes. No total da rodada,
+25 conferidas/22 mantidas/3 retidas; watermark10h35m41.846879 UTC.
+
+Outra trava Guardião foi reconciliada com audit26109, diretório inteiro preservado
+e settlement normal1/1/0. A última tentativa de coleta extra do Autor encontrou
+exclusão já ocupada e não executou outro complete. Não roubar a trava atual.
+A dica de12 requisitos e a edição futura da rotina ainda estão **preparadas**,
+sem recibo de aplicação por bloqueio do Mac. Nenhum operador deve declará-las ativas.
+Rascunhos de anúncios do MPRJ foram preparados com o modo histórico explícito;
+continuam sem contas/orçamento/gasto e exigem nova conferência antes de ativação.
