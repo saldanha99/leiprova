@@ -1,5 +1,20 @@
 # Operação do Edital Lei Seca
 
+**Operação em 25/10/2026, 01h13 BRT:** relatório conferido com **11/84
+preparações editorialmente elegíveis**, **1.816 questões válidas somadas nas
+ofertas** e **zero novas distintas publicadas neste dia de São Paulo**. Checkout
+continua sem homologação neste relatório. A linha de liberação estava falhando
+por ausência da imagem `leiprova-editorial-binding-importer`; imagem reconstruída
+pelo serviço existente, sem seed, alteração do app ou de flags. Renovada a evidência
+oficial MC5 do MPRJ pelo operador autorizado: audit25510, mesmos bytes/fatos e
+contrato preservado, gate da aplicação verdadeiro e validade até27/10 às00hUTC.
+Isso não libera o produto nem conta como autoria. Conferidas dez aprovações de16/10:
+nove mantidas e uma suspensa com audit25512 por fundamento incorreto na justificativa.
+Mac/Maestri acessível; há novos recibos de reserva, mas ainda não há nova publicação
+comprovada hoje. Não duplicar tarefas nem interromper ocupados. CP112/recibo1 retidos;
+sem API paga, WhatsApp, anúncios ou flags alterados. Os registros anteriores são
+históricos. [Recibos e pendências desta retomada](CONTINUACAO-PRODUCAO-2026-10-25.md).
+
 **Operação em16/10/2026,15h10 BRT:** **11/84 elegíveis**, **1.807 válidas somadas
 nas ofertas** e **8 novas distintas publicadas hoje** (relatório18h10 UTC).
 Contrato MC5 MPRJ admitido em produção, audits24759/24760, `humanReview:false`;
