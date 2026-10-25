@@ -468,3 +468,69 @@ Mac novamente bloqueado; sem repetir pedido já comunicado. Dica de cobertura ex
 continua sem aplicação; renovar snapshot antes de eventual uso. GitHub é pendência
 anterior, sem novo push/deploy. Protocolos incompletos do Forge não foram ativados.
 CP112/recibo1 retidos; WhatsApp sem integração identificada e anúncios sem gasto.
+
+
+## Conferência de 12h32 BRT — coordenação restabelecida
+
+Relatório final às2026-10-25 15:32:12.464801+00 UTC:12/84 preparações elegíveis, 136
+questões novas distintas válidas publicadas no dia de São Paulo e1952 válidas
+somadas nas ofertas, sem equivaler a soma a total único global. MPRJ73, treino
+histórico liberado; checkout não homologado pelo relatório. Health público ok;
+linha de liberação saudável na conferência. CP112/recibo1 continuam retidos.
+
+Dez novas aprovações conferidas, nove mantidas. Suspendida no operador existente,
+com preview/apply e audit26655, a questão47add8d0-e95d-5b41-912b-7e2d48c66f5f:
+[LRP167I9](https://www.planalto.gov.br/ccivil_03/leis/l6015compilada.htm) admite registro
+com ou sem arrependimento, mas [CC1417](https://www.planalto.gov.br/ccivil_03/leis/2002/l10406compilada.htm)
+exige promessa sem arrependimento para o direito real à aquisição. O comentário
+confundia os dois planos sem delimitar o contrato do caso. Novo watermark máximo
+conferido14h50m07.904132 UTC; sem declaração de revisão humana.
+
+Mantidos os recortes de LRF49§3, sem afastar a proteção de capital essencial no stay;
+ITBI na instituição da garantia, sem generalizar à consolidação;
+usufruto convencional como classificação registral, sem atribuir titularidade a
+pessoa jurídica já extinta (CC51); LBI3II/IX/28§1 e Lei10.098art10-A.
+A [ADI5357 foi conferida no STF](https://portal.stf.jus.br/noticias/verNoticiaDetalhe.asp?idConteudo=318570&ori=1),
+confirmando a inclusão em escolas privadas sem taxa adicional. Registros dos
+recortes estão no `conference-report.json` privado.
+
+Autor:96 havia concluído remotamente, mas a trava local tinha dono ausente
+(PID75239). Audit26617 coincide exatamente com input, token e resultado; o job
+atual já tinha novo input e nenhum lease. Arquivados packet antigo e trava inteira
+sob exclusão, após conferir dono/inode e estabilidade de resposta. Nenhum receipt
+fabricado, repetição de importação ou reset de tentativas. Guardião tinha reserva
+ativa e não foi reiniciado nem substituído.
+
+O controle nativo voltou a acessar o Mac/Maestri. CLI real confirmou o Maestro
+central e os oito nós existentes. Autor e Guardião estavam ociosos após falha de
+rede; retomada enviada somente às mesmas reservas author:94 e mapping:738,
+ambas ainda válidas e sem response/receipt. Survey opcional do Autor foi dispensada
+com a opção0 apresentada. Novos checks confirmaram execução nos dois nós, sem
+contar execução ou reserva como publicação. Nenhum ocupado foi interrompido.
+
+Forge retomou, no mesmo nó/sessão/modelo, o conjunto seguro de settlement:
+protocolo auditado, exclusão de packet vencido, executor fora do pre-run e plano
+fail-closed para legado; o protótipo detached isolado continua proibido de ativar.
+Prism iniciou, no mesmo nó, a fatia vertical de parent comercial/child editorial
+por cargo para PCAL e TCE-MA, com piso68 por trilha e sem estreitar o parent.
+Ambas as tarefas foram recebidas e os checks mostram trabalho real em andamento;
+ainda não há entrega, QA integrado, migração aplicada ou nova preparação por elas.
+Ownership não sobreposto e cópias privadas, sem editar a raiz, banco, flags ou fila.
+Relatórios esperados nos papéis existentes: `heartbeat-20261025-1522-forge-safe-collector-report.md`
+e `heartbeat-20261025-1522-prism-child-tracks-report.md`.
+
+Editadas somente as instruções de leitura das duas rotinas para consultar primeiro
+bloco atual e recortes pertinentes por `rg`, evitando reler o histórico inteiro;
+AGENTS, instruções do packet e corpus integral permanecem. Recibo real confirma
+IDs56cefb/cc6e9e, intervalo1min, skip-if-busy e ausência de notificações preservados.
+Não foram ativadas as dicas MPRJ expiradas, nem alterados preflight, modelos ou
+permissões. Quatro notas compartilhadas tiveram apenas seu bloco atual substituído,
+com backups/recibos e confirmação posterior; IDs/conexões e histórico preservados.
+
+Recibos privados sob `.local/maestri/heartbeat-20261025-1522-`: `owner-final.json`,
+`conference-report.json`, `hold-audits.jsonl`, `reconciliation.json`, `list.txt`,
+`routine-trim-receipt.json`, `notes-receipts.json`, `progress-*.txt` e despachos
+Forge/Prism/Autor/Guardião. Timeouts dos pedidos não foram tomados como sucesso:
+checks posteriores confirmaram recebimento e execução. GitHub ainda inválido na
+consulta somente leitura; pedido anterior permanece, sem contorno ou novo token.
+Sem novo deploy, API paga, flags, WhatsApp ou anúncios ativados.

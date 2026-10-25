@@ -1,5 +1,13 @@
 # Operação do Edital Lei Seca
 
+**Conferência em 25/10/2026, 12h32 BRT:** **12/84 elegíveis**, **136 novas distintas
+publicadas hoje**, **1.952 válidas somadas nas ofertas**; MPRJ**73**, em treino
+histórico. Dez aprovações conferidas, uma suspensa (audit26655). Maestri voltou a
+ficar acessível: Autor/Guardião retomam as mesmas reservas após falha de rede;
+Forge e Prism executam as próximas entregas em cópias privadas. Reduzida a releitura
+do histórico nas duas rotinas, preservados IDs, frequência e gates. Sem novo deploy,
+flags ou gasto. [Recibos e tarefas](CONTINUACAO-PRODUCAO-2026-10-25.md).
+
 **Conferência em 25/10/2026, 11h24 BRT:** **12/84 elegíveis**, **127 novas distintas
 publicadas hoje**, **1.943 válidas somadas nas ofertas**; MPRJ**73**, em treino
 histórico. Quinze aprovações conferidas:11 mantidas,4 suspensas por precisão, audits26577–26580.

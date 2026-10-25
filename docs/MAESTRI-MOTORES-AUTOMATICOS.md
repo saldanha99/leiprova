@@ -1,5 +1,12 @@
 # Editalume — contrato dos motores automáticos
 
+**Conferência de 25/10, 12h32 BRT:** distinguir a registrabilidade de LRP167I9,
+com ou sem cláusula de arrependimento, do direito real à aquisição de CC1417,
+que exige promessa sem arrependimento. Não converter o ato de registro em efeito
+real automático de toda promessa. Rotinas Autor/Guardião agora consultam primeiro
+bloco atual e recortes temáticos via `rg`, preservando leitura integral do corpus
+reservado e todos os gates. [Recibos](CONTINUACAO-PRODUCAO-2026-10-25.md).
+
 **Conferência de 25/10, 11h BRT:** receitas futuras frustradas são lucros
 cessantes, não danos emergentes (CC402). Ao comentar indenização estatal, preservar
 RPV/CF100§3; não afirmar precatório sem delimitar o valor. Convenção condominial
