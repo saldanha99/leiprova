@@ -1,5 +1,12 @@
 # Editalume — contrato dos motores automáticos
 
+**Conferência de 25/10, 17h52 BRT:** pensão por morte de cônjuge exige data do
+óbito: desde01/01/2021, PortariaME424/2020 estabelece vitaliciedade a partir45anos
+e20anos entre42e44, conforme Lei8.213art77§2-B. Não ensinar44anos como faixa atual
+universal; a viúva de46 continua no recorte vitalício. Título extrajudicial estrangeiro
+entre privados não cria competência da Justiça Federal apenas por sua origem;
+distinguir CF109I/X e CPC784§§2/3. [Fontes e retenções](CONTINUACAO-PRODUCAO-2026-10-25.md).
+
 **Conferência de 25/10, 13h40 BRT:** mandado de segurança coletivo exige
 legitimação de CF5LXX/Lei12.016art21; empresa e credores defendendo direitos próprios
 não viram legitimados coletivos por litisconsórcio. LBI28§2I é piso de formação;

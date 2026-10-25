@@ -619,3 +619,76 @@ especialmente `owner-final-2.json`, `conference-report.json`, `hold-audits-final
 `lock-recoveries.json`, `settle-*.json`, `forge-qa/independent-review.json`, logs de
 QA e tarefas Forge/Prism. O follow-up Forge deve usar o QA já concluído, evitando
 repetir a prova PostgreSQL sem mudança nova.
+
+## Conferência de 17h52 BRT — coleta recuperada e segunda entrega do Prism retida
+
+O disparo desta rodada identifica17h19 UTC, mas o relógio disponível na execução
+já marcava20h48 UTC. Relatório final às20h52m55.310294 UTC:12/84 elegíveis,
+165 novas questões distintas válidas no dia de São Paulo e1981 válidas somadas nas
+ofertas, sem equivalência a total único global. MPRJ73, treino histórico; checkout
+não homologado neste relatório. Health ok; liberação concluiu às20h41m22 UTC.
+Não inferir produção contínua ou causa da lacuna de horário apenas do disparo.
+
+Conferidas25 aprovações posteriores ao watermark16h30m08.084488 UTC;23 mantidas.
+Duas suspensões com preview/apply no operador existente, sem revisão humana:
+
+- audit26897, questão03daa18b-8088-5bbe-ae7b-a0931a279d32: comentários apresentam
+  vitaliciedade a partir44 e20anos entre41–43 como regra atual universal, sem marco
+  temporal. [Lei8.213art77§2-B](https://www.planalto.gov.br/ccivil_03/leis/l8213cons.htm)
+  permite atualização. O [INSS confirma PortariaME424/2020](https://www.gov.br/inss/pt-br/direitos-e-deveres/pensoes/pensao-por-morte-do-a-segurado-a-especial):
+  para óbitos desde01/01/2021, vitalícia desde45 e20anos entre42–44. O resultado
+  vitalício da viúva de46 não foi negado; precisa corrigir também a faixa/comentários.
+- audit26899, questãocd3f0de0-a3ad-522c-925b-ab718815df8e: execução de título
+  extrajudicial estrangeiro foi situada na Justiça Federal sem caracterizar hipótese
+  constitucional dessa competência. Origem estrangeira/credor multinacional não
+  bastam; distinguir [CF109I/X](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm)
+  da dispensa de homologação e requisitos de [CPC784§§2/3](https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13105.htm).
+
+Mantidos, nos recortes lidos: MCI7II/VII; LGPD14§§3/5 (contato com responsáveis
+sem converter consentimento em única base de todo tratamento); CF5LXXIX/XXXI;
+Lei8.213art16; LRP167I1/II1; CDC6V/18§§2–3/51VII/§2; CPC784I/III/§§1/4 e75VIII/IX/§2;
+CC1046. Fontes primárias adicionais:
+[MCI](https://www.planalto.gov.br/ccivil_03/_ato2011-2014/2014/lei/l12965.htm),
+[LGPD](https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709.htm),
+[CDC](https://www.planalto.gov.br/ccivil_03/leis/l8078compilado.htm),
+[CC](https://www.planalto.gov.br/ccivil_03/leis/2002/l10406compilada.htm)
+e [LRP](https://www.planalto.gov.br/ccivil_03/leis/l6015compilada.htm).
+A classificação de bem de família no Livro2 não foi lida como dispensa da
+transcrição no Livro3 prevista em LRP263. Novo watermark máximo efetivamente
+conferido17h00m09.296068 UTC, atualizado também no arquivo privado do Maestro.
+
+Autor103 e Guardião/mapping733 tinham donos locais ausentes, PID65419/60455.
+Audits26797(prepared)/26774(blocked) coincidiram com input/token/resultado, sem
+lease nos trabalhos. Conferidos estabilidade de inode/dono, host, bytes de packet e
+resposta; travas arquivadas inteiras. Coleta normal retornou1/1/0 em ambos, como
+replay, sem reset ou nova autoria contada. Às20h53 UTC surgiram novas reservas
+`author:104` e `legal-change:3849`, ambas com respostas locais salvas. Isso não
+comprova conclusão remota ou publicação; a causa das interrupções continua aberta.
+
+A segunda entrega do Prism foi encontrada em arquivo privado na raiz do projeto.
+Foi novamente recusada após probe independente somente em memória, sem banco:
+`txExecutor` no-op retorna applied; `dbState` ausente é aceito; snapshot/parent/edição
+divergentes também passam; mudar piso68para99 e rótulo não muda fingerprint.
+A auditoria INSERT usa colunas/tipo de ID incompatíveis com o schema real.
+Readiness ainda confia em booleans fornecidos pelo chamador e não usa o predicado
+comercial SQL completo. A suposta integração continua plano com IDs e contratos
+sintéticos marcados reviewed, sem operador vertical real de admissão.
+
+Não executar sua suíte PostgreSQL como entregue: seleciona `MIGRATION_DATABASE_URL`
+ou banco comum chamado leiprova, com credenciais literais no teste. Schema aleatório
+não prova ambiente descartável. Os testes de DDL não demonstram app restrito/RLS
+nem apply real. Nenhuma migração/código dessa entrega foi integrado e nenhum teste
+com conexão arbitrária foi executado pelo Maestro. Revisão e próxima corretiva
+preparadas em arquivos; Mac ainda bloqueado impediu o despacho. Não alegar que o
+Prism continua trabalhando ou que a próxima tarefa foi recebida.
+
+Coletor do Forge permanece com QA privado anterior, sem ativação; revisão adicional
+preparada antes também não foi enviada. GitHub segue inválido nas contas existentes.
+Pendências de acesso já comunicadas, sem repetição. Sem flags, API paga, WhatsApp,
+anúncios ou gasto alterados; CP112/recibo1 retidos. Evidência MPRJ25510 válida
+até27/10 às00hUTC, pendente de renovação antes do vencimento.
+
+Recibos privados sob `.local/maestri/heartbeat-20261025-1719-`: `owner-final.json`,
+`conference-report.json`, `hold-audits.jsonl`, `lock-recoveries.json`, `settle-*.json`,
+`latest-packets.json`, `prism-review.json`, `prism-adversarial-receipt.json` e
+`prism-review-task.txt`. O último é somente preparação, sem despacho comprovado.

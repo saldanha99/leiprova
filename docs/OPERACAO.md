@@ -1,5 +1,14 @@
 # Operação do Edital Lei Seca
 
+**Conferência em 25/10/2026, 17h52 BRT:** **12/84 elegíveis**, **165 novas distintas
+válidas publicadas hoje**, **1.981 válidas somadas nas ofertas**; MPRJ**73**, treino
+histórico. Conferidas25 aprovações, duas suspensas (audits26897/26899). Dois replays
+auditados destravaram a coleta; novas reservas/respostas locais não são publicações.
+Segunda entrega do Prism recusada após reproduzir apply sem escrita e validações
+incompletas; não integrar nem executar seu teste PostgreSQL com URL padrão.
+Mac/GitHub continuam com pendências já comunicadas. Sem deploy, flags ou gasto.
+[Conferência, provas e próximos passos](CONTINUACAO-PRODUCAO-2026-10-25.md).
+
 **Conferência em 25/10/2026, 13h40 BRT:** **12/84 elegíveis**, **144 novas distintas
 válidas publicadas hoje**, **1.960 válidas somadas nas ofertas**; MPRJ**73**, em treino
 histórico. Dez aprovações conferidas, duas suspensas (audits26689/26721). Forge
