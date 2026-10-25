@@ -534,3 +534,88 @@ Forge/Prism/Autor/Guardião. Timeouts dos pedidos não foram tomados como sucess
 checks posteriores confirmaram recebimento e execução. GitHub ainda inválido na
 consulta somente leitura; pedido anterior permanece, sem contorno ou novo token.
 Sem novo deploy, API paga, flags, WhatsApp ou anúncios ativados.
+
+## Conferência de 13h40 BRT — entrega do coletor em QA privado
+
+Relatório às2026-10-25 16:40:09.592844+00 UTC:12/84 elegíveis,144 novas questões
+distintas válidas publicadas no dia de São Paulo e1960 válidas somadas nas ofertas.
+A soma não é total único global. MPRJ73, treino histórico; checkout continua sem
+homologação pelo relatório. Health público ok; sem preparação adicional aberta.
+
+Dez aprovações conferidas, oito mantidas. Suspensões por precisão no operador
+existente, com preview/apply e audits reais, sem revisão humana declarada:
+
+- audit26689, questãocb6e3c8c-bb31-5478-a3a3-4b9954bfe789: sociedade empresária e
+  credores defendendo direitos próprios não se tornam legitimados para mandado de
+  segurança coletivo. Distinguir litisconsórcio individual e legitimação de
+  [Lei12.016art21](https://www.planalto.gov.br/ccivil_03/_ato2007-2010/2009/lei/l12016.htm),
+  sem negar a exclusão constitucional das garantias no ITBI.
+- audit26721, questãofd0de807-e65f-56e2-aecd-786f2dd973ea: o piso de LBI28§2I não
+  prova sozinho a invalidade de toda exigência de graduação em seleção pública.
+  Faltam a lei do cargo e a compatibilização da habilitação com
+  [Lei12.319art4](https://www.planalto.gov.br/ccivil_03/_ato2007-2010/2010/lei/l12319.htm)
+  e a transição de [Lei14.704art3](https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2023/lei/l14704.htm).
+  Não declarar o art28§2I revogado nem negar genericamente exigências legais superiores.
+
+Mantidos os recortes de LRF49§3, LRP167I7, CF5XXII/XXIII e LRP167I9. A promessa
+com arrependimento foi mantida somente na classificação registral perguntada,
+sem atribuir direito real à aquisição de CC1417. Também mantidos sinal sonoro de
+Lei10.098art9, adaptação razoável de LBI3VI, cadeiras de rodas de Lei10.098art12-A
+e apoio escolar de LBI3XIII, nos limites das perguntas e comentários lidos.
+Fontes: [LBI](https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13146.htm)
+e [Lei10.098](https://www.planalto.gov.br/ccivil_03/leis/l10098.htm).
+Watermark máximo efetivamente conferido16h30m08.084488 UTC.
+
+Mapping744 preparado continha atribuição legislativa incorreta do CPP310§§7–11:
+a [fonte oficial do CPP](https://www.planalto.gov.br/ccivil_03/decreto-lei/del3689.htm)
+indica Lei15.358/2026, não Lei13.964/2019. Registrada advertência para autoria;
+não alterados packet, audit, fonte ou mapeamento por escrita avulsa. Prepared não
+foi apresentado como aprovação. CP112/recibo1 continuam retidos.
+
+Quatro travas com donos ausentes reconciliadas nesta rodada, em dois momentos:
+audits26656/26687 (author94/mapping744) e26719/26692 (author98/mapping745).
+Cada recuperação conferiu host/PID, inode/dono, packet/resposta e hashes exatos do
+audit remoto, sem lease no trabalho. Arquivados diretórios de trava inteiros;
+settlement normal retornou attempted1/completed1/failed0, com replay auditado.
+Nenhuma nova autoria contada por replay nem tentativas resetadas. A recorrência
+continua aberta; PID ou idade isolados não autorizam limpeza.
+
+Forge entregou18 arquivos no artefato privado `forge-safe-collector-20261025`,
+baseb897f30: bloqueio de claim com packet não reconciliado, recibo remoto por tuple
+exato, settlement fora do pre-run e plano explícito de legado com fence/audit.
+Aplicado somente em cópia isolada. QA independente: lint/tipos/build exit0;
+suíte completa2069 pass/303 skip, com2workers e timeout20s, sem alterar asserts.
+Dois testes PostgreSQL17 reais passaram em cluster próprio descartável: o do patch
+e uma conferência independente com app NOSUPERUSER/NOCREATEDB/NOCREATEROLE e grants
+mínimos. Confirmados conflito NOWAIT com segunda conexão, rollback integral por
+falha no insert do audit, bloqueio por lease ativo, preservação de tentativas e
+rejeição do token antigo após retirada. Cluster encerrado; nenhuma escrita na VPS.
+
+Limites do QA: dependências foram clonadas dentro da cópia por APFS, sem instalar
+pacotes; somente uma fixture pública da Câmara foi copiada para testes existentes.
+O pnpm tentou instalação implícita e foi bloqueado antes de alterar dependências;
+a validação efetiva desativou essa instalação. Dois testes de shell antigos
+excederam5s sob carga; passaram com20s. O teste novo do watchdog150ms falhou sob
+concorrência alta por iniciar tarde demais o filho; passou com2workers e precisa
+de handshake de prontidão antes de tratar a entrega como pronta para ativação.
+Não há prova da causa externa das mortes. Coletor/preflight/patch continuam privados,
+sem integração na raiz, deploy ou mudança de rotina. Corte deve publicar primeiro
+o executor compatível e reconciliar cada legado, sem mistura de chamadores.
+
+Prism entregou um protótipo de trilhas, recusado por apply sem transação efetiva,
+confiança em metadados do cliente, fingerprint incompleto, readiness sem predicado
+integral e ausência de integração vertical. Corretiva1619 efetivamente recebida,
+com execução confirmada no mesmo nó. Teste que havia escrito na raiz foi movido
+por ele; não há migração aplicada ou produto liberado pelo protótipo.
+
+Mac voltou a bloquear antes do despacho da revisão adicional ao Forge. O arquivo
+existe, mas **não há envio/recebimento comprovado**; não alegar que está em execução.
+GitHub continua inválido nas duas contas existentes, sem troca, novo token ou
+repetição do pedido anterior. Sem aviso repetido de acesso já pendente. WhatsApp
+sem integração validada; anúncios sem contas/orçamento, flags e gasto preservados.
+
+Recibos privados: prefixos `.local/maestri/heartbeat-20261025-1619-` e `1619b-`,
+especialmente `owner-final-2.json`, `conference-report.json`, `hold-audits-final.jsonl`,
+`lock-recoveries.json`, `settle-*.json`, `forge-qa/independent-review.json`, logs de
+QA e tarefas Forge/Prism. O follow-up Forge deve usar o QA já concluído, evitando
+repetir a prova PostgreSQL sem mudança nova.

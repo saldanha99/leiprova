@@ -1,5 +1,14 @@
 # Editalume — contrato dos motores automáticos
 
+**Conferência de 25/10, 13h40 BRT:** mandado de segurança coletivo exige
+legitimação de CF5LXX/Lei12.016art21; empresa e credores defendendo direitos próprios
+não viram legitimados coletivos por litisconsórcio. LBI28§2I é piso de formação;
+não concluir apenas dele pela invalidade de qualquer graduação exigida em seleção.
+Compatibilizar habilitação com Lei12.319art4 e transição de Lei14.704art3.
+CPP310§§7–11: conferir atribuição legislativa atual; a fonte oficial indica
+Lei15.358/2026, não Lei13.964/2019. A advertência veio de mapping744 preparado,
+sem declarar correção ou revisão do mapeamento. [Fontes e recibos](CONTINUACAO-PRODUCAO-2026-10-25.md).
+
 **Conferência de 25/10, 12h32 BRT:** distinguir a registrabilidade de LRP167I9,
 com ou sem cláusula de arrependimento, do direito real à aquisição de CC1417,
 que exige promessa sem arrependimento. Não converter o ato de registro em efeito

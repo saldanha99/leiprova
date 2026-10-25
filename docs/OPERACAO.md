@@ -1,5 +1,15 @@
 # Operação do Edital Lei Seca
 
+**Conferência em 25/10/2026, 13h40 BRT:** **12/84 elegíveis**, **144 novas distintas
+válidas publicadas hoje**, **1.960 válidas somadas nas ofertas**; MPRJ**73**, em treino
+histórico. Dez aprovações conferidas, duas suspensas (audits26689/26721). Forge
+entregou o protocolo privado: lint, tipos,2.069 testes e build aprovados; também
+passaram duas verificações PostgreSQL17 reais, uma com app sem superusuário.
+Ainda sem integração/ativação: faltam corte do protocolo e revisão de teste temporal.
+Prism recebeu corretiva do protótipo de trilhas. Mac voltou a bloquear e GitHub
+continua inválido, pendências já comunicadas. Sem novo deploy, flags ou gasto.
+[Conferência, QA e limites](CONTINUACAO-PRODUCAO-2026-10-25.md).
+
 **Conferência em 25/10/2026, 12h32 BRT:** **12/84 elegíveis**, **136 novas distintas
 publicadas hoje**, **1.952 válidas somadas nas ofertas**; MPRJ**73**, em treino
 histórico. Dez aprovações conferidas, uma suspensa (audit26655). Maestri voltou a
