@@ -330,3 +330,39 @@ repetição. A rotina com dica de cobertura continua apenas preparada. GitHub
 reconferido: conta ativa esperada continua inválida, sem trocar conta, credenciais
 ou repetir notificação. Nenhuma nova integração de código/deploy/QA global nesta
 rodada operacional. Recibos: `.local/maestri/heartbeat-20261025-1108-*`.
+
+
+## Conferência de 09h17 BRT — 12/84 mantidas
+
+Relatório do proprietário às12h14m52 UTC:108 novas questões distintas válidas
+publicadas no dia de São Paulo,12/84 preparações elegíveis e1.924 questões válidas
+somadas nas ofertas (a soma não é contagem única global). MPRJ73, liberado em treino
+histórico; checkout continua sem homologação no relatório. Health público ok e
+linha de liberação concluída às12h11m23 UTC. Não mudou a elegibilidade das ofertas.
+
+Conferidas integralmente cinco aprovações posteriores ao watermark anterior:
+audits26373/26375/26377/26379/26381, gabaritos, distratores, justificativas e
+explicações. Todas mantidas. Fontes primárias: [CC1039/1045/1046](https://www.planalto.gov.br/ccivil_03/leis/2002/l10406compilada.htm)
+e [CPC75/76](https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13105.htm).
+O caso de representação da pessoa jurídica não foi interpretado como autorização
+para revelia imediata: o saneamento de CPC76 permanece. Novo watermark real:
+25/10 às11h20m08.638640 UTC. Conferência automatizada, sem declarar revisão humana.
+
+A trava do Autor criada às11h14m54 UTC estava com PID ausente. A ausência do
+processo foi apenas diagnóstico. A reconciliação exigiu audit26366 das11h14m58 UTC,
+com job author:103, input, hash do token e resultado validado exatamente coincidentes;
+o trabalho remoto estava pending, com input novo e sem lease. Sob a exclusão da
+trava antiga, o packet já concluído foi arquivado inteiro e depois a trava foi
+arquivada, preservados dono, marcadores e tentativas. Nenhum receipt sintético,
+reimportação ou reset. A rotina normal pode voltar a reservar o contexto atual.
+Isso não prova correção da causa externa das interrupções.
+
+Recibos privados: prefixo `.local/maestri/heartbeat-20261025-1214-`, arquivos
+`owner.json`, `conference.jsonl`, `conference-report.json`, `lock-proof.json`,
+`author-state.jsonl` e `reconciliation.json`. Não enviar conteúdos da fila ao Git.
+Mac novamente confirmado bloqueado pelo controle nativo; sem repetir pedido já
+comunicado. Dica de cobertura ainda não aplicada; não usar após sua expiração.
+GitHub continua pendência anterior, sem novo push/deploy. Protocolos do Forge
+continuam sem ativação: endpoint, execução externa e tratamento do legado precisam
+ser resolvidos juntos; protótipo detached isolado tem contraexemplo de segurança.
+CP112/recibo1 retidos, WhatsApp sem integração identificada e anúncios sem gasto.
