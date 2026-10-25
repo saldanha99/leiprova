@@ -1,5 +1,12 @@
 # Editalume — contrato dos motores automáticos
 
+**Conferência de 25/10, 10h17 BRT:** casos com negócio em2020 e decadência
+civil precisam computar Lei14.010/2020 art3§2 (suspensão excepcional do RJET),
+sem concluir decadência apenas somando quatro anos. Lei fictícia datada deve ser
+expressamente identificada como hipótese, com garantia real sustentada em fonte
+oficial; não atribuir vigência a norma não identificada. Precisão vale também
+nos comentários. [Retenções e fontes](CONTINUACAO-PRODUCAO-2026-10-25.md).
+
 **Conferência de 25/10, 08h19 BRT:** CPP394§4 não autoriza apresentar CPP397
 como universal, ignorando o rito do júri. LGPD14: delimitar a base consentimento
 sem negar as demais hipóteses legais de ANPD1/2023. CDC18: prazo de conserto não

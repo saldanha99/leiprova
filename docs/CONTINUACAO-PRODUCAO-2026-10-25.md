@@ -366,3 +366,49 @@ GitHub continua pendência anterior, sem novo push/deploy. Protocolos do Forge
 continuam sem ativação: endpoint, execução externa e tratamento do legado precisam
 ser resolvidos juntos; protótipo detached isolado tem contraexemplo de segurança.
 CP112/recibo1 retidos, WhatsApp sem integração identificada e anúncios sem gasto.
+
+
+## Conferência de 10h17 BRT — dez aprovações e dois replays
+
+Relatório final às13h17m45 UTC:12/84 preparações editorialmente elegíveis,
+116 novas questões distintas válidas efetivamente publicadas no dia de São Paulo,
+1.932 válidas somadas nas ofertas (não é total único global). MPRJ73, treino
+histórico liberado; checkout não homologado pelo relatório. Health ok e última
+liberação conferida concluída às13h11m23 UTC.
+
+Conferidas dez aprovações, audits26424–26442. Oito mantidas, duas suspensas pelo
+operador existente em preview/apply, sem alterar textos aprovados diretamente:
+
+- audit26489, questão7440b7da-2f1b-568a-9035-8acd07ce6a7d: a lei datada de2025
+  com teto contratual de5% não tem fonte nem é expressamente declarada hipotética.
+  Delimitar a ficção normativa; [CF5XXXVI](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm)
+  continua sendo a fonte real da garantia intertemporal.
+- audit26490, questão8c345e72-3195-5215-ad9b-6b0afb175fdc: negócio de10/05/2020,
+  ação de15/06/2024 e conclusão de decadência sem considerar
+  [Lei14.010/2020 art3§2](https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2020/lei/l14010.htm),
+  que estende a suspensão excepcional do RJET à decadência. Corrigir datas ou cômputo;
+  o literal isolado de CC178II não basta para resolver essas datas.
+
+Os demais itens foram confrontados com [CC171/178/869](https://www.planalto.gov.br/ccivil_03/leis/2002/l10406compilada.htm).
+No item sobre17anos, a distinção de nulidade foi mantida no recorte da incapacidade
+etária, sem dizer que CC166 só contém essa causa. Na gestão de negócios, preservar
+utilidade no momento do ato e nexo causal; comentários dos casos não substituem
+as hipóteses especiais dos arts868/870. Novo watermark:12h30m08.773975 UTC,
+máximo efetivamente conferido, sem declaração de revisão humana.
+
+Travas abandonadas do Autor (PID9854) e Guardião (PID29370) foram reconciliadas
+após prova de auditoria exata: author:88/audit26421 e mapping:709/audit26486,
+com input, token e resultado correspondentes, sem lease remoto e donos ausentes.
+Diretórios de trava foram arquivados inteiros após verificar inode e dono;
+settlement normal teve attempted1/completed1/failed0 para cada agente, e ambos
+os receipts indicam replay. Nenhuma nova importação contabilizada, nenhum reset
+de tentativas ou reserva e nenhum receipt fabricado. A causa das interrupções
+continua aberta; não ativar o protótipo detached isolado ou o protocolo incompleto.
+
+Recibos privados sob `.local/maestri/heartbeat-20261025-1315-`: `owner-final.json`,
+`conference-report.json`, `holds.json`, `hold-audits.jsonl`, `lock-recoveries.json`,
+`Autor-lock-proof.json`, `Guardiao-lock-proof.json`, `settle-Autor.json` e
+`settle-Guardiao.json`. Mac confirmado bloqueado novamente; GitHub segue inválido
+na consulta somente leitura. Pedidos anteriores não repetidos. A dica de cobertura
+preparada expirou e não foi aplicada; renovar snapshot antes de eventual uso.
+Sem código, deploy, flags, API paga, WhatsApp ou anúncios ativados; CP112/recibo1 retidos.

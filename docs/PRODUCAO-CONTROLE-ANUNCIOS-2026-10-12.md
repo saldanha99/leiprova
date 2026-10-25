@@ -1,5 +1,13 @@
 # Produção, controle do proprietário e anúncios
 
+**Conferência em 25/10/2026, 10h17 BRT:** **12/84 elegíveis**, **116 novas distintas
+publicadas hoje**, **1.932 válidas somadas nas ofertas**; MPRJ**73**, em treino
+histórico. Dez aprovações conferidas: oito mantidas, duas suspensas com audits26489/26490
+(lei fictícia não delimitada e decadência que ignorava RJET). Duas travas abandonadas
+reconciliadas por audit exato, com replay e recibos reais, sem nova autoria contabilizada.
+Site e linha da VPS saudáveis; Mac bloqueado e GitHub inválido, já comunicados.
+Sem novo deploy, flags, APIs pagas ou gasto. [Recibos](CONTINUACAO-PRODUCAO-2026-10-25.md).
+
 **Conferência em 25/10/2026, 09h17 BRT:** **12/84 elegíveis**, **108 novas distintas
 publicadas hoje**, **1.924 válidas somadas nas ofertas**; MPRJ permanece com **73**,
 em treino histórico. Cinco novas aprovações conferidas, sem suspensão. Recuperada
