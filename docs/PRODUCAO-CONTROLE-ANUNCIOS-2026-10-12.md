@@ -1,11 +1,12 @@
 # Produção, controle do proprietário e anúncios
 
-**Conferência em 25/10/2026, 18h02 BRT:** **12/84 elegíveis**, **169 novas distintas
-válidas publicadas hoje**, **1.985 válidas somadas nas ofertas**; MPRJ**73**. Cinco
-aprovações conferidas, uma suspensa (audit26931: capital votante não prova capital total).
-Teste temporal do coletor corrigido somente em QA privado; lint, tipos,2.069 testes
-e build aprovados. Sem integração/ativação; acessos e corte do protocolo pendentes.
-Relatório18h preparado, sem envio por WhatsApp. [Recibos](CONTINUACAO-PRODUCAO-2026-10-25.md).
+**Conferência em 25/10/2026, 19h03 BRT:** **12/84 elegíveis**, **173 novas distintas
+válidas publicadas hoje**, **1.989 válidas somadas nas ofertas**; MPRJ**73**. Cinco
+aprovações conferidas, uma suspensa (audit26979: responsabilidade pessoal de LRF82
+não se reduz ao IDPJ). Inventário somente leitura encontrou2.043 packets legados:
+o novo coletor permanece privado até plano de reconciliação auditado, sem purge.
+Mac/GitHub continuam pendentes; sem deploy, flags, API paga ou gasto.
+[Conferência e inventário](CONTINUACAO-PRODUCAO-2026-10-25.md).
 
 **Conferência em 25/10/2026, 17h52 BRT:** **12/84 elegíveis**, **165 novas distintas
 válidas publicadas hoje**, **1.981 válidas somadas nas ofertas**; MPRJ**73**, treino

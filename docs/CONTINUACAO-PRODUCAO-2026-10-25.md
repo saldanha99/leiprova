@@ -741,3 +741,60 @@ Recibos privados: prefixo `.local/maestri/heartbeat-20261025-2100-`, incluindo
 `owner-final.json`, `conference-report.json`, `hold-audits.jsonl`, `recovery.json`,
 `settle-Autor.json`, `watchdog-test-receipt.json`, e diretório do pacote completo
 acima. As corretivas aos nós continuam somente preparadas até recuperar o acesso.
+
+## Conferência de 19h03 BRT — inventário do legado antes do corte do coletor
+
+Relatório às22h03m39.381024 UTC:12/84 elegíveis,173 novas questões distintas
+válidas publicadas no dia de São Paulo e1989 válidas somadas nas ofertas. MPRJ73,
+treino histórico. A soma não é total único global; checkout não homologado.
+Health ok; linha de liberação concluiu às22h01m27 UTC, sem novo produto elegível.
+
+Cinco aprovações conferidas, quatro mantidas. Questão0c023b22-8b2e-5442-805b-92c91e2bcf3b
+suspensa com preview/apply e audit26979: o comentário transforma o IDPJ em única
+via para afetar patrimônio de sócios limitados/controladores/administradores.
+[LRF82](https://www.planalto.gov.br/ccivil_03/_ato2004-2006/2005/lei/l11101.htm)
+preserva responsabilidade pessoal própria fundada nas respectivas leis, apurada
+na ação específica, inclusive indisponibilidade do§2. Isso não nega o acerto da
+vedação de extensão automática da falência no caso de LRF82-A.
+
+Mantidos os recortes de [CC50§§1/4](https://www.planalto.gov.br/ccivil_03/leis/2002/l10406compilada.htm),
+[CDC28§2](https://www.planalto.gov.br/ccivil_03/leis/l8078compilado.htm) e LRF82-A,
+parágrafo único: grupo econômico isolado não prova abuso; a hipótese consumerista
+perguntava responsabilidade pelo grupo, sem afastar outras causas próprias; MP
+no IDPJ foi lido na condição de intervenção admitida. Novo watermark máximo
+conferido21h10m07.984048 UTC, sem revisão humana declarada.
+
+Autor105 tinha ownerPID84035 ausente. Prova exata do audit26934, trabalho sem
+lease, hashes de input/token/resultado e estabilidade de dono/inode/packet/resposta
+permitiram arquivar a trava inteira. Settlement normal1/1/0, replay, sem reset ou
+nova autoria contada. Guardião estava com mapping767 reservado, sem response;
+Radar já tinha recibo de discovery. Nenhuma reserva/agente duplicado ou interrompido.
+
+Inventário local somente leitura, usando função do candidato validado em cópia
+privada, encontrou2043 diretórios de packets legados: Autor652, Guardião1231,
+Radar160. São1841 receipts locais e zero `localSettlementVersion:1`.
+Receipt local não comprova auditoria remota, conclusão válida ou publicação.
+O novo protocolo bloquearia poll diante desses packets; portanto QA aprovado não
+basta para ativação. Necessário planejar/revalidar reconciliação por packet com
+prova remota e fingerprint, preservando journal/diretórios/contadores, sem purge
+em lote. Nenhum preview/apply, consulta remota ou mutação da fila foi feito pelo
+inventário. Artefato privado conserva refs opacas para a futura revisão.
+
+A revisão adicional do Forge recebeu essa informação somente no arquivo de tarefa
+preparado: **não foi despachada**, porque o Mac continua bloqueado. O mesmo vale
+para a corretiva do Prism. GitHub segue inválido, sem troca de conta ou pedido
+repetido. Código/preflight/modelos/rotinas/flags preservados; sem deploy ou gasto.
+
+Conferido o operador de renovação MPRJ: ele deriva a expiração da data UTC da
+observação mais2dias. Nova observação ainda em25/10 não estenderia a validade
+atual até27/10 às00hUTC. Preparar revalidação logo após26/10 às00hUTC, com fonte
+real, `--refresh` nas duas fases, fingerprint fresco e contrato idêntico. Não
+antecipar artificialmente a data para estender validade. Nenhuma renovação aplicada
+nesta rodada; MPRJ permanece elegível. WhatsApp continua sem envio, anúncios sem
+contas/orçamento/gasto e CP112/recibo1 retidos.
+
+Recibos privados: prefixo `.local/maestri/heartbeat-20261025-2200-`, em particular
+`owner-final.json`, `conference-report.json`, `hold-audits.jsonl`, `recovery.json`,
+`settle-Autor.json`, `local-state.json` e `legacy-inventory.json`. Testes completos
+não repetidos: não houve alteração de código produtivo; o QA do pacote privado
+permanece o registrado na rodada anterior.
