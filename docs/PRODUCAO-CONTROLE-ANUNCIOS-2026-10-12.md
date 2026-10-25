@@ -1,5 +1,17 @@
 # Produção, controle do proprietário e anúncios
 
+**Conferência em25/10/2026,05h12 BRT:** **11/84 elegíveis**, **8 novas distintas
+publicadas hoje**, **1.824 válidas somadas nas ofertas**; MPRJ**38/68**, ainda draft.
+Dez aprovações conferidas sem novas suspensões. Integrado localmente o hardening
+entregue pelo Forge: dono identificado, liberação verificada por inode/nonce e
+remoção do nome canônico antes da limpeza. Não recupera travas automaticamente
+nem elimina a causa externa dos cancelamentos. QA em cópia completa: lint, tipos,
+**2.026 testes** e build aprovados. Preflight privado agora registra duração,
+status/sinal e razão de idle, sem payload/segredos. Guardião retomou o mesmo
+packet após falha de conexão e salvou resposta; coleta normal permanece.
+VPS preservada em `cb200d6`; GitHub continua com autenticação inválida, sem novo
+pedido ao proprietário. [Integração e próximos passos](CONTINUACAO-PRODUCAO-2026-10-25.md).
+
 **Conferência em25/10/2026,04h05 BRT:** **11/84 elegíveis**, **8 novas distintas
 publicadas hoje** e **1.824 válidas somadas nas ofertas**. MPRJ está em**28/68**,
 ainda draft. Cinco novas aprovações conferidas sem suspensão. Liberação concluída

@@ -93,3 +93,51 @@ Atualizados PROJECT-CONTEXT, TEAM-CHARTER e EDITORIAL-QUEUE por `maestri note ed
 preservando conteúdo histórico, IDs e conexões. Três recibos OK. Sem ask de retorno
 ao Maestro, pois é shell. Nenhuma credencial ou corpus jurídico compartilhado.
 Recibos privados: `.local/maestri/heartbeat-20261025-0705-*`.
+
+## Integração local às05h12 BRT
+
+Relatório08h12 UTC:11/84 elegíveis,8novas distintas hoje e1.824 válidas somadas
+nas ofertas. MPRJ tem38/68, ainda draft. Dez aprovações foram conferidas sem nova
+suspensão; watermark até08h00m09.211509 UTC. Não somar rascunhos MPRJ à produção
+publicada do dia.
+
+Forge entregou patch/relatório dentro da pasta privada do seu papel; raiz não era
+editável nessa sessão. Sua validação focal passou, mas a cópia incompleta tinha
+limites de fixture/build. Integrador revisou quatro arquivos, montou cópia local
+completa a partir do HEAD e dependências clonadas (sem env de produção), incluiu
+somente os dois HTML oficiais exigidos pelos testes e repetiu a cadeia exigida:
+`pnpm lint`, `pnpm typecheck`, `pnpm test --maxWorkers=1 --testTimeout=30000`,
+`pnpm build`, todos exit0. Resultado2026passam/302pulados. `next typegen` preparou
+os tipos no ambiente isolado. Sem banco ou chamadas de modelos no QA.
+
+Integração atômica na raiz: helper/fixtures antes do dispatcher, hashes iguais
+aos arquivos testados. Novo owner.json600 com PID/host/data/nonce, diagnóstico
+sanitizado e liberação pelo dono. O nome canônico é desanexado antes de limpar
+metadata; morte posterior não bloqueia o próximo dono. Testes reais de processos
+cobrem concorrência, dono vivo/morto, SIGTERM/SIGKILL, remoto sintético pendente,
+abort cooperativo, troca de inode/nonce e morte antes/depois do detach.
+
+**Limite:** não há recuperação automática por idade ou por PID morto. A causa
+das mortes reais continua não comprovada. Trava legada/inválida ou dono morto
+permanece fechada até inspeção e reconciliação do trabalho remoto; não remover
+owner.json para transformar o diretório em vazio. Preserve artefato e reservas.
+Nenhum novo claim pode ser baseado somente em processo local ausente.
+
+Preflight privado recebeu apenas observabilidade: duração de settle/poll,
+PID/status/sinal/errorCode e reason de idle por whitelist fixa. Timeouts, chamadas,
+reservas e três tentativas preservados. Syntax check aprovado, eventos reais
+confirmam a instrumentação. Uma trava legada vazia desde07h54 foi removida após
+inspeção; Autor voltou a entregar/reservar. Não confundir esse reparo operacional
+com solução definitiva para cancelamentos.
+
+Guardião estava ocioso após falha de rede na reserva mapping2456. Fechada somente
+a pesquisa opcional da CLI e solicitado retomar o MESMO packet ainda vigente,
+sem nova reserva. Resposta escrita/validação local confirmadas; prepared continua
+proposta e a coleta fica no preflight normal. Nenhuma troca de modelo/conta,
+permissões, API paga, flag ou VPS. Maestro/Forge e sete auxiliares preservados.
+
+Relatório Forge copiado para `.local/maestri/heartbeat-20261025-0705-forge-lock-report.md`;
+recibos do integrador em `.local/maestri/heartbeat-20261025-0802-*`. QA guarda cópia
+isolada para auditoria; não possui `.env` de produção. Mudança ativa só na ponte
+local; nenhum deploy da VPS. Autenticação GitHub continua inválida conforme nova
+checagem; commits permanecem locais até login do proprietário, já solicitado.

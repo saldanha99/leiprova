@@ -1,11 +1,22 @@
-import { lstat, mkdir, readFile, readdir, rmdir } from "node:fs/promises";
+import { lstat, mkdir, readFile, readdir } from "node:fs/promises";
 import path from "node:path";
+
+import { createAgentLockOwner, inspectAgentLockDirectory } from "./local-agent-lock-owner";
+
+export type { LocalAgentLockDiagnostic } from "./local-agent-lock-owner";
 
 const agents = ["Radar", "Guardião", "Autor"];
 
-/** Exclusão entre processos. Uma trava abandonada exige inspeção, nunca roubo por timeout. */
-export async function withLocalAgentLock<T>(root: string, agent: string, run: () => Promise<T>) {
+/** Diagnóstico somente leitura: PID presente/ausente não prova o estado do trabalho remoto. */
+export function inspectLocalAgentLock(root: string, agent: string) {
   if (!agents.includes(agent)) throw new Error("Papel incompatível.");
+  return inspectAgentLockDirectory(path.join(root, `.dispatch-${agent}.lock`));
+}
+
+/** Exclusão entre processos. Uma trava abandonada exige inspeção, nunca roubo por timeout. */
+export async function withLocalAgentLock<T>(root: string, agent: string, run: () => Promise<T>, options: { signal?: AbortSignal } = {}) {
+  if (!agents.includes(agent)) throw new Error("Papel incompatível.");
+  options.signal?.throwIfAborted();
   await mkdir(root, { recursive: true, mode: 0o700 });
   const lock = path.join(root, `.dispatch-${agent}.lock`);
   try {
@@ -14,10 +25,18 @@ export async function withLocalAgentLock<T>(root: string, agent: string, run: ()
     if ((error as NodeJS.ErrnoException).code === "EEXIST") return { acquired: false as const };
     throw error;
   }
+  // Failure to initialize ownership stays closed; no external callback has started.
+  const owner = createAgentLockOwner(lock);
+  let started = false;
   try {
-    return { acquired: true as const, value: await run() };
+    options.signal?.throwIfAborted();
+    started = true;
+    const value = await run();
+    options.signal?.throwIfAborted();
+    return { acquired: true as const, value };
   } finally {
-    await rmdir(lock);
+    if (started && options.signal?.aborted) await owner.interrupted();
+    else owner.release();
   }
 }
 
