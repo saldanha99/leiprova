@@ -1,5 +1,13 @@
 # Editalume — contrato dos motores automáticos
 
+**Conferência de 25/10, 11h BRT:** receitas futuras frustradas são lucros
+cessantes, não danos emergentes (CC402). Ao comentar indenização estatal, preservar
+RPV/CF100§3; não afirmar precatório sem delimitar o valor. Convenção condominial
+é registro no Livro3/LRP178III, sem confundir classificação de LRP167I17 com Livro2.
+Securitização: não converter LRP167II17 em prova de eficácia constitutiva da afetação;
+compatibilizar com Lei14.430 art26 e revogação do antigo art10 da Lei9.514.
+[Retenções e fontes](CONTINUACAO-PRODUCAO-2026-10-25.md).
+
 **Conferência de 25/10, 10h17 BRT:** casos com negócio em2020 e decadência
 civil precisam computar Lei14.010/2020 art3§2 (suspensão excepcional do RJET),
 sem concluir decadência apenas somando quatro anos. Lei fictícia datada deve ser

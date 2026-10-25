@@ -1,5 +1,12 @@
 # Operação do Edital Lei Seca
 
+**Conferência em 25/10/2026, 11h24 BRT:** **12/84 elegíveis**, **127 novas distintas
+publicadas hoje**, **1.943 válidas somadas nas ofertas**; MPRJ**73**, em treino
+histórico. Quinze aprovações conferidas:11 mantidas,4 suspensas por precisão, audits26577–26580.
+Autor e Guardião retomaram reservas após replay auditado de dois settlements.
+Site e linha da VPS saudáveis. Mac bloqueado; acesso já solicitado permanece pendente.
+Sem novo deploy, flags, API paga ou gasto. [Recibos e fontes](CONTINUACAO-PRODUCAO-2026-10-25.md).
+
 **Conferência em 25/10/2026, 10h17 BRT:** **12/84 elegíveis**, **116 novas distintas
 publicadas hoje**, **1.932 válidas somadas nas ofertas**; MPRJ**73**, em treino
 histórico. Dez aprovações conferidas: oito mantidas, duas suspensas com audits26489/26490

@@ -412,3 +412,59 @@ Recibos privados sob `.local/maestri/heartbeat-20261025-1315-`: `owner-final.jso
 na consulta somente leitura. Pedidos anteriores não repetidos. A dica de cobertura
 preparada expirou e não foi aplicada; renovar snapshot antes de eventual uso.
 Sem código, deploy, flags, API paga, WhatsApp ou anúncios ativados; CP112/recibo1 retidos.
+
+
+## Conferência de 11h24 BRT — precisão das justificativas
+
+Relatório final às2026-10-25 14:23:52.269227+00 UTC:12/84 preparações editorialmente elegíveis,
+127 novas distintas válidas efetivamente publicadas no dia de São Paulo e1943 válidas
+somadas nas ofertas, sem equivaler essa soma a questões únicas globais. MPRJ73,
+liberado em treino histórico; checkout não homologado pelo relatório. Health ok,
+liberação da VPS concluída às14h21m22 UTC.
+
+Quinze aprovações conferidas integralmente, incluindo todas as alternativas e
+comentários. Onze mantidas; quatro suspensas no operador existente com preview/apply:
+
+- audit26577, questão9e58aacd-8c04-5d93-b952-7493e3c8650b: receitas de cirurgias
+  canceladas são lucros cessantes, não danos emergentes; distinguir perda efetiva e
+  ganho frustrado conforme [CC402](https://www.planalto.gov.br/ccivil_03/leis/2002/l10406compilada.htm).
+- audit26578, questão9c6c619f-79a0-54da-ab53-4fcba88db460: comentário sobre precatório
+  sem delimitar valor; preservar [CF100§3/RPV](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm)
+  e CPC535§3II. O dever de indenizar o excesso de prisão não foi negado.
+- audit26579, questãoc248f423-dc08-535b-b12c-7edbe89fb4c1: pergunta opõe Livro2 a
+  averbação no RCPJ para todos os títulos; distinguir registro da convenção no
+  Livro3, [LRP178III](https://www.planalto.gov.br/ccivil_03/leis/l6015compilada.htm).
+  A classificação de registro por LRP167I17 não atribui todos os atos ao Livro2.
+- audit26580, questãofc870f11-4a03-524f-b836-7d7a406f929a: comentárioB transforma
+  averbação no RI em condição constitutiva da afetação dos créditos. Compatibilizar
+  com [Lei14.430 art26](https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2022/lei/l14430.htm)
+  e a revogação do antigo art10 da Lei9.514; não inferir eficácia constitutiva
+  apenas da classificação literal de LRP167II17. Retido para precisão do comentário,
+  sem declarar o item da LRP revogado. O item13f07194 da conferência anterior
+  permanece no recorte estritamente literal, sem a afirmação constitutiva.
+
+Mantidos, nos recortes próprios, CF7XXVIII (culpa provada), CF5X, CF37§6,
+CC1358-A/U, LRP237-A/167 e CPC533§1. A questãoCC1367 foi lida como vedação de
+apropriação direta sem liquidação/prestação de contas, sem converter a referência
+à alienação em exigência universal de leilão de móveis:
+[DL911 art2](https://www.planalto.gov.br/ccivil_03/decreto-lei/1965-1988/del0911.htm)
+admite venda a terceiros sem leilão. CPC533 mantém a substituição judicial do§2.
+Novo watermark máximo efetivamente conferido:13h40m07.891995 UTC, sem revisão humana.
+
+Autor e Guardião apresentavam travas com donos ausentes (PID42325 e39380).
+Recuperação condicionada aos audits exatos26546/26492 para author:93/mapping:710,
+input, token e resultado coincidentes e ausência de lease remoto. Travas foram
+arquivadas inteiras após conferir estabilidade de inode/dono e packet/resposta.
+Settlement normal retornou attempted1/completed1/failed0 para cada agente, com
+receipts reais de replay. Não contar essas recuperações como novas importações,
+nem resetar tentativas. Telemetria confirmou novas reservas do Autor às14h22m34 UTC
+e do Guardião às14h23m34 UTC; respostas e publicações dessas reservas ainda não foram
+atestadas por este retrato. A causa das interrupções permanece aberta.
+
+Recibos privados: prefixo `.local/maestri/heartbeat-20261025-1419-`, em particular
+`owner-final.json`, `conference-report.json`, `holds.json`, `hold-audits.jsonl`,
+`lock-recoveries.json`, os dois `lock-proof.json` e os dois `settle-*.json`.
+Mac novamente bloqueado; sem repetir pedido já comunicado. Dica de cobertura expirada
+continua sem aplicação; renovar snapshot antes de eventual uso. GitHub é pendência
+anterior, sem novo push/deploy. Protocolos incompletos do Forge não foram ativados.
+CP112/recibo1 retidos; WhatsApp sem integração identificada e anúncios sem gasto.
