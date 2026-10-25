@@ -1,5 +1,12 @@
 # Editalume — contrato dos motores automáticos
 
+**Conferência25/10:** lei penal hipotética deve ser expressamente identificada
+como hipótese, sem atribuir a2024 pena2–10 para estelionato eletrônico: Lei14.155/2021
+introduziu art171§2-A com4–8. CF5XLIII prevê responsabilização de omissivos;
+não concluir automaticamente coautoria/participação sem distinguir Lei9455art1§2
+e eventual comissão por omissão. Precisão vale também nos comentários.
+[Fontes e retenções](CONTINUACAO-PRODUCAO-2026-10-25.md).
+
 **Conferência16/10:** CPC966§2 admite rescisão de certas decisões sem mérito;
 não generalizar requisito de mérito ao justificar a ação anulatória do§4. Em caso
 concreto sobre fundação estatal, explicitar natureza pública/autárquica ou privada

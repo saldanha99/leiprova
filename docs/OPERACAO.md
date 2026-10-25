@@ -1,5 +1,15 @@
 # Operação do Edital Lei Seca
 
+**Conferência em25/10/2026,03h07 BRT:** **11/84 elegíveis**, **1.824 válidas
+somadas nas ofertas** e **8 novas distintas publicadas hoje**. MPRJ avançou para
+**23/68 vínculos válidos**, ainda em rascunho; não anunciar como preparação aberta.
+Trinta aprovações conferidas:28 mantidas,2 suspensas pelos audits25759/25760.
+Nova trava vazia abandonada do Autor removida após inspeção de processo/inode;
+resposta recuperada por replay idempotente, sem nova autoria contabilizada.
+Liberação automática concluída às06h01 UTC, site saudável. A recorrência das
+travas continua pendência de engenharia. Sem flags, API paga, WhatsApp ou anúncios
+alterados. [Conferência e limites](CONTINUACAO-PRODUCAO-2026-10-25.md).
+
 **Operação em 25/10/2026, 01h13 BRT:** relatório conferido com **11/84
 preparações editorialmente elegíveis**, **1.816 questões válidas somadas nas
 ofertas** e **zero novas distintas publicadas neste dia de São Paulo**. Checkout
