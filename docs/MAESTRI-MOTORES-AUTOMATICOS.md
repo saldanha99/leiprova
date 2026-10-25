@@ -1,5 +1,10 @@
 # Editalume — contrato dos motores automáticos
 
+**Conferência de 25/10, 18h02 BRT:** CPC599§2 usa5% do capital social total,
+não apenas das ações com direito a voto.6% do votante pode ser menos de5% do total;
+explicitar estrutura/percentual antes de aplicar o piso à companhia fechada.
+[Retenção e fonte](CONTINUACAO-PRODUCAO-2026-10-25.md).
+
 **Conferência de 25/10, 17h52 BRT:** pensão por morte de cônjuge exige data do
 óbito: desde01/01/2021, PortariaME424/2020 estabelece vitaliciedade a partir45anos
 e20anos entre42e44, conforme Lei8.213art77§2-B. Não ensinar44anos como faixa atual

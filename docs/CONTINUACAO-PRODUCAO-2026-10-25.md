@@ -692,3 +692,52 @@ Recibos privados sob `.local/maestri/heartbeat-20261025-1719-`: `owner-final.jso
 `conference-report.json`, `hold-audits.jsonl`, `lock-recoveries.json`, `settle-*.json`,
 `latest-packets.json`, `prism-review.json`, `prism-adversarial-receipt.json` e
 `prism-review-task.txt`. O último é somente preparação, sem despacho comprovado.
+
+## Conferência de 18h02 BRT — teste temporal corrigido na cópia de QA
+
+Relatório às21h02m50.298532 UTC:12/84 elegíveis,169 novas questões distintas
+válidas no dia de São Paulo e1985 válidas somadas nas ofertas. MPRJ73, treino
+histórico. Soma não equivale a total único global; checkout continua não homologado.
+Health ok e linha de liberação concluída às21h02m07 UTC, sem preparação adicional.
+
+Cinco novas aprovações conferidas, quatro mantidas. Suspendida a questão
+9e07654a-0062-5ab9-a366-9f02370c536c, audit26931, pelo operador existente com preview
+seguido de apply: informa6% das ações com voto, mas o piso de
+[CPC599§2](https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2015/lei/l13105.htm)
+usa5% do capital social total. Sem descrever a estrutura das ações, não se pode
+presumir o piso atingido. A impossibilidade de preencher o fim social foi descrita;
+não negar genericamente a dissolução parcial de companhia fechada. Mantidos os
+recortes documentais de CPC599§1 e de [CC1066, caput/§§1–2](https://www.planalto.gov.br/ccivil_03/leis/2002/l10406compilada.htm).
+Watermark máximo efetivamente conferido21h00m09.26889 UTC; sem revisão humana.
+
+Recuperada somente a trava do Autor104 (PID79311 ausente), após prova exata do
+audit26900/input/token/resultado, trabalho sem lease e estabilidade de dono/inode
+/packet/resposta. Trava inteira arquivada; replay normal1/1/0, sem reset nem nova
+publicação contada. O Guardião tinha dono vivo no retrato21h00 e não foi tocado.
+Mac continua bloqueado; nenhum follow-up ao Forge ou Prism foi despachado.
+
+O Maestro corrigiu o teste temporal do coletor em sua própria cópia isolada,
+preservando os artefatos originais do Forge. O filho sintético anuncia prontidão
+após gravar o commit e instalar o handler; só então o relógio controlado do watchdog
+pai avança150ms+50ms. Não foram alterados o código produtivo, seus orçamentos ou
+os asserts de preservação do owner/commit e ausência de reentrada. Sete testes de
+processo passaram. Nova QA global da cópia: lint/tipos/build exit0,2069 pass e304
+skip com2workers/timeout20s. Um skip adicional é a prova PostgreSQL independente,
+executada separadamente na rodada anterior; fontes produtivas permanecem iguais.
+
+Pacote completo privado de18 arquivos em
+`.local/maestri/forge-safe-collector-review-20261025-2100/code.patch`, com manifest,
+patch incremental do teste e recibos. `git apply --check --whitespace=error` passou
+contra a raiz. Nada integrado/ativado: ainda faltam revisão do inventário/legado,
+executor remoto compatível e corte controlado por papel, além dos acessos pendentes.
+Não instalar preflight sozinho nem tratar QA como publicação.
+
+Relatório diário das18h preparado privadamente em texto, **não enviado por WhatsApp**:
+a integração existente ainda não foi identificada e não há recibo de conexão/envio.
+Não foi inferido destino nem feita chamada externa de mensagem. Anúncios, gasto,
+APIs pagas, flags, recursos de outros projetos e retenção CP112/recibo1 preservados.
+
+Recibos privados: prefixo `.local/maestri/heartbeat-20261025-2100-`, incluindo
+`owner-final.json`, `conference-report.json`, `hold-audits.jsonl`, `recovery.json`,
+`settle-Autor.json`, `watchdog-test-receipt.json`, e diretório do pacote completo
+acima. As corretivas aos nós continuam somente preparadas até recuperar o acesso.

@@ -1,5 +1,12 @@
 # Produção, controle do proprietário e anúncios
 
+**Conferência em 25/10/2026, 18h02 BRT:** **12/84 elegíveis**, **169 novas distintas
+válidas publicadas hoje**, **1.985 válidas somadas nas ofertas**; MPRJ**73**. Cinco
+aprovações conferidas, uma suspensa (audit26931: capital votante não prova capital total).
+Teste temporal do coletor corrigido somente em QA privado; lint, tipos,2.069 testes
+e build aprovados. Sem integração/ativação; acessos e corte do protocolo pendentes.
+Relatório18h preparado, sem envio por WhatsApp. [Recibos](CONTINUACAO-PRODUCAO-2026-10-25.md).
+
 **Conferência em 25/10/2026, 17h52 BRT:** **12/84 elegíveis**, **165 novas distintas
 válidas publicadas hoje**, **1.981 válidas somadas nas ofertas**; MPRJ**73**, treino
 histórico. Conferidas25 aprovações, duas suspensas (audits26897/26899). Dois replays
