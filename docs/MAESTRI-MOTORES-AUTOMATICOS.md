@@ -1,5 +1,12 @@
 # Editalume — contrato dos motores automáticos
 
+**Conferência de26/10, 02h17 BRT:** penhor industrial é registrado no Livro3
+(LRP177/178IV); distinguir a averbação de sua existência na matrícula (167II34).
+CDC53 exige pressuposto consumerista também para imóvel comercial e máquinas do
+produtor rural; não presumir nem excluir absolutamente o CDC. Linha da VPS foi
+restaurada após imagem ausente; retenção operacional documentada, gates mantidos.
+[Fontes e recibos](CONTINUACAO-PRODUCAO-2026-10-26.md).
+
 **Conferência de26/10, 00h15 BRT:** antes de aplicar CDC53 a compra, financiamento
 ou consórcio empresarial de veículos/maquinário, demonstrar relação de consumo ou
 vulnerabilidade concreta no finalismo mitigado. Microempresa, adesão e crise não

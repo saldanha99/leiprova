@@ -96,3 +96,67 @@ paga, envio WhatsApp, gasto em anúncios, deploy ou alteração de código/schem
 CP112/recibo1 retidos. QA completo não repetido nesta manutenção; diff de docs
 conferido. Recibos privados prefixo `.local/maestri/heartbeat-20261026-0413-`, com
 owner, conference-report, provas/recoveries dos dois e settle-Guardiao.
+
+## Reparo da linha e conferência às02h17 BRT
+
+A linha passou de saudável às04h41m20 UTC para falha por imagem ausente às04h50,
+05h00 e05h10. Faltava leiprova-editorial-binding-importer; reconstruída somente
+essa ferramenta pelo Compose a partir do runtimecb200d6, sem seed ou reinício da
+aplicação. A execução existente foi disparada novamente, com flock preservado:
+recibo20261026T051054Z.9iSCj6, término05h12m45 UTC, exit0. Gates e avaliação dos84
+produtos permaneceram no fluxo original. Health pós-reparo OK.
+
+Encontrado cron global diário às04h48: docker image prune -af --filter until=24h.
+Essa política e a janela explicam a vulnerabilidade das ferramentas sem container
+persistente; não há recibo individual de remoção, pois o cron descarta saída.
+O build em cache preservou a data de criação16/10, portanto reconstruir/retaggear
+sozinho não evita nova elegibilidade. Sem alterar cron ou recursos de outro projeto,
+criadas referências das duas imagens editoriais em containers parados:
+
+- leiprova-pin-binding-importer-4316dd8fa747;
+- leiprova-pin-opportunity-approver-f02334732a73.
+
+Nunca iniciados: statuscreated, rede none, sem mounts/credenciais, raiz somente
+leitura, capacidadesALL removidas e no-new-privileges. IDs das imagens conferidos.
+A [documentação do Docker](https://docs.docker.com/engine/manage-resources/pruning/)
+explica que image-prune -a preserva imagens referenciadas por containers existentes.
+Não foi executado prune para testar, nem alterada a limpeza global. Esta proteção
+é específica a image-prune; container/system-prune podem remover containers parados.
+Após próximo build/deploy, conferir se os IDs correntes das tags estão protegidos:
+pin antigo não retém imagem nova. Não apagar pins antigos automaticamente nem
+usar limpeza global como etapa de verificação. Recibo privado guarda IDs e flags;
+label própria com.editaleiseca.project=leiprova não vincula os pins ao Compose.
+
+Relatório05h17m05 UTC:12/84 elegíveis,7 novas distintas válidas hoje e2010 válidas
+somadas nas ofertas, MPRJ73. Nenhuma nova preparação ou checkout homologado.
+Após a retomada, cinco aprovações de05h10m59.734432 UTC conferidas: duas mantidas,
+três suspensas por preview/apply, sem revisão humana presumida:
+
+- Audits27264/27265: imóvel comercial adquirido por PJ e máquinas de produtor
+  rural sem pressuposto consumerista demonstrado. Esclarecer destinação final/
+  vulnerabilidade, preservando o finalismo mitigado quando cabível. Não validar
+  cláusulas automaticamente por afastar um fundamento do CDC.
+  [STJ sobre PJ](https://www.stj.jus.br/sites/portalp/Paginas/Comunicacao/Noticias/2024/08092024-Consumidor-pessoa-juridica-quando-as-empresas-podem-ter-a-protecao-do-CDC.aspx),
+  [acórdão sobre máquina agrícola e vulnerabilidade](https://scon.stj.jus.br/SCON/GetInteiroTeorDoAcordao?num_registro=202500394064).
+- Audit27267: competência do RI correta, mas penhor industrial e rural situados
+  como registro na matrícula. [LRP177/178IV/VI](https://www.planalto.gov.br/ccivil_03/leis/l6015compilada.htm)
+  exigem Livro3; compatibilizar com averbação da existência do penhor na matrícula
+  nas hipóteses de167II34, sem confundir os atos ou transferir o penhor para RTD.
+
+Mantidas averbação da preferência locatícia e registro da cláusula de vigência.
+Não tratar averbação como condição suficiente isolada de adjudicação: observar
+os demais requisitos de [Lei8.245art33](https://www.planalto.gov.br/ccivil_03/leis/l8245.htm).
+Watermark somente até05h10m59.734432 UTC.
+
+Autor107: audit27229 exato, mesmo input/token/resultado, prepared sem lease,
+owner91651 ausente, host/inodes90507119/90507120 e hashes estáveis. Trava inteira
+arquivada; replay normal1/1/0, sem nova autoria contada/reset. Guardião mapping877
+com resposta e sem receipt na observação inicial, não interrompido ou forçado.
+Mac confirmado bloqueado; tarefas Forge/Prism continuam apenas preparadas. MPRJ27070
+permanece válido até28/10 às00hUTC, renovar efetivamente após27/10 às00hUTC.
+WhatsApp não conectado/enviado, anúncios sem gasto, CP112/recibo1 retidos. Sem
+alteração de código/schema/flags ou API paga. QA completo não repetido: reparo
+operacional validado por build, inspeção dos pins, execução da linha e health.
+Recibos privados prefixo `.local/maestri/heartbeat-20261026-0508-`, em especial
+repair-result, image-pins, binding-image-build, release-final-tail, owner-post-holds,
+conference-report e hold-audits.
