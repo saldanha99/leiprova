@@ -1,12 +1,11 @@
 # Operação do Edital Lei Seca
 
-**Conferência em26/10/2026, 00h15 BRT:** **12/84 elegíveis**, **0 novas válidas no
-início do dia26**, **2.003 válidas somadas nas ofertas**; MPRJ**73**. Recontagem atual
-de25/10: **187 novas distintas válidas**, após retenções; a virada diária não reduz
-o acervo. Cinco aprovações conferidas, três suspensas por pressuposto consumerista
-não demonstrado (audits27180–27182). Dois replays auditados sem nova autoria contada.
-Mac bloqueado; sem deploy, flags, API paga ou gasto.
-[Conferência e fontes](CONTINUACAO-PRODUCAO-2026-10-26.md).
+**Conferência em26/10/2026, 01h14 BRT:** **12/84 elegíveis**, **5 novas distintas
+válidas publicadas hoje**, **2.008 válidas somadas nas ofertas**; MPRJ**73**. Cinco
+aprovações conferidas e mantidas. Travas mortas de Autor/Guardião reconciliadas com
+provas exatas; só o Guardião teve replay, pois o contexto do Autor foi substituído.
+Sem novo produto, deploy, flags, API paga ou gasto. Mac segue bloqueado.
+[Conferência, fontes e limites](CONTINUACAO-PRODUCAO-2026-10-26.md).
 
 **Conferência em 25/10/2026, 17h52 BRT:** **12/84 elegíveis**, **165 novas distintas
 válidas publicadas hoje**, **1.981 válidas somadas nas ofertas**; MPRJ**73**, treino

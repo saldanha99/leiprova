@@ -52,3 +52,47 @@ QA completo não repetido para esta manutenção operacional; diff de documenta�
 conferido. Recibos privados prefixo `.local/maestri/heartbeat-20261026-0310-`, incluindo
 owner-final, previous-day-recount, conference-report, hold-gate-audits, provas,
 recoveries e settlements dos dois agentes.
+
+## Conferência às01h14 BRT
+
+Relatório04h14m12 UTC:5 novas distintas válidas publicadas no dia26 de São Paulo,
+12/84 elegíveis e2008 válidas somadas nas ofertas, MPRJ73. Health saudável e linha
+concluída04h11m21 UTC. Nenhuma nova preparação ou homologação de checkout.
+
+Cinco aprovações conferidas, todas mantidas, sem nova suspensão:
+
+- Associação hospitalar civil sem fins lucrativos: recorte expresso de LRF1
+  compatível com o [REsp2159844/SP, publicado23/04/2026](https://scon.stj.jus.br/SCON/GetInteiroTeorDoAcordao?dt_publicacao=23%2F04%2F2026&num_registro=202402760316).
+  Não aplicar cautelares antigas como afirmação universal de admissão atual.
+- Suspensão em sociedade em nome coletivo: sócios de responsabilidade ilimitada e
+  solidária, distinguindo terceiros coobrigados/avalistas/fiadores. Conferido o
+  [acórdão STJ publicado17/04/2026](https://scon.stj.jus.br/SCON/GetInteiroTeorDoAcordao?dt_publicacao=17%2F04%2F2026&num_registro=202501965582).
+- Impontualidade exclusiva de32 salários mínimos não supera40 de LRF94I;
+  correspondência aos credores é dever de LRF22Ia. [Lei11.101](https://www.planalto.gov.br/ccivil_03/_ato2004-2006/2005/lei/l11101.htm).
+- Não sucessão na alienação judicial falimentar descrita sem vínculos/fraude:
+  [CTN133§1I](https://www.planalto.gov.br/ccivil_03/leis/l5172compilado.htm).
+
+Conferência automatizada, sem revisão humana presumida. Watermark avançado somente
+até03h20m07.457859 UTC de26/10. Não confundir cinco aprovações com novas questões
+além da contagem distinta do relatório.
+
+Autor110: audit histórico27184 corresponde exatamente ao packet/input/token/
+resultado, mas o trabalho atual está pending com input substituído e sem lease.
+Owner53967 ausente, host/inodes90495431/90495433 e bytes/hashes estáveis. Arquivada
+apenas a trava inteira; não tentado replay manual, fabricado receipt nem alterado
+packet/resposta/tentativas. A rotina existente continua sujeita à expiração local
+e aos limites; não contornar esse bloqueio com nova reserva ou resposta antiga.
+
+Guardião mapping854: audit27219 exato, mesmo input, prepared sem lease, owner63325
+ausente e inodes90497698/90497699 estáveis. Trava inteira arquivada; settle normal
+1/1/0 com replay real, sem novas questões ou reset. Usados caminhos canônicos com
+acento. Causa da recorrência e migração do protocolo privado continuam pendentes;
+nenhuma ativação improvisada ou rotina paralela.
+
+Mac confirmado bloqueado. Follow-ups Forge/Prism continuam apenas preparados;
+pendências conhecidas de acesso/GitHub não foram repetidas. Evidência MPRJ27070
+permanece até28/10 às00hUTC, próxima renovação efetiva após27/10 às00hUTC. Sem API
+paga, envio WhatsApp, gasto em anúncios, deploy ou alteração de código/schema/flags.
+CP112/recibo1 retidos. QA completo não repetido nesta manutenção; diff de docs
+conferido. Recibos privados prefixo `.local/maestri/heartbeat-20261026-0413-`, com
+owner, conference-report, provas/recoveries dos dois e settle-Guardiao.
