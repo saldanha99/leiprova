@@ -1,12 +1,12 @@
 # Produção, controle do proprietário e anúncios
 
-**Conferência em26/10/2026, 09h23 BRT:** **12/84 elegíveis**, **40 novas distintas
-válidas publicadas hoje**, **2.043 válidas somadas nas ofertas**; MPRJ**73**. Cinco
-aprovações conferidas e mantidas. Linha saudável; coleta reconciliada por auditoria
-exata, sem contar replay como autoria. Correção da recuperação de artigos ainda pendente.
-Mac bloqueado; pendências de acesso já comunicadas.
-Sem novo produto, deploy, flags, API paga ou gasto.
-[Conferência e recibos](CONTINUACAO-PRODUCAO-2026-10-26.md).
+**Conferência em 26/10/2026, 10h25 BRT:** **12/84 elegíveis**, **45 novas distintas
+válidas publicadas hoje**, **2.048 válidas somadas nas ofertas**; MPRJ **73**. Cinco
+aprovações conferidas e mantidas. Mac acessível: priorização do Autor aplicada e
+verificada, preservando reservas e gates. Forge entregou correção privada de busca,
+com build ainda pendente; Prism v3 recusada na conferência independente. Radar
+migrou no mesmo nó para Antigravity e aguarda OAuth; sua rotina está pausada.
+Sem nova preparação ou checkout validado. [Recibos](CONTINUACAO-PRODUCAO-2026-10-26.md).
 
 **Conferência em 25/10/2026, 17h52 BRT:** **12/84 elegíveis**, **165 novas distintas
 válidas publicadas hoje**, **1.981 válidas somadas nas ofertas**; MPRJ**73**, treino
