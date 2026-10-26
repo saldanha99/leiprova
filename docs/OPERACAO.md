@@ -1,13 +1,12 @@
 # Operação do Edital Lei Seca
 
-**Conferência em 26/10/2026, 11h40 BRT:** **12/84 elegíveis**, **49 novas distintas
-válidas publicadas hoje**, **2.052 válidas somadas nas ofertas**; MPRJ **73**.
-Conferidas cinco aprovações: quatro mantidas e uma suspensa (audit27579).
-Autor/Guardião retomados após replays auditados; dica consultiva renovada até13h30BRT.
-Correção privada de busca passou em2.043 testes e consulta PostgreSQL somente leitura,
-mas o build segue sem aprovação; nada integrado. Prism v4 recusada por incompatibilidade
-com o esquema real. Radar continua aguardando OAuth. Sem nova preparação ou checkout
-validado. [Recibos e limites](CONTINUACAO-PRODUCAO-2026-10-26.md).
+**Conferência em 26/10/2026, 12h22 BRT:** **12/84 elegíveis**, **54 novas distintas
+válidas publicadas hoje**, **2.057 válidas somadas nas ofertas**; MPRJ **73**.
+Cinco aprovações conferidas e mantidas. Linha e site saudáveis; dois replays exatos
+reconciliados, preservado o resultado bloqueado do Guardião. Forge executa prova
+sintética das interrupções; Prism busca metadados de fontes oficiais PCAL/TCE-MA.
+Sem nova preparação, build aprovado, integração ou checkout validado. Radar ainda
+aguarda OAuth, já solicitado. [Recibos e limites](CONTINUACAO-PRODUCAO-2026-10-26.md).
 
 **Conferência em 25/10/2026, 17h52 BRT:** **12/84 elegíveis**, **165 novas distintas
 válidas publicadas hoje**, **1.981 válidas somadas nas ofertas**; MPRJ**73**, treino
