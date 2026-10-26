@@ -1,9 +1,9 @@
 # Operação do Edital Lei Seca
 
-**Conferência em26/10/2026, 08h16 BRT:** **12/84 elegíveis**, **35 novas distintas
-válidas publicadas hoje**, **2.038 válidas somadas nas ofertas**; MPRJ**73**. Cinco
-aprovações conferidas e mantidas. Linha saudável e dois replays auditados; o bloqueio
-editorial do mapping931 foi preservado. Corpus pertinente existe, mas não veio no lote.
+**Conferência em26/10/2026, 09h23 BRT:** **12/84 elegíveis**, **40 novas distintas
+válidas publicadas hoje**, **2.043 válidas somadas nas ofertas**; MPRJ**73**. Cinco
+aprovações conferidas e mantidas. Linha saudável; coleta reconciliada por auditoria
+exata, sem contar replay como autoria. Correção da recuperação de artigos ainda pendente.
 Mac bloqueado; pendências de acesso já comunicadas.
 Sem novo produto, deploy, flags, API paga ou gasto.
 [Conferência e recibos](CONTINUACAO-PRODUCAO-2026-10-26.md).
