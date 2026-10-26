@@ -839,3 +839,48 @@ Recibos privados: prefixo `.local/maestri/heartbeat-20261025-2303-`, mais prova
 Nenhuma mudança de código produtivo, schema, flags ou modelos. Testes completos
 não repetidos para atualização operacional. WhatsApp não conectado, nenhum envio;
 anúncios sem contas/orçamento, sem gasto, CP112/recibo1 retidos.
+
+## Conferência às21h04 BRT e renovação MPRJ
+
+Relatório26/10 às00h04m35 UTC: calendário de produção ainda25/10 em São Paulo;
+180 novas distintas válidas no dia,12/84 elegíveis e1996 válidas somadas nas
+ofertas, MPRJ73. Soma por produto não é total único. Health saudável; linha
+terminou às00h01m35 UTC. Sem nova preparação ou homologação de checkout.
+
+Cinco aprovações conferidas, todas mantidas: sucessão tributária na incorporação
+e continuação pelo sócio após extinção, [CTN132 e123](https://www.planalto.gov.br/ccivil_03/leis/l5172compilado.htm);
+confusão patrimonial por pagamentos pessoais reiterados e desconsideração inversa,
+[CC50§§2I/3](https://www.planalto.gov.br/ccivil_03/leis/2002/l10406compilada.htm);
+responsabilidade das consorciadas neste empreendimento de consumo,
+[CDC28§3](https://www.planalto.gov.br/ccivil_03/leis/l8078compilado.htm).
+Holding isoladamente não foi tomada como abuso; o caso explicita finalidade de
+lesar credores. Conferência automatizada, sem revisão humana presumida. Watermark
+avançado até23h40m07.832186 UTC de25/10; aprovações não substituem a contagem de
+novas distintas válidas do relatório oficial.
+
+Após a virada UTC, executados preview e apply do operador MPRJ com --refresh,
+input estrito, administrador existente validado e fingerprint fresco. As duas
+fases observaram a fonte oficial novamente; hashes do documento, robots e página1
+iguais aos esperados. Audit27070 criou evidência observada em26/10, com expiração
+28/10 às00hUTC, e superou a anterior de25/10. Contrato48765afb… preservado, gate
+do aplicativo reconferido verdadeiro e73 questões válidas. Não houve data futura,
+reabertura de evidência encerrada, cópia de questões da prova nem revisão humana.
+Próxima renovação efetiva após27/10 às00hUTC, antes da expiração, com fonte real e
+mesmo fluxo de preview/fingerprint/apply; não confundir data UTC da evidência com
+o calendário de produção de São Paulo.
+
+Autor105 tinha nova trava de dono morto desde23h37 UTC. Audit27041 exato com
+mesmo input/token/resultado, trabalho prepared sem lease, host/PID/inodes e bytes
+estáveis permitiram arquivar a trava inteira. Settle normal1/1/0, receipt com
+replayed:true: nenhuma nova questão contada, nenhum reset. Guardião mapping822
+estava running, com lease até01h31m44 UTC e resposta local; consulta não encontrou
+recibo remoto exato, portanto nenhuma interrupção ou conclusão forçada. Rotinas
+e nós preservados. Protocolo privado e migração dos packets continuam pendentes.
+
+Mac novamente confirmado bloqueado, GitHub inválido. Pedidos já comunicados não
+foram repetidos. Tarefas corretivas Forge/Prism continuam preparadas sem despacho;
+WhatsApp sem integração validada/envio, anúncios sem contas/orçamento/gasto,
+CP112/recibo1 retidos. Sem alteração de código produtivo, schema ou flags; QA
+completo não repetido nesta manutenção. Recibos privados prefixo
+`.local/maestri/heartbeat-20261026-0001-`, incluindo mprj-preview/apply/final,
+owner-final, conference-report, recovery, settle-Autor e guardian-state.

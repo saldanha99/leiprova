@@ -1,12 +1,12 @@
 # Produção, controle do proprietário e anúncios
 
-**Conferência em 25/10/2026, 20h08 BRT:** **12/84 elegíveis**, **177 novas distintas
-válidas publicadas hoje**, **1.993 válidas somadas nas ofertas**; MPRJ**73**. Cinco
-aprovações conferidas, uma suspensa (audit27030: identidade do alienante no
-CTN133II). Mutex morto do Autor arquivado com prova remota exata, sem replay da
-resposta de contexto substituído. Renovação MPRJ preparada para após26/10 às00hUTC.
-Mac/GitHub continuam pendentes; sem deploy, flags, API paga ou gasto.
-[Conferência e próximos passos](CONTINUACAO-PRODUCAO-2026-10-25.md).
+**Conferência em 25/10/2026, 21h04 BRT:** **12/84 elegíveis**, **180 novas distintas
+válidas publicadas no dia de São Paulo**, **1.996 válidas somadas nas ofertas**;
+MPRJ**73**. Cinco aprovações conferidas e mantidas. Evidência oficial MPRJ renovada
+com fonte real após26/10 às00hUTC, audit27070, válida até28/10 às00hUTC; contrato
+preservado. Replay auditado do Autor sem nova autoria contada. Mac/GitHub ainda
+pendentes; sem deploy, flags, API paga ou gasto.
+[Conferência e recibos](CONTINUACAO-PRODUCAO-2026-10-25.md).
 
 **Conferência em 25/10/2026, 17h52 BRT:** **12/84 elegíveis**, **165 novas distintas
 válidas publicadas hoje**, **1.981 válidas somadas nas ofertas**; MPRJ**73**, treino
