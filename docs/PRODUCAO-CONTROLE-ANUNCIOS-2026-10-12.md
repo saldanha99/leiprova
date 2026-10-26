@@ -1,12 +1,12 @@
 # Produção, controle do proprietário e anúncios
 
-**Conferência em 25/10/2026, 22h11 BRT:** **12/84 elegíveis**, **183 novas distintas
-válidas publicadas no dia de São Paulo**, **1.999 válidas somadas nas ofertas**;
-MPRJ**73**. Cinco aprovações conferidas, duas suspensas (audits27118/27120:
-parentesco da pessoa jurídica adquirente e tributo imobiliário em imóvel alugado).
-Replay auditado do Autor sem nova autoria contada. Evidência MPRJ vigente até28/10
-às00hUTC. Mac bloqueado; pendências de acesso e integração preservadas, sem deploy,
-flags, API paga ou gasto. [Conferência e fontes](CONTINUACAO-PRODUCAO-2026-10-25.md).
+**Conferência em 25/10/2026, 23h14 BRT:** **12/84 elegíveis**, **185 novas distintas
+válidas publicadas no dia de São Paulo**, **2.001 válidas somadas nas ofertas**;
+MPRJ**73**. Cinco aprovações conferidas, uma suspensa (audit27145: tabela etária
+da pensão sem data do óbito). Coleta de Autor e Guardião reconciliada com provas
+remotas e replays reais, sem nova autoria contada. Evidência MPRJ até28/10 às00hUTC.
+Mac bloqueado; sem deploy, flags, API paga ou gasto.
+[Conferência e limites](CONTINUACAO-PRODUCAO-2026-10-25.md).
 
 **Conferência em 25/10/2026, 17h52 BRT:** **12/84 elegíveis**, **165 novas distintas
 válidas publicadas hoje**, **1.981 válidas somadas nas ofertas**; MPRJ**73**, treino

@@ -927,3 +927,47 @@ API paga, envio WhatsApp ou gasto em anúncios. CP112/recibo1 retidos. QA comple
 não repetido nesta manutenção operacional. Recibos privados prefixo
 `.local/maestri/heartbeat-20261026-0108-`: owner-final, conference-report, holds,
 hold-gate-audits, recovery, settle-Autor e prova exata do Autor.
+
+## Conferência às23h14 BRT
+
+Relatório26/10 às02h14m59 UTC, ainda25/10 em São Paulo:185 novas distintas válidas
+no dia,12/84 elegíveis e2001 válidas somadas nas ofertas, MPRJ73. Health saudável,
+linha concluída02h11m23 UTC; sem nova preparação ou checkout homologado.
+
+Cinco aprovações conferidas, quatro mantidas e uma suspensa por preview/apply,
+audit27145, questão `25729648-7c6e-5f02-8634-02d2389629d6`: a exceção de morte
+acidental e o prazo15anos da viúva38 estão corretos, mas explicação30–40 e
+comentárioC vitalícia44 reproduzem tabela anterior sem data do óbito. Para mortes
+desde01/01/2021, PortariaME424/2020 usa31–41 e45, conforme
+[INSS](https://www.gov.br/inss/pt-br/direitos-e-deveres/pensoes/pensao-por-morte) e
+[Lei8.213art77§2-B](https://www.planalto.gov.br/ccivil_03/leis/l8213cons.htm).
+Corrigir vigência/comentários, preservando o resultado do caso. Mantidos sobrenomes
+de convivente/enteado de [LRP57§§2/8](https://www.planalto.gov.br/ccivil_03/leis/l6015compilada.htm)
+e recortes de Lei8.213art16§§5/7, com as ressalvas legais. Sobrenome não foi tratado
+como constituição automática de filiação. Conferência automatizada, sem revisão
+humana; watermark26/10 às01h20m08.508834 UTC.
+
+Autor98: ownerPID2442 ausente, audit27122 exato, mesmo input/token/resultado e
+trabalho prepared sem lease; inodes90479075/90479076 e bytes/hashes estáveis.
+Trava inteira arquivada; settle normal1/1/0 com replay real, sem contar nova autoria.
+
+A primeira tentativa de settle do Guardião retornou agent_dispatch_locked.
+Corrigida a inspeção do caminho: o código usa `.dispatch-Guardião.lock`, com acento;
+a checagem anterior sem acento não comprovava ausência da trava canônica. No
+caminho correto, ownerPID4903 estava ausente. Prova exata do audit27134 para
+mapping1336, input/token/resultado, prepared sem lease, host e inodes90479367/90479368
+estáveis permitiram arquivar somente a trava inteira. Novo settle normal1/1/0,
+receipt real com replay e zero questões importadas. Packet/resposta/contadores
+preservados, sem conclusão inventada ou recuperação automática por PID/idade.
+As observações privadas e o próximo roteiro foram corrigidos para o caminho exato.
+Após a recuperação, observado novo packet mapping785 do Guardião, ainda sem
+resposta/receipt: despacho normal retomado, sem contar reserva como produção.
+
+Mac confirmado bloqueado; CLI não disponível no shell externo, sem forjar sessão
+ou socket. Tarefas Forge/Prism continuam apenas preparadas. Protocolo privado e
+migração dos packets ainda pendentes; nenhuma ativação improvisada. Evidência
+MPRJ27070 permanece até28/10 às00hUTC, renovar efetivamente após27/10 às00hUTC.
+Sem deploy, código/schema/flags/API paga, envio WhatsApp ou anúncio com gasto;
+CP112/recibo1 retidos. QA completo não repetido nesta manutenção. Recibos privados
+prefixo `.local/maestri/heartbeat-20261026-0211-`, com owner-final, conference-report,
+hold-audits, provas/recoveries de ambos, settle-Autor/Guardiao e estado corrigido.

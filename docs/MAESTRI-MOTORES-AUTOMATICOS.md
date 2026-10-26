@@ -1,5 +1,12 @@
 # Editalume — contrato dos motores automáticos
 
+**Conferência de 25/10, 23h14 BRT:** pensão por morte exige tabela da data do óbito
+também nos comentários: desde01/01/2021,15anos entre31–41 e vitalícia a partir45.
+Acidente afasta18contribuições/2anos, mas não congela a tabela antiga30–40/44.
+Viúva38 continua com15anos. Na inspeção operacional, o caminho canônico é
+`.dispatch-Guardião.lock`, com acento: não inferir ausência de caminho diferente.
+[Retenção, fontes e recuperação auditada](CONTINUACAO-PRODUCAO-2026-10-25.md).
+
 **Conferência de 25/10, 22h11 BRT:** CTN133§2: sociedade controlada por parentes
 não é automaticamente o próprio parente adquirente; distinguir incisosI/II/III e
 provar a hipótese exata. Cessação naquele estabelecimento não prova cessação da
