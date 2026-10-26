@@ -1,5 +1,11 @@
 # Editalume — contrato dos motores automáticos
 
+**Conferência de26/10, 00h15 BRT:** antes de aplicar CDC53 a compra, financiamento
+ou consórcio empresarial de veículos/maquinário, demonstrar relação de consumo ou
+vulnerabilidade concreta no finalismo mitigado. Microempresa, adesão e crise não
+bastam por si. Não converter a ausência desse pressuposto em validade automática
+das cláusulas por outras normas. [Retenções e fontes](CONTINUACAO-PRODUCAO-2026-10-26.md).
+
 **Conferência de 25/10, 23h14 BRT:** pensão por morte exige tabela da data do óbito
 também nos comentários: desde01/01/2021,15anos entre31–41 e vitalícia a partir45.
 Acidente afasta18contribuições/2anos, mas não congela a tabela antiga30–40/44.
