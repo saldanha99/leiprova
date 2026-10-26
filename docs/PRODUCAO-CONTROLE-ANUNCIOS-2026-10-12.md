@@ -1,5 +1,14 @@
 # Produção, controle do proprietário e anúncios
 
+**Conferência em 26/10/2026, 18h25 BRT:** **12/84 elegíveis**, **58 novas distintas
+válidas publicadas hoje**, **2.061 válidas somadas nas ofertas**; MPRJ **73**.
+Cinco aprovações conferidas: quatro mantidas e uma suspensa, audit27687, por premissa
+que ignorava CP266§1. Dois resultados concluídos reconciliados por replay exato;
+Autor/Guardião retomaram execução. Radar respondeu na conta Pro/Flash Low e sua rotina
+6237b5 foi reativada, preservando intervalo e gates. Forge retomou prova sintética;
+dossiê de fontes Prism recebido e ainda não admitido. Site/linha saudáveis; sem
+nova preparação ou checkout validado. [Recibos e limites](CONTINUACAO-PRODUCAO-2026-10-26.md).
+
 **Conferência em 26/10/2026, 12h22 BRT:** **12/84 elegíveis**, **54 novas distintas
 válidas publicadas hoje**, **2.057 válidas somadas nas ofertas**; MPRJ **73**.
 Cinco aprovações conferidas e mantidas. Linha e site saudáveis; dois replays exatos

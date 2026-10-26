@@ -1,5 +1,12 @@
 # Editalume — contrato dos motores automáticos
 
+**Conferência de26/10, 18h25 BRT:** interrupção de internet não pode ser apresentada
+como lacuna penal sem enfrentar CP266§1, que inclui serviço telemático. A proibição
+de analogia gravosa não afasta um tipo já existente; enquadramento exige os fatos,
+sem inferir condenação automática. Distinguir também absolvição sumária da sentença
+após instrução. Suspensão audit27687, humanReview:false.
+[Fontes e recibos](CONTINUACAO-PRODUCAO-2026-10-26.md).
+
 **Conferência de26/10, 11h40 BRT:** juiz natural não impede toda especialização ou
 redistribuição posterior de competência. Distinguir juízo ad hoc destinado a causas
 específicas da organização judiciária legítima; não exigir genericamente competência
