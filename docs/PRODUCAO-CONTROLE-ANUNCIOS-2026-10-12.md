@@ -1,9 +1,9 @@
 # Produção, controle do proprietário e anúncios
 
-**Conferência em26/10/2026, 06h13 BRT:** **12/84 elegíveis**, **26 novas distintas
-válidas publicadas hoje**, **2.029 válidas somadas nas ofertas**; MPRJ**73**. Cinco
-aprovações conferidas e mantidas. Linha saudável; Guardião899 coletado pela ponte.
-Trava abandonada do Autor86 reconciliada; contexto substituído preservado sem replay.
+**Conferência em26/10/2026, 07h21 BRT:** **12/84 elegíveis**, **30 novas distintas
+válidas publicadas hoje**, **2.033 válidas somadas nas ofertas**; MPRJ**73**. Cinco
+aprovações conferidas: quatro mantidas e uma suspensa por precisão do comentário
+(audit27449). Linha saudável e dois replays auditados, sem nova autoria contada.
 Mac bloqueado; pendências de acesso já comunicadas.
 Sem novo produto, deploy, flags, API paga ou gasto.
 [Conferência e recibos](CONTINUACAO-PRODUCAO-2026-10-26.md).

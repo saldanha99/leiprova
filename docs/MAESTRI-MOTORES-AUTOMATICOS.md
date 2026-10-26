@@ -1,5 +1,11 @@
 # Editalume — contrato dos motores automáticos
 
+**Conferência de26/10, 07h21 BRT:** ao explicar exclusão de dados no MCI7X,
+harmonizar com LGPD16/18VI. Conservação não se resume a obrigação legal: pesquisa,
+transferência e uso exclusivo anonimizado têm requisitos próprios. Isso não autoriza
+retenção identificável perpétua para monetização por mera política interna.
+[Retenção e fontes](CONTINUACAO-PRODUCAO-2026-10-26.md).
+
 **Conferência de26/10, 05h23 BRT:** CF5LVII: distinguir despacho sumário antes de
 qualquer sentença dos regimes do júri e de demissão após PAD autônomo. O gabarito
 correto no caso não autoriza comentário de vedação absoluta de quaisquer efeitos
