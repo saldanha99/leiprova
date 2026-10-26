@@ -1,5 +1,39 @@
 # Produção em26/10/2026
 
+## Conferência às05h23 BRT
+
+Relatório08h23m40 UTC:12/84 preparações elegíveis,21 novas distintas válidas
+publicadas no dia26 de São Paulo e2024 válidas somadas nas ofertas; MPRJ73.
+Soma por oferta não é contagem global distinta. Site saudável e linha concluída
+às08h11m21 UTC. Nenhuma nova preparação ou verificação financeira de checkout.
+
+Cinco aprovações de07h30m08.399987 UTC conferidas: quatro mantidas (CF5XXXIX,
+XL,XLV,XLVII) e uma suspensa por preview/apply, audit27365. O gabarito E sobre
+despacho sumário antes de qualquer sentença está correto; a retenção recai sobre
+a universalização absoluta do comentário. Delimitar a hipótese, distinguir a
+execução imediata no júri e a demissão após PAD autônomo, sem afirmar que tais
+regimes validem aquele despacho ou que exista PAD no caso. Fontes:
+[CF5](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm),
+[STF Tema1068](https://portal.stf.jus.br/jurisprudenciarepercussao/verAndamentoProcesso.asp?classeProcesso=RE&incidente=5776893&numeroProcesso=1235340&numeroTema=1068),
+[STJ sobre independência do PAD](https://www.stj.jus.br/websecstj/cgi/revista/REJ.exe/ITA?CodOrgaoJgdr=&SeqCgrmaSessao=&dt=20170609&formato=PDF&nreg=201000037231&salvar=false&seq=1607739&tipo=0).
+Conferência automatizada, humanReview:false; watermark só até07h30m08.399987 UTC.
+
+Autor114 e Guardião mapping888: audits27331/27363 exatos, mesmo input/token/
+resultado, prepared sem lease. Mutexes abandonados arquivados inteiros após
+prova remota fresca, host/PID ausente/inodes/bytes/hashes estáveis. No Guardião,
+uma rotina adquiriu novo mutex antes do settle manual; a tentativa respeitou a
+trava e retornou agent_dispatch_locked. Após confirmar morte desse novo owner e
+renovar toda a prova, feito novo arquivamento e settle normal. Recibos reais
+replayed:true,1/1/0 para cada agente; sem reset, remoção de packet ou nova autoria
+contada. Preservar sempre qualquer owner vivo; causa das interrupções segue aberta.
+
+Mac novamente confirmado bloqueado. Follow-ups Forge/Prism continuam preparados,
+sem despacho; GitHub com pendência conhecida, não reconferido nesta rodada.
+MPRJ só precisa de próxima renovação efetiva após27/10 às00hUTC, antes da validade
+28/10 às00hUTC. WhatsApp sem integração/envio, anúncios sem orçamento/contas/gasto.
+Sem deploy, mudança de código/schema/flags ou API paga. Verificação desta alteração:
+diff de documentação; QA completo anterior preservado.
+
 ## Conferência às00h15 BRT
 
 Relatório03h15m24 UTC:12/84 preparações elegíveis,0 questões novas distintas válidas

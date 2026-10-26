@@ -1,9 +1,10 @@
 # Produção, controle do proprietário e anúncios
 
-**Conferência em26/10/2026, 04h14 BRT:** **12/84 elegíveis**, **17 novas distintas
-válidas publicadas hoje**, **2.020 válidas somadas nas ofertas**; MPRJ**73**. Cinco
-aprovações conferidas e mantidas. Linha saudável e dois replays auditados sem nova
-autoria contada. Mac bloqueado e GitHub ainda inválido; pendências já comunicadas.
+**Conferência em26/10/2026, 05h23 BRT:** **12/84 elegíveis**, **21 novas distintas
+válidas publicadas hoje**, **2.024 válidas somadas nas ofertas**; MPRJ**73**. Cinco
+aprovações conferidas: quatro mantidas e uma suspensa por comentário absoluto
+(audit27365). Linha saudável e dois replays auditados sem nova autoria contada.
+Mac bloqueado; pendências de acesso já comunicadas.
 Sem novo produto, deploy, flags, API paga ou gasto.
 [Conferência e recibos](CONTINUACAO-PRODUCAO-2026-10-26.md).
 

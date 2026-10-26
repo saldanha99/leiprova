@@ -1,5 +1,11 @@
 # Editalume — contrato dos motores automáticos
 
+**Conferência de26/10, 05h23 BRT:** CF5LVII: distinguir despacho sumário antes de
+qualquer sentença dos regimes do júri e de demissão após PAD autônomo. O gabarito
+correto no caso não autoriza comentário de vedação absoluta de quaisquer efeitos
+antes do trânsito. Não usar Tema1068 para validar aquele despacho nem inventar PAD
+no enunciado. [Retenção e fontes](CONTINUACAO-PRODUCAO-2026-10-26.md).
+
 **Conferência de26/10, 02h17 BRT:** penhor industrial é registrado no Livro3
 (LRP177/178IV); distinguir a averbação de sua existência na matrícula (167II34).
 CDC53 exige pressuposto consumerista também para imóvel comercial e máquinas do
