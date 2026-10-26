@@ -1,5 +1,11 @@
 # Editalume — contrato dos motores automáticos
 
+**Conferência de26/10, 11h40 BRT:** juiz natural não impede toda especialização ou
+redistribuição posterior de competência. Distinguir juízo ad hoc destinado a causas
+específicas da organização judiciária legítima; não exigir genericamente competência
+fixada antes dos fatos. Questão27558 suspensa audit27579 por excesso no comentário,
+sem validar a comissão descrita. [Fonte e recibos](CONTINUACAO-PRODUCAO-2026-10-26.md).
+
 **Conferência de26/10, 07h21 BRT:** ao explicar exclusão de dados no MCI7X,
 harmonizar com LGPD16/18VI. Conservação não se resume a obrigação legal: pesquisa,
 transferência e uso exclusivo anonimizado têm requisitos próprios. Isso não autoriza
