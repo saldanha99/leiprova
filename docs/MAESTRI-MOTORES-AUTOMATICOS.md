@@ -1,5 +1,14 @@
 # Editalume — contrato dos motores automáticos
 
+**Conferência de 25/10, 22h11 BRT:** CTN133§2: sociedade controlada por parentes
+não é automaticamente o próprio parente adquirente; distinguir incisosI/II/III e
+provar a hipótese exata. Cessação naquele estabelecimento não prova cessação da
+atividade do alienante. No trespasse de restaurante em imóvel alugado, não atribuir
+IPTU ao locatário sem base de sujeição passiva; especificar tributos efetivamente
+devidos pelo alienante e relativos ao estabelecimento. Manter somente fatos
+necessários ao recorte jurídico, evitando premissas adicionais sem suporte.
+[Fontes e retenções](CONTINUACAO-PRODUCAO-2026-10-25.md).
+
 **Conferência de 25/10, 20h08 BRT:** manter a mesma pessoa jurídica/física como
 alienante em todo o caso de CTN133II: retomada por empresário individual distinto
 da sociedade alienante não demonstra a retomada pelo próprio alienante. Exatidão

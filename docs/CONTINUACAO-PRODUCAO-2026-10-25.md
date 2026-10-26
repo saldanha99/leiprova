@@ -884,3 +884,46 @@ CP112/recibo1 retidos. Sem alteração de código produtivo, schema ou flags; QA
 completo não repetido nesta manutenção. Recibos privados prefixo
 `.local/maestri/heartbeat-20261026-0001-`, incluindo mprj-preview/apply/final,
 owner-final, conference-report, recovery, settle-Autor e guardian-state.
+
+## Conferência às22h11 BRT
+
+Relatório26/10 às01h11m42 UTC, ainda25/10 em São Paulo:183 novas distintas
+válidas publicadas no dia,12/84 elegíveis,1999 válidas somadas nas ofertas;
+MPRJ73. Health saudável; linha terminou01h01m26 UTC, sem nova preparação.
+Cinco aprovações conferidas: três mantidas, duas suspensas por preview/apply:
+
+- Audit27118, questão `eda9f04c-1495-5b1c-a028-d1d94e99d5cf`: adquirente é pessoa
+  jurídica controlada por parentes, não o próprio parente. Não aplicar CTN133§2II
+  automaticamente; incisoI tem controle pelo devedor e incisoIII exige agente
+  identificado com finalidade de fraude. O comentárioE ainda confunde cessação
+  naquele estabelecimento com cessação da atividade do alienante para os incisos
+  I/II do caput. Exigir fatos da hipótese exata, sem presumir fraude ou parentesco
+  da pessoa jurídica. [CTN133](https://www.planalto.gov.br/ccivil_03/leis/l5172compilado.htm).
+- Audit27120, questão `d07ced1b-2bfc-5db4-a521-4777f34d4ec4`: regra sobre mudança
+  de firma correta, mas restaurante em imóvel alugado e cobrança de tributos
+  imobiliários sem identificar sujeição própria do alienante. A mera posse de
+  locatário não estabelece sujeição passiva de IPTU; esclarecer a natureza dos
+  tributos e o devedor, distinguindo CTN34/123/130/133. Isso não nega sucessão de
+  débitos municipais relativos ao estabelecimento nem alcança indistintamente
+  todas as taxas. [Acórdão oficial STJ](https://www.stj.jus.br/websecstj/cgi/revista/REJ.cgi/ITA?CodOrgaoJgdr=&SeqCgrmaSessao=&dt=20191202&formato=HTML&nreg=201700506935&salvar=false&seq=1892986&tipo=0).
+
+Mantidas exigência documental e balanço prévio de LRF51V/§4, e depósito de CTN133§3
+com destinação legal restrita. Conferência automatizada, sem revisão humana
+presumida. Watermark26/10 às00h10m07.951079 UTC, sem recontar reaprovações.
+
+Autor106 novamente bloqueado por mutex de ownerPID71253 ausente. Prova exata do
+audit27073, mesmo input/token/resultado, status prepared sem lease, host e inodes
+90473327/90473329, bytes/hashes estáveis: trava inteira arquivada e settle normal
+1/1/0, replay com receipt real; sem nova autoria contada ou reset de tentativas.
+Guardião tinha mapping859 sem response na observação, preservado sem interrupção.
+Recorrência da trava continua; não foi ativado o protocolo privado nem criada
+rotina paralela ou recuperação automática por PID/idade.
+
+Evidência MPRJ27070 reconferida, gate verdadeiro e expiração28/10 às00hUTC; próxima
+renovação efetiva após27/10 às00hUTC, sem nova aplicação redundante hoje. Mac
+confirmado bloqueado; tarefas Forge/Prism continuam somente preparadas, pendências
+já comunicadas não foram repetidas. Sem deploy, código/schema/flags modificados,
+API paga, envio WhatsApp ou gasto em anúncios. CP112/recibo1 retidos. QA completo
+não repetido nesta manutenção operacional. Recibos privados prefixo
+`.local/maestri/heartbeat-20261026-0108-`: owner-final, conference-report, holds,
+hold-gate-audits, recovery, settle-Autor e prova exata do Autor.
