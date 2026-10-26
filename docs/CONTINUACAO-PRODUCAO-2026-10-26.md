@@ -1,5 +1,39 @@
 # Produção em26/10/2026
 
+## Conferência às08h16 BRT
+
+Relatório11h16m46 UTC:12/84 elegíveis,35 novas distintas válidas publicadas hoje
+em São Paulo e2038 válidas somadas nas ofertas; MPRJ73. Site saudável e linha
+concluída11h11m21 UTC. Sem novo produto ou checkout validado.
+
+Cinco aprovações de10h30m07.609254 UTC conferidas e mantidas: legalidade das penas,
+graça/fiança na tortura, imprescritibilidade/inafiançabilidade do racismo, separação
+prisional e integridade dos presos. O rol de penas da Constituição é exemplificativo;
+inafiançabilidade não impede por si liberdade provisória sem fiança. Não equiparar
+penas/regimes dos mandantes, executores e omissos. Fontes:
+[CF5](https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm),
+[Lei9.455art1§§2/6/7](https://www.planalto.gov.br/ccivil_03/leis/l9455.htm).
+Conferência automatizada, humanReview:false; watermark10h30m07.609254 UTC.
+
+Autor114/Guardião mapping931: audits27451/27482 exatos, mesmo input/token/resultado,
+sem lease; prepared no Autor e blocked no Guardião. Owners35580/45477 mortos,
+host/inodes/bytes/hashes estáveis e provas frescas. Mutexes inteiros arquivados;
+settle normal1/1/0 e receipts replayed:true para ambos. Preservado blocked, sem
+aprovação fabricada, reset, remoção de packet ou nova autoria contada.
+
+Diagnóstico somente leitura do mapping931/TRF5: faltam candidatos pertinentes no
+lote de8, embora CC79–103 (25 artigos) já estejam reviewed, official_text e atuais,
+versão64, IDs3847–3871. A recuperação usa palavras com pelo menos5 letras, exclui
+o termo Bens e ranqueia globalmente; isso identifica um gargalo de recuperação neste
+caso, sem provar que uma simples troca de limite resolva. Preparada tarefa privada
+para correção conservadora e testes de recuperação/escopo/cache, sem reabrir o
+trabalho, alterar código ou declarar execução pelo Forge. Tarefa ainda NÃO enviada.
+
+Mac confirmado bloqueado; follow-ups existentes seguem preparados, GitHub com
+pendência conhecida. MPRJ renova após27/10 às00hUTC, validade28/10 às00hUTC.
+WhatsApp sem integração/envio e anúncios sem contas/orçamento/gasto. Sem deploy,
+código/schema/flags ou API paga; diff documental verificado, QA anterior preservado.
+
 ## Conferência às07h21 BRT
 
 Relatório10h21m13 UTC:12/84 preparações elegíveis,30 novas distintas válidas
