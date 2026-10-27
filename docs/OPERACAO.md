@@ -1,5 +1,14 @@
 # Operação do Edital Lei Seca
 
+**Conferência em 26/10/2026, 21h25 BRT (27/10, 00h25 UTC):** **12/84 elegíveis**,
+**63 novas distintas válidas publicadas no dia26 de São Paulo**, **2.066 válidas
+somadas nas ofertas**; MPRJ **73**. Cinco aprovações conferidas e mantidas.
+Evidência MPRJ renovada pelo operador auditado, audit27718, válida até29/10às00hUTC;
+contrato e fontes preservados. Site/liberação saudáveis. **Maestri sem processos
+de agentes ativos**; tentativa nativa ficou em “Encerrando processos…”, sem recibo
+de retomada. Solicitado abrir o workspace existente. Sem nova preparação ou checkout
+validado, deploy, flags ou gastos. [Recibos e pendências](CONTINUACAO-PRODUCAO-2026-10-26.md).
+
 **Conferência em 26/10/2026, 18h25 BRT:** **12/84 elegíveis**, **58 novas distintas
 válidas publicadas hoje**, **2.061 válidas somadas nas ofertas**; MPRJ **73**.
 Cinco aprovações conferidas: quatro mantidas e uma suspensa, audit27687, por premissa
