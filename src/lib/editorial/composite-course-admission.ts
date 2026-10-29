@@ -14,19 +14,31 @@ import { verifyOfficialExamUrl } from "@/lib/official-sources/fetch";
 
 const FGV = "https://conhecimento.fgv.br/sites/default/files/concursos/";
 export const COMPOSITE_ADMISSION_TARGETS = [
-  { productSlug: "mpe-rj-promotor-de-justica-2026", slug: "mprj-promotor-substituto-xxxix-2026-historico-objetiva", acronym: "MPRJ", notice: "XXXIX/2026", category: "carreiras-juridicas", career: "promotor-justica", noticeDate: "2026-03-12", statusDate: "2026-10-06", commission: "Comissão do XXXIX Concurso do MPRJ", stages: [
+  { productSlug: "mpe-rj-promotor-de-justica-2026", slug: "mprj-promotor-substituto-xxxix-2026-historico-objetiva", acronym: "MPRJ", notice: "XXXIX/2026", category: "carreiras-juridicas", career: "promotor-justica", noticeDate: "2026-03-12", statusDate: "2026-10-06", cycleYear: 2026, lifecycleStatus: "result_published", commission: "Comissão do XXXIX Concurso do MPRJ", stages: [
     { title: "Republicação — habilitados à inscrição definitiva", url: `${FGV}05.10-aviso-relacao-de-habilitados-a-inscricao-definitiva-republicacao.pdf`, publishedOn: "2026-10-06" },
   ] },
-  { productSlug: "pge-ac-procurador-do-estado-reta-final", slug: "pgeac-procurador-classe-i-viii-2026-historico-objetiva", acronym: "PGEAC", notice: "VIII/2026", category: "procuradorias", career: "procurador", noticeDate: "2026-02-26", statusDate: "2026-10-05", commission: "Comissão do VIII Concurso da PGE-AC", stages: [
+  { productSlug: "pge-ac-procurador-do-estado-reta-final", slug: "pgeac-procurador-classe-i-viii-2026-historico-objetiva", acronym: "PGEAC", notice: "VIII/2026", category: "procuradorias", career: "procurador", noticeDate: "2026-02-26", statusDate: "2026-10-05", cycleYear: 2026, lifecycleStatus: "result_published", commission: "Comissão do VIII Concurso da PGE-AC", stages: [
     { title: "Resultado definitivo da prova objetiva", url: `${FGV}529_pge-ac-resultado-definitivo-prova-objetiva-2026-07-06.pdf`, publishedOn: "2026-07-15" },
     { title: "Resultado preliminar da prova escrita subjetiva", url: `${FGV}529_pge-ac_resultado-preliminar-discursiva-2026-09-29_0.pdf`, publishedOn: "2026-10-05" },
+  ] },
+  { productSlug: "tj-pr-juiz-de-direito-2025-2026", slug: "tjpr-juiz-substituto-001-2025-historico-objetiva", acronym: "TJPR", notice: "001/2025", category: "carreiras-juridicas", career: "magistratura", noticeDate: "2025-11-24", statusDate: "2026-10-28", cycleYear: 2025, lifecycleStatus: "result_published", commission: "Comissão do Concurso para provimento de cargos de Juiz Substituto do TJPR", stages: [
+    { title: "Resultado definitivo da prova objetiva (Edital 030/2025)", url: `${FGV}resultado-definitivo-da-prova-objetiva.pdf`, publishedOn: "2026-04-13" },
+  ] },
+  { productSlug: "tj-ba-juiz-de-direito-2026", slug: "tjba-juiz-substituto-01-2026-historico-objetiva", acronym: "TJBA", notice: "01/2026", category: "carreiras-juridicas", career: "magistratura", noticeDate: "2026-01-30", statusDate: "2026-07-08", cycleYear: 2026, lifecycleStatus: "result_published", commission: "Comissão do Concurso para Juiz Substituto do TJBA", stages: [
+    { title: "Convocação para a segunda etapa (provas escritas)", url: `${FGV}01_tjba-convocacao-prova-escrita.pdf`, publishedOn: "2026-07-08" },
+  ] },
+  { productSlug: "tj-pe-juiz-de-direito-2026", slug: "tjpe-juiz-substituto-01-2026-historico-objetiva", acronym: "TJPE", notice: "01/2026", category: "carreiras-juridicas", career: "magistratura", noticeDate: "2026-05-26", statusDate: "2026-09-29", cycleYear: 2026, lifecycleStatus: "exam_held", commission: "Comissão do Concurso Público para Juiz Substituto do TJPE", stages: [
+    { title: "Gabarito oficial preliminar da prova objetiva seletiva", url: `${FGV}tjpe-gabaritos-para-publicacao_dda5sa3.pdf`, publishedOn: "2026-09-29" },
+  ] },
+  { productSlug: "mpe-go-promotor-de-justica-2025", slug: "mpgo-promotor-substituto-63-2025-historico-objetiva", acronym: "MPGO", notice: "182/2025-CSMP", category: "carreiras-juridicas", career: "promotor-justica", noticeDate: "2025-09-22", statusDate: "2026-03-31", cycleYear: 2025, lifecycleStatus: "result_published", commission: "Comissão do 63º Concurso do MPGO", stages: [
+    { title: "Comunicado 10 — resultado da prova preambular", url: `${FGV}comissaodeconcurso_comunicado-n-10.pdf`, publishedOn: "2026-03-12" },
   ] },
 ] as const;
 
 export function compositeCourseTarget(productSlug: string) {
   const target = COMPOSITE_ADMISSION_TARGETS.find((item) => item.productSlug === productSlug);
   const recipe = NEXT_OFFICIAL_COURSE_RECIPES.find((item) => item.productSlug === productSlug);
-  if (!target || !recipe) throw new Error("Operador delimitado exclusivamente a MPRJ XXXIX e PGE-AC VIII.");
+  if (!target || !recipe) throw new Error("Operador delimitado aos alvos compostos cadastrados (MPRJ XXXIX, PGE-AC VIII e lote FGV histórico).");
   return { target, recipe };
 }
 
@@ -41,16 +53,23 @@ export function assertCompositeFreshness(observedAt: string, now = Date.now()) {
 }
 
 /** Group literal numbered topics with their continuation lines, never reassign legal articles. */
-export function compositeProgrammeRequirements(sections: readonly ProgrammeSection[]) {
+export function compositeProgrammeRequirements(sections: readonly ProgrammeSection[], repeatable: readonly string[] = []) {
   const output: { documentKey: string; requirementText: string; sourceLocator: string }[] = [];
   const seen = new Set<string>();
+  // Textos genéricos declarados na receita (ex.: "Súmulas ... relacionada com os temas")
+  // repetem-se em mais de uma disciplina; a fonte guarda a primeira ocorrência.
+  const allowedRepeats = new Set(repeatable);
   for (const section of sections) {
     let pending: { text: string; first: number; last: number } | null = null;
     let pointHeading = "";
     const flush = () => {
       if (!pending) return;
       const key = `${section.documentKey}\0${pending.text}`;
-      if (seen.has(key)) throw new Error("Requisito literal duplicado na mesma fonte; revisão própria necessária.");
+      if (seen.has(key)) {
+        if (!allowedRepeats.has(pending.text)) throw new Error("Requisito literal duplicado na mesma fonte; revisão própria necessária.");
+        pending = null;
+        return;
+      }
       seen.add(key);
       output.push({ documentKey: section.documentKey, requirementText: pending.text, sourceLocator: `${section.documentKey} · ${section.subject} · p. ${pending.first}${pending.last === pending.first ? "" : `–${pending.last}`}` });
       pending = null;
@@ -107,7 +126,7 @@ export async function admitCompositeOfficialCourse(input: Readonly<{
   const evidence = await verifyCompositeMetadata(input.productSlug);
   const preview = buildNextOfficialCoursePreview(recipe, input.captures, new Date().toISOString(), evidence.previous);
   if (preview.programme.checksumSha256 !== input.expectedProgrammeHash) throw new Error("Composição do programa mudou desde a prévia conferida.");
-  const requirementCandidates = compositeProgrammeRequirements(preview.programme.sections);
+  const requirementCandidates = compositeProgrammeRequirements(preview.programme.sections, recipe.repeatableRequirements ?? []);
   const reviewer = parseOpportunityApprovalReviewerIdentity({ ADMIN_EMAILS: process.env.ADMIN_EMAILS, OPPORTUNITY_APPROVAL_REFERENCE: process.env.OPPORTUNITY_APPROVAL_REFERENCE });
   const client = postgres(databaseUrl, { max: 1, prepare: false });
   const note = `Revisão automatizada de fontes/programa sob owner_standing_authorization (${reviewer.approvalReference}); humanReview:false. Treino histórico da etapa objetiva com legislação atual; mapeamento/vigência/perfil/inéditas ainda pendentes. FGV presta a objetiva; demais etapas seguem a responsabilidade institucional do edital. Não é liberação comercial.`;
@@ -122,7 +141,7 @@ export async function admitCompositeOfficialCourse(input: Readonly<{
       await tx`select public.lock_product_binding_review_product(${recipe.productSlug})`;
       const products = await tx<{ opportunityId: string | null; status: string }[]>`select opportunity_id::text as "opportunityId", status from contest_store_products where slug = ${recipe.productSlug} for update`;
       if (products.length !== 1 || products[0].status !== "draft" || products[0].opportunityId !== null) throw new Error("Somente produto draft sem edição; não sobrescrever revisão existente.");
-      const existing = await tx`select id from contest_opportunities where slug = ${target.slug} or (institution_acronym = ${target.acronym} and official_notice_number = ${target.notice} and cycle_year = 2026) or (institution_name = ${recipe.institution} and role_name = ${recipe.role} and cycle_year = 2026) limit 1`;
+      const existing = await tx`select id from contest_opportunities where slug = ${target.slug} or (institution_acronym = ${target.acronym} and official_notice_number = ${target.notice} and cycle_year = ${target.cycleYear}) or (institution_name = ${recipe.institution} and role_name = ${recipe.role} and cycle_year = ${target.cycleYear}) limit 1`;
       if (existing.length) throw new Error("Edição já existente; admissão não duplica nem sobrescreve.");
       const catalog = await tx<{ categoryId: string; careerId: string; bankId: string }[]>`select category.id::text as "categoryId", career.id::text as "careerId", bank.id::text as "bankId"
         from contest_categories category join contest_category_careers link on link.category_id = category.id
@@ -136,10 +155,10 @@ export async function admitCompositeOfficialCourse(input: Readonly<{
       const [opportunity] = await tx<{ id: string }[]>`insert into contest_opportunities (public_id, slug, category_id, career_track_id, jurisdiction_code, scope, cycle_year,
         institution_acronym, institution_name, role_name, official_notice_number, title, summary, lifecycle_status, status_as_of, official_url,
         notice_published_at, exam_date, source_checked_at, editorial_status)
-        values (${opportunityPublicId}, ${target.slug}, ${catalog[0].categoryId}, ${catalog[0].careerId}, ${recipe.jurisdiction}, 'state', 2026,
+        values (${opportunityPublicId}, ${target.slug}, ${catalog[0].categoryId}, ${catalog[0].careerId}, ${recipe.jurisdiction}, 'state', ${target.cycleYear},
           ${target.acronym}, ${recipe.institution}, ${recipe.role}, ${target.notice}, ${`${target.acronym} — treino histórico objetivo ${recipe.cycle}`},
           ${`Programa composto com retificações/republicações oficiais. ${recipe.stage}. Treino histórico objetivo; legislação atual e inéditas exigem preparação própria. Não anuncia edição futura.`},
-          'result_published', ${target.statusDate}, ${recipe.documents[0].url}, ${target.noticeDate}, ${recipe.examDate}, ${now}, 'draft') returning id::text`;
+          ${target.lifecycleStatus}, ${target.statusDate}, ${recipe.documents[0].url}, ${target.noticeDate}, ${recipe.examDate}, ${now}, 'draft') returning id::text`;
       const identities = new Map<string, { sourceId: string; snapshotId: string; sourcePublicId: string; snapshotPublicId: string }>();
       for (const doc of recipe.documents) {
         const capture = input.captures.get(doc.key)!;

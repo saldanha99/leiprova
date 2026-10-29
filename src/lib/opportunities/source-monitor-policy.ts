@@ -28,6 +28,16 @@ export const OFFICIAL_OPPORTUNITY_SOURCE_POLICIES = [
       "/sites/default/files/concursos/05.10-aviso-relacao-de-habilitados-a-inscricao-definitiva-republicacao.pdf",
       "/sites/default/files/concursos/529_pge-ac-resultado-definitivo-prova-objetiva-2026-07-06.pdf",
       "/sites/default/files/concursos/529_pge-ac_resultado-preliminar-discursiva-2026-09-29_0.pdf",
+      // Lote FGV histórico (TJPR, TJBA, TJPE, MPGO): editais exatos e marcos de fase,
+      // estes somente como metadados; listas de candidatos não são armazenadas nem extraídas.
+      "/sites/default/files/concursos/tjpr-minuta-edital-de-abertura-cnper-ccicm-fgv-12.12.pdf",
+      "/sites/default/files/concursos/resultado-definitivo-da-prova-objetiva.pdf",
+      "/sites/default/files/concursos/edital-concurso-juiz-substituto-tjba-retificado-2.pdf",
+      "/sites/default/files/concursos/01_tjba-convocacao-prova-escrita.pdf",
+      "/sites/default/files/concursos/tjpe_edital-31.07.2026-retificado.pdf",
+      "/sites/default/files/concursos/tjpe-gabaritos-para-publicacao_dda5sa3.pdf",
+      "/sites/default/files/concursos/edital-retificado-publicado.pdf",
+      "/sites/default/files/concursos/comissaodeconcurso_comunicado-n-10.pdf",
     ],
   },
   {

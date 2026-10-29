@@ -26,6 +26,7 @@ import {
 import { saoPauloCalendarDate } from "../src/lib/opportunities/catalog-policy";
 
 import { PGEAC_OFFICIAL_PREVIOUS_EXAM } from "../src/lib/exams/pgeac-previous-exam-admission";
+import { FGV_HISTORICAL_PREVIOUS_EXAMS, FGV_HISTORICAL_REGISTRATION_ACTION } from "../src/lib/exams/fgv-historical-previous-exam-admission";
 import { MPMT_OFFICIAL_PREVIOUS_EXAM } from "../src/lib/exams/mpmt-previous-exam-admission";
 import { MPRJ_OFFICIAL_PREVIOUS_EXAM } from "../src/lib/exams/mprj-previous-exam-admission";
 import { requiresAnswerKeyMaintenanceAct } from "../src/lib/exams/answer-key-finality";
@@ -57,10 +58,12 @@ async function main() {
   const results: Record<string, unknown>[] = [];
   try {
     for (const pair of pairs) {
-      const standingTarget = pair.productSlug === PGEAC_OFFICIAL_PREVIOUS_EXAM.productSlug ? PGEAC_OFFICIAL_PREVIOUS_EXAM
+      const fgvHistorical = FGV_HISTORICAL_PREVIOUS_EXAMS.find((item) => item.productSlug === pair.productSlug);
+      const standingTarget = fgvHistorical ?? (pair.productSlug === PGEAC_OFFICIAL_PREVIOUS_EXAM.productSlug ? PGEAC_OFFICIAL_PREVIOUS_EXAM
         : pair.productSlug === MPRJ_OFFICIAL_PREVIOUS_EXAM.productSlug ? MPRJ_OFFICIAL_PREVIOUS_EXAM
-        : MPMT_OFFICIAL_PREVIOUS_EXAM;
-      const registrationAction = pair.productSlug === PGEAC_OFFICIAL_PREVIOUS_EXAM.productSlug ? "editorial.previous_exam.pgeac_metadata_registered"
+        : MPMT_OFFICIAL_PREVIOUS_EXAM);
+      const registrationAction = fgvHistorical ? FGV_HISTORICAL_REGISTRATION_ACTION
+        : pair.productSlug === PGEAC_OFFICIAL_PREVIOUS_EXAM.productSlug ? "editorial.previous_exam.pgeac_metadata_registered"
         : pair.productSlug === MPRJ_OFFICIAL_PREVIOUS_EXAM.productSlug ? "editorial.previous_exam.mprj_metadata_registered"
         : "editorial.previous_exam.mpmt_metadata_registered";
       const [edition] = await db

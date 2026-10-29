@@ -71,7 +71,7 @@ export function officialFormatEvidenceMatches(format:OfficialQuestionContract['f
   const ce=/\bcerto\b/u.test(text)&&/\berrado\b/u.test(text)&&/julgamento|julgue|julgad[oa]/u.test(text);
   const coverClause=/questoes objetivas tem 5\s*\(cinco\) opcoes de resposta \(a, b, c, d e e\) e somente uma delas esta correta/u.exec(text);
   const coverClauseNegated=coverClause && /\b(?:nao|falso|incorreto)\b[^.!?]*$/u.test(text.slice(Math.max(0,coverClause.index-80),coverClause.index));
-  const single=(!!coverClause && !coverClauseNegated) || /apenas uma resposta correta|uma unica resposta|um,? e somente um|das quais apenas 1\s*\(uma\) sera correta/u.test(text);
+  const single=(!!coverClause && !coverClauseNegated) || /apenas uma resposta correta|uma unica resposta|um,? e somente um|das quais apenas 1\s*\(uma\) sera correta|com somente uma opcao correta/u.test(text);
   return format==='multiple_choice'?mc&&single&&!ce:ce&&!mc;
 }
 

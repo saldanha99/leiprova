@@ -54,7 +54,7 @@ async function main() {
       expectedHashes: args.expectedHashes, expectedProgrammeHash: args.expectedProgrammeHash }) : await (async () => {
       const metadata = await verifyCompositeMetadata(slug);
       const preview = buildNextOfficialCoursePreview(recipe, captures, new Date().toISOString(), metadata.previous);
-      const requirements = compositeProgrammeRequirements(preview.programme.sections);
+      const requirements = compositeProgrammeRequirements(preview.programme.sections, recipe.repeatableRequirements ?? []);
       return { ...preview, stageEvidence: metadata.stages, captureReceipts: [...capturedAt].map(([key, timestamp]) => ({ key, capturedAt: timestamp })),
         requirements: requirements.length, legalMappingsApproved: 0, questionsApproved: 0, productsReleased: 0,
         applySupported: true, databaseWrites: 0, admissionApplied: false, productStatus: "draft" };

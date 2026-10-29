@@ -28,11 +28,19 @@ export function mprjCompositeAnswerKeyEvidenceStands() {
   );
 }
 
+/** Lote FGV histórico (admissão composta): pares exatos produto → edição-base objetiva. */
+export const FGV_HISTORICAL_PREVIOUS_PAIRS: Readonly<Record<string, string>> = {
+  "tj-pr-juiz-de-direito-2025-2026": "tjpr-juiz-substituto-001-2025-objetiva",
+  "tj-ba-juiz-de-direito-2026": "tjba-juiz-substituto-01-2026-objetiva",
+  "mpe-go-promotor-de-justica-2025": "mpgo-promotor-substituto-63-2025-preambular",
+};
+
 type Pair = Readonly<{ productSlug: string; editionPublicId: string }>;
 
 function standingPairAllowed(pair: Pair) {
   if (pair.productSlug === MPMT_PREVIOUS_PRODUCT_SLUG) return pair.editionPublicId === MPMT_PREVIOUS_EDITION_PUBLIC_ID;
   if (pair.productSlug === PGEAC_PREVIOUS_PRODUCT_SLUG) return pair.editionPublicId === PGEAC_PREVIOUS_EDITION_PUBLIC_ID;
+  if (Object.hasOwn(FGV_HISTORICAL_PREVIOUS_PAIRS, pair.productSlug)) return pair.editionPublicId === FGV_HISTORICAL_PREVIOUS_PAIRS[pair.productSlug];
   if (pair.productSlug === MPRJ_PREVIOUS_PRODUCT_SLUG) {
     return pair.editionPublicId === MPRJ_PREVIOUS_EDITION_PUBLIC_ID && mprjCompositeAnswerKeyEvidenceStands();
   }
@@ -51,7 +59,7 @@ export function parsePreviousExamLinkCommand(argv: readonly string[]) {
     pairs.push({ productSlug: parts[0], editionPublicId: parts[1] });
   }
   if (!pairs.length || new Set(pairs.map((pair) => pair.productSlug)).size !== pairs.length) throw new Error("Informe pares únicos de produto/edição.");
-  if (standing && (pairs.length !== 1 || !standingPairAllowed(pairs[0]))) throw new Error("Standing delimitado aos pares exatos MPMT 01/2026, PGE-AC VIII/2026 e MPRJ XXXIX/2026 preambular com evidência composta; uma edição por execução.");
+  if (standing && (pairs.length !== 1 || !standingPairAllowed(pairs[0]))) throw new Error("Standing delimitado aos pares exatos MPMT 01/2026, PGE-AC VIII/2026, MPRJ XXXIX/2026 preambular com evidência composta e lote FGV histórico (TJPR, TJBA, MPGO); uma edição por execução.");
   return { apply, standing, pairs };
 }
 
