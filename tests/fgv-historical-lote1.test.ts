@@ -6,6 +6,7 @@ vi.mock("postgres", () => ({ default: state.connect }));
 import { compositeCourseTarget, compositeProgrammeRequirements, COMPOSITE_ADMISSION_TARGETS } from "@/lib/editorial/composite-course-admission";
 import { extractDossierSubjectSections, NEXT_OFFICIAL_COURSE_RECIPES, previousExamAdmissionBlocker, type PreviewDocumentRecipe } from "@/lib/editorial/official-course-preview-candidates";
 import { officialFormatEvidenceMatches } from "@/lib/editorial/official-question-contract";
+import { PROGRAMME_CLASSIFICATION_SCOPES, programmeCanonicalSubject } from "@/lib/editorial/programme-subject-classification";
 import { assertFgvHistoricalAnchors, assertFgvHistoricalNoticeEvidence, assertFgvRegistrationRequest, fgvHistoricalPreviousExam, FGV_HISTORICAL_PREVIOUS_EXAMS, previewFgvHistoricalPreviousExam } from "@/lib/exams/fgv-historical-previous-exam-admission";
 import { FGV_HISTORICAL_PREVIOUS_PAIRS, parsePreviousExamLinkCommand } from "@/lib/exams/previous-exam-link-command";
 import { parseOfficialOpportunitySourceUrl } from "@/lib/opportunities/source-monitor-policy";
@@ -144,6 +145,19 @@ describe("lote FGV histórico — prova anterior por metadados", () => {
     }
     expect(() => parsePreviousExamLinkCommand(["--standing", "tj-pr-juiz-de-direito-2025-2026=tjba-juiz-substituto-01-2026-objetiva"])).toThrow();
     expect(() => parsePreviousExamLinkCommand(["--standing", "tj-pe-juiz-de-direito-2026=tjpe-juiz-substituto-01-2026-objetiva"])).toThrow();
+  });
+});
+
+describe("classificação de disciplinas do lote", () => {
+  it("escopo delimitado às oportunidades admitidas e títulos literais com regra canônica exata", () => {
+    for (const slug of LOTE) {
+      const { target, recipe } = compositeCourseTarget(slug);
+      expect(PROGRAMME_CLASSIFICATION_SCOPES[target.slug as keyof typeof PROGRAMME_CLASSIFICATION_SCOPES]).toBe(recipe.role);
+    }
+    // Disciplinas sem entrada exata no catálogo continuam fora da classificação.
+    expect(programmeCanonicalSubject("DIREITO PENAL")).toBe("Direito Penal");
+    expect(programmeCanonicalSubject("DIREITO FINANCEIRO E TRIBUTÁRIO")).toBe("Direito Financeiro e Tributário");
+    for (const heading of ["DIREITO DO CONSUMIDOR", "DIREITO DA CRIANÇA E DO ADOLESCENTE", "LEGISLAÇÃO DO MINISTÉRIO PÚBLICO", "NOÇÕES GERAIS DE DIREITO E FORMAÇÃO HUMANÍSTICA"]) expect(programmeCanonicalSubject(heading)).toBeNull();
   });
 });
 

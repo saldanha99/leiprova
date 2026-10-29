@@ -14,6 +14,11 @@ export const PROGRAMME_CLASSIFICATION_SCOPES = {
   "mpmt-promotor-substituto-2026-historico-objetiva": "Promotor de Justiça Substituto",
   "mprj-promotor-substituto-xxxix-2026-historico-objetiva": "Promotor de Justiça Substituto",
   "pgeac-procurador-classe-i-viii-2026-historico-objetiva": "Procurador do Estado — Classe I",
+  // Lote FGV histórico: mesmos títulos literais do anexo usados na admissão composta.
+  "tjpr-juiz-substituto-001-2025-historico-objetiva": "Juiz Substituto",
+  "tjba-juiz-substituto-01-2026-historico-objetiva": "Juiz Substituto",
+  "tjpe-juiz-substituto-01-2026-historico-objetiva": "Juiz Substituto",
+  "mpgo-promotor-substituto-63-2025-historico-objetiva": "Promotora e Promotor de Justiça Substituto",
 } as const;
 export const PROGRAMME_SUBJECT_CLASSIFICATION_ACTION = "editorial.programme.subject_classified";
 export const PROGRAMME_CLASSIFICATION_BATCH_LIMIT = 100;
