@@ -1,5 +1,13 @@
 # Produção, controle do proprietário e anúncios
 
+**Conferência em 29/10/2026, 15h32 BRT:** **13/84 elegíveis**, **1 nova distinta
+válida publicada hoje**, **2.146 válidas somadas nas ofertas** após quatro
+suspensões cautelares. PC-AL Agente e Escrivão liberado com **70** questões;
+checkout ainda não verificado, sem campanha ativada. SSH voltou, site e linha
+saudáveis; MPRJ73 com evidência renovada, audit30661, até31/10às00hUTC.
+Maestri segue sem processos e abertura já solicitada. WhatsApp sem integração
+validada; nenhum envio. [Recibos e pendências](CONTINUACAO-PRODUCAO-2026-10-29.md).
+
 **Conferência em 26/10/2026, 21h25 BRT (27/10, 00h25 UTC):** **12/84 elegíveis**,
 **63 novas distintas válidas publicadas no dia26 de São Paulo**, **2.066 válidas
 somadas nas ofertas**; MPRJ **73**. Cinco aprovações conferidas e mantidas.

@@ -1,5 +1,13 @@
 # Operação do Edital Lei Seca
 
+**Conferência em 29/10/2026, 15h32 BRT:** **13/84 elegíveis**, **1 nova distinta
+válida publicada hoje**, **2.146 válidas somadas nas ofertas** após quatro
+suspensões cautelares. PC-AL Agente e Escrivão está liberado com **70** questões;
+conteúdo inicial não significa cobertura integral ou checkout verificado.
+SSH voltou; site e linha respondem. MPRJ permanece com73, treino histórico;
+evidência renovada, audit30661, até31/10às00hUTC. Maestri segue sem processos,
+com pedido anterior de abertura pendente. [Conferência e pendências](CONTINUACAO-PRODUCAO-2026-10-29.md).
+
 **Conferência em 26/10/2026, 21h25 BRT (27/10, 00h25 UTC):** **12/84 elegíveis**,
 **63 novas distintas válidas publicadas no dia26 de São Paulo**, **2.066 válidas
 somadas nas ofertas**; MPRJ **73**. Cinco aprovações conferidas e mantidas.
