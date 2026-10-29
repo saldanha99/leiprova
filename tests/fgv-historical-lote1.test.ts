@@ -100,6 +100,8 @@ describe("lote FGV histórico — prova anterior por metadados", () => {
 
   it("âncoras exigem órgão, edital, rótulo, data e bloco exatos", () => {
     expect(() => assertFgvHistoricalAnchors(target, html)).not.toThrow();
+    // Script de CDN com token por requisição não muda o que foi conferido.
+    expect(assertFgvHistoricalAnchors(target, html + "<script>token=1</script>")).toBe(assertFgvHistoricalAnchors(target, html + "<script>token=2</script>"));
     for (const changed of [html.replace(target.portalHeading, "Tribunal de outro Estado"), html.replace("Gabarito Definitivo", "Gabarito Preliminar"),
       html.replace(target.documents[0].publishedOn, "2026-01-01"), html.replace("Prova Objetiva Seletiva", "Prova Discursiva"),
       html.replace(target.portalNotice.label, "Edital"), html + `<a href="${target.documents[1].url}">${target.documents[1].label}</a>`]) expect(() => assertFgvHistoricalAnchors(target, changed)).toThrow();
@@ -120,6 +122,8 @@ describe("lote FGV histórico — prova anterior por metadados", () => {
     pageTexts[0] = "provimento de 18 vagas para o cargo de Juiz Substituto";
     const valid = { checksum: target.noticeSha256, pages: target.noticePageCount, pageTexts };
     expect(() => assertFgvHistoricalNoticeEvidence(target, valid)).not.toThrow();
+    // Quebra de linha do PDF dentro da cláusula não invalida a evidência.
+    expect(() => assertFgvHistoricalNoticeEvidence(target, { ...valid, pageTexts: pageTexts.map((text, index) => index === 32 ? text.replace("múltipla escolha", "múltipla\nescolha") : text) })).not.toThrow();
     for (const patch of [{ checksum: "b".repeat(64) }, { pages: 117 }, { pageTexts: pageTexts.map((text, index) => index === 32 ? text.replace("5 (cinco)", "4 (quatro)") : text) },
       { pageTexts: pageTexts.map((text, index) => index === 32 ? text.replace("22 de fevereiro", "29 de março") : text) }]) expect(() => assertFgvHistoricalNoticeEvidence(target, { ...valid, ...patch })).toThrow();
   });

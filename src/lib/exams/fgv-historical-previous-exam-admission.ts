@@ -100,9 +100,13 @@ export function fgvHistoricalPreviousExam(productSlug: string) {
   return target;
 }
 
+/** Confere as âncoras e devolve só o que foi conferido: o HTML do portal traz script
+ * de CDN com token por requisição, então o hash bruto não serve de fingerprint. */
 export function assertFgvHistoricalAnchors(target: FgvHistoricalPreviousExam, html: string) {
   const $ = load(html);
-  if (!$("h1").text().includes(target.portalHeading)) throw new Error("Portal de outro órgão; cadastro bloqueado.");
+  const heading = $("h1").text().replace(/\s+/gu, " ").trim();
+  if (!heading.includes(target.portalHeading)) throw new Error("Portal de outro órgão; cadastro bloqueado.");
+  const verified: { href: string; label: string; publishedOn: string | null }[] = [];
   const notice = $("a").filter((_, anchor) => $(anchor).attr("href") === target.portalNotice.url);
   if (notice.length !== 1 || notice.text().replace(/\s+/gu, " ").trim() !== target.portalNotice.label) throw new Error("Portal não referencia o edital aprovado esperado; cadastro bloqueado.");
   for (const document of target.documents) {
@@ -111,7 +115,9 @@ export function assertFgvHistoricalAnchors(target: FgvHistoricalPreviousExam, ht
     const block = matches.closest(".paragraph--type--texto-data");
     if (block.find("time").attr("datetime")?.slice(0, 10) !== document.publishedOn) throw new Error("Data de publicação do link diverge da fonte oficial.");
     if (document.blockIncludes?.some((text) => !block.text().includes(text))) throw new Error("Caderno de cargo/etapa diferente.");
+    verified.push({ href: document.url, label: document.label, publishedOn: document.publishedOn });
   }
+  return createHash("sha256").update(JSON.stringify({ heading, notice: target.portalNotice, documents: verified })).digest("hex");
 }
 
 async function boundedOfficialText(url: string, limit: number, fetcher: typeof fetch) {
@@ -132,7 +138,7 @@ export async function previewFgvHistoricalPreviousExam(target: FgvHistoricalPrev
   const robots = await boundedOfficialText("https://conhecimento.fgv.br/robots.txt", 64 * 1024, options.fetcher ?? fetch);
   for (const url of [target.portalUrl, target.portalNotice.url, ...target.documents.map((document) => document.url)]) assertOfficialRobotsPathAllowed(robots.text, new URL(url).pathname);
   const portal = await boundedOfficialText(target.portalUrl, 2 * 1024 * 1024, options.fetcher ?? fetch);
-  assertFgvHistoricalAnchors(target, portal.text);
+  const portalAnchorsSha256 = assertFgvHistoricalAnchors(target, portal.text);
   const documents = [];
   for (const document of target.documents) {
     const metadata = await (options.verifier ?? verifyOfficialExamUrl)("fgv", document.url);
@@ -140,7 +146,7 @@ export async function previewFgvHistoricalPreviousExam(target: FgvHistoricalPrev
     documents.push({ ...document, ...metadata, distributionMode: "external_link", sourcePolicy: "metadata_only", sourceContentStored: false, status: "pending_review" });
   }
   return { mode: "preview", productSlug: target.productSlug, editionPublicId: target.editionPublicId, observedAt: new Date().toISOString(),
-    portalUrl: target.portalUrl, portalHttpStatus: portal.httpStatus, portalHtmlSha256: createHash("sha256").update(portal.text).digest("hex"),
+    portalUrl: target.portalUrl, portalHttpStatus: portal.httpStatus, portalHtmlSha256: createHash("sha256").update(portal.text).digest("hex"), portalAnchorsSha256,
     robotsSha256: createHash("sha256").update(robots.text).digest("hex"), examDate: target.examDate, documents,
     noticeEvidence: { sourceUrl: target.noticeUrl, checksumSha256: target.noticeSha256, pages: target.noticeChecks.map((check) => check.page), expectedQuestionCount: target.expectedQuestionCount, pageCount: target.noticePageCount },
     publicationAllowed: false, admissionApplied: false, latestEditionVerifiedInDatabase: false, databaseWrites: 0, questionsImported: 0, productsReleased: 0, humanReview: false,
@@ -149,7 +155,7 @@ export async function previewFgvHistoricalPreviousExam(target: FgvHistoricalPrev
 
 export function assertFgvHistoricalNoticeEvidence(target: FgvHistoricalPreviousExam, input: { checksum: string; pages: number; pageTexts: readonly string[] }) {
   if (input.checksum !== target.noticeSha256 || input.pages !== target.noticePageCount || input.pageTexts.length !== target.noticePageCount
-    || target.noticeChecks.some((check) => !new RegExp(check.pattern, "iu").test(input.pageTexts[check.page - 1] ?? ""))) {
+    || target.noticeChecks.some((check) => !new RegExp(check.pattern, "iu").test((input.pageTexts[check.page - 1] ?? "").replace(/\s+/gu, " ")))) {
     throw new Error("Edital aprovado não comprova quantidade/formato/data esperados; cadastro bloqueado.");
   }
 }
@@ -164,7 +170,7 @@ export function assertFgvRegistrationRequest(request: FgvRegistrationRequest) {
 }
 function assertFgvMetadataFresh(target: FgvHistoricalPreviousExam, preview: FgvPreview) {
   const stamps = [preview.observedAt, ...preview.documents.map((document) => document.checkedAt)];
-  if (!/^[a-f0-9]{64}$/u.test(preview.portalHtmlSha256) || !/^[a-f0-9]{64}$/u.test(preview.robotsSha256) || preview.portalUrl !== target.portalUrl || preview.portalHttpStatus !== 200
+  if (!/^[a-f0-9]{64}$/u.test(preview.portalHtmlSha256) || !/^[a-f0-9]{64}$/u.test(preview.portalAnchorsSha256) || !/^[a-f0-9]{64}$/u.test(preview.robotsSha256) || preview.portalUrl !== target.portalUrl || preview.portalHttpStatus !== 200
     || preview.noticeEvidence.sourceUrl !== target.noticeUrl || preview.noticeEvidence.checksumSha256 !== target.noticeSha256 || preview.noticeEvidence.pageCount !== target.noticePageCount
     || preview.humanReview !== false || preview.productSlug !== target.productSlug || preview.editionPublicId !== target.editionPublicId || preview.examDate !== target.examDate
     || preview.documents.length !== target.documents.length || preview.documents.some((document, index) => document.url !== target.documents[index].url || document.documentType !== target.documents[index].documentType
@@ -229,7 +235,7 @@ export async function reviewFgvHistoricalRegistration(tx: postgres.TransactionSq
   const actor = operators[0].id;
   const snapshotIdentity = snapshots.map(({ pageTexts: omitted, ...rest }) => { void omitted; return rest; });
   const fingerprint = createHash("sha256").update(JSON.stringify({ target: target.editionPublicId, opportunityPublicId, identity, snapshots: snapshotIdentity, assignments,
-    actor, reference: reviewer.approvalReference, portalHtmlSha256: preview.portalHtmlSha256, robotsSha256: preview.robotsSha256,
+    actor, reference: reviewer.approvalReference, portalAnchorsSha256: preview.portalAnchorsSha256, robotsSha256: preview.robotsSha256,
     documents: preview.documents.map((document) => ({ url: document.url, documentType: document.documentType, publishedOn: document.publishedOn,
       httpStatus: document.httpStatus, contentType: document.contentType, isPdf: document.isPdf, finalUrl: document.finalUrl })) })).digest("hex");
   if (request.mode === "preview") return { mode: "preview" as const, fingerprint, productSlug: target.productSlug, opportunityPublicId,
@@ -263,7 +269,7 @@ export async function reviewFgvHistoricalRegistration(tx: postgres.TransactionSq
       and preparation_approval_reference=${reviewer.approvalReference} and preparation_opportunity_updated_at::text=${identity.opportunityUpdatedAt} returning slug`;
   if (updatedProducts.length !== 1 || updatedProducts[0].slug !== target.productSlug) throw new Error("Fingerprint do modo não atualizou exatamente o produto esperado; transação cancelada.");
   const metadata = { approvalBasis: "owner_standing_authorization", approvalReference: reviewer.approvalReference, humanReview: false, productSlug: target.productSlug, opportunityPublicId,
-    editionPublicId: target.editionPublicId, documentPublicIds: documentIds, noticeSha256: expectedNoticeSha256, portalHtmlSha256: preview.portalHtmlSha256,
+    editionPublicId: target.editionPublicId, documentPublicIds: documentIds, noticeSha256: expectedNoticeSha256, portalHtmlSha256: preview.portalHtmlSha256, portalAnchorsSha256: preview.portalAnchorsSha256,
     fingerprint, examDate: target.examDate, expectedQuestionCount: target.expectedQuestionCount, noticeEvidencePages: target.noticeChecks.map((check) => check.page),
     examDateCorroboration: { statement: target.examDateCorroboration, observedOn: "2026-10-29", provenance: "official_documents_observed_by_project_operator", headerReextractedInThisExecution: false }, documents: preview.documents,
     documentStatus: "pending_review", sourcePolicy: "metadata_only", sourceContentStored: false, latestEditionVerifiedInDatabase: true,
