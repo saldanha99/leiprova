@@ -1,5 +1,12 @@
 # Produção, controle do proprietário e anúncios
 
+**Conferência em 05/11/2026, 12h BRT:** **12/84 elegíveis**. PC-MA Delegado
+fora do catálogo por fase/data; não usar como oferta disponível em anúncios.
+MPRJ recuperado com73, evidência renovada até07/11às00hUTC, audit31206.
+Nenhuma questão nova publicada hoje. Maestri ainda aguarda abertura; WhatsApp,
+checkout e campanhas mantêm as pendências anteriores. Nenhum envio ou gasto.
+[Recibos e limites](CONTINUACAO-PRODUCAO-2026-11-05.md).
+
 **Conferência em 29/10/2026, 15h32 BRT:** **13/84 elegíveis**, **1 nova distinta
 válida publicada hoje**, **2.146 válidas somadas nas ofertas** após quatro
 suspensões cautelares. PC-AL Agente e Escrivão liberado com **70** questões;

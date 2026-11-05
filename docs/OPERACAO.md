@@ -1,5 +1,12 @@
 # Operação do Edital Lei Seca
 
+**Conferência em 05/11/2026, 12h BRT:** **12/84 elegíveis** após o PC-MA
+Delegado sair do catálogo por fase/data; suas279 questões continuam válidas,
+mas o produto está em `current_notice` e o registro revisado indica `exam_held`.
+MPRJ recuperado com73 após renovar evidência vencida, audit31206, até07/11às00hUTC.
+Nenhuma nova aprovação ou publicação hoje. Site e linha saudáveis; Maestri ainda
+sem processos. [Evidências e pendências](CONTINUACAO-PRODUCAO-2026-11-05.md).
+
 **Conferência em 29/10/2026, 15h32 BRT:** **13/84 elegíveis**, **1 nova distinta
 válida publicada hoje**, **2.146 válidas somadas nas ofertas** após quatro
 suspensões cautelares. PC-AL Agente e Escrivão está liberado com **70** questões;
