@@ -113,6 +113,20 @@ esac
       expect.arrayContaining(["packet.json", "CONTRATO.md", "AGENTS.md", "response.json", "receipt.json"]));
   });
 
+  it("conclusão aplicada com falha posterior é recuperada por replay, sem nova autoria", async () => {
+    const { dir, env, restore } = await setup(`cat >/dev/null; n=$(cat calls 2>/dev/null || echo 0); echo $((n+1)) > calls; echo '{"outcome":"prepared"}' > response.json`);
+    // Primeira conclusão sai com erro (follow-up falhou); a repetição devolve o recibo.
+    const docker = path.join(dir, "bin/docker");
+    await writeFile(docker, (await readFile(docker, "utf8")).replace(
+      `*--mode=complete*) cat > "${dir}/completed.json";`,
+      `*--mode=complete*) cat > "${dir}/completed.json"; if [ ! -f "${dir}/failed" ]; then touch "${dir}/failed"; exit 1; fi;`));
+    try { await main(env); } finally { restore(); }
+    expect(await readFile(path.join(dir, "state/runs/autor", lease, "calls"), "utf8")).toBe("1\n");
+    const events = await readFile(path.join(dir, "state/events.jsonl"), "utf8");
+    expect(events).toMatch(/complete_retry/);
+    expect(events).toMatch(/"state":"prepared"/);
+  });
+
   it("limite da assinatura pausa o papel sem entregar nada", async () => {
     const { dir, env, restore } = await setup(`echo "Claude usage limit reached" >&2; exit 1`);
     try { await main(env); } finally { restore(); }

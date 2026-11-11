@@ -188,7 +188,14 @@ export async function main(env = process.env) {
       try { response = parseResponseFile(await readFile(path.join(dir, "response.json"), "utf8")); }
       catch { await event({ role, slot, state: "no_valid_response", jobKey: job.jobKey, attempt, exit: result.code, ms: Date.now() - started }); continue; }
 
-      const completed = await bridge("complete", null, JSON.stringify({ jobKey: job.jobKey, inputHash: job.inputHash, leaseToken: job.leaseToken, result: response }));
+      const request = JSON.stringify({ jobKey: job.jobKey, inputHash: job.inputHash, leaseToken: job.leaseToken, result: response });
+      let completed = await bridge("complete", null, request);
+      if (completed.code !== 0) {
+        // A conclusão pode ter sido aplicada antes da falha: a mesma resposta é repetível
+        // e o servidor devolve o recibo já gravado, sem reimportar.
+        await event({ role, slot, state: "complete_retry", jobKey: job.jobKey, detail: lastLine(completed.output).slice(0, 200) });
+        completed = await bridge("complete", null, request);
+      }
       if (completed.code !== 0) {
         await event({ role, slot, state: "rejected_by_contract", jobKey: job.jobKey, attempt });
         await rename(path.join(dir, "response.json"), path.join(dir, `response-rejected-${attempt}.json`)).catch(() => {});

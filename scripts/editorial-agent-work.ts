@@ -48,7 +48,10 @@ async function main() {
         inputHash:z.string().regex(/^[a-f0-9]{64}$/),leaseToken:z.uuid(),result:z.unknown()}).strict().parse(JSON.parse(text));
       result=await completeAgentWork(db,request);
       // A saída do Guardião abastece automaticamente a próxima etapa, sem revisar/publicar.
-      await prepareAgentWork(db,new Date(),{followupsOnly:true});
+      // A conclusão já foi confirmada: falha aqui não pode transformar um recibo aplicado
+      // em erro (o chamador repetiria a autoria). O ciclo periódico refaz os follow-ups.
+      try { await prepareAgentWork(db,new Date(),{followupsOnly:true}); }
+      catch { console.error("Follow-ups não preparados nesta conclusão; o ciclo periódico os refaz."); }
     }
     console.log(JSON.stringify(result));
   } finally {await client.end();}
