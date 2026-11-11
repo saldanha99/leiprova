@@ -33,10 +33,14 @@ export function readConfig(env) {
   const executor = env.EDITORIAL_EXECUTOR?.trim() || "claude";
   if (executor !== "claude" && executor !== "codex") throw new Error("EDITORIAL_EXECUTOR deve ser 'claude' ou 'codex'.");
   const model = env.EDITORIAL_EXECUTOR_MODEL?.trim() || "";
+  // Produtos priorizados na reserva (só reordena a fila; não filtra).
+  const focus = (env.EDITORIAL_FOCUS_PRODUCTS ?? "").split(",").map((slug) => slug.trim()).filter(Boolean);
+  if (focus.length > 40 || focus.some((slug) => !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug) || slug.length > 120)) throw new Error("EDITORIAL_FOCUS_PRODUCTS inválido.");
   if (model && !/^[A-Za-z0-9._:\-[\]]{2,80}$/.test(model)) throw new Error("EDITORIAL_EXECUTOR_MODEL inválido.");
   return {
     executor,
     model,
+    focus,
     bin: env.EDITORIAL_EXECUTOR_BIN?.trim() || executor,
     stateDir: env.EDITORIAL_REALTIME_STATE_DIR?.trim() || "/var/lib/leiprova-realtime",
     projectDir: env.EDITORIAL_PROJECT_DIR?.trim() || "/opt/leiprova",
@@ -148,7 +152,7 @@ export async function main(env = process.env) {
   const bridge = (mode, role, input) => run("docker", [
     "exec", ...(input === undefined ? [] : ["-i"]), config.container,
     "./node_modules/.bin/tsx", "--env-file-if-exists=.env", "scripts/editorial-agent-work.ts",
-    `--mode=${mode}`, ...(role ? [`--agent=${role}`, `--kinds=${ROLE_KINDS[role]}`] : []),
+    `--mode=${mode}`, ...(role ? [`--agent=${role}`, `--kinds=${ROLE_KINDS[role]}`, ...(config.focus.length ? [`--focus=${config.focus.join(",")}`] : [])] : []),
   ], { input, cwd: config.stateDir, timeoutMs: 120_000, env: process.env });
   // Gatilho da linha de liberação: um .path do systemd (root) observa o arquivo.
   const triggerRelease = (jobKey, imported) =>

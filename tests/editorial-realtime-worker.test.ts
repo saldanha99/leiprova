@@ -19,6 +19,10 @@ const claimed = { state: "claimed", agent: "Autor", job: { jobKey: "author:1", k
   handoff: { instruction: "Leia job.payload.instructions." } };
 
 describe("readConfig", () => {
+  it("lê produtos de foco", () => {
+    expect(readConfig({ EDITORIAL_FOCUS_PRODUCTS: " tj-ba-juiz-2026, mpe-go " }).focus).toEqual(["tj-ba-juiz-2026", "mpe-go"]);
+    expect(readConfig({}).focus).toEqual([]);
+  });
   it("usa padrões seguros", () => {
     const config = readConfig({});
     expect(config).toMatchObject({ executor: "claude", bin: "claude", slots: { "Guardião": 1, Autor: 2 }, taskTimeoutMs: 25 * 60_000 });
@@ -28,6 +32,7 @@ describe("readConfig", () => {
     [{ EDITORIAL_SLOTS_AUTOR: "7" }, /EDITORIAL_SLOTS_AUTOR/],
     [{ EDITORIAL_TASK_TIMEOUT_MIN: "90" }, /TIMEOUT/],
     [{ EDITORIAL_EXECUTOR_MODEL: "x; rm -rf /" }, /MODEL/],
+    [{ EDITORIAL_FOCUS_PRODUCTS: "tj-ba,../x" }, /FOCUS/],
   ])("recusa configuração inválida %#", (env, message) => {
     expect(() => readConfig(env)).toThrow(message);
   });

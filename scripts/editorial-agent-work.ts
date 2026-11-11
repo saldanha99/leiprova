@@ -15,7 +15,11 @@ async function main() {
   // Opcional, só com --agent: restringe os tipos reservados (ex.: --kinds=legal_mapping).
   const kindsArg=process.argv[4];
   const onlyKinds=kindsArg?.startsWith("--kinds=") ? kindsArg.slice(8).split(",") : undefined;
-  if(!["prepare","prepare-courses","claim","complete","status"].includes(mode??"") || process.argv.length>5 ||
+  // Opcional, só após --kinds: produtos cujas tarefas vêm primeiro (só reordena).
+  const focusArg=process.argv[5];
+  const focus=focusArg?.startsWith("--focus=") ? focusArg.slice(8).split(",") : undefined;
+  if(!["prepare","prepare-courses","claim","complete","status"].includes(mode??"") || process.argv.length>6 ||
+    (focusArg && (!onlyKinds || !focus || focus.some(slug=>!/^[a-z0-9]+(?:-[a-z0-9]+)*$/u.test(slug)))) ||
     (kindsArg && (!agent || !onlyKinds || onlyKinds.some(kind=>!agentWorkKindSchema.safeParse(kind).success))) ||
     (agent && (mode!=="claim" || !["Radar","Guardião","Autor"].includes(agent) || !process.argv[3].startsWith("--agent=")))) throw new Error("Modo inválido.");
   if(process.env.EDITORIAL_AGENT_BRIDGE_ENABLED!=="true") throw new Error("Ponte editorial desativada.");
@@ -32,7 +36,7 @@ async function main() {
     if(mode==="prepare") result=await prepareAgentWork(db);
     else if(mode==="prepare-courses") result=await prepareCourseIntake(db);
     else if(mode==="claim") {
-      const claimed=await claimAgentWork(db,new Date(),agent,onlyKinds);
+      const claimed=await claimAgentWork(db,new Date(),agent,onlyKinds,focus);
       // Instrução de despacho junto da reserva: o motor contínuo da VPS não importa o código TS.
       result=claimed && typeof claimed==="object" && "job" in claimed && claimed.job
         ? {...claimed,handoff:agentTaskHandoff(claimed.job.kind,claimed.job.payload)} : claimed;

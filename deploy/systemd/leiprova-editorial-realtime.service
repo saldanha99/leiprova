@@ -21,7 +21,10 @@ UMask=0077
 ExecStart=/usr/bin/env node /opt/leiprova/deploy/editorial-realtime-worker.mjs
 Restart=always
 RestartSec=30
-TimeoutStopSec=60
+# Parada graciosa: só o processo principal recebe SIGTERM, para de reservar e
+# espera as tarefas em curso terminarem (até o timeout de tarefa), sem queimar tentativas.
+KillMode=mixed
+TimeoutStopSec=1800
 NoNewPrivileges=true
 ProtectSystem=full
 PrivateTmp=true

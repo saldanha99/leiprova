@@ -97,7 +97,13 @@ export async function enqueueAgentWork(db: AgentDatabase, key: string, kind: Age
 /** Serializa só a reserva, não a execução. Todas as tentativas são auditadas. */
 // `onlyKinds` restringe a reserva (ex.: o motor contínuo sem rede não pega legal_change,
 // que exige consulta à fonte oficial). Nunca amplia os tipos do papel.
-export async function claimAgentWork(db: AgentDatabase, now = new Date(), agent?:string, onlyKinds?:readonly string[]) {
+// `focusProducts` só reordena: tarefas das edições desses produtos vêm primeiro
+// (ex.: rascunhos cujo único bloqueio é o piso de questões). Não filtra nem amplia.
+export async function claimAgentWork(db: AgentDatabase, now = new Date(), agent?:string, onlyKinds?:readonly string[], focusProducts?:readonly string[]) {
+  if(focusProducts?.some(slug=>!/^[a-z0-9]+(?:-[a-z0-9]+)*$/u.test(slug))) throw new Error("Produto de foco inválido.");
+  const focusOrder = focusProducts?.length ? sql`case when requirement.opportunity_id in (select focus.opportunity_id
+            from contest_store_products focus where focus.slug in (${sql.join(focusProducts.map(slug=>sql`${slug}`),sql`,`)}))
+            then 0 else 1 end,` : sql``;
   if(agent && !Object.values(AGENT_FOR_WORK).includes(agent)) throw new Error("Agente inválido.");
   const kinds=Object.entries(AGENT_FOR_WORK).filter(([kind,name])=>(!agent||name===agent)&&(!onlyKinds||onlyKinds.includes(kind))).map(([kind])=>kind);
   if(kinds.length===0) return { state: "idle" as const };
@@ -107,8 +113,8 @@ export async function claimAgentWork(db: AgentDatabase, now = new Date(), agent?
     on mapping_readiness.id = requirement.opportunity_id` : sql``;
   const productOrder = prioritizesMappings ? sql`case when work.kind='legal_mapping' and coalesce(mapping_readiness.has_current_contract, false)
             and requirement.subject_id is not null then 0 else 1 end,
-          tier.tier nulls first,
-          tier.upcoming_exam nulls last, (requirement.subject_id is null) nulls last` : PRODUCT_DEADLINE_ORDER;
+          ${focusOrder} tier.tier nulls first,
+          tier.upcoming_exam nulls last, (requirement.subject_id is null) nulls last` : sql`${focusOrder} ${PRODUCT_DEADLINE_ORDER}`;
   return db.transaction(async tx => {
     await tx.execute(sql`select pg_advisory_xact_lock(621743,37)`);
     await tx.execute(sql`

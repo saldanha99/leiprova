@@ -93,6 +93,19 @@ describe("prioridade da fila dos agentes", () => {
     expect(foreign.queries).toHaveLength(0);
   });
 
+  it("prioriza produtos de foco só na ordenação", async () => {
+    for (const agent of ["Guardião", "Autor"]) {
+      const { db, queries } = fakeDatabase();
+      await claimAgentWork(db, new Date(), agent, undefined, ["tj-ba-juiz-de-direito-2026"]);
+      const claim = new PgDialect().sqlToQuery(queries[2]);
+      expect(claim.params).toContain("tj-ba-juiz-de-direito-2026");
+      const order = claim.sql.slice(claim.sql.indexOf("order by"));
+      expect(order).toMatch(/case when requirement\.opportunity_id in \(select focus\.opportunity_id[\s\S]+then 0 else 1 end,\s+tier\.tier nulls first/u);
+      expect(claim.sql.slice(0, claim.sql.indexOf("order by"))).not.toContain("focus.");
+    }
+    await expect(claimAgentWork(fakeDatabase().db, new Date(), "Autor", undefined, ["x'; drop"])).rejects.toThrow();
+  });
+
   it.each(["Autor", "Radar"])("preserva o despacho de %s sem calcular prontidão dos mapeamentos", async (agent) => {
     const { db, queries } = fakeDatabase();
     await claimAgentWork(db, new Date(), agent);
