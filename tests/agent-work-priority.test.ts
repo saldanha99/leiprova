@@ -81,6 +81,18 @@ describe("prioridade da fila dos agentes", () => {
     expect(order).toContain("for update of work skip locked limit 1");
   });
 
+  it("restringe tipos do papel sem ampliá-los", async () => {
+    const restricted = fakeDatabase();
+    await claimAgentWork(restricted.db, new Date(), "Guardião", ["legal_mapping"]);
+    const claim = new PgDialect().sqlToQuery(restricted.queries[2]);
+    expect(claim.params).toContain("legal_mapping");
+    expect(claim.params).not.toContain("legal_change");
+
+    const foreign = fakeDatabase();
+    expect(await claimAgentWork(foreign.db, new Date(), "Guardião", ["authoring"])).toEqual({ state: "idle" });
+    expect(foreign.queries).toHaveLength(0);
+  });
+
   it.each(["Autor", "Radar"])("preserva o despacho de %s sem calcular prontidão dos mapeamentos", async (agent) => {
     const { db, queries } = fakeDatabase();
     await claimAgentWork(db, new Date(), agent);

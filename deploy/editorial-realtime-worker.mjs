@@ -12,6 +12,9 @@ import path from "node:path";
 import { pathToFileURL } from "node:url";
 
 export const ROLES = { "Guardião": "guardiao", Autor: "autor" };
+// Sem rede, o motor só reserva o que se resolve com o corpus do pacote.
+// legal_change exige consultar a fonte oficial: fica com o Guardião do Maestri.
+export const ROLE_KINDS = { "Guardião": "legal_mapping", Autor: "authoring" };
 const JOB_KEY = /^[a-z0-9:._-]{1,220}$/;
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 const HASH = /^[a-f0-9]{64}$/;
@@ -71,7 +74,8 @@ export function parseResponseFile(text) {
 export function buildPrompt({ role, model, handoff }) {
   return [
     `Você é o ${role} da fábrica editorial do Edital Lei Seca, rodando sem supervisão.`,
-    "Nesta pasta há: packet.json (a única tarefa reservada), CONTRATO.md (contrato dos motores, inclusive as conferências jurídicas já retidas) e AGENTS.md.",
+    "Nesta pasta há: packet.json (a única tarefa reservada), CONTRATO.md (cópia de docs/MAESTRI-MOTORES-AUTOMATICOS.md, inclusive as conferências jurídicas já retidas) e AGENTS.md.",
+    "Este motor não tem rede nem agent-browser: trabalhe só com o corpus do pacote; onde CONTRATO.md mandar navegar, isso não se aplica a esta tarefa.",
     "Leia CONTRATO.md, em especial a seção 'Formato de response.json', e as conferências do topo, que listam erros jurídicos já retidos.",
     handoff?.instruction ?? "Leia job.payload.instructions e o texto INTEGRAL de job.payload.articles[].text no packet.json.",
     model ? `Se for autoria, use generatorModel "${model}".` : "Se for autoria, preencha generatorModel com o modelo que você realmente é.",
@@ -137,7 +141,7 @@ export async function main(env = process.env) {
   const bridge = (mode, role, input) => run("docker", [
     "exec", ...(input === undefined ? [] : ["-i"]), config.container,
     "./node_modules/.bin/tsx", "--env-file-if-exists=.env", "scripts/editorial-agent-work.ts",
-    `--mode=${mode}`, ...(role ? [`--agent=${role}`] : []),
+    `--mode=${mode}`, ...(role ? [`--agent=${role}`, `--kinds=${ROLE_KINDS[role]}`] : []),
   ], { input, cwd: config.stateDir, timeoutMs: 120_000, env: process.env });
   // Gatilho da linha de liberação: um .path do systemd (root) observa o arquivo.
   const triggerRelease = (jobKey, imported) =>

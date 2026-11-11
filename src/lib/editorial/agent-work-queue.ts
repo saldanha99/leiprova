@@ -95,9 +95,12 @@ export async function enqueueAgentWork(db: AgentDatabase, key: string, kind: Age
 }
 
 /** Serializa só a reserva, não a execução. Todas as tentativas são auditadas. */
-export async function claimAgentWork(db: AgentDatabase, now = new Date(), agent?:string) {
+// `onlyKinds` restringe a reserva (ex.: o motor contínuo sem rede não pega legal_change,
+// que exige consulta à fonte oficial). Nunca amplia os tipos do papel.
+export async function claimAgentWork(db: AgentDatabase, now = new Date(), agent?:string, onlyKinds?:readonly string[]) {
   if(agent && !Object.values(AGENT_FOR_WORK).includes(agent)) throw new Error("Agente inválido.");
-  const kinds=Object.entries(AGENT_FOR_WORK).filter(([,name])=>!agent||name===agent).map(([kind])=>kind);
+  const kinds=Object.entries(AGENT_FOR_WORK).filter(([kind,name])=>(!agent||name===agent)&&(!onlyKinds||onlyKinds.includes(kind))).map(([kind])=>kind);
+  if(kinds.length===0) return { state: "idle" as const };
   const prioritizesMappings = kinds.includes('legal_mapping');
   const mappingReadiness = prioritizesMappings ? sql`, ${MAPPING_CONTRACT_READINESS_CTE}` : sql``;
   const mappingJoin = prioritizesMappings ? sql`left join mapping_contract_readiness mapping_readiness
