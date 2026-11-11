@@ -1,0 +1,11 @@
+# Dispara a linha de liberação assim que o motor contínuo importa rascunhos.
+# O cron de 10 minutos continua como rede de segurança.
+[Unit]
+Description=Edital Lei Seca - gatilho da linha de liberacao
+
+[Path]
+PathChanged=/var/lib/leiprova-realtime/release.trigger
+Unit=leiprova-release-trigger.service
+
+[Install]
+WantedBy=multi-user.target

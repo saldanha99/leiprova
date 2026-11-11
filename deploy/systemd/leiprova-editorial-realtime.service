@@ -1,0 +1,30 @@
+# Motor editorial contínuo (autoria pela assinatura via CLI). Instalar com
+# deploy/install-editorial-realtime.sh; ver docs/PLANO-MOTOR-TEMPO-REAL-2026-11-11.md.
+[Unit]
+Description=Edital Lei Seca - motor editorial continuo (Guardiao/Autor)
+After=docker.service network-online.target
+Wants=network-online.target
+Requires=docker.service
+
+[Service]
+Type=simple
+User=leiprova-editor
+Group=leiprova-editor
+SupplementaryGroups=docker
+# Configuração sem segredos (executor, modelo, vagas). O login da assinatura
+# fica no HOME do usuário leiprova-editor, feito pelo proprietário.
+EnvironmentFile=-/etc/leiprova/editorial-realtime.env
+Environment=EDITORIAL_REALTIME_STATE_DIR=/var/lib/leiprova-realtime
+StateDirectory=leiprova-realtime
+StateDirectoryMode=0750
+UMask=0077
+ExecStart=/usr/bin/env node /opt/leiprova/deploy/editorial-realtime-worker.mjs
+Restart=always
+RestartSec=30
+TimeoutStopSec=60
+NoNewPrivileges=true
+ProtectSystem=full
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

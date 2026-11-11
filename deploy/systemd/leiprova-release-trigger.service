@@ -1,0 +1,12 @@
+[Unit]
+Description=Edital Lei Seca - linha de liberacao por evento
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+# O próprio script usa flock -n: se o cron estiver rodando, sai sem duplicar.
+ExecStart=/opt/leiprova/deploy/editorial-release-chain.sh
+StandardOutput=append:/var/log/leiprova-release-chain.log
+StandardError=append:/var/log/leiprova-release-chain.log
+TimeoutStartSec=45min

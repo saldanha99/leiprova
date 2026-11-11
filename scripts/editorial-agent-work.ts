@@ -6,6 +6,7 @@ import * as schema from "../src/lib/db/schema";
 import { agentWorkSummary, claimAgentWork, completeAgentWork } from "../src/lib/editorial/agent-work-queue";
 import { prepareAgentWork } from "../src/lib/editorial/agent-work-preparation";
 import { prepareCourseIntake } from "../src/lib/editorial/course-intake";
+import { agentTaskHandoff } from "../src/lib/editorial/agent-task-handoff";
 
 async function main() {
   const mode=process.argv[2]?.replace(/^--mode=/,"");
@@ -25,7 +26,12 @@ async function main() {
     let result:unknown;
     if(mode==="prepare") result=await prepareAgentWork(db);
     else if(mode==="prepare-courses") result=await prepareCourseIntake(db);
-    else if(mode==="claim") result=await claimAgentWork(db,new Date(),agent);
+    else if(mode==="claim") {
+      const claimed=await claimAgentWork(db,new Date(),agent);
+      // Instrução de despacho junto da reserva: o motor contínuo da VPS não importa o código TS.
+      result=claimed && typeof claimed==="object" && "job" in claimed && claimed.job
+        ? {...claimed,handoff:agentTaskHandoff(claimed.job.kind,claimed.job.payload)} : claimed;
+    }
     else if(mode==="status") result=await agentWorkSummary(db);
     else {
       let text="";
