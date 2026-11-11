@@ -70,6 +70,9 @@ describe("executor", () => {
     expect(isSubscriptionLimit("Claude usage limit reached. Your limit will reset at 3pm")).toBe(true);
     expect(isSubscriptionLimit("You've hit your usage limit")).toBe(true);
     expect(isSubscriptionLimit("Error 429 Too Many Requests")).toBe(true);
+    // Mensagem real de 11/11/2026, com saída 0, que o padrão anterior não reconhecia.
+    expect(isSubscriptionLimit("You've hit your 5-hour limit · resets 8:50pm (UTC)")).toBe(true);
+    expect(isSubscriptionLimit("Your weekly limit resets Monday")).toBe(true);
     expect(isSubscriptionLimit("response.json gravado")).toBe(false);
   });
   it("lê JSON estrito, tolera cerca acidental e recusa texto livre", () => {
@@ -81,7 +84,7 @@ describe("executor", () => {
 
 // Ponta a ponta com docker e CLI simulados (scripts bash): roda no Linux/VPS.
 describe.skipIf(process.platform === "win32")("main com ponte e CLI simuladas", () => {
-  async function setup(executorScript: string) {
+  async function setup(executorScript: string, probeScript = "echo OK; exit 0") {
     const dir = await mkdtemp(path.join(tmpdir(), "realtime-"));
     const bin = path.join(dir, "bin");
     await import("node:fs/promises").then((fs) => fs.mkdir(bin));
@@ -92,7 +95,12 @@ case "$*" in
   *--mode=complete*) cat > "${dir}/completed.json"; echo '{"state":"prepared","importedQuestionPublicIds":["q1","q2"]}' ;;
 esac
 `);
-    await writeFile(path.join(bin, "claude"), `#!/usr/bin/env bash\n${executorScript}\n`);
+    // A sonda de disponibilidade recebe "Responda apenas: OK"; probeScript decide a resposta dela.
+    await writeFile(path.join(bin, "claude"), `#!/usr/bin/env bash
+input=$(cat)
+if [ "$input" = "Responda apenas: OK" ]; then ${probeScript}; fi
+${executorScript}
+`);
     await chmod(path.join(bin, "docker"), 0o755);
     await chmod(path.join(bin, "claude"), 0o755);
     const env = { EDITORIAL_REALTIME_ONCE: "1", EDITORIAL_SLOTS_GUARDIAO: "0", EDITORIAL_SLOTS_AUTOR: "1",
@@ -127,11 +135,25 @@ esac
     expect(events).toMatch(/"state":"prepared"/);
   });
 
-  it("limite da assinatura pausa o papel sem entregar nada", async () => {
-    const { dir, env, restore } = await setup(`echo "Claude usage limit reached" >&2; exit 1`);
+  it("limite na sonda pausa tudo sem reservar nenhuma tarefa", async () => {
+    const limited = `echo "You've hit your 5-hour limit · resets 8:50pm (UTC)"; exit 0`;
+    const { dir, env, restore } = await setup(limited, limited);
     try { await main(env); } finally { restore(); }
+    await expect(readFile(path.join(dir, "claimed"))).rejects.toThrow();
     await expect(readFile(path.join(dir, "completed.json"))).rejects.toThrow();
     const events = await readFile(path.join(dir, "state/events.jsonl"), "utf8");
     expect(events).toMatch(/subscription_limited/);
+    expect(events).not.toMatch(/"claimed"/);
+  });
+
+  it("limite durante a tarefa com saída 0 pausa sem repetir a CLI", async () => {
+    const { dir, env, restore } = await setup(
+      `n=$(cat calls 2>/dev/null || echo 0); echo $((n+1)) > calls; echo "You've hit your 5-hour limit · resets 8:50pm (UTC)"; exit 0`);
+    try { await main({ ...env, EDITORIAL_EXECUTOR_ATTEMPTS: "2" }); } finally { restore(); }
+    expect(await readFile(path.join(dir, "state/runs/autor", lease, "calls"), "utf8")).toBe("1\n");
+    await expect(readFile(path.join(dir, "completed.json"))).rejects.toThrow();
+    const events = await readFile(path.join(dir, "state/events.jsonl"), "utf8");
+    expect(events).toMatch(/subscription_limited/);
+    expect(events).not.toMatch(/no_valid_response/);
   });
 });

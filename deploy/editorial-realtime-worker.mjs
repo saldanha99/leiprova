@@ -18,7 +18,10 @@ export const ROLE_KINDS = { "Guardião": "legal_mapping", Autor: "authoring" };
 const JOB_KEY = /^[a-z0-9:._-]{1,220}$/;
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 const HASH = /^[a-f0-9]{64}$/;
-const LIMIT_PATTERN = /usage limit|rate.?limit|limit (reached|exceeded)|quota|too many requests|\b429\b|out of credits|weekly limit/i;
+// Inclui o texto real visto em 11/11/2026: "You've hit your 5-hour limit · resets 8:50pm (UTC)".
+const LIMIT_PATTERN = /usage limit|rate.?limit|limit (reached|exceeded)|hit your .{0,30}limit|\d+-hour limit|limit.{0,40}\bresets?\b|quota|too many requests|\b429\b|out of credits|weekly limit/i;
+// Depois de N tarefas seguidas sem entrega válida, pausa tudo: nunca queimar a fila.
+export const FAILURE_STREAK_LIMIT = 3;
 
 export function readConfig(env) {
   const int = (name, fallback, min, max) => {
@@ -129,8 +132,11 @@ export async function main(env = process.env) {
   const config = readConfig(env);
   const runs = path.join(config.stateDir, "runs");
   await mkdir(runs, { recursive: true, mode: 0o700 });
-  const cooldownUntil = { "Guardião": 0, Autor: 0 };
+  // Guardião e Autor usam a mesma conta: limite e pausa valem para todas as vagas.
+  const gate = { pausedUntil: 0, probeNeeded: true, probing: null, failStreak: 0, reason: null };
   const idleLogged = new Set();
+  const childEnv = { PATH: process.env.PATH, HOME: process.env.HOME, LANG: "C.UTF-8", NO_COLOR: "1" };
+  const command = executorCommand(config);
   let stopping = false;
   for (const signal of ["SIGTERM", "SIGINT"]) process.on(signal, () => { stopping = true; });
 
@@ -148,8 +154,39 @@ export async function main(env = process.env) {
   const triggerRelease = (jobKey, imported) =>
     writePrivate(path.join(config.stateDir, "release.trigger"), JSON.stringify({ at: new Date().toISOString(), jobKey, imported }));
 
+  async function pause(ms, reason, data) {
+    gate.pausedUntil = Math.max(gate.pausedUntil, Date.now() + ms);
+    gate.probeNeeded = true;
+    gate.reason = reason;
+    gate.failStreak = 0;
+    await event({ ...data, state: reason, resumeAt: new Date(gate.pausedUntil).toISOString() });
+  }
+
+  // Chamada mínima, sem tarefa reservada: só depois dela o motor volta a reservar.
+  async function probe() {
+    const dir = path.join(config.stateDir, "probe");
+    await mkdir(dir, { recursive: true, mode: 0o700 });
+    const result = await run(command.bin, command.args, { input: "Responda apenas: OK", cwd: dir, timeoutMs: 120_000, env: childEnv });
+    if (result.code === 0 && !isSubscriptionLimit(result.output) && /\bOK\b/i.test(result.output)) {
+      gate.probeNeeded = false;
+      await event({ state: "probe_ok" });
+      return true;
+    }
+    await pause(isSubscriptionLimit(result.output) ? config.limitCooldownMs : config.idleMs * 10,
+      isSubscriptionLimit(result.output) ? "subscription_limited" : "executor_unavailable",
+      { detail: lastLine(result.output).slice(0, 200) });
+    return false;
+  }
+
+  async function available() {
+    if (Date.now() < gate.pausedUntil) return false;
+    if (!gate.probeNeeded) return true;
+    gate.probing ??= probe().finally(() => { gate.probing = null; });
+    return gate.probing;
+  }
+
   async function once(role, slot) {
-    if (Date.now() < cooldownUntil[role]) return "cooldown";
+    if (!(await available())) return "cooldown";
     const claimed = await bridge("claim", role);
     if (claimed.code !== 0) {
       await event({ role, slot, state: "bridge_unavailable", exit: claimed.code, detail: lastLine(claimed.output).slice(0, 200) });
@@ -171,22 +208,23 @@ export async function main(env = process.env) {
     await copyFile(path.join(config.projectDir, "AGENTS.md"), path.join(dir, "AGENTS.md"));
     await event({ role, slot, state: "claimed", jobKey: job.jobKey, kind: job.kind });
 
-    const command = executorCommand(config);
     const prompt = buildPrompt({ role, model: config.model, handoff: claim.handoff });
     // A CLI não herda segredos do serviço: só PATH/HOME/idioma (login da assinatura fica no HOME).
-    const childEnv = { PATH: process.env.PATH, HOME: process.env.HOME, LANG: "C.UTF-8", NO_COLOR: "1" };
     for (let attempt = 1; attempt <= config.executorAttempts; attempt += 1) {
       const started = Date.now();
       const result = await run(command.bin, command.args, { input: prompt, cwd: dir, timeoutMs: config.taskTimeoutMs, env: childEnv });
       await writeFile(path.join(dir, `executor-${attempt}.log`), result.output, { mode: 0o600 });
-      if (result.code !== 0 && isSubscriptionLimit(result.output)) {
-        cooldownUntil[role] = Date.now() + config.limitCooldownMs;
-        await event({ role, slot, state: "subscription_limited", jobKey: job.jobKey, resumeAt: new Date(cooldownUntil[role]).toISOString() });
-        return "limited";
-      }
       let response;
       try { response = parseResponseFile(await readFile(path.join(dir, "response.json"), "utf8")); }
-      catch { await event({ role, slot, state: "no_valid_response", jobKey: job.jobKey, attempt, exit: result.code, ms: Date.now() - started }); continue; }
+      catch {
+        // A CLI pode sair com código 0 ao recusar por limite: decide pela mensagem.
+        if (isSubscriptionLimit(result.output)) {
+          await pause(config.limitCooldownMs, "subscription_limited", { role, slot, jobKey: job.jobKey, detail: lastLine(result.output).slice(0, 200) });
+          return "limited";
+        }
+        await event({ role, slot, state: "no_valid_response", jobKey: job.jobKey, attempt, exit: result.code, ms: Date.now() - started });
+        continue;
+      }
 
       const request = JSON.stringify({ jobKey: job.jobKey, inputHash: job.inputHash, leaseToken: job.leaseToken, result: response });
       let completed = await bridge("complete", null, request);
@@ -206,10 +244,15 @@ export async function main(env = process.env) {
       const imported = Array.isArray(receipt.importedQuestionPublicIds) ? receipt.importedQuestionPublicIds.length : 0;
       await event({ role, slot, state: receipt.state ?? "completed", jobKey: job.jobKey, imported, ms: Date.now() - started });
       if (imported > 0) await triggerRelease(job.jobKey, imported);
+      gate.failStreak = 0;
       return "done";
     }
     // Sem entrega válida: a reserva expira pelo lease e conta como tentativa.
     await event({ role, slot, state: "abandoned_to_lease", jobKey: job.jobKey });
+    gate.failStreak += 1;
+    if (gate.failStreak >= FAILURE_STREAK_LIMIT) {
+      await pause(config.limitCooldownMs, "paused_after_failures", { streak: gate.failStreak });
+    }
     return "error";
   }
 
@@ -220,7 +263,8 @@ export async function main(env = process.env) {
       let outcome;
       try { outcome = await once(role, slot); }
       catch (error) { outcome = "error"; await event({ role, slot, state: "error", message: String(error?.message ?? error).slice(0, 300) }); }
-      await writePrivate(path.join(config.stateDir, "heartbeat.json"), JSON.stringify({ at: new Date().toISOString(), pid: process.pid, cooldownUntil }));
+      await writePrivate(path.join(config.stateDir, "heartbeat.json"), JSON.stringify({ at: new Date().toISOString(), pid: process.pid,
+        pausedUntil: gate.pausedUntil ? new Date(gate.pausedUntil).toISOString() : null, reason: gate.reason, failStreak: gate.failStreak }));
       if (outcome !== "done" && !once_only) await sleep(outcome === "cooldown" ? Math.min(config.idleMs * 5, 300_000) : config.idleMs);
     }
   }
