@@ -149,7 +149,15 @@ export async function main(env = process.env) {
     console.log(line);
     return appendFile(path.join(config.stateDir, "events.jsonl"), line + "\n", { mode: 0o600 }).catch(() => {});
   };
-  const bridge = (mode, role, input) => run("docker", [
+  // Uma chamada à ponte por vez: cada tsx ocupa ~200 MB e o contêiner tem 768 MB.
+  // Chamadas paralelas estouravam a memória no meio da reserva (lease órfão).
+  let bridgeQueue = Promise.resolve();
+  const bridge = (mode, role, input) => {
+    const call = bridgeQueue.then(() => bridgeCall(mode, role, input));
+    bridgeQueue = call.catch(() => {});
+    return call;
+  };
+  const bridgeCall = (mode, role, input) => run("docker", [
     "exec", ...(input === undefined ? [] : ["-i"]), config.container,
     "./node_modules/.bin/tsx", "--env-file-if-exists=.env", "scripts/editorial-agent-work.ts",
     `--mode=${mode}`, ...(role ? [`--agent=${role}`, `--kinds=${ROLE_KINDS[role]}`, ...(config.focus.length ? [`--focus=${config.focus.join(",")}`] : [])] : []),
