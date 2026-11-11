@@ -130,6 +130,7 @@ export async function main(env = process.env) {
   const runs = path.join(config.stateDir, "runs");
   await mkdir(runs, { recursive: true, mode: 0o700 });
   const cooldownUntil = { "Guardião": 0, Autor: 0 };
+  const idleLogged = new Set();
   let stopping = false;
   for (const signal of ["SIGTERM", "SIGINT"]) process.on(signal, () => { stopping = true; });
 
@@ -150,9 +151,17 @@ export async function main(env = process.env) {
   async function once(role, slot) {
     if (Date.now() < cooldownUntil[role]) return "cooldown";
     const claimed = await bridge("claim", role);
-    if (claimed.code !== 0) { await event({ role, slot, state: "bridge_unavailable" }); return "error"; }
+    if (claimed.code !== 0) {
+      await event({ role, slot, state: "bridge_unavailable", exit: claimed.code, detail: lastLine(claimed.output).slice(0, 200) });
+      return "error";
+    }
     const claim = parseClaim(lastLine(claimed.stdout), role);
-    if (claim.state !== "claimed") return "idle";
+    if (claim.state !== "claimed") {
+      // Registra só a transição para fila vazia, sem uma linha por minuto.
+      if (!idleLogged.has(`${role}:${slot}`)) { idleLogged.add(`${role}:${slot}`); await event({ role, slot, state: claim.state }); }
+      return "idle";
+    }
+    idleLogged.delete(`${role}:${slot}`);
 
     const { job } = claim;
     const dir = path.join(runs, ROLES[role], job.leaseToken);
