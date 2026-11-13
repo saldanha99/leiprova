@@ -31,7 +31,8 @@ const normalize = (value: string) => value.normalize("NFKC").replace(/\s+/gu, " 
 const headingKey = (value: string) => normalize(value).toLocaleUpperCase("pt-BR");
 // Numbered section labels are syntax, not a synonym. The complete original
 // line is retained in headingQuote and proved against the official page.
-export const programmeLiteralHeadingName = (line: string) => normalize(line).replace(/^\d+(?:\.\d+)*[.)]?\s*[–—-]?\s*/u, "").split(" - Ponto 1.", 1)[0];
+// Glifos de uso privado (ex.: marcador U+F034 colado ao título no PDF do TJMS) são gráfico, não texto.
+export const programmeLiteralHeadingName = (line: string) => normalize(line).replace(/^[-]+\s*/u, "").replace(/^\d+(?:\.\d+)*[.)]?\s*[–—-]?\s*/u, "").split(" - Ponto 1.", 1)[0];
 const sha = z.string().regex(/^[a-f0-9]{64}$/u);
 const id = z.number().int().positive().safe();
 

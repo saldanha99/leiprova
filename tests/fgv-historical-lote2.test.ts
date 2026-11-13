@@ -114,3 +114,13 @@ describe("lote 2 — programas em prosa por cargo (TJMS, TJRJ)", () => {
     expect(requirements).toHaveLength(doc.layout!.headings.length * 3 - (doc.layout!.headings.length - 1));
   });
 });
+
+describe("lote 2 — título com marcador gráfico", () => {
+  it("o nome literal do título ignora glifo de uso privado, mas não troca a disciplina", async () => {
+    const { programmeLiteralHeadingName, programmeCanonicalSubject } = await import("@/lib/editorial/programme-subject-classification");
+    expect(programmeLiteralHeadingName("DIREITO CONSTITUCIONAL")).toBe("DIREITO CONSTITUCIONAL");
+    expect(programmeCanonicalSubject(programmeLiteralHeadingName("DIREITO CONSTITUCIONAL"))).toBe("Direito Constitucional");
+    expect(programmeLiteralHeadingName("3. DIREITO PENAL")).toBe("DIREITO PENAL");
+    expect(programmeCanonicalSubject(programmeLiteralHeadingName("NOÇÕES DE LEGISLAÇÃO"))).toBeNull();
+  });
+});
