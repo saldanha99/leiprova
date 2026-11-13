@@ -57,3 +57,47 @@ Depois da aplicação, o relatório do proprietário mostra TJGO e TRF-2 bloquea
 Recibos privados: `/opt/leiprova/.local/editorial/lote2-fgv-20261113/`
 (`vps-preview-*`, `apply-*`, `contracts/`, `classify/`) e
 `.local/editorial/fgv-historical-previous-exam-previews/lote2-*`.
+
+## Segunda parte — TJMS e TJRJ (servidores)
+
+Os dois editais trazem vários cargos no mesmo anexo e programa em prosa. O extrator
+ganhou recursos para isso (`951ceea`, `128ba79`):
+
+- `stopLine`: a extração termina na linha literal que abre o cargo seguinte. A linha é
+  obrigatória, e a extração bloqueia se ela não aparecer.
+- `itemMode: "sentences"` (TJMS): cada período literal vira um requisito.
+- `itemMode: "top-level-numbers"` (TJRJ): o número de primeiro nível abre o item, e os
+  subitens 1.1, 1.2.1 etc. ficam dentro dele.
+- `skipRepeatedRequirements`: guarda só a primeira ocorrência de um literal repetido.
+- Glifos de uso privado colados aos títulos (U+F034 no TJMS) não contam como texto do
+  título.
+
+| Produto | Cargo admitido | Edital (SHA-256) | Objetiva | Requisitos | Classificados | Contrato MC5 |
+|---|---|---|---|---:|---:|---|
+| tj-ms-analista-judiciario-area-fim-reta-final | Analista Judiciário - Área Fim (XI Concurso, Edital 01/2025) | `c7cab526…` 41 p. | 25/01/2026, 60 questões, 5 alt. | 417 | 375 | `a03ae3b6…` |
+| tj-rj-analista-e-tecnico-2025 | Analista Judiciário – Sem Especialidade (LXII, Edital 01/2025) | `61b3eacc…` 83 p. | 01/02/2026, 70 questões, 5 alt. | 117 | 90 | `b6a6a710…` |
+
+Oportunidades: TJMS `b3f5c5f7-a411-4cf4-a157-627d1280c9f4` e TJRJ
+`8bacb802-758a-4733-9f85-d3882eb71a1b`. As duas ficam na categoria `tribunais`, a mesma
+do catálogo. Caderno Tipo 1 e gabarito definitivo foram registrados e aprovados
+(`metadata_only`).
+
+Ficaram sem classificação os requisitos destas disciplinas, que não têm entrada exata
+no catálogo:
+
+- TJMS: Língua Portuguesa e Noções de Legislação.
+- TJRJ: Língua Portuguesa, Legislação Especial, PcD, Ética e Legislação.
+
+Também ficaram de fora 9 períodos do TJMS sem prova literal por fragmentos e 1 item do
+TJRJ. O TJRJ cobre só o cargo sem especialidade: as especialidades e o Técnico (Edital
+02/2025) não foram admitidos.
+
+Backup anterior: `backups/leiprova-20261113T032404Z.dump`, SHA-256
+`50dc33ca8f80684c2c840441171b0c3c3e848ebc7252afbddc4ba3b7a4bb6899`.
+
+Pendentes deste lote:
+
+- **TJMS Cartórios**: os títulos das disciplinas estão dentro do parágrafo ("DIREITO
+  CIVIL. Lei de…") e o edital remete a data da objetiva ao cronograma.
+- **TRT-24**: houve declaração de nulidade do Edital 01/2024 e reaplicação da objetiva
+  de Analista, o que exige leitura própria antes de admitir.
