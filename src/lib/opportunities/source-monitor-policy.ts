@@ -43,6 +43,10 @@ export const OFFICIAL_OPPORTUNITY_SOURCE_POLICIES = [
       "/sites/default/files/concursos/476_tjgo-resultado-objetiva-definitivo-2026-05-11.pdf",
       "/sites/default/files/concursos/sei_1438979_edital_154_retificado.pdf",
       "/sites/default/files/concursos/477-trf2-resultado-definitivo-prova-objetiva-2026-05-15.pdf",
+      "/sites/default/files/concursos/edital-com-2a-retificacao-tjms-servidores-1_0.pdf",
+      "/sites/default/files/concursos/448-tjms-resultado-final-de-aprovados-2026-06-17.pdf",
+      "/sites/default/files/concursos/edital-de-abertura-retificado-05-tjrj-analista-judiciario-06.03.26.pdf",
+      "/sites/default/files/concursos/397-tjrj-analista-resultado-definitivo-prova-discursiva-2026-06-08_0.pdf",
     ],
   },
   {

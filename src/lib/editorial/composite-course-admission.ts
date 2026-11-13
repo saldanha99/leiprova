@@ -36,6 +36,12 @@ export const COMPOSITE_ADMISSION_TARGETS = [
   { productSlug: "trf-2-juiz-federal-2-regiao", slug: "trf2-juiz-federal-substituto-xix-2025-historico-objetiva", acronym: "TRF-2", notice: "154/2025", category: "carreiras-juridicas", career: "magistratura", noticeDate: "2025-12-17", statusDate: "2026-05-20", cycleYear: 2025, lifecycleStatus: "result_published", commission: "Comissão Organizadora e Examinadora do XIX Concurso do TRF-2", scope: "regional", stages: [
     { title: "Resultado definitivo da prova objetiva seletiva", url: `${FGV}477-trf2-resultado-definitivo-prova-objetiva-2026-05-15.pdf`, publishedOn: "2026-05-20" },
   ] },
+  { productSlug: "tj-ms-analista-judiciario-area-fim-reta-final", slug: "tjms-analista-area-fim-xi-2025-historico-objetiva", acronym: "TJMS", notice: "01/2025", category: "tribunais", career: "analista-juridico", noticeDate: "2025-10-23", statusDate: "2026-06-23", cycleYear: 2025, lifecycleStatus: "result_published", commission: "Comissão do XI Concurso de servidores do TJMS", stages: [
+    { title: "Resultado final de aprovados (retificado em 23/06/2026)", url: `${FGV}448-tjms-resultado-final-de-aprovados-2026-06-17.pdf`, publishedOn: "2026-05-07" },
+  ] },
+  { productSlug: "tj-rj-analista-e-tecnico-2025", slug: "tjrj-analista-sem-especialidade-lxii-2025-historico-objetiva", acronym: "TJRJ", notice: "01/2025", category: "tribunais", career: "analista", noticeDate: "2025-10-24", statusDate: "2026-06-10", cycleYear: 2025, lifecycleStatus: "result_published", commission: "Comissão do LXII Concurso de Analista Judiciário do TJRJ", stages: [
+    { title: "Resultado definitivo da prova discursiva (retificado em 10/06/2026)", url: `${FGV}397-tjrj-analista-resultado-definitivo-prova-discursiva-2026-06-08_0.pdf`, publishedOn: "2026-05-25" },
+  ] },
   { productSlug: "mpe-go-promotor-de-justica-2025", slug: "mpgo-promotor-substituto-63-2025-historico-objetiva", acronym: "MPGO", notice: "182/2025-CSMP", category: "carreiras-juridicas", career: "promotor-justica", noticeDate: "2025-09-22", statusDate: "2026-03-31", cycleYear: 2025, lifecycleStatus: "result_published", commission: "Comissão do 63º Concurso do MPGO", stages: [
     { title: "Comunicado 10 — resultado da prova preambular", url: `${FGV}comissaodeconcurso_comunicado-n-10.pdf`, publishedOn: "2026-03-12" },
   ] },
@@ -59,7 +65,7 @@ export function assertCompositeFreshness(observedAt: string, now = Date.now()) {
 }
 
 /** Group literal numbered topics with their continuation lines, never reassign legal articles. */
-export function compositeProgrammeRequirements(sections: readonly ProgrammeSection[], repeatable: readonly string[] = []) {
+export function compositeProgrammeRequirements(sections: readonly ProgrammeSection[], repeatable: readonly string[] = [], skipRepeated = false) {
   const output: { documentKey: string; requirementText: string; sourceLocator: string }[] = [];
   const seen = new Set<string>();
   // Textos genéricos declarados na receita (ex.: "Súmulas ... relacionada com os temas")
@@ -72,7 +78,7 @@ export function compositeProgrammeRequirements(sections: readonly ProgrammeSecti
       if (!pending) return;
       const key = `${section.documentKey}\0${pending.text}`;
       if (seen.has(key)) {
-        if (!allowedRepeats.has(pending.text)) throw new Error("Requisito literal duplicado na mesma fonte; revisão própria necessária.");
+        if (!skipRepeated && !allowedRepeats.has(pending.text)) throw new Error("Requisito literal duplicado na mesma fonte; revisão própria necessária.");
         pending = null;
         return;
       }
@@ -85,7 +91,8 @@ export function compositeProgrammeRequirements(sections: readonly ProgrammeSecti
       if (/^Ponto\s+(?:n[ºo°]\s*)?\d+\.?$/iu.test(fragment.text)) {
         flush(); pointHeading = fragment.text; continue;
       }
-      if (/^(?:Ponto\s+(?:n[ºo°]\s*)?\d+\.|\d+(?:\.\d+)*[.)]?\s|[a-z]\)\s)/iu.test(fragment.text)) flush();
+      // Os modos de item do layout marcam a abertura (`start`); sem marca, vale a numeração.
+      if (fragment.start ?? /^(?:Ponto\s+(?:n[ºo°]\s*)?\d+\.|\d+(?:\.\d+)*[.)]?\s|[a-z]\)\s)/iu.test(fragment.text)) flush();
       if (!pending) pending = { text: `${pointHeading ? `${pointHeading} ` : ""}${fragment.text}`, first: fragment.page, last: fragment.page };
       else { pending.text += ` ${fragment.text}`; pending.last = fragment.page; }
     }
@@ -132,7 +139,7 @@ export async function admitCompositeOfficialCourse(input: Readonly<{
   const evidence = await verifyCompositeMetadata(input.productSlug);
   const preview = buildNextOfficialCoursePreview(recipe, input.captures, new Date().toISOString(), evidence.previous);
   if (preview.programme.checksumSha256 !== input.expectedProgrammeHash) throw new Error("Composição do programa mudou desde a prévia conferida.");
-  const requirementCandidates = compositeProgrammeRequirements(preview.programme.sections, recipe.repeatableRequirements ?? []);
+  const requirementCandidates = compositeProgrammeRequirements(preview.programme.sections, recipe.repeatableRequirements ?? [], recipe.skipRepeatedRequirements ?? false);
   const reviewer = parseOpportunityApprovalReviewerIdentity({ ADMIN_EMAILS: process.env.ADMIN_EMAILS, OPPORTUNITY_APPROVAL_REFERENCE: process.env.OPPORTUNITY_APPROVAL_REFERENCE });
   const client = postgres(databaseUrl, { max: 1, prepare: false });
   const note = `Revisão automatizada de fontes/programa sob owner_standing_authorization (${reviewer.approvalReference}); humanReview:false. Treino histórico da etapa objetiva com legislação atual; mapeamento/vigência/perfil/inéditas ainda pendentes. FGV presta a objetiva; demais etapas seguem a responsabilidade institucional do edital. Não é liberação comercial.`;

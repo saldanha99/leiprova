@@ -133,6 +133,44 @@ export const FGV_HISTORICAL_PREVIOUS_EXAMS: readonly FgvHistoricalPreviousExam[]
       { documentType: "answer_key", title: "TRF-2 XIX — gabarito oficial definitivo da prova objetiva seletiva (retificado em 06/05/2026)", label: "Gabarito Oficial Definitivo da Prova Objetiva Seletiva (retificado em 06/05/2026)", publishedOn: "2026-05-06", url: `${FGV}gabarito-definitivo-trf2-juiz-substituto-v2.pdf` },
     ],
   },
+  {
+    productSlug: "tj-ms-analista-judiciario-area-fim-reta-final", editionPublicId: "tjms-analista-area-fim-xi-2025-objetiva", opportunitySlug: "tjms-analista-area-fim-xi-2025-historico-objetiva",
+    portalUrl: "https://conhecimento.fgv.br/concursos/tjms25", portalHeading: "XI Concurso Público para o Tribunal de Justiça do Estado de Mato Grosso do Sul",
+    portalNotice: { url: `${FGV}edital-com-2a-retificacao-tjms-servidores-1_0.pdf`, label: "Edital (retificado em 03/12/2025)" },
+    role: "Analista Judiciário - Área Fim", jurisdiction: "MS", jurisdictionName: "Mato Grosso do Sul", institution: "TJMS", noticeNumber: "01/2025", cycleYear: 2025, careerSlug: "analista-juridico",
+    examDate: "2026-01-25", expectedQuestionCount: 60,
+    noticeUrl: `${FGV}edital-com-2a-retificacao-tjms-servidores-1_0.pdf`, noticeSha256: "c7cab526aff25a0020cc22f1b1b5b28f10cf7b8885adb6473f5b3fe5db48ecfa", noticePageCount: 41,
+    noticeChecks: [
+      { page: 20, pattern: "10\\.6[\\s\\S]*60 \\(sessenta\\) questões de múltipla escolha[\\s\\S]*05 \\(cinco\\) alternativas e apenas uma resposta correta" },
+      { page: 20, pattern: "25 de janeiro de 2026" },
+      { page: 1, pattern: "Analista Judiciário - Área Fim" },
+    ],
+    examDateCorroboration: "Portal FGV: caderno Tipo 1 publicado em 27/01/2026 e gabarito oficial definitivo em 03/03/2026, após a data do edital",
+    editionSourceExternalId: "fgv-tjms-xi-2025-analista-area-fim-objetiva", editionTitle: "TJMS XI Concurso — Analista Judiciário - Área Fim — objetiva",
+    documents: [
+      { documentType: "question_booklet", title: "TJMS XI — prova objetiva — Analista Judiciário - Área Fim — Tipo 1", label: "Tipo 1", publishedOn: "2026-01-27", url: `${FGV}analista-judiciario-area-fim-cns101-tipo-1.pdf`, blockIncludes: ["Prova Objetiva", "Analista Judiciário - Área Fim"] },
+      { documentType: "answer_key", title: "TJMS XI — gabarito oficial definitivo da prova objetiva", label: "Gabarito Oficial Definitivo da Prova Objetiva", publishedOn: "2026-03-03", url: `${FGV}tjms-analista-e-tecnico.pdf` },
+    ],
+  },
+  {
+    productSlug: "tj-rj-analista-e-tecnico-2025", editionPublicId: "tjrj-analista-sem-especialidade-lxii-2025-objetiva", opportunitySlug: "tjrj-analista-sem-especialidade-lxii-2025-historico-objetiva",
+    portalUrl: "https://conhecimento.fgv.br/concursos/tjrjservidores25/01", portalHeading: "LXII Concurso Público para o Tribunal de Justiça do Estado do Rio de Janeiro - Analista Judiciário",
+    portalNotice: { url: `${FGV}edital-de-abertura-retificado-05-tjrj-analista-judiciario-06.03.26.pdf`, label: "Edital (retificado em 11/03/2026)" },
+    role: "Analista Judiciário – Sem Especialidade", jurisdiction: "RJ", jurisdictionName: "Rio de Janeiro", institution: "TJRJ", noticeNumber: "01/2025", cycleYear: 2025, careerSlug: "analista",
+    examDate: "2026-02-01", expectedQuestionCount: 70,
+    noticeUrl: `${FGV}edital-de-abertura-retificado-05-tjrj-analista-judiciario-06.03.26.pdf`, noticeSha256: "61b3eacc606f8245eb72578546c865c9d7ef4c35ed806e6ee1af694f30f7fcc6", noticePageCount: 83,
+    noticeChecks: [
+      { page: 21, pattern: "11\\.6\\.1[\\s\\S]*70 \\(setenta\\) questões de múltipla escolha[\\s\\S]*05 \\(cinco\\) alternativas e apenas uma resposta correta" },
+      { page: 21, pattern: "01 de fevereiro de 2026" },
+      { page: 1, pattern: "Analista Judiciário – Sem Especialidade" },
+    ],
+    examDateCorroboration: "Portal FGV: caderno Tipo 1 publicado em 04/02/2026 e gabarito oficial definitivo em 11/03/2026, após a data do edital",
+    editionSourceExternalId: "fgv-tjrj-lxii-2025-analista-sem-especialidade-objetiva", editionTitle: "TJRJ LXII Concurso — Analista Judiciário – Sem Especialidade — objetiva",
+    documents: [
+      { documentType: "question_booklet", title: "TJRJ LXII — prova objetiva — Analista Judiciário – Sem Especialidade — Tipo 1", label: "Tipo 1", publishedOn: "2026-02-04", url: `${FGV}analista-judiciario-sem-especialidade-ns-a01-se-tipo-1.pdf`, blockIncludes: ["Prova Objetiva", "Sem Especialidade"] },
+      { documentType: "answer_key", title: "TJRJ LXII — gabarito oficial definitivo da prova objetiva (Analista Judiciário)", label: "Gabarito Oficial Definitivo da Prova Objetiva", publishedOn: "2026-03-11", url: `${FGV}tjrj-analista-gabarito-definitivo.pdf` },
+    ],
+  },
 ];
 
 export function fgvHistoricalPreviousExam(productSlug: string) {

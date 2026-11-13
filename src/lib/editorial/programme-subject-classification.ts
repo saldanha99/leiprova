@@ -20,6 +20,8 @@ export const PROGRAMME_CLASSIFICATION_SCOPES = {
   "tjpe-juiz-substituto-01-2026-historico-objetiva": "Juiz Substituto",
   "tjgo-juiz-substituto-59-2025-historico-objetiva": "Juiz Substituto",
   "trf2-juiz-federal-substituto-xix-2025-historico-objetiva": "Juiz Federal Substituto",
+  "tjms-analista-area-fim-xi-2025-historico-objetiva": "Analista Judiciário - Área Fim",
+  "tjrj-analista-sem-especialidade-lxii-2025-historico-objetiva": "Analista Judiciário – Sem Especialidade",
   "mpgo-promotor-substituto-63-2025-historico-objetiva": "Promotora e Promotor de Justiça Substituto",
 } as const;
 export const PROGRAMME_SUBJECT_CLASSIFICATION_ACTION = "editorial.programme.subject_classified";

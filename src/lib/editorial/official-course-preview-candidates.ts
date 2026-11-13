@@ -17,6 +17,11 @@ export type ProgrammeLayout = Readonly<{
   ignoreLines: readonly string[];
   /** Programa em prosa corrida ("1. … 2. …" na mesma linha): cada item numerado vira um fragmento. */
   splitInlineItems?: boolean;
+  /** Linha literal que abre o cargo seguinte no mesmo anexo; a extração termina nela e ela é obrigatória. */
+  stopLine?: string;
+  /** "top-level-numbers": "1 Tema. 1.1 Sub. 2 Tema." agrupa subitens no item de primeiro nível.
+   * "sentences": programa em prosa sem numeração; cada período literal é um requisito. */
+  itemMode?: "top-level-numbers" | "sentences";
 }>;
 export type PreviewDocumentRecipe = Readonly<{ key: string; url: string; title: string; pages: number; programmePages: readonly [number, number] | null; layout?: ProgrammeLayout }>;
 export type NextOfficialCourseRecipe = Readonly<{
@@ -29,6 +34,8 @@ export type NextOfficialCourseRecipe = Readonly<{
   previousExam: Readonly<{ cycle: string; role: string; portalUrl: string; examDate: string; answerKeyFinality: AnswerKeyFinality; documents: readonly Readonly<{ type: AnswerKeyDocumentType; title: string; url: string }>[] }>;
   limitations: readonly string[];
   repeatableRequirements?: readonly string[];
+  /** Programa em períodos curtos repete literais ("Lei nº 6.015/1973."): guarda só a primeira ocorrência. */
+  skipRepeatedRequirements?: boolean;
 }>;
 
 /** A evidência final do gabarito precisa estar completa: um documento definitivo
@@ -326,23 +333,101 @@ export const NEXT_OFFICIAL_COURSE_RECIPES: readonly NextOfficialCourseRecipe[] =
     ] },
     limitations: ["A 1ª retificação (Edital157/2025) altera datas da segunda à quarta etapa e o número de questões discursivas; o edital publicado como retificado já a incorpora e o AnexoI não muda.", "Os subtítulos A)–H) de Noções Gerais (Sociologia, Psicologia, Ética, Filosofia, Teoria Geral, Direito Digital, Pragmatismo/AED e Antidiscriminação) não viram requisitos próprios; os itens numerados de cada um ficam sob a mesma disciplina.", "Competência regional (RJ e ES): a jurisdição registrada é RJ, sede do tribunal, com escopo regional.", "Treino histórico da objetiva com legislação atual; não simula provas escritas, sentença ou oral."],
   },
+  // Lote 2 FGV histórico (13/11/2026): servidores de tribunal, programas em prosa por cargo.
+  {
+    productSlug: "tj-ms-analista-judiciario-area-fim-reta-final", institution: "Tribunal de Justiça do Estado de Mato Grosso do Sul", role: "Analista Judiciário - Área Fim",
+    jurisdiction: "MS", cycle: "XI Concurso — Edital 01/2025", bankScope: "Fundação Getulio Vargas, responsável pela execução do concurso, sob o TJMS",
+    portalUrl: "https://conhecimento.fgv.br/concursos/tjms25", examDate: "2026-01-25", examDateEvidence: { documentKey: "tjms-notice", page: 20, item: "10.1", quote: "no dia 25 de janeiro de 2026, das 13h às 16h30", actualDayIndependentlyVerified: false, corroboratingUrl: `${FGV_FILES}analista-judiciario-area-fim-cns101-tipo-1.pdf`, limitation: "O texto do gabarito não é extraído (política de material de prova); o portal publicou o caderno Tipo1 em27/01/2026 e o gabarito definitivo em03/03/2026, compatíveis com a data do edital." },
+    stage: "Objetiva com gabarito definitivo (03/03/2026); resultado final de aprovados publicado em07/05/2026 e retificado em23/06/2026",
+    stageObservedOn: "2026-11-13", proposedMode: "historical_training", expectedSubjects: 8,
+    documents: [
+      { key: "tjms-notice", url: `${FGV_FILES}edital-com-2a-retificacao-tjms-servidores-1_0.pdf`, title: "Edital01/2025 TJMS — XI Concurso de servidores, retificado em03/12/2025", pages: 41, programmePages: [31, 36], layout: {
+        // Os títulos do anexo trazem um marcador gráfico (U+F034) colado ao texto, preservado literalmente.
+        headings: [
+          { line: "LíNGUA PORTUGUESA", subject: "Língua Portuguesa" }, { line: "NOÇÕES DE LEGISLAÇÃO", subject: "Noções de Legislação" },
+          { line: "DIREITO CONSTITUCIONAL", subject: "Direito Constitucional" }, { line: "DIREITO ADMINISTRATIVO", subject: "Direito Administrativo" },
+          { line: "DIREITO CIVIL", subject: "Direito Civil" }, { line: "DIREITO PROCESSUAL CIVIL", subject: "Direito Processual Civil" },
+          { line: "DIREITO PENAL", subject: "Direito Penal" }, { line: "DIREITO PROCESSUAL PENAL", subject: "Direito Processual Penal" },
+        ],
+        ignoreLines: ["\\d+TRIBUNAL DE JUSTIÇA DO ESTADO DE MATO GROSSO DO SUL \\| CONCURSO PÚBLICO 2025", "ANEXO I – CONTEÚDO PROGRAMÁTICO", "NÍVEL SUPERIOR",
+          "CONHECIMENTOS BÁSICOS", "CONHECIMENTOS ESPECÍFICOS", "ANALISTA JUDICIÁRIO – ÁREA FIM \\(BACHAREL EM DIREITO\\)"],
+        stopLine: "TÉCNICO DE NÍVEL SUPERIOR – ENFERMEIRO",
+        itemMode: "sentences",
+      } },
+    ],
+    overlays: [],
+    identityClaims: [
+      { document: "tjms-notice", page: 1, contains: ["RETIFICADO EM 03 DE DEZEMBRO DE 2025", "EDITAL Nº 01/2025", "XI CONCURSO PÚBLICO", "Analista Judiciário - Área Fim", "Fundação Getulio Vargas"] },
+      { document: "tjms-notice", page: 20, contains: ["25 de janeiro de 2026", "60 (sessenta) questões de múltipla escolha", "05 (cinco) alternativas e apenas uma resposta correta"] },
+      { document: "tjms-notice", page: 32, contains: ["ANALISTA JUDICIÁRIO – ÁREA FIM (BACHAREL EM DIREITO)", "DIREITO CONSTITUCIONAL"] },
+    ],
+    previousExam: { cycle: "XI Concurso — objetiva já realizada em25/01/2026", role: "Analista Judiciário - Área Fim — prova objetiva", portalUrl: "https://conhecimento.fgv.br/concursos/tjms25", examDate: "2026-01-25", answerKeyFinality: "definitive_document", documents: [
+      { type: "question_booklet", title: "TJMS XI — caderno Tipo1 da prova objetiva de Analista Judiciário - Área Fim", url: `${FGV_FILES}analista-judiciario-area-fim-cns101-tipo-1.pdf` },
+      { type: "answer_key", title: "TJMS XI — gabarito oficial definitivo da prova objetiva (Analista e Técnico)", url: `${FGV_FILES}tjms-analista-e-tecnico.pdf` },
+    ] },
+    skipRepeatedRequirements: true,
+    limitations: ["O programa do cargo é prosa sem numeração: cada período literal vira um requisito e a repetição literal guarda só a primeira ocorrência.", "Só o cargo Analista Judiciário - Área Fim; o Técnico de Nível Superior - Enfermeiro do mesmo edital fica fora.", "As 1ª e 2ª retificações já constam do edital consolidado em03/12/2025.", "Treino histórico da objetiva com legislação atual; a legislação estadual de MS exige fonte oficial própria antes de vínculos."],
+  },
+  {
+    productSlug: "tj-rj-analista-e-tecnico-2025", institution: "Tribunal de Justiça do Estado do Rio de Janeiro", role: "Analista Judiciário – Sem Especialidade",
+    jurisdiction: "RJ", cycle: "LXII Concurso — Edital 01/2025", bankScope: "Fundação Getulio Vargas, responsável pela execução do concurso, sob o TJRJ",
+    portalUrl: "https://conhecimento.fgv.br/concursos/tjrjservidores25/01", examDate: "2026-02-01", examDateEvidence: { documentKey: "tjrj-notice", page: 21, item: "11.1", quote: "serão realizadas no dia 01 de fevereiro de 2026", actualDayIndependentlyVerified: false, corroboratingUrl: `${FGV_FILES}analista-judiciario-sem-especialidade-ns-a01-se-tipo-1.pdf`, limitation: "O texto do gabarito não é extraído (política de material de prova); o portal publicou o caderno Tipo1 em04/02/2026 e o gabarito definitivo em11/03/2026, compatíveis com a data do edital." },
+    stage: "Objetiva com gabarito definitivo (11/03/2026); resultado definitivo da discursiva em25/05/2026, retificado em10/06/2026",
+    stageObservedOn: "2026-11-13", proposedMode: "historical_training", expectedSubjects: 11,
+    documents: [
+      { key: "tjrj-notice", url: `${FGV_FILES}edital-de-abertura-retificado-05-tjrj-analista-judiciario-06.03.26.pdf`, title: "Edital01/2025 TJRJ — LXII Concurso de Analista Judiciário, retificado (5ª retificação) em11/03/2026", pages: 83, programmePages: [34, 39], layout: {
+        headings: [
+          { line: "LÍNGUA PORTUGUESA", subject: "Língua Portuguesa" }, { line: "LEGISLAÇÃO ESPECIAL", subject: "Legislação Especial" },
+          { line: "NOÇÕES DOS DIREITOS DAS PESSOAS COM DEFICIÊNCIA", subject: "Noções dos Direitos das Pessoas com Deficiência" },
+          { line: "ÉTICA NO SERVIÇO PÚBLICO", subject: "Ética no Serviço Público" },
+          { line: "DIREITO ADMINISTRATIVO", subject: "Direito Administrativo" }, { line: "DIREITO CONSTITUCIONAL", subject: "Direito Constitucional" },
+          { line: "DIREITO CIVIL", subject: "Direito Civil" }, { line: "DIREITO PROCESSUAL CIVIL", subject: "Direito Processual Civil" },
+          { line: "DIREITO PENAL", subject: "Direito Penal" }, { line: "DIREITO PROCESSUAL PENAL", subject: "Direito Processual Penal" },
+          { line: "LEGISLAÇÃO", subject: "Legislação" },
+        ],
+        ignoreLines: ["TRIBUNAL DE JUSTIÇA DO ESTADO DO RIO DE JANEIRO \\| CONCURSO PÚBLICO 2025 \\d+", "ANEXO I – CONTEÚDO PROGRAMÁTICO", "ANALISTA JUDICIÁRIO – SEM E COM ESPECIALIDADE",
+          "CONHECIMENTOS GERAIS", "CONHECIMENTOS ESPECÍFICOS", "CARGO: ANALISTA JUDICIÁRIO – GRUPO: NÍVEL SUPERIOR – SEM", "ESPECIALIDADE"],
+        stopLine: "CARGO: ANALISTA JUDICIÁRIO – GRUPO: ASSISTENCIAL – ESPECIALIDADE:",
+        itemMode: "top-level-numbers",
+      } },
+    ],
+    overlays: [],
+    identityClaims: [
+      { document: "tjrj-notice", page: 1, contains: ["LXII CONCURSO PÚBLICO", "EDITAL Nº 01/2025", "Analista Judiciário – Sem Especialidade", "Fundação Getulio Vargas"] },
+      { document: "tjrj-notice", page: 21, contains: ["01 de fevereiro de 2026", "70 (setenta) questões de múltipla escolha", "05 (cinco) alternativas e apenas uma resposta correta"] },
+      { document: "tjrj-notice", page: 35, contains: ["CARGO: ANALISTA JUDICIÁRIO – GRUPO: NÍVEL SUPERIOR – SEM", "DIREITO ADMINISTRATIVO"] },
+    ],
+    previousExam: { cycle: "LXII Concurso — objetiva já realizada em01/02/2026", role: "Analista Judiciário – Sem Especialidade — prova objetiva", portalUrl: "https://conhecimento.fgv.br/concursos/tjrjservidores25/01", examDate: "2026-02-01", answerKeyFinality: "definitive_document", documents: [
+      { type: "question_booklet", title: "TJRJ LXII — caderno Tipo1 da prova objetiva de Analista Judiciário – Sem Especialidade", url: `${FGV_FILES}analista-judiciario-sem-especialidade-ns-a01-se-tipo-1.pdf` },
+      { type: "answer_key", title: "TJRJ LXII — gabarito oficial definitivo da prova objetiva (Analista Judiciário)", url: `${FGV_FILES}tjrj-analista-gabarito-definitivo.pdf` },
+    ] },
+    skipRepeatedRequirements: true,
+    limitations: ["Só Analista Judiciário – Sem Especialidade (conhecimentos gerais e específicos); especialidades e o Técnico (Edital02/2025) ficam fora.", "Itens agrupados pelo número de primeiro nível; subitens (1.1, 1.2.1…) ficam no item.", "Edital consolidado com as cinco retificações (última em06/03/2026, publicada em11/03/2026).", "Treino histórico da objetiva com legislação atual; Código de Normas, Regimento e leis estaduais do RJ exigem fonte oficial própria antes de vínculos."],
+  },
 ];
 
 function normalized(value: string) { return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, " ").toLowerCase().trim(); }
-export type ProgrammeSection = Readonly<{ subject: string; documentKey: string; checksumSha256: string; sourceUrl: string; fragments: readonly Readonly<{ page: number; text: string }>[] }>;
+/** `start` (só nos modos `itemMode`) diz se o fragmento abre um requisito; ausente, vale a numeração. */
+export type ProgrammeSection = Readonly<{ subject: string; documentKey: string; checksumSha256: string; sourceUrl: string; fragments: readonly Readonly<{ page: number; text: string; start?: boolean }>[] }>;
 
 function extractLayoutSections(recipe: PreviewDocumentRecipe, layout: ProgrammeLayout, capture: Pick<CapturedOfficialDocument, "documentUrl" | "checksumSha256" | "pageTexts">): readonly ProgrammeSection[] {
   const ignore = layout.ignoreLines.map((source) => new RegExp(`^(?:${source})$`, "u"));
   const headings = layout.headings.map((heading) => ({ ...heading, key: normalized(heading.line) }));
   if (new Set(headings.map((heading) => heading.key)).size !== headings.length) throw new Error("Títulos de disciplina repetidos no layout.");
-  const sections: { subject: string; documentKey: string; checksumSha256: string; sourceUrl: string; fragments: { page: number; text: string }[] }[] = [];
+  const sections: { subject: string; documentKey: string; checksumSha256: string; sourceUrl: string; fragments: { page: number; text: string; start?: boolean }[] }[] = [];
   let current: (typeof sections)[number] | null = null;
   let expectedContinuation: string | null = null;
+  // Anexo com vários cargos: a extração termina na linha literal que abre o cargo seguinte.
+  const stopKey = layout.stopLine ? normalized(layout.stopLine) : null;
+  let stopped = false;
+  let continuesNext = false;
+  let sentenceEnded = false;
   const [start, end] = recipe.programmePages!;
-  for (let index = start - 1; index < end; index += 1) {
+  pages: for (let index = start - 1; index < end; index += 1) {
     for (const raw of capture.pageTexts[index].split(/\n+/u)) {
       const line = raw.replace(/\s+/g, " ").trim();
       if (!line) continue;
+      if (stopKey !== null && current && normalized(line) === stopKey) { stopped = true; break pages; }
       if (expectedContinuation !== null) {
         if (normalized(line) !== expectedContinuation) throw new Error("Continuação do título de disciplina diverge do layout.");
         expectedContinuation = null;
@@ -354,10 +439,33 @@ function extractLayoutSections(recipe: PreviewDocumentRecipe, layout: ProgrammeL
         if (sections.length !== headings.indexOf(heading)) throw new Error("Título de disciplina fora da ordem do layout.");
         current = { subject: heading.subject, documentKey: recipe.key, checksumSha256: capture.checksumSha256, sourceUrl: capture.documentUrl, fragments: [] };
         sections.push(current);
+        continuesNext = false; sentenceEnded = false;
         expectedContinuation = heading.continuation ? normalized(heading.continuation) : null;
         continue;
       }
       if (!current) continue;
+      if (layout.itemMode === "top-level-numbers") {
+        // "1 Tema. 1.1 Subtema. 2 Tema." (estilo Cebraspe/FGV corrido): só o número de primeiro
+        // nível abre item; subitens continuam no item. Número isolado no fim da linha abre a seguinte.
+        const trailing = /\s(\d{1,2})$/u.exec(line);
+        const body = trailing ? line.slice(0, trailing.index) : line;
+        body.split(/\s+(?=\d{1,2} [A-ZÀ-Ö])/u).forEach((part, partIndex) => {
+          const opens = !current!.fragments.length || (partIndex === 0 && continuesNext ? false : /^\d{1,2} [A-ZÀ-Ö]/u.test(part));
+          current!.fragments.push({ page: index + 1, text: part, start: opens });
+        });
+        continuesNext = false;
+        if (trailing) { current.fragments.push({ page: index + 1, text: trailing[1], start: true }); continuesNext = true; }
+        continue;
+      }
+      if (layout.itemMode === "sentences") {
+        // Programa em prosa sem numeração: cada período literal ("… . Próximo") é um item;
+        // a quebra de linha só encerra o item quando a linha termina em ponto final.
+        line.split(/(?<=\.)\s+(?=[A-ZÀ-Ö])/u).forEach((part, partIndex) => {
+          current!.fragments.push({ page: index + 1, text: part, start: !current!.fragments.length || partIndex > 0 || sentenceEnded });
+        });
+        sentenceEnded = /\.$/u.test(line);
+        continue;
+      }
       const parts = layout.splitInlineItems ? line.split(/\s+(?=\d{1,2}\.(?:\s+[A-ZÀ-Ö]|$))/u) : [line];
       for (const part of parts) {
         // Número de item isolado no fim da linha ("3.") abre o item da linha seguinte.
@@ -367,6 +475,7 @@ function extractLayoutSections(recipe: PreviewDocumentRecipe, layout: ProgrammeL
       }
     }
   }
+  if (stopKey !== null && !stopped) throw new Error("Linha final do cargo ausente; composição bloqueada.");
   if (sections.length !== headings.length) throw new Error("Título de disciplina ausente no anexo; composição bloqueada.");
   if (sections.some((section) => !section.fragments.length)) throw new Error("Disciplina sem conteúdo; composição bloqueada.");
   return sections;

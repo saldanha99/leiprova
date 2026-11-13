@@ -9,7 +9,7 @@ import { assertFgvHistoricalNoticeEvidence, fgvHistoricalPreviousExam } from "@/
 import { FGV_HISTORICAL_PREVIOUS_PAIRS } from "@/lib/exams/previous-exam-link-command";
 import { parseOfficialOpportunitySourceUrl } from "@/lib/opportunities/source-monitor-policy";
 
-const LOTE2 = ["tj-go-juiz-de-direito-2026", "trf-2-juiz-federal-2-regiao"];
+const LOTE2 = ["tj-go-juiz-de-direito-2026", "trf-2-juiz-federal-2-regiao", "tj-ms-analista-judiciario-area-fim-reta-final", "tj-rj-analista-e-tecnico-2025"];
 const recipeOf = (slug: string) => NEXT_OFFICIAL_COURSE_RECIPES.find((item) => item.productSlug === slug)!;
 const capture = (doc: PreviewDocumentRecipe, pages: Record<number, string>) => ({
   documentUrl: doc.url, checksumSha256: "a".repeat(64),
@@ -73,5 +73,44 @@ describe("lote 2 — escopo regional do TRF-2 no cadastro de prova anterior", ()
   it("TRF-2 confere escopo regional; TJGO mantém o estadual padrão", () => {
     expect(fgvHistoricalPreviousExam("trf-2-juiz-federal-2-regiao").scope).toBe("regional");
     expect(fgvHistoricalPreviousExam("tj-go-juiz-de-direito-2026").scope).toBeUndefined();
+  });
+});
+
+describe("lote 2 — programas em prosa por cargo (TJMS, TJRJ)", () => {
+  it("TJMS: cada período literal vira requisito, repetição fica só na primeira e o cargo seguinte encerra", () => {
+    const doc = recipeOf("tj-ms-analista-judiciario-area-fim-reta-final").documents[0];
+    const lines: string[] = ["NÍVEL SUPERIOR", "CONHECIMENTOS BÁSICOS"];
+    doc.layout!.headings.forEach((heading, index) => {
+      lines.push("32TRIBUNAL DE JUSTIÇA DO ESTADO DE MATO GROSSO DO SUL | CONCURSO PÚBLICO 2025", heading.line,
+        `Tema ${index} com período que`, `continua na linha seguinte. Lei nº 8.009/1990. Outro tema ${index}.`);
+    });
+    lines.push(doc.layout!.stopLine!, "ENFERMAGEM", "Conteúdo de outro cargo.");
+    const sections = extractDossierSubjectSections(doc, capture(doc, { 31: lines.join("\n") }));
+    expect(sections).toHaveLength(8);
+    const requirements = compositeProgrammeRequirements(sections, [], true);
+    expect(requirements.map((item) => item.requirementText).slice(0, 3)).toEqual(["Tema 0 com período que continua na linha seguinte.", "Lei nº 8.009/1990.", "Outro tema 0."]);
+    expect(requirements.filter((item) => item.requirementText === "Lei nº 8.009/1990.")).toHaveLength(1);
+    expect(requirements.some((item) => /outro cargo/u.test(item.requirementText))).toBe(false);
+    expect(() => compositeProgrammeRequirements(sections)).toThrow(/duplicado/u);
+  });
+
+  it("linha final do cargo é obrigatória", () => {
+    const doc = recipeOf("tj-ms-analista-judiciario-area-fim-reta-final").documents[0];
+    const lines = doc.layout!.headings.flatMap((heading, index) => [heading.line, `Tema ${index}.`]);
+    expect(() => extractDossierSubjectSections(doc, capture(doc, { 31: lines.join("\n") }))).toThrow(/Linha final/u);
+  });
+
+  it("TJRJ: só o número de primeiro nível abre item e número isolado no fim da linha abre a seguinte", () => {
+    const doc = recipeOf("tj-rj-analista-e-tecnico-2025").documents[0];
+    const lines: string[] = [];
+    doc.layout!.headings.forEach((heading, index) => {
+      lines.push(heading.line, `1 Tema ${index}. 1.1 Subtema. 1.2 Outro`, `subtema. 2 Segundo tema ${index}. 2.1 Detalhe. 3`, `Lei Federal nº 12.153/2009.`);
+    });
+    lines.push(doc.layout!.stopLine!, "DIREITO ADMINISTRATIVO", "1 Tema de outro cargo.");
+    const sections = extractDossierSubjectSections(doc, capture(doc, { 34: lines.join("\n") }));
+    const requirements = compositeProgrammeRequirements(sections, [], true);
+    expect(requirements.slice(0, 3).map((item) => item.requirementText)).toEqual([
+      "1 Tema 0. 1.1 Subtema. 1.2 Outro subtema.", "2 Segundo tema 0. 2.1 Detalhe.", "3 Lei Federal nº 12.153/2009."]);
+    expect(requirements).toHaveLength(doc.layout!.headings.length * 3 - (doc.layout!.headings.length - 1));
   });
 });
