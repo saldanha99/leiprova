@@ -1,4 +1,4 @@
-# Lote 2 FGV histórico — TJGO e TRF-2 (13/11/2026)
+# Lote 2 FGV histórico — TJGO, TRF-2, TJMS, TJRJ e TJMS Cartórios (13/11/2026)
 
 Pedido do proprietário em 12–13/11/2026: começar a admissão dos editais e provas
 dos 63 rascunhos, pelo lote FGV com objetiva realizada e gabarito definitivo.
@@ -95,9 +95,47 @@ TJRJ. O TJRJ cobre só o cargo sem especialidade: as especialidades e o Técnico
 Backup anterior: `backups/leiprova-20261113T032404Z.dump`, SHA-256
 `50dc33ca8f80684c2c840441171b0c3c3e848ebc7252afbddc4ba3b7a4bb6899`.
 
-Pendentes deste lote:
+## Terceira parte — TJMS Cartórios (VI Concurso de Notas e de Registro)
 
-- **TJMS Cartórios**: os títulos das disciplinas estão dentro do parágrafo ("DIREITO
-  CIVIL. Lei de…") e o edital remete a data da objetiva ao cronograma.
-- **TRT-24**: houve declaração de nulidade do Edital 01/2024 e reaplicação da objetiva
-  de Analista, o que exige leitura própria antes de admitir.
+Edital 01/2025, 2ª publicação com retificação (16/10/2025), `765407ef…`, 74 p.; Anexo II
+nas p. 53–68. A objetiva de ingresso por provimento foi em 01/03/2026 (item 10.2), com
+100 questões e 5 alternativas (item 10.9). O Edital 04/2025 só corrige o Anexo I (serventias).
+
+O anexo traz os títulos no início do parágrafo ("DIREITO CIVIL. Lei de…"). O extrator ganhou
+`inline: true` por título (`0dbc59e`): o título abre a seção e o resto da linha é o primeiro
+período. Na classificação, o nome literal é o prefixo em maiúsculas antes do ponto. O título
+"DIREITO NOTARIAL E REGISTRAL" leva o glifo U+F034, preservado como no TJMS Área Fim.
+
+Como o TJMS Área Fim já usa sigla, edital 01/2025 e ano 2025, o número oficial desta
+oportunidade é `01/2025-Notarial` (`85e4394`), no padrão do MPGO (`182/2025-CSMP`). A
+proteção contra duplicidade não foi afrouxada.
+
+| Produto | Oportunidade | Requisitos | Classificados | Contrato MC5 |
+|---|---|---:|---:|---|
+| tj-ms-cartorios-reta-final | `a20215e4-027f-489d-b064-2c5dafa14ca8` | 1.143 | 747 | `03936edd…` |
+
+Caderno Tipo 1 (provimento, 02/03/2026) e gabarito definitivo republicado (07/05/2026)
+foram registrados e aprovados (`metadata_only`). Ficaram sem classificação as seções
+notariais e registrais, as leis e atos normativos locais, Conhecimentos Gerais e a
+legislação especial, que não têm entrada no catálogo. Também ficaram de fora 3 períodos
+que atravessam páginas sem prova literal. Backup anterior:
+`backups/leiprova-20261113T164834Z.dump`, SHA-256
+`bd5aa33726a31fc2707892a6c9a54973e44e1cedea481c2e5db032fd66d57276`.
+
+## TRT-24 — não admitido
+
+A anulação do Edital 01/2024 (comunicado de 26/08/2025, PROAD 18693/2023) tratava da
+distribuição das vagas de cotas raciais. O CSJT suspendeu a anulação (PCA
+1000876-34.2025.5.90.0000, 23/09/2025), e o Pleno do TRT-24 a reformou por unanimidade em
+06/10/2025 (PROAD 4437/2025). O concurso foi mantido válido. A objetiva de Analista
+Judiciário (manhã de 09/03/2025) foi reaplicada porque não seguia a 1ª retificação. A de
+Técnico Judiciário não foi reaplicada.
+
+A admissão continua bloqueada por dois motivos:
+
+- A 1ª retificação (21/11/2024) altera o programa por exclusões parciais ("(...)") e trocas
+  "Onde se lê / Leia-se" dentro das disciplinas. O admissor composto só substitui
+  disciplinas inteiras; seria preciso um recurso de retificação item a item.
+- A 2ª retificação (`retificacao-13.02.pdf`) é recusada pela política de captura ("não
+  identificado como edital"), e o efeito dela no programa não pode ser provado. A recusa não
+  foi contornada.
