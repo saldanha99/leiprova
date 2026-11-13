@@ -175,7 +175,7 @@ export const FGV_HISTORICAL_PREVIOUS_EXAMS: readonly FgvHistoricalPreviousExam[]
     productSlug: "tj-ms-cartorios-reta-final", editionPublicId: "tjms-notas-registro-provimento-vi-2025-objetiva", opportunitySlug: "tjms-notas-registro-provimento-vi-2025-historico-objetiva",
     portalUrl: "https://conhecimento.fgv.br/concursos/tjmsnotarial25", portalHeading: "Concurso Público para o Tribunal de Justiça do Estado de Mato Grosso do Sul - Atividade Notarial e de Registro",
     portalNotice: { url: `${FGV}edital-tjms-notarial-2025-com-2a-retificacao.pdf`, label: "Edital (retificado em 16/10/2025)" },
-    role: "Outorga de Delegações de Notas e de Registro — Ingresso por Provimento", jurisdiction: "MS", jurisdictionName: "Mato Grosso do Sul", institution: "TJMS", noticeNumber: "01/2025", cycleYear: 2025, careerSlug: "cartorios",
+    role: "Outorga de Delegações de Notas e de Registro — Ingresso por Provimento", jurisdiction: "MS", jurisdictionName: "Mato Grosso do Sul", institution: "TJMS", noticeNumber: "01/2025-Notarial", cycleYear: 2025, careerSlug: "cartorios",
     examDate: "2026-03-01", expectedQuestionCount: 100,
     noticeUrl: `${FGV}edital-tjms-notarial-2025-com-2a-retificacao.pdf`, noticeSha256: "765407ef3a2d42c39b7a2c703a118421f27a02ef4ccee513549881b07c050eab", noticePageCount: 74,
     noticeChecks: [

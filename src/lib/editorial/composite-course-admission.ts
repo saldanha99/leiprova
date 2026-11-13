@@ -45,7 +45,7 @@ export const COMPOSITE_ADMISSION_TARGETS = [
   { productSlug: "mpe-go-promotor-de-justica-2025", slug: "mpgo-promotor-substituto-63-2025-historico-objetiva", acronym: "MPGO", notice: "182/2025-CSMP", category: "carreiras-juridicas", career: "promotor-justica", noticeDate: "2025-09-22", statusDate: "2026-03-31", cycleYear: 2025, lifecycleStatus: "result_published", commission: "Comissão do 63º Concurso do MPGO", stages: [
     { title: "Comunicado 10 — resultado da prova preambular", url: `${FGV}comissaodeconcurso_comunicado-n-10.pdf`, publishedOn: "2026-03-12" },
   ] },
-  { productSlug: "tj-ms-cartorios-reta-final", slug: "tjms-notas-registro-provimento-vi-2025-historico-objetiva", acronym: "TJMS", notice: "01/2025", category: "cartorios", career: "cartorios", noticeDate: "2025-10-06", statusDate: "2026-08-25", cycleYear: 2025, lifecycleStatus: "result_published", commission: "Comissão do VI Concurso de Outorga de Delegações de Notas e de Registro do TJMS", stages: [
+  { productSlug: "tj-ms-cartorios-reta-final", slug: "tjms-notas-registro-provimento-vi-2025-historico-objetiva", acronym: "TJMS", notice: "01/2025-Notarial", category: "cartorios", career: "cartorios", noticeDate: "2025-10-06", statusDate: "2026-08-25", cycleYear: 2025, lifecycleStatus: "result_published", commission: "Comissão do VI Concurso de Outorga de Delegações de Notas e de Registro do TJMS", stages: [
     { title: "Resultado definitivo da prova escrita e prática", url: `${FGV}427_tjms-resultado-definitivo-prova-escrita-e-pratica-2026-08-25.pdf`, publishedOn: "2026-08-25" },
   ] },
 ] as const;
