@@ -171,6 +171,25 @@ export const FGV_HISTORICAL_PREVIOUS_EXAMS: readonly FgvHistoricalPreviousExam[]
       { documentType: "answer_key", title: "TJRJ LXII — gabarito oficial definitivo da prova objetiva (Analista Judiciário)", label: "Gabarito Oficial Definitivo da Prova Objetiva", publishedOn: "2026-03-11", url: `${FGV}tjrj-analista-gabarito-definitivo.pdf` },
     ],
   },
+  {
+    productSlug: "tj-ms-cartorios-reta-final", editionPublicId: "tjms-notas-registro-provimento-vi-2025-objetiva", opportunitySlug: "tjms-notas-registro-provimento-vi-2025-historico-objetiva",
+    portalUrl: "https://conhecimento.fgv.br/concursos/tjmsnotarial25", portalHeading: "Concurso Público para o Tribunal de Justiça do Estado de Mato Grosso do Sul - Atividade Notarial e de Registro",
+    portalNotice: { url: `${FGV}edital-tjms-notarial-2025-com-2a-retificacao.pdf`, label: "Edital (retificado em 16/10/2025)" },
+    role: "Outorga de Delegações de Notas e de Registro — Ingresso por Provimento", jurisdiction: "MS", jurisdictionName: "Mato Grosso do Sul", institution: "TJMS", noticeNumber: "01/2025", cycleYear: 2025, careerSlug: "cartorios",
+    examDate: "2026-03-01", expectedQuestionCount: 100,
+    noticeUrl: `${FGV}edital-tjms-notarial-2025-com-2a-retificacao.pdf`, noticeSha256: "765407ef3a2d42c39b7a2c703a118421f27a02ef4ccee513549881b07c050eab", noticePageCount: 74,
+    noticeChecks: [
+      { page: 23, pattern: "10\\.2[\\s\\S]*ingresso por provimento, será realizada no dia 01 de março de" },
+      { page: 24, pattern: "100 \\(cem\\) questões de múltipla escolha[\\s\\S]*05 \\(cinco\\)[\\s\\S]*alternativas e apenas uma resposta correta" },
+      { page: 1, pattern: "OUTORGA DE DELEGAÇÕES DE NOTAS E DE REGISTRO" },
+    ],
+    examDateCorroboration: "Portal FGV: caderno Tipo 1 (ingresso por provimento) e gabarito preliminar publicados em 02/03/2026; gabarito oficial definitivo republicado em 07/05/2026",
+    editionSourceExternalId: "fgv-tjms-notarial-vi-2025-provimento-objetiva", editionTitle: "TJMS VI Concurso de Notas e de Registro — Ingresso por Provimento — objetiva",
+    documents: [
+      { documentType: "question_booklet", title: "TJMS VI Notas e Registro — prova objetiva — Ingresso por Provimento — Tipo 1", label: "Tipo 1", publishedOn: "2026-03-02", url: `${FGV}outorga-de-delegacoes-de-notas-e-de-registro-ingresso-por-provimento-not-prov-tipo-1.pdf`, blockIncludes: ["Prova Objetiva de Seleção", "Ingresso por Provimento"] },
+      { documentType: "answer_key", title: "TJMS VI Notas e Registro — gabarito oficial definitivo republicado da prova objetiva", label: "Gabarito Oficial Definitivo da Prova Objetiva de Seleção Republicado", publishedOn: "2026-05-07", url: `${FGV}2-gabarito-definitivo-tjms-notarial_atualizado07052026-2.pdf` },
+    ],
+  },
 ];
 
 export function fgvHistoricalPreviousExam(productSlug: string) {

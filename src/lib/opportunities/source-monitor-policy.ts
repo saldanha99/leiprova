@@ -47,6 +47,8 @@ export const OFFICIAL_OPPORTUNITY_SOURCE_POLICIES = [
       "/sites/default/files/concursos/448-tjms-resultado-final-de-aprovados-2026-06-17.pdf",
       "/sites/default/files/concursos/edital-de-abertura-retificado-05-tjrj-analista-judiciario-06.03.26.pdf",
       "/sites/default/files/concursos/397-tjrj-analista-resultado-definitivo-prova-discursiva-2026-06-08_0.pdf",
+      "/sites/default/files/concursos/edital-tjms-notarial-2025-com-2a-retificacao.pdf",
+      "/sites/default/files/concursos/427_tjms-resultado-definitivo-prova-escrita-e-pratica-2026-08-25.pdf",
     ],
   },
   {

@@ -124,3 +124,51 @@ describe("lote 2 — título com marcador gráfico", () => {
     expect(programmeCanonicalSubject(programmeLiteralHeadingName("NOÇÕES DE LEGISLAÇÃO"))).toBeNull();
   });
 });
+
+describe("lote 2 — TJMS Cartórios: título no início do parágrafo", () => {
+  const slug = "tj-ms-cartorios-reta-final";
+  it("tem receita, alvo composto na categoria do catálogo, prova anterior e escopo", () => {
+    const recipe = recipeOf(slug);
+    expect(recipe.documents[0].layout!.headings).toHaveLength(recipe.expectedSubjects);
+    expect(compositeCourseTarget(slug).target).toMatchObject({ category: "cartorios", career: "cartorios" });
+    expect(fgvHistoricalPreviousExam(slug).expectedQuestionCount).toBe(100);
+    expect(FGV_HISTORICAL_PREVIOUS_PAIRS[slug]).toBe("tjms-notas-registro-provimento-vi-2025-objetiva");
+    expect(PROGRAMME_CLASSIFICATION_SCOPES["tjms-notas-registro-provimento-vi-2025-historico-objetiva"]).toBe(recipe.role);
+    expect(parseOfficialOpportunitySourceUrl(recipe.documents[0].url)).not.toBeNull();
+  });
+
+  it("o título inline abre a seção e o resto da linha é o primeiro período", () => {
+    const doc = recipeOf(slug).documents[0];
+    const lines: string[] = ["ANEXO II – CONTEÚDO PROGRAMÁTICO", "DISCIPLINAS"];
+    doc.layout!.headings.forEach((heading, index) => {
+      lines.push("NOTAS E DE REGISTRO", heading.inline ? `${heading.line}. Tema ${index} que` : heading.line, ...(heading.inline ? [] : [`Tema ${index} que`]),
+        `continua. Lei nº 6.015/1973. Fim ${index}.`);
+    });
+    const sections = extractDossierSubjectSections(doc, capture(doc, { 53: lines.join("\n") }));
+    expect(sections.map((section) => section.subject)).toEqual(doc.layout!.headings.map((heading) => heading.subject));
+    const requirements = compositeProgrammeRequirements(sections, [], true);
+    const civil = requirements.filter((item) => item.sourceLocator.includes("· Direito Civil ·")).map((item) => item.requirementText);
+    expect(civil).toEqual([`Tema ${doc.layout!.headings.findIndex((h) => h.subject === "Direito Civil")} que continua.`, `Fim ${doc.layout!.headings.findIndex((h) => h.subject === "Direito Civil")}.`]);
+    expect(requirements.some((item) => /^DIREITO CIVIL/u.test(item.requirementText))).toBe(false);
+    expect(requirements.filter((item) => item.requirementText === "Lei nº 6.015/1973.")).toHaveLength(1);
+  });
+
+  it("título inline só vale com ponto e texto depois; linha só com o título não abre a seção", () => {
+    const doc = recipeOf(slug).documents[0];
+    const lines = doc.layout!.headings.map((heading, index) => heading.inline ? `${heading.line}. Tema ${index}.` : `${heading.line}\nTema ${index}.`);
+    lines.splice(13, 0, "DIREITO PENAL");
+    expect(() => extractDossierSubjectSections(doc, capture(doc, { 53: lines.join("\n") }))).not.toThrow();
+    const sections = extractDossierSubjectSections(doc, capture(doc, { 53: lines.join("\n") }));
+    expect(sections.find((section) => section.subject === "Direito Civil")!.fragments.map((item) => item.text)).toContain("DIREITO PENAL");
+  });
+
+  it("nome literal do título inline é o prefixo antes do ponto; linha comum não muda", async () => {
+    const { programmeLiteralHeadingName, programmeCanonicalSubject } = await import("@/lib/editorial/programme-subject-classification");
+    expect(programmeCanonicalSubject(programmeLiteralHeadingName("DIREITO CIVIL. Lei de Introdução às normas do Direito Brasileiro (Decreto‐Lei nº 4.657/1942 e Lei nº"))).toBe("Direito Civil");
+    expect(programmeLiteralHeadingName("ATOS NORMATIVOS DO CONSELHO NACIONAL DE JUSTIÇA – CNJ. Resolução nº 35/2007")).toBe("ATOS NORMATIVOS DO CONSELHO NACIONAL DE JUSTIÇA – CNJ");
+    expect(programmeCanonicalSubject(programmeLiteralHeadingName("REGISTRO DE IMÓVEIS. Lei nº 6.015/1973."))).toBeNull();
+    expect(programmeLiteralHeadingName("Lei de Registros Públicos. Atribuições.")).toBe("Lei de Registros Públicos. Atribuições.");
+    expect(programmeLiteralHeadingName("CNIB. Central Nacional")).toBe("CNIB. Central Nacional");
+    expect(programmeLiteralHeadingName("DIREITO PENAL")).toBe("DIREITO PENAL");
+  });
+});

@@ -13,7 +13,9 @@ const FGV_FILES = "https://conhecimento.fgv.br/sites/default/files/concursos/";
  * (com eventual linha de continuação) e as linhas repetidas de cabeçalho/rodapé são
  * descartadas por padrões ancorados. Título ausente, repetido ou fora de ordem bloqueia. */
 export type ProgrammeLayout = Readonly<{
-  headings: readonly Readonly<{ line: string; subject: string; continuation?: string }>[];
+  headings: readonly Readonly<{ line: string; subject: string; continuation?: string;
+    /** Título no início do parágrafo ("DIREITO CIVIL. Lei de…"): abre a seção e o restante da linha é conteúdo. */
+    inline?: boolean }>[];
   ignoreLines: readonly string[];
   /** Programa em prosa corrida ("1. … 2. …" na mesma linha): cada item numerado vira um fragmento. */
   splitInlineItems?: boolean;
@@ -404,6 +406,62 @@ export const NEXT_OFFICIAL_COURSE_RECIPES: readonly NextOfficialCourseRecipe[] =
     skipRepeatedRequirements: true,
     limitations: ["Só Analista Judiciário – Sem Especialidade (conhecimentos gerais e específicos); especialidades e o Técnico (Edital02/2025) ficam fora.", "Itens agrupados pelo número de primeiro nível; subitens (1.1, 1.2.1…) ficam no item.", "Edital consolidado com as cinco retificações (última em06/03/2026, publicada em11/03/2026).", "Treino histórico da objetiva com legislação atual; Código de Normas, Regimento e leis estaduais do RJ exigem fonte oficial própria antes de vínculos."],
   },
+  // TJMS Cartórios (VI Concurso de Notas e de Registro): títulos no início do parágrafo ("DIREITO CIVIL. Lei de…").
+  {
+    productSlug: "tj-ms-cartorios-reta-final", institution: "Tribunal de Justiça do Estado de Mato Grosso do Sul", role: "Outorga de Delegações de Notas e de Registro — Ingresso por Provimento",
+    jurisdiction: "MS", cycle: "VI Concurso de Notas e de Registro — Edital 01/2025", bankScope: "Fundação Getulio Vargas, auxílio operacional do concurso, sob a Comissão do TJMS",
+    portalUrl: "https://conhecimento.fgv.br/concursos/tjmsnotarial25", examDate: "2026-03-01", examDateEvidence: { documentKey: "tjmsnot-notice", page: 23, item: "10.2", quote: "na modalidade de ingresso por provimento, será realizada no dia 01 de março de", actualDayIndependentlyVerified: false, corroboratingUrl: `${FGV_FILES}outorga-de-delegacoes-de-notas-e-de-registro-ingresso-por-provimento-not-prov-tipo-1.pdf`, limitation: "O texto do gabarito não é extraído (política de material de prova); o portal publicou o caderno Tipo 1 e o gabarito preliminar em 02/03/2026, compatíveis com a data do edital. O Comunicado 07/2026 (alteração de data, 10/04/2026) é posterior à objetiva e não foi capturado pela política de documentos." },
+    stage: "Objetiva com gabarito definitivo republicado (07/05/2026); resultado definitivo da prova escrita e prática em 25/08/2026; prova oral em novembro de 2026",
+    stageObservedOn: "2026-11-13", proposedMode: "historical_training", expectedSubjects: 22,
+    documents: [
+      { key: "tjmsnot-notice", url: `${FGV_FILES}edital-tjms-notarial-2025-com-2a-retificacao.pdf`, title: "Edital 01/2025 TJMS — VI Concurso de Outorga de Delegações de Notas e de Registro, 2ª publicação (com retificação) de 16/10/2025", pages: 74, programmePages: [53, 68], layout: {
+        headings: [
+          // Marcador gráfico U+F034 colado ao título, preservado literalmente (como no TJMS Área Fim).
+          { line: "DIREITO NOTARIAL E REGISTRAL", subject: "Direito Notarial e Registral" },
+          { line: "REGISTRO DE IMÓVEIS", subject: "Registro de Imóveis", inline: true },
+          { line: "TABELIONATO DE NOTAS", subject: "Tabelionato de Notas", inline: true },
+          { line: "REGISTRO CIVIL DAS PESSOAS NATURAIS", subject: "Registro Civil das Pessoas Naturais", inline: true },
+          { line: "REGISTRO CIVIL DAS PESSOAS JURÍDICAS", subject: "Registro Civil das Pessoas Jurídicas", inline: true },
+          { line: "REGISTROS DE TÍTULOS E DOCUMENTOS", subject: "Registros de Títulos e Documentos", inline: true },
+          { line: "TABELIONATO DE PROTESTO", subject: "Tabelionato de Protesto", inline: true },
+          { line: "LEIS LOCAIS RELACIONADAS AOS SERVIÇOS EXTRAJUDICIAIS", subject: "Leis Locais Relacionadas aos Serviços Extrajudiciais", inline: true },
+          { line: "ATOS NORMATIVOS DO CONSELHO SUPERIOR DA MAGISTRATURA E DA PRESIDÊNCIA DO TJMS", subject: "Atos Normativos do Conselho Superior da Magistratura e da Presidência do TJMS", inline: true },
+          { line: "ATOS NORMATIVOS DA CORREGEDORIA-GERAL DE JUSTIÇA DO ESTADO DE MATO GROSSO DO SUL", subject: "Atos Normativos da Corregedoria-Geral de Justiça do Estado de Mato Grosso do Sul", inline: true },
+          { line: "ATOS NORMATIVOS DO CONSELHO NACIONAL DE JUSTIÇA – CNJ", subject: "Atos Normativos do Conselho Nacional de Justiça – CNJ", inline: true },
+          { line: "CONHECIMENTOS GERAIS", subject: "Conhecimentos Gerais", inline: true },
+          { line: "DIREITO CIVIL", subject: "Direito Civil", inline: true },
+          { line: "DIREITO PROCESSUAL CIVIL", subject: "Direito Processual Civil", inline: true },
+          { line: "DIREITO PENAL", subject: "Direito Penal", inline: true },
+          { line: "DIREITO PROCESSUAL PENAL", subject: "Direito Processual Penal", inline: true },
+          { line: "DIREITO TRIBUTÁRIO", subject: "Direito Tributário", inline: true },
+          { line: "DIREITO EMPRESARIAL", subject: "Direito Empresarial", inline: true },
+          { line: "DIREITO ADMINISTRATIVO", subject: "Direito Administrativo", inline: true },
+          { line: "LEGISLAÇÃO ESPECIAL DO ESTADO DE MATO GROSSO DO SUL", subject: "Legislação Especial do Estado de Mato Grosso do Sul", inline: true },
+          { line: "LEGISLAÇÃO ESPECIAL FEDERAL", subject: "Legislação Especial Federal", inline: true },
+          { line: "DIREITO CONSTITUCIONAL", subject: "Direito Constitucional", inline: true },
+        ],
+        ignoreLines: ["TRIBUNAL DE JUSTIÇA DO ESTADO DO MATO GROSSO DO SUL \\| CONCURSO PÚBLICO 2025 \\| \\d+", "EDITAL Nº 01/2025 – ABERTURA", "DO VI CONCURSO PÚBLICO DE",
+          "PROVAS E TÍTULOS PARA", "OUTORGA DE DELEGAÇÕES DE", "NOTAS E DE REGISTRO", "ANEXO II – CONTEÚDO PROGRAMÁTICO", "PARA AS MODALIDADES DE INGRESSO POR PROVIMENTO E POR REMOÇÃO", "DISCIPLINAS",
+          // Nota de rodapé do anexo (onde consultar a legislação estadual), não é conteúdo.
+          "\\*As legislações estaduais e os atos normativos do Poder Judiciário do Estado de Mato Grosso do Sul podem", "ser consultados no portal do TJMS, no menu Consulta – Biblioteca, disponível no link", "https://www\\.tjms\\.jus\\.br/legislacao/\\."],
+        itemMode: "sentences",
+      } },
+    ],
+    overlays: [],
+    identityClaims: [
+      { document: "tjmsnot-notice", page: 1, contains: ["EDITAL Nº 01/2025 – 2ª PUBLICAÇÃO (COM RETIFICAÇÃO)", "PARA OUTORGA DE DELEGAÇÕES DE NOTAS E DE REGISTRO DO ESTADO DO MATO GROSSO DO SUL", "remoção, de acordo com o disposto no presente Edital."] },
+      { document: "tjmsnot-notice", page: 2, contains: ["Fundação Getulio Vargas"] },
+      { document: "tjmsnot-notice", page: 23, contains: ["na modalidade de ingresso por provimento, será realizada no dia 01 de março de"] },
+      { document: "tjmsnot-notice", page: 24, contains: ["por 100 (cem) questões de múltipla escolha, numeradas sequencialmente, com 05 (cinco)", "alternativas e apenas uma resposta correta."] },
+      { document: "tjmsnot-notice", page: 53, contains: ["ANEXO II – CONTEÚDO PROGRAMÁTICO", "PARA AS MODALIDADES DE INGRESSO POR PROVIMENTO E POR REMOÇÃO"] },
+    ],
+    previousExam: { cycle: "VI Concurso — objetiva já realizada em 01/03/2026", role: "Outorga de Delegações de Notas e de Registro — Ingresso por Provimento — prova objetiva de seleção", portalUrl: "https://conhecimento.fgv.br/concursos/tjmsnotarial25", examDate: "2026-03-01", answerKeyFinality: "definitive_document", documents: [
+      { type: "question_booklet", title: "TJMS VI Notas e Registro — caderno Tipo 1 da prova objetiva (ingresso por provimento)", url: `${FGV_FILES}outorga-de-delegacoes-de-notas-e-de-registro-ingresso-por-provimento-not-prov-tipo-1.pdf` },
+      { type: "answer_key", title: "TJMS VI Notas e Registro — gabarito oficial definitivo republicado da prova objetiva", url: `${FGV_FILES}2-gabarito-definitivo-tjms-notarial_atualizado07052026-2.pdf` },
+    ] },
+    skipRepeatedRequirements: true,
+    limitations: ["Programa em prosa sem numeração: cada período literal vira um requisito e a repetição literal guarda só a primeira ocorrência.", "Ingresso por provimento; a remoção tem o mesmo quadro de disciplinas e o mesmo Anexo II, em turno próprio.", "Edital consolidado com as 1ª e 2ª retificações; o Edital 04/2025 só corrige o Anexo I (serventias).", "Treino histórico da objetiva com legislação atual; leis estaduais, atos do TJMS e da CGJ exigem fonte oficial própria antes de vínculos."],
+  },
 ];
 
 function normalized(value: string) { return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, " ").toLowerCase().trim(); }
@@ -425,7 +483,7 @@ function extractLayoutSections(recipe: PreviewDocumentRecipe, layout: ProgrammeL
   const [start, end] = recipe.programmePages!;
   pages: for (let index = start - 1; index < end; index += 1) {
     for (const raw of capture.pageTexts[index].split(/\n+/u)) {
-      const line = raw.replace(/\s+/g, " ").trim();
+      let line = raw.replace(/\s+/g, " ").trim();
       if (!line) continue;
       if (stopKey !== null && current && normalized(line) === stopKey) { stopped = true; break pages; }
       if (expectedContinuation !== null) {
@@ -434,16 +492,18 @@ function extractLayoutSections(recipe: PreviewDocumentRecipe, layout: ProgrammeL
         continue;
       }
       if (ignore.some((pattern) => pattern.test(line))) continue;
-      const heading = headings.find((item) => item.key === normalized(line));
+      const inlineHeading = headings.find((item) => item.inline && line.startsWith(`${item.line}. `));
+      const heading = inlineHeading ?? headings.find((item) => !item.inline && item.key === normalized(line));
       if (heading) {
         if (sections.length !== headings.indexOf(heading)) throw new Error("Título de disciplina fora da ordem do layout.");
         current = { subject: heading.subject, documentKey: recipe.key, checksumSha256: capture.checksumSha256, sourceUrl: capture.documentUrl, fragments: [] };
         sections.push(current);
         continuesNext = false; sentenceEnded = false;
         expectedContinuation = heading.continuation ? normalized(heading.continuation) : null;
-        continue;
+        if (!inlineHeading) continue;
       }
       if (!current) continue;
+      if (inlineHeading && current.fragments.length === 0) line = line.slice(inlineHeading.line.length + 2);
       if (layout.itemMode === "top-level-numbers") {
         // "1 Tema. 1.1 Subtema. 2 Tema." (estilo Cebraspe/FGV corrido): só o número de primeiro
         // nível abre item; subitens continuam no item. Número isolado no fim da linha abre a seguinte.

@@ -37,6 +37,7 @@ export const FGV_HISTORICAL_PREVIOUS_PAIRS: Readonly<Record<string, string>> = {
   "trf-2-juiz-federal-2-regiao": "trf2-juiz-federal-substituto-xix-2025-objetiva",
   "tj-ms-analista-judiciario-area-fim-reta-final": "tjms-analista-area-fim-xi-2025-objetiva",
   "tj-rj-analista-e-tecnico-2025": "tjrj-analista-sem-especialidade-lxii-2025-objetiva",
+  "tj-ms-cartorios-reta-final": "tjms-notas-registro-provimento-vi-2025-objetiva",
 };
 
 type Pair = Readonly<{ productSlug: string; editionPublicId: string }>;
