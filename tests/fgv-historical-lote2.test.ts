@@ -68,3 +68,10 @@ describe("lote 2 FGV histórico — TJGO e TRF-2", () => {
     expect(() => assertFgvHistoricalNoticeEvidence(target, { checksum: target.noticeSha256, pages: target.noticePageCount, pageTexts })).toThrow();
   });
 });
+
+describe("lote 2 — escopo regional do TRF-2 no cadastro de prova anterior", () => {
+  it("TRF-2 confere escopo regional; TJGO mantém o estadual padrão", () => {
+    expect(fgvHistoricalPreviousExam("trf-2-juiz-federal-2-regiao").scope).toBe("regional");
+    expect(fgvHistoricalPreviousExam("tj-go-juiz-de-direito-2026").scope).toBeUndefined();
+  });
+});

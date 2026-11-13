@@ -25,6 +25,8 @@ export type FgvHistoricalPreviousExam = Readonly<{
   portalUrl: string; portalHeading: string; portalNotice: Readonly<{ url: string; label: string }>;
   role: string; jurisdiction: string; jurisdictionName: string; institution: string; noticeNumber: string; cycleYear: number; careerSlug: string;
   examDate: string; expectedQuestionCount: number;
+  /** Escopo da oportunidade admitida; estadual por padrão, regional nos TRFs. */
+  scope?: "state" | "regional";
   noticeUrl: string; noticeSha256: string; noticePageCount: number;
   /** Trechos que precisam constar das páginas do edital aprovado (página iniciando em 1). */
   noticeChecks: readonly Readonly<{ page: number; pattern: string }>[];
@@ -116,7 +118,7 @@ export const FGV_HISTORICAL_PREVIOUS_EXAMS: readonly FgvHistoricalPreviousExam[]
     productSlug: "trf-2-juiz-federal-2-regiao", editionPublicId: "trf2-juiz-federal-substituto-xix-2025-objetiva", opportunitySlug: "trf2-juiz-federal-substituto-xix-2025-historico-objetiva",
     portalUrl: "https://conhecimento.fgv.br/concursos/trf2juiz", portalHeading: "Tribunal Regional Federal da 2ª Região",
     portalNotice: { url: `${FGV}sei_1438979_edital_154_retificado.pdf`, label: "Edital (retificado em 17/12/2025)" },
-    role: "Juiz Federal Substituto", jurisdiction: "RJ", jurisdictionName: "Rio de Janeiro", institution: "TRF-2", noticeNumber: "154/2025", cycleYear: 2025, careerSlug: "magistratura",
+    role: "Juiz Federal Substituto", jurisdiction: "RJ", jurisdictionName: "Rio de Janeiro", institution: "TRF-2", scope: "regional", noticeNumber: "154/2025", cycleYear: 2025, careerSlug: "magistratura",
     examDate: "2026-04-12", expectedQuestionCount: 100,
     noticeUrl: `${FGV}sei_1438979_edital_154_retificado.pdf`, noticeSha256: "e6c210d1d01270b785fbc54250ab05d8774e8ccb84e3fcb60dd78d537010f768", noticePageCount: 58,
     noticeChecks: [
@@ -238,7 +240,7 @@ export async function reviewFgvHistoricalRegistration(tx: postgres.TransactionSq
     where product.slug=${target.productSlug} and product.status='draft' and product.preparation_mode='historical_training'
       and product.preparation_approval_reference=${reviewer.approvalReference} and product.preparation_opportunity_updated_at=opportunity.updated_at
       and opportunity.public_id=${opportunityPublicId} and opportunity.slug=${target.opportunitySlug} and opportunity.editorial_status='reviewed'
-      and opportunity.institution_acronym=${target.institution} and opportunity.jurisdiction_code=${target.jurisdiction} and opportunity.scope='state' and opportunity.cycle_year=${target.cycleYear}
+      and opportunity.institution_acronym=${target.institution} and opportunity.jurisdiction_code=${target.jurisdiction} and opportunity.scope=${target.scope ?? "state"} and opportunity.cycle_year=${target.cycleYear}
       and opportunity.official_notice_number=${target.noticeNumber} and opportunity.role_name=${target.role} and opportunity.exam_date=${target.examDate}::date
       and opportunity.specialization_id is null and career.slug=${target.careerSlug} and career.is_active
       and exists(select 1 from opportunity_organizer_assignments organizer where organizer.opportunity_id=opportunity.id
