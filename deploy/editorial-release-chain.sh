@@ -53,8 +53,16 @@ summary() { grep -E '^  "(mode|approved|created|total|eligible|released|drafts)"
 
 log "início; recibos=$RUN_DIR"
 # Imagens são construídas no deploy; o cron não recompila o projeto a cada rodada.
-docker image inspect leiprova-opportunity-approver leiprova-editorial-binding-importer >/dev/null 2>&1 \
-  || { log "ferramentas ausentes; publique as imagens antes de executar"; exit 1; }
+# A limpeza diária de imagens da VPS (prune -a, until=24h) apaga essas ferramentas,
+# que só rodam sob demanda: sem elas a linha parou em 13/10 e 12/11. Reconstrói só
+# as ferramentas ausentes, a partir do checkout publicado, e segue.
+if ! docker image inspect leiprova-opportunity-approver leiprova-editorial-binding-importer >/dev/null 2>&1; then
+  log "ferramentas ausentes; reconstruindo a partir do checkout publicado"
+  docker compose build opportunity-approver editorial-binding-importer >"$RUN_DIR/rebuild-tools.log" 2>&1 \
+    && docker image inspect leiprova-opportunity-approver leiprova-editorial-binding-importer >/dev/null 2>&1 \
+    || { log "ferramentas ausentes e reconstrução falhou; recibo=$RUN_DIR/rebuild-tools.log"; exit 1; }
+  log "ferramentas reconstruídas"
+fi
 ACTOR=$(sql_ro "select public_id from users where role='admin'") || exit 1
 if [ "$(printf '%s\n' "$ACTOR" | grep -c .)" != "1" ]; then log "exige exatamente um admin"; exit 1; fi
 
