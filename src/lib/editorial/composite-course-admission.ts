@@ -30,6 +30,12 @@ export const COMPOSITE_ADMISSION_TARGETS = [
   { productSlug: "tj-pe-juiz-de-direito-2026", slug: "tjpe-juiz-substituto-01-2026-historico-objetiva", acronym: "TJPE", notice: "01/2026", category: "carreiras-juridicas", career: "magistratura", noticeDate: "2026-05-26", statusDate: "2026-09-29", cycleYear: 2026, lifecycleStatus: "exam_held", commission: "Comissão do Concurso Público para Juiz Substituto do TJPE", stages: [
     { title: "Gabarito oficial preliminar da prova objetiva seletiva", url: `${FGV}tjpe-gabaritos-para-publicacao_dda5sa3.pdf`, publishedOn: "2026-09-29" },
   ] },
+  { productSlug: "tj-go-juiz-de-direito-2026", slug: "tjgo-juiz-substituto-59-2025-historico-objetiva", acronym: "TJGO", notice: "01/2025", category: "carreiras-juridicas", career: "magistratura", noticeDate: "2025-12-18", statusDate: "2026-10-28", cycleYear: 2025, lifecycleStatus: "result_published", commission: "Comissão de Seleção e Treinamento do TJGO", stages: [
+    { title: "Resultado definitivo da prova objetiva seletiva", url: `${FGV}476_tjgo-resultado-objetiva-definitivo-2026-05-11.pdf`, publishedOn: "2026-05-13" },
+  ] },
+  { productSlug: "trf-2-juiz-federal-2-regiao", slug: "trf2-juiz-federal-substituto-xix-2025-historico-objetiva", acronym: "TRF-2", notice: "154/2025", category: "carreiras-juridicas", career: "magistratura", noticeDate: "2025-12-17", statusDate: "2026-05-20", cycleYear: 2025, lifecycleStatus: "result_published", commission: "Comissão Organizadora e Examinadora do XIX Concurso do TRF-2", scope: "regional", stages: [
+    { title: "Resultado definitivo da prova objetiva seletiva", url: `${FGV}477-trf2-resultado-definitivo-prova-objetiva-2026-05-15.pdf`, publishedOn: "2026-05-20" },
+  ] },
   { productSlug: "mpe-go-promotor-de-justica-2025", slug: "mpgo-promotor-substituto-63-2025-historico-objetiva", acronym: "MPGO", notice: "182/2025-CSMP", category: "carreiras-juridicas", career: "promotor-justica", noticeDate: "2025-09-22", statusDate: "2026-03-31", cycleYear: 2025, lifecycleStatus: "result_published", commission: "Comissão do 63º Concurso do MPGO", stages: [
     { title: "Comunicado 10 — resultado da prova preambular", url: `${FGV}comissaodeconcurso_comunicado-n-10.pdf`, publishedOn: "2026-03-12" },
   ] },
@@ -155,7 +161,7 @@ export async function admitCompositeOfficialCourse(input: Readonly<{
       const [opportunity] = await tx<{ id: string }[]>`insert into contest_opportunities (public_id, slug, category_id, career_track_id, jurisdiction_code, scope, cycle_year,
         institution_acronym, institution_name, role_name, official_notice_number, title, summary, lifecycle_status, status_as_of, official_url,
         notice_published_at, exam_date, source_checked_at, editorial_status)
-        values (${opportunityPublicId}, ${target.slug}, ${catalog[0].categoryId}, ${catalog[0].careerId}, ${recipe.jurisdiction}, 'state', ${target.cycleYear},
+        values (${opportunityPublicId}, ${target.slug}, ${catalog[0].categoryId}, ${catalog[0].careerId}, ${recipe.jurisdiction}, ${"scope" in target ? target.scope : "state"}, ${target.cycleYear},
           ${target.acronym}, ${recipe.institution}, ${recipe.role}, ${target.notice}, ${`${target.acronym} — treino histórico objetivo ${recipe.cycle}`},
           ${`Programa composto com retificações/republicações oficiais. ${recipe.stage}. Treino histórico objetivo; legislação atual e inéditas exigem preparação própria. Não anuncia edição futura.`},
           ${target.lifecycleStatus}, ${target.statusDate}, ${recipe.documents[0].url}, ${target.noticeDate}, ${recipe.examDate}, ${now}, 'draft') returning id::text`;

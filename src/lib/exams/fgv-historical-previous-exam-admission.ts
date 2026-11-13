@@ -92,6 +92,45 @@ export const FGV_HISTORICAL_PREVIOUS_EXAMS: readonly FgvHistoricalPreviousExam[]
       { documentType: "answer_key", title: "MPGO 63º — Comunicado 09, gabarito oficial definitivo da prova preambular", label: "COMUNICADO Nº 9 - Gabarito Oficial Definitivo da Prova Preambular", publishedOn: "2026-03-11", url: `${FGV}comissaodeconcurso_comunicado-n-09.pdf` },
     ],
   },
+  // Lote 2 FGV histórico (13/11/2026).
+  {
+    productSlug: "tj-go-juiz-de-direito-2026", editionPublicId: "tjgo-juiz-substituto-59-2025-objetiva", opportunitySlug: "tjgo-juiz-substituto-59-2025-historico-objetiva",
+    portalUrl: "https://conhecimento.fgv.br/concursos/tjgo2025", portalHeading: "Tribunal de Justiça do Estado de Goiás",
+    portalNotice: { url: `${FGV}59_juiz_edital_abertura_consolidado_13-01-2026.pdf`, label: "Edital (retificado em 12/01/2026)" },
+    role: "Juiz Substituto", jurisdiction: "GO", jurisdictionName: "Goiás", institution: "TJGO", noticeNumber: "01/2025", cycleYear: 2025, careerSlug: "magistratura",
+    examDate: "2026-03-29", expectedQuestionCount: 100,
+    noticeUrl: `${FGV}59_juiz_edital_abertura_consolidado_13-01-2026.pdf`, noticeSha256: "fbac0aa877753cb1bd36d10dbb2ce2787d164f53b58015277211024dcceeddf4", noticePageCount: 62,
+    noticeChecks: [
+      { page: 19, pattern: "12\\.5[\\s\\S]*100 \\(cem\\) questões de múltipla escolha[\\s\\S]*05 \\(cinco\\) alternativas e apenas uma resposta correta" },
+      { page: 19, pattern: "12\\.1[\\s\\S]*29 de março de 2026" },
+      { page: 1, pattern: "JUIZ SUBSTITUTO DO ESTADO DE GOIÁS" },
+    ],
+    examDateCorroboration: "Portal FGV: caderno Tipo 1 publicado em 31/03/2026 e gabarito oficial definitivo em 28/04/2026, após a data prevista no item 12.1",
+    editionSourceExternalId: "fgv-tjgo-59-2025-objetiva", editionTitle: "TJGO 59º Concurso — Juiz Substituto — objetiva",
+    documents: [
+      { documentType: "question_booklet", title: "TJGO 59º — prova objetiva seletiva — Tipo 1", label: "Tipo 1", publishedOn: "2026-03-31", url: `${FGV}juiz-substituto-j-sub-tipo-1.pdf`, blockIncludes: ["Prova Objetiva Seletiva", "Juiz Substituto"] },
+      { documentType: "answer_key", title: "TJGO 59º — gabarito oficial definitivo da prova objetiva seletiva", label: "Gabarito Oficial Definitivo da Prova Objetiva Seletiva", publishedOn: "2026-04-28", url: `${FGV}tjgo-juiz-substituto-gabarito-definitivo.pdf` },
+    ],
+  },
+  {
+    productSlug: "trf-2-juiz-federal-2-regiao", editionPublicId: "trf2-juiz-federal-substituto-xix-2025-objetiva", opportunitySlug: "trf2-juiz-federal-substituto-xix-2025-historico-objetiva",
+    portalUrl: "https://conhecimento.fgv.br/concursos/trf2juiz", portalHeading: "Tribunal Regional Federal da 2ª Região",
+    portalNotice: { url: `${FGV}sei_1438979_edital_154_retificado.pdf`, label: "Edital (retificado em 17/12/2025)" },
+    role: "Juiz Federal Substituto", jurisdiction: "RJ", jurisdictionName: "Rio de Janeiro", institution: "TRF-2", noticeNumber: "154/2025", cycleYear: 2025, careerSlug: "magistratura",
+    examDate: "2026-04-12", expectedQuestionCount: 100,
+    noticeUrl: `${FGV}sei_1438979_edital_154_retificado.pdf`, noticeSha256: "e6c210d1d01270b785fbc54250ab05d8774e8ccb84e3fcb60dd78d537010f768", noticePageCount: 58,
+    noticeChecks: [
+      { page: 18, pattern: "12\\.5[\\s\\S]*100 \\(cem\\) questões de múltipla escolha[\\s\\S]*05 \\(cinco\\) alternativas e apenas uma resposta correta" },
+      { page: 18, pattern: "12 de abril de 2026" },
+      { page: 1, pattern: "Juiz Federal Substituto da 2ª Região" },
+    ],
+    examDateCorroboration: "Portal FGV: caderno Tipo 1 publicado em 13/04/2026 e gabarito oficial definitivo (retificado) em 06/05/2026, após a data prevista no item 12.1",
+    editionSourceExternalId: "fgv-trf2-xix-2025-objetiva", editionTitle: "TRF-2 XIX Concurso — Juiz Federal Substituto — objetiva",
+    documents: [
+      { documentType: "question_booklet", title: "TRF-2 XIX — prova objetiva seletiva — Tipo 1", label: "Tipo 1", publishedOn: "2026-04-13", url: `${FGV}juiz-federal-substituto-da-2a-regiao-cns100-tipo-1.pdf`, blockIncludes: ["Prova Objetiva Seletiva", "Juiz Federal Substituto"] },
+      { documentType: "answer_key", title: "TRF-2 XIX — gabarito oficial definitivo da prova objetiva seletiva (retificado em 06/05/2026)", label: "Gabarito Oficial Definitivo da Prova Objetiva Seletiva (retificado em 06/05/2026)", publishedOn: "2026-05-06", url: `${FGV}gabarito-definitivo-trf2-juiz-substituto-v2.pdf` },
+    ],
+  },
 ];
 
 export function fgvHistoricalPreviousExam(productSlug: string) {

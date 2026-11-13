@@ -251,6 +251,81 @@ export const NEXT_OFFICIAL_COURSE_RECIPES: readonly NextOfficialCourseRecipe[] =
     repeatableRequirements: ["17. Súmulas, jurisprudência dos Tribunais Superiores e legislação relacionada com os temas."],
     limitations: ["A p.1 cita aprovação na 14ª Sessão Ordinária 'realizada no dia 15 de outubro de 2025', posterior à assinatura (22/09/2025) e à publicação (DOMP4013, 26/09/2025); nenhum ato oficial explica a divergência. A data da sessão não é usada; identidade, banca e programa não dependem dela.", "O edital não liga literalmente cada grupo do programa às disciplinas do item12.1; o vínculo por disciplina é do programa, não da distribuição de questões.", "Preambular histórica com legislação atual; não simula fases subjetivas.", "Legislação estadual de Goiás (LCE25/1998 e outras) exige fonte oficial própria antes de vínculos."],
   },
+  // Lote 2 FGV histórico (13/11/2026): magistratura estadual TJGO e federal TRF-2.
+  {
+    productSlug: "tj-go-juiz-de-direito-2026", institution: "Tribunal de Justiça do Estado de Goiás", role: "Juiz Substituto",
+    jurisdiction: "GO", cycle: "59º Concurso — Edital 01/2025", bankScope: "Fundação Getulio Vargas, responsável pela execução do concurso, sob a Comissão de Seleção e Treinamento do TJGO",
+    portalUrl: "https://conhecimento.fgv.br/concursos/tjgo2025", examDate: "2026-03-29", examDateEvidence: { documentKey: "tjgo-notice", page: 19, item: "12.1", quote: "está prevista para o dia 29 de março de 2026", actualDayIndependentlyVerified: false, corroboratingUrl: `${FGV_FILES}juiz-substituto-j-sub-tipo-1.pdf`, limitation: "O texto do gabarito não é extraído (política de material de prova); o portal publicou o caderno Tipo1 em31/03/2026 e o gabarito definitivo em28/04/2026, compatíveis com a data prevista." },
+    stage: "Objetiva com gabarito definitivo (28/04/2026) e resultado definitivo (13/05/2026); resultado definitivo da prova prática em28/10/2026",
+    stageObservedOn: "2026-11-13", proposedMode: "historical_training", expectedSubjects: 14,
+    documents: [
+      { key: "tjgo-notice", url: `${FGV_FILES}59_juiz_edital_abertura_consolidado_13-01-2026.pdf`, title: "Edital01/2025 TJGO — 59º Concurso de Juiz Substituto, consolidado em13/01/2026", pages: 62, programmePages: [43, 58], layout: {
+        headings: [
+          { line: "DIREITO CIVIL", subject: "Direito Civil" }, { line: "DIREITO PROCESSUAL CIVIL", subject: "Direito Processual Civil" },
+          { line: "DIREITO DO CONSUMIDOR", subject: "Direito do Consumidor" }, { line: "DIREITO DA CRIANÇA E DO ADOLESCENTE", subject: "Direito da Criança e do Adolescente" },
+          { line: "DIREITO PENAL", subject: "Direito Penal" }, { line: "DIREITO PROCESSUAL PENAL", subject: "Direito Processual Penal" },
+          { line: "DIREITO CONSTITUCIONAL", subject: "Direito Constitucional" }, { line: "DIREITO ELEITORAL", subject: "Direito Eleitoral" },
+          { line: "DIREITO EMPRESARIAL", subject: "Direito Empresarial" }, { line: "DIREITO TRIBUTÁRIO E FINANCEIRO", subject: "Direito Tributário e Financeiro" },
+          { line: "DIREITO AMBIENTAL", subject: "Direito Ambiental" }, { line: "DIREITO ADMINISTRATIVO", subject: "Direito Administrativo" },
+          { line: "NOÇÕES GERAIS DE DIREITO E FORMAÇÃO HUMANÍSTICA", subject: "Noções Gerais de Direito e Formação Humanística" },
+          { line: "DIREITOS HUMANOS", subject: "Direitos Humanos" },
+        ],
+        ignoreLines: ["\\d+TRIBUNAL DE JUSTIÇA DO ESTADO DE GOIÁS", "ANEXO II – CONTEÚDO PROGRAMÁTICO", "CARGO: JUIZ SUBSTITUTO", "BLOCO (?:I|II|III)"],
+      } },
+    ],
+    overlays: [],
+    identityClaims: [
+      { document: "tjgo-notice", page: 1, contains: ["EDITAL Nº 01/2025 de ABERTURA", "59º CONCURSO DE JUIZ SUBSTITUTO DO ESTADO DE GOIÁS", "CONSOLIDADO EM 13 DE JANEIRO DE 2026", "Fundação Getulio Vargas"] },
+      { document: "tjgo-notice", page: 19, contains: ["12.1", "29 de março de 2026", "100 (cem) questões de múltipla escolha", "05 (cinco) alternativas e apenas uma resposta correta"] },
+      { document: "tjgo-notice", page: 43, contains: ["ANEXO II – CONTEÚDO PROGRAMÁTICO", "CARGO: JUIZ SUBSTITUTO", "DIREITO CIVIL"] },
+    ],
+    previousExam: { cycle: "59º Concurso — objetiva já realizada em29/03/2026", role: "Juiz Substituto — prova objetiva seletiva", portalUrl: "https://conhecimento.fgv.br/concursos/tjgo2025", examDate: "2026-03-29", answerKeyFinality: "definitive_document", documents: [
+      { type: "question_booklet", title: "TJGO 59º — caderno Tipo1 da prova objetiva seletiva", url: `${FGV_FILES}juiz-substituto-j-sub-tipo-1.pdf` },
+      { type: "answer_key", title: "TJGO 59º — gabarito oficial definitivo da prova objetiva seletiva", url: `${FGV_FILES}tjgo-juiz-substituto-gabarito-definitivo.pdf` },
+    ] },
+    limitations: ["A 1ª retificação (Edital02/2026) altera só o item6.3.2 (laudo de pessoa com deficiência) e não muda o AnexoII; o edital consolidado já a incorpora.", "O produto se chama 'Juiz de Direito', mas o cargo oficial é Juiz Substituto.", "Treino histórico da objetiva com legislação atual; não simula discursiva, sentença ou oral.", "Organização judiciária, custas e regimentos de Goiás exigem fonte estadual própria antes de vínculos."],
+  },
+  {
+    productSlug: "trf-2-juiz-federal-2-regiao", institution: "Tribunal Regional Federal da 2ª Região", role: "Juiz Federal Substituto",
+    jurisdiction: "RJ", cycle: "XIX Concurso — Edital TRF2 154/2025", bankScope: "Fundação Getulio Vargas na primeira etapa (prova objetiva seletiva); Comissão Organizadora e Examinadora do TRF-2 nas demais",
+    portalUrl: "https://conhecimento.fgv.br/concursos/trf2juiz", examDate: "2026-04-12", examDateEvidence: { documentKey: "trf2-notice", page: 18, item: "12.1", quote: "12 de abril de 2026, das 13h às 18h", actualDayIndependentlyVerified: false, corroboratingUrl: `${FGV_FILES}juiz-federal-substituto-da-2a-regiao-cns100-tipo-1.pdf`, limitation: "O texto do gabarito não é extraído (política de material de prova); o portal publicou o caderno Tipo1 em13/04/2026 e o gabarito definitivo retificado em06/05/2026, compatíveis com a data prevista." },
+    stage: "Objetiva com gabarito definitivo retificado (06/05/2026) e resultado definitivo (20/05/2026); provas escritas e oral conduzidas pela comissão do TRF-2",
+    stageObservedOn: "2026-11-13", proposedMode: "historical_training", expectedSubjects: 15,
+    documents: [
+      { key: "trf2-notice", url: `${FGV_FILES}sei_1438979_edital_154_retificado.pdf`, title: "Edital TRF2154/2025 — XIX Concurso de Juiz Federal Substituto, retificado em17/12/2025 pelo Edital157/2025", pages: 58, programmePages: [30, 56], layout: {
+        headings: [
+          { line: "DIREITO CONSTITUCIONAL", subject: "Direito Constitucional" }, { line: "DIREITO ADMINISTRATIVO", subject: "Direito Administrativo" },
+          { line: "DIREITO PENAL", subject: "Direito Penal" }, { line: "DIREITO PROCESSUAL PENAL", subject: "Direito Processual Penal" },
+          { line: "DIREITO CIVIL", subject: "Direito Civil" }, { line: "DIREITO PROCESSUAL CIVIL", subject: "Direito Processual Civil" },
+          { line: "DIREITO PREVIDENCIÁRIO", subject: "Direito Previdenciário" },
+          { line: "DIREITO FINANCEIRO", subject: "Direito Financeiro" }, { line: "DIREITO TRIBUTÁRIO", subject: "Direito Tributário" },
+          { line: "DIREITO AMBIENTAL", subject: "Direito Ambiental" },
+          { line: "DIREITO INTERNACIONAL PÚBLICO E INTERNACIONAL PRIVADO", subject: "Direito Internacional Público e Privado" },
+          { line: "DIREITO EMPRESARIAL", subject: "Direito Empresarial" },
+          { line: "DIREITO ECONÔMICO E DE PROTEÇÃO AO CONSUMIDOR", subject: "Direito Econômico e de Proteção ao Consumidor" },
+          { line: "NOÇÕES GERAIS DE DIREITO E FORMAÇÃO HUMANÍSTICA", subject: "Noções Gerais de Direito e Formação Humanística" },
+          { line: "DIREITOS HUMANOS", subject: "Direitos Humanos" },
+        ],
+        // O título conjunto "DIREITO FINANCEIRO E TRIBUTÁRIO" só agrupa as duas disciplinas seguintes;
+        // os subtítulos A)–H) da formação humanística e as notas de inclusão por resolução não são requisitos.
+        ignoreLines: ["Edital 154 \\(1438979\\) SEI 0026204-71\\.2025\\.4\\.02\\.8000 / pg\\. \\d+", "ANEXO I - CONTEÚDO PROGRAMÁTICO", "ANEXO - CONTEÚDO PROGRAMÁTICO",
+          "CARGO: JUIZ SUBSTITUTO", "DIREITO FINANCEIRO E TRIBUTÁRIO", "[A-H]\\) [A-ZÀ-Ü ,]+(?: \\(incluído pela Resolução n\\. 423, de 5\\.10\\.2021\\)\\.)?",
+          "\\(incluído pela Resolução n\\. 423, de 5\\.10\\.2021\\)\\.", "\\(Resolução n\\. 496, de 3\\.4\\.2023\\)"],
+      } },
+    ],
+    overlays: [],
+    identityClaims: [
+      { document: "trf2-notice", page: 1, contains: ["EDITAL TRF2 Nº 154/2025", "RETIFICADO EM 17 DE DEZEMBRO DE 2025 PELO EDITAL TRF2 Nº 157/2025", "XIX Concurso público de provas e títulos", "Juiz Federal Substituto da 2ª Região", "Fundação Getulio Vargas"] },
+      { document: "trf2-notice", page: 17, contains: ["12.1 A Prova Objetiva Seletiva"] },
+      { document: "trf2-notice", page: 18, contains: ["12 de abril de 2026", "100 (cem) questões de múltipla escolha", "05 (cinco) alternativas e apenas uma resposta correta"] },
+      { document: "trf2-notice", page: 30, contains: ["ANEXO I - CONTEÚDO PROGRAMÁTICO", "DIREITO CONSTITUCIONAL"] },
+    ],
+    previousExam: { cycle: "XIX Concurso — objetiva já realizada em12/04/2026", role: "Juiz Federal Substituto — prova objetiva seletiva", portalUrl: "https://conhecimento.fgv.br/concursos/trf2juiz", examDate: "2026-04-12", answerKeyFinality: "definitive_document", documents: [
+      { type: "question_booklet", title: "TRF-2 XIX — caderno Tipo1 da prova objetiva seletiva", url: `${FGV_FILES}juiz-federal-substituto-da-2a-regiao-cns100-tipo-1.pdf` },
+      { type: "answer_key", title: "TRF-2 XIX — gabarito oficial definitivo da prova objetiva seletiva (retificado em06/05/2026)", url: `${FGV_FILES}gabarito-definitivo-trf2-juiz-substituto-v2.pdf` },
+    ] },
+    limitations: ["A 1ª retificação (Edital157/2025) altera datas da segunda à quarta etapa e o número de questões discursivas; o edital publicado como retificado já a incorpora e o AnexoI não muda.", "Os subtítulos A)–H) de Noções Gerais (Sociologia, Psicologia, Ética, Filosofia, Teoria Geral, Direito Digital, Pragmatismo/AED e Antidiscriminação) não viram requisitos próprios; os itens numerados de cada um ficam sob a mesma disciplina.", "Competência regional (RJ e ES): a jurisdição registrada é RJ, sede do tribunal, com escopo regional.", "Treino histórico da objetiva com legislação atual; não simula provas escritas, sentença ou oral."],
+  },
 ];
 
 function normalized(value: string) { return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, " ").toLowerCase().trim(); }

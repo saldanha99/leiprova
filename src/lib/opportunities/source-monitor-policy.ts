@@ -38,6 +38,11 @@ export const OFFICIAL_OPPORTUNITY_SOURCE_POLICIES = [
       "/sites/default/files/concursos/tjpe-gabaritos-para-publicacao_dda5sa3.pdf",
       "/sites/default/files/concursos/edital-retificado-publicado.pdf",
       "/sites/default/files/concursos/comissaodeconcurso_comunicado-n-10.pdf",
+      // Lote 2 FGV histórico (TJGO, TRF-2): editais exatos e resultado definitivo da objetiva (metadados).
+      "/sites/default/files/concursos/59_juiz_edital_abertura_consolidado_13-01-2026.pdf",
+      "/sites/default/files/concursos/476_tjgo-resultado-objetiva-definitivo-2026-05-11.pdf",
+      "/sites/default/files/concursos/sei_1438979_edital_154_retificado.pdf",
+      "/sites/default/files/concursos/477-trf2-resultado-definitivo-prova-objetiva-2026-05-15.pdf",
     ],
   },
   {

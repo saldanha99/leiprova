@@ -33,6 +33,8 @@ export const FGV_HISTORICAL_PREVIOUS_PAIRS: Readonly<Record<string, string>> = {
   "tj-pr-juiz-de-direito-2025-2026": "tjpr-juiz-substituto-001-2025-objetiva",
   "tj-ba-juiz-de-direito-2026": "tjba-juiz-substituto-01-2026-objetiva",
   "mpe-go-promotor-de-justica-2025": "mpgo-promotor-substituto-63-2025-preambular",
+  "tj-go-juiz-de-direito-2026": "tjgo-juiz-substituto-59-2025-objetiva",
+  "trf-2-juiz-federal-2-regiao": "trf2-juiz-federal-substituto-xix-2025-objetiva",
 };
 
 type Pair = Readonly<{ productSlug: string; editionPublicId: string }>;
