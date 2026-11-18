@@ -49,6 +49,8 @@ export const OFFICIAL_OPPORTUNITY_SOURCE_POLICIES = [
       "/sites/default/files/concursos/397-tjrj-analista-resultado-definitivo-prova-discursiva-2026-06-08_0.pdf",
       "/sites/default/files/concursos/edital-tjms-notarial-2025-com-2a-retificacao.pdf",
       "/sites/default/files/concursos/427_tjms-resultado-definitivo-prova-escrita-e-pratica-2026-08-25.pdf",
+      "/sites/default/files/concursos/copia-1-de-edital-01-2026-pcpr-publicacao.docx.pdf",
+      "/sites/default/files/concursos/pcpr2026-resultado-prova-objetiva_reprocessamento-v2.pdf",
     ],
   },
   {

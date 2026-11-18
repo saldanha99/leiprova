@@ -39,6 +39,7 @@ export const FGV_HISTORICAL_PREVIOUS_PAIRS: Readonly<Record<string, string>> = {
   "tj-rj-analista-e-tecnico-2025": "tjrj-analista-sem-especialidade-lxii-2025-objetiva",
   "tj-ms-cartorios-reta-final": "tjms-notas-registro-provimento-vi-2025-objetiva",
   "tj-pe-juiz-de-direito-2026": "tjpe-juiz-substituto-01-2026-objetiva",
+  "pc-pr-delegado-2026": "pcpr-delegado-01-2026-objetiva",
 };
 
 type Pair = Readonly<{ productSlug: string; editionPublicId: string }>;

@@ -23,6 +23,7 @@ export const PROGRAMME_CLASSIFICATION_SCOPES = {
   "tjms-analista-area-fim-xi-2025-historico-objetiva": "Analista Judiciário - Área Fim",
   "tjrj-analista-sem-especialidade-lxii-2025-historico-objetiva": "Analista Judiciário – Sem Especialidade",
   "tjms-notas-registro-provimento-vi-2025-historico-objetiva": "Outorga de Delegações de Notas e de Registro — Ingresso por Provimento",
+  "pcpr-delegado-01-2026-historico-objetiva": "Delegado de Polícia",
   "mpgo-promotor-substituto-63-2025-historico-objetiva": "Promotora e Promotor de Justiça Substituto",
 } as const;
 export const PROGRAMME_SUBJECT_CLASSIFICATION_ACTION = "editorial.programme.subject_classified";
@@ -33,8 +34,8 @@ const headingKey = (value: string) => normalize(value).toLocaleUpperCase("pt-BR"
 // Numbered section labels are syntax, not a synonym. The complete original
 // line is retained in headingQuote and proved against the official page.
 // Glifos de uso privado (ex.: marcador U+F034 colado ao título no PDF do TJMS) são gráfico, não texto.
-// Título no início do parágrafo ("DIREITO CIVIL. Lei de…", TJMS Cartórios): o nome é o prefixo em maiúsculas antes do ponto.
-const inlineHeadingPrefix = (name: string) => /^([A-ZÀ-ÖØ-Þ][A-ZÀ-ÖØ-Þ ,–-]{3,}[A-ZÀ-ÖØ-Þ])\. \S/u.exec(name)?.[1] ?? name;
+// Título no início do parágrafo ("DIREITO CIVIL. Lei de…", TJMS Cartórios; "1. DIREITO PENAL: 1.1 …", PCPR): o nome é o prefixo em maiúsculas antes do ponto ou dois-pontos.
+const inlineHeadingPrefix = (name: string) => /^([A-ZÀ-ÖØ-Þ][A-ZÀ-ÖØ-Þ ,–-]{3,}[A-ZÀ-ÖØ-Þ])[.:] \S/u.exec(name)?.[1] ?? name;
 export const programmeLiteralHeadingName = (line: string) => inlineHeadingPrefix(normalize(line).replace(/^[-]+\s*/u, "").replace(/^\d+(?:\.\d+)*[.)]?\s*[–—-]?\s*/u, "").split(" - Ponto 1.", 1)[0]);
 const sha = z.string().regex(/^[a-f0-9]{64}$/u);
 const id = z.number().int().positive().safe();
@@ -56,7 +57,9 @@ export const PROGRAMME_SECTION_HEADINGS = [...PROGRAMME_CANONICAL_SUBJECTS, "Dir
   "Direito Notarial e Registral", "Registro de Imóveis", "Tabelionato de Notas", "Registro Civil das Pessoas Naturais", "Registro Civil das Pessoas Jurídicas",
   "Registros de Títulos e Documentos", "Tabelionato de Protesto", "Leis Locais Relacionadas aos Serviços Extrajudiciais",
   "Atos Normativos do Conselho Superior da Magistratura e da Presidência do TJMS", "Atos Normativos da Corregedoria-Geral de Justiça do Estado de Mato Grosso do Sul",
-  "Atos Normativos do Conselho Nacional de Justiça – CNJ", "Conhecimentos Gerais", "Legislação Especial do Estado de Mato Grosso do Sul", "Legislação Especial Federal"] as const;
+  "Atos Normativos do Conselho Nacional de Justiça – CNJ", "Conhecimentos Gerais", "Legislação Especial do Estado de Mato Grosso do Sul", "Legislação Especial Federal",
+  // PCPR Delegado: títulos numerados inline com dois-pontos.
+  "Legislação Penal e Legislação Processual Penal Extravagante", "Direito Administrativo e Gestão Pública", "Legislação Estadual e Institucional", "Ciências Forenses"] as const;
 export function programmeCanonicalSubject(heading: string) {
   const base = PROGRAMME_CANONICAL_SUBJECTS.find(subject => headingKey(subject) === headingKey(heading));
   if (base) return base;

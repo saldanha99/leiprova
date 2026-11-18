@@ -15,7 +15,9 @@ const FGV_FILES = "https://conhecimento.fgv.br/sites/default/files/concursos/";
 export type ProgrammeLayout = Readonly<{
   headings: readonly Readonly<{ line: string; subject: string; continuation?: string;
     /** Título no início do parágrafo ("DIREITO CIVIL. Lei de…"): abre a seção e o restante da linha é conteúdo. */
-    inline?: boolean }>[];
+    inline?: boolean;
+    /** Pontuação literal entre o título inline e o conteúdo; "." por padrão ("1. DIREITO PENAL: 1.1 …" usa ":"). */
+    inlineSeparator?: ":" }>[];
   ignoreLines: readonly string[];
   /** Programa em prosa corrida ("1. … 2. …" na mesma linha): cada item numerado vira um fragmento. */
   splitInlineItems?: boolean;
@@ -23,7 +25,7 @@ export type ProgrammeLayout = Readonly<{
   stopLine?: string;
   /** "top-level-numbers": "1 Tema. 1.1 Sub. 2 Tema." agrupa subitens no item de primeiro nível.
    * "sentences": programa em prosa sem numeração; cada período literal é um requisito. */
-  itemMode?: "top-level-numbers" | "sentences";
+  itemMode?: "top-level-numbers" | "second-level-numbers" | "sentences";
 }>;
 export type PreviewDocumentRecipe = Readonly<{ key: string; url: string; title: string; pages: number; programmePages: readonly [number, number] | null; layout?: ProgrammeLayout }>;
 export type NextOfficialCourseRecipe = Readonly<{
@@ -462,6 +464,45 @@ export const NEXT_OFFICIAL_COURSE_RECIPES: readonly NextOfficialCourseRecipe[] =
     skipRepeatedRequirements: true,
     limitations: ["Programa em prosa sem numeração: cada período literal vira um requisito e a repetição literal guarda só a primeira ocorrência.", "Ingresso por provimento; a remoção tem o mesmo quadro de disciplinas e o mesmo Anexo II, em turno próprio.", "Edital consolidado com as 1ª e 2ª retificações; o Edital 04/2025 só corrige o Anexo I (serventias).", "Treino histórico da objetiva com legislação atual; leis estaduais, atos do TJMS e da CGJ exigem fonte oficial própria antes de vínculos."],
   },
+  // PCPR 2026 — Delegado de Polícia: títulos numerados inline ("1. DIREITO PENAL: 1.1 …"), itens de segundo nível.
+  {
+    productSlug: "pc-pr-delegado-2026", institution: "Polícia Civil do Estado do Paraná", role: "Delegado de Polícia",
+    jurisdiction: "PR", cycle: "Edital 01/2026", bankScope: "Fundação Getulio Vargas, executora do concurso, com a FUNDASEG e a Comissão de Concurso da PCPR",
+    portalUrl: "https://conhecimento.fgv.br/concursos/pcpr26", examDate: "2026-10-11", examDateEvidence: { documentKey: "pcpr-notice", page: 25, item: "9.1", quote: "Curitiba/PR, Londrina/PR e Cascavel/PR, no dia 11 de outubro de 2026 (domingo), no turno da", actualDayIndependentlyVerified: false, corroboratingUrl: `${FGV_FILES}cns101-delegado-de-policia-cns101-tipo-1.pdf`, limitation: "O texto do gabarito não é extraído (política de material de prova); o portal publicou os cadernos em 13/10/2026 e o gabarito definitivo em 13/11/2026, compatíveis com a data do edital." },
+    stage: "Objetiva com gabarito definitivo (13/11/2026) e resultado preliminar publicado em 13/11/2026",
+    stageObservedOn: "2026-11-18", proposedMode: "historical_training", expectedSubjects: 8,
+    documents: [
+      { key: "pcpr-notice", url: `${FGV_FILES}copia-1-de-edital-01-2026-pcpr-publicacao.docx.pdf`, title: "Edital 01/2026 PCPR — Delegado, Agente de Polícia Judiciária e Papiloscopista, retificado em 31/07/2026", pages: 107, programmePages: [65, 69], layout: {
+        headings: [
+          { line: "1. DIREITO PENAL", subject: "Direito Penal", inline: true, inlineSeparator: ":" },
+          { line: "2. DIREITO PROCESSUAL PENAL", subject: "Direito Processual Penal", inline: true, inlineSeparator: ":" },
+          { line: "3. LEGISLAÇÃO PENAL E LEGISLAÇÃO PROCESSUAL PENAL EXTRAVAGANTE", subject: "Legislação Penal e Legislação Processual Penal Extravagante", inline: true, inlineSeparator: ":" },
+          { line: "4. DIREITO CONSTITUCIONAL", subject: "Direito Constitucional", inline: true, inlineSeparator: ":" },
+          { line: "5. DIREITO ADMINISTRATIVO E GESTÃO PÚBLICA", subject: "Direito Administrativo e Gestão Pública", inline: true, inlineSeparator: ":" },
+          { line: "6. LEGISLAÇÃO ESTADUAL E INSTITUCIONAL", subject: "Legislação Estadual e Institucional", inline: true, inlineSeparator: ":" },
+          { line: "7. DIREITOS HUMANOS", subject: "Direitos Humanos", inline: true, inlineSeparator: ":" },
+          { line: "8. CIÊNCIAS FORENSES", subject: "Ciências Forenses", inline: true, inlineSeparator: ":" },
+        ],
+        ignoreLines: ["ANEXO I", "CONTEÚDO PROGRAMÁTICO", "DELEGADO DE POLÍCIA"],
+        stopLine: "AGENTE DE POLÍCIA JUDICIÁRIA E PAPILOSCOPISTA POLICIAL",
+        itemMode: "second-level-numbers",
+      } },
+    ],
+    overlays: [],
+    identityClaims: [
+      { document: "pcpr-notice", page: 1, contains: ["CONCURSO PÚBLICO DA POLÍCIA CIVIL DO PARANÁ", "EDITAL N.º 01/2026"] },
+      { document: "pcpr-notice", page: 2, contains: ["1.5 O concurso será executado sob a responsabilidade da Fundação Getulio Vargas, doravante"] },
+      { document: "pcpr-notice", page: 25, contains: ["no dia 11 de outubro de 2026 (domingo)"] },
+      { document: "pcpr-notice", page: 26, contains: ["9.5 A Prova Objetiva para o cargo de Delegado de Polícia", "será composta por 100 (cem) questões de múltipla escolha"] },
+      { document: "pcpr-notice", page: 28, contains: ["contendo 5 (cinco) alternativas cada, e apenas"] },
+      { document: "pcpr-notice", page: 65, contains: ["CONTEÚDO PROGRAMÁTICO", "DELEGADO DE POLÍCIA", "1. DIREITO PENAL: 1.1"] },
+    ],
+    previousExam: { cycle: "Edital 01/2026 — objetiva aplicada em 11/10/2026", role: "Delegado de Polícia — prova objetiva", portalUrl: "https://conhecimento.fgv.br/concursos/pcpr26", examDate: "2026-10-11", answerKeyFinality: "definitive_document", documents: [
+      { type: "question_booklet", title: "PCPR 01/2026 — caderno Tipo 1 da prova objetiva de Delegado de Polícia", url: `${FGV_FILES}cns101-delegado-de-policia-cns101-tipo-1.pdf` },
+      { type: "answer_key", title: "PCPR 01/2026 — gabarito oficial definitivo da prova objetiva", url: `${FGV_FILES}gabaritos-definitivos-v3.pdf` },
+    ] },
+    limitations: ["Só Delegado de Polícia; Agente de Polícia Judiciária e Papiloscopista têm programa próprio no mesmo anexo.", "Itens agrupados pelo número de segundo nível; subitens (1.1.1…) ficam no item.", "A 1ª retificação (Edital 02/2026) altera exame médico e títulos, sem mudar o Anexo I.", "Treino histórico da objetiva com legislação atual; legislação estadual do Paraná exige fonte oficial própria antes de vínculos."],
+  },
 ];
 
 function normalized(value: string) { return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, " ").toLowerCase().trim(); }
@@ -492,7 +533,7 @@ function extractLayoutSections(recipe: PreviewDocumentRecipe, layout: ProgrammeL
         continue;
       }
       if (ignore.some((pattern) => pattern.test(line))) continue;
-      const inlineHeading = headings.find((item) => item.inline && line.startsWith(`${item.line}. `));
+      const inlineHeading = headings.find((item) => item.inline && line.startsWith(`${item.line}${item.inlineSeparator ?? "."} `));
       const heading = inlineHeading ?? headings.find((item) => !item.inline && item.key === normalized(line));
       if (heading) {
         if (sections.length !== headings.indexOf(heading)) throw new Error("Título de disciplina fora da ordem do layout.");
@@ -503,7 +544,7 @@ function extractLayoutSections(recipe: PreviewDocumentRecipe, layout: ProgrammeL
         if (!inlineHeading) continue;
       }
       if (!current) continue;
-      if (inlineHeading && current.fragments.length === 0) line = line.slice(inlineHeading.line.length + 2);
+      if (inlineHeading && current.fragments.length === 0) line = line.slice(inlineHeading.line.length + (inlineHeading.inlineSeparator ?? ".").length + 1);
       if (layout.itemMode === "top-level-numbers") {
         // "1 Tema. 1.1 Subtema. 2 Tema." (estilo Cebraspe/FGV corrido): só o número de primeiro
         // nível abre item; subitens continuam no item. Número isolado no fim da linha abre a seguinte.
@@ -511,6 +552,19 @@ function extractLayoutSections(recipe: PreviewDocumentRecipe, layout: ProgrammeL
         const body = trailing ? line.slice(0, trailing.index) : line;
         body.split(/\s+(?=\d{1,2} [A-ZÀ-Ö])/u).forEach((part, partIndex) => {
           const opens = !current!.fragments.length || (partIndex === 0 && continuesNext ? false : /^\d{1,2} [A-ZÀ-Ö]/u.test(part));
+          current!.fragments.push({ page: index + 1, text: part, start: opens });
+        });
+        continuesNext = false;
+        if (trailing) { current.fragments.push({ page: index + 1, text: trailing[1], start: true }); continuesNext = true; }
+        continue;
+      }
+      if (layout.itemMode === "second-level-numbers") {
+        // "1.1 Tema. 1.1.1 Sub. 1.2 Tema." (título numerado inline): o número de segundo nível abre
+        // item e os de terceiro nível continuam nele. Número isolado no fim da linha abre a seguinte.
+        const trailing = /\s(\d{1,2}\.\d{1,2}\.?)$/u.exec(line);
+        const body = trailing ? line.slice(0, trailing.index) : line;
+        body.split(/\s+(?=\d{1,2}\.\d{1,2}\.?\s+[A-ZÀ-Ö])/u).forEach((part, partIndex) => {
+          const opens = !current!.fragments.length || (partIndex === 0 && continuesNext ? false : /^\d{1,2}\.\d{1,2}\.?\s+[A-ZÀ-Ö]/u.test(part));
           current!.fragments.push({ page: index + 1, text: part, start: opens });
         });
         continuesNext = false;

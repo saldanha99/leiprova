@@ -172,3 +172,39 @@ describe("lote 2 — TJMS Cartórios: título no início do parágrafo", () => {
     expect(programmeLiteralHeadingName("DIREITO PENAL")).toBe("DIREITO PENAL");
   });
 });
+
+describe("PCPR Delegado: título numerado inline com dois-pontos", () => {
+  const slug = "pc-pr-delegado-2026";
+  it("tem receita, alvo que só religa a oportunidade de catálogo vazia nomeada, prova anterior e escopo", () => {
+    const recipe = recipeOf(slug);
+    expect(recipe.documents[0].layout!.headings).toHaveLength(recipe.expectedSubjects);
+    expect(compositeCourseTarget(slug).target).toMatchObject({ category: "carreiras-policiais", career: "delegado", replacesEmptyOpportunitySlug: "pc-pr-2026", notice: "01/2026-Delegado" });
+    expect(fgvHistoricalPreviousExam(slug).noticeNumber).toBe("01/2026-Delegado");
+    expect(FGV_HISTORICAL_PREVIOUS_PAIRS[slug]).toBe("pcpr-delegado-01-2026-objetiva");
+    expect(PROGRAMME_CLASSIFICATION_SCOPES["pcpr-delegado-01-2026-historico-objetiva"]).toBe(recipe.role);
+    expect(parseOfficialOpportunitySourceUrl(recipe.documents[0].url)).not.toBeNull();
+  });
+
+  it("número de segundo nível abre item, terceiro nível continua e o número no fim da linha abre a seguinte", () => {
+    const doc = recipeOf(slug).documents[0];
+    const lines = ["ANEXO I", "CONTEÚDO PROGRAMÁTICO", "DELEGADO DE POLÍCIA"];
+    doc.layout!.headings.forEach((heading, index) => {
+      const n = index + 1;
+      lines.push(`${heading.line}: ${n}.1 Tema ${n}. ${n}.1.1 Sub ${n}. ${n}.2`, `Outro tema ${n}. ${n}.2.1 Detalhe.`);
+    });
+    lines.push(doc.layout!.stopLine!, "1. LÍNGUA PORTUGUESA: 1.1 Outro cargo.");
+    const sections = extractDossierSubjectSections(doc, capture(doc, { 65: lines.join("\n") }));
+    expect(sections).toHaveLength(8);
+    const requirements = compositeProgrammeRequirements(sections, [], true);
+    expect(requirements.slice(0, 2).map((item) => item.requirementText)).toEqual(["1.1 Tema 1. 1.1.1 Sub 1.", "1.2 Outro tema 1. 1.2.1 Detalhe."]);
+    expect(requirements).toHaveLength(16);
+    expect(requirements.some((item) => /Outro cargo/u.test(item.requirementText))).toBe(false);
+  });
+
+  it("nome literal do título numerado com dois-pontos é o prefixo", async () => {
+    const { programmeLiteralHeadingName, programmeCanonicalSubject } = await import("@/lib/editorial/programme-subject-classification");
+    expect(programmeCanonicalSubject(programmeLiteralHeadingName("1. DIREITO PENAL: 1.1 Princípios Fundamentais do Direito Penal. 1.1.1 Princípios da Legalidade,"))).toBe("Direito Penal");
+    expect(programmeCanonicalSubject(programmeLiteralHeadingName("5. DIREITO ADMINISTRATIVO E GESTÃO PÚBLICA: 5.1 Conceito e fontes do Direito"))).toBeNull();
+    expect(programmeLiteralHeadingName("Direito Administrativo: (...) 6. Licitações")).toBe("Direito Administrativo: (...) 6. Licitações");
+  });
+});

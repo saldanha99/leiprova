@@ -209,6 +209,25 @@ export const FGV_HISTORICAL_PREVIOUS_EXAMS: readonly FgvHistoricalPreviousExam[]
       { documentType: "answer_key", title: "TJPE 01/2026 — gabarito oficial definitivo da prova objetiva seletiva", label: "Gabarito Oficial Definitivo da Prova Objetiva Seletiva", publishedOn: "2026-11-11", url: `${FGV}gabaritodefinitivo.pdf` },
     ],
   },
+  {
+    productSlug: "pc-pr-delegado-2026", editionPublicId: "pcpr-delegado-01-2026-objetiva", opportunitySlug: "pcpr-delegado-01-2026-historico-objetiva",
+    portalUrl: "https://conhecimento.fgv.br/concursos/pcpr26", portalHeading: "Polícia Civil do Estado do Paraná",
+    portalNotice: { url: `${FGV}copia-1-de-edital-01-2026-pcpr-publicacao.docx.pdf`, label: "Edital (retificado em 31/07/2026)" },
+    role: "Delegado de Polícia", jurisdiction: "PR", jurisdictionName: "Paraná", institution: "PCPR", noticeNumber: "01/2026-Delegado", cycleYear: 2026, careerSlug: "delegado",
+    examDate: "2026-10-11", expectedQuestionCount: 100,
+    noticeUrl: `${FGV}copia-1-de-edital-01-2026-pcpr-publicacao.docx.pdf`, noticeSha256: "475b4bd7025d47074c366a1e35e0511045dd84904719245e95c7fd061f35efdb", noticePageCount: 107,
+    noticeChecks: [
+      { page: 26, pattern: "9\\.5 A Prova Objetiva para o cargo de Delegado de Polícia[\\s\\S]*100 \\(cem\\) questões de múltipla escolha" },
+      { page: 28, pattern: "5 \\(cinco\\) alternativas cada, e apenas" },
+      { page: 25, pattern: "no dia 11 de outubro de 2026" },
+    ],
+    examDateCorroboration: "Portal FGV: cadernos publicados em 13/10/2026; gabarito oficial definitivo em 13/11/2026",
+    editionSourceExternalId: "fgv-pcpr-01-2026-delegado-objetiva", editionTitle: "PCPR 01/2026 — Delegado de Polícia — objetiva",
+    documents: [
+      { documentType: "question_booklet", title: "PCPR 01/2026 — prova objetiva — Delegado de Polícia — Tipo 1", label: "Tipo 1", publishedOn: "2026-10-13", url: `${FGV}cns101-delegado-de-policia-cns101-tipo-1.pdf`, blockIncludes: ["Prova Objetiva", "Delegado de Polícia"] },
+      { documentType: "answer_key", title: "PCPR 01/2026 — gabarito oficial definitivo da prova objetiva", label: "Gabarito Oficial Definitivo da Prova Objetiva", publishedOn: "2026-11-13", url: `${FGV}gabaritos-definitivos-v3.pdf` },
+    ],
+  },
 ];
 
 export function fgvHistoricalPreviousExam(productSlug: string) {

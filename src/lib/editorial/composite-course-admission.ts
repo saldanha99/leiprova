@@ -48,6 +48,10 @@ export const COMPOSITE_ADMISSION_TARGETS = [
   { productSlug: "tj-ms-cartorios-reta-final", slug: "tjms-notas-registro-provimento-vi-2025-historico-objetiva", acronym: "TJMS", notice: "01/2025-Notarial", category: "cartorios", career: "cartorios", noticeDate: "2025-10-06", statusDate: "2026-08-25", cycleYear: 2025, lifecycleStatus: "result_published", commission: "Comissão do VI Concurso de Outorga de Delegações de Notas e de Registro do TJMS", stages: [
     { title: "Resultado definitivo da prova escrita e prática", url: `${FGV}427_tjms-resultado-definitivo-prova-escrita-e-pratica-2026-08-25.pdf`, publishedOn: "2026-08-25" },
   ] },
+  // Produto já ligado à oportunidade de catálogo "pc-pr-2026", sem programa nem vínculos: religado à edição admitida.
+  { productSlug: "pc-pr-delegado-2026", slug: "pcpr-delegado-01-2026-historico-objetiva", acronym: "PCPR", notice: "01/2026-Delegado", category: "carreiras-policiais", career: "delegado", noticeDate: "2026-07-06", statusDate: "2026-11-13", cycleYear: 2026, lifecycleStatus: "result_published", commission: "Comissão de Concurso da PCPR", replacesEmptyOpportunitySlug: "pc-pr-2026", stages: [
+    { title: "Resultado preliminar da prova objetiva (reprocessamento)", url: `${FGV}pcpr2026-resultado-prova-objetiva_reprocessamento-v2.pdf`, publishedOn: "2026-11-13" },
+  ] },
 ] as const;
 
 export function compositeCourseTarget(productSlug: string) {
@@ -156,8 +160,19 @@ export async function admitCompositeOfficialCourse(input: Readonly<{
       const actor = operators[0].id;
       await tx`select public.lock_product_binding_review_product(${recipe.productSlug})`;
       const products = await tx<{ opportunityId: string | null; status: string }[]>`select opportunity_id::text as "opportunityId", status from contest_store_products where slug = ${recipe.productSlug} for update`;
-      if (products.length !== 1 || products[0].status !== "draft" || products[0].opportunityId !== null) throw new Error("Somente produto draft sem edição; não sobrescrever revisão existente.");
-      const existing = await tx`select id from contest_opportunities where slug = ${target.slug} or (institution_acronym = ${target.acronym} and official_notice_number = ${target.notice} and cycle_year = ${target.cycleYear}) or (institution_name = ${recipe.institution} and role_name = ${recipe.role} and cycle_year = ${target.cycleYear}) limit 1`;
+      if (products.length !== 1 || products[0].status !== "draft") throw new Error("Somente produto draft sem edição; não sobrescrever revisão existente.");
+      // Produto já ligado só é religado quando o alvo nomeia a oportunidade antiga e ela está vazia:
+      // sem requisitos nem vínculos de questão (catálogo inicial sem programa admitido).
+      const replaced = products[0].opportunityId;
+      if (replaced !== null) {
+        const replaceSlug = "replacesEmptyOpportunitySlug" in target ? target.replacesEmptyOpportunitySlug : null;
+        const [empty] = replaceSlug ? await tx<{ ok: boolean }[]>`select (o.slug = ${replaceSlug}
+            and not exists (select 1 from opportunity_requirements r where r.opportunity_id = o.id)
+            and not exists (select 1 from contest_product_question_bindings b where b.opportunity_id = o.id)) as ok
+          from contest_opportunities o where o.id = ${replaced}::bigint for update` : [];
+        if (!empty?.ok) throw new Error("Somente produto draft sem edição; não sobrescrever revisão existente.");
+      }
+      const existing = await tx`select id from contest_opportunities where id is distinct from ${replaced}::bigint and (slug = ${target.slug} or (institution_acronym = ${target.acronym} and official_notice_number = ${target.notice} and cycle_year = ${target.cycleYear}) or (institution_name = ${recipe.institution} and role_name = ${recipe.role} and cycle_year = ${target.cycleYear})) limit 1`;
       if (existing.length) throw new Error("Edição já existente; admissão não duplica nem sobrescreve.");
       const catalog = await tx<{ categoryId: string; careerId: string; bankId: string }[]>`select category.id::text as "categoryId", career.id::text as "careerId", bank.id::text as "bankId"
         from contest_categories category join contest_category_careers link on link.category_id = category.id
@@ -220,7 +235,7 @@ export async function admitCompositeOfficialCourse(input: Readonly<{
       const updated = await tx<{ slug: string }[]>`update contest_store_products set opportunity_id = ${opportunity.id}, preparation_mode = 'historical_training',
         preparation_reviewed_at = ${now}, preparation_reviewed_by_user_id = ${actor}, preparation_approval_reference = ${reviewer.approvalReference},
         preparation_opportunity_updated_at = (select updated_at from contest_opportunities where id = ${opportunity.id}), updated_at = ${now}
-        where slug = ${recipe.productSlug} and status = 'draft' and opportunity_id is null returning slug`;
+        where slug = ${recipe.productSlug} and status = 'draft' and opportunity_id is not distinct from ${replaced}::bigint returning slug`;
       assertStandingCourseProductUpdate(updated, recipe.productSlug);
       const metadata = { approvalBasis: "owner_standing_authorization", approvalReference: reviewer.approvalReference, humanReview: false, executionSource: "server_cli",
         productSlug: recipe.productSlug, opportunityPublicId, sources: [...identities.entries()].map(([key, ids]) => ({ key, ...ids, checksumSha256: input.captures.get(key)!.checksumSha256 })),
