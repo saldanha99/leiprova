@@ -58,7 +58,9 @@ async function main() {
       // One question counts once across products and requirements. Reapproval of
       // an old binding does not turn it into a newly published question today.
       const [daily] = await db.execute<{ newValidPublishedToday: number }>(sql`
-        with first_publication as (
+        -- Materializa só as questões de primeira publicação hoje antes da checagem pesada de validade:
+        -- sem isso o planejador avaliava o predicado para todos os vínculos e estourava o timeout (18/11/2026).
+        with first_publication as materialized (
           select binding.question_id,min(greatest(audit.created_at,product.released_at)) first_at
           from audit_logs audit join contest_product_question_bindings binding
             on audit.entity_id=binding.id::text
@@ -66,13 +68,15 @@ async function main() {
           where audit.action='editorial.product_binding.approved'
             and product.released_at is not null
           group by binding.question_id
+          having min(greatest(audit.created_at,product.released_at)) >= (date_trunc('day',now() at time zone 'America/Sao_Paulo') at time zone 'America/Sao_Paulo')
         )
         select count(distinct binding.question_id)::int as "newValidPublishedToday"
         from first_publication first join contest_product_question_bindings binding on binding.question_id=first.question_id
         where first.first_at >= (date_trunc('day',now() at time zone 'America/Sao_Paulo') at time zone 'America/Sao_Paulo')
           and first.first_at <= now()
           and ${readySlugs.length ? sql`binding.product_slug in (${sql.join(readySlugs.map(slug => sql`${slug}`), sql`,`)})` : sql`false`}
-          and ${approvedProductQuestionExists(sql`binding.product_slug`,sql`binding.question_id`,sql`binding.opportunity_id`,sql`binding.id`)}
+          -- Subconsulta escalar: avaliada por vínculo candidato, sem virar semi-join sobre todos os vínculos.
+          and (select ${approvedProductQuestionExists(sql`binding.product_slug`,sql`binding.question_id`,sql`binding.opportunity_id`,sql`binding.id`)})
       `);
       const queue = await db.execute<{ kind: string; status: string; count: number }>(sql`
         select kind,status,count(*)::int count from editorial_agent_work
