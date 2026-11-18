@@ -270,8 +270,22 @@ export async function main(env = process.env) {
 
   // EDITORIAL_REALTIME_ONCE=1: uma única tarefa por vaga (rodada assistida/testes).
   const once_only = env.EDITORIAL_REALTIME_ONCE === "1";
+  // Vigia: em 14–17/11/2026 seis vagas ficaram presas sem nenhum evento depois do limite semanal,
+  // e só uma seguiu trabalhando. Vaga sem completar iteração além do teto de uma tarefa encerra o
+  // processo com falha; o systemd (Restart=always) recomeça todas as vagas. Reservas presas expiram pelo lease.
+  const lastBeat = new Map();
+  const stallMs = config.executorAttempts * config.taskTimeoutMs + 20 * 60_000;
+  const watchdog = once_only ? null : setInterval(() => {
+    const now = Date.now();
+    for (const [key, at] of lastBeat) if (now - at > stallMs && now >= gate.pausedUntil) {
+      void event({ state: "slot_stalled", slot: key, idleMinutes: Math.round((now - at) / 60_000) }).finally(() => process.exit(1));
+      return;
+    }
+  }, 60_000);
+  watchdog?.unref();
   async function loop(role, slot) {
     for (let done = false; !stopping && !done; done = once_only) {
+      lastBeat.set(`${role}:${slot}`, Date.now());
       let outcome;
       try { outcome = await once(role, slot); }
       catch (error) { outcome = "error"; await event({ role, slot, state: "error", message: String(error?.message ?? error).slice(0, 300) }); }
@@ -279,6 +293,7 @@ export async function main(env = process.env) {
         pausedUntil: gate.pausedUntil ? new Date(gate.pausedUntil).toISOString() : null, reason: gate.reason, failStreak: gate.failStreak }));
       if (outcome !== "done" && !once_only) await sleep(outcome === "cooldown" ? Math.min(config.idleMs * 5, 300_000) : config.idleMs);
     }
+    lastBeat.delete(`${role}:${slot}`);
   }
 
   await event({ state: "started", executor: config.executor, model: config.model || null, slots: config.slots });
