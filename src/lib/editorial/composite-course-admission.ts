@@ -162,12 +162,12 @@ export async function admitCompositeOfficialCourse(input: Readonly<{
       const products = await tx<{ opportunityId: string | null; status: string }[]>`select opportunity_id::text as "opportunityId", status from contest_store_products where slug = ${recipe.productSlug} for update`;
       if (products.length !== 1 || products[0].status !== "draft") throw new Error("Somente produto draft sem edição; não sobrescrever revisão existente.");
       // Produto já ligado só é religado quando o alvo nomeia a oportunidade antiga e ela está vazia:
-      // sem requisitos nem vínculos de questão (catálogo inicial sem programa admitido).
+      // sem requisito revisado nem vínculo de questão (catálogo inicial; rascunhos ficam onde estão).
       const replaced = products[0].opportunityId;
       if (replaced !== null) {
         const replaceSlug = "replacesEmptyOpportunitySlug" in target ? target.replacesEmptyOpportunitySlug : null;
         const [empty] = replaceSlug ? await tx<{ ok: boolean }[]>`select (o.slug = ${replaceSlug}
-            and not exists (select 1 from opportunity_requirements r where r.opportunity_id = o.id)
+            and not exists (select 1 from opportunity_requirements r where r.opportunity_id = o.id and r.editorial_status <> ${"draft"})
             and not exists (select 1 from contest_product_question_bindings b where b.opportunity_id = o.id)) as ok
           from contest_opportunities o where o.id = ${replaced}::bigint for update` : [];
         if (!empty?.ok) throw new Error("Somente produto draft sem edição; não sobrescrever revisão existente.");
