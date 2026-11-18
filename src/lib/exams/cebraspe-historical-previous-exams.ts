@@ -34,6 +34,29 @@ export const CEBRASPE_HISTORICAL_PREVIOUS_EXAMS: readonly FgvHistoricalPreviousE
         url: `${CDN}sefaz_rn_25_auditor/arquivos/CAA752D9479FB2950FC4628B664090960445EF8846E2AC3E7AF5FB2F344267C5.pdf` },
     ],
   },
+  {
+    bank: "cebraspe", cebraspeEventId: "TCE_RN_25",
+    productSlug: "tce-rn-auditor-2026", editionPublicId: "tcern-auditor-direito-1-2025-objetiva-p2", opportunitySlug: "tcern-auditor-direito-1-2025-historico-objetiva",
+    portalUrl: "https://www.cebraspe.org.br/concursos/tce_rn_25", portalHeading: "Tribunal de Contas do Estado do Rio Grande do Norte",
+    portalNotice: { url: `${CDN}TCE_RN_25/arquivos/57E129C2E6851CF23E0EC1333E6F5A80DB7550368502E00A308C4E839EAE78BB.pdf`, label: "Edital nº 1 – Abertura, conforme retificações" },
+    role: "Auditor de Controle Externo – Especialidade: Direito", jurisdiction: "RN", jurisdictionName: "Rio Grande do Norte", institution: "TCE-RN", noticeNumber: "1/2025-TCE/RN", cycleYear: 2025, careerSlug: "controle-externo",
+    examDate: "2026-04-11", expectedQuestionCount: 70,
+    noticeUrl: `${CDN}TCE_RN_25/arquivos/57E129C2E6851CF23E0EC1333E6F5A80DB7550368502E00A308C4E839EAE78BB.pdf`,
+    noticeSha256: "a36a581c90f1a59dfb74376608d7ef786fcf5e1e82fbc678ec072af464bdbe37", noticePageCount: 71,
+    noticeChecks: [
+      { page: 26, pattern: "7\\.1\\.2 AUDITOR DE CONTROLE EXTERNO[\\s\\S]*Prova objetiva \\(P2\\) Conhecimentos específicos 70" },
+      { page: 27, pattern: "O julgamento de cada item será CERTO ou ERRADO" },
+      { page: 69, pattern: "\\(Auditor de Controle Externo\\) 11/4/2026" },
+    ],
+    examDateCorroboration: "API oficial do evento Cebraspe: caderno P2 do Cargo 9 publicado em 17/04/2026 e gabarito definitivo em 13/05/2026, após a data do cronograma (11/4/2026)",
+    editionSourceExternalId: "cebraspe-tce-rn-25-cargo9-objetiva-p2", editionTitle: "TCE-RN 2025 — Auditor de Controle Externo – Direito (Cargo 9) — objetiva P2 (conhecimentos específicos)",
+    documents: [
+      { documentType: "question_booklet", title: "TCE-RN 2025 — prova objetiva P2 — conhecimentos específicos — Cargo 9", label: "PROVA OBJETIVA – CONHECIMENTOS ESPECÍFICOS – CARGO 9", publishedOn: "2026-04-17",
+        url: `${CDN}TCE_RN_25/arquivos/361EF1E1F67D6BA00F5FF942DEB12899120042A4355EBAEB4966FEFFD970832D.pdf` },
+      { documentType: "answer_key", title: "TCE-RN 2025 — gabarito definitivo da prova objetiva P2 — Cargo 9", label: "GABARITO DEFINITIVO – CONHECIMENTOS ESPECÍFICOS – CARGO 9", publishedOn: "2026-05-13",
+        url: `${CDN}TCE_RN_25/arquivos/6F2A7444B2D884D74F7FAA21083CF8D4F5342036A955C80C1AA293A4C118882C.pdf` },
+    ],
+  },
 ];
 
 type CebraspeFile = { nomeArquivo?: unknown; descricaoArquivo?: unknown; dataArquivoObj?: unknown; isGuid?: unknown };

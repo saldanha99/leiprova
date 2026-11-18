@@ -68,6 +68,9 @@ export const COMPOSITE_ADMISSION_TARGETS = [
   { productSlug: "sefaz-rn-auditor-fiscal-reta-final", slug: "sefazrn-auditor-fiscal-5-2025-historico-objetiva", acronym: "SEFAZ-RN", notice: "5/2025-SEAD/SEFAZ/RN", category: "fiscal-e-controle", career: "auditor-fiscal", noticeDate: "2025-12-19", statusDate: "2026-06-03", cycleYear: 2025, lifecycleStatus: "homologated", commission: "Secretaria de Estado da Administração do RN (SEAD/RN)", bank: "cebraspe", stages: [
     { title: "Homologação do concurso público", url: `${CEBRASPE}sefaz_rn_25_auditor/arquivos/7FCCAEB394A2FAE0DDB458D4BF39B41FD0ADBD3D0777F36C455FAF45C5D9D60F.pdf`, publishedOn: "2026-06-03" },
   ] },
+  { productSlug: "tce-rn-auditor-2026", slug: "tcern-auditor-direito-1-2025-historico-objetiva", acronym: "TCE-RN", notice: "1/2025-TCE/RN", category: "fiscal-e-controle", career: "controle-externo", noticeDate: "2025-12-29", statusDate: "2026-08-12", cycleYear: 2025, lifecycleStatus: "result_published", commission: "Tribunal de Contas do Estado do Rio Grande do Norte", bank: "cebraspe", stages: [
+    { title: "Edital nº 13 – Resultado final na avaliação de títulos e no concurso (nível superior)", url: `${CEBRASPE}TCE_RN_25/arquivos/350A497D60B14C4502E9C3DD47B3A45F7B5A493C7502F9A1EB09307231FA1E51.pdf`, publishedOn: "2026-08-12" },
+  ] },
 ] as const;
 
 export function compositeCourseTarget(productSlug: string) {

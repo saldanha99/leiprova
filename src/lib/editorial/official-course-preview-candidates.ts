@@ -23,6 +23,8 @@ export type ProgrammeLayout = Readonly<{
   splitInlineItems?: boolean;
   /** Linha literal que abre o cargo seguinte no mesmo anexo; a extração termina nela e ela é obrigatória. */
   stopLine?: string;
+  /** Linha literal que abre o cargo no anexo ("CARGO 9: …"); antes dela nada é lido e ela é obrigatória. */
+  startLine?: string;
   /** "top-level-numbers": "1 Tema. 1.1 Sub. 2 Tema." agrupa subitens no item de primeiro nível.
    * "sentences": programa em prosa sem numeração; cada período literal é um requisito. */
   itemMode?: "top-level-numbers" | "second-level-numbers" | "sentences";
@@ -552,6 +554,47 @@ export const NEXT_OFFICIAL_COURSE_RECIPES: readonly NextOfficialCourseRecipe[] =
     skipRepeatedRequirements: true,
     limitations: ["Itens agrupados pelo número de primeiro nível; subitens (1.1, 1.2.1…) ficam no item.", "Prova anterior registrada pela P3 (conhecimentos específicos, 80 questões); P1 e P2 têm cadernos próprios no mesmo evento.", "Edital nº 5/2025 sem retificação de programa; o Edital nº 7 só retifica resultado.", "Treino histórico da objetiva com legislação atual; legislação tributária estadual do RN exige fonte oficial própria antes de vínculos."],
   },
+  // TCE-RN 2025 — Auditor de Controle Externo – Direito (Cargo 9): só conhecimentos específicos (P2, Certo/Errado).
+  {
+    productSlug: "tce-rn-auditor-2026", institution: "Tribunal de Contas do Estado do Rio Grande do Norte", role: "Auditor de Controle Externo – Especialidade: Direito",
+    jurisdiction: "RN", cycle: "Edital nº 1 – TCE/RN, de 29/12/2025", bankScope: "Cebraspe, executor do concurso e responsável pelas provas objetivas e discursiva, sob o TCE/RN",
+    portalUrl: "https://www.cebraspe.org.br/concursos/tce_rn_25", examDate: "2026-04-11", examDateEvidence: { documentKey: "tcern-notice", page: 69, item: "Anexo I", quote: "(Auditor de Controle Externo) 11/4/2026", actualDayIndependentlyVerified: false, corroboratingUrl: "https://cdn.cebraspe.org.br/concursos/TCE_RN_25/arquivos/361EF1E1F67D6BA00F5FF942DEB12899120042A4355EBAEB4966FEFFD970832D.pdf", limitation: "O texto do gabarito não é extraído (política de material de prova); a API oficial publicou o caderno P2 do Cargo 9 em 17/04/2026 e o gabarito definitivo em 13/05/2026, compatíveis com a data do cronograma." },
+    stage: "Objetivas com gabarito definitivo (13/05/2026); resultado final no concurso para o nível superior em 12/08/2026 (Edital nº 13)",
+    stageObservedOn: "2026-11-18", proposedMode: "historical_training", expectedSubjects: 9,
+    documents: [
+      { key: "tcern-notice", url: "https://cdn.cebraspe.org.br/concursos/TCE_RN_25/arquivos/57E129C2E6851CF23E0EC1333E6F5A80DB7550368502E00A308C4E839EAE78BB.pdf", title: "Edital nº 1 – TCE/RN, de 29/12/2025 — abertura, versão atualizada até o Edital nº 6, de 31/03/2026", pages: 71, programmePages: [57, 60], layout: {
+        headings: [
+          { line: "DIREITO ADMINISTRATIVO", subject: "Direito Administrativo", inline: true, inlineSeparator: ":" },
+          { line: "DIREITO CONSTITUCIONAL", subject: "Direito Constitucional", inline: true, inlineSeparator: ":" },
+          { line: "DIREITO FINANCEIRO", subject: "Direito Financeiro", inline: true, inlineSeparator: ":" },
+          { line: "DIREITO TRIBUTÁRIO", subject: "Direito Tributário", inline: true, inlineSeparator: ":" },
+          { line: "DIREITO CIVIL", subject: "Direito Civil", inline: true, inlineSeparator: ":" },
+          { line: "DIREITO PROCESSUAL CIVIL", subject: "Direito Processual Civil", inline: true, inlineSeparator: ":" },
+          { line: "DIREITO PENAL", subject: "Direito Penal", inline: true, inlineSeparator: ":" },
+          { line: "DIREITO PREVIDENCIÁRIO", subject: "Direito Previdenciário", inline: true, inlineSeparator: ":" },
+          { line: "AUDITORIA DO SETOR PÚBLICO", subject: "Auditoria do Setor Público", inline: true, inlineSeparator: ":" },
+        ],
+        ignoreLines: [],
+        startLine: "CARGO 9: AUDITOR DE CONTROLE EXTERNO – ESPECIALIDADE: DIREITO",
+        stopLine: "CARGO 10: AUDITOR DE CONTROLE EXTERNO – ESPECIALIDADE: ENGENHARIA",
+        itemMode: "top-level-numbers",
+      } },
+    ],
+    overlays: [],
+    identityClaims: [
+      { document: "tcern-notice", page: 1, contains: ["EDITAL Nº 1 – TCE/RN, DE 29 DE DEZEMBRO DE 2025", "Versão atualizada até a retificação constante do Edital nº 6 – TCE/RN, de 31 de março de 2026.", "Avaliação e Seleção e de Promoção de Eventos (Cebraspe)."] },
+      { document: "tcern-notice", page: 26, contains: ["7.1.2 AUDITOR DE CONTROLE EXTERNO", "Prova objetiva (P2) Conhecimentos específicos 70"] },
+      { document: "tcern-notice", page: 27, contains: ["O julgamento de cada item será CERTO ou ERRADO"] },
+      { document: "tcern-notice", page: 57, contains: ["CARGO 9: AUDITOR DE CONTROLE EXTERNO – ESPECIALIDADE: DIREITO"] },
+      { document: "tcern-notice", page: 69, contains: ["(Auditor de Controle Externo) 11/4/2026"] },
+    ],
+    previousExam: { cycle: "Edital nº 1/2025 — objetivas já realizadas em 11/4/2026", role: "Auditor de Controle Externo – Direito — prova objetiva P2 (conhecimentos específicos)", portalUrl: "https://www.cebraspe.org.br/concursos/tce_rn_25", examDate: "2026-04-11", answerKeyFinality: "definitive_document", documents: [
+      { type: "question_booklet", title: "TCE-RN 2025 — caderno da prova objetiva P2 (conhecimentos específicos) — Cargo 9", url: "https://cdn.cebraspe.org.br/concursos/TCE_RN_25/arquivos/361EF1E1F67D6BA00F5FF942DEB12899120042A4355EBAEB4966FEFFD970832D.pdf" },
+      { type: "answer_key", title: "TCE-RN 2025 — gabarito definitivo da prova objetiva P2 — Cargo 9", url: "https://cdn.cebraspe.org.br/concursos/TCE_RN_25/arquivos/6F2A7444B2D884D74F7FAA21083CF8D4F5342036A955C80C1AA293A4C118882C.pdf" },
+    ] },
+    skipRepeatedRequirements: true,
+    limitations: ["Só os conhecimentos específicos do Cargo 9 (P2, 70 itens Certo/Errado); os conhecimentos gerais (P1) têm títulos com exceções por cargo e ficam para revisão própria.", "Itens agrupados pelo número de primeiro nível.", "Edital consolidado até a retificação do Edital nº 6 (avaliação de títulos); nenhuma retificação de programa.", "Treino histórico da objetiva com legislação atual; leis complementares estaduais do RN exigem fonte oficial própria antes de vínculos."],
+  },
 ];
 
 function normalized(value: string) { return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, " ").toLowerCase().trim(); }
@@ -567,6 +610,9 @@ function extractLayoutSections(recipe: PreviewDocumentRecipe, layout: ProgrammeL
   let expectedContinuation: string | null = null;
   // Anexo com vários cargos: a extração termina na linha literal que abre o cargo seguinte.
   const stopKey = layout.stopLine ? normalized(layout.stopLine) : null;
+  // Anexo com vários cargos na mesma página: o cargo começa na linha literal que o abre.
+  const startKey = layout.startLine ? normalized(layout.startLine) : null;
+  let started = startKey === null;
   let stopped = false;
   let continuesNext = false;
   let sentenceEnded = false;
@@ -575,6 +621,7 @@ function extractLayoutSections(recipe: PreviewDocumentRecipe, layout: ProgrammeL
     for (const raw of capture.pageTexts[index].split(/\n+/u)) {
       let line = raw.replace(/\s+/g, " ").trim();
       if (!line) continue;
+      if (!started) { started = normalized(line) === startKey; continue; }
       if (stopKey !== null && current && normalized(line) === stopKey) { stopped = true; break pages; }
       if (expectedContinuation !== null) {
         if (normalized(line) !== expectedContinuation) throw new Error("Continuação do título de disciplina diverge do layout.");
@@ -639,6 +686,7 @@ function extractLayoutSections(recipe: PreviewDocumentRecipe, layout: ProgrammeL
       }
     }
   }
+  if (!started) throw new Error("Linha inicial do cargo ausente; composição bloqueada.");
   if (stopKey !== null && !stopped) throw new Error("Linha final do cargo ausente; composição bloqueada.");
   if (sections.length !== headings.length) throw new Error("Título de disciplina ausente no anexo; composição bloqueada.");
   if (sections.some((section) => !section.fragments.length)) throw new Error("Disciplina sem conteúdo; composição bloqueada.");

@@ -27,9 +27,11 @@ export const PROGRAMME_CLASSIFICATION_SCOPES = {
   "mpgo-promotor-substituto-63-2025-historico-objetiva": "Promotora e Promotor de Justiça Substituto",
   // Lote Cebraspe histórico.
   "sefazrn-auditor-fiscal-5-2025-historico-objetiva": "Auditor Fiscal de Receitas Estaduais",
+  "tcern-auditor-direito-1-2025-historico-objetiva": "Auditor de Controle Externo – Especialidade: Direito",
 } as const;
 /** Escopos cujo edital aprovado vem do Cebraspe (demais: FGV Conhecimento). */
-export const CEBRASPE_PROGRAMME_SCOPES: ReadonlySet<string> = new Set(["sefaz-al-auditor-fiscal-2026", "sefazrn-auditor-fiscal-5-2025-historico-objetiva"]);
+export const CEBRASPE_PROGRAMME_SCOPES: ReadonlySet<string> = new Set(["sefaz-al-auditor-fiscal-2026", "sefazrn-auditor-fiscal-5-2025-historico-objetiva",
+  "tcern-auditor-direito-1-2025-historico-objetiva"]);
 export const PROGRAMME_SUBJECT_CLASSIFICATION_ACTION = "editorial.programme.subject_classified";
 export const PROGRAMME_CLASSIFICATION_BATCH_LIMIT = 100;
 const digest = (value: unknown) => createHash("sha256").update(JSON.stringify(value)).digest("hex");

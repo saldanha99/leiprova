@@ -122,3 +122,29 @@ describe("lote Cebraspe histórico — prova anterior pela API oficial do evento
       { pageTexts: pageTexts.map((text, index) => index === 20 ? text.replace("cinco opções", "quatro opções") : text) }]) expect(() => assertFgvHistoricalNoticeEvidence(target, { ...valid, ...patch })).toThrow();
   });
 });
+
+describe("lote Cebraspe histórico — TCE-RN Cargo 9", () => {
+  const slug = "tce-rn-auditor-2026";
+  it("receita do cargo exato, alvo de controle externo e prova anterior P2 Certo/Errado", () => {
+    const recipe = recipeOf(slug);
+    const { target } = compositeCourseTarget(slug);
+    expect(target).toMatchObject({ category: "fiscal-e-controle", career: "controle-externo", bank: "cebraspe" });
+    expect(recipe.documents[0].layout).toMatchObject({ startLine: "CARGO 9: AUDITOR DE CONTROLE EXTERNO – ESPECIALIDADE: DIREITO" });
+    expect(fgvHistoricalPreviousExam(slug)).toMatchObject({ cebraspeEventId: "TCE_RN_25", expectedQuestionCount: 70, examDate: "2026-04-11" });
+    expect(CEBRASPE_PROGRAMME_SCOPES.has(target.slug)).toBe(true);
+  });
+
+  it("título igual em outro cargo antes da linha inicial é ignorado; linha inicial e final são obrigatórias", () => {
+    const doc = recipeOf(slug).documents[0];
+    const layout = doc.layout!;
+    const body = layout.headings.map((heading, index) => `${heading.line}: 1 Tema ${index}.`);
+    // Cargo 8 também tem "AUDITORIA DO SETOR PÚBLICO:" na mesma página, antes do Cargo 9.
+    const page = ["AUDITORIA DO SETOR PÚBLICO: 1 Tema do cargo 8.", layout.startLine!, ...body, layout.stopLine!, "OBRAS DE EDIFICAÇÕES: 1 Outro cargo."].join("\n");
+    const sections = extractDossierSubjectSections(doc, capture(doc, { 57: page }));
+    expect(sections).toHaveLength(9);
+    const requirements = compositeProgrammeRequirements(sections, [], true);
+    expect(requirements.some((item) => /cargo 8|Outro cargo/u.test(item.requirementText))).toBe(false);
+    expect(() => extractDossierSubjectSections(doc, capture(doc, { 57: [...body, layout.stopLine!].join("\n") }))).toThrow(/Linha inicial/u);
+    expect(() => extractDossierSubjectSections(doc, capture(doc, { 57: [layout.startLine!, ...body].join("\n") }))).toThrow(/Linha final/u);
+  });
+});
