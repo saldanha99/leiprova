@@ -28,6 +28,8 @@ export const PROGRAMME_CLASSIFICATION_SCOPES = {
   // Lote Cebraspe histórico.
   "sefazrn-auditor-fiscal-5-2025-historico-objetiva": "Auditor Fiscal de Receitas Estaduais",
 } as const;
+/** Escopos cujo edital aprovado vem do Cebraspe (demais: FGV Conhecimento). */
+export const CEBRASPE_PROGRAMME_SCOPES: ReadonlySet<string> = new Set(["sefaz-al-auditor-fiscal-2026", "sefazrn-auditor-fiscal-5-2025-historico-objetiva"]);
 export const PROGRAMME_SUBJECT_CLASSIFICATION_ACTION = "editorial.programme.subject_classified";
 export const PROGRAMME_CLASSIFICATION_BATCH_LIMIT = 100;
 const digest = (value: unknown) => createHash("sha256").update(JSON.stringify(value)).digest("hex");
@@ -209,7 +211,7 @@ export async function classifyStandingProgrammeSubjects(db: PostgresJsDatabase<t
     for (const item of input.requirements) {
       const row = rows.find(row => row.id === item.requirementId)!, source = sources.find(source => source.id === row.snapshotId), subject = subjects.find(subject => subject.id === item.subjectId);
       if (!source || source.sourceDocumentId !== row.sourceDocumentId || !subject || source.policy !== "official_document" || !["official_document", "metadata_only"].includes(source.sourcePolicy) || !Array.isArray(source.pageTexts)) throw new Error("Snapshot/catálogo oficial ausente.");
-      const expectedSource = input.opportunitySlug === "sefaz-al-auditor-fiscal-2026" ? "cebraspe" : "fgv-conhecimento";
+      const expectedSource = CEBRASPE_PROGRAMME_SCOPES.has(input.opportunitySlug) ? "cebraspe" : "fgv-conhecimento";
       assertApprovedProgrammeSourceUrls(source.sourceUrl, source.url, source.sourcePolicy, expectedSource);
       assertProgrammeSubjectEvidence(row, item, source, subject);
     }

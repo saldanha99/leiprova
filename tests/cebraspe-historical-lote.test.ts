@@ -5,7 +5,7 @@ vi.mock("postgres", () => ({ default: state.connect }));
 
 import { compositeBank, compositeCourseTarget, compositeProgrammeRequirements } from "@/lib/editorial/composite-course-admission";
 import { extractDossierSubjectSections, NEXT_OFFICIAL_COURSE_RECIPES, type PreviewDocumentRecipe } from "@/lib/editorial/official-course-preview-candidates";
-import { PROGRAMME_CLASSIFICATION_SCOPES, programmeCanonicalSubject, programmeLiteralHeadingName } from "@/lib/editorial/programme-subject-classification";
+import { CEBRASPE_PROGRAMME_SCOPES, PROGRAMME_CLASSIFICATION_SCOPES, programmeCanonicalSubject, programmeLiteralHeadingName } from "@/lib/editorial/programme-subject-classification";
 import { assertCebraspeHistoricalEvent, CEBRASPE_HISTORICAL_PREVIOUS_EXAMS } from "@/lib/exams/cebraspe-historical-previous-exams";
 import { assertFgvHistoricalNoticeEvidence, fgvHistoricalPreviousExam, previewFgvHistoricalPreviousExam } from "@/lib/exams/fgv-historical-previous-exam-admission";
 import { FGV_HISTORICAL_PREVIOUS_PAIRS, parsePreviousExamLinkCommand } from "@/lib/exams/previous-exam-link-command";
@@ -31,6 +31,9 @@ describe("lote Cebraspe histórico — SEFAZ-RN", () => {
     expect(previous).toMatchObject({ bank: "cebraspe", cebraspeEventId: "SEFAZ_RN_25_AUDITOR", expectedQuestionCount: 80, examDate: recipe.examDate });
     expect(FGV_HISTORICAL_PREVIOUS_PAIRS[slug]).toBe(previous.editionPublicId);
     expect(PROGRAMME_CLASSIFICATION_SCOPES[target.slug as keyof typeof PROGRAMME_CLASSIFICATION_SCOPES]).toBe(recipe.role);
+    // A classificação confere o edital aprovado contra a origem Cebraspe, não FGV.
+    expect(CEBRASPE_PROGRAMME_SCOPES.has(target.slug)).toBe(true);
+    expect(CEBRASPE_PROGRAMME_SCOPES.has("tjgo-juiz-substituto-59-2025-historico-objetiva")).toBe(false);
     expect(parsePreviousExamLinkCommand(["--standing", `${slug}=${previous.editionPublicId}`]).standing).toBe(true);
     expect(() => parsePreviousExamLinkCommand(["--standing", `${slug}=outra-edicao`])).toThrow();
   });
