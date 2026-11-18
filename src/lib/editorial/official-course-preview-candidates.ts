@@ -221,11 +221,11 @@ export const NEXT_OFFICIAL_COURSE_RECIPES: readonly NextOfficialCourseRecipe[] =
       { document: "tjpe-notice", page: 23, contains: ["10.1", "27 de setembro de 2026", "5 (cinco) alternativas e apenas uma resposta correta"] },
       { document: "tjpe-notice", page: 52, contains: ["ANEXO I – CONTEÚDO PROGRAMÁTICO", "DIREITO CIVIL"] },
     ],
-    // Sem gabarito definitivo publicado: a referência fica incompleta e bloqueada.
     previousExam: { cycle: "Edital 01/2026 — objetiva aplicada em27/09/2026", role: "Juiz Substituto — prova objetiva seletiva", portalUrl: "https://conhecimento.fgv.br/concursos/tjpe26", examDate: "2026-09-27", answerKeyFinality: "definitive_document", documents: [
       { type: "question_booklet", title: "TJPE 01/2026 — caderno Tipo1 da prova objetiva", url: `${FGV_FILES}tjpe-jsub-t1.pdf` },
+      { type: "answer_key", title: "TJPE 01/2026 — gabarito oficial definitivo (11/11/2026)", url: `${FGV_FILES}gabaritodefinitivo.pdf` },
     ] },
-    limitations: ["Gabarito definitivo ainda não publicado; não aprovar referência de prova anterior nem liberar venda antes dele.", "A 1ª retificação altera idade, prazo de recurso e títulos, sem mudar o AnexoI.", "Treino histórico da objetiva com legislação atual; não simula fases seguintes.", "Legislação estadual de Pernambuco exige fonte oficial própria antes de vínculos."],
+    limitations: ["Gabarito definitivo publicado pelo portal em 11/11/2026 (conferido em 18/11/2026).", "A 1ª retificação altera idade, prazo de recurso e títulos, sem mudar o AnexoI.", "Treino histórico da objetiva com legislação atual; não simula fases seguintes.", "Legislação estadual de Pernambuco exige fonte oficial própria antes de vínculos."],
   },
   {
     productSlug: "mpe-go-promotor-de-justica-2025", institution: "Ministério Público do Estado de Goiás", role: "Promotora e Promotor de Justiça Substituto",

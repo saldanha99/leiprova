@@ -190,6 +190,25 @@ export const FGV_HISTORICAL_PREVIOUS_EXAMS: readonly FgvHistoricalPreviousExam[]
       { documentType: "answer_key", title: "TJMS VI Notas e Registro — gabarito oficial definitivo republicado da prova objetiva", label: "Gabarito Oficial Definitivo da Prova Objetiva de Seleção Republicado", publishedOn: "2026-05-07", url: `${FGV}2-gabarito-definitivo-tjms-notarial_atualizado07052026-2.pdf` },
     ],
   },
+  {
+    productSlug: "tj-pe-juiz-de-direito-2026", editionPublicId: "tjpe-juiz-substituto-01-2026-objetiva", opportunitySlug: "tjpe-juiz-substituto-01-2026-historico-objetiva",
+    portalUrl: "https://conhecimento.fgv.br/concursos/tjpe26", portalHeading: "Concurso Público para o Tribunal de Justiça do Estado de Pernambuco - Juiz Substituto",
+    portalNotice: { url: `${FGV}tjpe_edital-31.07.2026-retificado.pdf`, label: "Edital (retificado em 31/07/2026)" },
+    role: "Juiz Substituto", jurisdiction: "PE", jurisdictionName: "Pernambuco", institution: "TJPE", noticeNumber: "01/2026", cycleYear: 2026, careerSlug: "magistratura",
+    examDate: "2026-09-27", expectedQuestionCount: 100,
+    noticeUrl: `${FGV}tjpe_edital-31.07.2026-retificado.pdf`, noticeSha256: "677cfec30e9c07903944af25c55374e254324187bb2589cb1a9d04f9078109f3", noticePageCount: 72,
+    noticeChecks: [
+      { page: 23, pattern: "10\\.4[\\s\\S]*100 \\(cem\\) questões de múltipla escolha[\\s\\S]*5 \\(cinco\\) alternativas e apenas uma resposta correta" },
+      { page: 23, pattern: "10\\.1[\\s\\S]*prevista para o dia 27\\s+de setembro de 2026" },
+      { page: 1, pattern: "JUIZ SUBSTITUTO" },
+    ],
+    examDateCorroboration: "Portal FGV: caderno Tipo 1 e gabarito preliminar publicados em 29/09/2026; gabarito oficial definitivo em 11/11/2026",
+    editionSourceExternalId: "fgv-tjpe-01-2026-objetiva", editionTitle: "TJPE 01/2026 — Juiz Substituto — objetiva",
+    documents: [
+      { documentType: "question_booklet", title: "TJPE 01/2026 — prova objetiva seletiva — Tipo 1", label: "Tipo 1", publishedOn: "2026-09-29", url: `${FGV}tjpe-jsub-t1.pdf`, blockIncludes: ["Juiz Substituto"] },
+      { documentType: "answer_key", title: "TJPE 01/2026 — gabarito oficial definitivo da prova objetiva seletiva", label: "Gabarito Oficial Definitivo da Prova Objetiva Seletiva", publishedOn: "2026-11-11", url: `${FGV}gabaritodefinitivo.pdf` },
+    ],
+  },
 ];
 
 export function fgvHistoricalPreviousExam(productSlug: string) {
