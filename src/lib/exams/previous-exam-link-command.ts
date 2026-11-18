@@ -38,6 +38,8 @@ export const FGV_HISTORICAL_PREVIOUS_PAIRS: Readonly<Record<string, string>> = {
   "tj-ms-analista-judiciario-area-fim-reta-final": "tjms-analista-area-fim-xi-2025-objetiva",
   "tj-rj-analista-e-tecnico-2025": "tjrj-analista-sem-especialidade-lxii-2025-objetiva",
   "tj-ms-cartorios-reta-final": "tjms-notas-registro-provimento-vi-2025-objetiva",
+  // Lote Cebraspe histórico (mesmo núcleo, conferência pela API oficial do evento).
+  "sefaz-rn-auditor-fiscal-reta-final": "sefazrn-auditor-fiscal-5-2025-objetiva-p3",
   "tj-pe-juiz-de-direito-2026": "tjpe-juiz-substituto-01-2026-objetiva",
   "pc-pr-delegado-2026": "pcpr-delegado-01-2026-objetiva",
 };

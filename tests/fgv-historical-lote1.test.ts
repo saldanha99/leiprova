@@ -7,7 +7,7 @@ import { compositeCourseTarget, compositeProgrammeRequirements, COMPOSITE_ADMISS
 import { extractDossierSubjectSections, NEXT_OFFICIAL_COURSE_RECIPES, previousExamAdmissionBlocker, type PreviewDocumentRecipe } from "@/lib/editorial/official-course-preview-candidates";
 import { officialFormatEvidenceMatches } from "@/lib/editorial/official-question-contract";
 import { PROGRAMME_CLASSIFICATION_SCOPES, programmeCanonicalSubject } from "@/lib/editorial/programme-subject-classification";
-import { assertFgvHistoricalAnchors, assertFgvHistoricalNoticeEvidence, assertFgvRegistrationRequest, fgvHistoricalPreviousExam, FGV_HISTORICAL_PREVIOUS_EXAMS, previewFgvHistoricalPreviousExam } from "@/lib/exams/fgv-historical-previous-exam-admission";
+import { assertFgvHistoricalAnchors, assertFgvHistoricalNoticeEvidence, assertFgvRegistrationRequest, fgvHistoricalPreviousExam, FGV_HISTORICAL_PREVIOUS_EXAMS, HISTORICAL_PREVIOUS_EXAMS, previewFgvHistoricalPreviousExam } from "@/lib/exams/fgv-historical-previous-exam-admission";
 import { FGV_HISTORICAL_PREVIOUS_PAIRS, parsePreviousExamLinkCommand } from "@/lib/exams/previous-exam-link-command";
 import { parseOfficialOpportunitySourceUrl } from "@/lib/opportunities/source-monitor-policy";
 import { parseFgvHistoricalPreviousExamArgs } from "../scripts/register-fgv-historical-previous-exam-links";
@@ -141,7 +141,7 @@ describe("lote FGV histórico — prova anterior por metadados", () => {
   it("standing aceita só os pares exatos do lote, uma edição por vez", () => {
     for (const [product, edition] of Object.entries(FGV_HISTORICAL_PREVIOUS_PAIRS)) {
       expect(parsePreviousExamLinkCommand(["--standing", `${product}=${edition}`]).standing).toBe(true);
-      expect(FGV_HISTORICAL_PREVIOUS_EXAMS.find((item) => item.productSlug === product)?.editionPublicId).toBe(edition);
+      expect(HISTORICAL_PREVIOUS_EXAMS.find((item) => item.productSlug === product)?.editionPublicId).toBe(edition);
     }
     expect(() => parsePreviousExamLinkCommand(["--standing", "tj-pr-juiz-de-direito-2025-2026=tjba-juiz-substituto-01-2026-objetiva"])).toThrow();
     expect(() => parsePreviousExamLinkCommand(["--standing", "tj-pe-juiz-de-direito-2026=tjpe-juiz-substituto-01-2026-objetiva"])).toThrow();

@@ -9,6 +9,8 @@ import { assertOfficialRobotsPathAllowed } from "@/lib/official-sources/planalto
 import { verifyOfficialExamUrl } from "@/lib/official-sources/fetch";
 import { parseOpportunityApprovalReviewerIdentity } from "@/lib/opportunities/approval-command";
 import { saoPauloCalendarDate } from "@/lib/opportunities/catalog-policy";
+import { assertCebraspeHistoricalEvent, CEBRASPE_HISTORICAL_PREVIOUS_EXAMS } from "@/lib/exams/cebraspe-historical-previous-exams";
+import { cebraspeEventApiUrl } from "@/lib/opportunities/official-document-policy";
 
 // Registro dos links oficiais (caderno Tipo 1 + gabarito definitivo) das edições
 // FGV admitidas pela admissão composta em treino histórico. Mesmo desenho do
@@ -19,7 +21,9 @@ import { saoPauloCalendarDate } from "@/lib/opportunities/catalog-policy";
 const FGV = "https://conhecimento.fgv.br/sites/default/files/concursos/";
 export const FGV_HISTORICAL_REGISTRATION_ACTION = "editorial.previous_exam.fgv_historical_metadata_registered";
 
-type PortalDocument = Readonly<{ documentType: "question_booklet" | "answer_key"; title: string; label: string; publishedOn: string; url: string; blockIncludes?: readonly string[] }>;
+type PortalDocument = Readonly<{ documentType: "question_booklet" | "answer_key"; title: string; label: string; publishedOn: string; url: string; blockIncludes?: readonly string[];
+  /** Caderno com contagem própria (Cebraspe aplica P1/P2/P3 com quantidades diferentes). */
+  questionCount?: number }>;
 export type FgvHistoricalPreviousExam = Readonly<{
   productSlug: string; editionPublicId: string; opportunitySlug: string;
   portalUrl: string; portalHeading: string; portalNotice: Readonly<{ url: string; label: string }>;
@@ -33,6 +37,10 @@ export type FgvHistoricalPreviousExam = Readonly<{
   examDateCorroboration: string;
   editionSourceExternalId: string; editionTitle: string;
   documents: readonly PortalDocument[];
+  /** Banca da objetiva; FGV por padrão. Cebraspe confere a API oficial do evento em vez do HTML do portal. */
+  bank?: "cebraspe";
+  /** Identificador do evento Cebraspe (eventoURL da API oficial). */
+  cebraspeEventId?: string;
 }>;
 
 export const FGV_HISTORICAL_PREVIOUS_EXAMS: readonly FgvHistoricalPreviousExam[] = [
@@ -230,9 +238,12 @@ export const FGV_HISTORICAL_PREVIOUS_EXAMS: readonly FgvHistoricalPreviousExam[]
   },
 ];
 
+/** FGV e Cebraspe: mesmo núcleo transacional, conferência de portal própria por banca. */
+export const HISTORICAL_PREVIOUS_EXAMS: readonly FgvHistoricalPreviousExam[] = [...FGV_HISTORICAL_PREVIOUS_EXAMS, ...CEBRASPE_HISTORICAL_PREVIOUS_EXAMS];
+
 export function fgvHistoricalPreviousExam(productSlug: string) {
-  const target = FGV_HISTORICAL_PREVIOUS_EXAMS.find((item) => item.productSlug === productSlug);
-  if (!target) throw new Error("Produto fora do lote FGV histórico autorizado.");
+  const target = HISTORICAL_PREVIOUS_EXAMS.find((item) => item.productSlug === productSlug);
+  if (!target) throw new Error("Produto fora dos lotes históricos autorizados (FGV, Cebraspe).");
   return target;
 }
 
@@ -256,11 +267,11 @@ export function assertFgvHistoricalAnchors(target: FgvHistoricalPreviousExam, ht
   return createHash("sha256").update(JSON.stringify({ heading, notice: target.portalNotice, documents: verified })).digest("hex");
 }
 
-async function boundedOfficialText(url: string, limit: number, fetcher: typeof fetch) {
-  const response = await fetcher(url, { redirect: "manual", signal: AbortSignal.timeout(15_000), headers: { "User-Agent": "EditalLeiSeca-OfficialSourceMonitor/1.0 (+https://editaleiseca.com.br/fontes-e-atualizacao)", Accept: "text/html,text/plain" } });
+async function boundedOfficialText(url: string, limit: number, fetcher: typeof fetch, mimes: readonly string[] = ["text/plain", "text/html"]) {
+  const response = await fetcher(url, { redirect: "manual", signal: AbortSignal.timeout(15_000), headers: { "User-Agent": "EditalLeiSeca-OfficialSourceMonitor/1.0 (+https://editaleiseca.com.br/fontes-e-atualizacao)", Accept: mimes.join(",") } });
   if (response.status !== 200 || (response.url && response.url !== url)) throw new Error("Página oficial indisponível ou redirecionada; não contornar bloqueio.");
   const mime = response.headers.get("content-type")?.split(";", 1)[0].trim().toLowerCase();
-  if (mime !== "text/plain" && mime !== "text/html") throw new Error("Esperado somente HTML/robots; PDF nunca entra na captura de texto.");
+  if (!mime || !mimes.includes(mime)) throw new Error("Esperado somente HTML/JSON/robots; PDF nunca entra na captura de texto.");
   const reader = response.body?.getReader();
   if (!reader) throw new Error("Página oficial sem corpo.");
   const chunks: Uint8Array[] = []; let length = 0;
@@ -271,13 +282,25 @@ async function boundedOfficialText(url: string, limit: number, fetcher: typeof f
 }
 
 export async function previewFgvHistoricalPreviousExam(target: FgvHistoricalPreviousExam, options: { fetcher?: typeof fetch; verifier?: typeof verifyOfficialExamUrl } = {}) {
-  const robots = await boundedOfficialText("https://conhecimento.fgv.br/robots.txt", 64 * 1024, options.fetcher ?? fetch);
-  for (const url of [target.portalUrl, target.portalNotice.url, ...target.documents.map((document) => document.url)]) assertOfficialRobotsPathAllowed(robots.text, new URL(url).pathname);
-  const portal = await boundedOfficialText(target.portalUrl, 2 * 1024 * 1024, options.fetcher ?? fetch);
-  const portalAnchorsSha256 = assertFgvHistoricalAnchors(target, portal.text);
+  const fetcher = options.fetcher ?? fetch;
+  let robots: Awaited<ReturnType<typeof boundedOfficialText>>, portal: Awaited<ReturnType<typeof boundedOfficialText>>, portalAnchorsSha256: string;
+  if (target.bank === "cebraspe") {
+    // A página do concurso é montada por JavaScript; os links vêm da API pública que ela consulta.
+    // robots.txt do portal conferido aqui; apis/cdn não publicam robots.txt (política de fontes Cebraspe).
+    robots = await boundedOfficialText("https://www.cebraspe.org.br/robots.txt", 64 * 1024, fetcher);
+    assertOfficialRobotsPathAllowed(robots.text, new URL(target.portalUrl).pathname);
+    if (!target.cebraspeEventId) throw new Error("Evento Cebraspe obrigatório.");
+    portal = await boundedOfficialText(cebraspeEventApiUrl(target.cebraspeEventId), 2 * 1024 * 1024, fetcher, ["application/json"]);
+    portalAnchorsSha256 = assertCebraspeHistoricalEvent(target, JSON.parse(portal.text) as unknown);
+  } else {
+    robots = await boundedOfficialText("https://conhecimento.fgv.br/robots.txt", 64 * 1024, fetcher);
+    for (const url of [target.portalUrl, target.portalNotice.url, ...target.documents.map((document) => document.url)]) assertOfficialRobotsPathAllowed(robots.text, new URL(url).pathname);
+    portal = await boundedOfficialText(target.portalUrl, 2 * 1024 * 1024, fetcher);
+    portalAnchorsSha256 = assertFgvHistoricalAnchors(target, portal.text);
+  }
   const documents = [];
   for (const document of target.documents) {
-    const metadata = await (options.verifier ?? verifyOfficialExamUrl)("fgv", document.url);
+    const metadata = await (options.verifier ?? verifyOfficialExamUrl)(target.bank ?? "fgv", document.url);
     if (metadata.httpStatus !== 200 || !metadata.isPdf || metadata.finalUrl !== document.url || metadata.contentType?.split(";", 1)[0].trim().toLowerCase() !== "application/pdf") throw new Error("Link exato não retorna PDF oficial acessível.");
     documents.push({ ...document, ...metadata, distributionMode: "external_link", sourcePolicy: "metadata_only", sourceContentStored: false, status: "pending_review" });
   }
@@ -331,7 +354,7 @@ export async function reviewFgvHistoricalRegistration(tx: postgres.TransactionSq
   if (request.mode === "apply") await tx`select public.lock_product_binding_review_product(${target.productSlug})`;
   const [identity] = await tx<{ opportunityId: string; careerId: string; bankId: string; baselineEditionId: string | null; opportunityUpdatedAt: string }[]>`select opportunity.id::text as "opportunityId", opportunity.career_track_id::text as "careerId", bank.id::text as "bankId", opportunity.exam_edition_id::text as "baselineEditionId", opportunity.updated_at::text as "opportunityUpdatedAt"
     from contest_store_products product join contest_opportunities opportunity on opportunity.id=product.opportunity_id
-    join quiz_career_tracks career on career.id=opportunity.career_track_id join quiz_banks bank on bank.slug='fgv' and bank.is_active
+    join quiz_career_tracks career on career.id=opportunity.career_track_id join quiz_banks bank on bank.slug=${target.bank ?? "fgv"} and bank.is_active
     where product.slug=${target.productSlug} and product.status='draft' and product.preparation_mode='historical_training'
       and product.preparation_approval_reference=${reviewer.approvalReference} and product.preparation_opportunity_updated_at=opportunity.updated_at
       and opportunity.public_id=${opportunityPublicId} and opportunity.slug=${target.opportunitySlug} and opportunity.editorial_status='reviewed'
@@ -378,19 +401,20 @@ export async function reviewFgvHistoricalRegistration(tx: postgres.TransactionSq
     admissionApplied: true, latestEditionVerifiedInDatabase: true, editionPublicId: target.editionPublicId, noticeSha256: expectedNoticeSha256, examDate: target.examDate, documents: preview.documents,
     databaseWrites: 0, questionsImported: 0, referencesApproved: 0, productsReleased: 0, sourceContentStored: false, humanReview: false, publicationAllowed: false };
   if (request.expectedFingerprint !== fingerprint) throw new Error("Fingerprint da prévia divergiu; recapture e confira antes de apply.");
-  const portalTitle = `Concurso Público para o ${target.portalHeading}`;
+  const portalTitle = target.bank === "cebraspe" ? target.portalHeading : `Concurso Público para o ${target.portalHeading}`;
+  const organizer = target.bank === "cebraspe" ? "Cebraspe — objetiva" : "Fundação Getulio Vargas — objetiva";
   const [edition] = await tx<{ id: string }[]>`insert into exam_editions(public_id,career_track_id,bank_id,institution_acronym,jurisdiction_code,source_external_id,title,organizer,jurisdiction,
     official_url,exam_date,status,source_policy,source_content_stored,source_page_title,source_http_status,source_checked_at,created_by_user_id,updated_by_user_id)
     values(${target.editionPublicId},${identity.careerId},${identity.bankId},${target.institution},${target.jurisdiction},${target.editionSourceExternalId},
-      ${target.editionTitle},'Fundação Getulio Vargas — objetiva',${target.jurisdictionName},${target.portalUrl},${target.examDate},
+      ${target.editionTitle},${organizer},${target.jurisdictionName},${target.portalUrl},${target.examDate},
       'held','metadata_only',false,${portalTitle},200,${preview.observedAt},${actor},${actor}) returning id::text`;
   const documentIds: string[] = [];
   for (const document of preview.documents) {
     const publicId = randomUUID(); documentIds.push(publicId);
     await tx`insert into exam_edition_documents(public_id,exam_edition_id,document_type,title,source_url,source_host,published_at,source_checked_at,http_status,content_type,file_name,
       expected_question_count,distribution_mode,source_policy,status,initiated_by_user_id)
-      values(${publicId},${edition.id},${document.documentType},${document.title},${document.url},'conhecimento.fgv.br',${document.publishedOn},${document.checkedAt},200,${document.contentType},
-        ${new URL(document.url).pathname.split("/").at(-1)!},${document.documentType === "question_booklet" ? target.expectedQuestionCount : null},'external_link','metadata_only','pending_review',${actor})`;
+      values(${publicId},${edition.id},${document.documentType},${document.title},${document.url},${new URL(document.url).hostname},${document.publishedOn},${document.checkedAt},200,${document.contentType},
+        ${new URL(document.url).pathname.split("/").at(-1)!},${document.documentType === "question_booklet" ? (target.documents.find((item) => item.url === document.url)?.questionCount ?? target.expectedQuestionCount) : null},'external_link','metadata_only','pending_review',${actor})`;
   }
   const assignmentStamp = new Date().toISOString();
   const updatedOpportunities = await tx<{ id: string }[]>`update contest_opportunities set exam_edition_id=${edition.id}, updated_at=${assignmentStamp}
@@ -404,7 +428,7 @@ export async function reviewFgvHistoricalRegistration(tx: postgres.TransactionSq
     where slug=${target.productSlug} and opportunity_id=${identity.opportunityId} and status='draft' and preparation_mode='historical_training'
       and preparation_approval_reference=${reviewer.approvalReference} and preparation_opportunity_updated_at::text=${identity.opportunityUpdatedAt} returning slug`;
   if (updatedProducts.length !== 1 || updatedProducts[0].slug !== target.productSlug) throw new Error("Fingerprint do modo não atualizou exatamente o produto esperado; transação cancelada.");
-  const metadata = { approvalBasis: "owner_standing_authorization", approvalReference: reviewer.approvalReference, humanReview: false, productSlug: target.productSlug, opportunityPublicId,
+  const metadata = { approvalBasis: "owner_standing_authorization", approvalReference: reviewer.approvalReference, humanReview: false, productSlug: target.productSlug, bank: target.bank ?? "fgv", opportunityPublicId,
     editionPublicId: target.editionPublicId, documentPublicIds: documentIds, noticeSha256: expectedNoticeSha256, portalHtmlSha256: preview.portalHtmlSha256, portalAnchorsSha256: preview.portalAnchorsSha256,
     fingerprint, examDate: target.examDate, expectedQuestionCount: target.expectedQuestionCount, noticeEvidencePages: target.noticeChecks.map((check) => check.page),
     examDateCorroboration: { statement: target.examDateCorroboration, observedOn: "2026-10-29", provenance: "official_documents_observed_by_project_operator", headerReextractedInThisExecution: false }, documents: preview.documents,

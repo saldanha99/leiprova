@@ -46,7 +46,7 @@ describe("bounded next official dossier composition", () => {
     expect(sections[0].fragments).toEqual([{ page: 1, text: "Ponto1. Primeiro tema." }, { page: 2, text: "Continuação literal." }]);
   });
   it("has no apply path and only permits private outputs and confirmed targets", () => {
-    expect(parseNextOfficialDossierArgs([]).recipes).toHaveLength(12);
+    expect(parseNextOfficialDossierArgs([]).recipes).toHaveLength(13);
     expect(() => parseNextOfficialDossierArgs(["--apply"])).toThrow();
     expect(() => parseNextOfficialDossierArgs(["--product=unknown"])).toThrow();
     expect(() => parseNextOfficialDossierArgs(["--output=public"])).toThrow();

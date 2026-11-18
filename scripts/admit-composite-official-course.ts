@@ -1,7 +1,7 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { relative, resolve, sep } from "node:path";
 
-import { admitCompositeOfficialCourse, assertCompositeHashes, compositeCourseTarget, compositeProgrammeRequirements, verifyCompositeMetadata, COMPOSITE_ADMISSION_TARGETS } from "../src/lib/editorial/composite-course-admission";
+import { admitCompositeOfficialCourse, assertCompositeHashes, compositeBank, compositeCourseTarget, compositeProgrammeRequirements, verifyCompositeMetadata, COMPOSITE_ADMISSION_TARGETS } from "../src/lib/editorial/composite-course-admission";
 import { buildNextOfficialCoursePreview } from "../src/lib/editorial/official-course-preview-candidates";
 import { captureOfficialPdf, type CapturedOfficialDocument } from "../src/lib/opportunities/official-document-fetch";
 import { buildDirectOfficialDocumentCandidate } from "../src/lib/opportunities/official-document-policy";
@@ -41,12 +41,13 @@ async function main() {
   const args = parseCompositeCourseArgs(process.argv.slice(2));
   await mkdir(args.outputDirectory, { recursive: true, mode: 0o700 });
   for (const slug of args.products) {
-    const { recipe } = compositeCourseTarget(slug);
+    const { recipe, target } = compositeCourseTarget(slug);
+    const sourceId = compositeBank(target).sourceId;
     const captures = new Map<string, CapturedOfficialDocument>();
     const capturedAt = new Map<string, string>();
     // At most four bounded PDFs, fetched sequentially; never fetch question text into this map.
     for (const doc of recipe.documents) {
-      const capture = await captureOfficialPdf(buildDirectOfficialDocumentCandidate(doc.url, "fgv-conhecimento", doc.title), "fgv-conhecimento");
+      const capture = await captureOfficialPdf(buildDirectOfficialDocumentCandidate(doc.url, sourceId, doc.title), sourceId);
       captures.set(doc.key, capture);
       capturedAt.set(doc.key, new Date().toISOString());
     }

@@ -13,6 +13,18 @@ import type { OpportunitySourceMetadata } from "@/lib/opportunities/source-monit
 import { verifyOfficialExamUrl } from "@/lib/official-sources/fetch";
 
 const FGV = "https://conhecimento.fgv.br/sites/default/files/concursos/";
+const CEBRASPE = "https://cdn.cebraspe.org.br/concursos/";
+
+/** Banca que presta a objetiva: fonte de captura, portal de provas, catálogo e organizador. FGV é o padrão. */
+export const COMPOSITE_BANKS = {
+  fgv: { bankSlug: "fgv", sourceId: "fgv-conhecimento", publisher: "FGV Conhecimento", shortName: "FGV", organizerName: "Fundação Getulio Vargas — etapa objetiva" },
+  cebraspe: { bankSlug: "cebraspe", sourceId: "cebraspe", publisher: "Cebraspe", shortName: "Cebraspe", organizerName: "Cebraspe — etapa objetiva" },
+} as const;
+export function compositeBank(target: object) {
+  const bank = "bank" in target ? target.bank : "fgv";
+  if (bank !== "fgv" && bank !== "cebraspe") throw new Error("Banca fora das admissões compostas configuradas.");
+  return COMPOSITE_BANKS[bank];
+}
 export const COMPOSITE_ADMISSION_TARGETS = [
   { productSlug: "mpe-rj-promotor-de-justica-2026", slug: "mprj-promotor-substituto-xxxix-2026-historico-objetiva", acronym: "MPRJ", notice: "XXXIX/2026", category: "carreiras-juridicas", career: "promotor-justica", noticeDate: "2026-03-12", statusDate: "2026-10-06", cycleYear: 2026, lifecycleStatus: "result_published", commission: "Comissão do XXXIX Concurso do MPRJ", stages: [
     { title: "Republicação — habilitados à inscrição definitiva", url: `${FGV}05.10-aviso-relacao-de-habilitados-a-inscricao-definitiva-republicacao.pdf`, publishedOn: "2026-10-06" },
@@ -51,6 +63,10 @@ export const COMPOSITE_ADMISSION_TARGETS = [
   // Produto já ligado à oportunidade de catálogo "pc-pr-2026", sem programa nem vínculos: religado à edição admitida.
   { productSlug: "pc-pr-delegado-2026", slug: "pcpr-delegado-01-2026-historico-objetiva", acronym: "PCPR", notice: "01/2026-Delegado", category: "carreiras-policiais", career: "delegado", noticeDate: "2026-07-06", statusDate: "2026-11-13", cycleYear: 2026, lifecycleStatus: "result_published", commission: "Comissão de Concurso da PCPR", replacesEmptyOpportunitySlug: "pc-pr-2026", stages: [
     { title: "Resultado preliminar da prova objetiva (reprocessamento)", url: `${FGV}pcpr2026-resultado-prova-objetiva_reprocessamento-v2.pdf`, publishedOn: "2026-11-13" },
+  ] },
+  // Lote Cebraspe histórico.
+  { productSlug: "sefaz-rn-auditor-fiscal-reta-final", slug: "sefazrn-auditor-fiscal-5-2025-historico-objetiva", acronym: "SEFAZ-RN", notice: "5/2025-SEAD/SEFAZ/RN", category: "fiscal-e-controle", career: "auditor-fiscal", noticeDate: "2025-12-19", statusDate: "2026-06-03", cycleYear: 2025, lifecycleStatus: "homologated", commission: "Secretaria de Estado da Administração do RN (SEAD/RN)", bank: "cebraspe", stages: [
+    { title: "Homologação do concurso público", url: `${CEBRASPE}sefaz_rn_25_auditor/arquivos/7FCCAEB394A2FAE0DDB458D4BF39B41FD0ADBD3D0777F36C455FAF45C5D9D60F.pdf`, publishedOn: "2026-06-03" },
   ] },
 ] as const;
 
@@ -113,14 +129,15 @@ export async function verifyCompositeMetadata(productSlug: string) {
   const { target, recipe } = compositeCourseTarget(productSlug);
   const stages: OpportunitySourceMetadata[] = [];
   for (const stage of target.stages) {
-    const metadata = await checkOpportunitySourceMetadata({ sourceId: "fgv-conhecimento", publisher: "FGV Conhecimento", url: stage.url, documentType: "official_announcement", status: "pending_review", sourcePolicy: "metadata_only", sourceContentStored: false });
+    const bank = compositeBank(target);
+    const metadata = await checkOpportunitySourceMetadata({ sourceId: bank.sourceId, publisher: bank.publisher, url: stage.url, documentType: "official_announcement", status: "pending_review", sourcePolicy: "metadata_only", sourceContentStored: false });
     if (metadata.httpStatus !== 200) throw new Error("Marco da fase não retornou HTTP200; admissão bloqueada.");
     assertStandingCourseStageMetadata(metadata, stage.url);
     stages.push(metadata);
   }
   const previous: Record<string, unknown>[] = [];
   for (const doc of recipe.previousExam.documents) {
-    const metadata = await verifyOfficialExamUrl("fgv", doc.url);
+    const metadata = await verifyOfficialExamUrl(compositeBank(target).bankSlug, doc.url);
     if (metadata.httpStatus !== 200 || !metadata.isPdf || metadata.finalUrl !== doc.url) throw new Error("Link oficial de prova/gabarito não verificado; não presumir disponibilidade.");
     previous.push({ ...doc, ...metadata, distributionMode: "external_link", sourceContentStored: false, approvedForProduct: false });
   }
@@ -149,7 +166,7 @@ export async function admitCompositeOfficialCourse(input: Readonly<{
   const requirementCandidates = compositeProgrammeRequirements(preview.programme.sections, recipe.repeatableRequirements ?? [], recipe.skipRepeatedRequirements ?? false);
   const reviewer = parseOpportunityApprovalReviewerIdentity({ ADMIN_EMAILS: process.env.ADMIN_EMAILS, OPPORTUNITY_APPROVAL_REFERENCE: process.env.OPPORTUNITY_APPROVAL_REFERENCE });
   const client = postgres(databaseUrl, { max: 1, prepare: false });
-  const note = `Revisão automatizada de fontes/programa sob owner_standing_authorization (${reviewer.approvalReference}); humanReview:false. Treino histórico da etapa objetiva com legislação atual; mapeamento/vigência/perfil/inéditas ainda pendentes. FGV presta a objetiva; demais etapas seguem a responsabilidade institucional do edital. Não é liberação comercial.`;
+  const note = `Revisão automatizada de fontes/programa sob owner_standing_authorization (${reviewer.approvalReference}); humanReview:false. Treino histórico da etapa objetiva com legislação atual; mapeamento/vigência/perfil/inéditas ainda pendentes. ${compositeBank(target).shortName} presta a objetiva; demais etapas seguem a responsabilidade institucional do edital. Não é liberação comercial.`;
   try {
     return await client.begin("isolation level serializable", async (tx) => {
       await tx`set local statement_timeout = '30s'`;
@@ -177,7 +194,7 @@ export async function admitCompositeOfficialCourse(input: Readonly<{
       const catalog = await tx<{ categoryId: string; careerId: string; bankId: string }[]>`select category.id::text as "categoryId", career.id::text as "careerId", bank.id::text as "bankId"
         from contest_categories category join contest_category_careers link on link.category_id = category.id
         join quiz_career_tracks career on career.id = link.career_track_id cross join quiz_banks bank
-        where category.slug = ${target.category} and career.slug = ${target.career} and bank.slug = 'fgv' and category.is_active and career.is_active and bank.is_active`;
+        where category.slug = ${target.category} and career.slug = ${target.career} and bank.slug = ${compositeBank(target).bankSlug} and category.is_active and career.is_active and bank.is_active`;
       if (catalog.length !== 1) throw new Error("Categoria, carreira e banca não conferidas no catálogo ativo.");
       const now = new Date().toISOString();
       for (const stamp of input.capturedAt.values()) assertCompositeFreshness(stamp);
@@ -219,7 +236,7 @@ export async function admitCompositeOfficialCourse(input: Readonly<{
       await tx`insert into opportunity_organizer_assignments (opportunity_id, quiz_bank_id, source_document_id, responsible_type, role, organizer_slug,
         organizer_name, valid_from, status, reviewed_by_user_id, reviewed_at, review_notes)
         values (${opportunity.id}, null, ${noticeSource.sourceId}, 'institutional_commission', 'primary_responsible', ${target.acronym.toLowerCase()}, ${target.commission}, ${target.noticeDate}, 'reviewed', ${actor}, ${now}, ${note}),
-          (${opportunity.id}, ${catalog[0].bankId}, ${noticeSource.sourceId}, 'external_organizer', 'examination_provider', 'fgv', 'Fundação Getulio Vargas — etapa objetiva', ${target.noticeDate}, 'reviewed', ${actor}, ${now}, ${note})`;
+          (${opportunity.id}, ${catalog[0].bankId}, ${noticeSource.sourceId}, 'external_organizer', 'examination_provider', ${compositeBank(target).bankSlug}, ${compositeBank(target).organizerName}, ${target.noticeDate}, 'reviewed', ${actor}, ${now}, ${note})`;
       // Approved source and organizer must precede transition from draft (publication trigger).
       await tx`update contest_opportunities set editorial_status = 'reviewed', published_at = ${now}, reviewed_by_user_id = ${actor}, reviewed_at = ${now}, review_notes = ${note}, updated_at = ${now} where id = ${opportunity.id} and editorial_status = 'draft'`;
       const rows = requirementCandidates.map((item) => ({ opportunity_id: opportunity.id, source_document_id: identities.get(item.documentKey)!.sourceId,

@@ -503,6 +503,55 @@ export const NEXT_OFFICIAL_COURSE_RECIPES: readonly NextOfficialCourseRecipe[] =
     ] },
     limitations: ["Só Delegado de Polícia; Agente de Polícia Judiciária e Papiloscopista têm programa próprio no mesmo anexo.", "Itens agrupados pelo número de segundo nível; subitens (1.1.1…) ficam no item.", "A 1ª retificação (Edital 02/2026) altera exame médico e títulos, sem mudar o Anexo I.", "Treino histórico da objetiva com legislação atual; legislação estadual do Paraná exige fonte oficial própria antes de vínculos."],
   },
+  // Lote Cebraspe histórico (18/11/2026): títulos inline com dois-pontos ("DIREITO CIVIL: 1 …"), itens numerados corridos.
+  {
+    productSlug: "sefaz-rn-auditor-fiscal-reta-final", institution: "Secretaria de Estado da Fazenda do Rio Grande do Norte", role: "Auditor Fiscal de Receitas Estaduais",
+    jurisdiction: "RN", cycle: "Edital nº 5 – SEAD/SEFAZ/RN, de 19/12/2025", bankScope: "Cebraspe, executor do concurso e responsável pelas provas objetivas, sob a SEAD/RN",
+    portalUrl: "https://www.cebraspe.org.br/concursos/sefaz_rn_25_auditor", examDate: "2026-03-22", examDateEvidence: { documentKey: "sefazrn-notice", page: 38, item: "Anexo I", quote: "Aplicação das provas objetivas 21 e 22/3/2026", actualDayIndependentlyVerified: false, corroboratingUrl: "https://cdn.cebraspe.org.br/concursos/sefaz_rn_25_auditor/arquivos/355613AE6F4CBAEBA889E8A28F0DB4FC3887AE80F556A18EFF6980A58F662096.pdf", limitation: "O cronograma prevê as provas em 21 e 22/3/2026 sem dizer o dia de cada uma; a edição usa 22/3/2026, fim da aplicação. O texto do gabarito não é extraído (política de material de prova); a API oficial publicou os cadernos em 27/03/2026 e o gabarito definitivo P3 em 24/04/2026." },
+    stage: "Objetivas com gabarito definitivo (24/04/2026, P1 atualizado em 29/04/2026); concurso homologado em 03/06/2026",
+    stageObservedOn: "2026-11-18", proposedMode: "historical_training", expectedSubjects: 18,
+    documents: [
+      { key: "sefazrn-notice", url: "https://cdn.cebraspe.org.br/concursos/sefaz_rn_25_auditor/arquivos/E8D7BE4C19CD39BFF1D87ECFBF92C0409AF35B178B8865C9534F17236D261200.pdf", title: "Edital nº 5 – SEAD/SEFAZ/RN, de 19/12/2025 — abertura do concurso de Auditor Fiscal de Receitas Estaduais", pages: 40, programmePages: [31, 37], layout: {
+        headings: [
+          { line: "LÍNGUA PORTUGUESA", subject: "Língua Portuguesa", inline: true, inlineSeparator: ":" },
+          { line: "DIREITO CONSTITUCIONAL", subject: "Direito Constitucional", inline: true, inlineSeparator: ":" },
+          { line: "DIREITO ADMINISTRATIVO", subject: "Direito Administrativo", inline: true, inlineSeparator: ":" },
+          { line: "DIREITO COMERCIAL", subject: "Direito Comercial", inline: true, inlineSeparator: ":" },
+          { line: "DIREITO CIVIL", subject: "Direito Civil", inline: true, inlineSeparator: ":" },
+          { line: "DIREITO PENAL", subject: "Direito Penal", inline: true, inlineSeparator: ":" },
+          { line: "DIREITO FINANCEIRO", subject: "Direito Financeiro", inline: true, inlineSeparator: ":" },
+          { line: "ECONOMIA", subject: "Economia", inline: true, inlineSeparator: ":" },
+          { line: "CONTABILIDADE GERAL", subject: "Contabilidade Geral", inline: true, inlineSeparator: ":" },
+          { line: "HISTÓRIA DO RIO GRANDE DO NORTE E ASPECTOS GEOECONÔMICOS DO RIO GRANDE DO NORTE", subject: "História do Rio Grande do Norte e Aspectos Geoeconômicos do Rio Grande do Norte", inline: true, inlineSeparator: ":" },
+          { line: "AUDITORIA", subject: "Auditoria", inline: true, inlineSeparator: ":" },
+          { line: "MATEMÁTICA FINANCEIRA E ESTATÍSTICA", subject: "Matemática Financeira e Estatística", inline: true, inlineSeparator: ":" },
+          { line: "TECNOLOGIA DA INFORMAÇÃO", subject: "Tecnologia da Informação", inline: true, inlineSeparator: ":" },
+          { line: "DIREITO TRIBUTÁRIO I - GERAL", subject: "Direito Tributário I - Geral", inline: true, inlineSeparator: ":" },
+          { line: "DIREITO TRIBUTÁRIO II – REFORMA TRIBUTÁRIA", subject: "Direito Tributário II – Reforma Tributária", inline: true, inlineSeparator: ":" },
+          { line: "CONTABILIDADE AVANÇADA E CONTABILIDADE DE CUSTOS", subject: "Contabilidade Avançada e Contabilidade de Custos", inline: true, inlineSeparator: ":" },
+          { line: "LEGISLAÇÃO TRIBUTÁRIA ESTADUAL", subject: "Legislação Tributária Estadual", inline: true, inlineSeparator: ":" },
+          { line: "PROCESSO ADMINISTRATIVO TRIBUTÁRIO", subject: "Processo Administrativo Tributário", inline: true, inlineSeparator: ":" },
+        ],
+        ignoreLines: ["13\\.2\\.1 Nas provas, serão avaliados, além de habilidades, conhecimentos conforme descritos a seguir\\.", "13\\.2\\.2 CONHECIMENTOS GERAIS",
+          "13\\.2\\.3 CONHECIMENTOS COMPLEMENTARES", "13\\.2\\.4 CONHECIMENTOS ESPECÍFICOS",
+          // Assinatura do edital, depois do último título.
+          "IRANILDO GERMANO DOS SANTOS", "Secretário de Estado da Administração"],
+        itemMode: "top-level-numbers",
+      } },
+    ],
+    overlays: [],
+    identityClaims: [
+      { document: "sefazrn-notice", page: 1, contains: ["EDITAL Nº 5 – SEAD/SEFAZ/RN, DE 19 DE DEZEMBRO DE 2025", "CARGO DE AUDITOR FISCAL DE RECEITAS ESTADUAIS", "executado pelo Centro Brasileiro de Pesquisa em"] },
+      { document: "sefazrn-notice", page: 21, contains: ["múltipla escolha, com cinco opções (A, B, C, D e E)", "Processo administrativo tributário 10"] },
+      { document: "sefazrn-notice", page: 38, contains: ["Aplicação das provas objetivas 21 e 22/3/2026"] },
+    ],
+    previousExam: { cycle: "Edital nº 5/2025 — objetivas já realizadas em 21 e 22/3/2026", role: "Auditor Fiscal de Receitas Estaduais — prova objetiva P3 (conhecimentos específicos)", portalUrl: "https://www.cebraspe.org.br/concursos/sefaz_rn_25_auditor", examDate: "2026-03-22", answerKeyFinality: "definitive_document", documents: [
+      { type: "question_booklet", title: "SEFAZ-RN 2025 — caderno da prova objetiva P3 (conhecimentos específicos)", url: "https://cdn.cebraspe.org.br/concursos/sefaz_rn_25_auditor/arquivos/355613AE6F4CBAEBA889E8A28F0DB4FC3887AE80F556A18EFF6980A58F662096.pdf" },
+      { type: "answer_key", title: "SEFAZ-RN 2025 — gabarito definitivo da prova objetiva P3", url: "https://cdn.cebraspe.org.br/concursos/sefaz_rn_25_auditor/arquivos/CAA752D9479FB2950FC4628B664090960445EF8846E2AC3E7AF5FB2F344267C5.pdf" },
+    ] },
+    skipRepeatedRequirements: true,
+    limitations: ["Itens agrupados pelo número de primeiro nível; subitens (1.1, 1.2.1…) ficam no item.", "Prova anterior registrada pela P3 (conhecimentos específicos, 80 questões); P1 e P2 têm cadernos próprios no mesmo evento.", "Edital nº 5/2025 sem retificação de programa; o Edital nº 7 só retifica resultado.", "Treino histórico da objetiva com legislação atual; legislação tributária estadual do RN exige fonte oficial própria antes de vínculos."],
+  },
 ];
 
 function normalized(value: string) { return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, " ").toLowerCase().trim(); }
@@ -533,7 +582,8 @@ function extractLayoutSections(recipe: PreviewDocumentRecipe, layout: ProgrammeL
         continue;
       }
       if (ignore.some((pattern) => pattern.test(line))) continue;
-      const inlineHeading = headings.find((item) => item.inline && line.startsWith(`${item.line}${item.inlineSeparator ?? "."} `));
+      // Com ":" o PDF às vezes cola o conteúdo ("TECNOLOGIA DA INFORMAÇÃO:1 Fluência…"); com "." o espaço é obrigatório.
+      const inlineHeading = headings.find((item) => item.inline && line.startsWith(`${item.line}${item.inlineSeparator === ":" ? ":" : ". "}`));
       const heading = inlineHeading ?? headings.find((item) => !item.inline && item.key === normalized(line));
       if (heading) {
         if (sections.length !== headings.indexOf(heading)) throw new Error("Título de disciplina fora da ordem do layout.");
@@ -544,7 +594,7 @@ function extractLayoutSections(recipe: PreviewDocumentRecipe, layout: ProgrammeL
         if (!inlineHeading) continue;
       }
       if (!current) continue;
-      if (inlineHeading && current.fragments.length === 0) line = line.slice(inlineHeading.line.length + (inlineHeading.inlineSeparator ?? ".").length + 1);
+      if (inlineHeading && current.fragments.length === 0) { line = line.slice(inlineHeading.line.length + 1).trimStart(); if (!line) continue; }
       if (layout.itemMode === "top-level-numbers") {
         // "1 Tema. 1.1 Subtema. 2 Tema." (estilo Cebraspe/FGV corrido): só o número de primeiro
         // nível abre item; subitens continuam no item. Número isolado no fim da linha abre a seguinte.
