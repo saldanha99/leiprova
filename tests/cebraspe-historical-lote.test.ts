@@ -148,3 +148,42 @@ describe("lote Cebraspe histórico — TCE-RN Cargo 9", () => {
     expect(() => extractDossierSubjectSections(doc, capture(doc, { 57: [layout.startLine!, ...body].join("\n") }))).toThrow(/Linha final/u);
   });
 });
+
+describe("lote Cebraspe histórico — TJ-MT Cartórios (provimento) e TRT-10 Cargo 12", () => {
+  it("TJ-MT: provimento, 100 questões A–E, título inline com dois-pontos e assinatura fora do programa", () => {
+    const slug = "tj-mt-cartorios-reta-final";
+    const { target } = compositeCourseTarget(slug);
+    expect(target).toMatchObject({ category: "cartorios", career: "cartorios", bank: "cebraspe" });
+    expect(fgvHistoricalPreviousExam(slug)).toMatchObject({ cebraspeEventId: "tj_mt_25_notarios", expectedQuestionCount: 100, examDate: "2026-09-05" });
+    expect(CEBRASPE_PROGRAMME_SCOPES.has(target.slug)).toBe(true);
+    const doc = recipeOf(slug).documents[0];
+    const body = doc.layout!.headings.map((heading, index) => `${heading.line}: 1 Tema ${index}.`);
+    const sections = extractDossierSubjectSections(doc, capture(doc, { 49: ["20 DOS OBJETOS DE AVALIAÇÃO", ...body, "JOSÉ ZUQUIM NOGUEIRA", "Presidente do Tribunal de Justiça do Estado de Mato Grosso"].join("\n") }));
+    expect(sections).toHaveLength(10);
+    expect(compositeProgrammeRequirements(sections, [], true).some((item) => /ZUQUIM|Presidente/u.test(item.requirementText))).toBe(false);
+  });
+
+  it("TRT-10: só o Cargo 12, entre a linha do cargo e a do Cargo 13", () => {
+    const slug = "trt-10-analista-e-tecnico-df-to";
+    const { target } = compositeCourseTarget(slug);
+    expect(target).toMatchObject({ category: "trabalhistas", career: "analista", bank: "cebraspe" });
+    expect(fgvHistoricalPreviousExam(slug)).toMatchObject({ cebraspeEventId: "TRT10_24", expectedQuestionCount: 70, examDate: "2025-03-16" });
+    const layout = recipeOf(slug).documents[0].layout!;
+    expect(layout).toMatchObject({ startLine: "CARGO 12: ANALISTA JUDICIÁRIO – ÁREA: JUDICIÁRIA" });
+    const doc = recipeOf(slug).documents[0];
+    const body = layout.headings.map((heading, index) => `${heading.line}: 1 Tema ${index}.`);
+    const page = ["DIREITO CIVIL: 1 Tema do cargo 11.", layout.startLine!, ...body, layout.stopLine!, "DIREITO CIVIL: 1 Tema do cargo 13."].join("\n");
+    const requirements = compositeProgrammeRequirements(extractDossierSubjectSections(doc, capture(doc, { 73: page })), [], true);
+    expect(requirements.some((item) => /cargo 1[13]/u.test(item.requirementText))).toBe(false);
+  });
+
+  it("nome de arquivo com acento na URL confere com o nome literal da API do evento", () => {
+    const target = fgvHistoricalPreviousExam("trt-10-analista-e-tecnico-df-to");
+    const file = (url: string, descricaoArquivo: string) => ({ nomeArquivo: decodeURIComponent(url.split("/").at(-1)!), descricaoArquivo, dataArquivoObj: "2025-04-14T17:00:00", isGuid: false });
+    const payload = { eventoURL: "TRT10_24", eventoNomeCompleto: "Tribunal Regional do Trabalho da 10ª Região",
+      arquivosEdital: [file(target.portalNotice.url, target.portalNotice.label)],
+      arquivosGabarito: target.documents.map((document) => ({ ...file(document.url, document.label), dataArquivoObj: `${document.publishedOn}T10:00:00` })) };
+    expect(payload.arquivosEdital[0].nomeArquivo).toBe("Ed_1_2024_TRT_10_Abertura_atualizado_até_ret_6.pdf");
+    expect(() => assertCebraspeHistoricalEvent(target, payload)).not.toThrow();
+  });
+});

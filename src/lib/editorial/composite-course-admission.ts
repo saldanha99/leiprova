@@ -71,6 +71,12 @@ export const COMPOSITE_ADMISSION_TARGETS = [
   { productSlug: "tce-rn-auditor-2026", slug: "tcern-auditor-direito-1-2025-historico-objetiva", acronym: "TCE-RN", notice: "1/2025-TCE/RN", category: "fiscal-e-controle", career: "controle-externo", noticeDate: "2025-12-29", statusDate: "2026-08-12", cycleYear: 2025, lifecycleStatus: "result_published", commission: "Tribunal de Contas do Estado do Rio Grande do Norte", bank: "cebraspe", stages: [
     { title: "Edital nº 13 – Resultado final na avaliação de títulos e no concurso (nível superior)", url: `${CEBRASPE}TCE_RN_25/arquivos/350A497D60B14C4502E9C3DD47B3A45F7B5A493C7502F9A1EB09307231FA1E51.pdf`, publishedOn: "2026-08-12" },
   ] },
+  { productSlug: "tj-mt-cartorios-reta-final", slug: "tjmt-notas-registro-provimento-48-2025-historico-objetiva", acronym: "TJMT", notice: "48/2025-TJMT/DGP", category: "cartorios", career: "cartorios", noticeDate: "2025-10-20", statusDate: "2026-10-01", cycleYear: 2025, lifecycleStatus: "result_published", commission: "Comissão Examinadora do Concurso de Outorga de Delegações de Notas e de Registro do TJMT", bank: "cebraspe", stages: [
+    { title: "Edital nº 28 – Resultado final na prova objetiva de seleção, gabaritos definitivos e convocação para a prova escrita e prática", url: `${CEBRASPE}tj_mt_25_notarios/arquivos/968BCEC724DAEC0D5EE918A02F365625E9DA8C943069A384363963BB419B34C3.pdf`, publishedOn: "2026-10-01" },
+  ] },
+  { productSlug: "trt-10-analista-e-tecnico-df-to", slug: "trt10-analista-area-judiciaria-1-2024-historico-objetiva", acronym: "TRT-10", notice: "1/2024-TRT10", category: "trabalhistas", career: "analista", noticeDate: "2024-12-19", statusDate: "2025-08-01", cycleYear: 2024, lifecycleStatus: "result_published", commission: "Tribunal Regional do Trabalho da 10ª Região", bank: "cebraspe", stages: [
+    { title: "Edital nº 11 – Resultado final no desempate de notas e resultado final no concurso público, exceto para o Cargo 15", url: `${CEBRASPE}TRT10_24/arquivos/Ed_11_TRT_10_24_Res_final_desempate_Final_Concurso.pdf`, publishedOn: "2025-08-01" },
+  ] },
 ] as const;
 
 export function compositeCourseTarget(productSlug: string) {

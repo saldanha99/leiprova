@@ -595,6 +595,83 @@ export const NEXT_OFFICIAL_COURSE_RECIPES: readonly NextOfficialCourseRecipe[] =
     skipRepeatedRequirements: true,
     limitations: ["Só os conhecimentos específicos do Cargo 9 (P2, 70 itens Certo/Errado); os conhecimentos gerais (P1) têm títulos com exceções por cargo e ficam para revisão própria.", "Itens agrupados pelo número de primeiro nível.", "Edital consolidado até a retificação do Edital nº 6 (avaliação de títulos); nenhuma retificação de programa.", "Treino histórico da objetiva com legislação atual; leis complementares estaduais do RN exigem fonte oficial própria antes de vínculos."],
   },
+  // TJ-MT 2025 — Outorga de Delegações de Notas e de Registro, ingresso por provimento (objetiva de seleção, 100 questões A–E).
+  {
+    productSlug: "tj-mt-cartorios-reta-final", institution: "Tribunal de Justiça do Estado de Mato Grosso", role: "Outorga de Delegações de Notas e de Registro — Ingresso por Provimento",
+    jurisdiction: "MT", cycle: "Edital TJMT/DGP nº 48, de 20/10/2025", bankScope: "Cebraspe, executor do concurso e responsável pela prova objetiva de seleção, com a Comissão Examinadora do TJMT",
+    portalUrl: "https://www.cebraspe.org.br/concursos/tj_mt_25_notarios", examDate: "2026-09-05", examDateEvidence: { documentKey: "tjmt-notice", page: 57, item: "Anexo I", quote: "Aplicação da prova objetiva de seleção – Provimento 5/9/2026", actualDayIndependentlyVerified: false, corroboratingUrl: "https://cdn.cebraspe.org.br/concursos/tj_mt_25_notarios/arquivos/E8790E73E144A9BDAF6B0FC269782453E9217B3E5CBF4C89F3B67E91D228EED5.pdf", limitation: "O texto do gabarito não é extraído (política de material de prova); a API oficial publicou o caderno de provimento em 11/09/2026 e o gabarito definitivo em 01/10/2026, compatíveis com a data do cronograma." },
+    stage: "Objetiva de seleção com gabarito definitivo (Edital nº 28, 01/10/2026); prova escrita e prática aplicada (padrão preliminar em 03/11/2026)",
+    stageObservedOn: "2026-11-19", proposedMode: "historical_training", expectedSubjects: 10,
+    documents: [
+      { key: "tjmt-notice", url: "https://cdn.cebraspe.org.br/concursos/tj_mt_25_notarios/arquivos/6500401BB1E96C8AF9F9DA0910FF96202FF79B66FE7A9E9E516DFAA4B169DF9B.pdf", title: "Edital TJMT/DGP nº 48, de 20/10/2025 — abertura, versão atualizada até o Edital nº 11, de 15/04/2026", pages: 72, programmePages: [49, 55], layout: {
+        headings: [
+          { line: "DIREITO NOTARIAL E REGISTRAL", subject: "Direito Notarial e Registral", inline: true, inlineSeparator: ":" },
+          { line: "DIREITO CONSTITUCIONAL", subject: "Direito Constitucional", inline: true, inlineSeparator: ":" },
+          { line: "DIREITO ADMINISTRATIVO", subject: "Direito Administrativo", inline: true, inlineSeparator: ":" },
+          { line: "DIREITO TRIBUTÁRIO", subject: "Direito Tributário", inline: true, inlineSeparator: ":" },
+          { line: "DIREITO CIVIL", subject: "Direito Civil", inline: true, inlineSeparator: ":" },
+          { line: "DIREITO PROCESSUAL CIVIL", subject: "Direito Processual Civil", inline: true, inlineSeparator: ":" },
+          { line: "DIREITO PENAL", subject: "Direito Penal", inline: true, inlineSeparator: ":" },
+          { line: "DIREITO PROCESSUAL PENAL", subject: "Direito Processual Penal", inline: true, inlineSeparator: ":" },
+          { line: "DIREITO EMPRESARIAL", subject: "Direito Empresarial", inline: true, inlineSeparator: ":" },
+          { line: "CONHECIMENTOS GERAIS", subject: "Conhecimentos Gerais", inline: true, inlineSeparator: ":" },
+        ],
+        ignoreLines: ["ESTADO DE MATO GROSSO", "PODER JUDICIÁRIO", "TRIBUNAL DE JUSTIÇA",
+          // Assinatura do edital, depois do último título.
+          "JOSÉ ZUQUIM NOGUEIRA", "Presidente do Tribunal de Justiça do Estado de Mato Grosso"],
+        itemMode: "top-level-numbers",
+      } },
+    ],
+    overlays: [],
+    identityClaims: [
+      { document: "tjmt-notice", page: 1, contains: ["EDITALTJMT/DGP N. 48 DE 20 DE OUTUBRO DE 2025", "Versão atualizada até a retificação constante do Edital TJMT/DGP nº 11, de 15 de abril de 2026."] },
+      { document: "tjmt-notice", page: 24, contains: ["múltipla escolha, com cinco opções (A, B, C, D", "abrangerá os objetos de"] },
+      { document: "tjmt-notice", page: 49, contains: ["20 DOS OBJETOS DE AVALIAÇÃO"] },
+      { document: "tjmt-notice", page: 57, contains: ["Aplicação da prova objetiva de seleção –", "5/9/2026"] },
+    ],
+    previousExam: { cycle: "Edital TJMT/DGP nº 48/2025 — objetiva de seleção (provimento) já realizada em 5/9/2026", role: "Outorga de Delegações de Notas e de Registro — prova objetiva de seleção, ingresso por provimento", portalUrl: "https://www.cebraspe.org.br/concursos/tj_mt_25_notarios", examDate: "2026-09-05", answerKeyFinality: "definitive_document", documents: [
+      { type: "question_booklet", title: "TJ-MT 2025 Cartórios — caderno da prova objetiva de seleção — provimento", url: "https://cdn.cebraspe.org.br/concursos/tj_mt_25_notarios/arquivos/E8790E73E144A9BDAF6B0FC269782453E9217B3E5CBF4C89F3B67E91D228EED5.pdf" },
+      { type: "answer_key", title: "TJ-MT 2025 Cartórios — gabarito definitivo da prova objetiva de seleção — provimento", url: "https://cdn.cebraspe.org.br/concursos/tj_mt_25_notarios/arquivos/AC049C45E817444A5C57213E5850F5D6B78D57B4D6F4AE912D60F0FE472AFE2B.pdf" },
+    ] },
+    skipRepeatedRequirements: true,
+    limitations: ["Itens agrupados pelo número de primeiro nível; subitens ficam no item.", "Só o ingresso por provimento; a remoção tem prova própria com os mesmos objetos de avaliação.", "Edital consolidado até o Edital nº 11; as retificações posteriores (nº 17, 21 e seguintes) não alteram o item 20.", "Treino histórico da objetiva com legislação atual; normas da CGJ/TJMT exigem fonte oficial própria antes de vínculos."],
+  },
+  // TRT-10 2024 — Analista Judiciário – Área Judiciária (Cargo 12): só conhecimentos específicos (P2, Certo/Errado).
+  {
+    productSlug: "trt-10-analista-e-tecnico-df-to", institution: "Tribunal Regional do Trabalho da 10ª Região", role: "Analista Judiciário – Área: Judiciária",
+    jurisdiction: "DF", cycle: "Edital nº 1 – TRT 10ª Região, de 19/12/2024", bankScope: "Cebraspe, executor do concurso e responsável pelas provas objetivas e discursiva, sob o TRT 10ª Região",
+    portalUrl: "https://www.cebraspe.org.br/concursos/trt10_24", examDate: "2025-03-16", examDateEvidence: { documentKey: "trt10-notice", page: 83, item: "Anexo I", quote: "Aplicação das provas objetivas e discursiva 16/3/2025", actualDayIndependentlyVerified: false, corroboratingUrl: "https://cdn.cebraspe.org.br/concursos/TRT10_24/arquivos/050_TRT10_012_01.pdf", limitation: "O texto do gabarito não é extraído (política de material de prova); a API oficial publicou o caderno P2 do Cargo 12 em 21/03/2025 e o gabarito definitivo em 14/04/2025, compatíveis com a data do cronograma." },
+    stage: "Objetivas com gabarito definitivo (14/04/2025); resultado final no concurso em 01/08/2025 (Edital nº 11)",
+    stageObservedOn: "2026-11-19", proposedMode: "historical_training", expectedSubjects: 5,
+    documents: [
+      { key: "trt10-notice", url: "https://cdn.cebraspe.org.br/concursos/TRT10_24/arquivos/Ed_1_2024_TRT_10_Abertura_atualizado_at%C3%A9_ret_6.pdf", title: "Edital nº 1 – TRT 10ª Região, de 19/12/2024 — abertura, versão atualizada até o Edital nº 6, de 23/05/2025", pages: 86, programmePages: [73, 76], layout: {
+        headings: [
+          { line: "DIREITO CIVIL", subject: "Direito Civil", inline: true, inlineSeparator: ":" },
+          { line: "DIREITO PROCESSUAL CIVIL", subject: "Direito Processual Civil", inline: true, inlineSeparator: ":" },
+          { line: "DIREITO DO TRABALHO", subject: "Direito do Trabalho", inline: true, inlineSeparator: ":" },
+          { line: "DIREITO PROCESSUAL DO TRABALHO", subject: "Direito Processual do Trabalho", inline: true, inlineSeparator: ":" },
+          { line: "DIREITO PREVIDENCIÁRIO", subject: "Direito Previdenciário", inline: true, inlineSeparator: ":" },
+        ],
+        ignoreLines: [],
+        startLine: "CARGO 12: ANALISTA JUDICIÁRIO – ÁREA: JUDICIÁRIA",
+        stopLine: "CARGO 13: ANALISTA JUDICIÁRIO – ÁREA: JUDICIÁRIA – ESPECIALIDADE: OFICIAL DE JUSTIÇA AVALIADOR",
+        itemMode: "top-level-numbers",
+      } },
+    ],
+    overlays: [],
+    identityClaims: [
+      { document: "trt10-notice", page: 1, contains: ["EDITAL Nº 1 – TRT 10ª REGIÃO, DE 19 DE DEZEMBRO DE 2024", "Versão atualização até a retificação publicada no Edital nº 6 – TRT 10ª Região, de 23 de maio de 2025", "Avaliação e Seleção e de Promoção de Eventos (Cebraspe)."] },
+      { document: "trt10-notice", page: 34, contains: ["O julgamento de cada item será CERTO ou ERRADO"] },
+      { document: "trt10-notice", page: 73, contains: ["CARGO 12: ANALISTA JUDICIÁRIO – ÁREA: JUDICIÁRIA"] },
+      { document: "trt10-notice", page: 83, contains: ["Aplicação das provas objetivas e discursiva", "16/3/2025"] },
+    ],
+    previousExam: { cycle: "Edital nº 1/2024 — objetivas já realizadas em 16/3/2025", role: "Analista Judiciário – Área Judiciária — prova objetiva P2 (conhecimentos específicos)", portalUrl: "https://www.cebraspe.org.br/concursos/trt10_24", examDate: "2025-03-16", answerKeyFinality: "definitive_document", documents: [
+      { type: "question_booklet", title: "TRT-10 2024 — caderno da prova objetiva P2 (conhecimentos específicos) — Cargo 12", url: "https://cdn.cebraspe.org.br/concursos/TRT10_24/arquivos/050_TRT10_012_01.pdf" },
+      { type: "answer_key", title: "TRT-10 2024 — gabarito definitivo da prova objetiva P2 — Cargo 12", url: "https://cdn.cebraspe.org.br/concursos/TRT10_24/arquivos/Gab_Definitivo_050_TRT10_012_01.pdf" },
+    ] },
+    skipRepeatedRequirements: true,
+    limitations: ["Só os conhecimentos específicos do Cargo 12 (P2, 70 itens Certo/Errado); os conhecimentos básicos (P1) têm disciplinas com exceções por cargo e ficam para revisão própria.", "Itens agrupados pelo número de primeiro nível.", "Edital consolidado até o Edital nº 6; nenhuma retificação de programa.", "O produto cobre Analista e Técnico; esta admissão cobre só o Analista Judiciário – Área Judiciária.", "Treino histórico da objetiva com legislação atual."],
+  },
 ];
 
 function normalized(value: string) { return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, " ").toLowerCase().trim(); }

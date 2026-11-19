@@ -57,11 +57,55 @@ export const CEBRASPE_HISTORICAL_PREVIOUS_EXAMS: readonly FgvHistoricalPreviousE
         url: `${CDN}TCE_RN_25/arquivos/6F2A7444B2D884D74F7FAA21083CF8D4F5342036A955C80C1AA293A4C118882C.pdf` },
     ],
   },
+  {
+    bank: "cebraspe", cebraspeEventId: "tj_mt_25_notarios",
+    productSlug: "tj-mt-cartorios-reta-final", editionPublicId: "tjmt-notas-registro-provimento-48-2025-objetiva", opportunitySlug: "tjmt-notas-registro-provimento-48-2025-historico-objetiva",
+    portalUrl: "https://www.cebraspe.org.br/concursos/tj_mt_25_notarios", portalHeading: "TJ MT 25 NOTARIOS",
+    portalNotice: { url: `${CDN}tj_mt_25_notarios/arquivos/6500401BB1E96C8AF9F9DA0910FF96202FF79B66FE7A9E9E516DFAA4B169DF9B.pdf`, label: "Edital nº 48 – Abertura – Atualizado conforme retificações" },
+    role: "Outorga de Delegações de Notas e de Registro — Ingresso por Provimento", jurisdiction: "MT", jurisdictionName: "Mato Grosso", institution: "TJMT", noticeNumber: "48/2025-TJMT/DGP", cycleYear: 2025, careerSlug: "cartorios",
+    examDate: "2026-09-05", expectedQuestionCount: 100,
+    noticeUrl: `${CDN}tj_mt_25_notarios/arquivos/6500401BB1E96C8AF9F9DA0910FF96202FF79B66FE7A9E9E516DFAA4B169DF9B.pdf`,
+    noticeSha256: "d7e2a9ad3bf80d83c146ded7703b76a2482a0333dc57cf6bd3cba91c6725db9c", noticePageCount: 72,
+    noticeChecks: [
+      { page: 24, pattern: "múltipla escolha, com cinco opções \\(A, B, C, D" },
+      { page: 57, pattern: "Aplicação da prova objetiva de seleção –\\s*Provimento\\s*5/9/2026" },
+    ],
+    examDateCorroboration: "API oficial do evento Cebraspe: caderno de provimento publicado em 11/09/2026 e gabarito definitivo em 01/10/2026, após a data do cronograma (5/9/2026)",
+    editionSourceExternalId: "cebraspe-tj-mt-25-notarios-provimento-objetiva", editionTitle: "TJ-MT 2025 — Notas e Registro, ingresso por provimento — objetiva de seleção",
+    documents: [
+      { documentType: "question_booklet", title: "TJ-MT 2025 — prova objetiva de seleção — provimento", label: "PROVA OBJETIVA DE SELEÇÃO - PROVIMENTO", publishedOn: "2026-09-11",
+        url: `${CDN}tj_mt_25_notarios/arquivos/E8790E73E144A9BDAF6B0FC269782453E9217B3E5CBF4C89F3B67E91D228EED5.pdf` },
+      { documentType: "answer_key", title: "TJ-MT 2025 — gabarito definitivo da prova objetiva de seleção — provimento", label: "GABARITO DEFINITIVO - PROVA OBJETIVA DE SELEÇÃO - PROVIMENTO", publishedOn: "2026-10-01",
+        url: `${CDN}tj_mt_25_notarios/arquivos/AC049C45E817444A5C57213E5850F5D6B78D57B4D6F4AE912D60F0FE472AFE2B.pdf` },
+    ],
+  },
+  {
+    bank: "cebraspe", cebraspeEventId: "TRT10_24",
+    productSlug: "trt-10-analista-e-tecnico-df-to", editionPublicId: "trt10-analista-area-judiciaria-1-2024-objetiva-p2", opportunitySlug: "trt10-analista-area-judiciaria-1-2024-historico-objetiva",
+    portalUrl: "https://www.cebraspe.org.br/concursos/trt10_24", portalHeading: "Tribunal Regional do Trabalho da 10ª Região",
+    portalNotice: { url: `${CDN}TRT10_24/arquivos/Ed_1_2024_TRT_10_Abertura_atualizado_at%C3%A9_ret_6.pdf`, label: "Edital nº 1 – Abertura – Atualizado conforme retificações" },
+    role: "Analista Judiciário – Área: Judiciária", jurisdiction: "DF", jurisdictionName: "Distrito Federal", institution: "TRT-10", noticeNumber: "1/2024-TRT10", cycleYear: 2024, careerSlug: "analista",
+    examDate: "2025-03-16", expectedQuestionCount: 70,
+    noticeUrl: `${CDN}TRT10_24/arquivos/Ed_1_2024_TRT_10_Abertura_atualizado_at%C3%A9_ret_6.pdf`,
+    noticeSha256: "8ba3be22e312bde29bf2e682167e4183ee0ac5441581e456a6e335c6eff9433b", noticePageCount: 86,
+    noticeChecks: [
+      { page: 34, pattern: "O julgamento de cada item será CERTO ou ERRADO" },
+      { page: 83, pattern: "Aplicação das provas objetivas e discursiva\\s*16/3/2025" },
+    ],
+    examDateCorroboration: "API oficial do evento Cebraspe: caderno P2 do Cargo 12 publicado em 21/03/2025 e gabarito definitivo em 14/04/2025, após a data do cronograma (16/3/2025)",
+    editionSourceExternalId: "cebraspe-trt10-24-cargo12-objetiva-p2", editionTitle: "TRT-10 2024 — Analista Judiciário – Área Judiciária (Cargo 12) — objetiva P2 (conhecimentos específicos)",
+    documents: [
+      { documentType: "question_booklet", title: "TRT-10 2024 — prova objetiva P2 — conhecimentos específicos — Cargo 12", label: "PROVA OBJETIVA – CONHECIMENTOS ESPECÍFICOS – CARGO 12", publishedOn: "2025-03-21",
+        url: `${CDN}TRT10_24/arquivos/050_TRT10_012_01.pdf` },
+      { documentType: "answer_key", title: "TRT-10 2024 — gabarito definitivo da prova objetiva P2 — Cargo 12", label: "GABARITO DEFINITIVO - CONHECIMENTOS ESPECÍFICOS – CARGO 12", publishedOn: "2025-04-14",
+        url: `${CDN}TRT10_24/arquivos/Gab_Definitivo_050_TRT10_012_01.pdf` },
+    ],
+  },
 ];
 
 type CebraspeFile = { nomeArquivo?: unknown; descricaoArquivo?: unknown; dataArquivoObj?: unknown; isGuid?: unknown };
 const label = (value: unknown) => typeof value === "string" ? value.replace(/\s+/gu, " ").trim() : "";
-const fileName = (url: string) => new URL(url).pathname.split("/").at(-1)!;
+const fileName = (url: string) => decodeURIComponent(new URL(url).pathname.split("/").at(-1)!);
 
 /** Confere evento, edital e documentos na API oficial e devolve só o que foi conferido. */
 export function assertCebraspeHistoricalEvent(target: FgvHistoricalPreviousExam, payload: unknown) {
