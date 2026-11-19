@@ -24,6 +24,7 @@ const opportunity: PublicContestOpportunity = {
   institutionName: "Instituição de teste",
   roleName: "Cargo ilustrativo",
   cycleYear: 2026,
+  officialNoticeNumber: null,
   jurisdictionCode: "BR",
   lifecycleStatus: "pre_notice",
   statusAsOf: "2026-09-05",

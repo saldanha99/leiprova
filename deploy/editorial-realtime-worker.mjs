@@ -24,6 +24,12 @@ const LIMIT_PATTERN = /usage limit|rate.?limit|limit (reached|exceeded)|hit your
 export const FAILURE_STREAK_LIMIT = 3;
 
 export function readConfig(env) {
+  const usd = (name, fallback) => {
+    const raw = env[name]?.trim();
+    const value = raw ? Number(raw) : fallback;
+    if (!Number.isFinite(value) || value < 0 || value > 1000) throw new Error(`${name} deve ser valor em dólares entre 0 e 1000.`);
+    return value;
+  };
   const int = (name, fallback, min, max) => {
     const raw = env[name]?.trim();
     const value = raw ? Number(raw) : fallback;
@@ -45,7 +51,15 @@ export function readConfig(env) {
     stateDir: env.EDITORIAL_REALTIME_STATE_DIR?.trim() || "/var/lib/leiprova-realtime",
     projectDir: env.EDITORIAL_PROJECT_DIR?.trim() || "/opt/leiprova",
     container: env.EDITORIAL_CONTAINER?.trim() || "leiprova-editorial-automation",
-    slots: { "Guardião": int("EDITORIAL_SLOTS_GUARDIAO", 1, 0, 4), Autor: int("EDITORIAL_SLOTS_AUTOR", 2, 0, 6) },
+    slots: { "Guardião": int("EDITORIAL_SLOTS_GUARDIAO", 1, 0, 8), Autor: int("EDITORIAL_SLOTS_AUTOR", 2, 0, 8) },
+    // API paga (decisão do proprietário em 19/11/2026): teto de US$ 50, parada preventiva em US$ 48.
+    // A chave fica fora do repositório e só chega ao processo da CLI enquanto houver orçamento.
+    apiSecretFile: env.EDITORIAL_API_SECRET_FILE?.trim() || "/etc/leiprova/editorial-realtime.secret",
+    apiCapUsd: usd("EDITORIAL_API_CAP_USD", 50),
+    apiStopUsd: usd("EDITORIAL_API_STOP_USD", 48),
+    // Reservado por execução em andamento: o teto considera o que ainda não foi cobrado.
+    apiRunReserveUsd: usd("EDITORIAL_API_RUN_RESERVE_USD", 0.25),
+    apiRatePauseMs: int("EDITORIAL_API_RATE_PAUSE_SECONDS", 120, 10, 3600) * 1000,
     // Bem abaixo do lease de 90 min: a entrega precisa chegar com a reserva válida.
     taskTimeoutMs: int("EDITORIAL_TASK_TIMEOUT_MIN", 25, 5, 60) * 60_000,
     idleMs: int("EDITORIAL_IDLE_SECONDS", 60, 10, 3600) * 1000,
@@ -66,6 +80,99 @@ export function parseClaim(text, role) {
   return { state: "claimed", agent: value.agent, job, handoff: value.handoff ?? null };
 }
 
+/** Lê ANTHROPIC_API_KEY do arquivo privado; nunca registra o valor. */
+export function parseApiSecret(text) {
+  const match = /^\s*ANTHROPIC_API_KEY\s*=\s*["']?([^"'\s]+)["']?\s*$/m.exec(text ?? "");
+  return match ? match[1] : null;
+}
+
+/** Resultado de `claude -p --output-format json`: texto final e custo real informado pela CLI. */
+export function parseCliResult(stdout) {
+  const text = (stdout ?? "").trim();
+  const start = text.lastIndexOf("\n{");
+  for (const candidate of [text, start >= 0 ? text.slice(start + 1) : null]) {
+    if (!candidate?.startsWith("{")) continue;
+    try {
+      const value = JSON.parse(candidate);
+      if (value && typeof value === "object" && !Array.isArray(value)) {
+        const cost = typeof value.total_cost_usd === "number" && Number.isFinite(value.total_cost_usd) && value.total_cost_usd >= 0
+          ? value.total_cost_usd : null;
+        return { text: typeof value.result === "string" ? value.result : "", isError: value.is_error === true, cost };
+      }
+    } catch { /* tenta o próximo formato */ }
+  }
+  return null;
+}
+
+const round6 = (value) => Math.round(value * 1e6) / 1e6;
+
+/** Estado inicial ou recuperado do orçamento; esgotado nunca volta para a API sozinho. */
+export function loadBudget(saved, { capUsd, stopAtUsd, hasKey, now }) {
+  const base = saved && typeof saved === "object" ? saved : {};
+  const spentUsd = Number.isFinite(base.spentUsd) ? base.spentUsd : 0;
+  const exhaustedAt = typeof base.exhaustedAt === "string" ? base.exhaustedAt : null;
+  return {
+    capUsd, stopAtUsd, spentUsd, runs: Number.isInteger(base.runs) ? base.runs : 0,
+    unmeteredRuns: Number.isInteger(base.unmeteredRuns) ? base.unmeteredRuns : 0,
+    byRole: base.byRole && typeof base.byRole === "object" ? base.byRole : {},
+    mode: hasKey && !exhaustedAt && spentUsd < stopAtUsd ? "api" : "subscription",
+    exhaustedAt, updatedAt: now,
+  };
+}
+
+/** A chave só vai para a próxima execução se o gasto + reservas em andamento couberem antes da parada. */
+export function budgetAllows(budget, inflightUsd, reserveUsd) {
+  return budget.mode === "api" && !budget.exhaustedAt && budget.spentUsd + inflightUsd + reserveUsd < budget.stopAtUsd;
+}
+
+/** Soma o custo real (ou a reserva, sem medição) e aplica a parada preventiva. */
+export function chargeBudget(budget, role, costUsd, reserveUsd, now) {
+  const metered = typeof costUsd === "number";
+  const charged = metered ? costUsd : reserveUsd;
+  const roleStats = budget.byRole[role] ?? { runs: 0, spentUsd: 0 };
+  const next = {
+    ...budget,
+    spentUsd: round6(budget.spentUsd + charged), runs: budget.runs + 1,
+    unmeteredRuns: budget.unmeteredRuns + (metered ? 0 : 1),
+    byRole: { ...budget.byRole, [role]: { runs: roleStats.runs + 1, spentUsd: round6(roleStats.spentUsd + charged) } },
+    updatedAt: now,
+  };
+  if (next.spentUsd >= next.stopAtUsd && !next.exhaustedAt) Object.assign(next, { exhaustedAt: now, mode: "subscription" });
+  return next;
+}
+
+/**
+ * Extrato do contrato por papel: a CLI lê CONTRATO.md a cada tarefa. O Guardião (legal_mapping)
+ * só usa o formato da resposta; o Autor recebe também as conferências jurídicas retidas.
+ * Sem a seção de formato, devolve o documento inteiro.
+ */
+export function contractForRole(markdown, role) {
+  const sections = markdown.split(/^(?=## )/m);
+  const format = sections.find((section) => section.startsWith("## Formato de response.json"));
+  if (!format) return markdown;
+  const intro = role === "Autor" ? markdown.slice(0, markdown.search(/^## Responsabilidades/m) >>> 0) : `${sections[0].split("\n")[0]}\n\n`;
+  return `${intro.trimEnd()}\n\n${format.trimEnd()}\n`;
+}
+
+/** Mantém o primeiro vínculo de cada artigo: o contrato recusa o lote inteiro se um articleId se repetir. */
+export function dedupeMappings(response) {
+  if (!Array.isArray(response.mappings)) return { response, dropped: 0 };
+  const seen = new Set();
+  const mappings = response.mappings.filter((item) => {
+    const id = item?.articleId;
+    if (seen.has(id)) return false;
+    seen.add(id);
+    return true;
+  });
+  return { response: { ...response, mappings }, dropped: response.mappings.length - mappings.length };
+}
+
+/** Motivo fixo da recusa do contrato impresso pela ponte (`contract_rejected: ...`), ou null. */
+export function contractRejection(output) {
+  const match = /^contract_rejected: (.{1,300})$/m.exec(output ?? "");
+  return match ? match[1] : null;
+}
+
 export function isSubscriptionLimit(output) {
   return LIMIT_PATTERN.test(output);
 }
@@ -81,9 +188,9 @@ export function parseResponseFile(text) {
 export function buildPrompt({ role, model, handoff }) {
   return [
     `Você é o ${role} da fábrica editorial do Edital Lei Seca, rodando sem supervisão.`,
-    "Nesta pasta há: packet.json (a única tarefa reservada), CONTRATO.md (cópia de docs/MAESTRI-MOTORES-AUTOMATICOS.md, inclusive as conferências jurídicas já retidas) e AGENTS.md.",
+    "Nesta pasta há: packet.json (a única tarefa reservada), CONTRATO.md (extrato de docs/MAESTRI-MOTORES-AUTOMATICOS.md para o seu papel) e AGENTS.md.",
     "Este motor não tem rede nem agent-browser: trabalhe só com o corpus do pacote; onde CONTRATO.md mandar navegar, isso não se aplica a esta tarefa.",
-    "Leia CONTRATO.md, em especial a seção 'Formato de response.json', e as conferências do topo, que listam erros jurídicos já retidos.",
+    "Leia CONTRATO.md, em especial a seção 'Formato de response.json' e, quando houver, as conferências do topo, que listam erros jurídicos já retidos.",
     handoff?.instruction ?? "Leia job.payload.instructions e o texto INTEGRAL de job.payload.articles[].text no packet.json.",
     model ? `Se for autoria, use generatorModel "${model}".` : "Se for autoria, preencha generatorModel com o modelo que você realmente é.",
     "Grave o resultado SOMENTE em ./response.json: um objeto JSON estrito, sem cerca Markdown e sem texto adicional.",
@@ -95,7 +202,7 @@ export function buildPrompt({ role, model, handoff }) {
 export function executorCommand(config) {
   if (config.executor === "claude") {
     return { bin: config.bin, args: [
-      "-p", "--output-format", "text", "--permission-mode", "acceptEdits",
+      "-p", "--output-format", "json", "--permission-mode", "acceptEdits",
       "--allowedTools", "Read,Write,Edit",
       "--disallowedTools", "Bash,WebFetch,WebSearch,Task,NotebookEdit",
       ...(config.model ? ["--model", config.model] : []),
@@ -114,10 +221,11 @@ function run(bin, args, { input, cwd, timeoutMs, env }) {
     let stdout = "";
     const keep = (chunk) => { output = (output + chunk).slice(-200_000); };
     child.stdout.on("data", (chunk) => { stdout = (stdout + chunk).slice(-1_000_000); keep(chunk); });
-    child.stderr.on("data", keep);
+    let stderr = "";
+    child.stderr.on("data", (chunk) => { stderr = (stderr + chunk).slice(-50_000); keep(chunk); });
     const timer = setTimeout(() => child.kill("SIGTERM"), timeoutMs);
-    child.on("error", (error) => { clearTimeout(timer); resolve({ code: -1, stdout: "", output: String(error.message) }); });
-    child.on("close", (code, signal) => { clearTimeout(timer); resolve({ code: signal ? -2 : code, stdout, output }); });
+    child.on("error", (error) => { clearTimeout(timer); resolve({ code: -1, stdout: "", stderr: "", output: String(error.message) }); });
+    child.on("close", (code, signal) => { clearTimeout(timer); resolve({ code: signal ? -2 : code, stdout, stderr, output }); });
     child.stdin.end(input ?? "");
   });
 }
@@ -141,6 +249,34 @@ export async function main(env = process.env) {
   const idleLogged = new Set();
   const childEnv = { PATH: process.env.PATH, HOME: process.env.HOME, LANG: "C.UTF-8", NO_COLOR: "1" };
   const command = executorCommand(config);
+  // A chave é lida uma vez e só entra no ambiente da CLI; não vai para logs, eventos nem para a ponte.
+  const apiKey = config.executor === "claude"
+    ? await readFile(config.apiSecretFile, "utf8").then(parseApiSecret, () => null) : null;
+  const budgetFile = path.join(config.stateDir, "api-budget.json");
+  let budget = loadBudget(await readFile(budgetFile, "utf8").then(JSON.parse, () => null),
+    { capUsd: config.apiCapUsd, stopAtUsd: config.apiStopUsd, hasKey: Boolean(apiKey), now: new Date().toISOString() });
+  let inflightUsd = 0;
+  const saveBudget = () => writePrivate(budgetFile, JSON.stringify(budget, null, 2) + "\n");
+  await saveBudget();
+  /** Texto para detectar limite: no formato JSON, só o resultado da CLI e o stderr (números do JSON não contam). */
+  const cliText = (result) => {
+    const parsed = parseCliResult(result.stdout);
+    return parsed ? `${parsed.text}\n${result.stderr ?? ""}` : result.output;
+  };
+  /** Executa a CLI pela API enquanto houver orçamento; senão pela assinatura. Cobra o custo real. */
+  async function runExecutor(role, input, cwd, timeoutMs) {
+    const useApi = Boolean(apiKey) && budgetAllows(budget, inflightUsd, config.apiRunReserveUsd);
+    if (!useApi) return { ...(await run(command.bin, command.args, { input, cwd, timeoutMs, env: childEnv })), useApi };
+    inflightUsd += config.apiRunReserveUsd;
+    let result;
+    try { result = await run(command.bin, command.args, { input, cwd, timeoutMs, env: { ...childEnv, ANTHROPIC_API_KEY: apiKey } }); }
+    finally { inflightUsd -= config.apiRunReserveUsd; }
+    const wasExhausted = Boolean(budget.exhaustedAt);
+    budget = chargeBudget(budget, role, parseCliResult(result.stdout)?.cost ?? null, config.apiRunReserveUsd, new Date().toISOString());
+    await saveBudget();
+    if (!wasExhausted && budget.exhaustedAt) await event({ state: "api_budget_exhausted", spentUsd: budget.spentUsd, stopAtUsd: budget.stopAtUsd });
+    return { ...result, useApi };
+  }
   let stopping = false;
   for (const signal of ["SIGTERM", "SIGINT"]) process.on(signal, () => { stopping = true; });
 
@@ -178,15 +314,15 @@ export async function main(env = process.env) {
   async function probe() {
     const dir = path.join(config.stateDir, "probe");
     await mkdir(dir, { recursive: true, mode: 0o700 });
-    const result = await run(command.bin, command.args, { input: "Responda apenas: OK", cwd: dir, timeoutMs: 120_000, env: childEnv });
-    if (result.code === 0 && !isSubscriptionLimit(result.output) && /\bOK\b/i.test(result.output)) {
+    const result = await runExecutor("probe", "Responda apenas: OK", dir, 120_000);
+    if (result.code === 0 && !isSubscriptionLimit(cliText(result)) && /\bOK\b/i.test(cliText(result))) {
       gate.probeNeeded = false;
       await event({ state: "probe_ok" });
       return true;
     }
-    await pause(isSubscriptionLimit(result.output) ? config.limitCooldownMs : config.idleMs * 10,
-      isSubscriptionLimit(result.output) ? "subscription_limited" : "executor_unavailable",
-      { detail: lastLine(result.output).slice(0, 200) });
+    await pause(isSubscriptionLimit(cliText(result)) ? config.limitCooldownMs : config.idleMs * 10,
+      isSubscriptionLimit(cliText(result)) ? "subscription_limited" : "executor_unavailable",
+      { detail: lastLine(cliText(result)).slice(0, 200) });
     return false;
   }
 
@@ -198,7 +334,8 @@ export async function main(env = process.env) {
   }
 
   async function once(role, slot) {
-    if (!(await available())) return "cooldown";
+    const apiOpen = Boolean(apiKey) && budgetAllows(budget, inflightUsd, config.apiRunReserveUsd);
+    if (apiOpen ? (Date.now() < gate.pausedUntil && gate.reason === "paused_after_failures") : !(await available())) return "cooldown";
     const claimed = await bridge("claim", role);
     if (claimed.code !== 0) {
       await event({ role, slot, state: "bridge_unavailable", exit: claimed.code, detail: lastLine(claimed.output).slice(0, 200) });
@@ -216,45 +353,60 @@ export async function main(env = process.env) {
     const dir = path.join(runs, ROLES[role], job.leaseToken);
     await mkdir(dir, { recursive: true, mode: 0o700 });
     await writeFile(path.join(dir, "packet.json"), JSON.stringify({ agent: role, job }, null, 2), { mode: 0o600, flag: "wx" });
-    await copyFile(path.join(config.projectDir, "docs/MAESTRI-MOTORES-AUTOMATICOS.md"), path.join(dir, "CONTRATO.md"));
+    const contract = await readFile(path.join(config.projectDir, "docs/MAESTRI-MOTORES-AUTOMATICOS.md"), "utf8");
+    await writeFile(path.join(dir, "CONTRATO.md"), contractForRole(contract, role), { mode: 0o644 });
     await copyFile(path.join(config.projectDir, "AGENTS.md"), path.join(dir, "AGENTS.md"));
     await event({ role, slot, state: "claimed", jobKey: job.jobKey, kind: job.kind });
 
-    const prompt = buildPrompt({ role, model: config.model, handoff: claim.handoff });
+    const basePrompt = buildPrompt({ role, model: config.model, handoff: claim.handoff });
+    let feedback = null;
     // A CLI não herda segredos do serviço: só PATH/HOME/idioma (login da assinatura fica no HOME).
     for (let attempt = 1; attempt <= config.executorAttempts; attempt += 1) {
       const started = Date.now();
-      const result = await run(command.bin, command.args, { input: prompt, cwd: dir, timeoutMs: config.taskTimeoutMs, env: childEnv });
+      const prompt = feedback
+        ? `${basePrompt}\nA entrega anterior foi recusada pelo contrato do servidor: "${feedback}". Corrija e grave ./response.json de novo.`
+        : basePrompt;
+      const result = await runExecutor(role, prompt, dir, config.taskTimeoutMs);
       await writeFile(path.join(dir, `executor-${attempt}.log`), result.output, { mode: 0o600 });
       let response;
       try { response = parseResponseFile(await readFile(path.join(dir, "response.json"), "utf8")); }
       catch {
         // A CLI pode sair com código 0 ao recusar por limite: decide pela mensagem.
-        if (isSubscriptionLimit(result.output)) {
-          await pause(config.limitCooldownMs, "subscription_limited", { role, slot, jobKey: job.jobKey, detail: lastLine(result.output).slice(0, 200) });
+        if (isSubscriptionLimit(cliText(result))) {
+          if (result.useApi) {
+            // Na API, 429 é limite de taxa: pausa curta só desta vaga, sem o cooldown da assinatura.
+            await event({ role, slot, state: "api_rate_limited", jobKey: job.jobKey, pauseSeconds: config.apiRatePauseMs / 1000 });
+            await sleep(config.apiRatePauseMs);
+            return "limited";
+          }
+          await pause(config.limitCooldownMs, "subscription_limited", { role, slot, jobKey: job.jobKey, detail: lastLine(cliText(result)).slice(0, 200) });
           return "limited";
         }
         await event({ role, slot, state: "no_valid_response", jobKey: job.jobKey, attempt, exit: result.code, ms: Date.now() - started });
         continue;
       }
 
-      const request = JSON.stringify({ jobKey: job.jobKey, inputHash: job.inputHash, leaseToken: job.leaseToken, result: response });
+      const deduped = dedupeMappings(response);
+      if (deduped.dropped) await event({ role, slot, state: "mappings_deduplicated", jobKey: job.jobKey, dropped: deduped.dropped });
+      const request = JSON.stringify({ jobKey: job.jobKey, inputHash: job.inputHash, leaseToken: job.leaseToken, result: deduped.response });
       let completed = await bridge("complete", null, request);
-      if (completed.code !== 0) {
+      // Recusa do contrato é determinística: repetir a mesma entrega não muda o resultado.
+      if (completed.code !== 0 && !contractRejection(completed.output)) {
         // A conclusão pode ter sido aplicada antes da falha: a mesma resposta é repetível
         // e o servidor devolve o recibo já gravado, sem reimportar.
         await event({ role, slot, state: "complete_retry", jobKey: job.jobKey, detail: lastLine(completed.output).slice(0, 200) });
         completed = await bridge("complete", null, request);
       }
       if (completed.code !== 0) {
-        await event({ role, slot, state: "rejected_by_contract", jobKey: job.jobKey, attempt });
+        feedback = contractRejection(completed.output);
+        await event({ role, slot, state: "rejected_by_contract", jobKey: job.jobKey, attempt, ...(feedback ? { reason: feedback } : {}) });
         await rename(path.join(dir, "response.json"), path.join(dir, `response-rejected-${attempt}.json`)).catch(() => {});
         continue;
       }
       await writePrivate(path.join(dir, "receipt.json"), completed.stdout);
       const receipt = JSON.parse(lastLine(completed.stdout));
       const imported = Array.isArray(receipt.importedQuestionPublicIds) ? receipt.importedQuestionPublicIds.length : 0;
-      await event({ role, slot, state: receipt.state ?? "completed", jobKey: job.jobKey, imported, ms: Date.now() - started });
+      await event({ role, slot, state: receipt.state ?? "completed", jobKey: job.jobKey, imported, ms: Date.now() - started, via: result.useApi ? "api" : "subscription" });
       if (imported > 0) await triggerRelease(job.jobKey, imported);
       gate.failStreak = 0;
       return "done";
@@ -296,7 +448,8 @@ export async function main(env = process.env) {
     lastBeat.delete(`${role}:${slot}`);
   }
 
-  await event({ state: "started", executor: config.executor, model: config.model || null, slots: config.slots });
+  await event({ state: "started", executor: config.executor, model: config.model || null, slots: config.slots,
+    budget: { mode: budget.mode, spentUsd: budget.spentUsd, stopAtUsd: budget.stopAtUsd, keyLoaded: Boolean(apiKey) } });
   await Promise.all(Object.entries(config.slots).flatMap(([role, count]) =>
     Array.from({ length: count }, (_, index) => sleep(once_only ? 0 : index * 5000).then(() => loop(role, index + 1)))));
   await event({ state: "stopped" });

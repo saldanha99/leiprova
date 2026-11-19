@@ -41,6 +41,7 @@ const publicOpportunitySelection = {
   institutionName: contestOpportunities.institutionName,
   roleName: contestOpportunities.roleName,
   cycleYear: contestOpportunities.cycleYear,
+  officialNoticeNumber: contestOpportunities.officialNoticeNumber,
   jurisdictionCode: contestOpportunities.jurisdictionCode,
   lifecycleStatus: contestOpportunities.lifecycleStatus,
   statusAsOf: contestOpportunities.statusAsOf,

@@ -4,7 +4,15 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 
 import {
+  budgetAllows,
   buildPrompt,
+  chargeBudget,
+  loadBudget,
+  parseApiSecret,
+  parseCliResult,
+  contractForRole,
+  contractRejection,
+  dedupeMappings,
   executorCommand,
   isSubscriptionLimit,
   main,
@@ -29,7 +37,7 @@ describe("readConfig", () => {
   });
   it.each([
     [{ EDITORIAL_EXECUTOR: "openrouter" }, /claude/],
-    [{ EDITORIAL_SLOTS_AUTOR: "7" }, /EDITORIAL_SLOTS_AUTOR/],
+    [{ EDITORIAL_SLOTS_AUTOR: "9" }, /EDITORIAL_SLOTS_AUTOR/],
     [{ EDITORIAL_TASK_TIMEOUT_MIN: "90" }, /TIMEOUT/],
     [{ EDITORIAL_EXECUTOR_MODEL: "x; rm -rf /" }, /MODEL/],
     [{ EDITORIAL_FOCUS_PRODUCTS: "tj-ba,../x" }, /FOCUS/],
@@ -55,6 +63,7 @@ describe("executor", () => {
     const { args } = executorCommand(readConfig({ EDITORIAL_EXECUTOR_MODEL: "claude-sonnet-5-5" }));
     expect(args).toContain("-p");
     expect(args.join(" ")).toMatch(/--disallowedTools Bash,WebFetch,WebSearch/);
+    expect(args.join(" ")).toMatch(/--output-format json/);
     expect(args.slice(-2)).toEqual(["--model", "claude-sonnet-5-5"]);
   });
   it("codex em sandbox de escrita local", () => {
@@ -79,6 +88,53 @@ describe("executor", () => {
     expect(isSubscriptionLimit("You've hit your 5-hour limit · resets 8:50pm (UTC)")).toBe(true);
     expect(isSubscriptionLimit("Your weekly limit resets Monday")).toBe(true);
     expect(isSubscriptionLimit("response.json gravado")).toBe(false);
+  });
+  it("lê a chave do arquivo privado sem aceitar outras variáveis", () => {
+    expect(parseApiSecret("# comentário\nANTHROPIC_API_KEY=sk-ant-test_123\n")).toBe("sk-ant-test_123");
+    expect(parseApiSecret('ANTHROPIC_API_KEY="sk-ant-x"')).toBe("sk-ant-x");
+    expect(parseApiSecret("OTHER_KEY=abc")).toBeNull();
+  });
+  it("lê custo e texto do JSON da CLI e ignora saída sem JSON", () => {
+    expect(parseCliResult('{"type":"result","is_error":false,"result":"OK","total_cost_usd":0.0123}')).toEqual({ text: "OK", isError: false, cost: 0.0123 });
+    expect(parseCliResult('aviso\n{"result":"x","total_cost_usd":-1}')).toEqual({ text: "x", isError: false, cost: null });
+    expect(parseCliResult("texto livre")).toBeNull();
+  });
+  it("orçamento: reserva em andamento, parada preventiva e sem volta automática à API", () => {
+    const now = "2026-11-19T22:00:00.000Z";
+    let budget = loadBudget(null, { capUsd: 50, stopAtUsd: 48, hasKey: true, now });
+    expect(budget).toMatchObject({ mode: "api", spentUsd: 0, runs: 0, exhaustedAt: null });
+    expect(budgetAllows(budget, 0, 0.25)).toBe(true);
+    expect(budgetAllows({ ...budget, spentUsd: 47.6 }, 0.25, 0.25)).toBe(false);
+    budget = chargeBudget(budget, "Guardião", 0.02, 0.25, now);
+    budget = chargeBudget(budget, "Autor", null, 0.25, now);
+    expect(budget).toMatchObject({ spentUsd: 0.27, runs: 2, unmeteredRuns: 1,
+      byRole: { "Guardião": { runs: 1, spentUsd: 0.02 }, Autor: { runs: 1, spentUsd: 0.25 } } });
+    budget = chargeBudget({ ...budget, spentUsd: 47.9 }, "Autor", 0.2, 0.25, now);
+    expect(budget).toMatchObject({ mode: "subscription", exhaustedAt: now });
+    expect(budgetAllows(budget, 0, 0)).toBe(false);
+    const reloaded = loadBudget(JSON.parse(JSON.stringify(budget)), { capUsd: 50, stopAtUsd: 48, hasKey: true, now });
+    expect(reloaded).toMatchObject({ mode: "subscription", exhaustedAt: now, spentUsd: 48.1 });
+    expect(loadBudget(null, { capUsd: 50, stopAtUsd: 48, hasKey: false, now }).mode).toBe("subscription");
+  });
+  it("envia ao Guardião só o formato e ao Autor também as conferências", () => {
+    const doc = "# Contrato\n\n**Conferência** X\n\n## Recortes retidos\n\nY\n\n## Responsabilidades\n\nZ\n\n## Formato de response.json\n\nF\n\n## Inspeção\n\nI\n";
+    expect(contractForRole(doc, "Guardião")).toBe("# Contrato\n\n## Formato de response.json\n\nF\n");
+    const autor = contractForRole(doc, "Autor");
+    expect(autor).toContain("**Conferência** X");
+    expect(autor).toContain("## Recortes retidos");
+    expect(autor).toContain("## Formato de response.json\n\nF");
+    expect(autor).not.toContain("Responsabilidades");
+    expect(autor).not.toContain("Inspeção");
+    expect(contractForRole("# Sem formato\n", "Guardião")).toBe("# Sem formato\n");
+  });
+  it("mantém um vínculo por artigo, na ordem da resposta", () => {
+    const response = { outcome: "prepared", mappings: [{ articleId: 2, quote: "a" }, { articleId: 1, quote: "b" }, { articleId: 2, quote: "c" }] };
+    expect(dedupeMappings(response)).toEqual({ dropped: 1, response: { outcome: "prepared", mappings: [{ articleId: 2, quote: "a" }, { articleId: 1, quote: "b" }] } });
+    expect(dedupeMappings({ outcome: "blocked" })).toEqual({ dropped: 0, response: { outcome: "blocked" } });
+  });
+  it("lê só o motivo fixo da recusa do contrato", () => {
+    expect(contractRejection("x\ncontract_rejected: Mapeamento duplicado.\nOperação editorial não concluída.")).toBe("Mapeamento duplicado.");
+    expect(contractRejection("Operação editorial não concluída.")).toBeNull();
   });
   it("lê JSON estrito, tolera cerca acidental e recusa texto livre", () => {
     expect(parseResponseFile('```json\n{"outcome":"prepared"}\n```')).toEqual({ outcome: "prepared" });

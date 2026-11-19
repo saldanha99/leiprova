@@ -47,6 +47,30 @@ Preservar gates, fontes oficiais e isolamento; nenhum material privado de
 terceiros vai ao provedor. Acesso/créditos e execução precisam de recibos reais.
 Veja `docs/PILOTO-API-EDITORIAL-2026-10-13.md`.
 
+**Pré-edital com edital anterior, decidido em 19/11/2026:** o proprietário autorizou
+abrir como pré-edital (`preparation_mode=pre_notice`) os produtos cujo novo edital
+ainda não foi publicado, usando o edital/programa oficial do último concurso do
+mesmo órgão/cargo. A página do produto informa a edição e o número do edital de
+referência e que o programa será conferido e atualizado quando o novo edital sair.
+Fonte oficial, identidade de edição/cargo/banca e direitos continuam obrigatórios;
+a admissão segue o caminho auditado de 12/10/2026 (`owner_standing_authorization`,
+`humanReview:false`), sem declarar revisão humana. Sem edital anterior oficial
+acessível, o produto continua fechado e entra no relatório. Na mesma data, o
+proprietário autorizou commit e deploy deste projeto, sempre com backup validado
+(`pg_restore --list` + SHA-256) e `pnpm lint && pnpm typecheck && pnpm test && pnpm build`.
+Não abre flags comerciais, Stripe, DNS nem API paga.
+
+**API paga no motor realtime, decidida em 19/11/2026 (~19h25 BRT):** o proprietário
+autorizou o `leiprova-editorial-realtime` a usar a API oficial da Anthropic com
+`claude-haiku-5-5` (mesma CLI), com **teto total de US$ 50** e parada preventiva em
+**US$ 48**. O custo real (`total_cost_usd`) é somado em
+`/var/lib/leiprova-realtime/api-budget.json`; ao atingir a parada, o motor volta à
+assinatura e nunca retorna à API sozinho. A chave fica só em
+`/etc/leiprova/editorial-realtime.secret` (fora do Git, compartilhada com outro
+projeto): nunca imprimir, registrar ou copiar. Continua proibido OpenRouter ou outro
+provedor pago, e material privado (`.local/editorial`) não vai a provedores.
+Veja `docs/API-MOTOR-REALTIME-2026-11-19.md`.
+
 Regras que valem sempre:
 
 - Nenhum segredo é versionado. O `.env` de produção vive só na VPS, com permissão `600`.

@@ -123,8 +123,12 @@ export function ContestLanding({
         <section className="mx-auto max-w-6xl px-5 py-8" aria-label="Programa de referência">
           <h2 className="text-xl font-semibold">{preparationModeLabels[preparationMode]}</h2>
           <p className="mt-3 leading-7">{preparationModeDescriptions[preparationMode]}</p>
-          <p className="mt-2">Edição de referência: {opportunity.institutionAcronym} · {opportunity.roleName} · {opportunity.cycleYear}.
+          <p className="mt-2">Edição de referência: {opportunity.institutionAcronym} · {opportunity.roleName} · {opportunity.cycleYear}
+            {opportunity.officialNoticeNumber ? ` · Edital ${opportunity.officialNoticeNumber}` : ""}.
             Banca da edição de referência: {opportunity.bankName ?? "não confirmada"}.</p>
+          {preparationMode === "pre_notice" && (
+            <p className="mt-2">Baseado no edital anterior. Quando o novo edital for publicado, o programa será conferido e atualizado.</p>
+          )}
         </section>
       )}
       <CourseHero
