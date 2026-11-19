@@ -9,7 +9,7 @@ import { currentQuestionContractExists } from "./question-contract-query";
 import { approvedProductQuestionCount, MINIMUM_COURSE_QUESTION_COUNT } from "@/lib/commerce/minimum-course-content";
 import { AGENT_FOR_WORK, AGENT_WORK_DAILY_LIMIT, AGENT_WORK_LEASE_MINUTES,
   agentInputHash, agentWorkKindSchema, validateAgentWorkResult, workPayloadSchema,
-  agentWorkResultSchema,
+  agentWorkResultSchema, parseAgentWorkResult,
   type AgentWorkKind, type AgentWorkPayload } from "./agent-work-contract";
 
 // O requisito sai da chave ("mapping:<id>", "author:<id>"): ler o payload, com os
@@ -171,7 +171,7 @@ export async function completeAgentWork(db: AgentDatabase,
   request: { jobKey: string; inputHash: string; leaseToken: string; result: unknown }, now = new Date()) {
   const digest=(value:string)=>createHash("sha256").update(value).digest("hex");
   const completionTokenHash=digest(request.leaseToken);
-  const resultHash=digest(JSON.stringify(agentWorkResultSchema.parse(request.result)));
+  const resultHash=digest(JSON.stringify(parseAgentWorkResult(request.result)));
   return db.transaction(async tx => {
     const [job] = await tx.execute<AgentWork>(sql`
       select job_key as "jobKey",kind,input_hash as "inputHash",payload,lease_token::text as "leaseToken",

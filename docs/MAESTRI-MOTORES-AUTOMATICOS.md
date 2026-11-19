@@ -509,7 +509,9 @@ Objeto JSON estrito, sem cerca Markdown. Campos comuns:
 ```
 
 - **legal_mapping:** `mappings` contém até oito objetos `{articleId, rationale,
-  quote}`. O ID e a citação literal vêm de `job.payload.articles`. Não inventar
+  quote}`, **no máximo um por `articleId`** (repetir um artigo recusa o lote
+  inteiro; vários incisos do mesmo artigo viram um item, com os demais no
+  `rationale`). O ID e a citação literal, contígua, vêm de `job.payload.articles`. Não inventar
   artigo nem tratar doutrina/jurisprudência como texto legal. Sem base suficiente,
   `outcome: blocked`, explicar em `limitations` e deixar listas vazias.
 - **authoring:** incluir `generatorModel` com o modelo realmente usado e até

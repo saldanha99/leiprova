@@ -12,6 +12,10 @@ export function agentTaskHandoff(kind: AgentWorkKind, payload: AgentWorkPayload)
       "Leia AGENTS.md e docs/MAESTRI-MOTORES-AUTOMATICOS.md. Execute somente a tarefa reservada e salve response.json no contrato indicado.",
       "Leia job.payload.instructions e o texto INTEGRAL de job.payload.articles[].text no packet.json. context.exactCitation e mappingProposals não substituem articles[].text.",
       "Antes de afirmar que falta texto, confira os caminhos e comprimentos articleTexts deste despacho. Se a saída da ferramenta truncar, leia cada artigo separadamente até o fim.",
+      ...(kind === "legal_mapping" ? [
+        "Em mappings, cada articleId aparece no máximo uma vez (até oito itens): o contrato recusa o lote inteiro se um artigo se repetir. Se vários incisos ou parágrafos do mesmo artigo forem pertinentes, use um único item com o trecho literal mais representativo e cite os demais no rationale.",
+        "quote é cópia exata e contígua de articles[].text, com pelo menos 20 caracteres; não junte trechos separados nem corrija a grafia do texto oficial.",
+      ] : []),
       ...(kind === "authoring" ? [
         "Sua entrega é rascunho: prepared não aprova nem publica. humanReviewRequired e exactCitation.pending não são, sozinhos, impedimento para propor questões.",
         "Confira a pertinência real do artigo ao requisito; uma proposta de mapeamento pode estar errada. Escreva apenas sobre o recorte sustentado pelo texto e registre o restante como limitação, sem exigir cobertura integral do programa por esta tarefa.",

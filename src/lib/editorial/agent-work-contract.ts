@@ -85,44 +85,54 @@ export function validateDiscoveryUrl(input: string) {
   return url.toString();
 }
 
+/** Recusa do contrato: mensagem fixa, sem dado do pacote nem segredo; pode voltar ao executor. */
+export class AgentWorkContractError extends Error {}
+/** Parse estrito do resultado; a recusa cita só código e caminho dos campos. */
+export function parseAgentWorkResult(input: unknown) {
+  const parsed = agentWorkResultSchema.safeParse(input);
+  if (parsed.success) return parsed.data;
+  const fields = [...new Set(parsed.error.issues.map(issue => `${issue.code}:${issue.path.map(part => typeof part === "number" ? "#" : String(part)).join(".")}`))];
+  throw new AgentWorkContractError(`Formato de response.json inválido (${fields.slice(0, 6).join(", ")}).`);
+}
+
 /** Validação de contrato não equivale a revisão jurídica ou atestado de originalidade. */
 export function validateAgentWorkResult(kind: AgentWorkKind, payload: AgentWorkPayload, input: unknown) {
-  const result = agentWorkResultSchema.parse(input);
+  const result = parseAgentWorkResult(input);
   if (result.outcome === "blocked" && (!result.limitations.length || result.questions.length || result.mappings.length || result.discoveries.length)) {
-    throw new Error("Resultado bloqueado exige motivo e não pode conter propostas executáveis.");
+    throw new AgentWorkContractError("Resultado bloqueado exige motivo e não pode conter propostas executáveis.");
   }
   if ((kind !== "legal_mapping" && result.mappings.length) || (kind !== "authoring" && result.questions.length) ||
-      (kind !== "discovery" && result.discoveries.length)) throw new Error("Resultado incompatível com o papel reservado.");
+      (kind !== "discovery" && result.discoveries.length)) throw new AgentWorkContractError("Resultado incompatível com o papel reservado.");
   const articleById = new Map(payload.articles.map(article => [article.id, article]));
   for (const item of [...result.mappings, ...result.questions]) {
     const article = articleById.get(item.articleId);
     if (!article || normalize(item.quote).length < 20 || !normalize(article.text).includes(normalize(item.quote))) {
-      throw new Error("Fundamento não pertence ao corpus oficial versionado desta tarefa.");
+      throw new AgentWorkContractError("Fundamento não pertence ao corpus oficial versionado desta tarefa.");
     }
   }
-  if (new Set(result.mappings.map(item => item.articleId)).size !== result.mappings.length) throw new Error("Mapeamento duplicado.");
+  if (new Set(result.mappings.map(item => item.articleId)).size !== result.mappings.length) throw new AgentWorkContractError("Mapeamento duplicado.");
   for (const discovery of result.discoveries) {
     validateDiscoveryUrl(discovery.url);
-    if (/gabarito|caderno.{0,20}prova|quest[oõ]es/i.test(discovery.title)) throw new Error("Material de prova não é edital.");
-    if (Date.parse(discovery.observedAt) > Date.now() + 300_000) throw new Error("Observação no futuro.");
+    if (/gabarito|caderno.{0,20}prova|quest[oõ]es/i.test(discovery.title)) throw new AgentWorkContractError("Material de prova não é edital.");
+    if (Date.parse(discovery.observedAt) > Date.now() + 300_000) throw new AgentWorkContractError("Observação no futuro.");
   }
   for (const question of result.questions) {
     const scoped = payload.questionContract;
     if (!scoped || payload.questionContractId !== questionContractFingerprint(scoped) ||
       scoped.opportunityId !== payload.opportunityId || scoped.roleName !== payload.role ||
       !validateQuestionAgainstContract(scoped, { type: scoped.format, options: question.options }).allowed) {
-      throw new Error("Questão sem contrato oficial exato de cargo, edição e etapa ou com formato incompatível.");
+      throw new AgentWorkContractError("Questão sem contrato oficial exato de cargo, edição e etapa ou com formato incompatível.");
     }
     const keys = scoped.optionKeys;
     if (!result.generatorModel || !payload.bank || !payload.role || question.options.length !== keys.length ||
         question.options.some((option, index) => option.key !== keys[index]) ||
         question.options.filter(option => option.correct).length !== 1 ||
         new Set(question.options.map(option => normalize(option.text).toLowerCase())).size !== keys.length) {
-      throw new Error("Questão sem cargo/banca, alternativas distintas ou resposta única.");
+      throw new AgentWorkContractError("Questão sem cargo/banca, alternativas distintas ou resposta única.");
     }
   }
-  if (new Set(result.questions.map(item => normalize(item.prompt).toLowerCase())).size !== result.questions.length) throw new Error("Enunciados duplicados no lote.");
+  if (new Set(result.questions.map(item => normalize(item.prompt).toLowerCase())).size !== result.questions.length) throw new AgentWorkContractError("Enunciados duplicados no lote.");
   if (result.outcome === "prepared" && ((kind === "legal_mapping" && !result.mappings.length) ||
-      (kind === "authoring" && !result.questions.length))) throw new Error("Resultado preparado está vazio.");
+      (kind === "authoring" && !result.questions.length))) throw new AgentWorkContractError("Resultado preparado está vazio.");
   return result;
 }

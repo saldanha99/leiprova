@@ -7,7 +7,7 @@ import { agentWorkSummary, claimAgentWork, completeAgentWork } from "../src/lib/
 import { prepareAgentWork } from "../src/lib/editorial/agent-work-preparation";
 import { prepareCourseIntake } from "../src/lib/editorial/course-intake";
 import { agentTaskHandoff } from "../src/lib/editorial/agent-task-handoff";
-import { agentWorkKindSchema } from "../src/lib/editorial/agent-work-contract";
+import { AgentWorkContractError, agentWorkKindSchema } from "../src/lib/editorial/agent-work-contract";
 
 async function main() {
   const mode=process.argv[2]?.replace(/^--mode=/,"");
@@ -60,4 +60,9 @@ async function main() {
     console.log(JSON.stringify(result));
   } finally {await client.end();}
 }
-main().catch(()=>{console.error("Operação editorial não concluída. Confira destino, reserva, contrato e fontes; nenhum segredo é registrado.");process.exitCode=1;});
+main().catch(error=>{
+  // Só a recusa do contrato tem mensagem fixa e segura: o motor a devolve ao executor.
+  if(error instanceof AgentWorkContractError) console.error(`contract_rejected: ${error.message}`);
+  console.error("Operação editorial não concluída. Confira destino, reserva, contrato e fontes; nenhum segredo é registrado.");
+  process.exitCode=1;
+});

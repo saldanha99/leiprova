@@ -1,5 +1,5 @@
 import { describe,it,expect } from "vitest";
-import { AGENT_WORK_LEASE_MINUTES,AGENT_WORK_VERSION,agentInputHash,validateAgentWorkResult,validateDiscoveryUrl,
+import { AGENT_WORK_LEASE_MINUTES,AGENT_WORK_VERSION,AgentWorkContractError,agentInputHash,validateAgentWorkResult,validateDiscoveryUrl,
   type AgentWorkPayload } from "@/lib/editorial/agent-work-contract";
 import { syntheticQuestionContract } from "./fixtures/question-contract";
 import { questionContractFingerprint } from "@/lib/editorial/official-question-contract";
@@ -31,6 +31,15 @@ describe("contrato da ponte editorial",()=>{
   });
   it.each(["fonte inventada com texto muito comprido", ""])("rejeita citação ausente %s",quote=>{
     expect(()=>validateAgentWorkResult("legal_mapping",payload,{...base,mappings:[{articleId:1,quote,rationale:"Exemplo."}]})).toThrow();
+  });
+  it("recusa artigo repetido e formato inválido com erro de contrato sem dado do pacote",()=>{
+    const mapping={articleId:1,quote:payload.articles[0].text,rationale:"Vínculo proposto, sem revisão humana presumida."};
+    expect(()=>validateAgentWorkResult("legal_mapping",payload,{...base,mappings:[mapping,mapping]})).toThrow(AgentWorkContractError);
+    let message="";
+    try { validateAgentWorkResult("legal_mapping",payload,{...base,mappings:[{...mapping,quote:42}]}); }
+    catch(error){ expect(error).toBeInstanceOf(AgentWorkContractError); message=(error as Error).message; }
+    expect(message).toContain("invalid_type:mappings.#.quote");
+    expect(message).not.toContain("42");
   });
   it("recusa artigo de outro pacote",()=>{
     expect(()=>validateAgentWorkResult("legal_mapping",payload,{...base,mappings:[{articleId:2,quote:payload.articles[0].text,rationale:"Exemplo."}]})).toThrow();
