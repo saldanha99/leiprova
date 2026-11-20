@@ -77,6 +77,12 @@ export const COMPOSITE_ADMISSION_TARGETS = [
   { productSlug: "trt-10-analista-e-tecnico-df-to", slug: "trt10-analista-area-judiciaria-1-2024-historico-objetiva", acronym: "TRT-10", notice: "1/2024-TRT10", category: "trabalhistas", career: "analista", noticeDate: "2024-12-19", statusDate: "2025-08-01", cycleYear: 2024, lifecycleStatus: "result_published", commission: "Tribunal Regional do Trabalho da 10ª Região", bank: "cebraspe", stages: [
     { title: "Edital nº 11 – Resultado final no desempate de notas e resultado final no concurso público, exceto para o Cargo 15", url: `${CEBRASPE}TRT10_24/arquivos/Ed_11_TRT_10_24_Res_final_desempate_Final_Concurso.pdf`, publishedOn: "2025-08-01" },
   ] },
+  { productSlug: "pge-al-procurador-do-estado-reta-final", slug: "pgeal-procurador-1-2026-historico-objetiva", acronym: "PGE-AL", notice: "1/2026-PGE/AL", category: "procuradorias", career: "procurador", noticeDate: "2026-03-31", statusDate: "2026-10-20", cycleYear: 2026, lifecycleStatus: "result_published", commission: "Procuradoria-Geral do Estado de Alagoas e SEPLAG/AL", bank: "cebraspe", stages: [
+    { title: "Edital nº 12 – Resultado final na prova objetiva e resultado provisório nas provas discursivas", url: `${CEBRASPE}pge_al_26/arquivos/85A9432C4211D9CF60F6B83BEA41E5EFBD9C370995E2F5310DE78333E8456C2B.pdf`, publishedOn: "2026-10-20" },
+  ] },
+  { productSlug: "pc-df-delegado-de-policia-reta-final", slug: "pcdf-delegado-1-2026-historico-objetiva", acronym: "PCDF", notice: "1/2026-PCDF-Delegado", category: "carreiras-policiais", career: "delegado", noticeDate: "2026-02-03", statusDate: "2026-09-02", cycleYear: 2026, lifecycleStatus: "result_published", commission: "Escola Superior de Polícia Civil da PCDF", bank: "cebraspe", stages: [
+    { title: "Edital nº 9 – Resultado final na prova objetiva e resultado provisório nas provas discursivas", url: `${CEBRASPE}pc_df_26_delegado/arquivos/E6B1ED8CDDAE4765BBA952FEA279EFA2D70F62509B884B660B0CF0616CEA1CFD.pdf`, publishedOn: "2026-09-02" },
+  ] },
 ] as const;
 
 export function compositeCourseTarget(productSlug: string) {

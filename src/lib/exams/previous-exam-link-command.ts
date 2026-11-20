@@ -43,6 +43,8 @@ export const FGV_HISTORICAL_PREVIOUS_PAIRS: Readonly<Record<string, string>> = {
   "tce-rn-auditor-2026": "tcern-auditor-direito-1-2025-objetiva-p2",
   "tj-mt-cartorios-reta-final": "tjmt-notas-registro-provimento-48-2025-objetiva",
   "trt-10-analista-e-tecnico-df-to": "trt10-analista-area-judiciaria-1-2024-objetiva-p2",
+  "pge-al-procurador-do-estado-reta-final": "pgeal-procurador-1-2026-objetiva-p1",
+  "pc-df-delegado-de-policia-reta-final": "pcdf-delegado-1-2026-objetiva-p1",
   "tj-pe-juiz-de-direito-2026": "tjpe-juiz-substituto-01-2026-objetiva",
   "pc-pr-delegado-2026": "pcpr-delegado-01-2026-objetiva",
 };

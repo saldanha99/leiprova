@@ -101,6 +101,50 @@ export const CEBRASPE_HISTORICAL_PREVIOUS_EXAMS: readonly FgvHistoricalPreviousE
         url: `${CDN}TRT10_24/arquivos/Gab_Definitivo_050_TRT10_012_01.pdf` },
     ],
   },
+  {
+    bank: "cebraspe", cebraspeEventId: "PGE_AL_26",
+    productSlug: "pge-al-procurador-do-estado-reta-final", editionPublicId: "pgeal-procurador-1-2026-objetiva-p1", opportunitySlug: "pgeal-procurador-1-2026-historico-objetiva",
+    portalUrl: "https://www.cebraspe.org.br/concursos/pge_al_26", portalHeading: "PGE AL 26",
+    portalNotice: { url: "https://cdn.cebraspe.org.br/concursos/pge_al_26/arquivos/0C284DE63B81A961F93A4CE27711AF9109B61CE570945D18A8B6F64252D282E3.pdf", label: "Edital nº 1 – Abertura – Atualizado conforme retificações" },
+    role: "Procurador do Estado – 1ª Classe", jurisdiction: "AL", jurisdictionName: "Alagoas", institution: "PGE-AL", noticeNumber: "1/2026-PGE/AL", cycleYear: 2026, careerSlug: "procurador",
+    examDate: "2026-09-05", expectedQuestionCount: 100,
+    noticeUrl: "https://cdn.cebraspe.org.br/concursos/pge_al_26/arquivos/0C284DE63B81A961F93A4CE27711AF9109B61CE570945D18A8B6F64252D282E3.pdf",
+    noticeSha256: "e0e8cc8040f090558a87626e8619d9e125bc00bb50b2745e1398c255ca4d37d9", noticePageCount: 51,
+    noticeChecks: [
+      { page: 22, pattern: "múltipla escolha, com cinco opções \\(A, B, C, D e E\\)" },
+      { page: 50, pattern: "Aplicação das provas objetivas\\s*5/9/2026" },
+    ],
+    examDateCorroboration: "API oficial do evento Cebraspe: caderno P1 publicado em 25/09/2026 e gabarito definitivo em 20/10/2026, após a data do cronograma (5/9/2026)",
+    editionSourceExternalId: "cebraspe-pge-al-26-objetiva-p1", editionTitle: "PGE-AL 2026 — Procurador do Estado — objetiva P1",
+    documents: [
+      { documentType: "question_booklet", title: "PGE-AL 2026 — prova objetiva P1", label: "PROVA OBJETIVA (P1)", publishedOn: "2026-09-25",
+        url: "https://cdn.cebraspe.org.br/concursos/pge_al_26/arquivos/E30405D8FA2DE9B7FB3214F56781A2A33187C7F96567C12916CEF4940FDB29AC.pdf" },
+      { documentType: "answer_key", title: "PGE-AL 2026 — gabarito definitivo da prova objetiva P1", label: "GABARITO DEFINITIVO – PROVA OBJETIVA (P1)", publishedOn: "2026-10-20",
+        url: "https://cdn.cebraspe.org.br/concursos/pge_al_26/arquivos/43C3F343C215B3BCA4EC0F173722CF4F373EF03D9FE757A0EED8F48A7869A341.pdf" },
+    ],
+  },
+  {
+    bank: "cebraspe", cebraspeEventId: "PC_DF_26_DELEGADO",
+    productSlug: "pc-df-delegado-de-policia-reta-final", editionPublicId: "pcdf-delegado-1-2026-objetiva-p1", opportunitySlug: "pcdf-delegado-1-2026-historico-objetiva",
+    portalUrl: "https://www.cebraspe.org.br/concursos/pc_df_26_delegado", portalHeading: "PC DF 26 DELEGADO",
+    portalNotice: { url: "https://cdn.cebraspe.org.br/concursos/pc_df_26_delegado/arquivos/0D616074EFE30F97B69C0B62003B1A66CA3330166AC50F786225B864E24A5443.pdf", label: "Edital nº 1 - Abertura - atualizado conforme retificações" },
+    role: "Delegado de Polícia", jurisdiction: "DF", jurisdictionName: "Distrito Federal", institution: "PCDF", noticeNumber: "1/2026-PCDF-Delegado", cycleYear: 2026, careerSlug: "delegado",
+    examDate: "2026-07-05", expectedQuestionCount: 120,
+    noticeUrl: "https://cdn.cebraspe.org.br/concursos/pc_df_26_delegado/arquivos/0D616074EFE30F97B69C0B62003B1A66CA3330166AC50F786225B864E24A5443.pdf",
+    noticeSha256: "c1b5a9ca914f7e68e239b6b7fe44c714bf8f1a47aad8257844b1f3583b4a4e29", noticePageCount: 99,
+    noticeChecks: [
+      { page: 32, pattern: "O julgamento de cada item será CERTO ou ERRADO" },
+      { page: 86, pattern: "Aplicação das provas objetiva e discursiva\\s*5/7/2026" },
+    ],
+    examDateCorroboration: "API oficial do evento Cebraspe: caderno P1 publicado em 07/07/2026 e gabarito definitivo em 10/08/2026, após a data do cronograma (5/7/2026)",
+    editionSourceExternalId: "cebraspe-pc-df-26-delegado-objetiva-p1", editionTitle: "PC-DF 2026 — Delegado de Polícia — objetiva P1",
+    documents: [
+      { documentType: "question_booklet", title: "PC-DF 2026 Delegado — prova objetiva P1", label: "PROVA OBJETIVA (P1) E GABARITO PRELIMINAR COM JUSTIFICATIVAS", publishedOn: "2026-07-07",
+        url: "https://cdn.cebraspe.org.br/concursos/pc_df_26_delegado/arquivos/710BA7293977732DDD213CAE2E329E52507C348D3E446135F8978861CDA880F1.pdf" },
+      { documentType: "answer_key", title: "PC-DF 2026 Delegado — gabarito definitivo da prova objetiva P1", label: "GABARITO DEFINITIVO – PROVA OBJETIVA (P1)", publishedOn: "2026-08-10",
+        url: "https://cdn.cebraspe.org.br/concursos/pc_df_26_delegado/arquivos/793E15AB2B5B357F2DD614A0ACAEE093B9DFE97618931164855D005CDFF89841.pdf" },
+    ],
+  },
 ];
 
 type CebraspeFile = { nomeArquivo?: unknown; descricaoArquivo?: unknown; dataArquivoObj?: unknown; isGuid?: unknown };

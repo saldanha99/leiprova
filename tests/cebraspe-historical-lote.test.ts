@@ -187,3 +187,34 @@ describe("lote Cebraspe histórico — TJ-MT Cartórios (provimento) e TRT-10 Ca
     expect(() => assertCebraspeHistoricalEvent(target, payload)).not.toThrow();
   });
 });
+
+describe("lote Cebraspe histórico — PGE-AL e PC-DF (editais consolidados com as retificações de programa)", () => {
+  it("PGE-AL: procuradorias, 100 questões A–E; nota de retificação e assinatura fora do programa", () => {
+    const slug = "pge-al-procurador-do-estado-reta-final";
+    const { target } = compositeCourseTarget(slug);
+    expect(target).toMatchObject({ category: "procuradorias", career: "procurador", bank: "cebraspe" });
+    expect(fgvHistoricalPreviousExam(slug)).toMatchObject({ cebraspeEventId: "PGE_AL_26", expectedQuestionCount: 100, examDate: "2026-09-05" });
+    const doc = recipeOf(slug).documents[0];
+    const body = doc.layout!.headings.map((heading, index) => `${heading.line}: 1 Tema ${index}.`);
+    const page = [...body, "(Retificado por meio do Edital nº 3 – PGE/AL, de 6 de maio de 2026, disponível no endereço eletrônico", "http://www.cebraspe.org.br/concursos/pge_al_26)",
+      "JÚLIA CAROLINA BARROS CASADO BELTRÃO", "Secretária Interina de Estado do Planejamento, Gestão e Patrimônio"].join("\n");
+    const requirements = compositeProgrammeRequirements(extractDossierSubjectSections(doc, capture(doc, { 41: page })), [], true);
+    expect(requirements.some((item) => /Retificado|cebraspe|BELTRÃO|Secretária/u.test(item.requirementText))).toBe(false);
+  });
+
+  it("PC-DF: delegado, 120 itens Certo/Errado; último título em duas linhas abre na linha inline", () => {
+    const slug = "pc-df-delegado-de-policia-reta-final";
+    const { target } = compositeCourseTarget(slug);
+    expect(target).toMatchObject({ category: "carreiras-policiais", career: "delegado", bank: "cebraspe" });
+    expect(fgvHistoricalPreviousExam(slug)).toMatchObject({ cebraspeEventId: "PC_DF_26_DELEGADO", expectedQuestionCount: 120, examDate: "2026-07-05" });
+    const doc = recipeOf(slug).documents[0];
+    const headings = doc.layout!.headings;
+    const body = headings.slice(0, -1).map((heading, index) => `${heading.line}: I TEMA: 1 Tema ${index}.`);
+    const page = [...body, "CONHECIMENTOS DO DISTRITO FEDERAL, POLÍTICA PARA MULHERES, LEGISLAÇÃO E NOÇÕES DE", "PRIMEIROS SOCORROS: 1 Tópicos do DF.", "GIANCARLOS ZULIANI"].join("\n");
+    const sections = extractDossierSubjectSections(doc, capture(doc, { 79: page }));
+    expect(sections).toHaveLength(10);
+    expect(sections.at(-1)!.subject).toBe("Conhecimentos do Distrito Federal, Política para Mulheres, Legislação e Noções de Primeiros Socorros");
+    expect(sections.at(-2)!.fragments.some((fragment) => /CONHECIMENTOS DO DISTRITO/u.test(fragment.text))).toBe(false);
+    expect(compositeProgrammeRequirements(sections, [], true).some((item) => /ZULIANI/u.test(item.requirementText))).toBe(false);
+  });
+});

@@ -672,6 +672,92 @@ export const NEXT_OFFICIAL_COURSE_RECIPES: readonly NextOfficialCourseRecipe[] =
     skipRepeatedRequirements: true,
     limitations: ["Só os conhecimentos específicos do Cargo 12 (P2, 70 itens Certo/Errado); os conhecimentos básicos (P1) têm disciplinas com exceções por cargo e ficam para revisão própria.", "Itens agrupados pelo número de primeiro nível.", "Edital consolidado até o Edital nº 6; nenhuma retificação de programa.", "O produto cobre Analista e Técnico; esta admissão cobre só o Analista Judiciário – Área Judiciária.", "Treino histórico da objetiva com legislação atual."],
   },
+  // PGE-AL 2026 — Procurador do Estado (1ª Classe): objetiva P1, 100 questões A–E.
+  {
+    productSlug: "pge-al-procurador-do-estado-reta-final", institution: "Procuradoria-Geral do Estado de Alagoas", role: "Procurador do Estado – 1ª Classe",
+    jurisdiction: "AL", cycle: "Edital nº 1 – PGE/AL, de 31/03/2026", bankScope: "Cebraspe, executor do concurso e responsável pelas provas objetiva e discursivas, sob a PGE/AL e a SEPLAG/AL",
+    portalUrl: "https://www.cebraspe.org.br/concursos/pge_al_26", examDate: "2026-09-05", examDateEvidence: { documentKey: "pgeal-notice", page: 50, item: "Anexo I", quote: "Aplicação das provas objetivas 5/9/2026", actualDayIndependentlyVerified: false, corroboratingUrl: "https://cdn.cebraspe.org.br/concursos/pge_al_26/arquivos/E30405D8FA2DE9B7FB3214F56781A2A33187C7F96567C12916CEF4940FDB29AC.pdf", limitation: "O texto do gabarito não é extraído (política de material de prova); a API oficial publicou o caderno P1 em 25/09/2026 e o gabarito definitivo em 20/10/2026, compatíveis com a data do cronograma." },
+    stage: "Objetiva com gabarito definitivo e resultado final (Edital nº 12, 20/10/2026); discursivas com resultado final e convocação para a oral (Edital nº 13, 19/11/2026)",
+    stageObservedOn: "2026-11-19", proposedMode: "historical_training", expectedSubjects: 11,
+    documents: [
+      { key: "pgeal-notice", url: "https://cdn.cebraspe.org.br/concursos/pge_al_26/arquivos/0C284DE63B81A961F93A4CE27711AF9109B61CE570945D18A8B6F64252D282E3.pdf", title: "Edital nº 1 – PGE/AL, de 31/03/2026 — abertura, versão atualizada até o Edital nº 11, de 23/09/2026", pages: 51, programmePages: [41, 48], layout: {
+        headings: [
+          { line: "DIREITO ADMINISTRATIVO", subject: "Direito Administrativo", inline: true, inlineSeparator: ":" },
+          { line: "DIREITO AMBIENTAL", subject: "Direito Ambiental", inline: true, inlineSeparator: ":" },
+          { line: "DIREITO CIVIL", subject: "Direito Civil", inline: true, inlineSeparator: ":" },
+          { line: "DIREITO CONSTITUCIONAL", subject: "Direito Constitucional", inline: true, inlineSeparator: ":" },
+          { line: "DIREITO DO TRABALHO", subject: "Direito do Trabalho", inline: true, inlineSeparator: ":" },
+          { line: "DIREITO EMPRESARIAL", subject: "Direito Empresarial", inline: true, inlineSeparator: ":" },
+          { line: "DIREITO FINANCEIRO", subject: "Direito Financeiro", inline: true, inlineSeparator: ":" },
+          { line: "DIREITO PREVIDENCIÁRIO", subject: "Direito Previdenciário", inline: true, inlineSeparator: ":" },
+          { line: "DIREITO PROCESSUAL CIVIL", subject: "Direito Processual Civil", inline: true, inlineSeparator: ":" },
+          { line: "DIREITO PROCESSUAL DO TRABALHO", subject: "Direito Processual do Trabalho", inline: true, inlineSeparator: ":" },
+          { line: "DIREITO TRIBUTÁRIO", subject: "Direito Tributário", inline: true, inlineSeparator: ":" },
+        ],
+        ignoreLines: ["\\(Retificado por meio do Edital nº 3 – PGE/AL, de 6 de maio de 2026, disponível no endereço eletrônico", "http://www\\.cebraspe\\.org\\.br/concursos/pge_al_26\\)",
+          // Assinatura do edital, depois do último título.
+          "JÚLIA CAROLINA BARROS CASADO BELTRÃO", "Secretária Interina de Estado do Planejamento, Gestão e Patrimônio"],
+        itemMode: "top-level-numbers",
+      } },
+    ],
+    overlays: [],
+    identityClaims: [
+      { document: "pgeal-notice", page: 1, contains: ["EDITAL Nº 1 – PGE/AL, DE 31 DE MARÇO DE 2026", "Versão atualizada até a retificação divulgada por meio do Edital nº 11 – PGE/AL, de 23 de setembro de 2026."] },
+      { document: "pgeal-notice", page: 22, contains: ["múltipla escolha, com cinco opções (A, B, C, D e E)"] },
+      { document: "pgeal-notice", page: 41, contains: ["17.2 CONHECIMENTOS"] },
+      { document: "pgeal-notice", page: 50, contains: ["Aplicação das provas objetivas", "5/9/2026"] },
+    ],
+    previousExam: { cycle: "Edital nº 1/2026 — objetiva já realizada em 5/9/2026", role: "Procurador do Estado – 1ª Classe — prova objetiva P1", portalUrl: "https://www.cebraspe.org.br/concursos/pge_al_26", examDate: "2026-09-05", answerKeyFinality: "definitive_document", documents: [
+      { type: "question_booklet", title: "PGE-AL 2026 — caderno da prova objetiva P1", url: "https://cdn.cebraspe.org.br/concursos/pge_al_26/arquivos/E30405D8FA2DE9B7FB3214F56781A2A33187C7F96567C12916CEF4940FDB29AC.pdf" },
+      { type: "answer_key", title: "PGE-AL 2026 — gabarito definitivo da prova objetiva P1", url: "https://cdn.cebraspe.org.br/concursos/pge_al_26/arquivos/43C3F343C215B3BCA4EC0F173722CF4F373EF03D9FE757A0EED8F48A7869A341.pdf" },
+    ] },
+    skipRepeatedRequirements: true,
+    limitations: ["Itens agrupados pelo número de primeiro nível; subitens ficam no item.", "Edital consolidado até o Edital nº 11; as exclusões do Edital nº 3 em Direito Ambiental (subtópicos 4.6, 4.7 e tópico 10, com renumeração) já estão no texto consolidado.", "Treino histórico da objetiva com legislação atual; leis e decretos estaduais de Alagoas exigem fonte oficial própria antes de vínculos."],
+  },
+  // PC-DF 2026 — Delegado de Polícia: objetiva P1, 120 itens Certo/Errado.
+  {
+    productSlug: "pc-df-delegado-de-policia-reta-final", institution: "Polícia Civil do Distrito Federal", role: "Delegado de Polícia",
+    jurisdiction: "DF", cycle: "Edital nº 1 – PCDF – Delegado, de 03/02/2026", bankScope: "Cebraspe, executor das provas objetiva e discursiva, sob a Escola Superior de Polícia Civil da PCDF",
+    portalUrl: "https://www.cebraspe.org.br/concursos/pc_df_26_delegado", examDate: "2026-07-05", examDateEvidence: { documentKey: "pcdf-notice", page: 86, item: "Anexo I", quote: "Aplicação das provas objetiva e discursiva 5/7/2026", actualDayIndependentlyVerified: false, corroboratingUrl: "https://cdn.cebraspe.org.br/concursos/pc_df_26_delegado/arquivos/710BA7293977732DDD213CAE2E329E52507C348D3E446135F8978861CDA880F1.pdf", limitation: "O texto do caderno e do gabarito não é extraído (política de material de prova); a API oficial publicou o caderno P1 em 07/07/2026 e o gabarito definitivo em 10/08/2026, compatíveis com a data do cronograma." },
+    stage: "Objetiva com gabarito definitivo (10/08/2026) e resultado final (Edital nº 9, 02/09/2026); prova oral com resultado final (Edital nº 13, 17/11/2026)",
+    stageObservedOn: "2026-11-19", proposedMode: "historical_training", expectedSubjects: 10,
+    documents: [
+      { key: "pcdf-notice", url: "https://cdn.cebraspe.org.br/concursos/pc_df_26_delegado/arquivos/0D616074EFE30F97B69C0B62003B1A66CA3330166AC50F786225B864E24A5443.pdf", title: "Edital nº 1 – PCDF – Delegado, de 03/02/2026 — abertura, versão atualizada até o Edital nº 7, de 10/07/2026", pages: 99, programmePages: [79, 84], layout: {
+        headings: [
+          { line: "DIREITO ADMINISTRATIVO E LEGISLAÇÃO COMPLEMENTAR", subject: "Direito Administrativo e Legislação Complementar", inline: true, inlineSeparator: ":" },
+          { line: "DIREITO CONSTITUCIONAL E LEGISLAÇÃO COMPLEMENTAR", subject: "Direito Constitucional e Legislação Complementar", inline: true, inlineSeparator: ":" },
+          { line: "DIREITO CIVIL E LEGISLAÇÃO COMPLEMENTAR", subject: "Direito Civil e Legislação Complementar", inline: true, inlineSeparator: ":" },
+          { line: "DIREITO EMPRESARIAL E LEGISLAÇÃO COMPLEMENTAR", subject: "Direito Empresarial e Legislação Complementar", inline: true, inlineSeparator: ":" },
+          { line: "DIREITO PENAL E LEGISLAÇÃO COMPLEMENTAR", subject: "Direito Penal e Legislação Complementar", inline: true, inlineSeparator: ":" },
+          { line: "DIREITO TRIBUTÁRIO E LEGISLAÇÃO COMPLEMENTAR", subject: "Direito Tributário e Legislação Complementar", inline: true, inlineSeparator: ":" },
+          { line: "MEDICINA LEGAL", subject: "Medicina Legal", inline: true, inlineSeparator: ":" },
+          { line: "DIREITO PROCESSUAL PENAL E LEGISLAÇÃO COMPLEMENTAR", subject: "Direito Processual Penal e Legislação Complementar", inline: true, inlineSeparator: ":" },
+          { line: "DIREITO AMBIENTAL E LEGISLAÇÃO COMPLEMENTAR", subject: "Direito Ambiental e Legislação Complementar", inline: true, inlineSeparator: ":" },
+          { line: "PRIMEIROS SOCORROS", subject: "Conhecimentos do Distrito Federal, Política para Mulheres, Legislação e Noções de Primeiros Socorros", inline: true, inlineSeparator: ":" },
+        ],
+        ignoreLines: ["\\(Retificado por meio do Edital nº 2 – PCDF – Delegado, de 12 de março de 2026, disponível no endereço eletrônico", "http://www\\.cebraspe\\.org\\.br/concursos/pc_df_26_delegado\\)",
+          // Primeira linha do último título, que continua na linha "PRIMEIROS SOCORROS: 1 …" (título inline).
+          "CONHECIMENTOS DO DISTRITO FEDERAL, POLÍTICA PARA MULHERES, LEGISLAÇÃO E NOÇÕES DE",
+          // Assinatura do edital, depois do último título.
+          "GIANCARLOS ZULIANI"],
+        itemMode: "top-level-numbers",
+      } },
+    ],
+    overlays: [],
+    identityClaims: [
+      { document: "pcdf-notice", page: 1, contains: ["EDITAL Nº 1 – PCDF – DELEGADO, DE 3 DE FEVEREIRO DE 2026", "Versão atualizada até a retificação divulgada por meio do Edital nº 7 – PCDF – Delegado, de 10 de julho de 2026."] },
+      { document: "pcdf-notice", page: 32, contains: ["O julgamento de cada item será CERTO ou ERRADO"] },
+      { document: "pcdf-notice", page: 79, contains: ["22.2 CONHECIMENTOS"] },
+      { document: "pcdf-notice", page: 84, contains: ["CONHECIMENTOS DO DISTRITO FEDERAL, POLÍTICA PARA MULHERES, LEGISLAÇÃO E NOÇÕES DE"] },
+      { document: "pcdf-notice", page: 86, contains: ["Aplicação das provas objetiva e discursiva", "5/7/2026"] },
+    ],
+    previousExam: { cycle: "Edital nº 1/2026 — objetiva já realizada em 5/7/2026", role: "Delegado de Polícia — prova objetiva P1", portalUrl: "https://www.cebraspe.org.br/concursos/pc_df_26_delegado", examDate: "2026-07-05", answerKeyFinality: "definitive_document", documents: [
+      { type: "question_booklet", title: "PC-DF 2026 Delegado — caderno da prova objetiva P1", url: "https://cdn.cebraspe.org.br/concursos/pc_df_26_delegado/arquivos/710BA7293977732DDD213CAE2E329E52507C348D3E446135F8978861CDA880F1.pdf" },
+      { type: "answer_key", title: "PC-DF 2026 Delegado — gabarito definitivo da prova objetiva P1", url: "https://cdn.cebraspe.org.br/concursos/pc_df_26_delegado/arquivos/793E15AB2B5B357F2DD614A0ACAEE093B9DFE97618931164855D005CDFF89841.pdf" },
+    ] },
+    skipRepeatedRequirements: true,
+    limitations: ["Itens agrupados pelo número de primeiro nível; as partes \"I\" (disciplina) e \"II\" (legislação complementar) de cada bloco ficam na mesma disciplina.", "O último título ocupa duas linhas no PDF; a primeira é tratada como cabeçalho e a disciplina abre na linha \"PRIMEIROS SOCORROS:\".", "Edital consolidado até o Edital nº 7; a retificação de Direito Constitucional e Legislação Complementar e a renumeração de Medicina Legal (Edital nº 2) já estão no texto.", "Treino histórico da objetiva com legislação atual; Lei Orgânica e normas do DF exigem fonte oficial própria antes de vínculos."],
+  },
 ];
 
 function normalized(value: string) { return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, " ").toLowerCase().trim(); }

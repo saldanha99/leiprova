@@ -30,10 +30,13 @@ export const PROGRAMME_CLASSIFICATION_SCOPES = {
   "tcern-auditor-direito-1-2025-historico-objetiva": "Auditor de Controle Externo – Especialidade: Direito",
   "tjmt-notas-registro-provimento-48-2025-historico-objetiva": "Outorga de Delegações de Notas e de Registro — Ingresso por Provimento",
   "trt10-analista-area-judiciaria-1-2024-historico-objetiva": "Analista Judiciário – Área: Judiciária",
+  "pgeal-procurador-1-2026-historico-objetiva": "Procurador do Estado – 1ª Classe",
+  "pcdf-delegado-1-2026-historico-objetiva": "Delegado de Polícia",
 } as const;
 /** Escopos cujo edital aprovado vem do Cebraspe (demais: FGV Conhecimento). */
 export const CEBRASPE_PROGRAMME_SCOPES: ReadonlySet<string> = new Set(["sefaz-al-auditor-fiscal-2026", "sefazrn-auditor-fiscal-5-2025-historico-objetiva",
-  "tcern-auditor-direito-1-2025-historico-objetiva", "tjmt-notas-registro-provimento-48-2025-historico-objetiva", "trt10-analista-area-judiciaria-1-2024-historico-objetiva"]);
+  "tcern-auditor-direito-1-2025-historico-objetiva", "tjmt-notas-registro-provimento-48-2025-historico-objetiva", "trt10-analista-area-judiciaria-1-2024-historico-objetiva",
+  "pgeal-procurador-1-2026-historico-objetiva", "pcdf-delegado-1-2026-historico-objetiva"]);
 export const PROGRAMME_SUBJECT_CLASSIFICATION_ACTION = "editorial.programme.subject_classified";
 export const PROGRAMME_CLASSIFICATION_BATCH_LIMIT = 100;
 const digest = (value: unknown) => createHash("sha256").update(JSON.stringify(value)).digest("hex");
