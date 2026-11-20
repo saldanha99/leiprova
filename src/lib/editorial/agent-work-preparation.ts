@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { sql } from "drizzle-orm";
+import { sql, type SQL } from "drizzle-orm";
 import { AGENT_WORK_VERSION, agentInputHash, agentWorkResultSchema, validateDiscoveryUrl, workPayloadSchema,
   type AgentWorkPayload, type WorkArticle } from "./agent-work-contract";
 import { AGENT_OPPORTUNITY_PRIORITY_CTES, REQUIREMENT_CONTEXT_HASH_SQL, enqueueAgentWork, requirementContext, type AgentDatabase } from "./agent-work-queue";
@@ -79,7 +79,10 @@ export function authoringPreparationBatchQuery(batchSize: number) {
       r.opportunity_id as "opportunityId",case when content.opportunity_id is not null
         and coalesce(content.minimum_valid_question_count,0)<${MINIMUM_COURSE_QUESTION_COUNT} then 0 else 1 end priority
     from editorial_agent_work parent
-    join opportunity_requirements r on r.id=case when parent.payload->>'requirementId'~'^[0-9]{1,18}$' then(parent.payload->>'requirementId')::bigint end
+    -- A chave indexada da tarefa ("mapping:<id>") liga o requisito; o requisito do pacote continua conferido.
+    -- Só pelo pacote, o planejador cruzava cada requisito com cada mapa lendo o JSON grande (19/11/2026: >290 s).
+    join opportunity_requirements r on parent.job_key='mapping:'||r.id::text
+      and r.id=case when parent.payload->>'requirementId'~'^[0-9]{1,18}$' then(parent.payload->>'requirementId')::bigint end
     join contest_opportunities o on o.id=r.opportunity_id join opportunity_source_documents d on d.id=r.source_document_id
     join opportunity_document_snapshots s on s.id=r.source_snapshot_id
     join opportunity_question_contracts qc on qc.opportunity_id=o.id
@@ -108,6 +111,17 @@ export function authoringPreparationBatchQuery(batchSize: number) {
   select key,hash,payload,result,"questionContractId","questionContract" from balanced order by priority,position,id,key limit ${preparationBatchSize(batchSize) + 1}`;
 }
 
+/** Lotes de preparação: leitura com a contagem de questões válidas por produto, que passou
+ * do limite de 30 s do papel em 19/11/2026 (o Guardião entregava e o Autor ficava sem tarefa).
+ * O pooler opera por transação, então o limite maior vale só dentro desta transação de leitura. */
+export const PREPARATION_BATCH_TIMEOUT = "120s";
+async function preparationBatch<T extends Record<string, unknown>>(db: AgentDatabase, query: SQL) {
+  return db.transaction(async (tx) => {
+    await tx.execute(sql.raw(`set local statement_timeout = '${PREPARATION_BATCH_TIMEOUT}'`));
+    return tx.execute<T>(query);
+  });
+}
+
 export async function prepareAgentWork(db:AgentDatabase, now=new Date(), options:{followupsOnly?:boolean;batchSize?:number}={}) {
   let mappings=0, authoring=0, discovery=0, legalChanges=0;
   const batchSize = preparationBatchSize(options.batchSize);
@@ -126,7 +140,7 @@ export async function prepareAgentWork(db:AgentDatabase, now=new Date(), options
     if(!corpus || !/^[a-f0-9]{64}$/u.test(corpus.hash)) throw new Error("Fingerprint normativo indisponível; preparação não iniciada.");
     corpusHash = corpus.hash;
   }
-  const selectedRequirements=options.followupsOnly ? [] : await db.execute<Requirement>(mappingPreparationBatchQuery(corpusHash,batchSize));
+  const selectedRequirements=options.followupsOnly ? [] : await preparationBatch<Requirement>(db,mappingPreparationBatchQuery(corpusHash,batchSize));
   const mappingHasMore = selectedRequirements.length > batchSize;
   const requirements = selectedRequirements.slice(0,batchSize);
   for (const requirement of requirements) {
@@ -182,7 +196,7 @@ export async function prepareAgentWork(db:AgentDatabase, now=new Date(), options
       from editorial_agent_work work where work.job_key=${`mapping:${requirement.id}`}
         and work.input_hash=${agentInputHash(payload)} and work.status<>'running'`);
   }
-  const selectedParents=await db.execute<{key:string; hash:string; payload:AgentWorkPayload; result:unknown;questionContractId:string;questionContract:unknown}>(authoringPreparationBatchQuery(batchSize));
+  const selectedParents=await preparationBatch<{key:string; hash:string; payload:AgentWorkPayload; result:unknown;questionContractId:string;questionContract:unknown}>(db,authoringPreparationBatchQuery(batchSize));
   const authoringHasMore = selectedParents.length > batchSize;
   const parents = selectedParents.slice(0,batchSize);
   for(const parent of parents) {

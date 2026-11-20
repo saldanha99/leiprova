@@ -2,7 +2,7 @@ import type { SQL } from "drizzle-orm";
 import { PgDialect } from "drizzle-orm/pg-core";
 import { describe, expect, it, vi } from "vitest";
 
-import { AGENT_PREPARATION_ALGORITHM_PROFILE_HASH, prepareAgentWork, preparationBatchSize } from "@/lib/editorial/agent-work-preparation";
+import { AGENT_PREPARATION_ALGORITHM_PROFILE_HASH, authoringPreparationBatchQuery, prepareAgentWork, preparationBatchSize } from "@/lib/editorial/agent-work-preparation";
 import { enqueueAgentWork, type AgentDatabase } from "@/lib/editorial/agent-work-queue";
 import { AGENT_WORK_VERSION, type AgentWorkPayload } from "@/lib/editorial/agent-work-contract";
 
@@ -11,6 +11,7 @@ function databaseWithBatch(size: number) {
   const queued: AgentWorkPayload[] = [];
   const cache: Record<string, unknown>[] = [];
   let corpusReads = 0, retrievals = 0, sourceReads = 0;
+  const timeouts: string[] = [];
   const execute = vi.fn(async (fragment: SQL) => {
     const query = dialect.sqlToQuery(fragment);
     if (query.sql.includes("jsonb_agg(jsonb_build_array(a.id")) { corpusReads++; return [{ hash: "a".repeat(64) }]; }
@@ -32,7 +33,10 @@ function databaseWithBatch(size: number) {
     }
     return [];
   });
-  return { db: { execute } as unknown as AgentDatabase, queued, cache, reads: () => ({ corpusReads, retrievals, sourceReads }) };
+  // Lotes rodam em transação com limite local (pooler por transação); o `set local` não é consulta de dado.
+  const transaction = vi.fn(async (run: (tx: { execute: typeof execute }) => Promise<unknown>) => run({ execute: vi.fn(async (fragment: SQL) => {
+    timeouts.push(dialect.sqlToQuery(fragment).sql); return /^set local statement_timeout/u.test(timeouts.at(-1)!) ? [] : execute(fragment); }) }));
+  return { db: { execute, transaction } as unknown as AgentDatabase, queued, cache, timeouts, reads: () => ({ corpusReads, retrievals, sourceReads }) };
 }
 
 describe("bounded agent preparation", () => {
@@ -66,5 +70,18 @@ describe("bounded agent preparation", () => {
     expect(preparationBatchSize()).toBe(100);
     expect(() => preparationBatchSize(101)).toThrow();
     expect(() => preparationBatchSize(0)).toThrow();
+  });
+
+  it("roda os lotes de mapeamento e de autoria em transação com limite local de 120 s", async () => {
+    const harness = databaseWithBatch(1);
+    await prepareAgentWork(harness.db, new Date("2026-11-19T12:00:00Z"));
+    const sets = harness.timeouts.filter((text) => text.startsWith("set local statement_timeout"));
+    expect(sets).toEqual(["set local statement_timeout = '120s'", "set local statement_timeout = '120s'"]);
+  });
+
+  it("liga o mapa ao requisito pela chave indexada e mantém a conferência do pacote", () => {
+    const text = new PgDialect().sqlToQuery(authoringPreparationBatchQuery(10)).sql;
+    expect(text).toContain("parent.job_key='mapping:'||r.id::text");
+    expect(text).toContain("r.id=case when parent.payload->>'requirementId'");
   });
 });

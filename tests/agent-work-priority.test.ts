@@ -119,7 +119,10 @@ describe("prioridade da fila dos agentes", () => {
 
   it("encerra, antes de cada ciclo, tarefas de requisito retirado ou suspenso", async () => {
     const queries: SQL[] = [];
-    const db = { execute: vi.fn(async (query: SQL) => { queries.push(query); return []; }) };
+    const execute = vi.fn(async (query: SQL) => { queries.push(query); return []; });
+    // Lote em transação: o `set local statement_timeout` não conta como varredura.
+    const db = { execute, transaction: vi.fn(async (run: (tx: { execute: typeof execute }) => Promise<unknown>) =>
+      run({ execute: vi.fn(async (query: SQL) => /^set local statement_timeout/u.test(new PgDialect().sqlToQuery(query).sql) ? [] : execute(query)) })) };
     await prepareAgentWork(db as unknown as Parameters<typeof prepareAgentWork>[0], new Date(), { followupsOnly: true });
     // A confirmação leve da ponte não faz a varredura.
     expect(queries).toHaveLength(1);
