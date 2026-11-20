@@ -51,8 +51,19 @@ export function selectBindableQuestions(rows: readonly AuthoredQuestion[]) {
       left.requirementId - right.requirementId || left.questionPublicId.localeCompare(right.questionPublicId));
 }
 
+/** A citação do requisito precisa ser literal e ter de 10 a 20.000 caracteres no contrato
+ * do importador. Um item curto do programa ("Posse.", "Evicção.") recusava o pacote inteiro
+ * do produto em toda rodada (20/11/2026: 6 produtos e ~2.370 questões revisadas paradas).
+ * Esse item fica fora da proposta automática; os demais seguem. */
+export const MIN_REQUIREMENT_QUOTE = 10;
+export const MAX_REQUIREMENT_QUOTE = 20_000;
+export function quotableRequirement(row: Pick<AuthoredQuestion, "requirementText">) {
+  const length = row.requirementText.trim().length;
+  return length >= MIN_REQUIREMENT_QUOTE && length <= MAX_REQUIREMENT_QUOTE;
+}
+
 export function buildProposalPackage(productSlug: string, rows: readonly AuthoredQuestion[]) {
-  const items = selectBindableQuestions(rows).slice(0, MAX_ITEMS).map((row) => ({
+  const items = selectBindableQuestions(rows).filter(quotableRequirement).slice(0, MAX_ITEMS).map((row) => ({
     productSlug,
     opportunityPublicId: row.opportunityPublicId,
     requirementId: row.requirementId,
@@ -120,7 +131,12 @@ async function main() {
           )
       `);
     });
-    if (!selectBindableQuestions(rows).length) {
+    const skipped = selectBindableQuestions(rows).filter((row) => !quotableRequirement(row));
+    if (skipped.length) {
+      console.error(`Itens do programa fora da proposta (citação literal fora de ${MIN_REQUIREMENT_QUOTE}–${MAX_REQUIREMENT_QUOTE} caracteres): ` +
+        `${[...new Set(skipped.map((row) => row.requirementId))].join(",")} (${skipped.length} questões).`);
+    }
+    if (!selectBindableQuestions(rows).filter(quotableRequirement).length) {
       console.error(`Nenhuma questão revisada do Autor sem vínculo para ${productSlug}.`);
       process.exitCode = 3;
       return;

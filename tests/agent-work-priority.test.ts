@@ -34,14 +34,20 @@ describe("prioridade da fila dos agentes", () => {
     expect(claim.sql).toMatch(/coalesce\(content.minimum_valid_question_count, 0\) >= \$\d+ then 1/u);
     expect(claim.params).toContain(68);
     expect(claim.sql).toContain("min(valid_question_count)");
-    expect(claim.sql).toContain("count(distinct content_binding.question_id)");
-    expect(claim.sql).toContain("content_binding.product_slug = priority_product.slug");
-    expect(claim.sql).toContain("verified_product_binding.product_slug = priority_product.slug");
-    expect(claim.sql).toContain("verified_product_binding.opportunity_id = priority_product.opportunity_id");
-    expect(claim.sql).toContain("verified_product_question.editorial_status = 'reviewed'");
-    expect(claim.sql).toContain("verified_product_requirement.editorial_status = 'reviewed'");
-    expect(claim.sql).toContain("verified_product_source.status = 'approved'");
-    expect(claim.sql).toContain("verified_product_version.status = 'current'");
+    // Contagem só de ordenação (20/11/2026: 13 s → 0,18 s): conferências baratas do vínculo,
+    // sem comparar textos nem o JSON da questão a cada reserva.
+    expect(claim.sql).toContain("count(distinct priority_binding.question_id)");
+    expect(claim.sql).toContain("priority_binding.product_slug = priority_product.slug");
+    expect(claim.sql).toContain("priority_binding.opportunity_id = priority_product.opportunity_id");
+    expect(claim.sql).toContain("priority_binding.status = 'approved' and priority_binding.reviewed_by_user_id is not null");
+    expect(claim.sql).toContain("priority_question.editorial_status = 'reviewed'");
+    expect(claim.sql).toContain("date_trunc('milliseconds', priority_question.updated_at) = date_trunc('milliseconds', priority_binding.question_updated_at)");
+    expect(claim.sql).toContain("priority_requirement.editorial_status = 'reviewed'");
+    expect(claim.sql).toContain("priority_source.status = 'approved'");
+    expect(claim.sql).toContain("priority_version.status = 'current' and priority_version.checksum_sha256 = priority_binding.legal_version_checksum");
+    expect(claim.sql).toContain("priority_act.is_active");
+    expect(claim.sql).not.toContain("verified_product_binding");
+    expect(claim.sql).not.toContain("evidence->'questionContent'");
     expect(claim.sql).not.toContain("from question_opportunities link");
     expect(claim.sql).not.toContain("question.editorial_status <> 'suspended'");
     // O requisito sai da chave da tarefa; o payload (artigos candidatos) não é lido.

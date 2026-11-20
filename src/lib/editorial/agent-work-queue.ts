@@ -6,7 +6,7 @@ import { findMostSimilarQuestion, ORIGINALITY_REJECTION_THRESHOLD_BPS } from "./
 import { deterministicNoticeQuestionUuid } from "./notice-question-generator";
 import { readOfficialQuestionContract, lockQuestionContracts } from "./question-contract-service";
 import { currentQuestionContractExists } from "./question-contract-query";
-import { approvedProductQuestionCount, MINIMUM_COURSE_QUESTION_COUNT } from "@/lib/commerce/minimum-course-content";
+import { priorityProductQuestionCount, MINIMUM_COURSE_QUESTION_COUNT } from "@/lib/commerce/minimum-course-content";
 import { AGENT_FOR_WORK, AGENT_WORK_DAILY_LIMIT, AGENT_WORK_LEASE_MINUTES,
   agentInputHash, agentWorkKindSchema, validateAgentWorkResult, workPayloadSchema,
   agentWorkResultSchema, parseAgentWorkResult,
@@ -19,10 +19,11 @@ const requirementIdOf = (alias: "work" | "other") =>
 
 /** Faixa por edição, calculada uma vez por reserva: o alvo é conteúdo válido
  * por produto, não rascunhos ligados à edição. Um curso com 68 rascunhos mas
- * somente 67 vínculos válidos continua prioritário até completar o piso. */
+ * somente 67 vínculos válidos continua prioritário até completar o piso.
+ * Só ordena a fila: usa a contagem barata; acesso e venda seguem com a completa. */
 export const AGENT_OPPORTUNITY_PRIORITY_CTES = sql`product_content as materialized (
       select priority_product.opportunity_id, priority_product.status,
-        ${approvedProductQuestionCount(sql`priority_product.slug`, sql`priority_product.opportunity_id`)} as valid_question_count
+        ${priorityProductQuestionCount(sql`priority_product.slug`, sql`priority_product.opportunity_id`)} as valid_question_count
       from contest_store_products priority_product
       where priority_product.opportunity_id is not null and priority_product.status <> 'retired'
     ),
@@ -307,6 +308,14 @@ export async function completeAgentWork(db: AgentDatabase,
         publicationAllowed:false,humanReviewRequired:true,importedQuestionPublicIds,completionTokenHash,resultHash}});
     return { state: result.outcome, importedQuestionPublicIds, publicationAllowed: false, humanReviewRequired: true };
   });
+}
+
+/** Follow-up imediato só quando a conclusão pode abrir autoria: mapa do Guardião
+ * preparado (inclusive o recibo repetido). Autoria, descoberta e bloqueios ficam
+ * para o ciclo periódico de preparação (a cada 5 min). */
+export function followupsAfter(jobKey: string, completion: unknown) {
+  const state = completion && typeof completion === "object" && "state" in completion ? completion.state : null;
+  return /^mapping:[0-9]{1,18}$/u.test(jobKey) && state === "prepared";
 }
 
 export async function agentWorkSummary(db: AgentDatabase) {

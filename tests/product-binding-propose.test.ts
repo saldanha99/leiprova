@@ -6,6 +6,7 @@ import {
   type AuthoredQuestion,
   buildProposalPackage,
   parseProposeArgs,
+  quotableRequirement,
   selectBindableQuestions,
 } from "../scripts/propose-product-bindings";
 
@@ -71,5 +72,19 @@ describe("propostas de vínculo a partir das inéditas revisadas", () => {
       legalQuote: "Art. 1º Não há crime sem lei anterior que o defina. Não há pena sem prévia cominação legal.",
     });
     expect(pack.items[0].scopeNotes).toContain("Vínculo pendente de revisão humana");
+  });
+
+  it("deixa fora o item curto do programa sem recusar o pacote do produto", () => {
+    const short = { ...row(5, "q-z", 5), requirementText: "Posse." };
+    const padded = { ...row(6, "q-y", 5), requirementText: "  Revelia.  " };
+    expect(quotableRequirement(short)).toBe(false);
+    expect(quotableRequirement(padded)).toBe(false);
+    expect(quotableRequirement(row(10, "q-a", 5))).toBe(true);
+    expect(quotableRequirement({ requirementText: "x".repeat(20_001) })).toBe(false);
+    const pack = buildProposalPackage("tj-ms-cartorios-reta-final", [short, padded, row(10, "q-a", 5), row(10, "q-b", 5)]);
+    expect(pack.items.map((item) => [item.requirementId, item.questionPublicId])).toEqual([[10, "q-a"], [10, "q-b"]]);
+    // Sem nenhum item citável, o comando sai como "sem propostas" (código 3), não como falha.
+    expect(script).toContain("selectBindableQuestions(rows).filter(quotableRequirement).length");
+    expect(script).toContain("process.exitCode = 3");
   });
 });

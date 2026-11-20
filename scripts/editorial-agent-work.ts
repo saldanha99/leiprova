@@ -3,7 +3,7 @@ import { sql } from "drizzle-orm";
 import postgres from "postgres";
 import { z } from "zod";
 import * as schema from "../src/lib/db/schema";
-import { agentWorkSummary, claimAgentWork, completeAgentWork } from "../src/lib/editorial/agent-work-queue";
+import { agentWorkSummary, claimAgentWork, completeAgentWork, followupsAfter } from "../src/lib/editorial/agent-work-queue";
 import { prepareAgentWork } from "../src/lib/editorial/agent-work-preparation";
 import { prepareCourseIntake } from "../src/lib/editorial/course-intake";
 import { agentTaskHandoff } from "../src/lib/editorial/agent-task-handoff";
@@ -54,8 +54,12 @@ async function main() {
       // A saída do Guardião abastece automaticamente a próxima etapa, sem revisar/publicar.
       // A conclusão já foi confirmada: falha aqui não pode transformar um recibo aplicado
       // em erro (o chamador repetiria a autoria). O ciclo periódico refaz os follow-ups.
-      try { await prepareAgentWork(db,new Date(),{followupsOnly:true}); }
-      catch { console.error("Follow-ups não preparados nesta conclusão; o ciclo periódico os refaz."); }
+      // Só o mapa do Guardião gera autoria: depois de uma autoria o lote (até 20 s,
+      // segurando a ponte única das vagas) não tinha o que preparar (20/11/2026).
+      if(followupsAfter(request.jobKey,result)) {
+        try { await prepareAgentWork(db,new Date(),{followupsOnly:true}); }
+        catch { console.error("Follow-ups não preparados nesta conclusão; o ciclo periódico os refaz."); }
+      }
     }
     console.log(JSON.stringify(result));
   } finally {await client.end();}
