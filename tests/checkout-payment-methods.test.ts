@@ -29,7 +29,7 @@ describe("formas de pagamento do checkout", () => {
 const testKey = process.env.STRIPE_TEST_SECRET_KEY;
 describe.skipIf(!testKey?.startsWith("sk_test_"))("Stripe modo de teste", () => {
   it("cria sessão de assinatura (Elements) com cartão e Pix", async () => {
-    const stripe = new Stripe(testKey!, { apiVersion: "2026-03-25.dahlia" });
+    const stripe = new Stripe(testKey!, { apiVersion: "2026-07-29.dahlia" });
     const product = await stripe.products.create({ name: "QA teste automático (apagar)" });
     const price = await stripe.prices.create({ currency: "brl", unit_amount: 29_700, recurring: { interval: "month" },
       product: product.id });

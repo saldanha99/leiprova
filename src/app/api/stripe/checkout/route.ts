@@ -26,12 +26,16 @@ import {
   stripeKeyExpectsLivemode,
   stripeMetadata,
 } from "@/lib/stripe";
+import { checkoutTrackingSchema } from "@/lib/tracking";
+import { recordCheckoutAttribution } from "@/lib/tracking-server";
 
 export const runtime = "nodejs";
 
 const requestSchema = z.object({
   planSlug: z.string().min(1).max(40),
   attemptId: z.uuid(),
+  // Atribuição (LEI 10): opcional e validada; nunca bloqueia o pagamento.
+  tracking: checkoutTrackingSchema.optional(),
 });
 
 function jsonError(message: string, status: number) {
@@ -204,6 +208,8 @@ export async function POST(request: NextRequest) {
       stripe,
       user,
     });
+    await recordCheckoutAttribution({ entityType: "checkout_attempt", entityId: attempt.id, userId: user.id,
+      tracking: input.data.tracking });
     const metadata = stripeMetadata({
       userId: user.id,
       userPublicId: user.publicId,

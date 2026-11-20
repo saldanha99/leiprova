@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { getCatalogContest, getContestAccessOption } from "./catalog";
+import { checkoutTrackingSchema } from "../tracking";
 
 export const contestCartSchema = z
   .object({
@@ -15,6 +16,8 @@ export const contestCartSchema = z
       )
       .min(1)
       .max(3),
+    // Atribuição (LEI 10): opcional e validada; nunca bloqueia o pagamento.
+    tracking: checkoutTrackingSchema.optional(),
   })
   .strict()
   .superRefine((cart, ctx) => {

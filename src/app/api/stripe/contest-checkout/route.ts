@@ -36,6 +36,7 @@ import {
   expireContestCheckoutSnapshot, findRecoverableContestSession, markContestCreationStarted,
   originalContestCheckoutExpiry, persistContestCheckoutSession, validateContestCheckoutSession,
 } from "@/lib/commerce/contest-checkout-recovery";
+import { recordCheckoutAttribution } from "@/lib/tracking-server";
 
 export const runtime = "nodejs";
 export async function POST(request: NextRequest) {
@@ -210,6 +211,8 @@ export async function POST(request: NextRequest) {
     return error("Não foi possível validar o conteúdo desta contratação.", 503);
   }
 
+  await recordCheckoutAttribution({ entityType: "contest_order", entityId: order.id, userId: user.id,
+    tracking: input.data.tracking });
   try {
     const stripe = getStripeClient();
     if (order.stripeMode !== (expectedLive ? "live" : "test"))
