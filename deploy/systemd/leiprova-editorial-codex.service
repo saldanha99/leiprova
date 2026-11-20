@@ -1,0 +1,35 @@
+# Segunda instância do motor editorial contínuo: executor Codex (assinatura ChatGPT),
+# mesma fila editorial_agent_work (reserva atômica por advisory lock + skip locked).
+# Instalar com deploy/install-editorial-codex.sh; fica DESLIGADA até o OK do proprietário
+# (docs/MOTOR-CODEX-PARALELO.md). Não recebe a chave da API: o worker só lê a chave no executor claude.
+[Unit]
+Description=Edital Lei Seca - motor editorial continuo (Codex, Autor)
+After=docker.service network-online.target
+Wants=network-online.target
+Requires=docker.service
+
+[Service]
+Type=simple
+User=leiprova-editor
+Group=leiprova-editor
+SupplementaryGroups=docker
+# Sem segredos: executor, modelo, vagas, CODEX_HOME e o gatilho/trava compartilhados.
+EnvironmentFile=/etc/leiprova/editorial-codex.env
+# Estado próprio: heartbeat, eventos, recibos e api-budget.json não se misturam com a instância principal.
+Environment=EDITORIAL_REALTIME_STATE_DIR=/var/lib/leiprova-codex
+# Caminho inexistente de propósito: nenhuma chave da API chega a esta instância.
+Environment=EDITORIAL_API_SECRET_FILE=/nonexistent/leiprova-codex-has-no-api-key
+StateDirectory=leiprova-codex
+StateDirectoryMode=0750
+UMask=0077
+ExecStart=/usr/bin/env node /opt/leiprova/deploy/editorial-realtime-worker.mjs
+Restart=always
+RestartSec=30
+KillMode=mixed
+TimeoutStopSec=1800
+NoNewPrivileges=true
+ProtectSystem=full
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

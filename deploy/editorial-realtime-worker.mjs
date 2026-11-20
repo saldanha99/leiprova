@@ -43,12 +43,28 @@ export function readConfig(env) {
   const focus = (env.EDITORIAL_FOCUS_PRODUCTS ?? "").split(",").map((slug) => slug.trim()).filter(Boolean);
   if (focus.length > 40 || focus.some((slug) => !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug) || slug.length > 120)) throw new Error("EDITORIAL_FOCUS_PRODUCTS inválido.");
   if (model && !/^[A-Za-z0-9._:\-[\]]{2,80}$/.test(model)) throw new Error("EDITORIAL_EXECUTOR_MODEL inválido.");
+  const absolute = (name) => {
+    const raw = env[name]?.trim() ?? "";
+    if (raw && (!path.isAbsolute(raw) || !/^[A-Za-z0-9._/-]{2,200}$/.test(raw) || raw.split("/").includes(".."))) {
+      throw new Error(`${name} deve ser caminho absoluto simples.`);
+    }
+    return raw;
+  };
+  const stateDir = env.EDITORIAL_REALTIME_STATE_DIR?.trim() || "/var/lib/leiprova-realtime";
   return {
     executor,
     model,
     focus,
     bin: env.EDITORIAL_EXECUTOR_BIN?.trim() || executor,
-    stateDir: env.EDITORIAL_REALTIME_STATE_DIR?.trim() || "/var/lib/leiprova-realtime",
+    stateDir,
+    // Segunda instância (ex.: Codex) com STATE_DIR próprio dispara a MESMA linha de liberação:
+    // o .path do systemd observa só o arquivo da instância principal.
+    releaseTriggerFile: absolute("EDITORIAL_RELEASE_TRIGGER_FILE") || path.join(stateDir, "release.trigger"),
+    // Trava entre processos da ponte (flock): com duas instâncias, cada tsx ocupa ~200 MB no
+    // contêiner de 768 MB; vazio mantém só a fila interna de uma instância.
+    bridgeLockFile: absolute("EDITORIAL_BRIDGE_LOCK_FILE"),
+    // Login separado do Codex por instância; só chega à CLI quando definido.
+    codexHome: absolute("CODEX_HOME"),
     projectDir: env.EDITORIAL_PROJECT_DIR?.trim() || "/opt/leiprova",
     container: env.EDITORIAL_CONTAINER?.trim() || "leiprova-editorial-automation",
     slots: { "Guardião": int("EDITORIAL_SLOTS_GUARDIAO", 1, 0, 8), Autor: int("EDITORIAL_SLOTS_AUTOR", 2, 0, 8) },
@@ -247,7 +263,8 @@ export async function main(env = process.env) {
   // Guardião e Autor usam a mesma conta: limite e pausa valem para todas as vagas.
   const gate = { pausedUntil: 0, probeNeeded: true, probing: null, failStreak: 0, reason: null };
   const idleLogged = new Set();
-  const childEnv = { PATH: process.env.PATH, HOME: process.env.HOME, LANG: "C.UTF-8", NO_COLOR: "1" };
+  const childEnv = { PATH: process.env.PATH, HOME: process.env.HOME, LANG: "C.UTF-8", NO_COLOR: "1",
+    ...(config.executor === "codex" && config.codexHome ? { CODEX_HOME: config.codexHome } : {}) };
   const command = executorCommand(config);
   // A chave é lida uma vez e só entra no ambiente da CLI; não vai para logs, eventos nem para a ponte.
   const apiKey = config.executor === "claude"
@@ -293,14 +310,18 @@ export async function main(env = process.env) {
     bridgeQueue = call.catch(() => {});
     return call;
   };
-  const bridgeCall = (mode, role, input) => run("docker", [
-    "exec", ...(input === undefined ? [] : ["-i"]), config.container,
-    "./node_modules/.bin/tsx", "--env-file-if-exists=.env", "scripts/editorial-agent-work.ts",
-    `--mode=${mode}`, ...(role ? [`--agent=${role}`, `--kinds=${ROLE_KINDS[role]}`, ...(config.focus.length ? [`--focus=${config.focus.join(",")}`] : [])] : []),
-  ], { input, cwd: config.stateDir, timeoutMs: 120_000, env: process.env });
+  const bridgeCall = (mode, role, input) => {
+    const docker = ["docker",
+      "exec", ...(input === undefined ? [] : ["-i"]), config.container,
+      "./node_modules/.bin/tsx", "--env-file-if-exists=.env", "scripts/editorial-agent-work.ts",
+      `--mode=${mode}`, ...(role ? [`--agent=${role}`, `--kinds=${ROLE_KINDS[role]}`, ...(config.focus.length ? [`--focus=${config.focus.join(",")}`] : [])] : [])];
+    // Espera a ponte da outra instância até 110 s; sem a trava, sai com erro e a vaga tenta de novo.
+    const [bin, ...args] = config.bridgeLockFile ? ["flock", "-w", "110", config.bridgeLockFile, ...docker] : docker;
+    return run(bin, args, { input, cwd: config.stateDir, timeoutMs: config.bridgeLockFile ? 230_000 : 120_000, env: process.env });
+  };
   // Gatilho da linha de liberação: um .path do systemd (root) observa o arquivo.
   const triggerRelease = (jobKey, imported) =>
-    writePrivate(path.join(config.stateDir, "release.trigger"), JSON.stringify({ at: new Date().toISOString(), jobKey, imported }));
+    writePrivate(config.releaseTriggerFile, JSON.stringify({ at: new Date().toISOString(), jobKey, imported }));
 
   async function pause(ms, reason, data) {
     gate.pausedUntil = Math.max(gate.pausedUntil, Date.now() + ms);
