@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { chmod, mkdtemp, readFile, readdir, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -216,5 +217,76 @@ ${executorScript}
     const events = await readFile(path.join(dir, "state/events.jsonl"), "utf8");
     expect(events).toMatch(/subscription_limited/);
     expect(events).not.toMatch(/no_valid_response/);
+  });
+
+  it("instância Codex paralela: login próprio, trava da ponte e gatilho da instância principal", async () => {
+    const { dir, env, restore } = await setup("");
+    // Codex simulado: registra o ambiente recebido e grava a resposta.
+    const codex = path.join(dir, "bin/codex");
+    await writeFile(codex, `#!/usr/bin/env bash
+input=$(cat)
+if [ "$input" = "Responda apenas: OK" ]; then echo OK; exit 0; fi
+echo "CODEX_HOME=$CODEX_HOME ANTHROPIC_API_KEY=\${ANTHROPIC_API_KEY:-none} ARGS=$*" > "${dir}/codex-env"
+echo '{"schemaVersion":1,"outcome":"prepared"}' > response.json
+`);
+    await chmod(codex, 0o755);
+    // Uma chave existente no caminho padrão não pode chegar ao Codex.
+    const secret = path.join(dir, "secret");
+    await writeFile(secret, "ANTHROPIC_API_KEY=sk-ant-should-not-leak\n");
+    const mainState = path.join(dir, "main-state");
+    await import("node:fs/promises").then((fs) => fs.mkdir(mainState));
+    const docker = path.join(dir, "bin/docker");
+    // A ponte só roda com a trava compartilhada segura (flock mantém o descritor aberto).
+    await writeFile(docker, (await readFile(docker, "utf8")).replace("case \"$*\" in",
+      `if flock -n "${mainState}/bridge.lock" true; then echo "lock livre durante a ponte" >> "${dir}/lock-violations"; fi\ncase "$*" in`));
+    try {
+      await main({ ...env, EDITORIAL_EXECUTOR: "codex", EDITORIAL_EXECUTOR_BIN: codex, EDITORIAL_EXECUTOR_MODEL: "gpt-6-luna",
+        EDITORIAL_API_SECRET_FILE: secret, CODEX_HOME: path.join(dir, "codex-home"),
+        EDITORIAL_RELEASE_TRIGGER_FILE: path.join(mainState, "release.trigger"),
+        EDITORIAL_BRIDGE_LOCK_FILE: path.join(mainState, "bridge.lock") });
+    } finally { restore(); }
+    expect(await readFile(path.join(dir, "codex-env"), "utf8")).toBe(
+      `CODEX_HOME=${path.join(dir, "codex-home")} ANTHROPIC_API_KEY=none ARGS=exec --sandbox workspace-write --skip-git-repo-check -C . -m gpt-6-luna -\n`);
+    await expect(readFile(path.join(dir, "lock-violations"))).rejects.toThrow();
+    // Gatilho no arquivo da instância principal; heartbeat e orçamento no estado próprio.
+    expect(JSON.parse(await readFile(path.join(mainState, "release.trigger"), "utf8"))).toMatchObject({ jobKey: "author:1", imported: 2 });
+    await expect(readFile(path.join(dir, "state/release.trigger"))).rejects.toThrow();
+    expect(JSON.parse(await readFile(path.join(dir, "state/heartbeat.json"), "utf8"))).toHaveProperty("pid", process.pid);
+    expect(JSON.parse(await readFile(path.join(dir, "state/api-budget.json"), "utf8"))).toMatchObject({ mode: "subscription", spentUsd: 0 });
+    await expect(readFile(path.join(mainState, "heartbeat.json"))).rejects.toThrow();
+  });
+});
+
+describe("unidade Codex paralela", () => {
+  const unit = readFileSync(new URL("../deploy/systemd/leiprova-editorial-codex.service", import.meta.url), "utf8");
+  const envFile = readFileSync(new URL("../deploy/systemd/editorial-codex.env.example", import.meta.url), "utf8");
+  const installer = readFileSync(new URL("../deploy/install-editorial-codex.sh", import.meta.url), "utf8");
+  it("estado próprio, sem chave da API e com o mesmo worker", () => {
+    expect(unit).toContain("Environment=EDITORIAL_REALTIME_STATE_DIR=/var/lib/leiprova-codex");
+    expect(unit).toContain("StateDirectory=leiprova-codex");
+    expect(unit).toContain("Environment=EDITORIAL_API_SECRET_FILE=/nonexistent/");
+    expect(unit).toContain("ExecStart=/usr/bin/env node /opt/leiprova/deploy/editorial-realtime-worker.mjs");
+    expect(unit).not.toMatch(/leiprova-realtime\b(?!\/release\.trigger)/u);
+  });
+  it("só Autor, 2 vagas, gpt-6-luna, login e gatilho/trava compartilhados", () => {
+    const config = readConfig(Object.fromEntries(envFile.split("\n").filter((line) => /^[A-Z_]+=/.test(line))
+      .map((line) => [line.slice(0, line.indexOf("=")), line.slice(line.indexOf("=") + 1)])));
+    expect(config).toMatchObject({ executor: "codex", model: "gpt-6-luna", slots: { "Guardião": 0, Autor: 2 },
+      codexHome: "/var/lib/leiprova-codex/codex-home",
+      releaseTriggerFile: "/var/lib/leiprova-realtime/release.trigger",
+      bridgeLockFile: "/var/lib/leiprova-realtime/bridge.lock" });
+    expect(envFile).not.toMatch(/ANTHROPIC|OPENAI_API_KEY|sk-/u);
+  });
+  it("instalador não liga, não inicia e não faz login", () => {
+    const commands = installer.split("\n").filter((line) => !line.trimStart().startsWith("#")).join("\n");
+    expect(commands).not.toMatch(/codex login|editorial-realtime\.env|api-budget/u);
+    expect(installer).not.toMatch(/systemctl (enable|start|restart)(?! --now "\$UNIT" \|\| true)/u);
+  });
+  it("valida os caminhos novos", () => {
+    expect(readConfig({}).releaseTriggerFile).toBe("/var/lib/leiprova-realtime/release.trigger");
+    expect(readConfig({}).bridgeLockFile).toBe("");
+    expect(() => readConfig({ EDITORIAL_BRIDGE_LOCK_FILE: "relativo/lock" })).toThrow(/EDITORIAL_BRIDGE_LOCK_FILE/);
+    expect(() => readConfig({ EDITORIAL_RELEASE_TRIGGER_FILE: "/var/lib/../etc/x" })).toThrow(/EDITORIAL_RELEASE_TRIGGER_FILE/);
+    expect(() => readConfig({ CODEX_HOME: "/tmp/a b" })).toThrow(/CODEX_HOME/);
   });
 });
