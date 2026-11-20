@@ -71,6 +71,15 @@ projeto): nunca imprimir, registrar ou copiar. Continua proibido OpenRouter ou o
 provedor pago, e material privado (`.local/editorial`) não vai a provedores.
 Veja `docs/API-MOTOR-REALTIME-2026-11-19.md`.
 
+**PC-MA Delegado como treino histórico, decidido em 19/11/2026:** o proprietário
+autorizou reabrir `pc-ma-delegado-2026` (já liberado; prova objetiva em 01/11/2026)
+como `historical_training`. A exceção é nominal em `scripts/review-preparation-mode.ts`
+(`RELEASED_MODE_CHANGE_AUTHORIZATIONS`): vale só para esse produto, esse modo, a
+referência `owner-decision-2026-11-19:pc-ma-delegado-historical-training` e sem
+compra registrada. A trava geral (produto liberado não muda de modo) continua. A
+página informa que a prova já foi aplicada e que o material serve de treino para o
+próximo edital. Veja `docs/MODOS-DE-PREPARACAO.md`.
+
 Regras que valem sempre:
 
 - Nenhum segredo é versionado. O `.env` de produção vive só na VPS, com permissão `600`.

@@ -126,6 +126,12 @@ export function ContestLanding({
           <p className="mt-2">Edição de referência: {opportunity.institutionAcronym} · {opportunity.roleName} · {opportunity.cycleYear}
             {opportunity.officialNoticeNumber ? ` · Edital ${opportunity.officialNoticeNumber}` : ""}.
             Banca da edição de referência: {opportunity.bankName ?? "não confirmada"}.</p>
+          {preparationMode === "historical_training" && (
+            <p className="mt-2">
+              {opportunity.examDate ? `Prova já aplicada em ${formatOpportunityDate(opportunity.examDate)}.` : "Prova desta edição já aplicada."}{" "}
+              Este material serve de treino para o próximo edital; quando ele for publicado, o programa será conferido de novo.
+            </p>
+          )}
           {preparationMode === "pre_notice" && (
             <p className="mt-2">Baseado no edital anterior. Quando o novo edital for publicado, o programa será conferido e atualizado.</p>
           )}

@@ -27,6 +27,26 @@ export function parsePreparationModeArgs(argv: readonly string[]) {
   }
   return { apply, productSlug, mode };
 }
+/** Exceções nominais do proprietário para produto já liberado. Não afrouxam a regra geral:
+ * valem só para o produto, o modo e a referência listados, e só sem compra registrada. */
+export const RELEASED_MODE_CHANGE_AUTHORIZATIONS: Readonly<Record<string, { mode: "historical_training" | "pre_notice"; approvalReference: string }>> = {
+  // Decisão do proprietário de 19/11/2026: PC-MA Delegado (prova objetiva em 01/11/2026) vira treino histórico.
+  "pc-ma-delegado-2026": { mode: "historical_training", approvalReference: "owner-decision-2026-11-19:pc-ma-delegado-historical-training" },
+};
+
+/** Retorna o motivo de bloqueio para trocar o modo, ou null se a troca é permitida. */
+export function releasedModeChangeBlocker(input: {
+  productSlug: string; mode: string; status: string; approvalReference: string; purchaseCount: number;
+}): string | null {
+  if (input.status === "draft") return null;
+  const authorization = RELEASED_MODE_CHANGE_AUTHORIZATIONS[input.productSlug];
+  if (input.status !== "released" || !authorization || authorization.mode !== input.mode
+    || authorization.approvalReference !== input.approvalReference) {
+    return "Exige produto em rascunho ligado à edição oficial revisada; ofertas já vendidas não mudam de modo.";
+  }
+  if (input.purchaseCount !== 0) return "Produto liberado com compra registrada não muda de modo.";
+  return null;
+}
 class PreviewRollback extends Error {}
 
 async function main() {
@@ -46,8 +66,8 @@ async function main() {
           .where(reviewer.email ? sql`lower(${users.email}) = ${reviewer.email}` : sql`${users.role} = 'admin'`).limit(2);
         if (operators.length !== 1 || operators[0].role !== "admin") throw new Error("A decisão exige um administrador identificado.");
         await transaction.execute(sql`select public.lock_product_binding_review_product(${productSlug})`);
-        const [state] = await transaction.execute<PreparationEligibility & { status: string; editorialStatus: string; opportunityId: string }>(sql`
-          select product.status, product.opportunity_id::text as "opportunityId",
+        const [state] = await transaction.execute<PreparationEligibility & { status: string; editorialStatus: string; opportunityId: string; purchaseCount: number }>(sql`
+          select product.status, (select count(*)::int from contest_purchases purchase where purchase.product_slug = product.slug) as "purchaseCount", product.opportunity_id::text as "opportunityId",
             opportunity.editorial_status as "editorialStatus", opportunity.updated_at as "opportunityUpdatedAt",
             opportunity.lifecycle_status as "lifecycleStatus", opportunity.status_as_of::text as "statusAsOf",
             opportunity.registration_ends_at::text as "registrationEndsAt", opportunity.exam_date::text as "examDate",
@@ -55,9 +75,12 @@ async function main() {
           from contest_store_products product join contest_opportunities opportunity on opportunity.id = product.opportunity_id
           where product.slug = ${productSlug}
         `);
-        if (!state || state.status !== "draft" || state.editorialStatus !== "reviewed") {
+        if (!state || state.editorialStatus !== "reviewed") {
           throw new Error("Exige produto em rascunho ligado à edição oficial revisada; ofertas já vendidas não mudam de modo.");
         }
+        const statusBlocker = releasedModeChangeBlocker({ productSlug, mode, status: state.status,
+          approvalReference: reviewer.approvalReference, purchaseCount: state.purchaseCount });
+        if (statusBlocker) throw new Error(statusBlocker);
         const [program] = await transaction.execute<{ ready: boolean }>(sql`select exists (
           select 1 from opportunity_requirements requirement
           join opportunity_source_documents source on source.id = requirement.source_document_id
@@ -77,12 +100,13 @@ async function main() {
             preparation_approval_reference = ${reviewer.approvalReference},
             preparation_opportunity_updated_at = opportunity.updated_at, updated_at = now()
           from contest_opportunities opportunity
-          where product.slug = ${productSlug} and product.status = 'draft' and opportunity.id = product.opportunity_id`);
+          where product.slug = ${productSlug} and product.status = ${state.status} and opportunity.id = product.opportunity_id`);
         await transaction.insert(auditLogs).values({ actorUserId: operators[0].id, action: "commerce.preparation_mode.reviewed",
           entityType: "contest_store_product", entityId: productSlug, metadata: {
             preparationMode: mode, opportunityId: state.opportunityId, approvalReference: reviewer.approvalReference,
             programConfirmation: "reviewed-official-baseline", legalBasis: "current_legislation", executionSource: "server_cli",
             productReleased: false, salesFlagsChanged: false,
+            releasedProductModeChange: state.status === "released", purchaseCount: state.purchaseCount,
           },
         });
         const summary = { productSlug, preparationMode: mode, opportunityId: state.opportunityId, productsReleased: 0 };

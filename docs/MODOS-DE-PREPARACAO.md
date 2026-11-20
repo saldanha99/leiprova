@@ -33,6 +33,14 @@ A revisão registra modo, administrador, referência de aprovação e a versão 
 modo até nova conferência. Produtos já liberados não mudam de modo por esse
 comando; isso evita alterar o que foi contratado.
 
+Exceção nominal (decisão do proprietário de 19/11/2026): `pc-ma-delegado-2026`,
+liberado em 11/10/2026 e com prova objetiva aplicada em 01/11/2026, pode passar a
+`historical_training` com a referência
+`owner-decision-2026-11-19:pc-ma-delegado-historical-training`, desde que não haja
+compra registrada. A lista `RELEASED_MODE_CHANGE_AUTHORIZATIONS` só cresce por nova
+decisão explícita do proprietário, produto a produto. A auditoria registra
+`releasedProductModeChange` e `purchaseCount`.
+
 Após a decisão, a liberação comercial permanece separada: são exigidas 68 questões
 válidas por produto, vínculos aprovados ao programa exato, legislação vigente,
 citações verificáveis e prova anterior oficial aprovada ou dispensa motivada.

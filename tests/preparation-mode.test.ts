@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { preparationEligibilityBlocker, preparationModeDescriptions } from "@/lib/commerce/preparation-mode";
-import { parsePreparationModeArgs } from "../scripts/review-preparation-mode";
+import { parsePreparationModeArgs, releasedModeChangeBlocker } from "../scripts/review-preparation-mode";
 import { releaseBlockers } from "../scripts/release-contest-product";
 import { buildContestShowcase } from "@/lib/commerce/contest-showcase";
 import { CONTEST_CATALOG, catalogContestPath } from "@/lib/commerce/catalog";
@@ -57,5 +57,21 @@ describe("modos explícitos de preparação", () => {
     expect(() => parsePreparationModeArgs(args.slice(0, 2))).toThrow(/Confirme/);
     expect(() => parsePreparationModeArgs([...args, "--mode=historical_training"])).toThrow(/repetidos/);
     expect(() => parsePreparationModeArgs([args[0], "--mode=current_notice", args[2]])).toThrow(/Use/);
+  });
+});
+
+describe("exceção nominal para produto liberado", () => {
+  const pcma = { productSlug: "pc-ma-delegado-2026", mode: "historical_training", status: "released",
+    approvalReference: "owner-decision-2026-11-19:pc-ma-delegado-historical-training", purchaseCount: 0 };
+  it("permite só o PC-MA Delegado, no modo e com a referência autorizados, sem compras", () => {
+    expect(releasedModeChangeBlocker(pcma)).toBeNull();
+    expect(releasedModeChangeBlocker({ ...pcma, mode: "pre_notice" })).toMatch(/não mudam de modo/);
+    expect(releasedModeChangeBlocker({ ...pcma, approvalReference: "owner:outra" })).toMatch(/não mudam de modo/);
+    expect(releasedModeChangeBlocker({ ...pcma, purchaseCount: 1 })).toMatch(/compra registrada/);
+  });
+  it("mantém a trava para qualquer outro produto liberado", () => {
+    expect(releasedModeChangeBlocker({ ...pcma, productSlug: "pc-ma-oficial-investigador-2026" })).toMatch(/não mudam de modo/);
+    expect(releasedModeChangeBlocker({ ...pcma, status: "retired" })).toMatch(/não mudam de modo/);
+    expect(releasedModeChangeBlocker({ ...pcma, productSlug: "qualquer-rascunho", status: "draft" })).toBeNull();
   });
 });

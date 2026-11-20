@@ -247,4 +247,13 @@ describe("página premium compartilhada de concursos", () => {
       label: "Conhecer a plataforma",
     });
   });
+  it("deixa claro no treino histórico que a prova já foi aplicada e serve para o próximo edital", () => {
+    const html = renderToStaticMarkup(createElement(ContestLanding, {
+      opportunity: { ...opportunity, examDate: "2026-11-01" }, jurisdictionName: "Maranhão",
+      commerceOpen: false, contactOpen: true, preparationMode: "historical_training",
+    }));
+    expect(html).toContain("Prova já aplicada em");
+    expect(html).toContain("treino para o próximo edital");
+    expect(render()).not.toContain("Prova já aplicada em");
+  });
 });
