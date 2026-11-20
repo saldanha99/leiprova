@@ -20,8 +20,15 @@ configuração, depois do deploy aprovado.
    Pode pedir aceite de termos e dados da empresa: **só o Vinícius aceita**.
 2. Na mesma tela, conferir que o Pix ficou "Ativado" na configuração padrão.
 3. Depois do OK de deploy: definir `CHECKOUT_PAYMENT_METHODS=card,pix` no `.env` da VPS.
-4. A chave live do servidor é restrita (`rk_live_…`) e não lê métodos de pagamento;
+4. **Nome público da conta**: no Payment Element aparece "você autoriza a **2timeWeb** a
+   cobrar". Para mostrar Edital Lei Seca: Configurações → Detalhes públicos da empresa
+   (nome exibido e descritor da fatura) — decisão do Vinícius, pois a conta é da 2timeWeb.
+5. A chave live do servidor é restrita (`rk_live_…`) e não lê métodos de pagamento;
    isso não impede o checkout, só a conferência automática.
+
+Prints (modo de teste, 20/11/2026): `/data/OpenBot/Shared/leiprova/checkout-prints/`
+(desktop e celular, Pix e cartão). O Stripe.js avisou: "pix não ativado: aparece em teste
+e fica oculto em live" — confirma o item 1 acima.
 
 ## 2. Order bump (oferta extra) — configurável, desligado
 
