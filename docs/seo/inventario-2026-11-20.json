@@ -1,0 +1,35 @@
+{
+  "data": "2026-11-20",
+  "fonte": "banco de produção, somente leitura (leiprova-db), ~23h UTC",
+  "regras": "seo-estrutura-organica.md, seções 3.2 e 3.3; questões reviewed com comentário; texto próprio = enunciado + comentário + justificativas das até 5 questões públicas (D4); similaridade = Jaccard de shingles de 5 palavras entre artigos da mesma lei",
+  "artigos": {
+    "reviewed_em_versao_current": 9376,
+    "sem_questao": 8121,
+    "com_1_ou_2_questoes": 469,
+    "com_3_ou_mais_questoes": 786,
+    "com_5_ou_mais_questoes": 574,
+    "passam_250_palavras": 786,
+    "passam_similaridade_lt_0_5": 786,
+    "mediana_palavras_proprias": 882,
+    "passam_gate": 786
+  },
+  "paginas_por_tipo_que_passam": {
+    "artigo": 786,
+    "lei (>=10 artigos indexaveis)": 18,
+    "mais_cobrados (>=30 questoes na lei)": 38,
+    "tema (>=3 artigos e >=10 questoes)": 1,
+    "questoes_por_tema (>=10 questoes)": 4,
+    "banca (>=40 questoes no estilo)": 4,
+    "banca_x_lei (>=15 questoes, >=5 artigos)": 55,
+    "cargo (>=2 concursos com requisitos mapeados)": 9,
+    "alteracoes (2+ versoes com checksum diferente)": 2,
+    "concurso_existente (produtos released)": 27,
+    "hubs_e_guias (sempre)": 8
+  },
+  "total_aproximado": 952,
+  "observacoes": [
+    "13.839 de 14.189 questoes reviewed estao sem topic_id: os tipos tema/questoes por tema dependem de classificar topicos.",
+    "Ritmo da fabrica (questoes reviewed criadas): 17/11 490, 18/11 1.122, 19/11 475, 20/11 4.206.",
+    "Itens nao medidos no banco (estruturais): resposta direta >=40 palavras e >=2 itens 'cai assim' (derivados das questoes) e >=1 link de entrada fora do sumario."
+  ]
+}
