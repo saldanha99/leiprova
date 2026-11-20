@@ -22,6 +22,7 @@ import {
   getPublicOrigin,
   getStripeClient,
   hasTrustedOrigin,
+  checkoutPaymentMethodTypes,
   isContestCheckoutEnabled,
   stripeKeyExpectsLivemode,
 } from "@/lib/stripe";
@@ -278,7 +279,7 @@ export async function POST(request: NextRequest) {
         mode: "subscription",
         ui_mode: order.checkoutUiMode as "hosted" | "elements",
         customer: customerId,
-        payment_method_types: ["card"],
+        payment_method_types: checkoutPaymentMethodTypes(),
         client_reference_id: user.publicId,
         locale: "pt-BR",
         metadata,

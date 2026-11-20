@@ -19,6 +19,7 @@ import {
   isMasterCatalogCoverageReady,
 } from "@/lib/commerce/store";
 import {
+  checkoutPaymentMethodTypes,
   getPublicOrigin,
   getStripeClient,
   hasTrustedOrigin,
@@ -217,6 +218,8 @@ export async function POST(request: NextRequest) {
     const params: Stripe.Checkout.SessionCreateParams = {
       ui_mode: "elements",
       mode: "subscription",
+      // Cartão por padrão; Pix junto quando CHECKOUT_PAYMENT_METHODS=card,pix.
+      payment_method_types: checkoutPaymentMethodTypes(),
       customer: customerId,
       client_reference_id: user.publicId,
       line_items: [{ price: availability.priceId, quantity: 1 }],
