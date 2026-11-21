@@ -20,6 +20,8 @@ import {
 } from "lucide-react";
 
 import { NotebookPicker } from "@/components/materials/study-library-forms";
+import { LiteralHighlightView } from "@/components/study/literal-highlight-view";
+import type { LiteralFeedback } from "@/lib/study/literal-highlight";
 import { cn } from "@/lib/utils";
 
 type Confidence = "guess" | "almost" | "sure";
@@ -40,6 +42,7 @@ type Feedback = {
   isCorrect: boolean;
   correctOptionId: string;
   literalText: string;
+  literal?: LiteralFeedback | null;
   explanation: string;
   articleRef: string;
   officialUrl: string;
@@ -303,7 +306,7 @@ export function LiveStudySession({
               tabIndex={-1}
             >
               <div className="flex items-center gap-2"><span className={cn("grid size-8 place-items-center rounded-full", feedback.isCorrect ? "bg-emerald-300 text-slate-950" : "bg-amber-300 text-slate-950")}>{feedback.isCorrect ? <Check className="size-4" /> : <Sparkles className="size-4" />}</span><strong>{feedback.isCorrect ? "Redação recuperada" : "Compare a palavra decisiva"}</strong><span className="ml-auto text-xs font-bold text-amber-300">+{feedback.xp} XP</span></div>
-              <blockquote className="mt-4 border-l-2 border-emerald-300/40 pl-4 text-sm leading-7 text-slate-200">{feedback.literalText}</blockquote>
+              {feedback.literal ? <LiteralHighlightView literal={feedback.literal} className="mt-4" /> : <blockquote className="mt-4 border-l-2 border-emerald-300/40 pl-4 text-sm leading-7 text-slate-200">{feedback.literalText}</blockquote>}
               <p className="mt-4 text-sm leading-6 text-slate-400">{feedback.explanation}</p>
               <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-xs"><a href={feedback.officialUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 font-semibold text-emerald-300">Conferir no Planalto <ExternalLink className="size-3.5" /></a><span className="text-slate-600">revisão agendada para {new Intl.DateTimeFormat("pt-BR").format(new Date(feedback.nextReviewAt))}</span></div>
               <p className="mt-3 text-[10px] leading-4 text-slate-600">Trecho meramente informativo e não oficial; não substitui a publicação no Diário Oficial da União.</p>

@@ -1,5 +1,6 @@
 import { and, asc, eq, or, sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
+import { loadLiteralFeedback, type LiteralFeedback } from "@/lib/study/literal-feedback";
 
 import { getCurrentUser } from "@/lib/auth";
 import { approvedReleasedProductPreviousExamQuestionExists } from "@/lib/commerce/previous-exam-content";
@@ -32,6 +33,15 @@ function saoPauloDate(now: Date) {
     month: "2-digit",
     day: "2-digit",
   }).format(now);
+}
+
+/** Grifo do artigo no gabarito; uma falha aqui nunca derruba a resposta. */
+async function literalFor(questionIds: number[], selected: Map<number, string | null>) {
+  try {
+    return await loadLiteralFeedback(questionIds, selected);
+  } catch {
+    return new Map<number, LiteralFeedback>();
+  }
 }
 
 export async function POST(request: Request) {
@@ -193,6 +203,7 @@ export async function POST(request: Request) {
     const answerRows = await tx
       .select({
         position: quizSessionQuestions.position,
+        questionDbId: questions.id,
         questionId: questions.publicId,
         selectedOptionId: questionOptions.optionKey,
         correctOptionId: sql<string>`(
@@ -269,6 +280,10 @@ export async function POST(request: Request) {
   }
 
   const { answerRows } = finishState;
+  const literals = await literalFor(
+    answerRows.map((answer) => answer.questionDbId),
+    new Map(answerRows.map((answer) => [answer.questionDbId, answer.selectedOptionId])),
+  );
 
   const answers = answerRows.map((answer) => ({
     questionId: answer.questionId,
@@ -276,6 +291,7 @@ export async function POST(request: Request) {
     correctOptionId: answer.correctOptionId,
     isCorrect: answer.isCorrect ?? false,
     explanation: answer.explanation,
+    literal: literals.get(answer.questionDbId) ?? null,
     source: formatQuizQuestionSource({
       mode: answer.quizMode as "dry_law" | "previous_exam" | "original_style",
       sourceTitle: answer.sourceTitle,
