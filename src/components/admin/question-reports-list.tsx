@@ -2,7 +2,6 @@ import Link from "next/link";
 import { ChevronLeft, ChevronRight, Flag, MessageSquareText, UserRound } from "lucide-react";
 
 import { QuestionReportStatusForm } from "@/components/admin/question-report-status-form";
-import type { QuestionReportActionState } from "@/app/admin/relatos/actions";
 import type { AdminQuestionReport, AdminQuestionReportsPage } from "@/lib/db/question-reports-admin";
 import { QUESTION_REPORT_REASONS } from "@/lib/study/question-bar-contract";
 import {
@@ -148,7 +147,7 @@ function QuestionDetails({ question }: { question: AdminQuestionReport["question
   );
 }
 
-function ReportRow({ report, previewState }: { report: AdminQuestionReport; previewState?: QuestionReportActionState }) {
+function ReportRow({ report }: { report: AdminQuestionReport }) {
   const { question } = report;
   const activeCount = report.activeReportsForQuestion;
   return (
@@ -204,7 +203,7 @@ function ReportRow({ report, previewState }: { report: AdminQuestionReport; prev
           >
             {numberFormatter.format(activeCount)} {activeCount === 1 ? "relato ativo" : "relatos ativos"} nesta questão
           </span>
-          <QuestionReportStatusForm reportId={report.id} status={report.status} initialMessage={previewState} />
+          <QuestionReportStatusForm reportId={report.id} status={report.status} />
         </div>
       </div>
       <QuestionDetails question={question} />
@@ -212,16 +211,7 @@ function ReportRow({ report, previewState }: { report: AdminQuestionReport; prev
   );
 }
 
-export function QuestionReportsList({
-  data,
-  filters,
-  previewStates,
-}: {
-  data: AdminQuestionReportsPage;
-  filters: QuestionReportFilters;
-  /** Só a prévia de layout usa: mensagem inicial do formulário por relato. */
-  previewStates?: Record<number, QuestionReportActionState>;
-}) {
+export function QuestionReportsList({ data, filters }: { data: AdminQuestionReportsPage; filters: QuestionReportFilters }) {
   return (
     <section className="mt-5 space-y-4" aria-label="Relatos de questões">
       <div className="flex flex-col gap-3 rounded-[1.5rem] border border-white/8 bg-[#09131f] p-4 sm:p-5 xl:flex-row xl:items-center xl:justify-between">
@@ -230,7 +220,7 @@ export function QuestionReportsList({
       </div>
 
       {data.reports.length ? (
-        data.reports.map((report) => <ReportRow key={report.id} report={report} previewState={previewStates?.[report.id]} />)
+        data.reports.map((report) => <ReportRow key={report.id} report={report} />)
       ) : (
         <p className="rounded-2xl border border-dashed border-white/10 p-8 text-center text-sm text-slate-500">
           Nenhum relato com esses filtros.

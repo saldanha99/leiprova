@@ -15,20 +15,8 @@ import {
 
 const initialState: QuestionReportActionState = { status: "idle", message: "" };
 
-export function QuestionReportStatusForm({
-  reportId,
-  status,
-  initialMessage,
-}: {
-  reportId: number;
-  status: QuestionReportStatus;
-  /** Só para a prévia de layout; a tela real começa sem mensagem. */
-  initialMessage?: QuestionReportActionState;
-}) {
-  const [state, formAction, pending] = useActionState(
-    changeQuestionReportStatusAction,
-    initialMessage ?? initialState,
-  );
+export function QuestionReportStatusForm({ reportId, status }: { reportId: number; status: QuestionReportStatus }) {
+  const [state, formAction, pending] = useActionState(changeQuestionReportStatusAction, initialState);
   const targets = QUESTION_REPORT_TRANSITIONS[status];
 
   if (!targets.length) {
