@@ -21,7 +21,7 @@ export const QUESTION_REPORT_STATUS_LABELS: Record<QuestionReportStatus, string>
  */
 export const QUESTION_REPORT_TRANSITIONS: Record<QuestionReportStatus, readonly QuestionReportStatus[]> = {
   open: ["reviewing", "resolved", "dismissed"],
-  reviewing: ["open", "resolved", "dismissed"],
+  reviewing: ["resolved", "dismissed", "open"],
   resolved: [],
   dismissed: [],
 };
