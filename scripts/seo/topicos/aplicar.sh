@@ -33,7 +33,7 @@ python3 -I "$HERE/classificar.py" "$DIR" "$DIR/proposta.csv"
 python3 -I - "$DIR/proposta.csv" "$NIVEIS" > "$DIR/aplicar.csv" <<'PY'
 import csv, sys
 levels = set(sys.argv[2].split(","))
-w = csv.writer(sys.stdout)
+w = csv.writer(sys.stdout, lineterminator="\n")
 for r in csv.DictReader(open(sys.argv[1], encoding="utf-8")):
     if r["confianca"] in levels:
         w.writerow([r["question_id"], r["topic_id"], r["confianca"], r["origem"]])
@@ -46,7 +46,7 @@ echo "linhas a aplicar ($NIVEIS): $(wc -l < "$DIR/aplicar.csv")"
   echo "create temp table topic_proposal(question_id bigint primary key, topic_id bigint not null, confidence text not null, origin text not null);"
   printf '%s\n' "\\copy topic_proposal from stdin csv"
   cat "$DIR/aplicar.csv"
-  printf '%s\n' '\\.'
+  printf '%s\n' '\.'
   cat <<'SQL'
 with applied as (
   update questions q set topic_id = p.topic_id
