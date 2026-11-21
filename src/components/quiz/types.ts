@@ -102,6 +102,9 @@ export type QuizSessionPayload = {
 
 export type QuizAnswerMap = Record<string, string>;
 
+/** Cadernos do aluno para a barra por questão ("Caderno"). */
+export type QuizNotebookOption = { publicId: string; name: string; questionCount: number };
+
 export function isQuizConfigReady(
   config: QuizConfig,
   examEditions: readonly QuizExamEditionOption[] = [],

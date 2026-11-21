@@ -7,6 +7,7 @@ import { requireUser } from "@/lib/auth";
 import { PROTECTED_PATH_HEADER } from "@/lib/protected-path";
 import { QuizExperience } from "@/components/quiz/quiz-experience";
 import { quizConfigFromSearchParams, type QuizPresetSearchParams } from "@/components/quiz/preset-config";
+import { listQuestionNotebooks } from "@/lib/db/legal-library";
 import { listEligibleQuizExamEditions } from "@/lib/db/quiz-exam-editions";
 import { toQuizExamEditionOptions } from "@/lib/quiz/exam-edition-catalog";
 
@@ -22,8 +23,12 @@ export default async function QuizPage({
 }) {
   // O layout também exige login, mas renderiza em paralelo com a página:
   // sem esta guarda, a consulta pesada rodava para visitante sem sessão.
-  await requireUser((await headers()).get(PROTECTED_PATH_HEADER) ?? "/app");
-  const examEditions = toQuizExamEditionOptions(await listEligibleQuizExamEditions(new Date(), true));
+  const user = await requireUser((await headers()).get(PROTECTED_PATH_HEADER) ?? "/app");
+  const [editionRows, notebooks] = await Promise.all([
+    listEligibleQuizExamEditions(new Date(), true),
+    listQuestionNotebooks(user.id),
+  ]);
+  const examEditions = toQuizExamEditionOptions(editionRows);
   const initialConfig = quizConfigFromSearchParams(await searchParams, examEditions);
 
   return (
@@ -34,7 +39,11 @@ export default async function QuizPage({
         description="Escolha o cargo ou a banca, refine a matéria e treine literalidade, questões licenciadas ou itens inéditos autorais no padrão de cobrança."
         icon={ListChecks}
       />
-      <QuizExperience examEditions={examEditions} initialConfig={initialConfig} />
+      <QuizExperience
+        examEditions={examEditions}
+        initialConfig={initialConfig}
+        notebooks={notebooks.map(({ publicId, name, questionCount }) => ({ publicId, name, questionCount }))}
+      />
     </main>
   );
 }
