@@ -50,7 +50,9 @@
     "delivery:run": "NODE_PATH=./node_modules/next/dist/compiled node --conditions=react-server --import tsx --env-file-if-exists=.env scripts/run-purchase-delivery.ts",
     "db:seed": "tsx --env-file-if-exists=.env scripts/seed.ts",
     "admin:bootstrap": "tsx --env-file-if-exists=.env scripts/bootstrap-admin.ts",
-    "access:master:test": "tsx --env-file-if-exists=.env scripts/grant-owner-test-master.ts"
+    "access:master:test": "tsx --env-file-if-exists=.env scripts/grant-owner-test-master.ts",
+    "seo:wave:select": "NODE_PATH=./node_modules/next/dist/compiled node --conditions=react-server --import tsx --env-file-if-exists=.env scripts/seo/select-wave-0.ts",
+    "seo:page-state": "NODE_PATH=./node_modules/next/dist/compiled node --conditions=react-server --import tsx --env-file-if-exists=.env scripts/seo/refresh-page-state.ts"
   },
   "dependencies": {
     "@node-rs/argon2": "^2.1.0",
