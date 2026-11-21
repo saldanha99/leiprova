@@ -57,10 +57,14 @@ async function main() {
     const applied = await reviewOfficialQuestionContract(db, { ...request, mode: "apply", expectedFingerprint: preview.fingerprint });
     if (applied.contractId !== row.id) fail("Aplicação não confirmou o contrato original.");
 
-    const [evidence] = await client<{ id: string; expires_at: Date; verification_date: string }[]>`
+    const [evidence] = await client<{ id: string; expires_at: string | Date; verification_date: string }[]>`
       select id, expires_at, verification_date::text from official_question_format_evidence
       where opportunity_id = 20 and status = 'approved' order by expires_at desc limit 1`;
-    if (!evidence || evidence.expires_at.getTime() - Date.now() < MIN_REMAINING_MS) fail("Evidência aprovada não vale por mais 24 h.");
+    // O driver pode devolver timestamptz como texto (prepare:false): normaliza antes de comparar.
+    const expiresAt = evidence ? new Date(evidence.expires_at) : null;
+    if (!evidence || !expiresAt || Number.isNaN(expiresAt.getTime()) || expiresAt.getTime() - Date.now() < MIN_REMAINING_MS) {
+      fail("Evidência aprovada não vale por mais 24 h.");
+    }
 
     const [eligible] = await db.execute<{ count: number }>(sql`
       select count(distinct binding.question_id)::int as count from contest_product_question_bindings binding
@@ -70,7 +74,7 @@ async function main() {
 
     console.log(JSON.stringify({
       ok: true, contractId: row.id, previousEvidenceId: previousEvidence?.evidenceId ?? null, evidenceId: evidence.id,
-      verificationDate: evidence.verification_date, expiresAt: evidence.expires_at.toISOString(),
+      verificationDate: evidence.verification_date, expiresAt: expiresAt?.toISOString(),
       validQuestions: eligible.count, product: PRODUCT_SLUG,
     }));
   } finally {
