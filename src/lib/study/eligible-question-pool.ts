@@ -12,11 +12,11 @@ import { authorialStudyRightsConditions } from "@/lib/study/question-rights";
  * direitos autorais conferidos, artigo revisado de versão vigente e lei ativa.
  * Em 21/11/2026 o filtro de direitos sobre o acervo inteiro levava 23,6 s (EXPLAIN
  * ANALYZE em produção) e /api/study/session chegava a 26 s, rente ao limite de 30 s.
- * O conjunto fica 5 min em memória (servido enquanto recalcula, aquecido na partida);
+ * O conjunto fica 15 min em memória (servido enquanto recalcula, aquecido na partida);
  * a rota reconfere o filtro completo nas candidatas antes de entregar, então uma
  * questão que deixou de valer nesse intervalo nunca chega ao aluno.
  */
-export const STUDY_POOL_CACHE_TTL_MS = 5 * 60_000;
+export const STUDY_POOL_CACHE_TTL_MS = 15 * 60_000;
 /** Acima disso a lista de ids vira parâmetros demais para uma consulta: volta ao filtro direto. */
 export const STUDY_POOL_MAX_IDS = 50_000;
 

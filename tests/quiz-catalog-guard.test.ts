@@ -18,7 +18,7 @@ describe("quiz e simulados: login antes da consulta pesada", () => {
   it("as duas listas rodam com limite próprio e cache curto", () => {
     const source = page("src/lib/db/quiz-exam-editions.ts");
     expect(source).toContain("set local statement_timeout");
-    expect(source).toContain("QUIZ_CATALOG_CACHE_TTL_MS = 5 * 60_000");
+    expect(source).toContain("QUIZ_CATALOG_CACHE_TTL_MS = 15 * 60_000");
     expect(source).toContain("staleWhileRevalidate(loadOriginalStyleSimulationCoverage");
     expect(source).toContain("__leiprovaQuizCatalog");
     expect(page("src/instrumentation.ts")).toContain("warmQuizCatalogCaches");
