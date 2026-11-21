@@ -4,6 +4,7 @@ import { parseOfficialOpportunitySourceUrl } from "@/lib/opportunities/source-mo
 import { discoveryPathBlocked } from "./discovery-policy";
 import { isVerifiedCourseDiscoveryUrl } from "./course-discovery-sources";
 import { officialQuestionContractSchema, questionContractFingerprint, validateQuestionAgainstContract } from "./official-question-contract";
+import { findInternalReference } from "./student-facing-text";
 
 export const AGENT_WORK_VERSION = "editalume-agents-v1";
 // A resposta só é recolhida na rodada seguinte da rotina (20 min) e a rotina não
@@ -117,6 +118,14 @@ export function validateAgentWorkResult(kind: AgentWorkKind, payload: AgentWorkP
     if (Date.parse(discovery.observedAt) > Date.now() + 300_000) throw new AgentWorkContractError("Observação no futuro.");
   }
   for (const question of result.questions) {
+    // Texto que o aluno lê: nada de id de artigo, versão ou "corpus" do motor.
+    const leaked = [question.prompt, question.explanation, ...question.options.flatMap(option => [option.text, option.rationale])]
+      .map(findInternalReference).find(Boolean);
+    if (leaked) {
+      throw new AgentWorkContractError(
+        "Texto para o aluno com referência interna do motor (id de artigo, versão ou corpus). Cite a lei e o artigo pelo nome, ex.: \"art. 5º, LXIX, da Constituição Federal\".",
+      );
+    }
     const scoped = payload.questionContract;
     if (!scoped || payload.questionContractId !== questionContractFingerprint(scoped) ||
       scoped.opportunityId !== payload.opportunityId || scoped.roleName !== payload.role ||

@@ -1,6 +1,7 @@
 import { and, asc, eq, or, sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { loadLiteralFeedback, type LiteralFeedback } from "@/lib/study/literal-feedback";
+import { cleanStudentFacingText } from "@/lib/editorial/student-facing-text";
 
 import { getCurrentUser } from "@/lib/auth";
 import { approvedReleasedProductPreviousExamQuestionExists } from "@/lib/commerce/previous-exam-content";
@@ -220,6 +221,7 @@ export async function POST(request: Request) {
         sourceTitle: questions.sourceTitle,
         sourceUrl: questions.sourceUrl,
         legalActTitle: legalActs.shortTitle,
+        articleRef: legalArticles.articleRef,
         officialLegalUrl: legalActs.officialUrl,
         styleBankName: quizBanks.name,
       })
@@ -280,6 +282,10 @@ export async function POST(request: Request) {
   }
 
   const { answerRows } = finishState;
+  // Comentário sem referência interna do motor (ex.: "artigo 6008, versão 65"); o banco não muda.
+  for (const row of answerRows) {
+    row.explanation = cleanStudentFacingText(row.explanation, { articleRef: row.articleRef, actTitle: row.legalActTitle });
+  }
   const literals = await literalFor(
     answerRows.map((answer) => answer.questionDbId),
     new Map(answerRows.map((answer) => [answer.questionDbId, answer.selectedOptionId])),
