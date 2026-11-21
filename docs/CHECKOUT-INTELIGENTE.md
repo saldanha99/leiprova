@@ -102,6 +102,11 @@ Assunto: Seu acesso ao {CONCURSO} ficou a um passo
 | `STAPE_SERVER_EVENTS_URL` | Endpoint do Data Client do Stape para o Purchase server-side (CAPI). |
 | `CHECKOUT_PAYMENT_METHODS` | `card` (padrão) ou `card,pix`. |
 
+Para ligar o GTM/Stape depois: as duas `NEXT_PUBLIC_*` entram no build (CSP do
+`next.config.ts`), então precisam virar `ARG`/`ENV` no `Dockerfile` e o app precisa de
+novo build; `STAPE_SERVER_EVENTS_URL` precisa entrar no `environment` do serviço `app`
+no `docker-compose.yml`. `CHECKOUT_PAYMENT_METHODS` já está no compose (21/11/2026).
+
 No GTM/Stape (Vinícius): tags de Pixel e CAPI lendo `event_id` do dataLayer/evento,
 para a deduplicação da Meta.
 
