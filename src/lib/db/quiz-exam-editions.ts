@@ -30,10 +30,10 @@ import {
  * 38,3 s e 20,2 s, acima do statement_timeout de 30 s do banco: /app/quiz e
  * /app/simulados davam erro. A regra não muda: a mesma consulta roda numa
  * transação com limite próprio e o resultado (igual para todos os alunos) fica
- * 5 min em memória, servido enquanto recalcula. O cache é aquecido na partida
+ * 15 min em memória (21/11: 5 → 15 min, menos carga no banco), servido enquanto recalcula. O cache é aquecido na partida
  * (src/instrumentation.ts). A sessão de quiz revalida cada questão ao montar.
  */
-export const QUIZ_CATALOG_CACHE_TTL_MS = 5 * 60_000;
+export const QUIZ_CATALOG_CACHE_TTL_MS = 15 * 60_000;
 const QUIZ_CATALOG_STATEMENT_TIMEOUT = sql.raw(`'120s'`);
 
 async function withCatalogTimeout<T>(run: (db: ReturnType<typeof getDb>) => Promise<T>): Promise<T> {
