@@ -33,5 +33,5 @@ vínculo/certificação pelo mesmo procedimento (o gerador aceita a entrada inve
 - Resultado: 3.667 campos (0 pulados), 2.861 audit_logs, 2.677 vínculos e 2.402 certificações regravados.
 - Conferência: em dia antes = depois; vínculos e certificações aprovados dessincronizados 0 → 0 no banco todo;
   updated_at das 4.496 sem mudança (mesmo md5); elegíveis por produto iguais (27 produtos, 11.414).
-- Fora da gravação: 11 questões novas com jargão, geradas antes da trava (ids 19148, 19150, 19156–19159,
+- Fora da gravação: 11 questões novas com jargão, geradas antes da trava (7 com 11 campos que a regra corrige; ids 19148, 19150, 19156–19159,
   19161, 19162, 19171, 19172, 19196). Ficam para um próximo OK.
