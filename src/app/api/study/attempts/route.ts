@@ -1,6 +1,7 @@
 import { and, eq, sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { loadLiteralFeedback, type LiteralFeedback } from "@/lib/study/literal-feedback";
 
 import { getCurrentUser } from "@/lib/auth";
 import { getDb } from "@/lib/db/client";
@@ -34,6 +35,15 @@ function saoPauloDate() {
     month: "2-digit",
     day: "2-digit",
   }).format(new Date());
+}
+
+/** Grifo do artigo no gabarito; uma falha aqui nunca derruba a resposta. */
+async function literalFor(questionIds: number[], selected: Map<number, string | null>) {
+  try {
+    return await loadLiteralFeedback(questionIds, selected);
+  } catch {
+    return new Map<number, LiteralFeedback>();
+  }
 }
 
 export async function POST(request: Request) {
@@ -172,7 +182,11 @@ export async function POST(request: Request) {
     return nextReview;
   });
 
+  const literal = (
+    await literalFor([selected.questionDbId], new Map([[selected.questionDbId, parsed.data.optionId]]))
+  ).get(selected.questionDbId) ?? null;
   return NextResponse.json({
+    literal,
     isCorrect: selected.isCorrect,
     correctOptionId: correctOption?.optionId,
     literalText: selected.literalText,

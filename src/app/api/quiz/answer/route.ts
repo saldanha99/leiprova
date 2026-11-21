@@ -1,5 +1,6 @@
 import { and, eq, inArray, or, sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
+import { loadLiteralFeedback, type LiteralFeedback } from "@/lib/study/literal-feedback";
 
 import { getCurrentUser } from "@/lib/auth";
 import { approvedReleasedProductPreviousExamQuestionExists } from "@/lib/commerce/previous-exam-content";
@@ -48,9 +49,19 @@ type AnswerContext = {
   correctOptionId: string;
 };
 
-function correctionResponse(context: AnswerContext, isCorrect: boolean) {
+/** Grifo do artigo no gabarito; uma falha aqui nunca derruba a resposta. */
+async function literalFor(questionIds: number[], selected: Map<number, string | null>) {
+  try {
+    return await loadLiteralFeedback(questionIds, selected);
+  } catch {
+    return new Map<number, LiteralFeedback>();
+  }
+}
+
+function correctionResponse(context: AnswerContext, isCorrect: boolean, literal: LiteralFeedback | null = null) {
   return {
     isCorrect,
+    literal,
     correctOptionId: context.correctOptionId,
     explanation: context.explanation,
     source: formatQuizQuestionSource({
@@ -319,7 +330,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ accepted: true }, { headers: { "Cache-Control": "no-store" } });
   }
 
-  return NextResponse.json(correctionResponse(context, acceptedIsCorrect), {
+  const literal = (
+    await literalFor([context.questionDbId], new Map([[context.questionDbId, parsed.data.optionId]]))
+  ).get(context.questionDbId) ?? null;
+  return NextResponse.json(correctionResponse(context, acceptedIsCorrect, literal), {
     headers: { "Cache-Control": "no-store" },
   });
 }

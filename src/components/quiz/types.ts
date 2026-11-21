@@ -1,3 +1,5 @@
+import type { LiteralFeedback } from "@/lib/study/literal-highlight";
+
 import {
   getCareerBySlug,
   getSubjectsForCareer,
@@ -38,6 +40,7 @@ export type QuizSource = QuizQuestionSource;
 export type QuizQuestion = QuizSessionQuestion;
 
 export type QuizTrainingFeedback = {
+  literal?: LiteralFeedback | null;
   isCorrect: boolean;
   correctOptionId: string;
   explanation: string;
@@ -45,6 +48,7 @@ export type QuizTrainingFeedback = {
 };
 
 export type QuizFinishAnswer = {
+  literal?: LiteralFeedback | null;
   questionId: string;
   selectedOptionId: string | null;
   correctOptionId: string;
