@@ -51,7 +51,7 @@ describe("prioridade da fila dos agentes", () => {
     expect(claim.sql).not.toContain("from question_opportunities link");
     expect(claim.sql).not.toContain("question.editorial_status <> 'suspended'");
     // O requisito sai da chave da tarefa; o payload (artigos candidatos) não é lido.
-    expect(claim.sql).toContain("work.job_key ~ '^(mapping|author):[0-9]{1,18}$' then split_part(work.job_key, ':', 2)::bigint");
+    expect(claim.sql).toContain("work.job_key ~ '^(mapping|author):[0-9]{1,18}$' or work.job_key ~ '^author-thin:[0-9]{1,18}:[0-9]{1,18}$'\n    then split_part(work.job_key, ':', 2)::bigint");
     expect(claim.sql).not.toContain("payload->>'opportunityId'");
     expect(claim.sql).not.toContain("payload->>'requirementId'");
     // Pendências de outro papel não deixam o agente ocioso.
@@ -85,6 +85,23 @@ describe("prioridade da fila dos agentes", () => {
     expect(order).toContain("when 'legal_change' then 0 when 'authoring' then 1 when 'discovery' then 2 else 3 end");
     expect(order).toMatch(/coalesce\(mapping_readiness.has_current_contract, false\)[\s\S]+requirement\.subject_id is not null then 0 else 1 end,\s+tier\.tier nulls first,[\s\S]+tier\.upcoming_exam nulls last/u);
     expect(order).toContain("for update of work skip locked limit 1");
+  });
+
+  it("na autoria, serve primeiro requisitos que tocam artigos com 1 ou 2 questões, só na ordenação", async () => {
+    const { db, queries } = fakeDatabase();
+    await claimAgentWork(db, new Date(), "Autor");
+    const claim = new PgDialect().sqlToQuery(queries[2]);
+    expect(claim.sql).toContain("thin_article as materialized (");
+    expect(claim.sql).toContain("having count(*) between 1 and 2");
+    const order = claim.sql.slice(claim.sql.indexOf("order by"));
+    // Depois da regra das tarefas de artigo fino (author-thin:, ver thin-article-authoring.test.ts).
+    expect(order).toMatch(/else 3 end,\s+case when work\.job_key like 'author-thin:%' then 1 else 0 end,[\s\S]+?nulls first,\s+case when work\.kind='authoring' and exists \(select 1[\s\S]+?then 0 else 1 end,\s+tier\.tier nulls first/u);
+    const selection = claim.sql.slice(claim.sql.indexOf("where work.status='pending'"), claim.sql.indexOf("order by"));
+    expect(selection).not.toContain("thin_article");
+
+    const guardian = fakeDatabase();
+    await claimAgentWork(guardian.db, new Date(), "Guardião");
+    expect(new PgDialect().sqlToQuery(guardian.queries[2]).sql).not.toContain("thin_article");
   });
 
   it("restringe tipos do papel sem ampliá-los", async () => {
