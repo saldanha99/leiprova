@@ -177,6 +177,10 @@ describe("grifo do texto literal no gabarito", () => {
       { kind: "paragraph", value: "UNICO" },
       { kind: "caput" },
     ]);
+    expect(parseLegalReferences("art. 109, inciso V-A e § 5º", "109")).toEqual([
+      { kind: "inciso", value: "V-A", paragraph: null },
+      { kind: "paragraph", value: "5" },
+    ]);
     expect(parseLegalReferences("Estão corretas I, II e III.", "5")).toEqual([]);
     expect(parseLegalReferences("art. 7º, II", "5")).toEqual([]);
   });

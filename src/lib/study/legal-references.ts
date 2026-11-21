@@ -21,7 +21,8 @@ type Chain = {
 };
 
 // Fronteira por letra Unicode: com `\b`, o "C" de "Código" contaria como numeral.
-const ROMAN = String.raw`(?<![\p{L}\p{N}])[IVXLC]+(?![\p{L}\p{N}])`;
+// Inciso acrescido por emenda: "V-A".
+const ROMAN = String.raw`(?<![\p{L}\p{N}])[IVXLC]+(?:\s*-\s*[A-Z])?(?![\p{L}\p{N}])`;
 const ROMAN_LIST = String.raw`${ROMAN}(?:\s*(?:,|\be\b|\bou\b)\s*${ROMAN})*`;
 const ORDINAL = String.raw`\d+\s*[º°o]?(?:\s*-\s*[A-Z](?![\p{L}]))?`;
 // Na continuação de uma lista de alíneas, "a" e "o" são artigos da frase ("alínea b e a lei").
@@ -49,7 +50,9 @@ function isConnector(gap: string) {
 const VALID_ROMAN = /^(?:C|XC|XL|L?X{0,3})(?:IX|IV|V?I{0,3})$/u;
 
 function romans(text: string) {
-  return [...text.matchAll(new RegExp(ROMAN, "gu"))].map((m) => m[0]).filter((r) => VALID_ROMAN.test(r));
+  return [...text.matchAll(new RegExp(ROMAN, "gu"))]
+    .map((m) => m[0].replace(/\s/gu, ""))
+    .filter((r) => VALID_ROMAN.test(r.split("-")[0]));
 }
 
 export function normalizeOrdinal(text: string) {
@@ -162,9 +165,9 @@ export function labelUnits(texts: string[]): UnitLabel[] {
       inciso = null;
       return { kind: "paragraph", value: paragraph, paragraph, inciso: null };
     }
-    const incisoMatch = /^([IVXLC]+)\s*[-–—]/u.exec(text);
+    const incisoMatch = /^([IVXLC]+)(?:\s*-\s*([A-Z])(?![\p{L}]))?\s*[-–—]/u.exec(text);
     if (incisoMatch && VALID_ROMAN.test(incisoMatch[1])) {
-      inciso = incisoMatch[1];
+      inciso = incisoMatch[2] ? `${incisoMatch[1]}-${incisoMatch[2]}` : incisoMatch[1];
       return { kind: "inciso", value: inciso, paragraph, inciso };
     }
     const alineaMatch = /^([a-z])\)/u.exec(text);
