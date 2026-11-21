@@ -23,6 +23,7 @@ import {
 
 import { normalizeQuizDurationMs } from "@/lib/quiz/response";
 import { LiteralHighlightView } from "@/components/study/literal-highlight-view";
+import { QuestionActionBar } from "@/components/study/question-action-bar";
 import { cn } from "@/lib/utils";
 
 import type {
@@ -30,6 +31,7 @@ import type {
   QuizConfig,
   QuizFinishAnswer,
   QuizFinishPayload,
+  QuizNotebookOption,
   QuizQuestion,
   QuizSessionPayload,
   QuizTrainingFeedback,
@@ -41,9 +43,10 @@ type QuizSessionProps = {
   onBackToBuilder: () => void;
   onRestart: () => void;
   onSwitchMode: (mode: "dry_law" | "original_style") => void;
+  notebooks?: QuizNotebookOption[];
 };
 
-export function QuizSession({ config, payload, onBackToBuilder, onRestart, onSwitchMode }: QuizSessionProps) {
+export function QuizSession({ config, payload, onBackToBuilder, onRestart, onSwitchMode, notebooks = [] }: QuizSessionProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<QuizAnswerMap>({});
   const [trainingFeedback, setTrainingFeedback] = useState<Record<string, QuizTrainingFeedback>>({});
@@ -119,6 +122,7 @@ export function QuizSession({ config, payload, onBackToBuilder, onRestart, onSwi
       <QuizResult
         config={config}
         finishReason={finishReason}
+        notebooks={notebooks}
         onBackToBuilder={onBackToBuilder}
         onRestart={onRestart}
         questions={questions}
@@ -249,6 +253,7 @@ export function QuizSession({ config, payload, onBackToBuilder, onRestart, onSwi
 
           {error && <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-rose-300/15 bg-rose-300/6 px-4 py-3" role="alert"><p className="text-xs leading-5 text-rose-200">{error}</p>{timeExpired && <button className="text-xs font-bold text-rose-100 underline underline-offset-4" onClick={() => void finishSession("time")} type="button">Tentar concluir</button>}</div>}
           {showFeedback && feedback && <QuestionFeedback feedback={feedback} question={currentQuestion} selectedOptionId={selectedOptionId} feedbackRef={feedbackRef} />}
+          {showFeedback && feedback && <QuestionActionBar key={currentQuestion.id} notebooks={notebooks} optionLabels={optionLabels(currentQuestion)} questionPublicId={currentQuestion.id} />}
 
           {config.experience === "training" ? (
             showFeedback ? <button className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-amber-400 px-5 text-sm font-bold text-slate-950 transition hover:bg-amber-300 disabled:opacity-40" disabled={finishing} onClick={nextTrainingQuestion} type="button">{finishing ? <><LoaderCircle className="size-4 animate-spin" />Concluindo…</> : <>{currentIndex === questions.length - 1 ? "Ver resultado" : "Próxima questão"}<ArrowRight className="size-4" /></>}</button> : <button className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-amber-400 px-5 text-sm font-bold text-slate-950 transition hover:bg-amber-300 disabled:cursor-not-allowed disabled:opacity-35" disabled={!selectedOptionId || savingAnswer || timeExpired} onClick={(event) => void confirmTrainingAnswer(event.timeStamp)} type="button">{savingAnswer ? <><LoaderCircle className="size-4 animate-spin" />Corrigindo…</> : <>Confirmar resposta <ArrowRight className="size-4" /></>}</button>
@@ -287,23 +292,23 @@ function QuestionNavigator({ answers, currentIndex, questions, onSelect }: { ans
   return <nav aria-label="Navegação entre questões" className="mt-5 border-t border-white/8 pt-4"><p className="text-[10px] font-bold uppercase tracking-[.13em] text-slate-600">Mapa da prova</p><div className="mt-3 flex flex-wrap gap-2">{questions.map((question, index) => <button key={question.id} aria-current={currentIndex === index ? "step" : undefined} aria-label={`Questão ${index + 1}${answers[question.id] ? ", respondida" : ", em branco"}`} className={cn("grid size-9 place-items-center rounded-lg border text-xs font-bold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300", currentIndex === index ? "border-amber-300 bg-amber-300 text-slate-950" : answers[question.id] ? "border-emerald-300/30 bg-emerald-300/8 text-emerald-200" : "border-white/8 bg-black/15 text-slate-600 hover:border-white/20")} onClick={() => onSelect(index)} type="button">{index + 1}</button>)}</div></nav>;
 }
 
-function QuizResult({ config, finishReason, onBackToBuilder, onRestart, questions, result }: { config: QuizConfig; finishReason: "submitted" | "time"; onBackToBuilder: () => void; onRestart: () => void; questions: QuizQuestion[]; result: QuizFinishPayload }) {
+function QuizResult({ config, finishReason, notebooks, onBackToBuilder, onRestart, questions, result }: { config: QuizConfig; finishReason: "submitted" | "time"; notebooks: QuizNotebookOption[]; onBackToBuilder: () => void; onRestart: () => void; questions: QuizQuestion[]; result: QuizFinishPayload }) {
   const answerMap = new Map(result.answers.map((answer) => [answer.questionId, answer]));
   return (
     <div className="mt-8">
       <section className="overflow-hidden rounded-[2rem] border border-emerald-300/15 bg-[linear-gradient(145deg,#0c1925,#0b1b1b)] shadow-2xl"><div className="p-6 text-center sm:p-10"><span className="mx-auto grid size-16 place-items-center rounded-2xl bg-amber-300/12 text-amber-300"><Medal className="size-8" /></span><p className="mt-6 text-xs font-bold uppercase tracking-[.18em] text-emerald-300">{finishReason === "time" ? "Tempo encerrado" : config.experience === "exam" ? "Prova entregue" : "Treino concluído"}</p><h2 className="mt-2 text-3xl font-semibold tracking-[-.04em] sm:text-4xl">{result.result.correct} de {result.result.total} acertos</h2><p className="mx-auto mt-3 max-w-lg text-sm leading-6 text-slate-400">Agora o gabarito, a explicação editorial e a fonte de cada item estão liberados para revisão.</p><div className="mx-auto mt-7 grid max-w-2xl gap-3 sm:grid-cols-3"><ResultMetric icon={Target} label="Aproveitamento" value={`${result.result.scorePercent}%`} accent="emerald" /><ResultMetric icon={CheckCircle2} label="Respondidas" value={`${result.result.answered}/${result.result.total}`} accent="sky" /><ResultMetric icon={Clock3} label="Ritmo" value={config.timed ? "Cronometrado" : "Tempo livre"} accent="amber" /></div><div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row"><button className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-amber-400 px-5 text-sm font-bold text-slate-950 transition hover:bg-amber-300" onClick={onRestart} type="button"><RotateCcw className="size-4" />Refazer este recorte</button><button className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-white/10 px-5 text-sm font-semibold text-white transition hover:border-white/20" onClick={onBackToBuilder} type="button">Montar outro quiz <ArrowRight className="size-4" /></button></div></div></section>
-      <section className="mt-5 rounded-[1.75rem] border border-white/8 bg-[#09131f] p-4 sm:p-6"><div className="flex items-center justify-between gap-3"><div><p className="text-xs font-bold uppercase tracking-[.15em] text-emerald-300">Gabarito comentado</p><h2 className="mt-1 text-xl font-semibold">Revise questão por questão</h2></div><FileQuestion className="size-6 text-amber-300" /></div><div className="mt-5 grid gap-3">{questions.map((question, index) => <ResultQuestion key={question.id} answer={answerMap.get(question.id)} index={index} question={question} />)}</div></section>
+      <section className="mt-5 rounded-[1.75rem] border border-white/8 bg-[#09131f] p-4 sm:p-6"><div className="flex items-center justify-between gap-3"><div><p className="text-xs font-bold uppercase tracking-[.15em] text-emerald-300">Gabarito comentado</p><h2 className="mt-1 text-xl font-semibold">Revise questão por questão</h2></div><FileQuestion className="size-6 text-amber-300" /></div><div className="mt-5 grid gap-3">{questions.map((question, index) => <ResultQuestion key={question.id} answer={answerMap.get(question.id)} index={index} notebooks={notebooks} question={question} />)}</div></section>
     </div>
   );
 }
 
-function ResultQuestion({ answer, index, question }: { answer?: QuizFinishAnswer; index: number; question: QuizQuestion }) {
+function ResultQuestion({ answer, index, notebooks, question }: { answer?: QuizFinishAnswer; index: number; notebooks: QuizNotebookOption[]; question: QuizQuestion }) {
   const selectedOption = question.options.find((option) => option.id === answer?.selectedOptionId);
   const correctOption = question.options.find((option) => option.id === answer?.correctOptionId);
   const sourceUrl = safeSourceUrl(answer?.source.url);
   const correct = Boolean(answer?.isCorrect);
   return (
-    <details className="group min-w-0 [overflow-wrap:anywhere] rounded-2xl border border-white/8 bg-slate-950/25 open:border-white/14"><summary className="flex min-h-16 cursor-pointer list-none items-center gap-3 p-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300"><span className={cn("grid size-9 shrink-0 place-items-center rounded-full", correct ? "bg-emerald-300 text-slate-950" : "bg-rose-300/12 text-rose-200")}>{correct ? <Check className="size-4" /> : <X className="size-4" />}</span><span className="min-w-0 flex-1"><strong className="block text-xs text-slate-200">Questão {index + 1} · {correct ? "Correta" : answer?.selectedOptionId ? "Incorreta" : "Em branco"}</strong><span className="mt-1 block truncate text-[11px] text-slate-600">{question.prompt}</span></span><span className="shrink-0 text-xs font-bold text-slate-600 group-open:text-amber-300">Ver análise</span></summary><div className="border-t border-white/8 p-4 sm:p-5"><p className="text-sm font-semibold leading-6 text-slate-200">{question.prompt}</p><div className="mt-4 grid gap-2 text-xs leading-5"><p className={cn("rounded-xl border p-3", correct ? "border-emerald-300/15 bg-emerald-300/5 text-emerald-100" : "border-rose-300/15 bg-rose-300/5 text-rose-100")}>Sua resposta: {selectedOption?.text ?? "Em branco"}</p><p className="rounded-xl border border-emerald-300/15 bg-emerald-300/5 p-3 text-emerald-100">Gabarito: {correctOption?.text ?? "Gabarito editorial indisponível"}</p></div>{answer?.literal && <LiteralHighlightView literal={answer.literal} className="mt-4" />}{answer?.explanation && <p className="mt-4 text-sm leading-6 text-slate-400">{answer.explanation}</p>}<div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-white/8 pt-4 text-xs"><span className="text-slate-600">Fonte: {answer?.source.label ?? "Fonte editorial indisponível"}</span>{sourceUrl && <a href={sourceUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 font-semibold text-emerald-300">Abrir fonte <ExternalLink className="size-3.5" /></a>}</div>{answer?.source.kind === "official_law" && <p className="mt-3 text-[10px] leading-4 text-slate-600">Trecho meramente informativo e não oficial; não substitui a publicação no diário oficial.</p>}</div></details>
+    <details className="group min-w-0 [overflow-wrap:anywhere] rounded-2xl border border-white/8 bg-slate-950/25 open:border-white/14"><summary className="flex min-h-16 cursor-pointer list-none items-center gap-3 p-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300"><span className={cn("grid size-9 shrink-0 place-items-center rounded-full", correct ? "bg-emerald-300 text-slate-950" : "bg-rose-300/12 text-rose-200")}>{correct ? <Check className="size-4" /> : <X className="size-4" />}</span><span className="min-w-0 flex-1"><strong className="block text-xs text-slate-200">Questão {index + 1} · {correct ? "Correta" : answer?.selectedOptionId ? "Incorreta" : "Em branco"}</strong><span className="mt-1 block truncate text-[11px] text-slate-600">{question.prompt}</span></span><span className="shrink-0 text-xs font-bold text-slate-600 group-open:text-amber-300">Ver análise</span></summary><div className="border-t border-white/8 p-4 sm:p-5"><p className="text-sm font-semibold leading-6 text-slate-200">{question.prompt}</p><div className="mt-4 grid gap-2 text-xs leading-5"><p className={cn("rounded-xl border p-3", correct ? "border-emerald-300/15 bg-emerald-300/5 text-emerald-100" : "border-rose-300/15 bg-rose-300/5 text-rose-100")}>Sua resposta: {selectedOption?.text ?? "Em branco"}</p><p className="rounded-xl border border-emerald-300/15 bg-emerald-300/5 p-3 text-emerald-100">Gabarito: {correctOption?.text ?? "Gabarito editorial indisponível"}</p></div>{answer?.literal && <LiteralHighlightView literal={answer.literal} className="mt-4" />}{answer?.explanation && <p className="mt-4 text-sm leading-6 text-slate-400">{answer.explanation}</p>}<div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-white/8 pt-4 text-xs"><span className="text-slate-600">Fonte: {answer?.source.label ?? "Fonte editorial indisponível"}</span>{sourceUrl && <a href={sourceUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 font-semibold text-emerald-300">Abrir fonte <ExternalLink className="size-3.5" /></a>}</div>{answer?.source.kind === "official_law" && <p className="mt-3 text-[10px] leading-4 text-slate-600">Trecho meramente informativo e não oficial; não substitui a publicação no diário oficial.</p>}<QuestionActionBar className="mt-4" notebooks={notebooks} optionLabels={optionLabels(question)} questionPublicId={question.id} /></div></details>
   );
 }
 
@@ -332,6 +337,7 @@ function SessionTag({ children, accent = false }: { children?: string; accent?: 
 function Timer({ seconds }: { seconds: number }) { const urgent = seconds <= 60; return <span aria-label={`${formatClock(seconds)} restantes`} className={cn("inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 font-mono text-[10px] font-bold", urgent ? "border-rose-300/25 bg-rose-300/8 text-rose-200" : "border-amber-300/15 bg-amber-300/7 text-amber-200")} role="timer"><Clock3 className="size-3" />{formatClock(seconds)}</span>; }
 function selectionLabel(value: unknown): string | undefined { if (typeof value === "string") return value; if (!value || typeof value !== "object") return undefined; const record = value as Record<string, unknown>; for (const key of ["name", "label", "title", "shortName"]) if (typeof record[key] === "string") return record[key]; return undefined; }
 function safeSourceUrl(value?: string | null) { if (!value) return undefined; try { const url = new URL(value); return url.protocol === "https:" || url.protocol === "http:" ? url.toString() : undefined; } catch { return undefined; } }
+function optionLabels(question: QuizQuestion) { return Object.fromEntries(question.options.map((option, index) => [option.id, optionLetter(index)])); }
 function optionLetter(index: number) { return index >= 0 && index < 26 ? String.fromCharCode(65 + index) : "—"; }
 function formatClock(seconds: number) { const minutes = Math.floor(seconds / 60); return `${String(minutes).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`; }
 function restoreAnswer(current: QuizAnswerMap, questionId: string, attemptedOptionId: string, previousOptionId?: string) { if (current[questionId] !== attemptedOptionId) return current; const next = { ...current }; if (previousOptionId) next[questionId] = previousOptionId; else delete next[questionId]; return next; }

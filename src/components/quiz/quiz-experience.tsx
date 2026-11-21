@@ -4,15 +4,17 @@ import { useState } from "react";
 
 import { QuizBuilder } from "./quiz-builder";
 import { QuizSession } from "./quiz-session";
-import { isQuizConfigReady, type QuizConfig, type QuizSessionPayload } from "./types";
+import { isQuizConfigReady, type QuizConfig, type QuizNotebookOption, type QuizSessionPayload } from "./types";
 import type { QuizExamEditionOption } from "@/lib/quiz/exam-edition-catalog";
 
 export function QuizExperience({
   examEditions,
   initialConfig,
+  notebooks = [],
 }: {
   examEditions: readonly QuizExamEditionOption[];
   initialConfig: QuizConfig;
+  notebooks?: QuizNotebookOption[];
 }) {
   const [config, setConfig] = useState<QuizConfig>(initialConfig);
   const [session, setSession] = useState<QuizSessionPayload | null>(null);
@@ -83,6 +85,7 @@ export function QuizExperience({
       <QuizSession
         config={activeConfig}
         key={session.sessionId}
+        notebooks={notebooks}
         onBackToBuilder={backToBuilder}
         onRestart={() => void requestSession(activeConfig)}
         onSwitchMode={switchMode}

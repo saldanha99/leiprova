@@ -28,6 +28,9 @@ export const RATE_LIMIT_POLICIES = {
   studyAttemptUserMinute: { scope: "study_attempt_user_minute", limit: 60, windowSeconds: 60 },
   studyAttemptUserDay: { scope: "study_attempt_user_day", limit: 1_000, windowSeconds: 24 * 60 * 60 },
   studyAttemptIpMinute: { scope: "study_attempt_ip_minute", limit: 120, windowSeconds: 60 },
+  questionBarUserMinute: { scope: "question_bar_user_minute", limit: 30, windowSeconds: 60 },
+  questionBarIpMinute: { scope: "question_bar_ip_minute", limit: 90, windowSeconds: 60 },
+  questionReportUserDay: { scope: "question_report_user_day", limit: 20, windowSeconds: 24 * 60 * 60 },
 } as const;
 
 export type RateLimitPolicyName = keyof typeof RATE_LIMIT_POLICIES;

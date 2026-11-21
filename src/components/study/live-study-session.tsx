@@ -19,8 +19,8 @@ import {
   X,
 } from "lucide-react";
 
-import { NotebookPicker } from "@/components/materials/study-library-forms";
 import { LiteralHighlightView } from "@/components/study/literal-highlight-view";
+import { QuestionActionBar } from "@/components/study/question-action-bar";
 import type { LiteralFeedback } from "@/lib/study/literal-highlight";
 import { cn } from "@/lib/utils";
 
@@ -310,16 +310,17 @@ export function LiveStudySession({
               <p className="mt-4 text-sm leading-6 text-slate-400">{feedback.explanation}</p>
               <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-xs"><a href={feedback.officialUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 font-semibold text-emerald-300">Conferir no Planalto <ExternalLink className="size-3.5" /></a><span className="text-slate-600">revisão agendada para {new Intl.DateTimeFormat("pt-BR").format(new Date(feedback.nextReviewAt))}</span></div>
               <p className="mt-3 text-[10px] leading-4 text-slate-600">Trecho meramente informativo e não oficial; não substitui a publicação no Diário Oficial da União.</p>
-              <div className="mt-4">
-                <NotebookPicker
-                  key={question.publicId}
-                  questionPublicId={question.publicId}
-                  notebooks={notebooks}
-                />
-              </div>
             </div>
           ) : (
             <button onClick={submitAnswer} disabled={!selected || !confidence || submitting} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-amber-400 px-5 text-sm font-bold text-slate-950 transition hover:bg-amber-300 disabled:cursor-not-allowed disabled:opacity-35">{submitting ? <LoaderCircle className="size-4 animate-spin" /> : "Confirmar resposta"}<ArrowRight className="size-4" /></button>
+          )}
+
+          {feedback && (
+            <QuestionActionBar
+              key={question.publicId}
+              notebooks={notebooks}
+              questionPublicId={question.publicId}
+            />
           )}
 
           {feedback && <button onClick={nextQuestion} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-amber-400 px-5 text-sm font-bold text-slate-950 transition hover:bg-amber-300">{index === questions.length - 1 ? "Ver resultado" : "Próxima questão"}<ArrowRight className="size-4" /></button>}
