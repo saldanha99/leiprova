@@ -612,6 +612,10 @@ grant update (
 -- Artigos adicionais de cada item do programa, gravados só na revisão do requisito.
 grant select, insert on opportunity_requirement_articles to :app_user;
 
+-- Estado de indexação das páginas de SEO (migration 0057): o app só lê; o job
+-- scripts/seo/refresh-page-state.ts grava hash e data de mudança do conteúdo.
+grant select, insert, update on seo_page_state to :app_user;
+
 grant insert (
   public_id,
   opportunity_id,

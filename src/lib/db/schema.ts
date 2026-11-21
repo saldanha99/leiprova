@@ -3927,3 +3927,5 @@ export type LegalTextSnapshot = typeof legalTextSnapshots.$inferSelect;
 export { legalComplementarySources } from "./schema-complementary";
 
 export { legalCpCorrectionEvidence } from "./schema-cp-correction";
+
+export { seoPageState, type SeoPageState } from "./schema-seo";

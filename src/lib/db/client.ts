@@ -39,3 +39,10 @@ export function getDb() {
 export function isDatabaseConfigured() {
   return Boolean(process.env.DATABASE_URL);
 }
+
+/** Closes the shared pool (command-line scripts only). */
+export async function closeDb() {
+  await globalForDb.leiprovaSql?.end({ timeout: 5 });
+  globalForDb.leiprovaSql = undefined;
+  globalForDb.leiprovaDb = undefined;
+}
