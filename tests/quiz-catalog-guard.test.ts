@@ -20,6 +20,7 @@ describe("quiz e simulados: login antes da consulta pesada", () => {
     expect(source).toContain("set local statement_timeout");
     expect(source).toContain("QUIZ_CATALOG_CACHE_TTL_MS = 5 * 60_000");
     expect(source).toContain("staleWhileRevalidate(loadOriginalStyleSimulationCoverage");
+    expect(source).toContain("__leiprovaQuizCatalog");
     expect(page("src/instrumentation.ts")).toContain("warmQuizCatalogCaches");
   });
 });

@@ -106,7 +106,16 @@ async function loadEligibleQuizExamEditions(
   return buildQuizExamEditionCatalog(rows, todayIso, includeScheduled);
 }
 
-const eligibleEditionsCache = new Map<string, ReturnType<typeof staleWhileRevalidate<QuizExamEditionCatalogItem[]>>>();
+type CatalogCache<T> = ReturnType<typeof staleWhileRevalidate<T>>;
+type QuizCatalogStore = {
+  editions: Map<string, CatalogCache<QuizExamEditionCatalogItem[]>>;
+  coverage?: CatalogCache<Awaited<ReturnType<typeof loadOriginalStyleSimulationCoverage>>>;
+};
+// No processo inteiro: o Next empacota src/instrumentation.ts separado das páginas,
+// e um cache de módulo ficaria numa cópia que as páginas não enxergam.
+const quizCatalogStore: QuizCatalogStore = ((globalThis as { __leiprovaQuizCatalog?: QuizCatalogStore })
+  .__leiprovaQuizCatalog ??= { editions: new Map() });
+const eligibleEditionsCache = quizCatalogStore.editions;
 
 export async function listEligibleQuizExamEditions(
   referenceDate = new Date(),
@@ -156,10 +165,9 @@ async function loadOriginalStyleSimulationCoverage() {
     .orderBy(desc(sql`count(distinct ${questions.id})`), asc(quizBanks.name), asc(quizSubjects.name)));
 }
 
-const simulationCoverageCache = staleWhileRevalidate(loadOriginalStyleSimulationCoverage, QUIZ_CATALOG_CACHE_TTL_MS);
-
 export async function listOriginalStyleSimulationCoverage() {
-  return simulationCoverageCache();
+  quizCatalogStore.coverage ??= staleWhileRevalidate(loadOriginalStyleSimulationCoverage, QUIZ_CATALOG_CACHE_TTL_MS);
+  return quizCatalogStore.coverage();
 }
 
 /** Aquecimento na partida do servidor: o primeiro aluno não espera o cálculo. */
