@@ -16,6 +16,7 @@ export type LiteralFeedback = {
   articleRef: string;
   actTitle: string;
   segments: LiteralSegment[];
+  excerpt?: LiteralSegment[] | null;
   hasTrap: boolean;
 };
 
@@ -30,9 +31,14 @@ export type LiteralHighlightInput = {
 
 export type LiteralHighlight = {
   segments: LiteralSegment[];
+  /** Só as unidades em foco (com "…" entre trechos não contíguos); null quando é o artigo inteiro. */
+  excerpt: LiteralSegment[] | null;
   hasTrap: boolean;
   hasMatch: boolean;
 };
+
+/** Abaixo disto o artigo vai inteiro; acima, o gabarito abre no trecho em foco. */
+export const EXCERPT_MIN_CHARS = 900;
 
 const STOPWORDS = new Set(
   (
@@ -96,7 +102,7 @@ function isTrueFalse(type: string, options: LiteralHighlightInput["options"]): b
 
 export function highlightLiteral(input: LiteralHighlightInput): LiteralHighlight {
   const literal = input.literalText ?? "";
-  if (!literal.trim()) return { segments: [], hasTrap: false, hasMatch: false };
+  if (!literal.trim()) return { segments: [], excerpt: null, hasTrap: false, hasMatch: false };
 
   const tf = isTrueFalse(input.type, input.options);
   const correct = input.options.find((o) => o.isCorrect);
@@ -131,19 +137,23 @@ export function highlightLiteral(input: LiteralHighlightInput): LiteralHighlight
   const best = Math.max(0, ...scores);
   const focus = new Set(scores.map((s, i) => (best >= 2 && s >= Math.max(2, best * 0.6) ? i : -1)).filter((i) => i >= 0));
 
-  const segments: LiteralSegment[] = [];
   let hasTrap = false;
   let hasMatch = false;
-  const push = (text: string, kind: LiteralSegment["kind"]) => {
-    if (!text) return;
-    const last = segments[segments.length - 1];
-    if (last && last.kind === kind) last.text += text;
-    else segments.push({ text, kind });
+  const merge = (list: LiteralSegment[]) => {
+    const out: LiteralSegment[] = [];
+    for (const seg of list) {
+      if (!seg.text) continue;
+      const last = out[out.length - 1];
+      if (last && last.kind === seg.kind) last.text += seg.text;
+      else out.push({ ...seg });
+    }
+    return out;
   };
 
-  units.forEach((unit, index) => {
+  const perUnit: LiteralSegment[][] = units.map((unit, index) => {
     const text = literal.slice(unit.start, unit.end);
-    if (!focus.has(index)) return push(text, "plain");
+    if (!focus.has(index)) return [{ text, kind: "plain" }];
+    const list: LiteralSegment[] = [];
     const words = [...text.matchAll(WORD)].map((m) => ({ at: m.index ?? 0, raw: m[0], norm: normalizeWord(m[0]) }));
     // Certo/Errado com gabarito "Errado": a troca fica entre a 1ª e a última palavra que o
     // enunciado repete; ali, a palavra da lei que o enunciado não traz é o ponto da pegadinha.
@@ -159,7 +169,7 @@ export function highlightLiteral(input: LiteralHighlightInput): LiteralHighlight
     }
     let cursor = 0;
     words.forEach((w, i) => {
-      push(text.slice(cursor, w.at), "plain");
+      list.push({ text: text.slice(cursor, w.at), kind: "plain" });
       let kind: LiteralSegment["kind"] = "plain";
       if (significant(w.norm)) {
         if (trapWords.has(w.norm)) kind = "trap";
@@ -168,20 +178,36 @@ export function highlightLiteral(input: LiteralHighlightInput): LiteralHighlight
       }
       if (kind === "trap") hasTrap = true;
       if (kind === "match") hasMatch = true;
-      push(w.raw, kind);
+      list.push({ text: w.raw, kind });
       cursor = w.at + w.raw.length;
     });
-    push(text.slice(cursor), "plain");
+    list.push({ text: text.slice(cursor), kind: "plain" });
+    return list;
   });
 
   // Troca pontual: poucas palavras. Muitas = item reescrito; o vermelho viraria ruído.
-  const trapDistinct = new Set(segments.filter((seg) => seg.kind === "trap").flatMap((seg) => [...seg.text.matchAll(WORD)].map((m) => normalizeWord(m[0]))));
+  const trapDistinct = new Set(perUnit.flat().filter((seg) => seg.kind === "trap").flatMap((seg) => [...seg.text.matchAll(WORD)].map((m) => normalizeWord(m[0]))));
   if (trapDistinct.size > MAX_TRAP_WORDS) {
-    for (const seg of segments) if (seg.kind === "trap") seg.kind = "plain";
+    for (const seg of perUnit.flat()) if (seg.kind === "trap") seg.kind = "plain";
     hasTrap = false;
   }
 
   // Sem foco confiável: devolve o texto sem grifo (melhor nada do que grifo errado).
-  if (!focus.size) return { segments: [{ text: literal, kind: "plain" }], hasTrap: false, hasMatch: false };
-  return { segments, hasTrap, hasMatch };
+  if (!focus.size) return { segments: [{ text: literal, kind: "plain" }], excerpt: null, hasTrap: false, hasMatch: false };
+
+  const segments = merge(perUnit.flat());
+  let excerpt: LiteralSegment[] | null = null;
+  if (literal.length > EXCERPT_MIN_CHARS) {
+    const parts: LiteralSegment[] = [];
+    let previous = -2;
+    [...focus].sort((a, b) => a - b).forEach((index) => {
+      if (previous !== index - 1 && (index > 0 || parts.length)) parts.push({ text: "…\n", kind: "plain" });
+      parts.push(...perUnit[index].map((seg) => ({ ...seg })));
+      previous = index;
+    });
+    if (previous < units.length - 1) parts.push({ text: "\n…", kind: "plain" });
+    excerpt = merge(parts);
+    excerpt[0] = { ...excerpt[0], text: excerpt[0].text.replace(/^\s+/, "") };
+  }
+  return { segments, excerpt, hasTrap, hasMatch };
 }

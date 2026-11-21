@@ -1,10 +1,28 @@
-import type { LiteralFeedback } from "@/lib/study/literal-highlight";
+import type { LiteralFeedback, LiteralSegment } from "@/lib/study/literal-highlight";
 import { cn } from "@/lib/utils";
 
 /**
  * Trecho literal do artigo no gabarito: verde = o que a lei diz e o item confirma;
  * vermelho = a palavra da lei que a alternativa trocou (o ponto da pegadinha).
  */
+function Segments({ segments }: { segments: LiteralSegment[] }) {
+  return (
+    <>
+      {segments.map((segment, index) =>
+        segment.kind === "plain" ? (
+          <span key={index}>{segment.text}</span>
+        ) : segment.kind === "match" ? (
+          <mark key={index} className="rounded bg-emerald-300/15 px-0.5 text-emerald-50">{segment.text}</mark>
+        ) : (
+          <mark key={index} className="rounded bg-rose-400/25 px-0.5 font-semibold text-rose-50 underline decoration-rose-300 decoration-2 underline-offset-4">
+            {segment.text}
+          </mark>
+        ),
+      )}
+    </>
+  );
+}
+
 export function LiteralHighlightView({ literal, className }: { literal: LiteralFeedback; className?: string }) {
   return (
     <figure className={cn("rounded-xl border border-white/8 bg-slate-950/40 p-4", className)}>
@@ -17,18 +35,16 @@ export function LiteralHighlightView({ literal, className }: { literal: LiteralF
         </span>
       </figcaption>
       <blockquote className="whitespace-pre-line text-sm leading-7 text-slate-300">
-        {literal.segments.map((segment, index) =>
-          segment.kind === "plain" ? (
-            <span key={index}>{segment.text}</span>
-          ) : segment.kind === "match" ? (
-            <mark key={index} className="rounded bg-emerald-300/15 px-0.5 text-emerald-50">{segment.text}</mark>
-          ) : (
-            <mark key={index} className="rounded bg-rose-400/25 px-0.5 font-semibold text-rose-50 underline decoration-rose-300 decoration-2 underline-offset-4">
-              {segment.text}
-            </mark>
-          ),
-        )}
+        <Segments segments={literal.excerpt ?? literal.segments} />
       </blockquote>
+      {literal.excerpt && (
+        <details className="mt-3 border-t border-white/8 pt-3 text-xs">
+          <summary className="cursor-pointer font-semibold text-slate-400 hover:text-white">Ver o artigo inteiro</summary>
+          <blockquote className="mt-3 whitespace-pre-line text-sm leading-7 text-slate-400">
+            <Segments segments={literal.segments} />
+          </blockquote>
+        </details>
+      )}
     </figure>
   );
 }

@@ -67,6 +67,7 @@ export async function loadLiteralFeedback(
       articleRef: row.articleRef,
       actTitle: row.actTitle,
       segments: highlight.segments,
+      excerpt: highlight.excerpt,
       hasTrap: highlight.hasTrap,
     });
   }

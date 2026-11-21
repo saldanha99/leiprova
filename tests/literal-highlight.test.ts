@@ -72,4 +72,20 @@ describe("grifo do texto literal no gabarito", () => {
     expect(r.segments.map((s) => s.text).join("")).toBe(ART);
     expect(marked(r, "trap")).toContain("não");
   });
+
+  it("artigo longo: o gabarito abre só no trecho em foco, com o artigo inteiro guardado", () => {
+    const longo = "Art. 5º Todos são iguais perante a lei.\n" + Array.from({ length: 40 }, (_, i) => `${["I","II","III","IV","V","VI","VII","VIII","IX","X"][i % 10]} - inciso genérico número ${i} sobre matéria qualquer da lista;`).join("\n") +
+      "\nLX - a lei só poderá restringir a publicidade dos atos processuais quando a defesa da intimidade ou o interesse social o exigirem;\nLXI - ninguém será preso senão em flagrante.";
+    const r = highlightLiteral({
+      literalText: longo,
+      prompt: "A lei pode restringir a publicidade dos atos processuais por mera conveniência administrativa.",
+      type: "true_false",
+      options: [{ key: "C", text: "Certo", isCorrect: false }, { key: "E", text: "Errado", isCorrect: true }],
+    });
+    expect(r.excerpt).not.toBeNull();
+    const excerpt = r.excerpt!.map((s) => s.text).join("");
+    expect(excerpt).toContain("publicidade dos atos processuais");
+    expect(excerpt.length).toBeLessThan(longo.length / 3);
+    expect(r.segments.map((s) => s.text).join("")).toBe(longo);
+  });
 });
