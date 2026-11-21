@@ -22,8 +22,7 @@ import { staleWhileRevalidate } from "./stale-while-revalidate";
  * cópia: checkout e webhook revalidam a cobertura antes de cobrar e de liberar. */
 export const RELEASED_PRODUCTS_CACHE_TTL_MS = 5 * 60_000;
 
-const releasedContestProductsCache = staleWhileRevalidate(
-  async function loadReleasedContestProducts() {
+async function loadReleasedContestProducts() {
     // Página revisada + liberação explícita + pelo menos 68 questões válidas por
     // produto + última prova oficial aprovada. Decisão do proprietário (28/09/2026):
     // a prova anterior entra na venda como link oficial (caderno + gabarito); as
@@ -78,11 +77,24 @@ const releasedContestProductsCache = staleWhileRevalidate(
         ...row.product,
         opportunityPublicId: row.opportunityPublicId,
       }));
-  },
-  RELEASED_PRODUCTS_CACHE_TTL_MS,
-);
+}
+
+type ReleasedProductsCache = ReturnType<typeof staleWhileRevalidate<Awaited<ReturnType<typeof loadReleasedContestProducts>>>>;
+// No processo inteiro: o Next empacota src/instrumentation.ts separado das páginas;
+// um cache de módulo ficaria numa cópia que as páginas não enxergam.
+const productStore = (globalThis as { __leiprovaReleasedProducts?: { cache?: ReleasedProductsCache } })
+  .__leiprovaReleasedProducts ??= {};
+function releasedContestProductsCache() {
+  productStore.cache ??= staleWhileRevalidate(loadReleasedContestProducts, RELEASED_PRODUCTS_CACHE_TTL_MS);
+  return productStore.cache();
+}
 
 export const listReleasedContestProducts = cache(() => releasedContestProductsCache());
+
+/** Aquecimento na partida: home, /concursos, páginas de lei e artigo não esperam o cálculo (~13 s). */
+export async function warmReleasedContestProducts() {
+  await releasedContestProductsCache().catch(() => undefined);
+}
 
 type StoreQueryExecutor = Pick<ReturnType<typeof getDb>, "select">;
 

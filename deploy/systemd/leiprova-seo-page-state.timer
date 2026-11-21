@@ -1,0 +1,12 @@
+# 1 vez por dia às 04h30 de Brasília (pouco tráfego). Persistent: se a VPS estava desligada, roda ao subir.
+[Unit]
+Description=Edital Lei Seca - agenda diaria da reavaliacao de SEO
+
+[Timer]
+OnCalendar=*-*-* 04:30:00 America/Sao_Paulo
+Persistent=true
+RandomizedDelaySec=5min
+Unit=leiprova-seo-page-state.service
+
+[Install]
+WantedBy=timers.target

@@ -36,3 +36,26 @@ describe("treino: elegibilidade em cache com reconferência", () => {
     expect(pool).toContain("__leiprovaStudyPool");
   });
 });
+
+describe("aquecimento da vitrine e reavaliação diária de SEO", () => {
+  it("a lista de produtos à venda fica no processo inteiro e é aquecida primeiro na partida", () => {
+    const store = page("src/lib/commerce/store.ts");
+    expect(store).toContain("__leiprovaReleasedProducts");
+    expect(store).toContain("export async function warmReleasedContestProducts");
+    const boot = page("src/instrumentation.ts");
+    expect(boot.indexOf("warmReleasedContestProducts()")).toBeGreaterThan(-1);
+    expect(boot.indexOf("warmReleasedContestProducts()")).toBeLessThan(boot.indexOf("warmQuizCatalogCaches()"));
+  });
+
+  it("o job diário usa os valores do .env do app com os padrões do compose e roda 1 vez por dia", () => {
+    const job = page("deploy/seo-page-state.sh");
+    expect(job).toContain('WAVE="${WAVE:-off}"');
+    expect(job).toContain('DIRECT="${DIRECT:-1}"');
+    expect(job).toContain("scripts/seo/refresh-page-state.ts $MODE");
+    expect(page("docker-compose.yml")).toContain("SEO_WAVE: ${SEO_WAVE:-off}");
+    expect(page("docker-compose.yml")).toContain("SEO_DIRECT_ANSWER_REQUIRED: ${SEO_DIRECT_ANSWER_REQUIRED:-1}");
+    const timer = page("deploy/systemd/leiprova-seo-page-state.timer");
+    expect(timer).toContain("OnCalendar=*-*-* 04:30:00 America/Sao_Paulo");
+    expect(page("deploy/systemd/leiprova-seo-page-state.service")).toContain("flock -n");
+  });
+});

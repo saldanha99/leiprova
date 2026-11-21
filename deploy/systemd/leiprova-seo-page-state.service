@@ -1,0 +1,16 @@
+# Reavaliação diária das páginas de SEO (gate de indexação, hash e lastmod). Infraestrutura do app.
+# Instalar com deploy/install-seo-page-state.sh. Log: journalctl -u leiprova-seo-page-state
+# e /var/log/leiprova/seo-page-state.log.
+[Unit]
+Description=Edital Lei Seca - reavaliacao diaria das paginas de SEO
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/leiprova
+# flock: nunca duas reavaliações ao mesmo tempo (o banco é compartilhado).
+ExecStart=/bin/sh -c 'mkdir -p /var/log/leiprova && exec /usr/bin/flock -n /run/leiprova-seo-page-state.lock /bin/sh /opt/leiprova/deploy/seo-page-state.sh --apply 2>&1 | tee -a /var/log/leiprova/seo-page-state.log'
+Nice=10
+IOSchedulingClass=idle
+TimeoutStartSec=30min
