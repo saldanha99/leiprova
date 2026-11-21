@@ -16,6 +16,13 @@ Desligados: GTM/Stape (sem variáveis) e recuperação de abandono.
   são assinaturas recorrentes, não há parcelamento nelas. Para parcelar seria preciso um
   plano de pagamento único (ex.: anual à vista ou parcelado), o que é decisão de oferta/preço.
 
+**ATENÇÃO (testado em live, 21/11/2026):** com `CHECKOUT_PAYMENT_METHODS=card,pix` e o Pix
+inativo na conta, a Stripe recusa a sessão inteira (400: "The payment method type provided: pix
+is invalid… activated in your dashboard") e o **cartão também para de funcionar**. O Pix NÃO fica
+só oculto. Por isso a produção ficou em `card`. Só trocar para `card,pix` depois que o Pix
+aparecer como "Ativado" no painel; a troca é no `.env` da VPS + `docker compose up -d --no-deps app`
+(sem build), e o teste é abrir um checkout logado e ver Pix e cartão.
+
 ### O que o Vinícius ativa no painel da Stripe (live)
 1. Configurações → Pagamentos → Métodos de pagamento → **Pix** → ativar (ou "Solicitar acesso").
    Pode pedir aceite de termos e dados da empresa: **só o Vinícius aceita**.
