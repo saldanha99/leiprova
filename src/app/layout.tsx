@@ -3,6 +3,7 @@ import { Manrope, Geist_Mono } from "next/font/google";
 
 import { JsonLd } from "@/components/seo/json-ld";
 import { QaEnvironmentNotice } from "@/components/qa-environment-notice";
+import { TrackingBootstrap } from "@/components/tracking/tracking-bootstrap";
 import { BRAND_NAME, BRAND_TAGLINE } from "@/lib/brand";
 import { SITE_URL, SOCIAL_IMAGE, SOCIAL_IMAGE_PATH, siteIdentityGraph } from "@/lib/seo";
 
@@ -74,6 +75,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="flex min-h-full flex-col">
         <QaEnvironmentNotice />
         <JsonLd data={siteIdentityGraph} />
+        <TrackingBootstrap />
         {children}
       </body>
     </html>

@@ -31,13 +31,16 @@ async function getAdminOverview() {
   const [userRows, subscriptionRows, questionRows, examRows, sessionRows, contactRows] =
     await Promise.all([
       db
-        .select({ total: sql<number>`count(*)::int` })
+        // Contas de teste (domínio reservado .invalid) não contam como clientes.
+        .select({ total: sql<number>`count(*) filter (where ${users.email} not ilike '%@example.invalid')::int` })
         .from(users),
       db
         .select({
-          total: sql<number>`count(*)::int`,
-          entitled: sql<number>`count(*) filter (where ${subscriptions.status} in ('active', 'trialing') and (${subscriptions.accessEndsAt} is null or ${subscriptions.accessEndsAt} > now()))::int`,
-          trialing: sql<number>`count(*) filter (where ${subscriptions.status} = 'trialing' and (${subscriptions.accessEndsAt} is null or ${subscriptions.accessEndsAt} > now()))::int`,
+          // Assinantes = só Stripe. Concessão manual/sintética (QA, cortesia) aparece à parte.
+          total: sql<number>`count(*) filter (where ${subscriptions.provider} = 'stripe')::int`,
+          entitled: sql<number>`count(*) filter (where ${subscriptions.provider} = 'stripe' and ${subscriptions.status} in ('active', 'trialing') and (${subscriptions.accessEndsAt} is null or ${subscriptions.accessEndsAt} > now()))::int`,
+          trialing: sql<number>`count(*) filter (where ${subscriptions.provider} = 'stripe' and ${subscriptions.status} = 'trialing' and (${subscriptions.accessEndsAt} is null or ${subscriptions.accessEndsAt} > now()))::int`,
+          granted: sql<number>`count(*) filter (where ${subscriptions.provider} <> 'stripe' and ${subscriptions.status} in ('active', 'trialing') and ${subscriptions.accessEndsAt} > now())::int`,
         })
         .from(subscriptions),
       db
@@ -71,7 +74,7 @@ async function getAdminOverview() {
 
   return {
     users: userRows[0]?.total ?? 0,
-    subscriptions: subscriptionRows[0] ?? { total: 0, entitled: 0, trialing: 0 },
+    subscriptions: subscriptionRows[0] ?? { total: 0, entitled: 0, trialing: 0, granted: 0 },
     questions: questionRows[0] ?? { total: 0, reviewed: 0, humanReviewed: 0, aiAssisted: 0, pending: 0 },
     exams: examRows[0] ?? { total: 0, published: 0 },
     sessions: sessionRows[0] ?? { total: 0, completed: 0 },
@@ -149,7 +152,7 @@ export default async function AdminOverviewPage() {
     {
       label: "Assinaturas com acesso",
       value: overview.subscriptions.entitled,
-      detail: `${numberFormatter.format(overview.subscriptions.trialing)} em período de teste; ${numberFormatter.format(overview.subscriptions.total)} registros no histórico.`,
+      detail: `${numberFormatter.format(overview.subscriptions.trialing)} em período de teste; ${numberFormatter.format(overview.subscriptions.total)} registros no histórico; ${numberFormatter.format(overview.subscriptions.granted)} acessos de cortesia/QA fora da contagem.`,
       icon: CreditCard,
       tone: "emerald",
     },

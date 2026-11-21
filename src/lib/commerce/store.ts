@@ -14,9 +14,16 @@ import { productPreviousExamRequirementMet } from "./previous-exam-content";
 import { preparationEligibilityBlocker } from "./preparation-mode";
 import { preparationProgramReviewSatisfied } from "./preparation-mode-query";
 import { saoPauloCalendarDate } from "../opportunities/catalog-policy";
+import { staleWhileRevalidate } from "./stale-while-revalidate";
 
-export const listReleasedContestProducts = cache(
-  async function listReleasedContestProducts() {
+/** Vitrine: a contagem completa por produto custa ~13 s com o banco carregado
+ * (20/11/2026: home 12–19 s, /concursos 13–15 s). O resultado fica 5 min na
+ * memória do processo e é servido enquanto recalcula. A venda não depende desta
+ * cópia: checkout e webhook revalidam a cobertura antes de cobrar e de liberar. */
+export const RELEASED_PRODUCTS_CACHE_TTL_MS = 5 * 60_000;
+
+const releasedContestProductsCache = staleWhileRevalidate(
+  async function loadReleasedContestProducts() {
     // Página revisada + liberação explícita + pelo menos 68 questões válidas por
     // produto + última prova oficial aprovada. Decisão do proprietário (28/09/2026):
     // a prova anterior entra na venda como link oficial (caderno + gabarito); as
@@ -72,7 +79,10 @@ export const listReleasedContestProducts = cache(
         opportunityPublicId: row.opportunityPublicId,
       }));
   },
+  RELEASED_PRODUCTS_CACHE_TTL_MS,
 );
+
+export const listReleasedContestProducts = cache(() => releasedContestProductsCache());
 
 type StoreQueryExecutor = Pick<ReturnType<typeof getDb>, "select">;
 

@@ -101,6 +101,7 @@ export function PricingPlans({ commerceOpen, contactOpen }: PricingPlansProps) {
 
           {commerceOpen ? (
             <Link
+              id={`cta-checkout-master-${activePlan.slug}-home`}
               className={`button button--full ${
                 activePlan.featured ? "button--amber" : "button--outline"
               }`}

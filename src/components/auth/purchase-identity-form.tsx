@@ -75,8 +75,9 @@ export function PurchaseIdentityForm({
   return (
     <form action={formAction} className="grid gap-5" noValidate>
       <input type="hidden" name="planSlug" value={planSlug} />
-      <IdentityField name="name" label="Seu nome" autoComplete="name" placeholder="Como podemos chamar você?" error={state.fieldErrors?.name} icon={UserRound} />
+      {/* E-mail primeiro: o lead fica identificado antes do nome (LEI 10). */}
       <IdentityField name="email" label="E-mail para receber o acesso" type="email" autoComplete="email" placeholder="voce@exemplo.com" error={state.fieldErrors?.email} icon={Mail} />
+      <IdentityField name="name" label="Seu nome" autoComplete="name" placeholder="Como podemos chamar você?" error={state.fieldErrors?.name} icon={UserRound} />
       <label className="flex items-start gap-3 text-xs leading-5 text-slate-400">
         <input type="checkbox" name="terms" className="mt-1 size-4 rounded border-white/20 bg-slate-950 accent-amber-400" />
         <span>

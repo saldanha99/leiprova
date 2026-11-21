@@ -5,6 +5,7 @@ import { getDb } from "@/lib/db/client";
 import { stripeEvents } from "@/lib/db/schema";
 import { processMasterStripeEvent } from "@/lib/stripe/master-subscription";
 import { withTrackedContestStripeEvent } from "@/lib/commerce/webhook-transaction";
+import { sendPurchaseServerEvent } from "@/lib/tracking-server";
 import {
   getStripeClient,
   getStripeWebhookConfiguration,
@@ -77,6 +78,7 @@ export async function POST(request: NextRequest) {
   // O Master mantém sua unidade própria; não é executado dentro da tx dos concursos.
   try {
     if (await processMasterStripeEvent(event, { trackEvent: true })) {
+      await sendPurchaseServerEvent(event);
       return Response.json({ received: true });
     }
   } catch {
@@ -85,6 +87,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const result = await withTrackedContestStripeEvent(event, (tx) => processStripeEvent(event, tx));
+    if (!result.duplicate) await sendPurchaseServerEvent(event);
     return Response.json({ received: true, ...(result.duplicate ? { duplicate: true } : {}) });
   } catch {
     // Rollback preserva o estado anterior. Não gravar failed fora da tx: uma

@@ -22,6 +22,7 @@ import {
 import { formatBRL, PLANS } from "@/lib/plans";
 import { contestCartTotal } from "@/lib/commerce/order-policy";
 import styles from "./contest-cart.module.css";
+import { browserReadAttribution, browserTrack, newEventId } from "@/lib/tracking";
 
 const ContestPayment = dynamic(() => import("./contest-payment").then((module) => module.ContestPayment), {
   ssr: false,
@@ -90,15 +91,21 @@ export function ContestCart({
     const signature = JSON.stringify(items);
     if (attempt.current?.signature !== signature)
       attempt.current = { signature, id: crypto.randomUUID() };
+    const initiateEventId = newEventId("InitiateCheckout");
     try {
       const response = await fetch("/api/stripe/contest-checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ attemptId: attempt.current.id, items }),
+        body: JSON.stringify({
+          attemptId: attempt.current.id,
+          items,
+          tracking: { eventId: initiateEventId, attribution: browserReadAttribution() },
+        }),
       });
       const data: { url?: string; error?: string; clientSecret?: string; orderId?: string } = await response.json();
       if (!response.ok)
         throw new Error(data.error ?? "Não foi possível abrir o pagamento.");
+      browserTrack("InitiateCheckout", initiateEventId, { contest_items: items.map((item) => item.productSlug) });
       if (data.clientSecret && data.orderId) {
         setPayment({ clientSecret: data.clientSecret, orderId: data.orderId });
         return;
@@ -322,6 +329,7 @@ export function ContestCart({
                 {PLANS.map((plan) => (
                   <Link
                     key={plan.slug}
+                    id={`cta-checkout-master-${plan.slug}-carrinho`}
                     href={`/checkout/${plan.slug}`}
                     aria-label={`Comparar ${plan.name} por ${formatBRL(plan.priceCents)}${plan.billingLabel}`}
                   >

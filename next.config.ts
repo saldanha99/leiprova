@@ -8,14 +8,34 @@ const isDevelopment = process.env.NODE_ENV === "development";
  * reescrevem os assets para https://localhost e a página carrega sem CSS nem
  * JS. Em produção continuam valendo.
  */
+/**
+ * Rastreamento (LEI 10): só libera GTM/Stape e Meta quando o GTM estiver configurado
+ * no build (NEXT_PUBLIC_GTM_ID). Sem ele, a política continua só com a Stripe.
+ */
+const gtmServerOrigin = (() => {
+  const raw = process.env.NEXT_PUBLIC_GTM_SERVER_URL?.trim();
+  if (!raw) return "";
+  try {
+    const url = new URL(raw);
+    return url.protocol === "https:" ? url.origin : "";
+  } catch {
+    return "";
+  }
+})();
+const trackingOrigins = process.env.NEXT_PUBLIC_GTM_ID?.trim()
+  ? [gtmServerOrigin, "https://www.googletagmanager.com", "https://connect.facebook.net", "https://www.facebook.com",
+    "https://www.google-analytics.com"].filter(Boolean).join(" ")
+  : "";
+const withTracking = (directive: string) => (trackingOrigins ? `${directive} ${trackingOrigins}` : directive);
+
 const contentSecurityPolicy = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${isDevelopment ? " 'unsafe-eval'" : ""} https://js.stripe.com https://checkout.stripe.com`,
+  withTracking(`script-src 'self' 'unsafe-inline'${isDevelopment ? " 'unsafe-eval'" : ""} https://js.stripe.com https://checkout.stripe.com`),
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https://*.stripe.com",
+  withTracking("img-src 'self' data: blob: https://*.stripe.com"),
   "font-src 'self' data:",
-  "connect-src 'self' https://api.stripe.com https://checkout.stripe.com https://*.stripe.com https://*.stripe.network",
-  "frame-src https://js.stripe.com https://hooks.stripe.com https://checkout.stripe.com https://*.stripe.com",
+  withTracking("connect-src 'self' https://api.stripe.com https://checkout.stripe.com https://*.stripe.com https://*.stripe.network"),
+  withTracking("frame-src https://js.stripe.com https://hooks.stripe.com https://checkout.stripe.com https://*.stripe.com"),
   "worker-src 'self' blob:",
   "object-src 'none'",
   "base-uri 'self'",
