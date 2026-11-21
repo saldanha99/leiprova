@@ -35,3 +35,10 @@ vínculo/certificação pelo mesmo procedimento (o gerador aceita a entrada inve
   updated_at das 4.496 sem mudança (mesmo md5); elegíveis por produto iguais (27 produtos, 11.414).
 - Fora da gravação: 11 questões novas com jargão, geradas antes da trava (7 com 11 campos que a regra corrige; ids 19148, 19150, 19156–19159,
   19161, 19162, 19171, 19172, 19196). Ficam para um próximo OK.
+
+## Gravação das questões novas, 21/11/2026 às 19:07 UTC (OK do Vinícius via Chefe de Gabinete)
+- Backup antes: backups/leiprova-20261121T185250Z.dump (1.360 entradas). Carga 2,93 no início.
+- 7 questões, 11 campos (dos 11 ids listados acima), 0 pulados. 7 audit_logs, 7 vínculos e 5 certificações regravados.
+  Em dia antes = depois. Dessincronizados no banco todo: 0 → 0. updated_at intacto (mesmo md5).
+  Elegíveis iguais (27 produtos, 11.414).
+- Tela: deploy aab992c (limpeza de id cru). Nas 43 páginas públicas cujas questões ainda guardam id cru no banco: 0 na tela.
