@@ -12,6 +12,7 @@ import {
   type QuestionHistoryEntry,
   type QuestionReportReason,
 } from "@/lib/study/question-bar-contract";
+import { ACTIVE_QUESTION_REPORT_STATUSES } from "@/lib/study/question-report-admin";
 
 export type BarQuestion = {
   id: number;
@@ -99,8 +100,6 @@ export async function enqueueQuestionForReview(userId: number, questionId: numbe
   return row?.nextReviewAt ?? now;
 }
 
-const OPEN_REPORT_STATUSES = ["open", "reviewing"] as const;
-
 /** Um relato aberto por aluno e questão; o lock evita duplicata em clique duplo. */
 export async function createQuestionReport(input: {
   userId: number;
@@ -119,7 +118,7 @@ export async function createQuestionReport(input: {
         and(
           eq(questionReports.userId, input.userId),
           eq(questionReports.questionId, input.questionId),
-          inArray(questionReports.status, [...OPEN_REPORT_STATUSES]),
+          inArray(questionReports.status, [...ACTIVE_QUESTION_REPORT_STATUSES]),
         ),
       )
       .limit(1);

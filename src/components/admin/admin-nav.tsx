@@ -8,6 +8,7 @@ import {
   CreditCard,
   FileCheck2,
   FileSearch,
+  Flag,
   LayoutDashboard,
   LogOut,
   RefreshCcw,
@@ -43,6 +44,12 @@ const adminNavItems = [
     href: "/admin/fabrica-autoral",
     label: "Fábrica autoral",
     icon: BookOpenCheck,
+    adminOnly: false,
+  },
+  {
+    href: "/admin/relatos",
+    label: "Relatos de questões",
+    icon: Flag,
     adminOnly: false,
   },
   {

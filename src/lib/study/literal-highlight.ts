@@ -1,13 +1,21 @@
 /**
  * Grifo do texto literal do artigo no gabarito (sem IA, determinístico).
  *
- * - Divide o artigo em unidades (caput, parágrafos, incisos, alíneas) e escolhe as que mais
- *   coincidem com o enunciado e as alternativas.
+ * - Divide o artigo em unidades (caput, parágrafos, incisos, alíneas) e escolhe as citadas
+ *   explicitamente ("art. 5º, LXIX e LXXI", "§ 2º") e as que mais coincidem com o enunciado e
+ *   as alternativas.
  * - "match": palavras da lei que a versão correta do item repete (o item confirma a lei).
  * - "trap": palavras da lei que a versão errada trocou ou omitiu (o ponto da pegadinha).
  * Só palavras significativas entram (números, ou 4+ letras fora das palavras vazias), para o
  * grifo apontar prazo, competência, exceção e verbo, não artigos e preposições.
  */
+
+import {
+  labelUnits,
+  literalArticleNumber,
+  parseLegalReferences,
+  referencedUnitIndexes,
+} from "@/lib/study/legal-references";
 
 export type LiteralSegment = { text: string; kind: "plain" | "match" | "trap" };
 
@@ -136,6 +144,13 @@ export function highlightLiteral(input: LiteralHighlightInput): LiteralHighlight
   });
   const best = Math.max(0, ...scores);
   const focus = new Set(scores.map((s, i) => (best >= 2 && s >= Math.max(2, best * 0.6) ? i : -1)).filter((i) => i >= 0));
+  // A parte citada pelo número entra sempre, mesmo longe das outras ou com pouca coincidência.
+  const questionText = [input.prompt, ...input.options.map((o) => o.text)].join("\n");
+  const refs = parseLegalReferences(questionText, literalArticleNumber(literal));
+  if (refs.length) {
+    const labels = labelUnits(units.map((u) => literal.slice(u.start, u.end)));
+    for (const index of referencedUnitIndexes(refs, labels)) focus.add(index);
+  }
 
   let hasTrap = false;
   let hasMatch = false;
