@@ -5,6 +5,7 @@ import postgres from "postgres";
 import * as schema from "../src/lib/db/schema";
 import { productBindingPackageSchema } from "../src/lib/commerce/product-binding-policy";
 import { requireOpportunityApprovalDatabaseUrl } from "../src/lib/opportunities/approval-command";
+import { THIN_ARTICLE_JOB_KEY_SQL_PATTERN } from "../src/lib/editorial/thin-article-job";
 
 // Monta o pacote de PROPOSTAS de vínculo (questão revisada ↔ requisito do edital)
 // a partir das questões que o Autor escreveu para cada requisito, registradas na
@@ -94,7 +95,9 @@ async function main() {
           select split_part(audit.entity_id, ':', 2)::bigint as requirement_id,
             jsonb_array_elements_text(audit.metadata->'importedQuestionPublicIds') as question_public_id
           from audit_logs audit
-          where audit.action = 'automation.agent.prepared' and audit.entity_id ~ '^author:[0-9]{1,18}$'
+          -- Autoria do requisito ("author:<id>") e de artigo fino ("author-thin:<id>:<artigo>"): o requisito é o 2º campo.
+          where audit.action = 'automation.agent.prepared'
+            and (audit.entity_id ~ '^author:[0-9]{1,18}$' or audit.entity_id ~ ${THIN_ARTICLE_JOB_KEY_SQL_PATTERN})
         )
         select distinct requirement.id::int as "requirementId",
           requirement.requirement_text as "requirementText",

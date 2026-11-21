@@ -51,7 +51,7 @@ describe("prioridade da fila dos agentes", () => {
     expect(claim.sql).not.toContain("from question_opportunities link");
     expect(claim.sql).not.toContain("question.editorial_status <> 'suspended'");
     // O requisito sai da chave da tarefa; o payload (artigos candidatos) não é lido.
-    expect(claim.sql).toContain("work.job_key ~ '^(mapping|author):[0-9]{1,18}$' then split_part(work.job_key, ':', 2)::bigint");
+    expect(claim.sql).toContain("work.job_key ~ '^(mapping|author):[0-9]{1,18}$' or work.job_key ~ '^author-thin:[0-9]{1,18}:[0-9]{1,18}$'\n    then split_part(work.job_key, ':', 2)::bigint");
     expect(claim.sql).not.toContain("payload->>'opportunityId'");
     expect(claim.sql).not.toContain("payload->>'requirementId'");
     // Pendências de outro papel não deixam o agente ocioso.
@@ -94,7 +94,8 @@ describe("prioridade da fila dos agentes", () => {
     expect(claim.sql).toContain("thin_article as materialized (");
     expect(claim.sql).toContain("having count(*) between 1 and 2");
     const order = claim.sql.slice(claim.sql.indexOf("order by"));
-    expect(order).toMatch(/else 3 end,\s+case when work\.kind='authoring' and exists \(select 1[\s\S]+?then 0 else 1 end,\s+tier\.tier nulls first/u);
+    // Depois da regra das tarefas de artigo fino (author-thin:, ver thin-article-authoring.test.ts).
+    expect(order).toMatch(/else 3 end,\s+case when work\.job_key like 'author-thin:%' then 1 else 0 end,[\s\S]+?nulls first,\s+case when work\.kind='authoring' and exists \(select 1[\s\S]+?then 0 else 1 end,\s+tier\.tier nulls first/u);
     const selection = claim.sql.slice(claim.sql.indexOf("where work.status='pending'"), claim.sql.indexOf("order by"));
     expect(selection).not.toContain("thin_article");
 

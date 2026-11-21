@@ -7,15 +7,17 @@ import { deterministicNoticeQuestionUuid } from "./notice-question-generator";
 import { readOfficialQuestionContract, lockQuestionContracts } from "./question-contract-service";
 import { currentQuestionContractExists } from "./question-contract-query";
 import { priorityProductQuestionCount, MINIMUM_COURSE_QUESTION_COUNT } from "@/lib/commerce/minimum-course-content";
+import { THIN_ARTICLE_JOB_KEY_SQL_PATTERN, THIN_ARTICLE_JOB_PREFIX, thinArticleMaxRunning } from "./thin-article-job";
 import { AGENT_FOR_WORK, AGENT_WORK_DAILY_LIMIT, AGENT_WORK_LEASE_MINUTES,
   agentInputHash, agentWorkKindSchema, validateAgentWorkResult, workPayloadSchema,
   agentWorkResultSchema, parseAgentWorkResult,
   type AgentWorkKind, type AgentWorkPayload } from "./agent-work-contract";
 
-// O requisito sai da chave ("mapping:<id>", "author:<id>"): ler o payload, com os
-// artigos candidatos, custava segundos por reserva.
+// O requisito sai da chave ("mapping:<id>", "author:<id>", "author-thin:<id>:<artigo>"):
+// ler o payload, com os artigos candidatos, custava segundos por reserva.
 const requirementIdOf = (alias: "work" | "other") =>
-  `case when ${alias}.job_key ~ '^(mapping|author):[0-9]{1,18}$' then split_part(${alias}.job_key, ':', 2)::bigint end`;
+  `case when ${alias}.job_key ~ '^(mapping|author):[0-9]{1,18}$' or ${alias}.job_key ~ '${THIN_ARTICLE_JOB_KEY_SQL_PATTERN}'
+    then split_part(${alias}.job_key, ':', 2)::bigint end`;
 
 /** Faixa por edição, calculada uma vez por reserva: o alvo é conteúdo válido
  * por produto, não rascunhos ligados à edição. Um curso com 68 rascunhos mas
@@ -87,6 +89,18 @@ const THIN_ARTICLE_ORDER = sql`case when work.kind='authoring' and exists (selec
             join thin_article on thin_article.legal_article_id = thin_link.legal_article_id
             where thin_link.requirement_id = requirement.id) then 0 else 1 end,`;
 
+/** Autoria de artigo fino (`author-thin:`, ver ./thin-article-authoring): nunca passa na
+ * frente da autoria normal (toda ela de produtos à venda em 21/11/2026) e tem teto de
+ * execuções simultâneas (EDITORIAL_THIN_ARTICLE_MAX_RUNNING, padrão 1, 0 pausa), contado
+ * sob a mesma trava da reserva e somando todas as instâncias do motor. */
+const IS_THIN_ARTICLE_JOB = sql.raw(`work.job_key like '${THIN_ARTICLE_JOB_PREFIX}:%'`);
+const thinArticleGate = (maxRunning: number) => sql`and (not ${IS_THIN_ARTICLE_JOB} or (select count(*)
+          from editorial_agent_work thin_running where thin_running.status='running'
+            and thin_running.job_key like ${`${THIN_ARTICLE_JOB_PREFIX}:%`}) < ${maxRunning})`;
+// Entre si, na ordem do enfileiramento (onda 0, depois mais requisitos à venda).
+const THIN_ARTICLE_JOB_ORDER = sql`case when ${IS_THIN_ARTICLE_JOB} then 1 else 0 end,
+          case when ${IS_THIN_ARTICLE_JOB} then work.created_at end nulls first,`;
+
 export type AgentDatabase = PostgresJsDatabase<typeof schema>;
 export type AgentWork = {
   jobKey: string; kind: AgentWorkKind; inputHash: string; payload: AgentWorkPayload;
@@ -116,7 +130,8 @@ export async function enqueueAgentWork(db: AgentDatabase, key: string, kind: Age
 // que exige consulta à fonte oficial). Nunca amplia os tipos do papel.
 // `focusProducts` só reordena: tarefas das edições desses produtos vêm primeiro
 // (ex.: rascunhos cujo único bloqueio é o piso de questões). Não filtra nem amplia.
-export async function claimAgentWork(db: AgentDatabase, now = new Date(), agent?:string, onlyKinds?:readonly string[], focusProducts?:readonly string[]) {
+export async function claimAgentWork(db: AgentDatabase, now = new Date(), agent?:string, onlyKinds?:readonly string[], focusProducts?:readonly string[],
+  options: { thinArticleMaxRunning?: number } = {}) {
   if(focusProducts?.some(slug=>!/^[a-z0-9]+(?:-[a-z0-9]+)*$/u.test(slug))) throw new Error("Produto de foco inválido.");
   const focusOrder = focusProducts?.length ? sql`case when requirement.opportunity_id in (select focus.opportunity_id
             from contest_store_products focus where focus.slug in (${sql.join(focusProducts.map(slug=>sql`${slug}`),sql`,`)}))
@@ -127,7 +142,10 @@ export async function claimAgentWork(db: AgentDatabase, now = new Date(), agent?
   const prioritizesMappings = kinds.includes('legal_mapping');
   const prioritizesThinArticles = kinds.includes('authoring');
   const thinArticles = prioritizesThinArticles ? sql`, ${THIN_ARTICLE_CTE}` : sql``;
-  const thinArticleOrder = prioritizesThinArticles ? THIN_ARTICLE_ORDER : sql``;
+  const thinArticleOrder = prioritizesThinArticles ? sql`${THIN_ARTICLE_JOB_ORDER} ${THIN_ARTICLE_ORDER}` : sql``;
+  const thinArticleMax = options.thinArticleMaxRunning ?? thinArticleMaxRunning();
+  if (!Number.isSafeInteger(thinArticleMax) || thinArticleMax < 0) throw new Error("Teto de artigos finos inválido.");
+  const thinArticleClaimGate = prioritizesThinArticles ? thinArticleGate(thinArticleMax) : sql``;
   const mappingReadiness = prioritizesMappings ? sql`, ${MAPPING_CONTRACT_READINESS_CTE}` : sql``;
   const mappingJoin = prioritizesMappings ? sql`left join mapping_contract_readiness mapping_readiness
     on mapping_readiness.id = requirement.opportunity_id` : sql``;
@@ -152,6 +170,7 @@ export async function claimAgentWork(db: AgentDatabase, now = new Date(), agent?
         select work.job_key ${CLAIM_FROM} ${mappingJoin}
         where work.status='pending' and work.attempts<3
         and (work.kind<>'authoring' or ${currentQuestionContractExists(sql`work.payload->>'questionContractId'`,sql`requirement.opportunity_id`)})
+        ${thinArticleClaimGate}
         and work.kind in (${sql.join(kinds.map(kind=>sql`${kind}`),sql`,`)})
         order by case work.kind when 'legal_change' then 0 when 'authoring' then 1 when 'discovery' then 2 else 3 end,
           ${thinArticleOrder} ${productOrder},
