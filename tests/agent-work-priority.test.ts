@@ -87,6 +87,22 @@ describe("prioridade da fila dos agentes", () => {
     expect(order).toContain("for update of work skip locked limit 1");
   });
 
+  it("na autoria, serve primeiro requisitos que tocam artigos com 1 ou 2 questões, só na ordenação", async () => {
+    const { db, queries } = fakeDatabase();
+    await claimAgentWork(db, new Date(), "Autor");
+    const claim = new PgDialect().sqlToQuery(queries[2]);
+    expect(claim.sql).toContain("thin_article as materialized (");
+    expect(claim.sql).toContain("having count(*) between 1 and 2");
+    const order = claim.sql.slice(claim.sql.indexOf("order by"));
+    expect(order).toMatch(/else 3 end,\s+case when work\.kind='authoring' and exists \(select 1[\s\S]+?then 0 else 1 end,\s+tier\.tier nulls first/u);
+    const selection = claim.sql.slice(claim.sql.indexOf("where work.status='pending'"), claim.sql.indexOf("order by"));
+    expect(selection).not.toContain("thin_article");
+
+    const guardian = fakeDatabase();
+    await claimAgentWork(guardian.db, new Date(), "Guardião");
+    expect(new PgDialect().sqlToQuery(guardian.queries[2]).sql).not.toContain("thin_article");
+  });
+
   it("restringe tipos do papel sem ampliá-los", async () => {
     const restricted = fakeDatabase();
     await claimAgentWork(restricted.db, new Date(), "Guardião", ["legal_mapping"]);

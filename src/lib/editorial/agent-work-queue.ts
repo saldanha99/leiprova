@@ -71,6 +71,22 @@ const CLAIM_FROM = sql.raw(`from editorial_agent_work work
 const PRODUCT_DEADLINE_ORDER = sql.raw(`tier.tier nulls first, tier.upcoming_exam nulls last,
           (requirement.subject_id is null) nulls last`);
 
+/** Artigos "finos": 1 ou 2 questões revisadas com comentário. A página pública do
+ * artigo exige 3 (gate de SEO, 21/11/2026), então a autoria que toca esses artigos
+ * vem primeiro dentro da autoria. Só ordena; não cria tarefa nem muda o volume. */
+const THIN_ARTICLE_CTE = sql`thin_article as materialized (
+      select thin_question.legal_article_id
+      from questions thin_question
+      where thin_question.editorial_status = 'reviewed' and thin_question.legal_article_id is not null
+        and coalesce(length(thin_question.explanation), 0) > 0
+      group by thin_question.legal_article_id
+      having count(*) between 1 and 2
+    )`;
+const THIN_ARTICLE_ORDER = sql`case when work.kind='authoring' and exists (select 1
+            from opportunity_requirement_articles thin_link
+            join thin_article on thin_article.legal_article_id = thin_link.legal_article_id
+            where thin_link.requirement_id = requirement.id) then 0 else 1 end,`;
+
 export type AgentDatabase = PostgresJsDatabase<typeof schema>;
 export type AgentWork = {
   jobKey: string; kind: AgentWorkKind; inputHash: string; payload: AgentWorkPayload;
@@ -109,6 +125,9 @@ export async function claimAgentWork(db: AgentDatabase, now = new Date(), agent?
   const kinds=Object.entries(AGENT_FOR_WORK).filter(([kind,name])=>(!agent||name===agent)&&(!onlyKinds||onlyKinds.includes(kind))).map(([kind])=>kind);
   if(kinds.length===0) return { state: "idle" as const };
   const prioritizesMappings = kinds.includes('legal_mapping');
+  const prioritizesThinArticles = kinds.includes('authoring');
+  const thinArticles = prioritizesThinArticles ? sql`, ${THIN_ARTICLE_CTE}` : sql``;
+  const thinArticleOrder = prioritizesThinArticles ? THIN_ARTICLE_ORDER : sql``;
   const mappingReadiness = prioritizesMappings ? sql`, ${MAPPING_CONTRACT_READINESS_CTE}` : sql``;
   const mappingJoin = prioritizesMappings ? sql`left join mapping_contract_readiness mapping_readiness
     on mapping_readiness.id = requirement.opportunity_id` : sql``;
@@ -129,13 +148,13 @@ export async function claimAgentWork(db: AgentDatabase, now = new Date(), agent?
       update editorial_agent_work set status='running',attempts=attempts+1,
         lease_token=${leaseToken}::uuid,lease_expires_at=${expires}::timestamptz,
         updated_at=${now.toISOString()}::timestamptz
-      where job_key=(with ${AGENT_OPPORTUNITY_PRIORITY_CTES}${mappingReadiness}
+      where job_key=(with ${AGENT_OPPORTUNITY_PRIORITY_CTES}${mappingReadiness}${thinArticles}
         select work.job_key ${CLAIM_FROM} ${mappingJoin}
         where work.status='pending' and work.attempts<3
         and (work.kind<>'authoring' or ${currentQuestionContractExists(sql`work.payload->>'questionContractId'`,sql`requirement.opportunity_id`)})
         and work.kind in (${sql.join(kinds.map(kind=>sql`${kind}`),sql`,`)})
         order by case work.kind when 'legal_change' then 0 when 'authoring' then 1 when 'discovery' then 2 else 3 end,
-          ${productOrder},
+          ${thinArticleOrder} ${productOrder},
           work.created_at,work.job_key for update of work skip locked limit 1)
       returning job_key as "jobKey",kind,input_hash as "inputHash",payload,
         lease_token::text as "leaseToken",lease_expires_at::text as "leaseExpiresAt"
