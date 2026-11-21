@@ -38,9 +38,15 @@ revisão humana por alegação fictícia. Registra `owner_standing_authorization
 
 A observação expira à00hUTC do segundo dia após a verificação. Antes disso,
 repetir preview/apply com `--refresh` nos dois comandos, usando fonte atual.
-Ausência de observação válida fecha o gate por leitura; nenhum monitor HTTP novo
-ou renovação automática foi instalado por este módulo. A coordenação deve conferir
-a janela nas retomadas, sem declarar vigência remota contínua.
+Ausência de observação válida fecha o gate por leitura.
+
+Renovação automática (OK do Vinícius em 21/11/2026): o timer `leiprova-mprj-format-refresh` roda todo dia
+às 02h40 de Brasília `deploy/mprj-format-refresh.sh` → `scripts/refresh-mprj-format-evidence.ts`. O mesmo
+preview/apply com `--refresh`, com a entrada derivada do contrato aprovado no banco. Se a prévia não preservar o
+contrato original (fonte, página, parser ou fatos mudaram), se a evidência nova não valer por mais 24 h ou se o
+produto ficar sem questões, nada é aplicado e a unit termina em falha (código 1). Log em
+`journalctl -u leiprova-mprj-format-refresh` e `/var/log/leiprova/mprj-format-refresh.log`. Instalação:
+`sh deploy/install-mprj-format-refresh.sh`. A coordenação confere só se o timer rodou e se a evidência vale.
 
 Renovar fatos de formato idênticos preserva o contrato autoral original e seus
 certificados. A função SQL exige uma observação atual aprovada dos mesmos bytes,

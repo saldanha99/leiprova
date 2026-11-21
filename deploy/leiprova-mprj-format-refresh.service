@@ -1,0 +1,15 @@
+# Renovação diária da evidência de formato do MPRJ (OK do Vinícius em 21/11/2026). Sem IA.
+# Instalar com deploy/install-mprj-format-refresh.sh. Log: journalctl -u leiprova-mprj-format-refresh
+# e /var/log/leiprova/mprj-format-refresh.log. Falha => unit "failed" e código 1; nada é aplicado.
+[Unit]
+Description=Edital Lei Seca - renovacao diaria da evidencia de formato MPRJ
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/leiprova
+# flock: nunca duas renovações ao mesmo tempo. pipefail: o código do script vale para a unit.
+ExecStart=/bin/bash -c 'set -o pipefail; mkdir -p /var/log/leiprova && /usr/bin/flock -n /run/leiprova-mprj-format-refresh.lock /bin/sh /opt/leiprova/deploy/mprj-format-refresh.sh 2>&1 | tee -a /var/log/leiprova/mprj-format-refresh.log'
+Nice=10
+TimeoutStartSec=10min

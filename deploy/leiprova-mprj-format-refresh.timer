@@ -1,0 +1,14 @@
+# 1 vez por dia às 02h40 de Brasília: longe do backup (00h17), da limpeza de imagens (01h48),
+# do backup da Wise Wolf (03h15) e do SEO (04h30). A evidência dura até 00h UTC do 2º dia:
+# uma falha ainda deixa ~1 dia para corrigir. Persistent: se a VPS estava desligada, roda ao subir.
+[Unit]
+Description=Edital Lei Seca - agenda diaria da renovacao da evidencia MPRJ
+
+[Timer]
+OnCalendar=*-*-* 02:40:00 America/Sao_Paulo
+Persistent=true
+RandomizedDelaySec=3min
+Unit=leiprova-mprj-format-refresh.service
+
+[Install]
+WantedBy=timers.target
