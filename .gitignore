@@ -57,3 +57,6 @@ next-env.d.ts
 /content/editorial/*.zip
 # Extrações e páginas de PDFs fornecidos para análise privada.
 /tmp/pdfs/
+
+__pycache__/
+*.pyc
