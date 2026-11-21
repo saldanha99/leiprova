@@ -2,6 +2,7 @@ import { and, eq, sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { loadLiteralFeedback, type LiteralFeedback } from "@/lib/study/literal-feedback";
+import { cleanStudentFacingText } from "@/lib/editorial/student-facing-text";
 
 import { getCurrentUser } from "@/lib/auth";
 import { getDb } from "@/lib/db/client";
@@ -77,6 +78,7 @@ export async function POST(request: Request) {
       explanation: questions.explanation,
       literalText: legalArticles.literalText,
       articleRef: legalArticles.articleRef,
+      actTitle: legalActs.shortTitle,
       officialUrl: legalActs.officialUrl,
     })
     .from(questions)
@@ -190,7 +192,7 @@ export async function POST(request: Request) {
     isCorrect: selected.isCorrect,
     correctOptionId: correctOption?.optionId,
     literalText: selected.literalText,
-    explanation: selected.explanation,
+    explanation: cleanStudentFacingText(selected.explanation, { articleRef: selected.articleRef, actTitle: selected.actTitle }),
     articleRef: selected.articleRef,
     officialUrl: selected.officialUrl,
     xp,

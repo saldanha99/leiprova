@@ -52,6 +52,14 @@ describe("contrato da ponte editorial",()=>{
     expect(validateAgentWorkResult("authoring",payload,{...base,outcome:"blocked",limitations:["Falta fonte oficial."]}).outcome).toBe("blocked");
     expect(()=>validateAgentWorkResult("authoring",payload,{...base,outcome:"blocked",limitations:[]})).toThrow();
   });
+  it("recusa texto para o aluno com id de artigo, versão ou corpus do motor",()=>{
+    const leaked=question();
+    leaked.explanation=`${leaked.explanation} Fonte: Constituição Federal, artigo 6008, versão 65, do corpus fornecido.`;
+    expect(()=>validateAgentWorkResult("authoring",payload,{...base,generatorModel:"synthetic-test",questions:[leaked]})).toThrow("referência interna");
+    const inOption=question();
+    inOption.options=inOption.options.map((option,index)=>index===0?{...option,rationale:`${option.rationale} Conforme a versão 3 do corpus recebido.`}:option);
+    expect(()=>validateAgentWorkResult("authoring",payload,{...base,generatorModel:"synthetic-test",questions:[inOption]})).toThrow("referência interna");
+  });
   it("valida autoria sem publicar",()=>{
     expect(validateAgentWorkResult("authoring",payload,{...base,generatorModel:"synthetic-test",questions:[question()]}).questions).toHaveLength(1);
   });

@@ -1,6 +1,7 @@
 import "server-only";
 
 import { and, asc, desc, eq, inArray, isNotNull, or, sql } from "drizzle-orm";
+import { cleanStudentFacingText } from "@/lib/editorial/student-facing-text";
 
 import { staleWhileRevalidate } from "@/lib/commerce/stale-while-revalidate";
 import { catalogContestPath, contestTitle, getCatalogContest } from "@/lib/commerce/catalog";
@@ -173,7 +174,12 @@ async function loadQuestions(versionId: number) {
   const optionsByQuestion = new Map<number, OptionRow[]>();
   for (const option of options) {
     const list = optionsByQuestion.get(option.questionId) ?? [];
-    list.push({ key: option.key, text: option.text, isCorrect: option.isCorrect, rationale: option.rationale });
+    list.push({
+      key: option.key,
+      text: option.text,
+      isCorrect: option.isCorrect,
+      rationale: option.rationale === null ? null : cleanStudentFacingText(option.rationale),
+    });
     optionsByQuestion.set(option.questionId, list);
   }
 
@@ -187,7 +193,8 @@ async function loadQuestions(versionId: number) {
             articleId: row.articleId,
             type: row.type,
             prompt: row.prompt,
-            explanation: row.explanation,
+            // Sem referência interna do motor ("artigo 6008, versão 65"); o banco não muda.
+            explanation: cleanStudentFacingText(row.explanation),
             sourceRights: "original_authorial" as const,
             styleBankName: row.styleBankName,
             licensedBankName: null,

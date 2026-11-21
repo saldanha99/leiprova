@@ -1,6 +1,7 @@
 import { and, eq, inArray, or, sql } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { loadLiteralFeedback, type LiteralFeedback } from "@/lib/study/literal-feedback";
+import { cleanStudentFacingText } from "@/lib/editorial/student-facing-text";
 
 import { getCurrentUser } from "@/lib/auth";
 import { approvedReleasedProductPreviousExamQuestionExists } from "@/lib/commerce/previous-exam-content";
@@ -42,6 +43,7 @@ type AnswerContext = {
   sourceTitle: string | null;
   sourceUrl: string | null;
   legalActTitle: string | null;
+  articleRef: string | null;
   officialLegalUrl: string | null;
   styleBankName: string | null;
   selectedOptionDbId: number;
@@ -178,6 +180,7 @@ export async function POST(request: Request) {
         sourceTitle: questions.sourceTitle,
         sourceUrl: questions.sourceUrl,
         legalActTitle: legalActs.shortTitle,
+        articleRef: legalArticles.articleRef,
         officialLegalUrl: legalActs.officialUrl,
         styleBankName: quizBanks.name,
         selectedOptionDbId: questionOptions.id,
@@ -330,6 +333,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ accepted: true }, { headers: { "Cache-Control": "no-store" } });
   }
 
+  // Comentário sem referência interna do motor (ex.: "artigo 6008, versão 65"); o banco não muda.
+  context.explanation = cleanStudentFacingText(context.explanation, { articleRef: context.articleRef, actTitle: context.legalActTitle });
   const literal = (
     await literalFor([context.questionDbId], new Map([[context.questionDbId, parsed.data.optionId]]))
   ).get(context.questionDbId) ?? null;
