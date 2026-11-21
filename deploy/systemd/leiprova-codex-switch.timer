@@ -1,0 +1,12 @@
+# Rede de segurança do liga/desliga da instância Codex: na partida da VPS e a cada 10 min
+# (cobre a virada do mês com a instância principal parada e campainhas perdidas).
+[Unit]
+Description=Edital Lei Seca - conferencia periodica da instancia Codex
+
+[Timer]
+OnBootSec=3min
+OnUnitActiveSec=10min
+Unit=leiprova-codex-switch.service
+
+[Install]
+WantedBy=timers.target

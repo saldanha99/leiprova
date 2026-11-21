@@ -4,12 +4,16 @@
 // (reserva atômica, lease de 90 min, até 3 tentativas), entrega o pacote imutável
 // a uma CLI de assinatura sem rede/shell e devolve o response.json pelo comando
 // delimitado do worker. O servidor revalida tudo; a importação é só rascunho.
-// Nunca usa API paga: limite da assinatura vira pausa do papel, não fallback.
+// API paga só a da Anthropic, dentro do orçamento mensal (deploy/editorial-budget.mjs);
+// limite da assinatura vira pausa do papel, não fallback para outro provedor.
 // Sem dependências: roda com o Node do host (o mesmo exigido pela CLI).
 import { spawn } from "node:child_process";
 import { appendFile, copyFile, mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
+import { budgetAllows, budgetMonth, chargeBudget, codexShouldRun, loadBudget, rolloverBudget } from "./editorial-budget.mjs";
+
+export { budgetAllows, budgetMonth, chargeBudget, codexShouldRun, loadBudget, rolloverBudget };
 
 export const ROLES = { "Guardião": "guardiao", Autor: "autor" };
 // Sem rede, o motor só reserva o que se resolve com o corpus do pacote.
@@ -65,14 +69,17 @@ export function readConfig(env) {
     bridgeLockFile: absolute("EDITORIAL_BRIDGE_LOCK_FILE"),
     // Login separado do Codex por instância; só chega à CLI quando definido.
     codexHome: absolute("CODEX_HOME"),
+    // Campainha do leiprova-codex-switch.path: regravada só quando muda se a instância Codex deve rodar.
+    // Só a instância principal (claude) toca; vazio desliga.
+    codexSwitchFile: absolute("EDITORIAL_CODEX_SWITCH_FILE") || (executor === "claude" ? path.join(stateDir, "codex-switch.signal") : ""),
     projectDir: env.EDITORIAL_PROJECT_DIR?.trim() || "/opt/leiprova",
     container: env.EDITORIAL_CONTAINER?.trim() || "leiprova-editorial-automation",
     slots: { "Guardião": int("EDITORIAL_SLOTS_GUARDIAO", 1, 0, 8), Autor: int("EDITORIAL_SLOTS_AUTOR", 2, 0, 8) },
-    // API paga (decisão do proprietário em 19/11/2026): teto de US$ 50, parada preventiva em US$ 48.
-    // A chave fica fora do repositório e só chega ao processo da CLI enquanto houver orçamento.
+    // API paga (decisões do proprietário em 19/11 e 21/11/2026): teto de US$ 50 por mês-calendário UTC,
+    // parada em 100% (US$ 50). A chave fica fora do repositório e só chega à CLI enquanto houver orçamento.
     apiSecretFile: env.EDITORIAL_API_SECRET_FILE?.trim() || "/etc/leiprova/editorial-realtime.secret",
     apiCapUsd: usd("EDITORIAL_API_CAP_USD", 50),
-    apiStopUsd: usd("EDITORIAL_API_STOP_USD", 48),
+    apiStopUsd: usd("EDITORIAL_API_STOP_USD", 50),
     // Reservado por execução em andamento: o teto considera o que ainda não foi cobrado.
     apiRunReserveUsd: usd("EDITORIAL_API_RUN_RESERVE_USD", 0.25),
     apiRatePauseMs: int("EDITORIAL_API_RATE_PAUSE_SECONDS", 120, 10, 3600) * 1000,
@@ -118,43 +125,6 @@ export function parseCliResult(stdout) {
     } catch { /* tenta o próximo formato */ }
   }
   return null;
-}
-
-const round6 = (value) => Math.round(value * 1e6) / 1e6;
-
-/** Estado inicial ou recuperado do orçamento; esgotado nunca volta para a API sozinho. */
-export function loadBudget(saved, { capUsd, stopAtUsd, hasKey, now }) {
-  const base = saved && typeof saved === "object" ? saved : {};
-  const spentUsd = Number.isFinite(base.spentUsd) ? base.spentUsd : 0;
-  const exhaustedAt = typeof base.exhaustedAt === "string" ? base.exhaustedAt : null;
-  return {
-    capUsd, stopAtUsd, spentUsd, runs: Number.isInteger(base.runs) ? base.runs : 0,
-    unmeteredRuns: Number.isInteger(base.unmeteredRuns) ? base.unmeteredRuns : 0,
-    byRole: base.byRole && typeof base.byRole === "object" ? base.byRole : {},
-    mode: hasKey && !exhaustedAt && spentUsd < stopAtUsd ? "api" : "subscription",
-    exhaustedAt, updatedAt: now,
-  };
-}
-
-/** A chave só vai para a próxima execução se o gasto + reservas em andamento couberem antes da parada. */
-export function budgetAllows(budget, inflightUsd, reserveUsd) {
-  return budget.mode === "api" && !budget.exhaustedAt && budget.spentUsd + inflightUsd + reserveUsd < budget.stopAtUsd;
-}
-
-/** Soma o custo real (ou a reserva, sem medição) e aplica a parada preventiva. */
-export function chargeBudget(budget, role, costUsd, reserveUsd, now) {
-  const metered = typeof costUsd === "number";
-  const charged = metered ? costUsd : reserveUsd;
-  const roleStats = budget.byRole[role] ?? { runs: 0, spentUsd: 0 };
-  const next = {
-    ...budget,
-    spentUsd: round6(budget.spentUsd + charged), runs: budget.runs + 1,
-    unmeteredRuns: budget.unmeteredRuns + (metered ? 0 : 1),
-    byRole: { ...budget.byRole, [role]: { runs: roleStats.runs + 1, spentUsd: round6(roleStats.spentUsd + charged) } },
-    updatedAt: now,
-  };
-  if (next.spentUsd >= next.stopAtUsd && !next.exhaustedAt) Object.assign(next, { exhaustedAt: now, mode: "subscription" });
-  return next;
 }
 
 /**
@@ -270,11 +240,36 @@ export async function main(env = process.env) {
   const apiKey = config.executor === "claude"
     ? await readFile(config.apiSecretFile, "utf8").then(parseApiSecret, () => null) : null;
   const budgetFile = path.join(config.stateDir, "api-budget.json");
+  const budgetOptions = { hasKey: Boolean(apiKey), reserveUsd: config.apiRunReserveUsd };
   let budget = loadBudget(await readFile(budgetFile, "utf8").then(JSON.parse, () => null),
-    { capUsd: config.apiCapUsd, stopAtUsd: config.apiStopUsd, hasKey: Boolean(apiKey), now: new Date().toISOString() });
+    { capUsd: config.apiCapUsd, stopAtUsd: config.apiStopUsd, ...budgetOptions, now: new Date().toISOString() });
   let inflightUsd = 0;
-  const saveBudget = () => writePrivate(budgetFile, JSON.stringify(budget, null, 2) + "\n");
+  // Gravações em série: vagas concorrentes não disputam o mesmo arquivo temporário.
+  let budgetWrites = Promise.resolve();
+  let codexSignaled = null;
+  const saveBudget = () => {
+    const text = JSON.stringify(budget, null, 2) + "\n";
+    const codexWanted = codexShouldRun(budget, new Date().toISOString());
+    const write = budgetWrites.then(async () => {
+      await writePrivate(budgetFile, text);
+      if (config.codexSwitchFile && codexWanted !== codexSignaled) {
+        await writePrivate(config.codexSwitchFile, JSON.stringify({ at: new Date().toISOString(), codexWanted, mode: budget.mode, month: budget.month }));
+        codexSignaled = codexWanted;
+      }
+    });
+    budgetWrites = write.catch(() => {});
+    return write;
+  };
   await saveBudget();
+  /** Virada do mês UTC: fecha o mês em history, zera o gasto e volta à API (se houver chave). */
+  async function renewIfNewMonth() {
+    const renewed = rolloverBudget(budget, { ...budgetOptions, now: new Date().toISOString() });
+    if (!renewed.rolled) return;
+    budget = renewed.budget;
+    await saveBudget();
+    const closed = budget.history.at(-1);
+    await event({ state: "api_budget_renewed", month: budget.month, mode: budget.mode, previousMonth: closed?.month, previousSpentUsd: closed?.spentUsd });
+  }
   /** Texto para detectar limite: no formato JSON, só o resultado da CLI e o stderr (números do JSON não contam). */
   const cliText = (result) => {
     const parsed = parseCliResult(result.stdout);
@@ -282,12 +277,15 @@ export async function main(env = process.env) {
   };
   /** Executa a CLI pela API enquanto houver orçamento; senão pela assinatura. Cobra o custo real. */
   async function runExecutor(role, input, cwd, timeoutMs) {
+    await renewIfNewMonth();
     const useApi = Boolean(apiKey) && budgetAllows(budget, inflightUsd, config.apiRunReserveUsd);
     if (!useApi) return { ...(await run(command.bin, command.args, { input, cwd, timeoutMs, env: childEnv })), useApi };
     inflightUsd += config.apiRunReserveUsd;
     let result;
     try { result = await run(command.bin, command.args, { input, cwd, timeoutMs, env: { ...childEnv, ANTHROPIC_API_KEY: apiKey } }); }
     finally { inflightUsd -= config.apiRunReserveUsd; }
+    // Execução que atravessou a virada é cobrada no mês novo (mais conservador para o teto).
+    await renewIfNewMonth();
     const wasExhausted = Boolean(budget.exhaustedAt);
     budget = chargeBudget(budget, role, parseCliResult(result.stdout)?.cost ?? null, config.apiRunReserveUsd, new Date().toISOString());
     await saveBudget();
@@ -355,6 +353,7 @@ export async function main(env = process.env) {
   }
 
   async function once(role, slot) {
+    await renewIfNewMonth();
     const apiOpen = Boolean(apiKey) && budgetAllows(budget, inflightUsd, config.apiRunReserveUsd);
     if (apiOpen ? (Date.now() < gate.pausedUntil && gate.reason === "paused_after_failures") : !(await available())) return "cooldown";
     const claimed = await bridge("claim", role);
@@ -456,6 +455,9 @@ export async function main(env = process.env) {
     }
   }, 60_000);
   watchdog?.unref();
+  // Renova na virada mesmo com a fila parada, para a instância Codex desligar logo.
+  const monthTimer = once_only ? null : setInterval(() => { void renewIfNewMonth().catch(() => {}); }, 60_000);
+  monthTimer?.unref();
   async function loop(role, slot) {
     for (let done = false; !stopping && !done; done = once_only) {
       lastBeat.set(`${role}:${slot}`, Date.now());
@@ -470,7 +472,7 @@ export async function main(env = process.env) {
   }
 
   await event({ state: "started", executor: config.executor, model: config.model || null, slots: config.slots,
-    budget: { mode: budget.mode, spentUsd: budget.spentUsd, stopAtUsd: budget.stopAtUsd, keyLoaded: Boolean(apiKey) } });
+    budget: { mode: budget.mode, month: budget.month, spentUsd: budget.spentUsd, stopAtUsd: budget.stopAtUsd, keyLoaded: Boolean(apiKey) } });
   await Promise.all(Object.entries(config.slots).flatMap(([role, count]) =>
     Array.from({ length: count }, (_, index) => sleep(once_only ? 0 : index * 5000).then(() => loop(role, index + 1)))));
   await event({ state: "stopped" });

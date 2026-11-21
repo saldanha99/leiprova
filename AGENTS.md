@@ -62,10 +62,12 @@ Não abre flags comerciais, Stripe, DNS nem API paga.
 
 **API paga no motor realtime, decidida em 19/11/2026 (~19h25 BRT):** o proprietário
 autorizou o `leiprova-editorial-realtime` a usar a API oficial da Anthropic com
-`claude-haiku-5-5` (mesma CLI), com **teto total de US$ 50** e parada preventiva em
-**US$ 48**. O custo real (`total_cost_usd`) é somado em
-`/var/lib/leiprova-realtime/api-budget.json`; ao atingir a parada, o motor volta à
-assinatura e nunca retorna à API sozinho. A chave fica só em
+`claude-haiku-5-5` (mesma CLI). Atualizado pelo proprietário em 21/11/2026: **teto de
+US$ 50 por mês-calendário UTC, parada em 100%** e renovação automática na virada do mês
+(o limite de gasto da Anthropic recomeça às 00:00 UTC do dia 1º). O custo real
+(`total_cost_usd`) é somado em `/var/lib/leiprova-realtime/api-budget.json`; esgotado, o
+motor segue pela assinatura e a instância Codex (assinatura, `gpt-6-luna`) liga sozinha até a
+renovação, quando a API volta e o Codex desliga. A chave fica só em
 `/etc/leiprova/editorial-realtime.secret` (fora do Git, compartilhada com outro
 projeto): nunca imprimir, registrar ou copiar. Continua proibido OpenRouter ou outro
 provedor pago, e material privado (`.local/editorial`) não vai a provedores.

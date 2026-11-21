@@ -1,0 +1,13 @@
+# Liga/desliga leiprova-editorial-codex.service pelo api-budget.json da instância principal:
+# roda enquanto a API do mês UTC estiver esgotada, para na renovação mensal (docs/MOTOR-CODEX-PARALELO.md).
+# Disparado por leiprova-codex-switch.path (campainha do worker) e leiprova-codex-switch.timer.
+[Unit]
+Description=Edital Lei Seca - liga/desliga a instancia Codex pelo orcamento da API
+
+[Service]
+Type=oneshot
+# Root: só lê o api-budget.json e o auth.json e chama systemctl start/stop --no-block.
+ExecStart=/usr/bin/env node /opt/leiprova/deploy/editorial-codex-switch.mjs
+TimeoutStartSec=2min
+NoNewPrivileges=true
+PrivateTmp=true
