@@ -24,3 +24,15 @@ describe("quiz e simulados: login antes da consulta pesada", () => {
     expect(page("src/instrumentation.ts")).toContain("warmQuizCatalogCaches");
   });
 });
+
+describe("treino: elegibilidade em cache com reconferência", () => {
+  it("a rota escolhe candidatas pela lista em cache e reconfere o filtro completo antes de entregar", () => {
+    const route = page("src/app/api/study/session/route.ts");
+    expect(route).toContain("await eligibleStudyCondition()");
+    expect(route).toContain("await keepCurrentlyEligible(questionRows, 10)");
+    expect(route).not.toContain("authorialStudyRightsConditions(),");
+    const pool = page("src/lib/study/eligible-question-pool.ts");
+    expect(pool).toContain("authorialStudyRightsConditions()");
+    expect(pool).toContain("__leiprovaStudyPool");
+  });
+});

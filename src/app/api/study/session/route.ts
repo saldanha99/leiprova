@@ -16,7 +16,7 @@ import {
 } from "@/lib/db/schema";
 import { accessibleQuestionIds } from "@/lib/study/access-policy";
 import { getStudyEntitlement } from "@/lib/study/entitlement";
-import { authorialStudyRightsConditions } from "@/lib/study/question-rights";
+import { eligibleStudyCondition, keepCurrentlyEligible } from "@/lib/study/eligible-question-pool";
 import {
   normalizeArticleRange,
   normalizeLegalActSlug,
@@ -80,6 +80,9 @@ export async function GET(request: NextRequest) {
     ? undefined
     : inArray(questions.publicId, accessibleQuestionIds(entitlement));
 
+  // Elegibilidade pela lista em cache; o filtro completo é reconferido nas candidatas.
+  const eligibleCondition = await eligibleStudyCondition();
+  const CANDIDATES = 30;
   let questionRows: QuestionRow[];
 
   if (mode === "revisao") {
@@ -98,7 +101,7 @@ export async function GET(request: NextRequest) {
           eq(reviewQueue.userId, user.id),
           lte(reviewQueue.nextReviewAt, now),
           eq(questions.editorialStatus, "reviewed"),
-          authorialStudyRightsConditions(),
+          eligibleCondition,
           eq(legalArticles.editorialStatus, "reviewed"),
           eq(legalVersions.status, "current"),
           eq(legalActs.isActive, true),
@@ -115,7 +118,7 @@ export async function GET(request: NextRequest) {
         ),
       )
       .orderBy(asc(reviewQueue.nextReviewAt), asc(questions.id))
-      .limit(10);
+      .limit(CANDIDATES);
   } else {
     const lastAttempts = db
       .select({
@@ -140,7 +143,7 @@ export async function GET(request: NextRequest) {
       .where(
         and(
           eq(questions.editorialStatus, "reviewed"),
-          authorialStudyRightsConditions(),
+          eligibleCondition,
           eq(legalArticles.editorialStatus, "reviewed"),
           eq(legalVersions.status, "current"),
           eq(legalActs.isActive, true),
@@ -161,8 +164,10 @@ export async function GET(request: NextRequest) {
         sequential ? asc(legalArticles.articleOrder) : sql`random()`,
         sequential ? asc(questions.id) : sql`random()`,
       )
-      .limit(10);
+      .limit(CANDIDATES);
   }
+
+  questionRows = await keepCurrentlyEligible(questionRows, 10);
 
   if (!questionRows.length)
     return NextResponse.json({
