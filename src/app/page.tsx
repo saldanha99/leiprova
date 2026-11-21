@@ -698,6 +698,7 @@ export default async function Home() {
             <div>
               <strong>Produto</strong>
               <Link href="/como-memorizar-lei-seca">Como memorizar lei seca</Link>
+              <Link href="/leis">Leis e artigos</Link>
               <Link href="/fontes-e-atualizacao">Fontes e atualização</Link>
               <a href="#laboratorio">Laboratório</a>
               <a href="#recursos">Recursos</a>

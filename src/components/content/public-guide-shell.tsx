@@ -73,6 +73,9 @@ export function PublicGuideShell({
             <Link className="hover:text-white" href="/concursos">
               Concursos
             </Link>
+            <Link className="hover:text-white" href="/leis">
+              Leis
+            </Link>
             <Link className="hover:text-white" href="/metodologia">
               Metodologia
             </Link>
