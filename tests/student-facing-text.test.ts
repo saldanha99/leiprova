@@ -37,6 +37,23 @@ describe("texto para o aluno sem referência interna do motor", () => {
     expect(findInternalReference(ok)).toBeNull();
   });
 
+  it("a trava do motor barra o jargão, mas não habeas corpus nem pacote anticrime", () => {
+    for (const leaked of [
+      "Segundo o § 2º do art. 30-A da Lei das Eleições no texto recebido, a sanção é…",
+      "Conforme o texto fornecido, o prazo é de 30 dias.",
+      "O dispositivo do pacote prevê a hipótese.",
+      "Nos termos do art. 5º, conforme o texto versionado no pacote, …",
+      "O art. 7º fornecido não prevê exceção.",
+      "Não há essa regra no pacote.",
+    ]) expect(findInternalReference(leaked), leaked).not.toBeNull();
+    for (const ok of [
+      "Cabe habeas corpus sempre que alguém sofrer coação ilegal.",
+      "O Pacote Anticrime alterou o art. 28-A do CPP.",
+      "A alteração trazida pelo pacote anticrime incluiu o juiz das garantias.",
+      "O texto constitucional assegura a ampla defesa.",
+    ]) expect(findInternalReference(ok), ok).toBeNull();
+  });
+
   it("a trava do motor detecta o formato proibido", () => {
     expect(findInternalReference("Fonte: CF, artigo 6008, versão 65.")).toBe("artigo 6008, versão 65");
     expect(findInternalReference("conforme a versão 12 do corpus fornecido")).not.toBeNull();

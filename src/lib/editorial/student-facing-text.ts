@@ -12,7 +12,7 @@ const INTERNAL_VERSION_REF = /\bvers[aã]o\s+\d+\s*,?\s*do\s+corpus(?:\s+(?:ofic
 /** Parêntese com id logo depois do artigo certo: "art. 321 do CPP (artigo 1600 do pacote)". */
 const INTERNAL_PACKET_REF = /\s*\(\s*artigo\s+\d{3,}\s+do\s+pacote\s*\)|\bartigo\s+\d{3,}\s+do\s+pacote\b/giu;
 /** Qualificador solto: ", do corpus fornecido". */
-const CORPUS_QUALIFIER = /\s*,?\s*do\s+corpus(?:\s+(?:oficial|fornecido|recebido|versionado))?/giu;
+const CORPUS_QUALIFIER = /\s*,\s*do\s+corpus(?:\s+(?:oficial|fornecido|recebido|versionado))?/giu;
 
 /** Padrões que o Autor e o Guardião nunca podem produzir em texto para o aluno. */
 export const INTERNAL_REFERENCE_PATTERNS: readonly RegExp[] = [
@@ -21,6 +21,17 @@ export const INTERNAL_REFERENCE_PATTERNS: readonly RegExp[] = [
   /\bdo\s+corpus\s+(?:oficial|fornecido|recebido|versionado)\b/iu,
   /\b(?:artigo|dispositivo)\s+(?:id|#)\s*\d+/iu,
   /\bartigo\s+\d{3,}\s+do\s+pacote\b/iu,
+  // Jargão do motor (decisão de 21/11/2026): o aluno não recebeu "texto" nem "pacote" nenhum.
+  /\b(?:texto|dispositivo|artigo|trecho|reda[çc][aã]o)s?\s+(?:recebid[oa]s?|fornecid[oa]s?|versionad[oa]s?)\b/iu,
+  /\b(?:lei|norma)s?\s+(?:recebid[oa]s?|fornecid[oa]s?)\b(?!\s+pel[oa])/iu,
+  /\b(?:no|do|ao|pelo|nos|dos)\s+pacote\b(?!\s+anticrime)/iu,
+  /\b(?:texto|dispositivo|reda[çc][aã]o|artigo)\s+do\s+pacote\b/iu,
+  /\barts?\.?\s*\d+[ºo°]?(?:-[A-Z])?\s+(?:fornecid[oa]s?|recebid[oa]s?|versionad[oa]s?)\b/iu,
+  /(?<!habeas\s)\bcorpus\b/iu,
+  /\b(?:versionId|articleId)\b/iu,
+  /\bpacote\b(?!\s+anticrime)/iu,
+  /\btexto\s+(?:legal|do\s+pacote|recebido|fornecido)\s*,\s*vers[aã]o\s+\d+\b/iu,
+  /\barts?\.?\s*\d+[ºo°]?(?:-[A-Z])?(?:,\s*[^,.;]{1,25})?,\s*vers[aã]o\s+\d+\b/iu,
 ];
 
 /** Primeiro trecho com referência interna, ou null. */
