@@ -231,3 +231,23 @@ export function stripeMetadata({
     checkout_attempt_id: attemptId,
   } satisfies Stripe.MetadataParam;
 }
+
+export type CheckoutPaymentMethod = "card" | "pix";
+
+/**
+ * Formas de pagamento das sessões de checkout. Padrão: só cartão (comportamento atual).
+ * `CHECKOUT_PAYMENT_METHODS=card,pix` liga o Pix na mesma tela do cartão; só tem efeito
+ * em live depois que o Pix for ativado no painel da Stripe (capability pix_payments).
+ * Valor desconhecido é ignorado; lista vazia volta para cartão (falha fechada).
+ */
+export function checkoutPaymentMethodTypes(
+  raw = process.env.CHECKOUT_PAYMENT_METHODS,
+): CheckoutPaymentMethod[] {
+  const allowed: readonly CheckoutPaymentMethod[] = ["card", "pix"];
+  const picked = (raw ?? "")
+    .split(",")
+    .map((value) => value.trim().toLowerCase())
+    .filter((value): value is CheckoutPaymentMethod => (allowed as readonly string[]).includes(value));
+  const unique = [...new Set(picked)];
+  return unique.length ? unique : ["card"];
+}

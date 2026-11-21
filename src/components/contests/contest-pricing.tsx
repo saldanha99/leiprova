@@ -136,6 +136,7 @@ export function ContestPricing({
                 ))}
               </ul>
               <Link
+                id={`cta-checkout-concurso-${productSlug ?? "indisponivel"}-${option.key}`}
                 className={offer.action}
                 href={
                   commerceOpen && productAvailable && productSlug

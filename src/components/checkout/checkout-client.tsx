@@ -8,7 +8,9 @@ import {
 import { loadStripe, type StripeCheckoutElementsSdkOptions } from "@stripe/stripe-js";
 import { AlertTriangle, LoaderCircle, LockKeyhole, ShieldCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+
+import { browserReadAttribution, browserTrack, newEventId } from "@/lib/tracking";
 
 type CheckoutClientProps = {
   planSlug: string;
@@ -25,6 +27,8 @@ export function CheckoutClient({ planSlug, publishableKey, buttonLabel }: Checko
   const router = useRouter();
   const [stripePromise] = useState(() => loadStripe(publishableKey));
   const [attemptId] = useState(() => crypto.randomUUID());
+  // Mesmo event_id no dataLayer (Pixel) e no servidor (CAPI), por tentativa.
+  const [initiateEventId] = useState(() => newEventId("InitiateCheckout"));
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -37,7 +41,11 @@ export function CheckoutClient({ planSlug, publishableKey, buttonLabel }: Checko
           method: "POST",
           credentials: "same-origin",
           headers: { "content-type": "application/json" },
-          body: JSON.stringify({ planSlug, attemptId }),
+          body: JSON.stringify({
+            planSlug,
+            attemptId,
+            tracking: { eventId: initiateEventId, attribution: browserReadAttribution() },
+          }),
           signal: controller.signal,
         });
         const data = (await response.json().catch(() => ({}))) as SessionResponse;
@@ -53,6 +61,7 @@ export function CheckoutClient({ planSlug, publishableKey, buttonLabel }: Checko
           throw new Error("A sessão de pagamento não pôde ser iniciada.");
         }
 
+        browserTrack("InitiateCheckout", initiateEventId, { plan_slug: planSlug, checkout_attempt_id: attemptId });
         setClientSecret(data.clientSecret);
       } catch (caughtError) {
         if (controller.signal.aborted) return;
@@ -62,7 +71,7 @@ export function CheckoutClient({ planSlug, publishableKey, buttonLabel }: Checko
 
     void createSession();
     return () => controller.abort();
-  }, [attemptId, planSlug, router]);
+  }, [attemptId, initiateEventId, planSlug, router]);
 
   const options = useMemo<StripeCheckoutElementsSdkOptions | null>(
     () =>
@@ -142,6 +151,7 @@ function PaymentForm({ buttonLabel }: { buttonLabel: string }) {
   const result = useCheckoutElements();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const paymentInfoTracked = useRef(false);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -181,6 +191,12 @@ function PaymentForm({ buttonLabel }: { buttonLabel: string }) {
       <div className="rounded-2xl border border-white/8 bg-[#0b1623] p-4 sm:p-5">
         <PaymentElement
           options={{ layout: { type: "accordion", defaultCollapsed: false, radios: "always" } }}
+          onChange={(event) => {
+            if (event.complete && !paymentInfoTracked.current) {
+              paymentInfoTracked.current = true;
+              browserTrack("AddPaymentInfo", newEventId("AddPaymentInfo"), { payment_type: event.value.type });
+            }
+          }}
           onLoadError={(event) =>
             setError(event.error.message ?? "Não foi possível carregar os meios de pagamento.")
           }

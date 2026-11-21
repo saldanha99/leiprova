@@ -5,8 +5,21 @@ import { AlertTriangle, CheckCircle2, Clock3, LoaderCircle, RotateCcw } from "lu
 import { useEffect, useState } from "react";
 
 import { PortalButton } from "@/components/checkout/portal-button";
+import { browserTrack, purchaseEventId } from "@/lib/tracking";
 
 type Stage = "processing" | "active" | "attention" | "failed" | "error";
+
+/** Purchase no Pixel com o mesmo event_id que o servidor usa na CAPI (purchase_<session>). */
+function trackPurchaseOnce(sessionId: string, planName: string | null) {
+  const key = `els:purchase-tracked:${sessionId}`;
+  try {
+    if (window.sessionStorage.getItem(key)) return;
+    window.sessionStorage.setItem(key, "1");
+  } catch {
+    // sem storage: o dedupe por event_id na Meta evita contagem dupla
+  }
+  browserTrack("Purchase", purchaseEventId(sessionId), { plan_name: planName, checkout_session_id: sessionId });
+}
 
 export function ReturnStatus({ sessionId }: { sessionId: string }) {
   const [stage, setStage] = useState<Stage>("processing");
@@ -40,6 +53,7 @@ export function ReturnStatus({ sessionId }: { sessionId: string }) {
 
         setStage(data.stage);
         setPlanName(data.planName ?? null);
+        if (data.stage === "active") trackPurchaseOnce(sessionId, data.planName ?? null);
 
         if (data.stage === "processing" && attempts < 16) {
           timeout = setTimeout(poll, 2_000);
