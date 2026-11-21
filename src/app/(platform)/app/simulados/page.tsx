@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import Link from "next/link";
 import { ArrowRight, Building2, FileCheck2, Sparkles } from "lucide-react";
 
 import { PageHeader } from "@/components/platform/page-header";
+import { requireUser } from "@/lib/auth";
+import { PROTECTED_PATH_HEADER } from "@/lib/protected-path";
 import { quizPresetHref } from "@/components/quiz/preset-config";
 import { listEligibleQuizExamEditions, listOriginalStyleSimulationCoverage } from "@/lib/db/quiz-exam-editions";
 import { getSubjectsForCareer } from "@/lib/quiz/catalog";
@@ -14,6 +17,9 @@ export const metadata: Metadata = {
 };
 
 export default async function SimulationsPage() {
+  // O layout também exige login, mas renderiza em paralelo com a página:
+  // sem esta guarda, a consulta pesada rodava para visitante sem sessão.
+  await requireUser((await headers()).get(PROTECTED_PATH_HEADER) ?? "/app");
   const [eligibleEditions, bankRounds] = await Promise.all([
     listEligibleQuizExamEditions(new Date(), true),
     listOriginalStyleSimulationCoverage(),

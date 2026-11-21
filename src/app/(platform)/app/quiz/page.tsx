@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { ListChecks } from "lucide-react";
 
 import { PageHeader } from "@/components/platform/page-header";
+import { requireUser } from "@/lib/auth";
+import { PROTECTED_PATH_HEADER } from "@/lib/protected-path";
 import { QuizExperience } from "@/components/quiz/quiz-experience";
 import { quizConfigFromSearchParams, type QuizPresetSearchParams } from "@/components/quiz/preset-config";
 import { listEligibleQuizExamEditions } from "@/lib/db/quiz-exam-editions";
@@ -17,6 +20,9 @@ export default async function QuizPage({
 }: {
   searchParams: Promise<QuizPresetSearchParams>;
 }) {
+  // O layout também exige login, mas renderiza em paralelo com a página:
+  // sem esta guarda, a consulta pesada rodava para visitante sem sessão.
+  await requireUser((await headers()).get(PROTECTED_PATH_HEADER) ?? "/app");
   const examEditions = toQuizExamEditionOptions(await listEligibleQuizExamEditions(new Date(), true));
   const initialConfig = quizConfigFromSearchParams(await searchParams, examEditions);
 
