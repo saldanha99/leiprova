@@ -718,6 +718,8 @@ grant select, insert on
   audit_logs,
   contact_messages
 to :app_user;
+-- /admin/relatos: muda só o status do relato e a data de fechamento.
+grant update (status, resolved_at) on question_reports to :app_user;
 
 grant select, insert, update on editorial_automation_jobs to :app_user;
 grant select, insert, update on editorial_agent_work to :app_user;
