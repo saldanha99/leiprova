@@ -10,7 +10,7 @@ describe("guia de descoberta para assistentes", () => {
     vi.stubEnv("NEXT_PUBLIC_APP_URL", "https://editaleiseca.com.br");
     vi.resetModules();
     const { GET } = await import("@/app/llms.txt/route");
-    const response = GET();
+    const response = await GET();
     const text = await response.text();
 
     expect(response.headers.get("Content-Type")).toContain("text/plain");
@@ -21,5 +21,8 @@ describe("guia de descoberta para assistentes", () => {
     expect(text).not.toMatch(/zero publicados|12 itens beta|84.*disponíveis/);
     expect(text).toContain("não equivale a revisão humana independente");
     expect(text).toContain("não garante rastreamento, indexação, ranking ou citação");
+    expect(text).toContain("## Fatos sobre o Edital Lei Seca");
+    expect(text).not.toMatch(/decorandoaleiseca/i);
+    expect(Buffer.byteLength(text)).toBeLessThanOrEqual(30 * 1024);
   });
 });

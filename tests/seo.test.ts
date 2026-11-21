@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 
 import robots from "@/app/robots";
-import sitemap from "@/app/sitemap";
+import { GET as sitemapIndex } from "@/app/sitemap.xml/route";
+import { sitemapSegments } from "@/lib/seo/sitemaps";
 import { LITERAL_LAB_EXAMPLES } from "@/components/landing/LiteralLab";
 import { DEMO_QUESTIONS } from "@/lib/demo-content";
 import { SITE_NAME, serializeJsonLd, siteIdentityGraph } from "@/lib/seo";
@@ -9,7 +10,8 @@ import { createPublicWebPageStructuredData } from "@/lib/seo/page-structured-dat
 
 describe("fundação GEO e SEO", () => {
   it("publica URLs canônicas de conteúdo com datas editoriais estáveis", async () => {
-    const entries = await sitemap();
+    const segments = await sitemapSegments();
+    const entries = segments.get("paginas") ?? [];
     const urls = entries.map((entry) => entry.url);
 
     expect(urls).toEqual(
@@ -25,40 +27,41 @@ describe("fundação GEO e SEO", () => {
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls).not.toContain("https://leiprova.2b.app.br/contato");
     // Páginas de edição só entram pelo banco, depois de revisadas; o calendário é
-    // a única subpágina fixa de /concursos.
+    // a única subpágina fixa de /concursos. Sem SEO_WAVE, nenhuma lei ou artigo.
     expect(urls.filter((url) => url.startsWith("https://leiprova.2b.app.br/concursos/"))).toEqual([
       "https://leiprova.2b.app.br/concursos/calendario",
     ]);
+    expect(urls.some((url) => /\/leis?(\/|$)/.test(new URL(url).pathname))).toBe(false);
+    expect(segments.has("leis")).toBe(false);
     expect(
-      entries.every((entry) =>
-        entry.lastModified instanceof Date && !Number.isNaN(entry.lastModified.getTime()),
-      ),
+      entries.every((entry) => !Number.isNaN(entry.lastModified.getTime()) && entry.lastModified.getTime() <= Date.now()),
     ).toBe(true);
-    expect(
-      entries.every((entry) => {
-        const timestamp =
-          entry.lastModified instanceof Date
-            ? entry.lastModified.getTime()
-            : new Date(entry.lastModified!).getTime();
-        return timestamp <= Date.now();
-      }),
-    ).toBe(true);
+
+    const index = await (await sitemapIndex()).text();
+    expect(index).toContain("<sitemapindex");
+    expect(index).toContain("<loc>https://leiprova.2b.app.br/sitemap/paginas.xml</loc>");
+    expect(index).not.toContain("changefreq");
   });
 
-  it("separa descoberta por busca de treinamento de modelos", () => {
+  it("libera busca, assistentes e treino de IA e bloqueia só as áreas privadas", () => {
     const rules = robots().rules;
     expect(rules).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ userAgent: "OAI-SearchBot", allow: "/" }),
-        expect.objectContaining({ userAgent: "Googlebot", allow: "/" }),
-        { userAgent: "GPTBot", disallow: "/" },
-        { userAgent: "Google-Extended", disallow: "/" },
+        expect.objectContaining({
+          userAgent: expect.arrayContaining(["Googlebot", "OAI-SearchBot", "GPTBot", "Google-Extended", "ClaudeBot"]),
+          allow: "/",
+        }),
       ]),
     );
+    // D2 (20/11/2026): treino de IA liberado; nenhum grupo bloqueia o site inteiro.
+    expect(JSON.stringify(rules)).not.toContain('"disallow":"/"');
     const genericRule = Array.isArray(rules)
       ? rules.find((rule) => rule.userAgent === "*")
       : undefined;
-    expect(genericRule?.disallow).toEqual(["/app$", "/app/", "/admin$", "/admin/", "/api$", "/api/"]);
+    expect(genericRule?.disallow).toEqual([
+      "/app$", "/app/", "/admin$", "/admin/", "/api$", "/api/",
+      "/checkout", "/entrar", "/cadastro", "/ativar-acesso", "/recuperar-acesso", "/busca",
+    ]);
   });
 
   it("serializa JSON-LD sem permitir fechamento de script por conteúdo", () => {
