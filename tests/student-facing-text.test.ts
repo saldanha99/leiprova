@@ -60,4 +60,17 @@ describe("texto para o aluno sem referência interna do motor", () => {
     expect(findInternalReference("segundo o texto do corpus fornecido")).not.toBeNull();
     expect(findInternalReference("artigo id 4471")).not.toBeNull();
   });
+
+  it("remove o id cru do motor na exibição sem deixar sobra", () => {
+    const cases: [string, string][] = [
+      ["O §1º do art. 236 (pacote, articleId 2303) condiciona a expedição.", "O §1º do art. 236 condiciona a expedição."],
+      ["Art. 50, §13, inciso II, e §14 (articleId 988): a adoção.", "Art. 50, §13, inciso II, e §14: a adoção."],
+      ["O §1º (pacote articleId 2253) indica o marco.", "O §1º indica o marco."],
+      ["Lei da Ação Civil Pública (texto do pacote, articleId 8723). O dispositivo atribui.", "Lei da Ação Civil Pública. O dispositivo atribui."],
+      ["Fonte: pacote, articleId 1340.", ""],
+      ["O texto não contém. Versão do pacote: versionId 86.", "O texto não contém."],
+      ["a ação de improbidade (versionId 86). Os distratores", "a ação de improbidade. Os distratores"],
+    ];
+    for (const [input, expected] of cases) expect(cleanStudentFacingText(input)).toBe(expected);
+  });
 });

@@ -11,6 +11,9 @@ const INTERNAL_ARTICLE_REF =
 const INTERNAL_VERSION_REF = /\bvers[aã]o\s+\d+\s*,?\s*do\s+corpus(?:\s+(?:oficial|fornecido|recebido|versionado))?/giu;
 /** Parêntese com id logo depois do artigo certo: "art. 321 do CPP (artigo 1600 do pacote)". */
 const INTERNAL_PACKET_REF = /\s*\(\s*artigo\s+\d{3,}\s+do\s+pacote\s*\)|\bartigo\s+\d{3,}\s+do\s+pacote\b/giu;
+/** Id cru do motor: "(articleId 988)", "(pacote, articleId 2303)", "conforme versionId 61 do pacote". */
+const INTERNAL_ID_REF =
+  /\s*\(\s*(?:texto\s+(?:do|no)\s+pacote\s*,\s*)?(?:pacote\s*,?\s*)?(?:articleId|versionId)\s*\d+(?:\s+do\s+pacote)?\s*\)|\s+como\s+(?:articleId|versionId)\s*\d+|\s*,?\s*(?:(?:conforme|no|do|pelo)\s+)?(?:pacote\s*,\s*)?(?:articleId|versionId)\s*\d+(?:\s+do\s+pacote)?/giu;
 /** Qualificador solto: ", do corpus fornecido". */
 const CORPUS_QUALIFIER = /\s*,\s*do\s+corpus(?:\s+(?:oficial|fornecido|recebido|versionado))?/giu;
 
@@ -50,8 +53,11 @@ export function findInternalReference(text: string): string | null {
 export function cleanStudentFacingText(
   text: string,
   article?: { articleRef?: string | null; actTitle?: string | null } | null,
+  /** false na correção gravada (jargon-rewrite-v1, amostra aprovada em 21/11): id cru fica para a tela. */
+  options: { stripRawIds?: boolean } = {},
 ): string {
   if (!text) return text;
+  const stripRawIds = options.stripRawIds ?? true;
   const full = articleLabel(article?.articleRef, article?.actTitle);
   const short = article?.articleRef?.trim().replace(/^Art\./u, "art.") || full;
   const act = article?.actTitle?.trim().toLowerCase();
@@ -62,13 +68,14 @@ export function cleanStudentFacingText(
     if (short && before.endsWith(short.toLowerCase())) return "";
     return (act && before.endsWith(act) ? short : full) ?? "";
   });
-  out = out.replace(INTERNAL_PACKET_REF, "").replace(INTERNAL_VERSION_REF, "").replace(CORPUS_QUALIFIER, "");
+  out = out.replace(INTERNAL_PACKET_REF, "").replace(stripRawIds ? INTERNAL_ID_REF : /(?!)/gu, "").replace(INTERNAL_VERSION_REF, "").replace(CORPUS_QUALIFIER, "");
   return out
     .replace(/\(\s*\)/g, "")
     .replace(/\s+([,.;:])/g, "$1")
     .replace(/,\s*([.;])/g, "$1")
     .replace(/(Fonte|Fundamento)\s*:\s*,\s*/giu, "$1: ")
     .replace(/(Fonte|Fundamento)\s*:\s*\./giu, "")
+    .replace(/\s*Vers[aã]o(?:\s+do\s+pacote)?\s*:\s*\./giu, "")
     .replace(/[ \t]{2,}/g, " ")
     .trim();
 }

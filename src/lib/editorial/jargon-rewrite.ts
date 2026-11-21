@@ -106,7 +106,7 @@ export function rewriteJargon(original: string, article?: { articleRef?: string 
   if (!original || !findInternalReference(original)) return { text: original, rules: [], resolved: true };
   const rules: string[] = [];
   let text = original;
-  const ids = cleanStudentFacingText(text, article);
+  const ids = cleanStudentFacingText(text, article, { stripRawIds: false });
   if (ids !== text) {
     rules.push("ids");
     text = ids;
