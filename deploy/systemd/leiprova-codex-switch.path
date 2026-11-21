@@ -1,0 +1,11 @@
+# O worker principal regrava a campainha só quando muda se a instância Codex deve rodar
+# (esgotou a API do mês ou renovou). O api-budget.json muda a cada execução: não é observado direto.
+[Unit]
+Description=Edital Lei Seca - campainha do liga/desliga da instancia Codex
+
+[Path]
+PathChanged=/var/lib/leiprova-realtime/codex-switch.signal
+Unit=leiprova-codex-switch.service
+
+[Install]
+WantedBy=multi-user.target

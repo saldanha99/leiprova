@@ -1,12 +1,16 @@
 # Segunda instância do motor editorial contínuo: executor Codex (assinatura ChatGPT),
 # mesma fila editorial_agent_work (reserva atômica por advisory lock + skip locked).
-# Instalar com deploy/install-editorial-codex.sh; fica DESLIGADA até o OK do proprietário
-# (docs/MOTOR-CODEX-PARALELO.md). Não recebe a chave da API: o worker só lê a chave no executor claude.
+# Instalar com deploy/install-editorial-codex.sh. Não é habilitada (sem [Install]): quem liga e desliga é
+# leiprova-codex-switch (roda enquanto a API do mês estiver esgotada; para na renovação mensal).
+# Ver docs/MOTOR-CODEX-PARALELO.md. Não recebe a chave da API: o worker só lê a chave no executor claude.
 [Unit]
 Description=Edital Lei Seca - motor editorial continuo (Codex, Autor)
 After=docker.service network-online.target
 Wants=network-online.target
 Requires=docker.service
+# Sem login do Codex, a partida é pulada (condição falha, unidade fica inativa, sem Restart=):
+# nada de reinício em laço. Login: docs/MOTOR-CODEX-PARALELO.md.
+ConditionPathExists=/var/lib/leiprova-codex/codex-home/auth.json
 
 [Service]
 Type=simple
@@ -30,6 +34,3 @@ TimeoutStopSec=1800
 NoNewPrivileges=true
 ProtectSystem=full
 PrivateTmp=true
-
-[Install]
-WantedBy=multi-user.target
