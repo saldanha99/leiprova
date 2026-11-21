@@ -1,7 +1,8 @@
 # Checkout inteligente — Edital Lei Seca (branch `feat/checkout-inteligente`)
 
-Preparado em 20/11/2026 a pedido do Vinícius. **Nada está ativo**: cada parte liga por
-configuração, depois do deploy aprovado.
+Preparado em 20/11/2026 a pedido do Vinícius; deploy aprovado em 21/11/2026 ("Publicar agora").
+Ativo: Pix + cartão por configuração (Pix só aparece em live depois de ativado na Stripe).
+Desligados: GTM/Stape (sem variáveis) e recuperação de abandono.
 
 ## 1. Pix + cartão na mesma tela
 
@@ -30,23 +31,20 @@ Prints (modo de teste, 20/11/2026): `/data/OpenBot/Shared/leiprova/checkout-prin
 (desktop e celular, Pix e cartão). O Stripe.js avisou: "pix não ativado: aparece em teste
 e fica oculto em live" — confirma o item 1 acima.
 
-## 2. Order bump (oferta extra) — configurável, desligado
+## 2. Order bump (oferta extra) — Opção A escolhida (21/11/2026)
 
-`ORDER_BUMP_CONFIG` (JSON) em `src/lib/commerce/order-bump.ts`. Sem a variável, nada aparece.
-O valor vem de um **preço que já existe na Stripe**; nenhum preço ou desconto foi criado.
+Decisão do Vinícius: **Opção A, segundo concurso da mesma carreira**, só com preços que
+já existem na Stripe.
 
-**Opção A — "Segundo concurso da mesma carreira"** (recomendada)
-- Mostrada no carrinho de concurso quando há 1 ou 2 concursos (o carrinho aceita até 3 da
-  mesma carreira e periodicidade).
-- Por quê: quem estuda TJ-RS Juiz estuda a mesma lei seca que TJ-PR/TJ-BA; o segundo
-  concurso aproveita quase todo o estudo, então a percepção de valor é alta e o ticket sobe
-  sem mudar de produto. Usa os preços atuais; um cupom só se o Vinícius definir o percentual.
+Essa oferta **já existe no carrinho de concurso** (bloco "02 · Amplie seus objetivos",
+`src/components/checkout/contest-cart.tsx`): mostra até 2 concursos liberados da mesma
+carreira, desmarcados, cada um pelo preço do próprio concurso na periodicidade escolhida
+(preço já cadastrado na Stripe). O carrinho aceita até 3 concursos e a cobrança revalida
+cada item antes de cobrar. Por isso **não há variável a ligar**: o `ORDER_BUMP_CONFIG`
+preparado em 20/11 nunca chegou à tela e foi removido (código morto, YAGNI).
 
-**Opção B — "Trocar pelo Master"**
-- Mostrada quando o carrinho tem 2 ou mais concursos: o Master (R$ 297/mês ou R$ 897/ano,
-  preços já cadastrados) libera todos os concursos e o acervo inteiro.
-- Por quê: com 2–3 concursos o cliente já paga perto do Master; a comparação lado a lado
-  ancora o Master como a escolha óbvia. Risco: canibaliza a venda por concurso.
+Opção B (trocar pelo Master) não foi escolhida; o bloco "Conheça o Master" do carrinho
+continua como já era.
 
 ## 3. Recuperação de abandono — rascunhos, sem disparo
 
@@ -103,7 +101,6 @@ Assunto: Seu acesso ao {CONCURSO} ficou a um passo
 | `NEXT_PUBLIC_GTM_SERVER_URL` | Domínio do Stape (ex.: `https://sgtm.editaleiseca.com.br`), de onde o `gtm.js` é servido. |
 | `STAPE_SERVER_EVENTS_URL` | Endpoint do Data Client do Stape para o Purchase server-side (CAPI). |
 | `CHECKOUT_PAYMENT_METHODS` | `card` (padrão) ou `card,pix`. |
-| `ORDER_BUMP_CONFIG` | JSON da oferta extra (seção 2). |
 
 No GTM/Stape (Vinícius): tags de Pixel e CAPI lendo `event_id` do dataLayer/evento,
 para a deduplicação da Meta.
