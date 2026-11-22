@@ -78,6 +78,9 @@ export function readConfig(env) {
     // API paga (decisões do proprietário em 19/11 e 21/11/2026): teto de US$ 50 por mês-calendário UTC,
     // parada em 100% (US$ 50). A chave fica fora do repositório e só chega à CLI enquanto houver orçamento.
     apiSecretFile: env.EDITORIAL_API_SECRET_FILE?.trim() || "/etc/leiprova/editorial-realtime.secret",
+    // Assinatura Claude alternativa (decisão do proprietário em 22/11/2026): com o arquivo definido e
+    // um token válido, a CLI usa essa conta em vez do login do HOME. Vazio = login do HOME.
+    oauthTokenFile: absolute("EDITORIAL_OAUTH_TOKEN_FILE"),
     apiCapUsd: usd("EDITORIAL_API_CAP_USD", 50),
     apiStopUsd: usd("EDITORIAL_API_STOP_USD", 50),
     // Reservado por execução em andamento: o teto considera o que ainda não foi cobrado.
@@ -107,6 +110,19 @@ export function parseClaim(text, role) {
 export function parseApiSecret(text) {
   const match = /^\s*ANTHROPIC_API_KEY\s*=\s*["']?([^"'\s]+)["']?\s*$/m.exec(text ?? "");
   return match ? match[1] : null;
+}
+
+/**
+ * Token de acesso de outra assinatura Claude, em arquivo privado regravado de fora (só o token de
+ * acesso, sem o de renovação). Linhas `CLAUDE_CODE_OAUTH_TOKEN=...` e, opcional, `EXPIRES_AT=<ms>`.
+ * Token vencido (ou a menos de 2 min) vale como ausente. Nunca registra o valor.
+ */
+export function parseOauthToken(text, now = Date.now()) {
+  const match = /^\s*(?:CLAUDE_CODE_OAUTH_TOKEN\s*=\s*)?["']?(sk-ant-oat[0-9A-Za-z_-]{20,})["']?\s*$/m.exec(text ?? "");
+  if (!match) return null;
+  const expires = /^\s*EXPIRES_AT\s*=\s*(\d{13})\s*$/m.exec(text)?.[1];
+  if (expires && Number(expires) - now < 120_000) return null;
+  return match[1];
 }
 
 /** Resultado de `claude -p --output-format json`: texto final e custo real informado pela CLI. */
@@ -236,6 +252,12 @@ export async function main(env = process.env) {
   const idleLogged = new Set();
   const childEnv = { PATH: process.env.PATH, HOME: process.env.HOME, LANG: "C.UTF-8", NO_COLOR: "1",
     ...(config.executor === "codex" && config.codexHome ? { CODEX_HOME: config.codexHome } : {}) };
+  // Relido a cada execução: o token é renovado de fora. Ausente ou vencido = login do HOME.
+  const subscriptionEnv = async () => {
+    if (config.executor !== "claude" || !config.oauthTokenFile) return childEnv;
+    const token = await readFile(config.oauthTokenFile, "utf8").then((text) => parseOauthToken(text), () => null);
+    return token ? { ...childEnv, CLAUDE_CODE_OAUTH_TOKEN: token } : childEnv;
+  };
   const command = executorCommand(config);
   // A chave é lida uma vez e só entra no ambiente da CLI; não vai para logs, eventos nem para a ponte.
   const apiKey = config.executor === "claude"
@@ -280,9 +302,10 @@ export async function main(env = process.env) {
   async function runExecutor(role, input, cwd, timeoutMs) {
     await renewIfNewMonth();
     const useApi = Boolean(apiKey) && budgetAllows(budget, inflightUsd, config.apiRunReserveUsd);
-    if (!useApi) return { ...(await run(command.bin, command.args, { input, cwd, timeoutMs, env: childEnv })), useApi };
+    if (!useApi) return { ...(await run(command.bin, command.args, { input, cwd, timeoutMs, env: await subscriptionEnv() })), useApi };
     inflightUsd += config.apiRunReserveUsd;
     let result;
+    // Na API não vai o token da assinatura: a cobrança fica só na chave e no teto.
     try { result = await run(command.bin, command.args, { input, cwd, timeoutMs, env: { ...childEnv, ANTHROPIC_API_KEY: apiKey } }); }
     finally { inflightUsd -= config.apiRunReserveUsd; }
     // Execução que atravessou a virada é cobrada no mês novo (mais conservador para o teto).

@@ -13,6 +13,7 @@ import {
   loadBudget,
   rolloverBudget,
   parseApiSecret,
+  parseOauthToken,
   parseCliResult,
   contractForRole,
   contractRejection,
@@ -98,6 +99,26 @@ describe("executor", () => {
     expect(parseApiSecret("# comentário\nANTHROPIC_API_KEY=sk-ant-test_123\n")).toBe("sk-ant-test_123");
     expect(parseApiSecret('ANTHROPIC_API_KEY="sk-ant-x"')).toBe("sk-ant-x");
     expect(parseApiSecret("OTHER_KEY=abc")).toBeNull();
+  });
+  it("lê o token da assinatura alternativa e recusa outros formatos", () => {
+    const token = "sk-ant-oat01-" + "a".repeat(40);
+    expect(parseOauthToken(`${token}\n`)).toBe(token);
+    expect(parseOauthToken(`CLAUDE_CODE_OAUTH_TOKEN="${token}"`)).toBe(token);
+    expect(parseOauthToken("ANTHROPIC_API_KEY=sk-ant-api03-xyz")).toBeNull();
+    expect(parseOauthToken("")).toBeNull();
+  });
+  it("token vencido ou a menos de 2 min do vencimento vale como ausente", () => {
+    const token = "sk-ant-oat01-" + "b".repeat(40);
+    const now = 1_800_000_000_000;
+    expect(parseOauthToken(`CLAUDE_CODE_OAUTH_TOKEN=${token}\nEXPIRES_AT=${now + 3_600_000}\n`, now)).toBe(token);
+    expect(parseOauthToken(`CLAUDE_CODE_OAUTH_TOKEN=${token}\nEXPIRES_AT=${now + 60_000}\n`, now)).toBeNull();
+    expect(parseOauthToken(`CLAUDE_CODE_OAUTH_TOKEN=${token}\nEXPIRES_AT=${now - 1}\n`, now)).toBeNull();
+  });
+  it("arquivo de token é opcional e precisa ser caminho absoluto", () => {
+    expect(readConfig({}).oauthTokenFile).toBe("");
+    expect(readConfig({ EDITORIAL_OAUTH_TOKEN_FILE: "/etc/leiprova/editorial-oauth.secret" }).oauthTokenFile)
+      .toBe("/etc/leiprova/editorial-oauth.secret");
+    expect(() => readConfig({ EDITORIAL_OAUTH_TOKEN_FILE: "token.txt" })).toThrow();
   });
   it("lê custo e texto do JSON da CLI e ignora saída sem JSON", () => {
     expect(parseCliResult('{"type":"result","is_error":false,"result":"OK","total_cost_usd":0.0123}')).toEqual({ text: "OK", isError: false, cost: 0.0123 });
