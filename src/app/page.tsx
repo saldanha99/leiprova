@@ -271,9 +271,10 @@ export default async function Home() {
               </div>
               <p className="els-sheet__text els-serif">
                 Ninguém será privado da liberdade ou de seus{" "}
-                <span className="els-blank" aria-label="lacuna">
+                <span className="els-blank" aria-hidden="true">
                   bens
-                </span>{" "}
+                </span>
+                <span className="sr-only">lacuna</span>{" "}
                 sem o devido processo legal.
               </p>
               <div className="els-sheet__options">

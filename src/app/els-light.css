@@ -1270,7 +1270,7 @@ body:has(.els-light) {
 
 .els-footer__links a {
   display: flex;
-  min-height: 40px;
+  min-height: 44px;
   align-items: center;
   color: var(--ink-2);
   font-weight: 600;

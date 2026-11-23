@@ -152,6 +152,8 @@ const STEPS = [
   },
 ] as const;
 
+export const viewport = { themeColor: "#fbfaf6" };
+
 export default function MemorizeDryLawPage() {
   return (
     <PublicGuideShell tone="light">
