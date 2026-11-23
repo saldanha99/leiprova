@@ -10,6 +10,7 @@ export default defineConfig({
     alias: {
       "@": path.join(root, "src"),
       "server-only": path.join(root, "tests/stubs/server-only.ts"),
+      "next/font/google": path.join(root, "tests/stubs/next-font-google.ts"),
     },
   },
   test: {
