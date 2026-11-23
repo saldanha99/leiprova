@@ -325,16 +325,19 @@ export async function captureOfficialDiscoveryPage(url: string, validate: (url: 
   const html = decodeBody(bytes, response.headers.get("content-type"));
   const $ = cheerio.load(html);
   const links: { text: string; href: string }[] = [];
+  // Links the policy forbids following (e.g. FCC /concursos/, robots) are kept only as text:
+  // never fetched and never citable as discovery.url, but their label/code is evidence.
+  const listedOnly: string[] = [];
   const seen = new Set<string>();
   $("a[href]").each((_, element) => {
-    if (links.length >= MAX_DISCOVERY_LINKS) return;
-    const text = normalizeOfficialText($(element).text()).slice(0, 300);
-    const raw = $(element).attr("href") ?? "";
-    let href: string;
-    try { href = validate(new URL(raw, finalUrl).toString()); } catch { return; }
-    if (!text || seen.has(href)) return;
-    seen.add(href);
-    links.push({ text, href });
+    if (links.length + listedOnly.length >= MAX_DISCOVERY_LINKS) return;
+    const label = normalizeOfficialText($(element).text() || $(element).find("img[alt]").attr("alt") || $(element).attr("title") || "").slice(0, 300);
+    let absolute: string;
+    try { absolute = new URL($(element).attr("href") ?? "", finalUrl).toString(); } catch { return; }
+    if (seen.has(absolute)) return;
+    seen.add(absolute);
+    try { links.push({ text: label || absolute, href: validate(absolute) }); }
+    catch { if (absolute.startsWith(target.origin)) listedOnly.push(`${label || "(sem rótulo)"} — ${absolute}`); }
   });
   return {
     url: target.toString(),
@@ -342,7 +345,54 @@ export async function captureOfficialDiscoveryPage(url: string, validate: (url: 
     httpStatus: response.status,
     fetchedAt: new Date().toISOString(),
     sha256: createHash("sha256").update(bytes).digest("hex"),
-    text: extractOfficialDocumentText(html).slice(0, MAX_DISCOVERY_TEXT_CHARS),
+    text: [extractOfficialDocumentText(html),
+      ...(listedOnly.length ? ["Links listados no índice que a política proíbe seguir (não acessados; cite a página do índice):", ...listedOnly] : [])]
+      .join("\n").slice(0, MAX_DISCOVERY_TEXT_CHARS),
     links,
+  };
+}
+
+const CEBRASPE_EVENTS_API = "https://apis.cebraspe.org.br/cebraspe/eventos/tipo/concursos/";
+const CEBRASPE_INDEX = "https://www.cebraspe.org.br/concursos/";
+
+/**
+ * Cebraspe's index is a React shell (empty HTML); the list comes from its public JSON API
+ * (no robots.txt there: 404). Converted to the same capture shape, citing the public pages.
+ */
+export async function captureCebraspeDiscoveryIndex(validate: (url: string) => string): Promise<DiscoveryPageCapture> {
+  const robots = await fetchWithTrustedRedirects("https://apis.cebraspe.org.br/robots.txt", candidate => {
+    if (new URL(candidate).origin !== "https://apis.cebraspe.org.br") throw new Error("robots.txt redirecionou para outra origem.");
+  });
+  if (robots.status !== 404) {
+    if (!robots.ok) throw new Error(`robots.txt da API Cebraspe respondeu HTTP ${robots.status}; captura bloqueada.`);
+    assertOfficialRobotsPathAllowed(decodeBody(await readLimitedBody(robots), robots.headers.get("content-type")), new URL(CEBRASPE_EVENTS_API).pathname);
+  }
+  const response = await fetchWithTrustedRedirects(CEBRASPE_EVENTS_API, candidate => {
+    if (candidate !== CEBRASPE_EVENTS_API) throw new Error("API Cebraspe redirecionou.");
+  });
+  if (!response.ok || !(response.headers.get("content-type") ?? "").includes("json")) throw new Error(`API Cebraspe respondeu HTTP ${response.status}.`);
+  const bytes = await readLimitedBody(response, MAX_DISCOVERY_PAGE_BYTES);
+  const phases: unknown = JSON.parse(new TextDecoder("utf-8").decode(bytes));
+  if (!Array.isArray(phases)) throw new Error("API Cebraspe mudou de formato.");
+  const lines: string[] = [];
+  const links: { text: string; href: string }[] = [];
+  // Open/new phases first; closed ones last, so the cap drops old events, not new ones.
+  const ordered = [...phases].sort((a, b) => Number(/encerrad/i.test(String(a?.faseEvento))) - Number(/encerrad/i.test(String(b?.faseEvento))));
+  for (const phase of ordered) {
+    const name = typeof phase?.faseEvento === "string" ? phase.faseEvento : "Fase";
+    lines.push(`## ${name}`);
+    for (const event of Array.isArray(phase?.eventos) ? phase.eventos : []) {
+      if (typeof event?.eventoURL !== "string" || !/^[A-Za-z0-9_-]{2,120}$/u.test(event.eventoURL)) continue;
+      const title = String(event.eventoNomeAbreviado ?? event.eventoURL).slice(0, 200);
+      const line = `${title} | ano ${event.eventoAno ?? "?"} | vagas ${event.eventoTotalVagas ?? "?"} | inscrição aberta: ${event.isInscricaoAberta ? "sim" : "não"} | fase: ${name}`;
+      lines.push(line);
+      if (links.length < MAX_DISCOVERY_LINKS) {
+        try { links.push({ text: line, href: validate(`${CEBRASPE_INDEX}${event.eventoURL}`) }); } catch { /* not citable */ }
+      }
+    }
+  }
+  return {
+    url: CEBRASPE_INDEX, finalUrl: CEBRASPE_INDEX, httpStatus: response.status, fetchedAt: new Date().toISOString(),
+    sha256: createHash("sha256").update(bytes).digest("hex"), text: lines.join("\n").slice(0, MAX_DISCOVERY_TEXT_CHARS), links,
   };
 }

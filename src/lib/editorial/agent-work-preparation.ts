@@ -7,7 +7,7 @@ import { MINIMUM_COURSE_QUESTION_COUNT } from "@/lib/commerce/minimum-course-con
 import { STYLE_PROFILE_SEEDS } from "./style-profiles";
 import { suggestLegalRequirementMapping, type MappingArticle } from "./legal-requirement-mapping";
 import { discoveryPortalPolicy } from "./discovery-policy";
-import { captureOfficialDiscoveryPage, type DiscoveryPageCapture } from "@/lib/official-sources/fetch";
+import { captureCebraspeDiscoveryIndex, captureOfficialDiscoveryPage, type DiscoveryPageCapture } from "@/lib/official-sources/fetch";
 import { prepareCourseIntake } from "./course-intake";
 import { officialQuestionContractSchema, questionContractFingerprint } from "./official-question-contract";
 import { currentQuestionContractExists } from "./question-contract-query";
@@ -244,7 +244,8 @@ export async function prepareAgentWork(db:AgentDatabase, now=new Date(), options
     if(existing?.captured) continue;
     const pages:DiscoveryPageCapture[]=[];const failures:string[]=[];
     if(!policy.blocked) for(const url of urls) {
-      try { pages.push(await captureOfficialDiscoveryPage(url,validateDiscoveryUrl)); }
+      try { pages.push(portal.bank==="cebraspe" ? await captureCebraspeDiscoveryIndex(validateDiscoveryUrl)
+        : await captureOfficialDiscoveryPage(url,validateDiscoveryUrl)); }
       catch(error) { failures.push(`${url}: ${error instanceof Error ? error.message.slice(0,200) : "falha de captura"}`); }
     }
     const blocked=policy.blocked ?? (pages.length ? null : "portal_capture_failed");
