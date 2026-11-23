@@ -120,36 +120,37 @@ const STATISTICAL_SIGNALS = [
 
 export default function MethodologyPage() {
   return (
-    <PublicGuideShell>
+    <PublicGuideShell tone="els">
       <JsonLd data={methodologyStructuredData} />
       <article>
-        <header className="relative overflow-hidden border-b border-white/8 bg-[radial-gradient(circle_at_82%_5%,rgba(105,167,255,.15),transparent_36%),radial-gradient(circle_at_8%_15%,rgba(45,212,164,.1),transparent_30%),#07101b]">
+        <header className="relative overflow-hidden border-b border-els-line bg-[radial-gradient(circle_at_82%_5%,color-mix(in_oklch,var(--els-info)_15%,transparent),transparent_36%),radial-gradient(circle_at_8%_15%,color-mix(in_oklch,var(--els-green)_10%,transparent),transparent_30%),var(--els-bg)]">
           <div className="mx-auto max-w-6xl px-5 py-14 sm:py-20">
-            <GuideBreadcrumbs current="Metodologia" />
+            <GuideBreadcrumbs tone="els" current="Metodologia" />
             <div className="mt-9 max-w-5xl">
-              <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-blue-300">
+              <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-els-info-ink">
                 Política pública de produto e conteúdo
               </p>
-              <h1 className="mt-4 text-4xl font-semibold tracking-[-0.05em] text-white sm:text-6xl">
+              <h1 className="mt-4 text-4xl font-semibold tracking-[-0.05em] text-els-fg sm:text-6xl">
                 {PAGE_TITLE}
               </h1>
-              <p className="mt-6 max-w-4xl text-lg leading-8 text-slate-300">
+              <p className="mt-6 max-w-4xl text-lg leading-8 text-els-fg-2">
                 O processo separa descoberta de fontes, análise de evidências e publicação. Normas, editais, programas e inéditas têm conferência própria e podem seguir revisão automatizada autorizada pelo proprietário, com auditoria e suspensão de erros; não se presume revisão humana independente. Fonte oficial, cargo, edição e origem da aprovação devem permanecer identificados.
               </p>
-              <p className="mt-5 text-sm leading-7 text-slate-400">
+              <p className="mt-5 text-sm leading-7 text-els-fg-3">
                 Esta página descreve a política de implementação. Ela não afirma que todos os conectores, análises históricas ou páginas específicas já estejam operando.
               </p>
             </div>
           </div>
         </header>
 
+        <div data-theme="light" className="border-t border-els-line">
         <div className="mx-auto max-w-6xl space-y-20 px-5 py-16 sm:py-20">
           <section aria-labelledby="fluxo-title">
             <div className="max-w-3xl">
-              <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-amber-300">
+              <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-els-amber-ink">
                 Do sinal à publicação
               </p>
-              <h2 id="fluxo-title" className="mt-3 text-3xl font-semibold tracking-[-0.045em] text-white sm:text-4xl">
+              <h2 id="fluxo-title" className="mt-3 text-3xl font-semibold tracking-[-0.045em] text-els-fg sm:text-4xl">
                 Seis etapas com evidência e responsabilidade
               </h2>
             </div>
@@ -157,24 +158,24 @@ export default function MethodologyPage() {
               {PIPELINE.map((step) => {
                 const Icon = step.icon;
                 return (
-                  <li key={step.title} className="rounded-[1.6rem] border border-white/9 bg-[#0a1420] p-6">
-                    <Icon aria-hidden="true" className="size-6 text-emerald-300" />
-                    <h3 className="mt-5 text-xl font-semibold tracking-[-0.025em] text-white">{step.title}</h3>
-                    <p className="mt-3 text-sm leading-7 text-slate-400">{step.text}</p>
+                  <li key={step.title} className="rounded-[1.6rem] border border-els-line bg-els-surface p-6">
+                    <Icon aria-hidden="true" className="size-6 text-els-green-ink" />
+                    <h3 className="mt-5 text-xl font-semibold tracking-[-0.025em] text-els-fg">{step.title}</h3>
+                    <p className="mt-3 text-sm leading-7 text-els-fg-3">{step.text}</p>
                   </li>
                 );
               })}
             </ol>
           </section>
 
-          <section aria-labelledby="responsavel-title" className="rounded-[2rem] border border-amber-300/20 bg-[radial-gradient(circle_at_0%_0%,rgba(251,191,36,.12),transparent_40%),#08111d] p-6 sm:p-10">
+          <section aria-labelledby="responsavel-title" className="rounded-[2rem] border border-els-amber/20 bg-[radial-gradient(circle_at_0%_0%,color-mix(in_oklch,var(--els-amber)_12%,transparent),transparent_40%),var(--els-bg-2)] p-6 sm:p-10">
             <div className="grid gap-9 lg:grid-cols-[.72fr_1.28fr]">
               <div>
-                <Building2 aria-hidden="true" className="size-7 text-amber-300" />
-                <h2 id="responsavel-title" className="mt-5 text-3xl font-semibold tracking-[-0.045em] text-white">
+                <Building2 aria-hidden="true" className="size-7 text-els-amber-ink" />
+                <h2 id="responsavel-title" className="mt-5 text-3xl font-semibold tracking-[-0.045em] text-els-fg">
                   Categoria não é banca
                 </h2>
-                <p className="mt-4 text-sm leading-7 text-slate-400">
+                <p className="mt-4 text-sm leading-7 text-els-fg-3">
                   A mesma carreira pode ter responsáveis diferentes a cada ano e em cada estado. Por isso, a interface não deve oferecer quatro bancas livres para uma edição concreta.
                 </p>
               </div>
@@ -184,9 +185,9 @@ export default function MethodologyPage() {
                   ["Comissão institucional", "O próprio órgão conduz a edição; não se inventa uma banca de questões."],
                   ["Modelo híbrido", "Papéis de responsabilidade, elaboração e logística ficam separados e documentados."],
                 ].map(([title, text]) => (
-                  <article key={title} className="rounded-2xl border border-white/8 bg-white/[0.025] p-5">
-                    <h3 className="font-semibold text-white">{title}</h3>
-                    <p className="mt-2 text-sm leading-6 text-slate-400">{text}</p>
+                  <article key={title} className="rounded-2xl border border-els-line bg-els-raise p-5">
+                    <h3 className="font-semibold text-els-fg">{title}</h3>
+                    <p className="mt-2 text-sm leading-6 text-els-fg-3">{text}</p>
                   </article>
                 ))}
               </div>
@@ -196,24 +197,24 @@ export default function MethodologyPage() {
           <section aria-labelledby="estatistica-title">
             <div className="grid gap-10 lg:grid-cols-[1fr_.9fr]">
               <div>
-                <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-emerald-300">
+                <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-els-green-ink">
                   Estatística com limites visíveis
                 </p>
-                <h2 id="estatistica-title" className="mt-3 text-3xl font-semibold tracking-[-0.045em] text-white sm:text-4xl">
+                <h2 id="estatistica-title" className="mt-3 text-3xl font-semibold tracking-[-0.045em] text-els-fg sm:text-4xl">
                   Dez anos é uma janela possível, não um número mágico
                 </h2>
-                <p className="mt-5 text-sm leading-7 text-slate-400">
+                <p className="mt-5 text-sm leading-7 text-els-fg-3">
                   A janela histórica pode chegar a dez anos quando existirem provas comparáveis, fonte identificada e direito de uso documentado. Se a amostra for menor, a página deve mostrar exatamente o período e a quantidade analisada. Nenhum percentual deve ser apresentado como “chance de cair” sem método, denominador e incerteza explicados.
                 </p>
-                <p className="mt-4 rounded-2xl border border-white/9 bg-white/[0.025] p-5 text-sm leading-7 text-slate-400">
+                <p className="mt-4 rounded-2xl border border-els-line bg-els-raise p-5 text-sm leading-7 text-els-fg-3">
                   No modelo inicial versionado, o ranking combina incidência histórica (35%), recência (20%), persistência entre anos (15%), aderência ao edital atual (25%) e relevância de mudança legislativa (5%). A incidência exibe intervalo de 95%; o resultado é prioridade de estudo, não previsão garantida.
                 </p>
               </div>
               <div className="grid gap-3">
                 {STATISTICAL_SIGNALS.map((signal) => (
-                  <article key={signal.title} className="rounded-2xl border border-white/9 bg-[#0a1420] p-5">
-                    <h3 className="font-semibold text-white">{signal.title}</h3>
-                    <p className="mt-2 text-sm leading-6 text-slate-400">{signal.text}</p>
+                  <article key={signal.title} className="rounded-2xl border border-els-line bg-els-surface p-5">
+                    <h3 className="font-semibold text-els-fg">{signal.title}</h3>
+                    <p className="mt-2 text-sm leading-6 text-els-fg-3">{signal.text}</p>
                   </article>
                 ))}
               </div>
@@ -221,59 +222,60 @@ export default function MethodologyPage() {
           </section>
 
           <section aria-labelledby="lexml-title" className="grid gap-8 lg:grid-cols-[.78fr_1.22fr] lg:items-center">
-            <div className="rounded-[1.7rem] border border-blue-300/16 bg-blue-300/[0.045] p-6 sm:p-8">
-              <div className="flex items-center gap-3 text-blue-300">
+            <div className="rounded-[1.7rem] border border-els-info/16 bg-els-info/[0.045] p-6 sm:p-8">
+              <div className="flex items-center gap-3 text-els-info-ink">
                 <Bot aria-hidden="true" className="size-6" />
                 <span className="text-xs font-extrabold uppercase tracking-[0.16em]">LexML no motor</span>
               </div>
-              <p className="mt-5 text-sm leading-7 text-slate-300">
+              <p className="mt-5 text-sm leading-7 text-els-fg-2">
                 Os serviços e dados abertos da LexML podem ajudar a localizar registros, identificadores e relações entre atos. Essa integração funciona como apoio à descoberta e ao versionamento; a publicação jurídica continua vinculada à fonte oficial competente e à aprovação editorial identificada.
               </p>
-              <a className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-blue-300 hover:text-blue-200" href="https://projeto.lexml.gov.br/open-data" rel="noreferrer">
+              <a className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-els-info-ink hover:text-els-info-ink min-h-11" href="https://projeto.lexml.gov.br/open-data" rel="noreferrer">
                 Conhecer os dados abertos da LexML
                 <ExternalLink aria-hidden="true" className="size-4" />
               </a>
             </div>
             <div>
-              <h2 id="lexml-title" className="text-3xl font-semibold tracking-[-0.045em] text-white sm:text-4xl">
+              <h2 id="lexml-title" className="text-3xl font-semibold tracking-[-0.045em] text-els-fg sm:text-4xl">
                 O que a API jurídica não decide
               </h2>
-              <ul className="mt-6 space-y-4 text-sm leading-7 text-slate-400">
-                <li className="flex gap-3"><span aria-hidden="true" className="mt-3 size-1.5 shrink-0 rounded-full bg-amber-300" />Ela não confirma, sozinha, que um concurso está aberto ou que uma organizadora foi contratada.</li>
-                <li className="flex gap-3"><span aria-hidden="true" className="mt-3 size-1.5 shrink-0 rounded-full bg-amber-300" />Ela não transforma provas e questões disponíveis na internet em conteúdo licenciado para exploração comercial.</li>
-                <li className="flex gap-3"><span aria-hidden="true" className="mt-3 size-1.5 shrink-0 rounded-full bg-amber-300" />Ela não substitui diário oficial, texto consolidado do ente competente nem conferência de vigência.</li>
+              <ul className="mt-6 space-y-4 text-sm leading-7 text-els-fg-3">
+                <li className="flex gap-3"><span aria-hidden="true" className="mt-3 size-1.5 shrink-0 rounded-full bg-els-amber" />Ela não confirma, sozinha, que um concurso está aberto ou que uma organizadora foi contratada.</li>
+                <li className="flex gap-3"><span aria-hidden="true" className="mt-3 size-1.5 shrink-0 rounded-full bg-els-amber" />Ela não transforma provas e questões disponíveis na internet em conteúdo licenciado para exploração comercial.</li>
+                <li className="flex gap-3"><span aria-hidden="true" className="mt-3 size-1.5 shrink-0 rounded-full bg-els-amber" />Ela não substitui diário oficial, texto consolidado do ente competente nem conferência de vigência.</li>
               </ul>
             </div>
           </section>
 
-          <section aria-labelledby="publicacao-title" className="rounded-[2rem] border border-white/9 bg-[#08111d] p-6 sm:p-10">
-            <BookOpenCheck aria-hidden="true" className="size-7 text-emerald-300" />
-            <h2 id="publicacao-title" className="mt-5 text-3xl font-semibold tracking-[-0.045em] text-white">
+          <section aria-labelledby="publicacao-title" className="rounded-[2rem] border border-els-line bg-els-surface p-6 sm:p-10">
+            <BookOpenCheck aria-hidden="true" className="size-7 text-els-green-ink" />
+            <h2 id="publicacao-title" className="mt-5 text-3xl font-semibold tracking-[-0.045em] text-els-fg">
               O que fica público — e quando
             </h2>
             <div className="mt-7 grid gap-4 md:grid-cols-2">
-              <article className="rounded-2xl border border-emerald-300/18 bg-emerald-300/[0.045] p-5">
-                <h3 className="font-semibold text-emerald-200">Pode ser publicado</h3>
-                <p className="mt-2 text-sm leading-7 text-slate-400">
+              <article className="rounded-2xl border border-els-green/18 bg-els-green/[0.045] p-5">
+                <h3 className="font-semibold text-els-green-ink">Pode ser publicado</h3>
+                <p className="mt-2 text-sm leading-7 text-els-fg-3">
                   Página com fonte oficial aprovada, edição identificada, responsável corretamente classificado, situação conferida, conteúdo visível coerente com o schema e aprovação editorial com sua origem registrada.
                 </p>
               </article>
-              <article className="rounded-2xl border border-rose-300/15 bg-rose-300/[0.035] p-5">
-                <h3 className="font-semibold text-rose-200">Continua privado</h3>
-                <p className="mt-2 text-sm leading-7 text-slate-400">
+              <article className="rounded-2xl border border-els-danger/15 bg-els-danger/[0.035] p-5">
+                <h3 className="font-semibold text-els-danger-ink">Continua privado</h3>
+                <p className="mt-2 text-sm leading-7 text-els-fg-3">
                   Pista de agregador, edital sem validação, banca herdada de ano anterior, estimativa sem amostra, questão sem direito de uso ou texto jurídico sem fonte e aprovação identificadas.
                 </p>
               </article>
             </div>
             <div className="mt-7 flex flex-wrap gap-3">
-              <Link className="inline-flex min-h-12 items-center rounded-xl bg-amber-300 px-5 py-3 text-sm font-extrabold text-slate-950 transition hover:bg-amber-200" href="/concursos">
+              <Link className="inline-flex min-h-12 items-center rounded-xl bg-els-amber px-5 py-3 text-sm font-extrabold text-els-on-amber transition hover:bg-els-amber-2" href="/concursos">
                 Ver categorias acompanhadas
               </Link>
-              <Link className="inline-flex min-h-12 items-center rounded-xl border border-white/10 px-5 py-3 text-sm font-bold text-slate-200 transition hover:border-white/20 hover:text-white" href="/fontes-e-atualizacao">
+              <Link className="inline-flex min-h-12 items-center rounded-xl border border-els-line px-5 py-3 text-sm font-bold text-els-fg-2 transition hover:border-els-line-strong hover:text-els-fg" href="/fontes-e-atualizacao">
                 Ver fontes e atualização
               </Link>
             </div>
           </section>
+        </div>
         </div>
       </article>
     </PublicGuideShell>

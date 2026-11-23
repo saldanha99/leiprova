@@ -83,9 +83,9 @@ function StatusBadge({ status }: { status: string }) {
     <span
       className={cn(
         "inline-flex items-center rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-[.1em]",
-        positive && "border-emerald-300/15 bg-emerald-300/8 text-emerald-200",
-        warning && "border-amber-300/15 bg-amber-300/8 text-amber-200",
-        !positive && !warning && "border-white/10 bg-white/5 text-slate-400",
+        positive && "border-els-green/15 bg-els-green/8 text-els-green-ink",
+        warning && "border-els-amber/15 bg-els-amber/8 text-els-amber-ink",
+        !positive && !warning && "border-els-line bg-els-raise text-els-fg-3",
       )}
     >
       {labels[status] ?? status}
@@ -105,24 +105,24 @@ function SummaryCard({
   icon: typeof UsersRound;
 }) {
   return (
-    <article className="rounded-2xl border border-white/8 bg-[#09131f] p-5">
-      <span className="grid size-10 place-items-center rounded-xl bg-amber-300/10 text-amber-300">
+    <article className="rounded-2xl border border-els-line bg-els-surface p-5">
+      <span className="grid size-10 place-items-center rounded-xl bg-els-amber/10 text-els-amber-ink">
         <Icon aria-hidden="true" className="size-[18px]" />
       </span>
-      <p className="mt-5 text-2xl font-semibold tracking-[-.04em] text-white">{value}</p>
-      <h2 className="mt-1 text-sm font-semibold text-slate-200">{label}</h2>
-      <p className="mt-2 text-xs leading-5 text-slate-500">{detail}</p>
+      <p className="mt-5 text-2xl font-semibold tracking-[-.04em] text-els-fg">{value}</p>
+      <h2 className="mt-1 text-sm font-semibold text-els-fg-2">{label}</h2>
+      <p className="mt-2 text-xs leading-5 text-els-fg-3">{detail}</p>
     </article>
   );
 }
 
 function ReadinessItem({ ok, children }: { ok: boolean; children: React.ReactNode }) {
   return (
-    <li className="flex items-start gap-3 text-sm leading-6 text-slate-300">
+    <li className="flex items-start gap-3 text-sm leading-6 text-els-fg-2">
       <span
         className={cn(
           "mt-0.5 grid size-5 shrink-0 place-items-center rounded-full",
-          ok ? "bg-emerald-300/12 text-emerald-300" : "bg-slate-700/50 text-slate-500",
+          ok ? "bg-els-green/12 text-els-green-ink" : "bg-els-fg-4/50 text-els-fg-3",
         )}
       >
         {ok ? <Check aria-hidden="true" className="size-3" /> : <X aria-hidden="true" className="size-3" />}
@@ -145,14 +145,14 @@ export function StripeConnectPanel({
     <main className="mx-auto w-full max-w-[1440px] px-4 py-6 sm:px-7 lg:px-9 lg:py-9">
       <header className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
         <div>
-          <span className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[.17em] text-amber-300">
+          <span className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[.17em] text-els-amber-ink">
             <GitBranch aria-hidden="true" className="size-3.5" />
             Financeiro · Stripe Connect
           </span>
           <h1 className="mt-2 text-3xl font-semibold tracking-[-.04em] sm:text-4xl">
             Divisão auditável de pagamentos
           </h1>
-          <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-500">
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-els-fg-3">
             Estrutura preparada para contas Express e cobranças e transferências separadas. O executor financeiro ainda não está conectado ao checkout e continuará ausente até todas as travas abaixo serem liberadas.
           </p>
         </div>
@@ -160,8 +160,8 @@ export function StripeConnectPanel({
           className={cn(
             "inline-flex w-fit items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold",
             readiness.ready
-              ? "border-emerald-300/20 bg-emerald-300/8 text-emerald-200"
-              : "border-amber-300/20 bg-amber-300/8 text-amber-200",
+              ? "border-els-green/20 bg-els-green/8 text-els-green-ink"
+              : "border-els-amber/20 bg-els-amber/8 text-els-amber-ink",
           )}
         >
           {readiness.ready ? <BadgeCheck className="size-4" /> : <LockKeyhole className="size-4" />}
@@ -169,14 +169,14 @@ export function StripeConnectPanel({
         </span>
       </header>
 
-      <section className="mt-7 rounded-[1.5rem] border border-amber-300/18 bg-[linear-gradient(135deg,rgba(251,191,36,.08),rgba(14,116,144,.05))] p-5 sm:p-6">
+      <section className="mt-7 rounded-[1.5rem] border border-els-amber/18 bg-[linear-gradient(135deg,color-mix(in_oklch,var(--els-amber)_8%,transparent),color-mix(in_oklch,var(--els-surface-2)_5%,transparent))] p-5 sm:p-6">
         <div className="flex items-start gap-4">
-          <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-amber-300/10 text-amber-300">
+          <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-els-amber/10 text-els-amber-ink">
             <AlertTriangle aria-hidden="true" className="size-5" />
           </span>
           <div>
-            <h2 className="font-semibold text-amber-100">Brasil ainda exige confirmação da Stripe</h2>
-            <p className="mt-2 max-w-4xl text-sm leading-6 text-slate-400">
+            <h2 className="font-semibold text-els-amber-ink">Brasil ainda exige confirmação da Stripe</h2>
+            <p className="mt-2 max-w-4xl text-sm leading-6 text-els-fg-3">
               A documentação atual lista contas conectadas no Brasil como disponibilidade em preview. O modelo de cobranças e transferências separadas aceita Brasil, mas só será ativado depois da habilitação do Connect para a conta, validação de KYC dos recebedores e revisão contábil/jurídica da sociedade.
             </p>
             <div className="mt-4 flex flex-wrap gap-3 text-xs font-semibold">
@@ -184,7 +184,7 @@ export function StripeConnectPanel({
                 href="https://docs.stripe.com/connect/how-connect-works"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-amber-200 hover:text-amber-100"
+                className="inline-flex items-center gap-2 text-els-amber-ink hover:text-els-amber-ink min-h-11"
               >
                 Disponibilidade oficial <ArrowUpRight className="size-3.5" />
               </a>
@@ -192,7 +192,7 @@ export function StripeConnectPanel({
                 href="https://docs.stripe.com/connect/separate-charges-and-transfers?locale=pt-BR"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-sky-200 hover:text-sky-100"
+                className="inline-flex items-center gap-2 text-els-info-ink hover:text-els-fg min-h-11"
               >
                 Modelo de cobrança <ArrowUpRight className="size-3.5" />
               </a>
@@ -229,13 +229,13 @@ export function StripeConnectPanel({
       </section>
 
       <section className="mt-4 grid gap-4 xl:grid-cols-[.8fr_1.2fr]">
-        <article className="rounded-[1.5rem] border border-white/8 bg-[#09131f] p-5 sm:p-6">
+        <article className="rounded-[1.5rem] border border-els-line bg-els-surface p-5 sm:p-6">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <h2 className="font-semibold text-white">Travas de ativação</h2>
-              <p className="mt-1 text-xs text-slate-500">Todas precisam estar liberadas simultaneamente.</p>
+              <h2 className="font-semibold text-els-fg">Travas de ativação</h2>
+              <p className="mt-1 text-xs text-els-fg-3">Todas precisam estar liberadas simultaneamente.</p>
             </div>
-            <ShieldAlert aria-hidden="true" className="size-5 text-amber-300" />
+            <ShieldAlert aria-hidden="true" className="size-5 text-els-amber-ink" />
           </div>
           <ul className="mt-6 grid gap-4">
             <ReadinessItem ok={readiness.apiConfigured}>Nova chave restrita do servidor configurada</ReadinessItem>
@@ -245,9 +245,9 @@ export function StripeConnectPanel({
             <ReadinessItem ok={readiness.enabled}>Chave geral STRIPE_CONNECT_ENABLED liberada</ReadinessItem>
           </ul>
           {readiness.requirements.length > 0 && (
-            <div className="mt-6 rounded-xl border border-white/8 bg-black/10 p-4">
-              <p className="text-[10px] font-bold uppercase tracking-[.12em] text-slate-500">Pendências técnicas</p>
-              <ul className="mt-2 grid gap-1 text-xs leading-5 text-slate-400">
+            <div className="mt-6 rounded-xl border border-els-line bg-els-sink p-4">
+              <p className="text-[10px] font-bold uppercase tracking-[.12em] text-els-fg-3">Pendências técnicas</p>
+              <ul className="mt-2 grid gap-1 text-xs leading-5 text-els-fg-3">
                 {readiness.requirements.map((requirement) => <li key={requirement}>• {requirement}</li>)}
               </ul>
             </div>
@@ -255,7 +255,7 @@ export function StripeConnectPanel({
           <div
             className={cn(
               "mt-6 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl px-4 text-center text-sm font-bold",
-              readiness.ready ? "bg-emerald-300/12 text-emerald-200" : "bg-slate-800 text-slate-500",
+              readiness.ready ? "bg-els-green/12 text-els-green-ink" : "bg-els-surface-2 text-els-fg-3",
             )}
           >
             <LockKeyhole className="size-4" />
@@ -263,13 +263,13 @@ export function StripeConnectPanel({
           </div>
         </article>
 
-        <article className="rounded-[1.5rem] border border-white/8 bg-[#09131f] p-5 sm:p-6">
+        <article className="rounded-[1.5rem] border border-els-line bg-els-surface p-5 sm:p-6">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <h2 className="font-semibold text-white">Arquitetura preparada</h2>
-              <p className="mt-1 text-xs text-slate-500">Cada etapa deixa rastros próprios no PostgreSQL.</p>
+              <h2 className="font-semibold text-els-fg">Arquitetura preparada</h2>
+              <p className="mt-1 text-xs text-els-fg-3">Cada etapa deixa rastros próprios no PostgreSQL.</p>
             </div>
-            <DatabaseZap aria-hidden="true" className="size-5 text-emerald-300" />
+            <DatabaseZap aria-hidden="true" className="size-5 text-els-green-ink" />
           </div>
           <ol className="mt-7 grid gap-3 sm:grid-cols-2">
             {[
@@ -280,13 +280,13 @@ export function StripeConnectPanel({
             ].map(([Icon, title, detail], index) => {
               const StepIcon = Icon as typeof Building2;
               return (
-                <li key={String(title)} className="rounded-2xl border border-white/7 bg-white/[.025] p-4">
+                <li key={String(title)} className="rounded-2xl border border-els-line bg-els-raise p-4">
                   <span className="flex items-center gap-3">
-                    <span className="grid size-8 place-items-center rounded-lg bg-emerald-300/9 text-xs font-bold text-emerald-300">{index + 1}</span>
-                    <StepIcon aria-hidden="true" className="size-4 text-slate-500" />
+                    <span className="grid size-8 place-items-center rounded-lg bg-els-green/9 text-xs font-bold text-els-green-ink">{index + 1}</span>
+                    <StepIcon aria-hidden="true" className="size-4 text-els-fg-3" />
                   </span>
-                  <strong className="mt-4 block text-sm text-slate-200">{String(title)}</strong>
-                  <p className="mt-1 text-xs leading-5 text-slate-500">{String(detail)}</p>
+                  <strong className="mt-4 block text-sm text-els-fg-2">{String(title)}</strong>
+                  <p className="mt-1 text-xs leading-5 text-els-fg-3">{String(detail)}</p>
                 </li>
               );
             })}
@@ -294,32 +294,32 @@ export function StripeConnectPanel({
         </article>
       </section>
 
-      <section className="mt-4 rounded-[1.5rem] border border-white/8 bg-[#09131f] p-5 sm:p-6">
+      <section className="mt-4 rounded-[1.5rem] border border-els-line bg-els-surface p-5 sm:p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <h2 className="font-semibold text-white">Parceiros e contas conectadas</h2>
-            <p className="mt-1 text-xs text-slate-500">Cadastro local, onboarding Express e requisitos retornados pela Stripe.</p>
+            <h2 className="font-semibold text-els-fg">Parceiros e contas conectadas</h2>
+            <p className="mt-1 text-xs text-els-fg-3">Cadastro local, onboarding Express e requisitos retornados pela Stripe.</p>
           </div>
           <NewConnectPartnerButton enabled={readiness.onboardingReady} />
         </div>
         {snapshot.partners.length === 0 ? (
-          <div className="mt-6 rounded-2xl border border-dashed border-white/10 p-8 text-center">
-            <Building2 aria-hidden="true" className="mx-auto size-7 text-slate-700" />
-            <p className="mt-3 text-sm font-semibold text-slate-300">Nenhum parceiro cadastrado</p>
-            <p className="mx-auto mt-1 max-w-lg text-xs leading-5 text-slate-600">O primeiro cadastro será liberado somente depois da aprovação do Connect e da definição jurídica de quem efetivamente receberá os valores.</p>
+          <div className="mt-6 rounded-2xl border border-dashed border-els-line p-8 text-center">
+            <Building2 aria-hidden="true" className="mx-auto size-7 text-els-fg-4" />
+            <p className="mt-3 text-sm font-semibold text-els-fg-2">Nenhum parceiro cadastrado</p>
+            <p className="mx-auto mt-1 max-w-lg text-xs leading-5 text-els-fg-4">O primeiro cadastro será liberado somente depois da aprovação do Connect e da definição jurídica de quem efetivamente receberá os valores.</p>
           </div>
         ) : (
           <div className="mt-6 overflow-x-auto">
             <table className="w-full min-w-[760px] text-left text-xs">
-              <thead className="text-[10px] uppercase tracking-[.12em] text-slate-600"><tr><th className="pb-3">Parceiro</th><th className="pb-3">Conta</th><th className="pb-3">KYC</th><th className="pb-3">Cobranças</th><th className="pb-3">Repasses</th><th className="pb-3">Status</th><th className="pb-3">Onboarding</th></tr></thead>
-              <tbody className="divide-y divide-white/7">
+              <thead className="text-[10px] uppercase tracking-[.12em] text-els-fg-4"><tr><th className="pb-3">Parceiro</th><th className="pb-3">Conta</th><th className="pb-3">KYC</th><th className="pb-3">Cobranças</th><th className="pb-3">Repasses</th><th className="pb-3">Status</th><th className="pb-3">Onboarding</th></tr></thead>
+              <tbody className="divide-y divide-els-line">
                 {snapshot.partners.map((partner) => (
                   <tr key={partner.publicId}>
-                    <td className="py-4 pr-5"><strong className="block text-slate-200">{partner.displayName}</strong><span className="mt-1 block text-slate-600">{partner.email}</span></td>
-                    <td className="py-4 pr-5 font-mono text-slate-500">{partner.stripeAccountId ?? "Não criada"}</td>
-                    <td className="py-4 pr-5 text-slate-400">{partner.detailsSubmitted ? "Enviado" : "Pendente"}</td>
-                    <td className="py-4 pr-5 text-slate-400">{partner.chargesEnabled ? "Ativas" : "Bloqueadas"}</td>
-                    <td className="py-4 pr-5 text-slate-400">{partner.payoutsEnabled ? "Ativos" : "Bloqueados"}</td>
+                    <td className="py-4 pr-5"><strong className="block text-els-fg-2">{partner.displayName}</strong><span className="mt-1 block text-els-fg-4">{partner.email}</span></td>
+                    <td className="py-4 pr-5 font-mono text-els-fg-3">{partner.stripeAccountId ?? "Não criada"}</td>
+                    <td className="py-4 pr-5 text-els-fg-3">{partner.detailsSubmitted ? "Enviado" : "Pendente"}</td>
+                    <td className="py-4 pr-5 text-els-fg-3">{partner.chargesEnabled ? "Ativas" : "Bloqueadas"}</td>
+                    <td className="py-4 pr-5 text-els-fg-3">{partner.payoutsEnabled ? "Ativos" : "Bloqueados"}</td>
                     <td className="py-4 pr-5"><StatusBadge status={partner.status} /></td>
                     <td className="py-4"><ConnectPartnerOnboardingButton partnerPublicId={partner.publicId} enabled={readiness.onboardingReady && partner.status !== "enabled" && partner.status !== "archived"} /></td>
                   </tr>
@@ -330,16 +330,16 @@ export function StripeConnectPanel({
         )}
       </section>
 
-      <section className="mt-4 rounded-[1.5rem] border border-white/8 bg-[#09131f] p-5 sm:p-6">
+      <section className="mt-4 rounded-[1.5rem] border border-els-line bg-els-surface p-5 sm:p-6">
         <div>
-          <h2 className="font-semibold text-white">Regras de divisão</h2>
-          <p className="mt-1 text-xs text-slate-500">A soma da plataforma e dos parceiros precisa fechar em 10.000 bps = 100%.</p>
+          <h2 className="font-semibold text-els-fg">Regras de divisão</h2>
+          <p className="mt-1 text-xs text-els-fg-3">A soma da plataforma e dos parceiros precisa fechar em 10.000 bps = 100%.</p>
         </div>
         {snapshot.rules.length === 0 ? (
-          <div className="mt-6 rounded-2xl border border-dashed border-white/10 p-8 text-center">
-            <Percent aria-hidden="true" className="mx-auto size-7 text-slate-700" />
-            <p className="mt-3 text-sm font-semibold text-slate-300">Nenhuma regra criada</p>
-            <p className="mx-auto mt-1 max-w-lg text-xs leading-5 text-slate-600">Os percentuais serão versionados; uma alteração futura não reescreve o histórico de pagamentos anteriores.</p>
+          <div className="mt-6 rounded-2xl border border-dashed border-els-line p-8 text-center">
+            <Percent aria-hidden="true" className="mx-auto size-7 text-els-fg-4" />
+            <p className="mt-3 text-sm font-semibold text-els-fg-2">Nenhuma regra criada</p>
+            <p className="mx-auto mt-1 max-w-lg text-xs leading-5 text-els-fg-4">Os percentuais serão versionados; uma alteração futura não reescreve o histórico de pagamentos anteriores.</p>
           </div>
         ) : (
           <div className="mt-6 grid gap-3">
@@ -347,9 +347,9 @@ export function StripeConnectPanel({
               const allocatedBps = rule.allocations.reduce((sum, item) => sum + item.shareBps, 0);
               const totalBps = rule.platformShareBps + allocatedBps;
               return (
-                <article key={rule.publicId} className="rounded-2xl border border-white/7 bg-white/[.025] p-4 sm:p-5">
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"><div><div className="flex flex-wrap items-center gap-2"><strong className="text-sm text-slate-200">{rule.name}</strong><StatusBadge status={rule.status} /></div><p className="mt-1 text-xs text-slate-600">Versão {rule.version} · Separate charges and transfers</p></div><strong className={cn("text-sm", totalBps === 10000 ? "text-emerald-300" : "text-rose-300")}>{formatBps(totalBps)} alocado</strong></div>
-                  <div className="mt-4 flex flex-wrap gap-2 text-xs"><span className="rounded-lg border border-amber-300/10 bg-amber-300/5 px-3 py-2 text-amber-100">Plataforma: {formatBps(rule.platformShareBps)}</span>{rule.allocations.map((allocation) => <span key={allocation.partnerId} className="rounded-lg border border-sky-300/10 bg-sky-300/5 px-3 py-2 text-sky-100">{allocation.partnerName}: {formatBps(allocation.shareBps)}</span>)}</div>
+                <article key={rule.publicId} className="rounded-2xl border border-els-line bg-els-raise p-4 sm:p-5">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between"><div><div className="flex flex-wrap items-center gap-2"><strong className="text-sm text-els-fg-2">{rule.name}</strong><StatusBadge status={rule.status} /></div><p className="mt-1 text-xs text-els-fg-4">Versão {rule.version} · Separate charges and transfers</p></div><strong className={cn("text-sm", totalBps === 10000 ? "text-els-green-ink" : "text-els-danger-ink")}>{formatBps(totalBps)} alocado</strong></div>
+                  <div className="mt-4 flex flex-wrap gap-2 text-xs"><span className="rounded-lg border border-els-amber/10 bg-els-amber/5 px-3 py-2 text-els-amber-ink">Plataforma: {formatBps(rule.platformShareBps)}</span>{rule.allocations.map((allocation) => <span key={allocation.partnerId} className="rounded-lg border border-els-info/10 bg-els-info/5 px-3 py-2 text-els-fg">{allocation.partnerName}: {formatBps(allocation.shareBps)}</span>)}</div>
                 </article>
               );
             })}
@@ -357,18 +357,18 @@ export function StripeConnectPanel({
         )}
       </section>
 
-      <section className="mt-4 rounded-[1.5rem] border border-white/8 bg-[#09131f] p-5 sm:p-6">
-        <div className="flex items-start justify-between gap-4"><div><h2 className="font-semibold text-white">Histórico de lotes</h2><p className="mt-1 text-xs text-slate-500">Últimos 20 lotes; vazio enquanto o Connect estiver desligado.</p></div><Clock3 aria-hidden="true" className="size-5 text-slate-600" /></div>
+      <section className="mt-4 rounded-[1.5rem] border border-els-line bg-els-surface p-5 sm:p-6">
+        <div className="flex items-start justify-between gap-4"><div><h2 className="font-semibold text-els-fg">Histórico de lotes</h2><p className="mt-1 text-xs text-els-fg-3">Últimos 20 lotes; vazio enquanto o Connect estiver desligado.</p></div><Clock3 aria-hidden="true" className="size-5 text-els-fg-4" /></div>
         {snapshot.batches.length === 0 ? (
-          <div className="mt-6 rounded-2xl border border-dashed border-white/10 p-8 text-center"><BanknoteArrowUp aria-hidden="true" className="mx-auto size-7 text-slate-700" /><p className="mt-3 text-sm font-semibold text-slate-300">Nenhum repasse executado</p><p className="mt-1 text-xs text-slate-600">Este é o estado esperado antes da ativação.</p></div>
+          <div className="mt-6 rounded-2xl border border-dashed border-els-line p-8 text-center"><BanknoteArrowUp aria-hidden="true" className="mx-auto size-7 text-els-fg-4" /><p className="mt-3 text-sm font-semibold text-els-fg-2">Nenhum repasse executado</p><p className="mt-1 text-xs text-els-fg-4">Este é o estado esperado antes da ativação.</p></div>
         ) : (
-          <div className="mt-6 overflow-x-auto"><table className="w-full min-w-[720px] text-left text-xs"><thead className="text-[10px] uppercase tracking-[.12em] text-slate-600"><tr><th className="pb-3">Criado</th><th className="pb-3">Ambiente</th><th className="pb-3">Bruto</th><th className="pb-3">Plataforma</th><th className="pb-3">Parceiros</th><th className="pb-3">Status</th></tr></thead><tbody className="divide-y divide-white/7">{snapshot.batches.map((batch) => <tr key={batch.id}><td className="py-4 pr-4 text-slate-500">{dateFormatter.format(batch.createdAt)}</td><td className="py-4 pr-4 text-slate-500">{batch.livemode ? "Live" : "Teste"}</td><td className="py-4 pr-4 text-slate-300">{formatMoney(batch.grossAmountCents)}</td><td className="py-4 pr-4 text-slate-400">{formatMoney(batch.platformAmountCents)}</td><td className="py-4 pr-4 text-slate-400">{formatMoney(batch.partnerAmountCents)}</td><td className="py-4"><StatusBadge status={batch.status} /></td></tr>)}</tbody></table></div>
+          <div className="mt-6 overflow-x-auto"><table className="w-full min-w-[720px] text-left text-xs"><thead className="text-[10px] uppercase tracking-[.12em] text-els-fg-4"><tr><th className="pb-3">Criado</th><th className="pb-3">Ambiente</th><th className="pb-3">Bruto</th><th className="pb-3">Plataforma</th><th className="pb-3">Parceiros</th><th className="pb-3">Status</th></tr></thead><tbody className="divide-y divide-els-line">{snapshot.batches.map((batch) => <tr key={batch.id}><td className="py-4 pr-4 text-els-fg-3">{dateFormatter.format(batch.createdAt)}</td><td className="py-4 pr-4 text-els-fg-3">{batch.livemode ? "Live" : "Teste"}</td><td className="py-4 pr-4 text-els-fg-2">{formatMoney(batch.grossAmountCents)}</td><td className="py-4 pr-4 text-els-fg-3">{formatMoney(batch.platformAmountCents)}</td><td className="py-4 pr-4 text-els-fg-3">{formatMoney(batch.partnerAmountCents)}</td><td className="py-4"><StatusBadge status={batch.status} /></td></tr>)}</tbody></table></div>
         )}
       </section>
 
-      <footer className="mt-5 flex flex-col gap-3 rounded-2xl border border-white/7 bg-white/[.025] p-4 text-xs leading-5 text-slate-500 sm:flex-row sm:items-center sm:justify-between">
-        <p className="flex items-start gap-2"><FileLock2 aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-emerald-300" />As chaves ficam somente no servidor; esta tela nunca recebe segredos nem dados bancários.</p>
-        <Link href="/admin" className="font-semibold text-slate-300 hover:text-white">Voltar à visão geral</Link>
+      <footer className="mt-5 flex flex-col gap-3 rounded-2xl border border-els-line bg-els-raise p-4 text-xs leading-5 text-els-fg-3 sm:flex-row sm:items-center sm:justify-between">
+        <p className="flex items-start gap-2"><FileLock2 aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-els-green-ink" />As chaves ficam somente no servidor; esta tela nunca recebe segredos nem dados bancários.</p>
+        <Link href="/admin" className="font-semibold text-els-fg-2 hover:text-els-fg min-h-11 inline-flex items-center">Voltar à visão geral</Link>
       </footer>
     </main>
   );

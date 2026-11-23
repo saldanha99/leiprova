@@ -172,7 +172,7 @@ export function LiveStudySession({
   }
 
   if (loading) {
-    return <div className="grid min-h-[70vh] place-items-center"><div className="text-center"><LoaderCircle className="mx-auto size-7 animate-spin text-amber-300" /><p className="mt-3 text-sm text-slate-500">Montando sua sessão…</p></div></div>;
+    return <div className="grid min-h-[70vh] place-items-center"><div className="text-center"><LoaderCircle className="mx-auto size-7 animate-spin text-els-amber-ink" /><p className="mt-3 text-sm text-els-fg-3">Montando sua sessão…</p></div></div>;
   }
 
   if (completed) {
@@ -180,13 +180,13 @@ export function LiveStudySession({
     const xp = results.reduce((total, result) => total + result.xp, 0);
     return (
       <section className="mx-auto flex min-h-[78vh] max-w-3xl items-center px-4 py-10">
-        <div className="w-full rounded-[2rem] border border-emerald-300/15 bg-[linear-gradient(145deg,#0c1925,#0b1b1b)] p-7 text-center shadow-2xl sm:p-11">
-          <span className="mx-auto grid size-16 place-items-center rounded-2xl bg-amber-300/12 text-amber-300"><Trophy className="size-8" /></span>
-          <p className="mt-6 text-xs font-bold uppercase tracking-[.18em] text-emerald-300">Sessão concluída</p>
+        <div className="w-full rounded-[2rem] border border-els-green/15 bg-[linear-gradient(145deg,var(--els-surface-2),var(--els-surface))] p-7 text-center shadow-2xl sm:p-11">
+          <span className="mx-auto grid size-16 place-items-center rounded-2xl bg-els-amber/12 text-els-amber-ink"><Trophy className="size-8" /></span>
+          <p className="mt-6 text-xs font-bold uppercase tracking-[.18em] text-els-green-ink">Sessão concluída</p>
           <h1 className="mt-2 text-3xl font-semibold tracking-[-.04em] sm:text-4xl">Você recuperou {correct} de {questions.length} redações</h1>
-          <p className="mx-auto mt-3 max-w-lg text-sm leading-6 text-slate-400">Os itens já entraram na sua fila de revisão conforme acerto e confiança.</p>
-          <div className="mx-auto mt-7 grid max-w-md grid-cols-2 gap-3"><div className="rounded-xl bg-white/5 p-4"><strong className="text-2xl text-emerald-300">{correct}</strong><p className="text-xs text-slate-500">acertos</p></div><div className="rounded-xl bg-white/5 p-4"><strong className="text-2xl text-amber-300">+{xp}</strong><p className="text-xs text-slate-500">XP</p></div></div>
-          <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row"><button onClick={() => window.location.reload()} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-amber-400 px-5 text-sm font-bold text-slate-950"><RefreshCcw className="size-4" />Nova sessão</button><Link href="/app" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-white/10 px-5 text-sm font-semibold text-white">Voltar ao painel <ArrowRight className="size-4" /></Link></div>
+          <p className="mx-auto mt-3 max-w-lg text-sm leading-6 text-els-fg-3">Os itens já entraram na sua fila de revisão conforme acerto e confiança.</p>
+          <div className="mx-auto mt-7 grid max-w-md grid-cols-2 gap-3"><div className="rounded-xl bg-els-raise p-4"><strong className="text-2xl text-els-green-ink">{correct}</strong><p className="text-xs text-els-fg-3">acertos</p></div><div className="rounded-xl bg-els-raise p-4"><strong className="text-2xl text-els-amber-ink">+{xp}</strong><p className="text-xs text-els-fg-3">XP</p></div></div>
+          <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row"><button onClick={() => window.location.reload()} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-els-amber px-5 text-sm font-bold text-els-on-amber"><RefreshCcw className="size-4" />Nova sessão</button><Link href="/app" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-els-line px-5 text-sm font-semibold text-els-fg">Voltar ao painel <ArrowRight className="size-4" /></Link></div>
         </div>
       </section>
     );
@@ -195,13 +195,13 @@ export function LiveStudySession({
   if (!question && mode === "revisao" && !error) {
     return (
       <section className="mx-auto flex min-h-[70vh] max-w-3xl items-center px-5 py-10 text-center">
-        <div className="w-full rounded-[1.75rem] border border-emerald-300/15 bg-[#09131f] p-7 shadow-2xl sm:p-10">
-          <span className="mx-auto grid size-14 place-items-center rounded-2xl bg-emerald-300/10 text-emerald-300"><CalendarCheck2 className="size-6" /></span>
+        <div className="w-full rounded-[1.75rem] border border-els-green/15 bg-els-surface p-7 shadow-2xl sm:p-10">
+          <span className="mx-auto grid size-14 place-items-center rounded-2xl bg-els-green/10 text-els-green-ink"><CalendarCheck2 className="size-6" /></span>
           <h1 className="mt-5 text-2xl font-semibold">Nenhuma revisão pendente</h1>
-          <p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-slate-500">Sua fila está em dia. Um novo treino alimenta as próximas revisões conforme seu desempenho.</p>
+          <p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-els-fg-3">Sua fila está em dia. Um novo treino alimenta as próximas revisões conforme seu desempenho.</p>
           <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
-            <Link href="/app/treinar" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-amber-400 px-5 text-sm font-bold text-slate-950">Treinar novo conteúdo <ArrowRight className="size-4" /></Link>
-            <Link href="/app/revisoes" className="inline-flex min-h-11 items-center justify-center rounded-xl border border-white/10 px-5 text-sm font-semibold text-white">Voltar às revisões</Link>
+            <Link href="/app/treinar" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-els-amber px-5 text-sm font-bold text-els-on-amber">Treinar novo conteúdo <ArrowRight className="size-4" /></Link>
+            <Link href="/app/revisoes" className="inline-flex min-h-11 items-center justify-center rounded-xl border border-els-line px-5 text-sm font-semibold text-els-fg">Voltar às revisões</Link>
           </div>
         </div>
       </section>
@@ -210,14 +210,14 @@ export function LiveStudySession({
 
   if (!question) {
     const scoped = topic || legalActSlug || notebookPublicId;
-    return <div className="grid min-h-[70vh] place-items-center px-5 text-center"><div><BookOpenCheck className="mx-auto size-8 text-slate-600" /><h1 className="mt-4 text-xl font-semibold">Treino indisponível</h1><p className="mt-2 text-sm text-slate-500">{error ?? (scoped ? "Não há questões liberadas neste recorte." : "O acervo ainda não foi publicado.")}</p>{scoped && <Link href={legalActSlug ? `/app/leis/${legalActSlug}` : "/app/materiais"} className="mt-5 inline-flex min-h-10 items-center gap-2 rounded-xl border border-white/10 px-4 text-xs font-semibold text-white"><ArrowLeft className="size-3.5" />Voltar ao recorte</Link>}</div></div>;
+    return <div className="grid min-h-[70vh] place-items-center px-5 text-center"><div><BookOpenCheck className="mx-auto size-8 text-els-fg-4" /><h1 className="mt-4 text-xl font-semibold">Treino indisponível</h1><p className="mt-2 text-sm text-els-fg-3">{error ?? (scoped ? "Não há questões liberadas neste recorte." : "O acervo ainda não foi publicado.")}</p>{scoped && <Link href={legalActSlug ? `/app/leis/${legalActSlug}` : "/app/materiais"} className="mt-5 inline-flex min-h-10 items-center gap-2 rounded-xl border border-els-line px-4 text-xs font-semibold text-els-fg"><ArrowLeft className="size-3.5" />Voltar ao recorte</Link>}</div></div>;
   }
 
   return (
     <main className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-7 lg:px-9 lg:py-9">
       <div className="flex items-center justify-between gap-4">
-        <Link href={mode === "revisao" ? "/app/revisoes" : topic ? "/app/materiais" : "/app"} className="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 transition hover:text-white"><ArrowLeft className="size-4" />{mode === "revisao" ? "Revisões" : topic ? "Materiais" : "Painel"}</Link>
-        <span className="rounded-full border border-white/8 bg-white/5 px-3 py-1.5 text-xs text-slate-400">{index + 1} de {questions.length}</span>
+        <Link href={mode === "revisao" ? "/app/revisoes" : topic ? "/app/materiais" : "/app"} className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-els-fg-3 transition hover:text-els-fg"><ArrowLeft className="size-4" />{mode === "revisao" ? "Revisões" : topic ? "Materiais" : "Painel"}</Link>
+        <span className="rounded-full border border-els-line bg-els-raise px-3 py-1.5 text-xs text-els-fg-3">{index + 1} de {questions.length}</span>
       </div>
       <div
         aria-label="Progresso da sessão"
@@ -225,31 +225,31 @@ export function LiveStudySession({
         aria-valuemin={0}
         aria-valuenow={progress}
         aria-valuetext={`${index + (feedback ? 1 : 0)} de ${questions.length} questões respondidas`}
-        className="mt-5 h-1.5 overflow-hidden rounded-full bg-white/7"
+        className="mt-5 h-1.5 overflow-hidden rounded-full bg-els-raise"
         role="progressbar"
       >
         <div
-          className="h-full rounded-full bg-gradient-to-r from-amber-400 to-emerald-300 transition-[width] duration-500"
+          className="h-full rounded-full bg-gradient-to-r from-els-amber to-els-green transition-[width] duration-500"
           style={{ width: `${progress}%` }}
         />
       </div>
 
-      <section className="mt-5 overflow-hidden rounded-[1.75rem] border border-white/8 bg-[#09131f] shadow-2xl shadow-black/20">
-        <header className="border-b border-white/7 px-5 py-5 sm:px-7">
-          <div className="flex flex-wrap items-center gap-2 text-[11px]"><span className="rounded-full bg-amber-300/10 px-2.5 py-1 font-bold text-amber-200">{question.articleRef}</span><span className="text-slate-600">{question.actTitle}</span><span className="ml-auto text-slate-600">verificado em {new Intl.DateTimeFormat("pt-BR").format(new Date(`${question.verifiedAt}T12:00:00`))}</span></div>
-          <h1 className="mt-5 text-balance text-lg font-semibold leading-8 text-slate-100 sm:text-xl">{question.prompt}</h1>
+      <section className="mt-5 overflow-hidden rounded-[1.75rem] border border-els-line bg-els-surface shadow-2xl shadow-black/20">
+        <header className="border-b border-els-line px-5 py-5 sm:px-7">
+          <div className="flex flex-wrap items-center gap-2 text-[11px]"><span className="rounded-full bg-els-amber/10 px-2.5 py-1 font-bold text-els-amber-ink">{question.articleRef}</span><span className="text-els-fg-4">{question.actTitle}</span><span className="ml-auto text-els-fg-4">verificado em {new Intl.DateTimeFormat("pt-BR").format(new Date(`${question.verifiedAt}T12:00:00`))}</span></div>
+          <h1 className="mt-5 text-balance text-lg font-semibold leading-8 text-els-fg sm:text-xl">{question.prompt}</h1>
         </header>
 
         <div className="grid gap-7 p-5 sm:p-7">
           <fieldset disabled={Boolean(feedback)}>
-            <legend className="text-sm font-semibold text-slate-300">Qual é sua confiança antes de ver as alternativas?</legend>
+            <legend className="text-sm font-semibold text-els-fg-2">Qual é sua confiança antes de ver as alternativas?</legend>
             <div className="mt-3 grid gap-2 sm:grid-cols-3">
               {confidenceOptions.map(({ id, label, helper, icon: Icon }) => (
                 <label
                   key={id}
                   className={cn(
-                    "relative flex cursor-pointer items-center gap-3 rounded-xl border border-white/8 bg-white/[.025] p-3 text-left transition hover:border-white/15 focus-within:ring-2 focus-within:ring-amber-300 focus-within:ring-offset-2 focus-within:ring-offset-[#09131f]",
-                    confidence === id && "border-amber-300/40 bg-amber-300/8",
+                    "relative flex cursor-pointer items-center gap-3 rounded-xl border border-els-line bg-els-raise p-3 text-left transition hover:border-els-line-strong focus-within:ring-2 focus-within:ring-els-amber focus-within:ring-offset-2 focus-within:ring-offset-els-surface",
+                    confidence === id && "border-els-amber/40 bg-els-amber/8",
                   )}
                 >
                   <input
@@ -260,8 +260,8 @@ export function LiveStudySession({
                     type="radio"
                     value={id}
                   />
-                  <Icon aria-hidden="true" className={cn("size-4 text-slate-500", confidence === id && "text-amber-300")} />
-                  <span><strong className="block text-xs text-slate-200">{label}</strong><span className="text-[10px] text-slate-600">{helper}</span></span>
+                  <Icon aria-hidden="true" className={cn("size-4 text-els-fg-3", confidence === id && "text-els-amber-ink")} />
+                  <span><strong className="block text-xs text-els-fg-2">{label}</strong><span className="text-[10px] text-els-fg-4">{helper}</span></span>
                 </label>
               ))}
             </div>
@@ -275,7 +275,7 @@ export function LiveStudySession({
                 const isCorrect = feedback?.correctOptionId === option.id;
                 const isWrongSelected = Boolean(feedback && isSelected && !feedback.isCorrect);
                 return (
-                  <label key={option.id} className={cn("relative flex cursor-pointer items-start gap-3 rounded-xl border border-white/8 bg-slate-950/35 p-4 text-left text-sm leading-6 text-slate-300 transition hover:border-white/15 focus-within:ring-2 focus-within:ring-amber-300 focus-within:ring-offset-2 focus-within:ring-offset-[#09131f]", isSelected && !feedback && "border-amber-300/45 bg-amber-300/7", isCorrect && "border-emerald-300/45 bg-emerald-300/8", isWrongSelected && "border-rose-300/45 bg-rose-300/8")}>
+                  <label key={option.id} className={cn("relative flex cursor-pointer items-start gap-3 rounded-xl border border-els-line bg-els-bg/35 p-4 text-left text-sm leading-6 text-els-fg-2 transition hover:border-els-line-strong focus-within:ring-2 focus-within:ring-els-amber focus-within:ring-offset-2 focus-within:ring-offset-els-surface", isSelected && !feedback && "border-els-amber/45 bg-els-amber/7", isCorrect && "border-els-green/45 bg-els-green/8", isWrongSelected && "border-els-danger/45 bg-els-danger/8")}>
                     <input
                       checked={isSelected}
                       className="sr-only"
@@ -284,7 +284,7 @@ export function LiveStudySession({
                       type="radio"
                       value={option.id}
                     />
-                    <span aria-hidden="true" className={cn("grid size-7 shrink-0 place-items-center rounded-full border border-white/10 text-xs font-bold uppercase", isCorrect && "border-emerald-300/30 bg-emerald-300 text-slate-950", isWrongSelected && "border-rose-300/30 bg-rose-300 text-slate-950")}>{isCorrect ? <Check className="size-4" /> : isWrongSelected ? <X className="size-4" /> : option.id}</span>
+                    <span aria-hidden="true" className={cn("grid size-7 shrink-0 place-items-center rounded-full border border-els-line text-xs font-bold uppercase", isCorrect && "border-els-green/30 bg-els-green text-els-on-amber", isWrongSelected && "border-els-danger/30 bg-els-danger text-els-on-amber")}>{isCorrect ? <Check className="size-4" /> : isWrongSelected ? <X className="size-4" /> : option.id}</span>
                     <span>{option.text}</span>
                     {isCorrect && <span className="sr-only">Alternativa correta.</span>}
                     {isWrongSelected && <span className="sr-only">Sua alternativa está incorreta.</span>}
@@ -294,25 +294,25 @@ export function LiveStudySession({
             </div>
           </fieldset>
 
-          {error && <p role="alert" className="rounded-xl border border-rose-300/15 bg-rose-300/6 px-4 py-3 text-sm text-rose-200">{error}</p>}
+          {error && <p role="alert" className="rounded-xl border border-els-danger/15 bg-els-danger/6 px-4 py-3 text-sm text-els-danger-ink">{error}</p>}
 
           {feedback ? (
             <div
               ref={feedbackRef}
               aria-atomic="true"
               aria-live="polite"
-              className={cn("rounded-2xl border p-5 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300", feedback.isCorrect ? "border-emerald-300/15 bg-emerald-300/5" : "border-amber-300/15 bg-amber-300/5")}
+              className={cn("rounded-2xl border p-5 focus:outline-none focus-visible:ring-2 focus-visible:ring-els-amber", feedback.isCorrect ? "border-els-green/15 bg-els-green/5" : "border-els-amber/15 bg-els-amber/5")}
               role="status"
               tabIndex={-1}
             >
-              <div className="flex items-center gap-2"><span className={cn("grid size-8 place-items-center rounded-full", feedback.isCorrect ? "bg-emerald-300 text-slate-950" : "bg-amber-300 text-slate-950")}>{feedback.isCorrect ? <Check className="size-4" /> : <Sparkles className="size-4" />}</span><strong>{feedback.isCorrect ? "Redação recuperada" : "Compare a palavra decisiva"}</strong><span className="ml-auto text-xs font-bold text-amber-300">+{feedback.xp} XP</span></div>
-              {feedback.literal ? <LiteralHighlightView literal={feedback.literal} className="mt-4" /> : <blockquote className="mt-4 border-l-2 border-emerald-300/40 pl-4 text-sm leading-7 text-slate-200">{feedback.literalText}</blockquote>}
-              <p className="mt-4 text-sm leading-6 text-slate-400">{feedback.explanation}</p>
-              <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-xs"><a href={feedback.officialUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 font-semibold text-emerald-300">Conferir no Planalto <ExternalLink className="size-3.5" /></a><span className="text-slate-600">revisão agendada para {new Intl.DateTimeFormat("pt-BR").format(new Date(feedback.nextReviewAt))}</span></div>
-              <p className="mt-3 text-[10px] leading-4 text-slate-600">Trecho meramente informativo e não oficial; não substitui a publicação no Diário Oficial da União.</p>
+              <div className="flex items-center gap-2"><span className={cn("grid size-8 place-items-center rounded-full", feedback.isCorrect ? "bg-els-green text-els-on-amber" : "bg-els-amber text-els-on-amber")}>{feedback.isCorrect ? <Check className="size-4" /> : <Sparkles className="size-4" />}</span><strong>{feedback.isCorrect ? "Redação recuperada" : "Compare a palavra decisiva"}</strong><span className="ml-auto text-xs font-bold text-els-amber-ink">+{feedback.xp} XP</span></div>
+              {feedback.literal ? <LiteralHighlightView literal={feedback.literal} className="mt-4" /> : <blockquote className="mt-4 border-l-2 border-els-green/40 pl-4 text-sm leading-7 text-els-fg-2">{feedback.literalText}</blockquote>}
+              <p className="mt-4 text-sm leading-6 text-els-fg-3">{feedback.explanation}</p>
+              <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-xs"><a href={feedback.officialUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 font-semibold text-els-green-ink min-h-11">Conferir no Planalto <ExternalLink className="size-3.5" /></a><span className="text-els-fg-4">revisão agendada para {new Intl.DateTimeFormat("pt-BR").format(new Date(feedback.nextReviewAt))}</span></div>
+              <p className="mt-3 text-[10px] leading-4 text-els-fg-4">Trecho meramente informativo e não oficial; não substitui a publicação no Diário Oficial da União.</p>
             </div>
           ) : (
-            <button onClick={submitAnswer} disabled={!selected || !confidence || submitting} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-amber-400 px-5 text-sm font-bold text-slate-950 transition hover:bg-amber-300 disabled:cursor-not-allowed disabled:opacity-35">{submitting ? <LoaderCircle className="size-4 animate-spin" /> : "Confirmar resposta"}<ArrowRight className="size-4" /></button>
+            <button onClick={submitAnswer} disabled={!selected || !confidence || submitting} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-els-amber px-5 text-sm font-bold text-els-on-amber transition hover:bg-els-amber-2 disabled:cursor-not-allowed disabled:opacity-35">{submitting ? <LoaderCircle className="size-4 animate-spin" /> : "Confirmar resposta"}<ArrowRight className="size-4" /></button>
           )}
 
           {feedback && (
@@ -323,7 +323,7 @@ export function LiveStudySession({
             />
           )}
 
-          {feedback && <button onClick={nextQuestion} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-amber-400 px-5 text-sm font-bold text-slate-950 transition hover:bg-amber-300">{index === questions.length - 1 ? "Ver resultado" : "Próxima questão"}<ArrowRight className="size-4" /></button>}
+          {feedback && <button onClick={nextQuestion} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-els-amber px-5 text-sm font-bold text-els-on-amber transition hover:bg-els-amber-2">{index === questions.length - 1 ? "Ver resultado" : "Próxima questão"}<ArrowRight className="size-4" /></button>}
         </div>
       </section>
     </main>

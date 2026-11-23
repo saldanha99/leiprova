@@ -167,6 +167,7 @@ export function ContestCart({
                 <label
                   key={option.key}
                   className={`${styles.plan} ${option.key === "annual" ? styles.annualPlan : styles.monthlyPlan}`}
+                  data-theme={option.key === "annual" ? "light" : undefined}
                   data-checkout-plan={option.key}
                   data-selected={access === option.key}
                 >
@@ -353,6 +354,7 @@ export function ContestCart({
         </div>
         <aside
           className={styles.summary}
+          data-theme="light"
           aria-labelledby="checkout-summary-title"
         >
           <div className={styles.summaryHeader}>

@@ -54,11 +54,11 @@ function ArticleEntry({ article }: { article: ArticlePage }) {
   const text = `${article.label}${article.heading ? ` — ${article.heading}` : ""}`;
   // Spec 2.5 B: only indexable articles are linked; the others are listed.
   return article.gate.status === "index" ? (
-    <Link className="font-semibold text-amber-300 hover:underline" href={article.path}>
+    <Link className="font-semibold text-els-amber-ink hover:underline" href={article.path}>
       {text}
     </Link>
   ) : (
-    <span className="text-slate-400">{article.label}</span>
+    <span className="text-els-fg-3">{article.label}</span>
   );
 }
 
@@ -73,12 +73,12 @@ export default async function LawPageRoute({ params }: { params: Params }) {
   const law = snapshot.law;
 
   return (
-    <PublicGuideShell>
+    <PublicGuideShell tone="els">
       <JsonLd data={lawJsonLd(snapshot, { description, faq, modifiedAt })} />
       <article className="mx-auto max-w-3xl px-5 py-10 sm:py-14">
         <Breadcrumbs crumbs={lawCrumbs(snapshot)} />
-        <h1 className="mt-6 text-3xl font-semibold tracking-[-0.04em] text-white sm:text-4xl">{lawHeadline(snapshot)}</h1>
-        <p className="mt-5 text-lg leading-8 text-slate-200" id="resumo">
+        <h1 className="mt-6 text-3xl font-semibold tracking-[-0.04em] text-els-fg sm:text-4xl">{lawHeadline(snapshot)}</h1>
+        <p className="mt-5 text-lg leading-8 text-els-fg-2" id="resumo">
           {lawSummary(snapshot, contests)}
         </p>
         <SourceSeal
@@ -90,27 +90,27 @@ export default async function LawPageRoute({ params }: { params: Params }) {
 
         <Section id="ficha" title="Ficha da norma">
           <dl className="grid gap-x-6 gap-y-3 text-sm sm:grid-cols-[10rem_1fr]">
-            <dt className="font-bold text-slate-400">Norma</dt>
-            <dd className="text-slate-200">{law.title}</dd>
-            <dt className="font-bold text-slate-400">Tipo</dt>
-            <dd className="text-slate-200">{legislationTypeLabel(law.actType)}</dd>
+            <dt className="font-bold text-els-fg-3">Norma</dt>
+            <dd className="text-els-fg-2">{law.title}</dd>
+            <dt className="font-bold text-els-fg-3">Tipo</dt>
+            <dd className="text-els-fg-2">{legislationTypeLabel(law.actType)}</dd>
             {law.actNumber ? (
               <>
-                <dt className="font-bold text-slate-400">Número</dt>
-                <dd className="text-slate-200">{law.actNumber}</dd>
+                <dt className="font-bold text-els-fg-3">Número</dt>
+                <dd className="text-els-fg-2">{law.actNumber}</dd>
               </>
             ) : null}
             {law.actYear ? (
               <>
-                <dt className="font-bold text-slate-400">Ano</dt>
-                <dd className="text-slate-200">{law.actYear}</dd>
+                <dt className="font-bold text-els-fg-3">Ano</dt>
+                <dd className="text-els-fg-2">{law.actYear}</dd>
               </>
             ) : null}
-            <dt className="font-bold text-slate-400">Situação</dt>
-            <dd className="text-slate-200">Vigente (versão verificada em {brDate(law.versionVerifiedAt)})</dd>
-            <dt className="font-bold text-slate-400">Texto oficial</dt>
+            <dt className="font-bold text-els-fg-3">Situação</dt>
+            <dd className="text-els-fg-2">Vigente (versão verificada em {brDate(law.versionVerifiedAt)})</dd>
+            <dt className="font-bold text-els-fg-3">Texto oficial</dt>
             <dd>
-              <a className="font-semibold text-amber-300 hover:underline" href={law.officialUrl} rel="noopener">
+              <a className="inline-flex min-h-11 items-center font-semibold text-els-amber-ink hover:underline" href={law.officialUrl} rel="noopener">
                 {sourceLabel(law.officialUrl)}
               </a>
             </dd>
@@ -119,14 +119,14 @@ export default async function LawPageRoute({ params }: { params: Params }) {
 
         {snapshot.topArticles.length ? (
           <Section id="mais-cobrados" title={`Os artigos ${ofLaw(snapshot.label)} com mais questões`}>
-            <p className="text-sm leading-7 text-slate-400">
+            <p className="text-sm leading-7 text-els-fg-3">
               Contagem de questões revisadas na base do Edital Lei Seca em {brDate(now)} (inéditas da nossa base, não todas as provas do país).
             </p>
             <ol className="mt-4 space-y-2 text-sm">
               {snapshot.topArticles.map((article) => (
-                <li className="flex items-baseline justify-between gap-4 border-b border-white/5 pb-2" key={article.path}>
+                <li className="flex items-baseline justify-between gap-4 border-b border-els-line pb-2" key={article.path}>
                   <ArticleEntry article={article} />
-                  <span className="shrink-0 text-slate-400">{article.reviewedQuestionCount} questões</span>
+                  <span className="shrink-0 text-els-fg-3">{article.reviewedQuestionCount} questões</span>
                 </li>
               ))}
             </ol>
@@ -138,7 +138,7 @@ export default async function LawPageRoute({ params }: { params: Params }) {
             <ul className="space-y-2 text-sm">
               {contests.map((contest) => (
                 <li key={contest.path}>
-                  <Link className="font-semibold text-amber-300 hover:underline" href={contest.path}>
+                  <Link className="font-semibold text-els-amber-ink hover:underline" href={contest.path}>
                     {contest.title}
                   </Link>
                 </li>
@@ -151,7 +151,7 @@ export default async function LawPageRoute({ params }: { params: Params }) {
           <div className="space-y-6">
             {groups.map((group, index) => (
               <div key={`${group.heading ?? "sem-titulo"}-${index}`}>
-                {group.heading ? <h3 className="text-sm font-bold uppercase tracking-[0.1em] text-slate-400">{group.heading}</h3> : null}
+                {group.heading ? <h3 className="text-sm font-bold uppercase tracking-[0.1em] text-els-fg-3">{group.heading}</h3> : null}
                 <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm">
                   {group.articles.map((article) => (
                     <li key={article.path}>

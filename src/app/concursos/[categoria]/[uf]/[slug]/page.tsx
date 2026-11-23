@@ -185,7 +185,7 @@ export default async function ContestOpportunityPage({
     )
       notFound();
     return (
-      <PublicGuideShell mobileActionBar>
+      <PublicGuideShell tone="els" mobileActionBar>
         <PlannedContestLanding
           contest={planned}
           commerceOpen={isCommerceOpen()}
@@ -253,7 +253,7 @@ export default async function ContestOpportunityPage({
   };
 
   return (
-    <PublicGuideShell mobileActionBar>
+    <PublicGuideShell tone="els" mobileActionBar>
       <JsonLd data={structuredData} />
       <ContestLanding
         opportunity={opportunity}

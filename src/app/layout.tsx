@@ -8,6 +8,7 @@ import { BRAND_NAME, BRAND_TAGLINE } from "@/lib/brand";
 import { SITE_URL, SOCIAL_IMAGE, SOCIAL_IMAGE_PATH, siteIdentityGraph } from "@/lib/seo";
 
 import "./globals.css";
+import "./els-ui.css";
 
 const manrope = Manrope({
   variable: "--font-manrope",
@@ -18,6 +19,8 @@ const manrope = Manrope({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  // Só usada em detalhes do app (números, códigos): não disputa banda com o texto da primeira tela.
+  preload: false,
 });
 
 export const metadata: Metadata = {

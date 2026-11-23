@@ -68,15 +68,15 @@ export default async function ArticlePageRoute({ params }: { params: Params }) {
   const segment = article.path.split("/").pop() ?? "artigo";
 
   return (
-    <PublicGuideShell>
+    <PublicGuideShell tone="els">
       <JsonLd data={articleJsonLd(snapshot, article, { description, faq, modifiedAt })} />
       <article className="mx-auto max-w-3xl px-5 py-10 sm:py-14">
         <Breadcrumbs crumbs={articleCrumbs(snapshot, article)} />
-        <h1 className="mt-6 text-3xl font-semibold tracking-[-0.04em] text-white sm:text-4xl">
+        <h1 className="mt-6 text-3xl font-semibold tracking-[-0.04em] text-els-fg sm:text-4xl">
           {articleHeadline(snapshot, article)}
         </h1>
         {article.directAnswer ? (
-          <p className="mt-5 text-lg leading-8 text-slate-200" id="resposta-direta">
+          <p className="mt-5 text-lg leading-8 text-els-fg-2" id="resposta-direta">
             {article.directAnswer}
           </p>
         ) : null}
@@ -93,17 +93,17 @@ export default async function ArticlePageRoute({ params }: { params: Params }) {
 
         {article.traps.length ? (
           <Section id="cai-assim" title="Cai assim na prova">
-            <p className="text-sm leading-7 text-slate-400">
+            <p className="text-sm leading-7 text-els-fg-3">
               Afirmações erradas tiradas das nossas questões revisadas sobre este artigo, com o motivo do erro.
             </p>
             <ul className="mt-4 space-y-4">
               {article.traps.map((trap) => (
-                <li className="rounded-2xl border border-rose-300/15 bg-rose-300/[0.04] p-4" key={trap.questionAnchorId + trap.statement}>
-                  <p className="text-sm leading-7 text-slate-200">
-                    <span className="font-bold text-rose-200">Errado: </span>“{trap.statement}”
+                <li className="rounded-2xl border border-els-danger/15 bg-els-danger/[0.04] p-4" key={trap.questionAnchorId + trap.statement}>
+                  <p className="text-sm leading-7 text-els-fg-2">
+                    <span className="font-bold text-els-danger-ink">Errado: </span>“{trap.statement}”
                   </p>
-                  <p className="mt-2 text-sm leading-7 text-slate-400">{trap.why}</p>
-                  <a className="mt-2 inline-block text-xs font-bold text-amber-300 hover:underline" href={`#${trap.questionAnchorId}`}>
+                  <p className="mt-2 text-sm leading-7 text-els-fg-3">{trap.why}</p>
+                  <a className="mt-2 inline-block text-xs font-bold text-els-amber-ink hover:underline" href={`#${trap.questionAnchorId}`}>
                     Ver a questão que mostra esse padrão
                   </a>
                 </li>
@@ -127,7 +127,7 @@ export default async function ArticlePageRoute({ params }: { params: Params }) {
             <ul className="space-y-2 text-sm">
               {contests.slice(0, 10).map((contest) => (
                 <li key={contest.path}>
-                  <Link className="font-semibold text-amber-300 hover:underline" href={contest.path}>
+                  <Link className="font-semibold text-els-amber-ink hover:underline" href={contest.path}>
                     {contest.title}
                   </Link>
                 </li>
@@ -138,9 +138,9 @@ export default async function ArticlePageRoute({ params }: { params: Params }) {
 
         <nav aria-label="Artigo anterior e próximo" className="mt-12 grid gap-3 sm:grid-cols-2">
           {article.previous ? (
-            <Link className="rounded-2xl border border-white/10 p-4 text-sm hover:border-amber-300/40" href={article.previous.path} rel="prev">
-              <span className="block text-xs font-bold uppercase tracking-[0.12em] text-slate-400">Artigo anterior</span>
-              <span className="mt-1 block font-semibold text-slate-100">
+            <Link className="rounded-2xl border border-els-line p-4 text-sm hover:border-els-amber/40" href={article.previous.path} rel="prev">
+              <span className="block text-xs font-bold uppercase tracking-[0.12em] text-els-fg-3">Artigo anterior</span>
+              <span className="mt-1 block font-semibold text-els-fg">
                 {article.previous.label} {ofLaw(snapshot.label)}
                 {article.previous.heading ? ` — ${article.previous.heading}` : ""}
               </span>
@@ -149,9 +149,9 @@ export default async function ArticlePageRoute({ params }: { params: Params }) {
             <span />
           )}
           {article.next ? (
-            <Link className="rounded-2xl border border-white/10 p-4 text-sm hover:border-amber-300/40 sm:text-right" href={article.next.path} rel="next">
-              <span className="block text-xs font-bold uppercase tracking-[0.12em] text-slate-400">Próximo artigo</span>
-              <span className="mt-1 block font-semibold text-slate-100">
+            <Link className="rounded-2xl border border-els-line p-4 text-sm hover:border-els-amber/40 sm:text-right" href={article.next.path} rel="next">
+              <span className="block text-xs font-bold uppercase tracking-[0.12em] text-els-fg-3">Próximo artigo</span>
+              <span className="mt-1 block font-semibold text-els-fg">
                 {article.next.label} {ofLaw(snapshot.label)}
                 {article.next.heading ? ` — ${article.next.heading}` : ""}
               </span>
@@ -164,14 +164,14 @@ export default async function ArticlePageRoute({ params }: { params: Params }) {
             <ul className="space-y-2 text-sm">
               {article.related.map((related) => (
                 <li key={related.path}>
-                  <Link className="font-semibold text-amber-300 hover:underline" href={related.path}>
+                  <Link className="font-semibold text-els-amber-ink hover:underline" href={related.path}>
                     {related.label} {ofLaw(snapshot.label)}
                     {related.heading ? ` — ${related.heading}` : ""}
                   </Link>
                 </li>
               ))}
               <li>
-                <Link className="font-semibold text-amber-300 hover:underline" href={snapshot.path}>
+                <Link className="font-semibold text-els-amber-ink hover:underline" href={snapshot.path}>
                   Todos os artigos {ofLaw(snapshot.label)}
                 </Link>
               </li>

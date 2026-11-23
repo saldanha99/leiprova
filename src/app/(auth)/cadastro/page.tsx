@@ -30,11 +30,11 @@ export default async function RegisterPage({
         description="Esta é uma prévia pública da Edital Lei Seca. Enquanto concluímos a revisão jurídica e operacional, você pode experimentar o método sem informar dados pessoais."
       >
         <div className="grid gap-4 text-center">
-          <Construction className="mx-auto size-10 text-amber-300" aria-hidden="true" />
-          <Link href="/demo" className="inline-flex min-h-12 items-center justify-center rounded-xl bg-amber-400 px-5 text-sm font-bold text-slate-950">
+          <Construction className="mx-auto size-10 text-els-amber-ink" aria-hidden="true" />
+          <Link href="/demo" className="inline-flex min-h-12 items-center justify-center rounded-xl bg-els-amber px-5 text-sm font-bold text-els-on-amber">
             Fazer a demonstração
           </Link>
-          <Link href="/entrar" className="text-sm font-semibold text-slate-400 hover:text-white">
+          <Link href="/entrar" className="text-sm font-semibold text-els-fg-3 hover:text-els-fg min-h-11 inline-flex items-center">
             Já fui convidado para a beta
           </Link>
         </div>

@@ -7,7 +7,7 @@ export function QaEnvironmentNotice() {
   return (
     <aside
       aria-label="Ambiente de homologação"
-      className="border-b border-amber-300/40 bg-amber-100 px-4 py-3 text-center text-xs leading-5 text-amber-950"
+      className="border-b border-els-amber/40 bg-els-amber-2 px-4 py-3 text-center text-xs leading-5 text-els-on-amber"
     >
       <strong className="font-extrabold">HOMOLOGAÇÃO · DADOS FICTÍCIOS</strong>
       {" — "}Perfis e acessos de teste. Não representa matrícula, pagamento ou

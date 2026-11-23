@@ -112,6 +112,7 @@ export function ContestProductTour() {
           </div>
         </div>
         <div
+          data-theme="light"
           className={`${styles.preview} ${device === "mobile" ? styles.previewMobile : device === "tablet" ? styles.previewTablet : ""}`}
           data-device={device}
           id={panelId}

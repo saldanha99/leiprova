@@ -38,13 +38,13 @@ type AuthoringFormProps = {
 };
 
 const fieldClass =
-  "min-h-12 w-full rounded-xl border border-white/10 bg-[#07111d] px-3.5 text-sm text-slate-100 outline-none transition placeholder:text-slate-600 focus:border-amber-300/45 focus:ring-2 focus:ring-amber-300/10";
+  "min-h-12 w-full rounded-xl border border-els-line bg-els-bg px-3.5 text-sm text-els-fg outline-none transition placeholder:text-els-fg-4 focus:border-els-amber/45 focus:ring-2 focus:ring-els-amber/10";
 
 const textareaClass = `${fieldClass} min-h-28 resize-y py-3 leading-6`;
 
 function FieldLabel({ children, htmlFor }: { children: React.ReactNode; htmlFor: string }) {
   return (
-    <label htmlFor={htmlFor} className="mb-2 block text-xs font-bold uppercase tracking-[.11em] text-slate-400">
+    <label htmlFor={htmlFor} className="mb-2 block text-xs font-bold uppercase tracking-[.11em] text-els-fg-3">
       {children}
     </label>
   );
@@ -70,7 +70,7 @@ export function AuthoringForm({ profiles, articles, subjects, topics }: Authorin
 
   if (!profiles.length || !articles.length || !subjects.length || !topics.length) {
     return (
-      <div className="rounded-2xl border border-amber-300/20 bg-amber-300/8 p-5 text-sm leading-6 text-amber-100">
+      <div className="rounded-2xl border border-els-amber/20 bg-els-amber/8 p-5 text-sm leading-6 text-els-amber-ink">
         A fábrica precisa de perfis ativos, fonte legal revisada, matérias e assuntos antes de receber uma questão.
       </div>
     );
@@ -110,16 +110,16 @@ export function AuthoringForm({ profiles, articles, subjects, topics }: Authorin
 
       <input type="hidden" name="type" value={profile?.format ?? "multiple_choice"} />
       {profile ? (
-        <div className="rounded-2xl border border-sky-300/12 bg-sky-300/[.055] p-4">
+        <div className="rounded-2xl border border-els-info/12 bg-els-info/[.055] p-4">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs font-bold uppercase tracking-[.12em] text-sky-200">
+            <span className="text-xs font-bold uppercase tracking-[.12em] text-els-info-ink">
               {profile.format === "true_false" ? "Certo ou errado" : "Múltipla escolha"}
             </span>
-            <span className="text-xs text-slate-500">•</span>
-            <span className="text-xs text-slate-400">perfil abstrato v1</span>
+            <span className="text-xs text-els-fg-3">•</span>
+            <span className="text-xs text-els-fg-3">perfil abstrato v1</span>
           </div>
-          <p className="mt-2 text-sm leading-6 text-slate-300">{profile.commandStyle}</p>
-          <p className="mt-2 text-xs leading-5 text-slate-400">Formato deste perfil interno genérico. Para uma preparação, o contrato oficial de cargo, edição e etapa define o formato e o perfil de autoria.</p>
+          <p className="mt-2 text-sm leading-6 text-els-fg-2">{profile.commandStyle}</p>
+          <p className="mt-2 text-xs leading-5 text-els-fg-3">Formato deste perfil interno genérico. Para uma preparação, o contrato oficial de cargo, edição e etapa define o formato e o perfil de autoria.</p>
         </div>
       ) : null}
 
@@ -140,9 +140,9 @@ export function AuthoringForm({ profiles, articles, subjects, topics }: Authorin
           ))}
         </select>
         {article ? (
-          <div className="mt-3 rounded-2xl border border-white/8 bg-black/15 p-4">
+          <div className="mt-3 rounded-2xl border border-els-line bg-els-sink p-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <span className="inline-flex items-center gap-2 text-xs font-semibold text-emerald-200">
+              <span className="inline-flex items-center gap-2 text-xs font-semibold text-els-green-ink">
                 <FileText aria-hidden="true" className="size-3.5" />
                 Texto oficial revisado em {new Intl.DateTimeFormat("pt-BR").format(new Date(article.verifiedAt))}
               </span>
@@ -150,13 +150,13 @@ export function AuthoringForm({ profiles, articles, subjects, topics }: Authorin
                 href={article.sourceUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-300 hover:text-amber-200"
+                className="inline-flex min-h-11 items-center gap-1.5 text-xs font-bold text-els-amber-ink hover:text-els-amber-ink"
               >
                 Abrir fonte
                 <ExternalLink aria-hidden="true" className="size-3.5" />
               </a>
             </div>
-            <p className="mt-3 max-h-32 overflow-y-auto whitespace-pre-line pr-2 text-xs leading-5 text-slate-400">
+            <p className="mt-3 max-h-32 overflow-y-auto whitespace-pre-line pr-2 text-xs leading-5 text-els-fg-3">
               {article.literalText}
             </p>
           </div>
@@ -221,7 +221,7 @@ export function AuthoringForm({ profiles, articles, subjects, topics }: Authorin
       </div>
 
       <fieldset>
-        <legend className="mb-3 text-xs font-bold uppercase tracking-[.11em] text-slate-400">
+        <legend className="mb-3 text-xs font-bold uppercase tracking-[.11em] text-els-fg-3">
           Respostas
         </legend>
         <div className="space-y-3">
@@ -230,14 +230,14 @@ export function AuthoringForm({ profiles, articles, subjects, topics }: Authorin
             return (
               <div
                 key={`${profile?.format}-${key}`}
-                className="grid gap-3 rounded-xl border border-white/8 bg-white/[.025] p-3 sm:grid-cols-[auto_1fr] sm:items-start"
+                className="grid gap-3 rounded-xl border border-els-line bg-els-raise p-3 sm:grid-cols-[auto_1fr] sm:items-start"
               >
-                <label className="flex min-h-11 items-center gap-2 text-xs font-bold text-slate-300">
+                <label className="flex min-h-11 items-center gap-2 text-xs font-bold text-els-fg-2">
                   <input
                     type="radio"
                     name="correctOption"
                     value={key}
-                    className="size-4 accent-emerald-400"
+                    className="size-4 accent-els-green"
                     required
                   />
                   {key}
@@ -254,12 +254,12 @@ export function AuthoringForm({ profiles, articles, subjects, topics }: Authorin
                     required
                   />
                 )}
-                {fixedText ? <p className="self-center text-sm font-semibold text-slate-200">{fixedText}</p> : null}
+                {fixedText ? <p className="self-center text-sm font-semibold text-els-fg-2">{fixedText}</p> : null}
               </div>
             );
           })}
         </div>
-        <p className="mt-2 text-xs leading-5 text-slate-500">Marque à esquerda a única resposta correta.</p>
+        <p className="mt-2 text-xs leading-5 text-els-fg-3">Marque à esquerda a única resposta correta.</p>
       </fieldset>
 
       <div>
@@ -275,7 +275,7 @@ export function AuthoringForm({ profiles, articles, subjects, topics }: Authorin
         />
       </div>
 
-      <div className="rounded-2xl border border-white/8 bg-white/[.025] p-4">
+      <div className="rounded-2xl border border-els-line bg-els-raise p-4">
         <FieldLabel htmlFor="authorshipMethod">Método de autoria</FieldLabel>
         <select
           id="authorshipMethod"
@@ -302,19 +302,19 @@ export function AuthoringForm({ profiles, articles, subjects, topics }: Authorin
         ) : null}
       </div>
 
-      <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-emerald-300/15 bg-emerald-300/[.055] p-4">
+      <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-els-green/15 bg-els-green/[.055] p-4">
         <input
           type="checkbox"
           name="cleanRoomAttestation"
-          className="mt-1 size-4 shrink-0 accent-emerald-400"
+          className="mt-1 size-4 shrink-0 accent-els-green"
           required
         />
         <span>
-          <strong className="flex items-center gap-2 text-sm text-emerald-100">
+          <strong className="flex items-center gap-2 text-sm text-els-green-ink">
             <ShieldCheck aria-hidden="true" className="size-4" />
             Declaração de autoria limpa
           </strong>
-          <span className="mt-1 block text-xs leading-5 text-slate-400">
+          <span className="mt-1 block text-xs leading-5 text-els-fg-3">
             Confirmo que esta questão foi criada do zero a partir da fonte oficial selecionada e do perfil abstrato,
             sem consultar, copiar ou parafrasear uma questão de terceiros.
           </span>
@@ -326,8 +326,8 @@ export function AuthoringForm({ profiles, articles, subjects, topics }: Authorin
           aria-live="polite"
           className={`flex items-start gap-2 rounded-xl border p-3 text-sm ${
             state.status === "success"
-              ? "border-emerald-300/20 bg-emerald-300/8 text-emerald-100"
-              : "border-rose-300/20 bg-rose-300/8 text-rose-100"
+              ? "border-els-green/20 bg-els-green/8 text-els-green-ink"
+              : "border-els-danger/20 bg-els-danger/8 text-els-fg"
           }`}
         >
           {state.status === "success" ? (
@@ -342,7 +342,7 @@ export function AuthoringForm({ profiles, articles, subjects, topics }: Authorin
       <button
         type="submit"
         disabled={pending}
-        className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-amber-400 px-5 text-sm font-extrabold text-slate-950 transition hover:bg-amber-300 disabled:cursor-wait disabled:opacity-60 sm:w-auto"
+        className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-els-amber px-5 text-sm font-extrabold text-els-on-amber transition hover:bg-els-amber-2 disabled:cursor-wait disabled:opacity-60 sm:w-auto"
       >
         <Send aria-hidden="true" className="size-4" />
         {pending ? "Enviando..." : "Enviar para revisão humana"}

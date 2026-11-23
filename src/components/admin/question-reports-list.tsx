@@ -22,10 +22,10 @@ const dateFormatter = new Intl.DateTimeFormat("pt-BR", {
 const numberFormatter = new Intl.NumberFormat("pt-BR");
 
 const statusTone: Record<QuestionReportStatus, string> = {
-  open: "bg-amber-300/10 text-amber-200",
-  reviewing: "bg-sky-300/10 text-sky-200",
-  resolved: "bg-emerald-300/10 text-emerald-200",
-  dismissed: "bg-white/5 text-slate-400",
+  open: "bg-els-amber/10 text-els-amber-ink",
+  reviewing: "bg-els-info/10 text-els-info-ink",
+  resolved: "bg-els-green/10 text-els-green-ink",
+  dismissed: "bg-els-raise text-els-fg-3",
 };
 
 const quizModeLabels: Record<string, string> = {
@@ -50,14 +50,14 @@ function StatusFilters({ filters, counts }: { filters: QuestionReportFilters; co
             href={questionReportFiltersHref({ ...filters, status: item.value, page: 1 })}
             aria-current={active ? "page" : undefined}
             className={cn(
-              "inline-flex min-h-9 items-center gap-2 rounded-full border px-3 text-xs font-bold transition",
+              "inline-flex min-h-11 items-center gap-2 rounded-full border px-3 text-xs font-bold transition",
               active
-                ? "border-amber-300/30 bg-amber-300/12 text-amber-100"
-                : "border-white/8 text-slate-400 hover:border-white/15 hover:text-white",
+                ? "border-els-amber/30 bg-els-amber/12 text-els-amber-ink"
+                : "border-els-line text-els-fg-3 hover:border-els-line-strong hover:text-els-fg",
             )}
           >
             {item.label}
-            <span className={cn("rounded-full px-1.5 text-[10px]", active ? "bg-amber-300/20" : "bg-white/6")}>
+            <span className={cn("rounded-full px-1.5 text-[10px]", active ? "bg-els-amber/20" : "bg-els-raise")}>
               {numberFormatter.format(item.count)}
             </span>
           </Link>
@@ -71,14 +71,14 @@ function ReasonFilter({ filters }: { filters: QuestionReportFilters }) {
   return (
     <form method="get" action="/admin/relatos" className="flex flex-wrap items-center gap-2">
       {filters.status !== "open" ? <input type="hidden" name="status" value={filters.status} /> : null}
-      <label htmlFor="report-reason-filter" className="text-xs font-semibold text-slate-500">
+      <label htmlFor="report-reason-filter" className="text-xs font-semibold text-els-fg-3">
         Motivo
       </label>
       <select
         id="report-reason-filter"
         name="motivo"
         defaultValue={filters.reason ?? ""}
-        className="min-h-9 rounded-lg border border-white/10 bg-[#0b1724] px-2 text-xs font-semibold text-slate-200 outline-none focus:border-amber-300/40"
+        className="min-h-11 rounded-lg border border-els-line bg-els-surface px-2 text-xs font-semibold text-els-fg-2 outline-none focus:border-els-amber/40"
       >
         <option value="">Todos os motivos</option>
         {QUESTION_REPORT_REASONS.map((reason) => (
@@ -89,7 +89,7 @@ function ReasonFilter({ filters }: { filters: QuestionReportFilters }) {
       </select>
       <button
         type="submit"
-        className="min-h-9 rounded-lg border border-white/10 px-3 text-xs font-bold text-slate-300 transition hover:border-white/20 hover:text-white"
+        className="min-h-11 rounded-lg border border-els-line px-3 text-xs font-bold text-els-fg-2 transition hover:border-els-line-strong hover:text-els-fg"
       >
         Filtrar
       </button>
@@ -99,16 +99,16 @@ function ReasonFilter({ filters }: { filters: QuestionReportFilters }) {
 
 function QuestionDetails({ question }: { question: AdminQuestionReport["question"] }) {
   return (
-    <details className="group mt-3 rounded-xl border border-white/8 bg-black/15">
-      <summary className="flex min-h-10 cursor-pointer list-none items-center justify-between gap-2 px-3 text-xs font-bold text-amber-300 hover:text-amber-200">
+    <details className="group mt-3 rounded-xl border border-els-line bg-els-sink">
+      <summary className="flex min-h-10 cursor-pointer list-none items-center justify-between gap-2 px-3 text-xs font-bold text-els-amber-ink hover:text-els-amber-ink">
         <span>Abrir questão</span>
         <ChevronRight aria-hidden="true" className="size-4 transition group-open:rotate-90" />
       </summary>
-      <div className="space-y-4 border-t border-white/8 p-3 text-sm leading-6 text-slate-300">
-        <p className="text-[11px] text-slate-500">
+      <div className="space-y-4 border-t border-els-line p-3 text-sm leading-6 text-els-fg-2">
+        <p className="text-[11px] text-els-fg-3">
           Somente leitura · {quizModeLabels[question.quizMode] ?? question.quizMode} · status editorial {question.editorialStatus}
         </p>
-        <p className="whitespace-pre-line text-slate-200">{question.prompt}</p>
+        <p className="whitespace-pre-line text-els-fg-2">{question.prompt}</p>
         {question.options.length ? (
           <ol className="space-y-2">
             {question.options.map((option) => (
@@ -116,15 +116,15 @@ function QuestionDetails({ question }: { question: AdminQuestionReport["question
                 key={option.key}
                 className={cn(
                   "flex gap-2 rounded-lg border px-3 py-2 text-[13px]",
-                  option.isCorrect ? "border-emerald-300/25 bg-emerald-300/[.06] text-emerald-50" : "border-white/6 text-slate-400",
+                  option.isCorrect ? "border-els-green/25 bg-els-green/[.06] text-els-fg" : "border-els-line text-els-fg-3",
                 )}
               >
-                <strong className={cn("shrink-0 uppercase", option.isCorrect ? "text-emerald-300" : "text-slate-500")}>
+                <strong className={cn("shrink-0 uppercase", option.isCorrect ? "text-els-green-ink" : "text-els-fg-3")}>
                   {option.key})
                 </strong>
                 <span className="min-w-0 whitespace-pre-line">{option.text}</span>
                 {option.isCorrect ? (
-                  <span className="ml-auto shrink-0 self-start rounded-full bg-emerald-300/15 px-2 text-[10px] font-bold text-emerald-200">
+                  <span className="ml-auto shrink-0 self-start rounded-full bg-els-green/15 px-2 text-[10px] font-bold text-els-green-ink">
                     Gabarito
                   </span>
                 ) : null}
@@ -132,13 +132,13 @@ function QuestionDetails({ question }: { question: AdminQuestionReport["question
             ))}
           </ol>
         ) : (
-          <p className="text-xs text-slate-500">Questão sem alternativas cadastradas.</p>
+          <p className="text-xs text-els-fg-3">Questão sem alternativas cadastradas.</p>
         )}
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-[.12em] text-slate-500">Explicação</p>
-          <p className="mt-1 whitespace-pre-line text-[13px] text-slate-400">{question.explanation}</p>
+          <p className="text-[11px] font-bold uppercase tracking-[.12em] text-els-fg-3">Explicação</p>
+          <p className="mt-1 whitespace-pre-line text-[13px] text-els-fg-3">{question.explanation}</p>
         </div>
-        <p className="text-[11px] text-slate-500">
+        <p className="text-[11px] text-els-fg-3">
           Fonte: {question.lawShortTitle ?? "sem lei vinculada"}
           {question.articleRef ? `, ${question.articleRef}` : ""}
         </p>
@@ -151,15 +151,15 @@ function ReportRow({ report }: { report: AdminQuestionReport }) {
   const { question } = report;
   const activeCount = report.activeReportsForQuestion;
   return (
-    <article className="rounded-2xl border border-white/8 bg-[#09131f] p-4 sm:p-5">
+    <article className="rounded-2xl border border-els-line bg-els-surface p-4 sm:p-5">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-2 text-[11px] text-slate-500">
+          <div className="flex flex-wrap items-center gap-2 text-[11px] text-els-fg-3">
             <span className={cn("rounded-full px-2.5 py-1 text-[10px] font-bold", statusTone[report.status])}>
               {QUESTION_REPORT_STATUS_LABELS[report.status]}
             </span>
-            <span className="inline-flex items-center gap-1 font-bold text-slate-200">
-              <Flag aria-hidden="true" className="size-3.5 text-rose-300" />
+            <span className="inline-flex items-center gap-1 font-bold text-els-fg-2">
+              <Flag aria-hidden="true" className="size-3.5 text-els-danger-ink" />
               {questionReportReasonLabel(report.reason)}
             </span>
             <span>·</span>
@@ -177,20 +177,20 @@ function ReportRow({ report }: { report: AdminQuestionReport }) {
             ) : null}
           </div>
 
-          <p className="mt-3 text-xs font-semibold text-slate-400">
+          <p className="mt-3 text-xs font-semibold text-els-fg-3">
             {question.lawShortTitle ?? "Sem lei vinculada"}
             {question.articleRef ? ` · ${question.articleRef}` : ""}
-            <span className="ml-2 break-all font-mono text-[10px] font-normal text-slate-600">{question.publicId}</span>
+            <span className="ml-2 break-all font-mono text-[10px] font-normal text-els-fg-4">{question.publicId}</span>
           </p>
-          <p className="mt-1 text-sm leading-6 text-slate-200">{question.promptPreview}</p>
+          <p className="mt-1 text-sm leading-6 text-els-fg-2">{question.promptPreview}</p>
 
           {report.notes ? (
-            <blockquote className="mt-3 flex gap-2 rounded-xl border border-white/6 bg-white/[.03] px-3 py-2 text-[13px] leading-5 text-slate-300">
-              <MessageSquareText aria-hidden="true" className="mt-0.5 size-3.5 shrink-0 text-slate-500" />
+            <blockquote className="mt-3 flex gap-2 rounded-xl border border-els-line bg-els-raise px-3 py-2 text-[13px] leading-5 text-els-fg-2">
+              <MessageSquareText aria-hidden="true" className="mt-0.5 size-3.5 shrink-0 text-els-fg-3" />
               <span className="min-w-0 whitespace-pre-line break-words">{report.notes}</span>
             </blockquote>
           ) : (
-            <p className="mt-3 text-[11px] text-slate-600">Sem observação do aluno.</p>
+            <p className="mt-3 text-[11px] text-els-fg-4">Sem observação do aluno.</p>
           )}
         </div>
 
@@ -198,7 +198,7 @@ function ReportRow({ report }: { report: AdminQuestionReport }) {
           <span
             className={cn(
               "self-start rounded-lg px-2.5 py-1 text-[11px] font-bold lg:self-end",
-              activeCount > 1 ? "bg-rose-300/10 text-rose-200" : "bg-white/5 text-slate-400",
+              activeCount > 1 ? "bg-els-danger/10 text-els-danger-ink" : "bg-els-raise text-els-fg-3",
             )}
           >
             {numberFormatter.format(activeCount)} {activeCount === 1 ? "relato ativo" : "relatos ativos"} nesta questão
@@ -214,7 +214,7 @@ function ReportRow({ report }: { report: AdminQuestionReport }) {
 export function QuestionReportsList({ data, filters }: { data: AdminQuestionReportsPage; filters: QuestionReportFilters }) {
   return (
     <section className="mt-5 space-y-4" aria-label="Relatos de questões">
-      <div className="flex flex-col gap-3 rounded-[1.5rem] border border-white/8 bg-[#09131f] p-4 sm:p-5 xl:flex-row xl:items-center xl:justify-between">
+      <div className="flex flex-col gap-3 rounded-[1.5rem] border border-els-line bg-els-surface p-4 sm:p-5 xl:flex-row xl:items-center xl:justify-between">
         <StatusFilters filters={filters} counts={data.statusCounts} />
         <ReasonFilter filters={filters} />
       </div>
@@ -222,7 +222,7 @@ export function QuestionReportsList({ data, filters }: { data: AdminQuestionRepo
       {data.reports.length ? (
         data.reports.map((report) => <ReportRow key={report.id} report={report} />)
       ) : (
-        <p className="rounded-2xl border border-dashed border-white/10 p-8 text-center text-sm text-slate-500">
+        <p className="rounded-2xl border border-dashed border-els-line p-8 text-center text-sm text-els-fg-3">
           Nenhum relato com esses filtros.
         </p>
       )}
@@ -232,7 +232,7 @@ export function QuestionReportsList({ data, filters }: { data: AdminQuestionRepo
           {filters.page > 1 ? (
             <Link
               href={questionReportFiltersHref({ ...filters, page: filters.page - 1 })}
-              className="inline-flex min-h-9 items-center gap-1 rounded-lg border border-white/10 px-3 text-slate-300 hover:text-white"
+              className="inline-flex min-h-11 items-center gap-1 rounded-lg border border-els-line px-3 text-els-fg-2 hover:text-els-fg"
             >
               <ChevronLeft aria-hidden="true" className="size-4" />
               Anteriores
@@ -240,11 +240,11 @@ export function QuestionReportsList({ data, filters }: { data: AdminQuestionRepo
           ) : (
             <span />
           )}
-          <span className="text-slate-500">Página {numberFormatter.format(filters.page)}</span>
+          <span className="text-els-fg-3">Página {numberFormatter.format(filters.page)}</span>
           {data.hasNextPage ? (
             <Link
               href={questionReportFiltersHref({ ...filters, page: filters.page + 1 })}
-              className="inline-flex min-h-9 items-center gap-1 rounded-lg border border-white/10 px-3 text-slate-300 hover:text-white"
+              className="inline-flex min-h-11 items-center gap-1 rounded-lg border border-els-line px-3 text-els-fg-2 hover:text-els-fg"
             >
               Próximos
               <ChevronRight aria-hidden="true" className="size-4" />
@@ -260,15 +260,15 @@ export function QuestionReportsList({ data, filters }: { data: AdminQuestionRepo
 
 export function QuestionReportsHeader() {
   return (
-    <header className="relative overflow-hidden rounded-[1.75rem] border border-rose-300/15 bg-[linear-gradient(145deg,#101a27_0%,#091521_60%,#1f1018_100%)] p-6 sm:p-8">
-      <div className="pointer-events-none absolute -right-20 -top-28 size-72 rounded-full bg-rose-300/8 blur-3xl" />
+    <header className="relative overflow-hidden rounded-[1.75rem] border border-els-danger/15 bg-[linear-gradient(145deg,var(--els-surface)_0%,var(--els-bg-2)_60%,var(--els-bg-2)_100%)] p-6 sm:p-8">
+      <div className="pointer-events-none absolute -right-20 -top-28 size-72 rounded-full bg-els-danger/8 blur-3xl" />
       <div className="relative max-w-4xl">
-        <span className="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-[.17em] text-rose-300">
+        <span className="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-[.17em] text-els-danger-ink">
           <Flag aria-hidden="true" className="size-3.5" />
           Relatos dos alunos
         </span>
-        <h1 className="mt-3 text-3xl font-semibold tracking-[-.045em] text-white sm:text-4xl">Problemas apontados nas questões.</h1>
-        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-400 sm:text-base">
+        <h1 className="mt-3 text-3xl font-semibold tracking-[-.045em] text-els-fg sm:text-4xl">Problemas apontados nas questões.</h1>
+        <p className="mt-3 max-w-3xl text-sm leading-6 text-els-fg-3 sm:text-base">
           Cada relato vem da barra da questão. Confira enunciado, gabarito e artigo antes de decidir; o aluno aparece
           só por um identificador anônimo, e toda mudança de status fica na auditoria.
         </p>

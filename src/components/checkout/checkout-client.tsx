@@ -116,12 +116,12 @@ export function CheckoutClient({ planSlug, publishableKey, buttonLabel }: Checko
 
   if (error) {
     return (
-      <div className="rounded-2xl border border-rose-300/20 bg-rose-300/[.06] p-5 text-sm text-rose-100" role="alert">
+      <div className="rounded-2xl border border-els-danger/20 bg-els-danger/[.06] p-5 text-sm text-els-fg" role="alert">
         <div className="flex items-start gap-3">
-          <AlertTriangle className="mt-0.5 size-5 shrink-0 text-rose-300" aria-hidden="true" />
+          <AlertTriangle className="mt-0.5 size-5 shrink-0 text-els-danger-ink" aria-hidden="true" />
           <div>
             <strong className="block font-semibold">Não foi possível iniciar o checkout</strong>
-            <p className="mt-1 leading-6 text-rose-100/70">{error}</p>
+            <p className="mt-1 leading-6 text-els-fg">{error}</p>
           </div>
         </div>
       </div>
@@ -130,10 +130,10 @@ export function CheckoutClient({ planSlug, publishableKey, buttonLabel }: Checko
 
   if (!options) {
     return (
-      <div className="grid min-h-64 place-items-center rounded-2xl border border-white/8 bg-white/[.025]" aria-live="polite">
+      <div className="grid min-h-64 place-items-center rounded-2xl border border-els-line bg-els-raise" aria-live="polite">
         <div className="text-center">
-          <LoaderCircle className="mx-auto size-7 animate-spin text-amber-300" aria-hidden="true" />
-          <p className="mt-3 text-sm text-slate-400">Preparando seu ambiente seguro…</p>
+          <LoaderCircle className="mx-auto size-7 animate-spin text-els-amber-ink" aria-hidden="true" />
+          <p className="mt-3 text-sm text-els-fg-3">Preparando seu ambiente seguro…</p>
         </div>
       </div>
     );
@@ -180,7 +180,7 @@ function PaymentForm({ buttonLabel }: { buttonLabel: string }) {
 
   if (result.type === "error") {
     return (
-      <div className="rounded-2xl border border-rose-300/20 bg-rose-300/[.06] p-5 text-sm text-rose-100" role="alert">
+      <div className="rounded-2xl border border-els-danger/20 bg-els-danger/[.06] p-5 text-sm text-els-fg" role="alert">
         {result.error.message}
       </div>
     );
@@ -188,7 +188,7 @@ function PaymentForm({ buttonLabel }: { buttonLabel: string }) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      <div className="rounded-2xl border border-white/8 bg-[#0b1623] p-4 sm:p-5">
+      <div className="rounded-2xl border border-els-line bg-els-surface p-4 sm:p-5">
         <PaymentElement
           options={{ layout: { type: "accordion", defaultCollapsed: false, radios: "always" } }}
           onChange={(event) => {
@@ -204,7 +204,7 @@ function PaymentForm({ buttonLabel }: { buttonLabel: string }) {
       </div>
 
       {error && (
-        <p className="rounded-xl border border-rose-300/20 bg-rose-300/[.06] px-4 py-3 text-sm text-rose-200" role="alert">
+        <p className="rounded-xl border border-els-danger/20 bg-els-danger/[.06] px-4 py-3 text-sm text-els-danger-ink" role="alert">
           {error}
         </p>
       )}
@@ -212,7 +212,7 @@ function PaymentForm({ buttonLabel }: { buttonLabel: string }) {
       <button
         type="submit"
         disabled={result.type !== "success" || !result.checkout.canConfirm || submitting}
-        className="flex min-h-14 w-full items-center justify-center gap-2 rounded-xl bg-amber-400 px-5 text-sm font-extrabold text-slate-950 shadow-[0_16px_50px_rgba(251,191,36,.16)] transition hover:bg-amber-300 disabled:cursor-not-allowed disabled:opacity-45"
+        className="flex min-h-14 w-full items-center justify-center gap-2 rounded-xl bg-els-amber px-5 text-sm font-extrabold text-els-on-amber shadow-[0_16px_50px_color-mix(in_oklch,var(--els-amber)_16%,transparent)] transition hover:bg-els-amber-2 disabled:cursor-not-allowed disabled:opacity-45"
       >
         {submitting ? (
           <>
@@ -225,8 +225,8 @@ function PaymentForm({ buttonLabel }: { buttonLabel: string }) {
         )}
       </button>
 
-      <div className="flex items-start gap-2.5 text-xs leading-5 text-slate-500">
-        <ShieldCheck className="mt-0.5 size-4 shrink-0 text-emerald-300" aria-hidden="true" />
+      <div className="flex items-start gap-2.5 text-xs leading-5 text-els-fg-3">
+        <ShieldCheck className="mt-0.5 size-4 shrink-0 text-els-green-ink" aria-hidden="true" />
         <p>Seus dados de pagamento são enviados diretamente à Stripe e não passam pelos servidores da Edital Lei Seca.</p>
       </div>
     </form>

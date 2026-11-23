@@ -34,21 +34,21 @@ const CONFIDENCE_OPTIONS = [
     label: "Chute",
     helper: "Ainda não lembro",
     icon: Dice5,
-    selectedClass: "border-slate-300/45 bg-slate-300/10 text-white",
+    selectedClass: "border-els-fg-2/45 bg-els-fg-2/10 text-els-fg",
   },
   {
     id: "almost",
     label: "Quase",
     helper: "Estou entre duas",
     icon: CircleHelp,
-    selectedClass: "border-amber-300/55 bg-amber-300/10 text-amber-100",
+    selectedClass: "border-els-amber/55 bg-els-amber/10 text-els-amber-ink",
   },
   {
     id: "sure",
     label: "Certo",
     helper: "Lembro a redação",
     icon: ShieldCheck,
-    selectedClass: "border-emerald-300/55 bg-emerald-300/10 text-emerald-100",
+    selectedClass: "border-els-green/55 bg-els-green/10 text-els-green-ink",
   },
 ] as const;
 
@@ -162,12 +162,12 @@ function LoadingSession() {
       aria-label="Carregando a sessão demonstrativa"
     >
       <div className="flex flex-col items-center gap-4 text-center">
-        <span className="grid size-12 place-items-center rounded-2xl border border-amber-300/20 bg-amber-300/10 text-amber-300 shadow-[0_16px_45px_rgba(251,191,36,.12)] motion-safe:animate-pulse">
+        <span className="grid size-12 place-items-center rounded-2xl border border-els-amber/20 bg-els-amber/10 text-els-amber-ink shadow-[0_16px_45px_color-mix(in_oklch,var(--els-amber)_12%,transparent)] motion-safe:animate-pulse">
           <BookOpenCheck className="size-6" aria-hidden="true" />
         </span>
         <div>
-          <p className="font-semibold text-white">Preparando seus artigos</p>
-          <p className="mt-1 text-sm text-slate-500">Recuperando o progresso deste navegador…</p>
+          <p className="font-semibold text-els-fg">Preparando seus artigos</p>
+          <p className="mt-1 text-sm text-els-fg-3">Recuperando o progresso deste navegador…</p>
         </div>
       </div>
     </div>
@@ -188,19 +188,19 @@ function SessionProgress({
 
   return (
     <section
-      className="rounded-2xl border border-white/8 bg-white/[.035] p-4 shadow-[0_18px_60px_rgba(0,0,0,.18)] backdrop-blur-xl sm:p-5"
+      className="rounded-2xl border border-els-line bg-els-raise p-4 shadow-[0_18px_60px_rgba(0,0,0,.18)] backdrop-blur-xl sm:p-5"
       aria-label="Progresso da sessão"
     >
       <div className="mb-3 flex items-center justify-between gap-4">
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-[.2em] text-emerald-300">
+          <p className="text-[11px] font-bold uppercase tracking-[.2em] text-els-green-ink">
             Rodada constitucional
           </p>
-          <p className="mt-1 text-sm text-slate-400">
-            Questão <strong className="font-semibold text-slate-100">{currentIndex + 1}</strong> de {total}
+          <p className="mt-1 text-sm text-els-fg-3">
+            Questão <strong className="font-semibold text-els-fg">{currentIndex + 1}</strong> de {total}
           </p>
         </div>
-        <span className="rounded-full border border-white/8 bg-slate-950/70 px-3 py-1.5 text-xs font-semibold tabular-nums text-slate-300">
+        <span className="rounded-full border border-els-line bg-els-bg/70 px-3 py-1.5 text-xs font-semibold tabular-nums text-els-fg-2">
           {percentage}% concluído
         </span>
       </div>
@@ -218,9 +218,9 @@ function SessionProgress({
           <span
             key={index}
             className={cn(
-              "rounded-full bg-white/10 transition-colors duration-500",
-              index < completedSteps && "bg-emerald-400",
-              index === currentIndex && !answeredCurrent && "bg-amber-300",
+              "rounded-full bg-els-raise transition-colors duration-500",
+              index < completedSteps && "bg-els-green",
+              index === currentIndex && !answeredCurrent && "bg-els-amber",
             )}
             aria-hidden="true"
           />
@@ -241,9 +241,9 @@ function ConfidencePicker({
 }) {
   return (
     <fieldset>
-      <legend className="flex w-full items-center justify-between gap-3 text-sm font-semibold text-slate-200">
+      <legend className="flex w-full items-center justify-between gap-3 text-sm font-semibold text-els-fg-2">
         <span>Antes de responder, qual é sua confiança?</span>
-        <span className="hidden text-xs font-normal text-slate-500 sm:inline">Isso melhora sua revisão</span>
+        <span className="hidden text-xs font-normal text-els-fg-3 sm:inline">Isso melhora sua revisão</span>
       </legend>
       <div className="mt-3 grid gap-2 sm:grid-cols-3">
         {CONFIDENCE_OPTIONS.map((option) => {
@@ -258,21 +258,21 @@ function ConfidencePicker({
               disabled={disabled}
               onClick={() => onChange(option.id)}
               className={cn(
-                "flex min-h-16 items-center gap-3 rounded-xl border border-white/8 bg-slate-950/45 px-3.5 py-3 text-left text-slate-300 outline-none transition hover:border-white/20 hover:bg-white/[.045] focus-visible:ring-2 focus-visible:ring-amber-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[#09111d] disabled:cursor-default",
+                "flex min-h-16 items-center gap-3 rounded-xl border border-els-line bg-els-bg/45 px-3.5 py-3 text-left text-els-fg-2 outline-none transition hover:border-els-line-strong hover:bg-els-raise-hover focus-visible:ring-2 focus-visible:ring-els-amber focus-visible:ring-offset-2 focus-visible:ring-offset-els-surface disabled:cursor-default",
                 isSelected && option.selectedClass,
               )}
             >
               <span
                 className={cn(
-                  "grid size-8 shrink-0 place-items-center rounded-lg bg-white/5 text-slate-400",
-                  isSelected && "bg-white/10 text-current",
+                  "grid size-8 shrink-0 place-items-center rounded-lg bg-els-raise text-els-fg-3",
+                  isSelected && "bg-els-raise text-current",
                 )}
               >
                 <Icon className="size-4" aria-hidden="true" />
               </span>
               <span>
                 <strong className="block text-sm font-semibold text-current">{option.label}</strong>
-                <small className="mt-0.5 block text-[11px] text-slate-500">{option.helper}</small>
+                <small className="mt-0.5 block text-[11px] text-els-fg-3">{option.helper}</small>
               </span>
             </button>
           );
@@ -294,10 +294,10 @@ function AnswerOptions({
   onAnswer: (optionId: DemoQuestionOptionId) => void;
 }) {
   return (
-    <fieldset className="mt-7 border-t border-white/8 pt-6">
-      <legend className="px-1 text-sm font-semibold text-slate-200">Escolha a redação exata</legend>
+    <fieldset className="mt-7 border-t border-els-line pt-6">
+      <legend className="px-1 text-sm font-semibold text-els-fg-2">Escolha a redação exata</legend>
       {!confidence && !response && (
-        <p id="confidence-hint" className="mt-1 text-xs leading-5 text-amber-200/75">
+        <p id="confidence-hint" className="mt-1 text-xs leading-5 text-els-amber-ink">
           Registre sua confiança acima para liberar as alternativas.
         </p>
       )}
@@ -317,20 +317,20 @@ function AnswerOptions({
               aria-describedby={!confidence && !response ? "confidence-hint" : undefined}
               onClick={() => onAnswer(option.id)}
               className={cn(
-                "group flex min-h-16 w-full items-start gap-3 rounded-2xl border border-white/8 bg-slate-950/55 p-3.5 text-left text-sm leading-6 text-slate-300 outline-none transition sm:gap-4 sm:p-4 sm:text-[15px]",
+                "group flex min-h-16 w-full items-start gap-3 rounded-2xl border border-els-line bg-els-bg/55 p-3.5 text-left text-sm leading-6 text-els-fg-2 outline-none transition sm:gap-4 sm:p-4 sm:text-[15px]",
                 confidence && !response &&
-                  "cursor-pointer hover:-translate-y-0.5 hover:border-amber-300/35 hover:bg-amber-300/[.035] focus-visible:ring-2 focus-visible:ring-amber-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[#09111d]",
+                  "cursor-pointer hover:-translate-y-0.5 hover:border-els-amber/35 hover:bg-els-amber/[.035] focus-visible:ring-2 focus-visible:ring-els-amber focus-visible:ring-offset-2 focus-visible:ring-offset-els-surface",
                 !confidence && !response && "cursor-not-allowed opacity-55",
-                revealCorrect && "border-emerald-300/50 bg-emerald-300/[.08] text-emerald-50",
-                revealWrong && "border-rose-300/45 bg-rose-300/[.07] text-rose-50",
+                revealCorrect && "border-els-green/50 bg-els-green/[.08] text-els-fg",
+                revealWrong && "border-els-danger/45 bg-els-danger/[.07] text-els-fg",
               )}
             >
               <span
                 className={cn(
-                  "grid size-8 shrink-0 place-items-center rounded-lg border border-white/10 bg-white/5 text-xs font-bold uppercase text-slate-400 transition",
-                  confidence && !response && "group-hover:border-amber-300/30 group-hover:text-amber-200",
-                  revealCorrect && "border-emerald-300/40 bg-emerald-300/15 text-emerald-200",
-                  revealWrong && "border-rose-300/35 bg-rose-300/15 text-rose-200",
+                  "grid size-8 shrink-0 place-items-center rounded-lg border border-els-line bg-els-raise text-xs font-bold uppercase text-els-fg-3 transition",
+                  confidence && !response && "group-hover:border-els-amber/30 group-hover:text-els-amber-ink",
+                  revealCorrect && "border-els-green/40 bg-els-green/15 text-els-green-ink",
+                  revealWrong && "border-els-danger/35 bg-els-danger/15 text-els-danger-ink",
                 )}
                 aria-hidden="true"
               >
@@ -338,13 +338,13 @@ function AnswerOptions({
               </span>
               <span className="flex-1">{option.text}</span>
               {revealCorrect && (
-                <span className="mt-1 grid size-6 shrink-0 place-items-center rounded-full bg-emerald-400 text-slate-950">
+                <span className="mt-1 grid size-6 shrink-0 place-items-center rounded-full bg-els-green text-els-on-amber">
                   <Check className="size-3.5" aria-hidden="true" />
                   <span className="sr-only">Alternativa correta</span>
                 </span>
               )}
               {revealWrong && (
-                <span className="mt-1 grid size-6 shrink-0 place-items-center rounded-full bg-rose-400 text-slate-950">
+                <span className="mt-1 grid size-6 shrink-0 place-items-center rounded-full bg-els-danger text-els-on-amber">
                   <X className="size-3.5" aria-hidden="true" />
                   <span className="sr-only">Alternativa incorreta selecionada</span>
                 </span>
@@ -365,32 +365,32 @@ function SessionGuide() {
   ] as const;
 
   return (
-    <aside className="rounded-[1.5rem] border border-white/8 bg-white/[.035] p-5 shadow-[0_22px_70px_rgba(0,0,0,.2)] backdrop-blur-xl sm:p-6">
-      <span className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[.18em] text-amber-300">
+    <aside className="rounded-[1.5rem] border border-els-line bg-els-raise p-5 shadow-[0_22px_70px_rgba(0,0,0,.2)] backdrop-blur-xl sm:p-6">
+      <span className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[.18em] text-els-amber-ink">
         <Sparkles className="size-3.5" aria-hidden="true" />
         Método em ação
       </span>
-      <h2 className="mt-3 text-xl font-semibold tracking-[-.03em] text-white">
+      <h2 className="mt-3 text-xl font-semibold tracking-[-.03em] text-els-fg">
         Uma questão, três decisões de memória.
       </h2>
       <div className="mt-6 grid gap-5">
         {steps.map(([Icon, title, description], index) => (
           <div className="flex gap-3.5" key={title}>
-            <span className="grid size-9 shrink-0 place-items-center rounded-xl border border-white/8 bg-slate-950/65 text-emerald-300">
+            <span className="grid size-9 shrink-0 place-items-center rounded-xl border border-els-line bg-els-bg/65 text-els-green-ink">
               <Icon className="size-4" aria-hidden="true" />
             </span>
             <div>
-              <p className="text-sm font-semibold text-slate-200">
-                <span className="mr-2 text-xs text-slate-600">0{index + 1}</span>
+              <p className="text-sm font-semibold text-els-fg-2">
+                <span className="mr-2 text-xs text-els-fg-4">0{index + 1}</span>
                 {title}
               </p>
-              <p className="mt-1 text-xs leading-5 text-slate-500">{description}</p>
+              <p className="mt-1 text-xs leading-5 text-els-fg-3">{description}</p>
             </div>
           </div>
         ))}
       </div>
-      <div className="mt-7 flex gap-3 rounded-xl border border-emerald-300/10 bg-emerald-300/[.045] p-3.5 text-xs leading-5 text-emerald-100/75">
-        <LockKeyhole className="mt-0.5 size-4 shrink-0 text-emerald-300" aria-hidden="true" />
+      <div className="mt-7 flex gap-3 rounded-xl border border-els-green/10 bg-els-green/[.045] p-3.5 text-xs leading-5 text-els-green-ink">
+        <LockKeyhole className="mt-0.5 size-4 shrink-0 text-els-green-ink" aria-hidden="true" />
         <p>Seu avanço desta demonstração fica salvo somente neste navegador.</p>
       </div>
     </aside>
@@ -413,8 +413,8 @@ function AnswerFeedback({
       className={cn(
         "rounded-[1.5rem] border p-5 shadow-[0_22px_70px_rgba(0,0,0,.22)] backdrop-blur-xl sm:p-6",
         response.isCorrect
-          ? "border-emerald-300/20 bg-emerald-300/[.055]"
-          : "border-rose-300/20 bg-rose-300/[.045]",
+          ? "border-els-green/20 bg-els-green/[.055]"
+          : "border-els-danger/20 bg-els-danger/[.045]",
       )}
       aria-live="polite"
       aria-atomic="true"
@@ -424,8 +424,8 @@ function AnswerFeedback({
           className={cn(
             "grid size-10 shrink-0 place-items-center rounded-xl",
             response.isCorrect
-              ? "bg-emerald-400 text-slate-950"
-              : "bg-rose-400 text-slate-950",
+              ? "bg-els-green text-els-on-amber"
+              : "bg-els-danger text-els-on-amber",
           )}
         >
           {response.isCorrect ? (
@@ -435,40 +435,40 @@ function AnswerFeedback({
           )}
         </span>
         <div>
-          <p className="text-[11px] font-bold uppercase tracking-[.18em] text-slate-400">
+          <p className="text-[11px] font-bold uppercase tracking-[.18em] text-els-fg-3">
             Feedback imediato
           </p>
-          <h2 className="mt-1 text-xl font-semibold tracking-[-.03em] text-white">
+          <h2 className="mt-1 text-xl font-semibold tracking-[-.03em] text-els-fg">
             {response.isCorrect ? "Literalidade preservada." : "Uma mutação passou."}
           </h2>
-          <p className="mt-2 text-sm leading-6 text-slate-400">{calibrationMessage(response)}</p>
+          <p className="mt-2 text-sm leading-6 text-els-fg-3">{calibrationMessage(response)}</p>
         </div>
       </div>
 
-      <div className="mt-6 rounded-2xl border border-amber-300/20 bg-[#0a111c]/80 p-4 shadow-inner shadow-black/20">
-        <span className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[.2em] text-amber-300">
+      <div className="mt-6 rounded-2xl border border-els-amber/20 bg-els-surface/80 p-4 shadow-inner shadow-black/20">
+        <span className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[.2em] text-els-amber-ink">
           <BookOpenCheck className="size-3.5" aria-hidden="true" />
           Redação literal
         </span>
-        <blockquote className="mt-3 border-l-2 border-amber-300/55 pl-3.5 text-sm font-medium leading-6 text-slate-100">
+        <blockquote className="mt-3 border-l-2 border-els-amber/55 pl-3.5 text-sm font-medium leading-6 text-els-fg">
           {question.literalText}
         </blockquote>
       </div>
 
       <div className="mt-5">
-        <p className="text-xs font-bold uppercase tracking-[.16em] text-slate-500">Por que?</p>
-        <p className="mt-2 text-sm leading-6 text-slate-300">{question.explanation}</p>
+        <p className="text-xs font-bold uppercase tracking-[.16em] text-els-fg-3">Por que?</p>
+        <p className="mt-2 text-sm leading-6 text-els-fg-2">{question.explanation}</p>
       </div>
 
-      <div className="mt-5 rounded-xl border border-white/8 bg-slate-950/45 p-3.5">
-        <p className="text-[10px] font-bold uppercase tracking-[.16em] text-slate-600">
+      <div className="mt-5 rounded-xl border border-els-line bg-els-bg/45 p-3.5">
+        <p className="text-[10px] font-bold uppercase tracking-[.16em] text-els-fg-4">
           Fonte oficial · verificada em 16/08/2026
         </p>
-        <p className="mt-1.5 text-xs font-semibold text-slate-300">
+        <p className="mt-1.5 text-xs font-semibold text-els-fg-2">
           {question.legalAct} · {question.articleRef}
         </p>
         <a
-          className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-300 outline-none transition hover:text-emerald-200 focus-visible:rounded focus-visible:ring-2 focus-visible:ring-emerald-300"
+          className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-els-green-ink outline-none transition hover:text-els-green-ink focus-visible:rounded focus-visible:ring-2 focus-visible:ring-els-green"
           href={question.officialUrl}
           target="_blank"
           rel="noreferrer"
@@ -476,7 +476,7 @@ function AnswerFeedback({
           Conferir no Planalto
           <ExternalLink className="size-3.5" aria-hidden="true" />
         </a>
-        <p className="mt-3 text-[10px] leading-4 text-slate-600">
+        <p className="mt-3 text-[10px] leading-4 text-els-fg-4">
           Trecho meramente informativo e não oficial; não substitui a publicação no Diário Oficial da União.
         </p>
       </div>
@@ -484,7 +484,7 @@ function AnswerFeedback({
       <button
         type="button"
         onClick={onAdvance}
-        className="group mt-6 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-amber-400 px-5 text-sm font-bold text-slate-950 shadow-[0_15px_45px_rgba(251,191,36,.16)] outline-none transition hover:bg-amber-300 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:ring-offset-2 focus-visible:ring-offset-[#09111d]"
+        className="group mt-6 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-els-amber px-5 text-sm font-bold text-els-on-amber shadow-[0_15px_45px_color-mix(in_oklch,var(--els-amber)_16%,transparent)] outline-none transition hover:bg-els-amber-2 focus-visible:ring-2 focus-visible:ring-els-amber-2 focus-visible:ring-offset-2 focus-visible:ring-offset-els-surface"
       >
         {isLast ? "Ver meu resultado" : "Próxima questão"}
         <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
@@ -512,47 +512,47 @@ function CompletionScreen({
 
   return (
     <div className="mx-auto w-full max-w-6xl px-5 py-10 sm:px-8 sm:py-14 lg:px-10">
-      <section className="overflow-hidden rounded-[2rem] border border-white/10 bg-[#0a121e]/90 shadow-[0_35px_120px_rgba(0,0,0,.38)] backdrop-blur-2xl">
-        <div className="relative border-b border-white/8 px-6 py-10 text-center sm:px-10 sm:py-12">
+      <section className="overflow-hidden rounded-[2rem] border border-els-line bg-els-surface/90 shadow-[0_35px_120px_rgba(0,0,0,.38)] backdrop-blur-2xl">
+        <div className="relative border-b border-els-line px-6 py-10 text-center sm:px-10 sm:py-12">
           <div
-            className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(16,185,129,.16),transparent_48%),radial-gradient(circle_at_85%_100%,rgba(251,191,36,.1),transparent_34%)]"
+            className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,color-mix(in_oklch,var(--els-green)_16%,transparent),transparent_48%),radial-gradient(circle_at_85%_100%,color-mix(in_oklch,var(--els-amber)_10%,transparent),transparent_34%)]"
             aria-hidden="true"
           />
-          <div className="relative mx-auto grid size-16 place-items-center rounded-2xl border border-amber-200/25 bg-amber-300/10 text-amber-300 shadow-[0_20px_60px_rgba(251,191,36,.14)]">
+          <div className="relative mx-auto grid size-16 place-items-center rounded-2xl border border-els-amber-2/25 bg-els-amber/10 text-els-amber-ink shadow-[0_20px_60px_color-mix(in_oklch,var(--els-amber)_14%,transparent)]">
             <Trophy className="size-8" aria-hidden="true" />
           </div>
-          <p className="relative mt-6 text-[11px] font-bold uppercase tracking-[.22em] text-emerald-300">
+          <p className="relative mt-6 text-[11px] font-bold uppercase tracking-[.22em] text-els-green-ink">
             Sessão concluída
           </p>
           <h2
             ref={headingRef}
-            className="relative mx-auto mt-3 max-w-2xl text-balance text-3xl font-semibold tracking-[-.045em] text-white sm:text-4xl"
+            className="relative mx-auto mt-3 max-w-2xl text-balance text-3xl font-semibold tracking-[-.045em] text-els-fg sm:text-4xl"
             tabIndex={-1}
           >
             Você não só respondeu. Você comparou a lei palavra por palavra.
           </h2>
-          <p className="relative mx-auto mt-4 max-w-xl text-sm leading-6 text-slate-400 sm:text-base">
+          <p className="relative mx-auto mt-4 max-w-xl text-sm leading-6 text-els-fg-3 sm:text-base">
             Este foi um recorte da experiência Edital Lei Seca. Seu resultado mostra acerto e também onde a confiança merece calibração.
           </p>
         </div>
 
         <div className="p-5 sm:p-8 lg:p-10">
           <div className="grid gap-3 sm:grid-cols-3">
-            <div className="rounded-2xl border border-emerald-300/15 bg-emerald-300/[.055] p-5">
-              <p className="text-xs font-semibold text-emerald-200/70">Acertos</p>
-              <p className="mt-2 text-3xl font-semibold tracking-[-.04em] text-white">
-                {correctCount}<span className="text-base text-slate-500">/{questions.length}</span>
+            <div className="rounded-2xl border border-els-green/15 bg-els-green/[.055] p-5">
+              <p className="text-xs font-semibold text-els-green-ink">Acertos</p>
+              <p className="mt-2 text-3xl font-semibold tracking-[-.04em] text-els-fg">
+                {correctCount}<span className="text-base text-els-fg-3">/{questions.length}</span>
               </p>
             </div>
-            <div className="rounded-2xl border border-amber-300/15 bg-amber-300/[.05] p-5">
-              <p className="text-xs font-semibold text-amber-200/70">Aproveitamento</p>
-              <p className="mt-2 text-3xl font-semibold tracking-[-.04em] text-white">{score}%</p>
+            <div className="rounded-2xl border border-els-amber/15 bg-els-amber/[.05] p-5">
+              <p className="text-xs font-semibold text-els-amber-ink">Aproveitamento</p>
+              <p className="mt-2 text-3xl font-semibold tracking-[-.04em] text-els-fg">{score}%</p>
             </div>
-            <div className="rounded-2xl border border-white/8 bg-white/[.035] p-5">
-              <p className="text-xs font-semibold text-slate-500">Confiança para revisar</p>
-              <p className="mt-2 text-3xl font-semibold tracking-[-.04em] text-white">
+            <div className="rounded-2xl border border-els-line bg-els-raise p-5">
+              <p className="text-xs font-semibold text-els-fg-3">Confiança para revisar</p>
+              <p className="mt-2 text-3xl font-semibold tracking-[-.04em] text-els-fg">
                 {confidentMisses}
-                <span className="ml-1.5 text-sm font-normal text-slate-500">
+                <span className="ml-1.5 text-sm font-normal text-els-fg-3">
                   {confidentMisses === 1 ? "alerta" : "alertas"}
                 </span>
               </p>
@@ -563,14 +563,14 @@ function CompletionScreen({
             <div>
               <div className="flex items-center justify-between gap-3">
                 <div>
-                  <p className="text-[11px] font-bold uppercase tracking-[.18em] text-slate-500">
+                  <p className="text-[11px] font-bold uppercase tracking-[.18em] text-els-fg-3">
                     Seu percurso
                   </p>
-                  <h2 className="mt-1 text-xl font-semibold tracking-[-.03em] text-white">
+                  <h2 className="mt-1 text-xl font-semibold tracking-[-.03em] text-els-fg">
                     Cinco artigos revisitados
                   </h2>
                 </div>
-                <Flag className="size-5 text-emerald-300" aria-hidden="true" />
+                <Flag className="size-5 text-els-green-ink" aria-hidden="true" />
               </div>
 
               <ol className="mt-5 grid gap-2.5">
@@ -579,14 +579,14 @@ function CompletionScreen({
                   return (
                     <li
                       key={question.slug}
-                      className="flex items-center gap-3 rounded-xl border border-white/8 bg-slate-950/45 p-3.5"
+                      className="flex items-center gap-3 rounded-xl border border-els-line bg-els-bg/45 p-3.5"
                     >
                       <span
                         className={cn(
                           "grid size-8 shrink-0 place-items-center rounded-lg",
                           response?.isCorrect
-                            ? "bg-emerald-300/12 text-emerald-300"
-                            : "bg-rose-300/10 text-rose-300",
+                            ? "bg-els-green/12 text-els-green-ink"
+                            : "bg-els-danger/10 text-els-danger-ink",
                         )}
                       >
                         {response?.isCorrect ? (
@@ -596,35 +596,35 @@ function CompletionScreen({
                         )}
                       </span>
                       <span className="min-w-0 flex-1">
-                        <strong className="block truncate text-sm font-semibold text-slate-200">
+                        <strong className="block truncate text-sm font-semibold text-els-fg-2">
                           {question.articleRef} · {question.topic}
                         </strong>
-                        <small className="mt-0.5 block text-xs text-slate-500">
+                        <small className="mt-0.5 block text-xs text-els-fg-3">
                           Confiança: {response ? confidenceLabel(response.confidence) : "—"}
                         </small>
                       </span>
-                      <span className="text-xs tabular-nums text-slate-600">0{index + 1}</span>
+                      <span className="text-xs tabular-nums text-els-fg-4">0{index + 1}</span>
                     </li>
                   );
                 })}
               </ol>
             </div>
 
-            <aside className="relative overflow-hidden rounded-2xl border border-amber-300/20 bg-amber-300/[.065] p-6">
+            <aside className="relative overflow-hidden rounded-2xl border border-els-amber/20 bg-els-amber/[.065] p-6">
               <div
-                className="pointer-events-none absolute -right-12 -top-12 size-36 rounded-full bg-amber-300/10 blur-3xl"
+                className="pointer-events-none absolute -right-12 -top-12 size-36 rounded-full bg-els-amber/10 blur-3xl"
                 aria-hidden="true"
               />
-              <CheckCircle2 className="relative size-7 text-amber-300" aria-hidden="true" />
-              <h2 className="relative mt-5 text-2xl font-semibold tracking-[-.04em] text-white">
+              <CheckCircle2 className="relative size-7 text-els-amber-ink" aria-hidden="true" />
+              <h2 className="relative mt-5 text-2xl font-semibold tracking-[-.04em] text-els-fg">
                 Faça cada artigo voltar no momento certo.
               </h2>
-              <p className="relative mt-3 text-sm leading-6 text-slate-400">
+              <p className="relative mt-3 text-sm leading-6 text-els-fg-3">
                 Crie sua conta para liberar trilhas, histórico e revisão espaçada por desempenho.
               </p>
               <Link
                 href="/cadastro"
-                className="group relative mt-6 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-amber-400 px-5 text-center text-sm font-bold text-slate-950 shadow-[0_15px_45px_rgba(251,191,36,.16)] outline-none transition hover:bg-amber-300 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:ring-offset-2 focus-visible:ring-offset-[#101722]"
+                className="group relative mt-6 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-els-amber px-5 text-center text-sm font-bold text-els-on-amber shadow-[0_15px_45px_color-mix(in_oklch,var(--els-amber)_16%,transparent)] outline-none transition hover:bg-els-amber-2 focus-visible:ring-2 focus-visible:ring-els-amber-2 focus-visible:ring-offset-2 focus-visible:ring-offset-els-surface-2"
               >
                 Criar minha conta grátis
                 <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
@@ -632,7 +632,7 @@ function CompletionScreen({
               <button
                 type="button"
                 onClick={onReset}
-                className="relative mt-3 inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-lg text-xs font-semibold text-slate-400 outline-none transition hover:text-white focus-visible:ring-2 focus-visible:ring-slate-400"
+                className="relative mt-3 inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-lg text-xs font-semibold text-els-fg-3 outline-none transition hover:text-els-fg focus-visible:ring-2 focus-visible:ring-els-fg-3"
               >
                 <RotateCcw className="size-3.5" aria-hidden="true" />
                 Refazer demonstração
@@ -696,7 +696,7 @@ export function DemoStudySession({ questions }: { questions: readonly DemoQuesti
 
   if (!isReady) {
     return (
-      <div className="relative min-h-screen overflow-hidden bg-[#050a12] text-slate-100">
+      <div className="relative min-h-screen overflow-hidden bg-els-bg text-els-fg">
         <LoadingSession />
       </div>
     );
@@ -768,38 +768,38 @@ export function DemoStudySession({ questions }: { questions: readonly DemoQuesti
     : undefined;
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#050a12] text-slate-100 selection:bg-amber-300/25">
+    <div className="relative min-h-screen overflow-hidden bg-els-bg text-els-fg selection:bg-els-amber/25">
       <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_14%_0%,rgba(16,185,129,.11),transparent_30%),radial-gradient(circle_at_88%_12%,rgba(251,191,36,.09),transparent_26%),linear-gradient(180deg,#07101b_0%,#050a12_55%,#060c15_100%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_14%_0%,color-mix(in_oklch,var(--els-green)_11%,transparent),transparent_30%),radial-gradient(circle_at_88%_12%,color-mix(in_oklch,var(--els-amber)_9%,transparent),transparent_26%),linear-gradient(180deg,var(--els-bg)_0%,var(--els-bg)_55%,var(--els-bg)_100%)]"
         aria-hidden="true"
       />
       <div
-        className="pointer-events-none absolute left-[8%] top-48 size-72 rounded-full border border-emerald-300/[.04]"
+        className="pointer-events-none absolute left-[8%] top-48 size-72 rounded-full border border-els-green/[.04]"
         aria-hidden="true"
       />
       <div
-        className="pointer-events-none absolute right-[6%] top-32 size-44 rounded-full border border-amber-300/[.05]"
+        className="pointer-events-none absolute right-[6%] top-32 size-44 rounded-full border border-els-amber/[.05]"
         aria-hidden="true"
       />
 
       <a
         href="#demo-conteudo"
-        className="fixed left-4 top-4 z-50 -translate-y-24 rounded-lg bg-amber-300 px-4 py-2 text-sm font-bold text-slate-950 outline-none transition focus:translate-y-0"
+        className="fixed left-4 top-4 z-50 -translate-y-24 rounded-lg bg-els-amber px-4 py-2 text-sm font-bold text-els-on-amber outline-none transition focus:translate-y-0"
       >
         Pular para a questão
       </a>
 
-      <header className="relative z-10 border-b border-white/[.07] bg-[#050a12]/72 backdrop-blur-xl">
+      <header className="relative z-10 border-b border-els-line bg-els-bg/72 backdrop-blur-xl">
         <div className="mx-auto flex min-h-18 w-full max-w-7xl items-center justify-between gap-4 px-5 sm:px-8 lg:px-10">
           <LeiProvaMark href="/" />
           <div className="flex items-center gap-2 sm:gap-4">
-            <span className="hidden items-center gap-2 rounded-full border border-emerald-300/15 bg-emerald-300/[.055] px-3 py-1.5 text-[10px] font-bold uppercase tracking-[.17em] text-emerald-300 sm:inline-flex">
+            <span className="hidden items-center gap-2 rounded-full border border-els-green/15 bg-els-green/[.055] px-3 py-1.5 text-[10px] font-bold uppercase tracking-[.17em] text-els-green-ink sm:inline-flex">
               <Sparkles className="size-3.5" aria-hidden="true" />
               Demonstração pública
             </span>
             <Link
               href="/"
-              className="inline-flex min-h-10 items-center gap-2 rounded-lg px-2 text-xs font-semibold text-slate-400 outline-none transition hover:text-white focus-visible:ring-2 focus-visible:ring-amber-300 sm:px-3 sm:text-sm"
+              className="inline-flex min-h-10 items-center gap-2 rounded-lg px-2 text-xs font-semibold text-els-fg-3 outline-none transition hover:text-els-fg focus-visible:ring-2 focus-visible:ring-els-amber sm:px-3 sm:text-sm"
             >
               <ArrowLeft className="size-4" aria-hidden="true" />
               <span className="hidden sm:inline">Voltar ao início</span>
@@ -834,36 +834,36 @@ export function DemoStudySession({ questions }: { questions: readonly DemoQuesti
                 ref={questionCardRef}
                 tabIndex={-1}
                 aria-labelledby="question-title"
-                className="rounded-[1.5rem] border border-white/10 bg-[#0a121e]/88 p-5 shadow-[0_28px_90px_rgba(0,0,0,.3)] outline-none backdrop-blur-xl sm:p-7 lg:p-8"
+                className="rounded-[1.5rem] border border-els-line bg-els-surface/88 p-5 shadow-[0_28px_90px_rgba(0,0,0,.3)] outline-none backdrop-blur-xl sm:p-7 lg:p-8"
               >
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300/15 bg-emerald-300/[.055] px-3 py-1.5 text-[10px] font-bold uppercase tracking-[.15em] text-emerald-300">
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-els-green/15 bg-els-green/[.055] px-3 py-1.5 text-[10px] font-bold uppercase tracking-[.15em] text-els-green-ink">
                     <BookOpenCheck className="size-3.5" aria-hidden="true" />
                     Direito Constitucional
                   </span>
-                  <span className="rounded-full border border-white/8 bg-white/[.035] px-3 py-1.5 text-[10px] font-bold uppercase tracking-[.14em] text-slate-400">
+                  <span className="rounded-full border border-els-line bg-els-raise px-3 py-1.5 text-[10px] font-bold uppercase tracking-[.14em] text-els-fg-3">
                     {difficultyLabel(question.difficulty)}
                   </span>
                 </div>
 
                 <div className="mt-6 flex items-start gap-4">
-                  <span className="hidden size-11 shrink-0 place-items-center rounded-xl border border-amber-300/15 bg-amber-300/[.06] text-amber-300 sm:grid">
+                  <span className="hidden size-11 shrink-0 place-items-center rounded-xl border border-els-amber/15 bg-els-amber/[.06] text-els-amber-ink sm:grid">
                     <span className="text-sm font-bold tabular-nums">0{currentIndex + 1}</span>
                   </span>
                   <div>
-                    <p className="text-xs font-semibold text-amber-300">
+                    <p className="text-xs font-semibold text-els-amber-ink">
                       {question.articleRef} · {question.topic}
                     </p>
                     <h2
                       id="question-title"
-                      className="mt-2 text-balance text-xl font-semibold leading-8 tracking-[-.025em] text-white sm:text-2xl sm:leading-9"
+                      className="mt-2 text-balance text-xl font-semibold leading-8 tracking-[-.025em] text-els-fg sm:text-2xl sm:leading-9"
                     >
                       {question.prompt}
                     </h2>
                   </div>
                 </div>
 
-                <div className="mt-7 rounded-2xl border border-white/8 bg-slate-950/35 p-4 sm:p-5">
+                <div className="mt-7 rounded-2xl border border-els-line bg-els-bg/35 p-4 sm:p-5">
                   <ConfidencePicker
                     value={confidence}
                     disabled={Boolean(response)}
@@ -894,8 +894,8 @@ export function DemoStudySession({ questions }: { questions: readonly DemoQuesti
         ) : (
           <div className="mx-auto grid min-h-[70vh] max-w-xl place-items-center px-5 text-center">
             <div>
-              <p className="text-lg font-semibold text-white">A sessão não pôde ser carregada.</p>
-              <Link className="mt-4 inline-flex text-sm font-semibold text-amber-300" href="/">
+              <p className="text-lg font-semibold text-els-fg">A sessão não pôde ser carregada.</p>
+              <Link className="mt-4 inline-flex text-sm font-semibold text-els-amber-ink" href="/">
                 Voltar ao início
               </Link>
             </div>

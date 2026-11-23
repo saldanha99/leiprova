@@ -72,52 +72,52 @@ export default async function ProductCatalogAdminPage() {
   ).length;
   return (
     <main className="mx-auto max-w-6xl px-5 py-10">
-      <p className="text-xs font-bold uppercase tracking-widest text-emerald-300">
+      <p className="text-xs font-bold uppercase tracking-widest text-els-green-ink">
         OPERAÇÃO COMERCIAL
       </p>
       <h1 className="mt-4 text-4xl font-semibold tracking-tight">
         Catálogo de produtos
       </h1>
-      <p className="mt-5 max-w-3xl text-sm leading-7 text-slate-400">
+      <p className="mt-5 max-w-3xl text-sm leading-7 text-els-fg-3">
         {CONTEST_CATALOG.length} concursos separados, oito carreiras, uma fonte
         de preços. Sincronizar preços não libera conteúdo nem abre vendas.
       </p>
-      <p className="mt-3 text-sm text-amber-100">
+      <p className="mt-3 text-sm text-els-amber-ink">
         {productsAtMinimum} de {CONTEST_CATALOG.length} cursos com pelo menos{" "}
         {MINIMUM_COURSE_QUESTION_COUNT} questões válidas. Rascunhos, propostas
         pendentes e vínculos desatualizados não entram nessa contagem.
       </p>
-      <p className="mt-2 text-sm text-sky-100">
+      <p className="mt-2 text-sm text-els-fg">
         {productsWithApprovedBooklet} de {CONTEST_CATALOG.length} com caderno
         oficial anterior vinculado e {productsWithCompleteLicensedPreviousExam}
         com todas as questões do caderno licenciadas e revisadas. As duas
         verificações são distintas.
       </p>
-      <section aria-labelledby="production-plan-title" className="mt-8 overflow-hidden rounded-2xl border border-amber-200/25 bg-[#171b1a]">
+      <section aria-labelledby="production-plan-title" className="mt-8 overflow-hidden rounded-2xl border border-els-amber-2/25 bg-els-surface-2">
         <div className="grid gap-6 p-6 md:grid-cols-[1fr_auto] md:p-8">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-amber-200">CADERNO DE PRODUÇÃO · {CONTEST_CATALOG.length} CURSOS</p>
-            <h2 id="production-plan-title" className="mt-3 font-serif text-3xl text-amber-50">Cada concurso, seu próprio percurso.</h2>
-            <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-300">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-els-amber-ink">CADERNO DE PRODUÇÃO · {CONTEST_CATALOG.length} CURSOS</p>
+            <h2 id="production-plan-title" className="mt-3 font-serif text-3xl text-els-fg">Cada concurso, seu próprio percurso.</h2>
+            <p className="mt-4 max-w-2xl text-sm leading-7 text-els-fg-2">
               Fonte, edição, cargo, banca e programa individualizados. Este plano organiza
               a preparação; não representa questões geradas nem agentes executando em segundo plano.
               Consulte os detalhes de cada curso abaixo.
             </p>
           </div>
-          <div className="border-l-2 border-amber-200/40 pl-5">
-            <p className="text-5xl font-semibold tracking-tight text-amber-100">{(CONTEST_CATALOG.length * MINIMUM_COURSE_QUESTION_COUNT).toLocaleString("pt-BR")}</p>
-            <p className="mt-2 max-w-48 text-xs leading-6 text-slate-400">vínculos válidos como piso total · 68 por curso, sem equivaler à cobertura integral de cada edital</p>
+          <div className="border-l-2 border-els-amber-2/40 pl-5">
+            <p className="text-5xl font-semibold tracking-tight text-els-amber-ink">{(CONTEST_CATALOG.length * MINIMUM_COURSE_QUESTION_COUNT).toLocaleString("pt-BR")}</p>
+            <p className="mt-2 max-w-48 text-xs leading-6 text-els-fg-3">vínculos válidos como piso total · 68 por curso, sem equivaler à cobertura integral de cada edital</p>
           </div>
         </div>
-        <dl className="grid border-t border-white/10 sm:grid-cols-2 lg:grid-cols-3">
+        <dl className="grid border-t border-els-line sm:grid-cols-2 lg:grid-cols-3">
           {Object.entries(COURSE_PRODUCTION_NEXT_STEP_LABELS).map(([step, label]) => (
-            <div key={step} className="flex items-center justify-between gap-4 border-b border-r border-white/10 px-6 py-4">
-              <dt className="text-xs leading-5 text-slate-300">{label}</dt>
-              <dd className="text-2xl font-semibold text-amber-100">{workorders.filter((order) => order.nextStep === step).length}</dd>
+            <div key={step} className="flex items-center justify-between gap-4 border-b border-r border-els-line px-6 py-4">
+              <dt className="text-xs leading-5 text-els-fg-2">{label}</dt>
+              <dd className="text-2xl font-semibold text-els-amber-ink">{workorders.filter((order) => order.nextStep === step).length}</dd>
             </div>
           ))}
         </dl>
-        <p className="px-6 py-4 text-xs leading-6 text-slate-400">
+        <p className="px-6 py-4 text-xs leading-6 text-els-fg-3">
           Pesquisa consolidada em {courseResearch.checkedAt.slice(0, 10)}. Edições históricas,
           programas ainda não lidos e fontes bloqueadas permanecem identificados. Não foi
           presumida uma nova abertura a partir de notícia, resultado ou homologação.
@@ -125,32 +125,32 @@ export default async function ProductCatalogAdminPage() {
       </section>
       <nav aria-label="Ir para carreira no caderno de produção" className="mt-6 flex flex-wrap gap-2">
         {contestCategories.map((category) => (
-          <a key={category.slug} href={`#producao-${category.slug}`} className="inline-flex min-h-11 items-center rounded-full border border-white/15 px-4 py-2 text-xs text-slate-200 hover:border-amber-200/50 hover:text-amber-100 focus-visible:outline-2 focus-visible:outline-amber-200">
+          <a key={category.slug} href={`#producao-${category.slug}`} className="inline-flex min-h-11 items-center rounded-full border border-els-line-strong px-4 py-2 text-xs text-els-fg-2 hover:border-els-amber-2/50 hover:text-els-amber-ink focus-visible:outline-2 focus-visible:outline-els-amber-2">
             {category.name}
           </a>
         ))}
       </nav>
       <div className="my-8 grid gap-4 sm:grid-cols-3">
-        <div className="rounded-2xl border border-white/15 p-5">
+        <div className="rounded-2xl border border-els-line-strong p-5">
           <h2 className="font-bold">Avulsos</h2>
           {CONTEST_ACCESS_OPTIONS.map((option) => (
-            <p className="mt-3 text-sm text-slate-400" key={option.key}>
+            <p className="mt-3 text-sm text-els-fg-3" key={option.key}>
               {option.label}: {formatBRL(option.amountCents)}{option.billingLabel} · recorrente
             </p>
           ))}
         </div>
-        <div className="rounded-2xl border border-white/15 p-5">
+        <div className="rounded-2xl border border-els-line-strong p-5">
           <h2 className="font-bold">Master</h2>
           {PLANS.map((plan) => (
-            <p className="mt-3 text-sm text-slate-400" key={plan.slug}>
+            <p className="mt-3 text-sm text-els-fg-3" key={plan.slug}>
               {formatBRL(plan.priceCents)}
               {plan.billingLabel} · recorrente
             </p>
           ))}
         </div>
-        <div className="rounded-2xl border border-white/15 p-5">
+        <div className="rounded-2xl border border-els-line-strong p-5">
           <h2 className="font-bold">Antes da liberação</h2>
-          <p className="mt-3 text-sm leading-7 text-slate-400">
+          <p className="mt-3 text-sm leading-7 text-els-fg-3">
             Vincular edição oficial, aprovar pelo menos {MINIMUM_COURSE_QUESTION_COUNT}{" "}
             questões autorais distintas com aderência ao produto, vincular a última
             prova oficial, comprovar licença e revisão independente de todas as
@@ -183,22 +183,22 @@ export default async function ProductCatalogAdminPage() {
               return (
                 <article
                   key={contest.slug}
-                  className="rounded-xl border border-white/15 p-5"
+                  className="rounded-xl border border-els-line-strong p-5"
                 >
                   <Link
                     href={catalogContestPath(contest)}
-                    className="font-bold text-amber-100"
+                    className="font-bold text-els-amber-ink"
                   >
                     {contestTitle(contest)}
                   </Link>
-                  <p className="mt-2 text-xs text-slate-400">
+                  <p className="mt-2 text-xs text-els-fg-3">
                     {contest.editionLabel} ·{" "}
                     {contest.jurisdictionCodes.join(" / ")}
                   </p>
                   <dl className="mt-4 space-y-2 text-xs">
                     <div>
-                      <dt className="inline text-slate-500">Questões válidas: </dt>
-                      <dd className="inline text-amber-100">
+                      <dt className="inline text-els-fg-3">Questões válidas: </dt>
+                      <dd className="inline text-els-amber-ink">
                         {validQuestionCount} / {MINIMUM_COURSE_QUESTION_COUNT}{" "}
                         — {missingQuestionCount > 0
                           ? `faltam ${missingQuestionCount} para o mínimo`
@@ -206,16 +206,16 @@ export default async function ProductCatalogAdminPage() {
                       </dd>
                     </div>
                     <div>
-                      <dt className="inline text-slate-500">Última prova oficial: </dt>
-                      <dd className="inline text-sky-100">
+                      <dt className="inline text-els-fg-3">Última prova oficial: </dt>
+                      <dd className="inline text-els-fg">
                         {hasApprovedLastExamBooklet
                           ? "caderno externo revisado"
                           : "vínculo/caderno pendente"}
                       </dd>
                     </div>
                     <div>
-                      <dt className="inline text-slate-500">Questões reais licenciadas: </dt>
-                      <dd className="inline text-sky-100">
+                      <dt className="inline text-els-fg-3">Questões reais licenciadas: </dt>
+                      <dd className="inline text-els-fg">
                         {licensedPreviousExamQuestionCount} /{" "}
                         {expectedPreviousExamQuestionCount || "?"}{" "}
                         {hasCompleteLicensedPreviousExam
@@ -224,18 +224,18 @@ export default async function ProductCatalogAdminPage() {
                       </dd>
                     </div>
                     <div>
-                      <dt className="inline text-slate-500">Editorial: </dt>
+                      <dt className="inline text-els-fg-3">Editorial: </dt>
                       <dd className="inline">{product?.status ?? "draft"}</dd>
                     </div>
                     <div>
-                      <dt className="inline text-slate-500">Stripe: </dt>
+                      <dt className="inline text-els-fg-3">Stripe: </dt>
                       <dd className="inline">
                         {product?.stripeProductId ?? "Ainda não sincronizado"} ·{" "}
                         {product?.stripeMode ?? "teste planejado"}
                       </dd>
                     </div>
                     <div>
-                      <dt className="inline text-slate-500">
+                      <dt className="inline text-els-fg-3">
                         Preços mensal / anual:{" "}
                       </dt>
                       <dd className="inline break-all">
@@ -247,13 +247,13 @@ export default async function ProductCatalogAdminPage() {
                   <CourseProductionCard order={order} />
                   <Link
                     href="/admin/provas-anteriores"
-                    className="mt-4 mr-5 inline-flex min-h-11 items-center text-xs font-bold text-sky-200"
+                    className="mt-4 mr-5 inline-flex min-h-11 items-center text-xs font-bold text-els-info-ink"
                   >
                     Organizar prova anterior
                   </Link>
                   <Link
                     href={`/checkout/concurso/${contest.slug}`}
-                    className="mt-4 inline-flex min-h-11 items-center text-xs font-bold text-emerald-200"
+                    className="mt-4 inline-flex min-h-11 items-center text-xs font-bold text-els-green-ink"
                   >
                     Ver prévia do checkout
                   </Link>

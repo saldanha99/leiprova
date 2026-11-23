@@ -23,22 +23,22 @@ export default async function CheckoutReturnPage({
 
   if (!sessionId || !CHECKOUT_SESSION_PATTERN.test(sessionId)) {
     return (
-      <main className="min-h-screen bg-[#050b12] px-4 py-8 text-white sm:px-6">
+      <main className="min-h-screen bg-els-bg px-4 py-8 text-els-fg sm:px-6">
         <div className="mx-auto max-w-5xl">
           <LeiProvaMark href="/" />
-          <section className="mx-auto mt-20 max-w-xl rounded-[1.75rem] border border-white/9 bg-[#0a1420] p-7 text-center shadow-2xl shadow-black/20 sm:p-10">
-            <span className="mx-auto grid size-16 place-items-center rounded-2xl border border-rose-300/15 bg-rose-300/[.07] text-rose-300">
+          <section className="mx-auto mt-20 max-w-xl rounded-[1.75rem] border border-els-line bg-els-surface p-7 text-center shadow-2xl shadow-black/20 sm:p-10">
+            <span className="mx-auto grid size-16 place-items-center rounded-2xl border border-els-danger/15 bg-els-danger/[.07] text-els-danger-ink">
               <AlertTriangle className="size-8" aria-hidden="true" />
             </span>
             <h1 className="mt-6 text-2xl font-semibold tracking-[-.035em] sm:text-3xl">
               Retorno de pagamento inválido
             </h1>
-            <p className="mt-3 text-sm leading-6 text-slate-400">
+            <p className="mt-3 text-sm leading-6 text-els-fg-3">
               Este endereço não contém uma sessão de pagamento válida. Nenhuma cobrança foi iniciada por esta página.
             </p>
             <Link
               href="/#planos"
-              className="mt-7 inline-flex min-h-11 items-center justify-center rounded-xl bg-amber-400 px-5 text-sm font-bold text-slate-950 transition hover:bg-amber-300"
+              className="mt-7 inline-flex min-h-11 items-center justify-center rounded-xl bg-els-amber px-5 text-sm font-bold text-els-on-amber transition hover:bg-els-amber-2"
             >
               Voltar aos planos
             </Link>
@@ -51,9 +51,9 @@ export default async function CheckoutReturnPage({
   await requireUser(`/checkout/retorno?session_id=${encodeURIComponent(sessionId)}`);
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#050b12] px-4 py-8 text-white sm:px-6">
-      <div className="pointer-events-none absolute -left-40 top-24 size-[34rem] rounded-full bg-emerald-400/[.055] blur-3xl" />
-      <div className="pointer-events-none absolute -right-40 -top-40 size-[36rem] rounded-full bg-amber-300/[.06] blur-3xl" />
+    <main className="relative min-h-screen overflow-hidden bg-els-bg px-4 py-8 text-els-fg sm:px-6">
+      <div className="pointer-events-none absolute -left-40 top-24 size-[34rem] rounded-full bg-els-green/[.055] blur-3xl" />
+      <div className="pointer-events-none absolute -right-40 -top-40 size-[36rem] rounded-full bg-els-amber/[.06] blur-3xl" />
       <div className="relative mx-auto max-w-5xl">
         <LeiProvaMark href="/" />
         <div className="mt-20">

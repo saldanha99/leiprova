@@ -102,23 +102,23 @@ export default async function ContestCalendarPage() {
     : [];
 
   return (
-    <PublicGuideShell>
+    <PublicGuideShell tone="els">
       <JsonLd data={structuredData} />
       <article>
-        <header className="border-b border-white/8 bg-[radial-gradient(circle_at_80%_0%,rgba(45,212,164,.15),transparent_35%),#07101b]">
+        <header className="border-b border-els-line bg-[radial-gradient(circle_at_80%_0%,color-mix(in_oklch,var(--els-green)_15%,transparent),transparent_35%),var(--els-bg)]">
           <div className="mx-auto max-w-6xl px-5 py-14 sm:py-20">
-            <GuideBreadcrumbs
+            <GuideBreadcrumbs tone="els"
               current="Calendário"
               parent={{ label: "Concursos", href: "/concursos" }}
             />
-            <p className="mt-9 flex items-center gap-2 text-xs font-extrabold uppercase tracking-[0.18em] text-emerald-300">
+            <p className="mt-9 flex items-center gap-2 text-xs font-extrabold uppercase tracking-[0.18em] text-els-green-ink">
               <CalendarDays aria-hidden="true" className="size-4" />
               Calendário de concursos
             </p>
-            <h1 className="mt-4 max-w-4xl text-4xl font-semibold tracking-[-0.05em] text-white sm:text-6xl">
+            <h1 className="mt-4 max-w-4xl text-4xl font-semibold tracking-[-0.05em] text-els-fg sm:text-6xl">
               O que abre, o que tem prova e o que já passou.
             </h1>
-            <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-300">
+            <p className="mt-6 max-w-3xl text-lg leading-8 text-els-fg-2">
               Cada data vem do edital oficial conferido pela equipe. Quando o
               prazo de inscrição ou a prova passa, o concurso muda de seção
               sozinho, e os encerrados ficam aqui por um ano.
@@ -128,7 +128,7 @@ export default async function ContestCalendarPage() {
 
         <div className="mx-auto max-w-6xl space-y-16 px-5 py-16 sm:py-20">
           {sections.length === 0 ? (
-            <div className="rounded-[1.6rem] border border-white/9 bg-[#0a1420] p-6 text-sm leading-7 text-slate-400">
+            <div className="rounded-[1.6rem] border border-els-line bg-els-surface p-6 text-sm leading-7 text-els-fg-3">
               Nenhum edital revisado neste ambiente ainda.
             </div>
           ) : (
@@ -137,14 +137,14 @@ export default async function ContestCalendarPage() {
                 <div className="max-w-3xl">
                   <h2
                     id={`calendario-${section.phase}`}
-                    className="text-3xl font-semibold tracking-[-0.045em] text-white sm:text-4xl"
+                    className="text-3xl font-semibold tracking-[-0.045em] text-els-fg sm:text-4xl"
                   >
                     {section.title}{" "}
-                    <span className="text-lg font-bold text-slate-500">
+                    <span className="text-lg font-bold text-els-fg-3">
                       ({section.items.length})
                     </span>
                   </h2>
-                  <p className="mt-3 text-base leading-8 text-slate-400">
+                  <p className="mt-3 text-base leading-8 text-els-fg-3">
                     {section.description}
                   </p>
                 </div>
@@ -158,12 +158,12 @@ export default async function ContestCalendarPage() {
                         key={item.publicId}
                         className={
                           closed
-                            ? "rounded-[1.6rem] border border-white/8 bg-white/[0.02] p-6"
-                            : "rounded-[1.6rem] border border-emerald-300/15 bg-emerald-300/[0.035] p-6"
+                            ? "rounded-[1.6rem] border border-els-line bg-els-raise p-6"
+                            : "rounded-[1.6rem] border border-els-green/15 bg-els-green/[0.035] p-6"
                         }
                       >
                         <div
-                          className={`flex flex-wrap items-center gap-2 text-xs font-extrabold uppercase tracking-[0.12em] ${closed ? "text-slate-500" : "text-emerald-300"}`}
+                          className={`flex flex-wrap items-center gap-2 text-xs font-extrabold uppercase tracking-[0.12em] ${closed ? "text-els-fg-3" : "text-els-green-ink"}`}
                         >
                           <span>{badge(item, section.phase)}</span>
                           <span aria-hidden="true">·</span>
@@ -175,16 +175,16 @@ export default async function ContestCalendarPage() {
                             </>
                           ) : null}
                         </div>
-                        <h3 className={`mt-4 text-xl font-semibold ${closed ? "text-slate-300" : "text-white"}`}>
+                        <h3 className={`mt-4 text-xl font-semibold ${closed ? "text-els-fg-2" : "text-els-fg"}`}>
                           {item.title}
                         </h3>
                         {date ? (
-                          <p className="mt-3 text-sm font-semibold text-amber-200/90">{date}</p>
+                          <p className="mt-3 text-sm font-semibold text-els-amber-ink">{date}</p>
                         ) : null}
                         <div className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-sm font-extrabold">
                           {contest && !closed ? (
                             <Link
-                              className="inline-flex items-center gap-2 text-amber-300"
+                              className="inline-flex items-center gap-2 text-els-amber-ink"
                               href={catalogContestPath(contest)}
                             >
                               Ver concurso
@@ -193,7 +193,7 @@ export default async function ContestCalendarPage() {
                           ) : null}
                           {item.officialUrl ? (
                             <a
-                              className="inline-flex items-center gap-2 text-slate-300 hover:text-white"
+                              className="inline-flex items-center gap-2 text-els-fg-2 hover:text-els-fg"
                               href={item.officialUrl}
                               rel="noopener noreferrer"
                               target="_blank"

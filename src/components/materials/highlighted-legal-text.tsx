@@ -16,15 +16,15 @@ export function HighlightedLegalText({ text, theme }: { text: string; theme: Leg
   const content: ReactNode[] = parts.map((part, index) => {
     if (!part || !part.match(HIGHLIGHT_PATTERN)) return part;
     const color = DEADLINE_PATTERN.test(part)
-      ? "bg-sky-300/20 text-sky-100 print:bg-sky-100 print:text-sky-950"
+      ? "bg-els-info/20 text-els-fg print:bg-sky-100 print:text-sky-950"
       : EXCEPTION_PATTERN.test(part)
-        ? "bg-amber-300/20 text-amber-100 print:bg-amber-100 print:text-amber-950"
+        ? "bg-els-amber/20 text-els-amber-ink print:bg-amber-100 print:text-amber-950"
         : DUTY_PATTERN.test(part)
-          ? "bg-emerald-300/20 text-emerald-100 print:bg-emerald-100 print:text-emerald-950"
-          : "bg-rose-300/20 text-rose-100 print:bg-rose-100 print:text-rose-950";
+          ? "bg-els-green/20 text-els-green-ink print:bg-emerald-100 print:text-emerald-950"
+          : "bg-els-danger/20 text-els-fg print:bg-rose-100 print:text-rose-950";
     return (
       <mark
-        className={`rounded-sm px-0.5 font-semibold ${theme === "ink" ? "bg-slate-200 text-slate-950 print:bg-slate-200 print:text-black" : color}`}
+        className={`rounded-sm px-0.5 font-semibold ${theme === "ink" ? "bg-els-fg-2 text-els-on-amber print:bg-slate-200 print:text-black" : color}`}
         key={`${index}-${part}`}
       >
         {part}

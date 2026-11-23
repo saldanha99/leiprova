@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { EditalumeLogo } from "@/components/brand/EditalumeLogo";
+import { ElsLogo } from "@/components/brand/ElsLogo";
 import { BRAND_NAME } from "@/lib/brand";
 
 type BrandMarkProps = {
@@ -15,7 +15,7 @@ export function BrandMark({ href = "#inicio", compact = false }: BrandMarkProps)
       href={href}
       aria-label={`${BRAND_NAME} — ir para o início`}
     >
-      <EditalumeLogo compact={compact} />
+      <ElsLogo compact={compact} />
     </Link>
   );
 }

@@ -21,14 +21,14 @@ import {
 
 const initialState: NoticeEngineActionState = { status: "idle", message: "" };
 const fieldClass =
-  "mt-2 min-h-11 w-full rounded-xl border border-white/10 bg-[#07111d] px-3 text-sm text-slate-200 outline-none transition focus:border-amber-300/45 focus:ring-2 focus:ring-amber-300/10";
+  "mt-2 min-h-11 w-full rounded-xl border border-els-line bg-els-bg px-3 text-sm text-els-fg-2 outline-none transition focus:border-els-amber/45 focus:ring-2 focus:ring-els-amber/10";
 
 function Feedback({ state }: { state: NoticeEngineActionState }) {
   if (!state.message) return null;
   return (
     <p
       aria-live="polite"
-      className={`mt-3 text-xs leading-5 ${state.status === "success" ? "text-emerald-200" : "text-rose-200"}`}
+      className={`mt-3 text-xs leading-5 ${state.status === "success" ? "text-els-green-ink" : "text-els-danger-ink"}`}
     >
       {state.message}
     </p>
@@ -42,27 +42,27 @@ export function OpportunityEditionForm({ opportunities, editions }: {
   const [state, action, pending] = useActionState(mapOpportunityEditionAction, initialState);
   return (
     <form action={action} className="mt-5 grid gap-4 sm:grid-cols-2">
-      <label className="text-xs font-semibold text-slate-400">Programa do concurso
+      <label className="text-xs font-semibold text-els-fg-3">Programa do concurso
         <select name="opportunityPublicId" required className={fieldClass}>
           <option value="">Selecione o programa</option>
           {opportunities.map((item) => <option key={item.publicId} value={item.publicId}>{item.title}{item.examEditionId ? " · já vinculado" : " · sem vínculo"}</option>)}
         </select>
       </label>
-      <label className="text-xs font-semibold text-slate-400">Edição exata da prova
+      <label className="text-xs font-semibold text-els-fg-3">Edição exata da prova
         <select name="examEditionId" required className={fieldClass}>
           <option value="">Selecione a edição</option>
           {editions.map((item) => <option key={item.id} value={item.id}>{item.title}</option>)}
         </select>
       </label>
-      <label className="text-xs font-semibold text-slate-400 sm:col-span-2">Evidência conferida
+      <label className="text-xs font-semibold text-els-fg-3 sm:col-span-2">Evidência conferida
         <textarea name="notes" required minLength={20} maxLength={1500} className={`${fieldClass} min-h-20 py-3`} placeholder="Registre a fonte oficial, número e edição do edital que comprovam este vínculo." />
       </label>
-      <label className="flex items-start gap-3 text-xs leading-5 text-slate-300 sm:col-span-2">
-        <input type="checkbox" name="confirmed" required className="mt-1 size-4 accent-amber-300" />
+      <label className="flex items-start gap-3 text-xs leading-5 text-els-fg-2 sm:col-span-2">
+        <input type="checkbox" name="confirmed" required className="mt-1 size-4 accent-els-amber" />
         Conferi na fonte oficial que programa e edição correspondem ao mesmo concurso, cargo e banca.
       </label>
       <div className="sm:col-span-2">
-        <button disabled={pending} className="min-h-11 rounded-xl bg-amber-300 px-5 text-sm font-bold text-amber-950 disabled:opacity-50">{pending ? "Salvando vínculo…" : "Confirmar vínculo da edição"}</button>
+        <button disabled={pending} className="min-h-11 rounded-xl bg-els-amber px-5 text-sm font-bold text-els-on-amber disabled:opacity-50">{pending ? "Salvando vínculo…" : "Confirmar vínculo da edição"}</button>
         <Feedback state={state} />
       </div>
     </form>
@@ -73,7 +73,7 @@ export function RetryEditorialJobButton({ jobKey }: { jobKey: string }) {
   const [state, action, pending] = useActionState(retryEditorialJobAction, initialState);
   return <form action={action} className="mt-3">
     <input type="hidden" name="jobKey" value={jobKey} />
-    <button disabled={pending} className="min-h-11 rounded-lg border border-amber-300/20 px-3 text-xs font-bold text-amber-200 disabled:opacity-50">{pending ? "Enfileirando…" : "Solicitar reavaliação"}</button>
+    <button disabled={pending} className="min-h-11 rounded-lg border border-els-amber/20 px-3 text-xs font-bold text-els-amber-ink disabled:opacity-50">{pending ? "Enfileirando…" : "Solicitar reavaliação"}</button>
     <Feedback state={state} />
   </form>;
 }
@@ -86,7 +86,7 @@ export function NoticeSourceForm({
   const [state, action, pending] = useActionState(registerNoticeSourceAction, initialState);
   return (
     <form action={action} className="mt-5 grid gap-4 sm:grid-cols-2">
-      <label className="text-xs font-semibold text-slate-400 sm:col-span-2">
+      <label className="text-xs font-semibold text-els-fg-3 sm:col-span-2">
         Concurso
         <select name="opportunityPublicId" required className={fieldClass}>
           <option value="">Selecione</option>
@@ -97,7 +97,7 @@ export function NoticeSourceForm({
           ))}
         </select>
       </label>
-      <label className="text-xs font-semibold text-slate-400">
+      <label className="text-xs font-semibold text-els-fg-3">
         Tipo de documento
         <select name="documentType" required className={fieldClass} defaultValue="notice">
           <option value="notice">Edital</option>
@@ -106,15 +106,15 @@ export function NoticeSourceForm({
           <option value="authorization">Autorização</option>
         </select>
       </label>
-      <label className="text-xs font-semibold text-slate-400">
+      <label className="text-xs font-semibold text-els-fg-3">
         Data de publicação
         <input type="date" name="publishedAt" className={fieldClass} />
       </label>
-      <label className="text-xs font-semibold text-slate-400 sm:col-span-2">
+      <label className="text-xs font-semibold text-els-fg-3 sm:col-span-2">
         Título oficial
         <input name="title" required minLength={5} maxLength={300} className={fieldClass} />
       </label>
-      <label className="text-xs font-semibold text-slate-400 sm:col-span-2">
+      <label className="text-xs font-semibold text-els-fg-3 sm:col-span-2">
         Link no órgão ou banca oficial
         <input
           type="url"
@@ -125,14 +125,14 @@ export function NoticeSourceForm({
           className={fieldClass}
         />
       </label>
-      <label className="text-xs font-semibold text-slate-400 sm:col-span-2">
+      <label className="text-xs font-semibold text-els-fg-3 sm:col-span-2">
         Identificador do documento (opcional)
         <input name="sourceExternalId" maxLength={180} placeholder="Ex.: Edital 02/2026" className={fieldClass} />
       </label>
       <div className="sm:col-span-2">
         <button
           disabled={pending}
-          className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-amber-300 px-5 text-sm font-extrabold text-amber-950 disabled:opacity-50"
+          className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-els-amber px-5 text-sm font-extrabold text-els-on-amber disabled:opacity-50"
         >
           {pending ? <LoaderCircle aria-hidden="true" className="size-4 animate-spin" /> : <FilePlus2 aria-hidden="true" className="size-4" />}
           {pending ? "Verificando origem…" : "Verificar e registrar fonte"}
@@ -146,9 +146,9 @@ export function NoticeSourceForm({
 export function NoticeSourceReviewControls({ publicId }: { publicId: string }) {
   const [state, action, pending] = useActionState(reviewNoticeSourceAction, initialState);
   return (
-    <form action={action} className="mt-4 rounded-xl border border-white/8 bg-black/15 p-3">
+    <form action={action} className="mt-4 rounded-xl border border-els-line bg-els-sink p-3">
       <input type="hidden" name="publicId" value={publicId} />
-      <label className="text-[11px] font-semibold text-slate-400">
+      <label className="text-[11px] font-semibold text-els-fg-3">
         Nota da revisão humana
         <textarea
           name="notes"
@@ -165,7 +165,7 @@ export function NoticeSourceReviewControls({ publicId }: { publicId: string }) {
           name="decision"
           value="approve"
           disabled={pending}
-          className="inline-flex min-h-9 items-center gap-2 rounded-lg bg-emerald-300 px-3 text-xs font-extrabold text-emerald-950 disabled:opacity-50"
+          className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-els-green px-3 text-xs font-extrabold text-els-on-amber disabled:opacity-50"
         >
           <Check aria-hidden="true" className="size-3.5" /> Aprovar fonte
         </button>
@@ -173,7 +173,7 @@ export function NoticeSourceReviewControls({ publicId }: { publicId: string }) {
           name="decision"
           value="reject"
           disabled={pending}
-          className="inline-flex min-h-9 items-center gap-2 rounded-lg border border-rose-300/20 bg-rose-300/8 px-3 text-xs font-bold text-rose-100 disabled:opacity-50"
+          className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-els-danger/20 bg-els-danger/8 px-3 text-xs font-bold text-els-fg disabled:opacity-50"
         >
           <RotateCcw aria-hidden="true" className="size-3.5" /> Rejeitar
         </button>
@@ -191,14 +191,14 @@ function CaptureCandidateButton({
 }) {
   const [state, action, pending] = useActionState(captureNoticeDocumentAction, initialState);
   return (
-    <form action={action} className="rounded-xl border border-sky-300/10 bg-sky-300/[.035] p-3">
+    <form action={action} className="rounded-xl border border-els-info/10 bg-els-info/[.035] p-3">
       <input type="hidden" name="sourceDocumentPublicId" value={sourceDocumentPublicId} />
       <input type="hidden" name="documentUrl" value={candidate.url} />
-      <p className="text-xs font-bold leading-5 text-slate-200">{candidate.label}</p>
-      <p className="mt-1 truncate text-[10px] text-slate-600" title={candidate.url}>{candidate.url}</p>
+      <p className="text-xs font-bold leading-5 text-els-fg-2">{candidate.label}</p>
+      <p className="mt-1 truncate text-[10px] text-els-fg-4" title={candidate.url}>{candidate.url}</p>
       <button
         disabled={pending}
-        className="mt-3 inline-flex min-h-9 items-center gap-2 rounded-lg bg-sky-300 px-3 text-xs font-extrabold text-sky-950 disabled:opacity-50"
+        className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-lg bg-els-info px-3 text-xs font-extrabold text-els-on-amber disabled:opacity-50"
       >
         {pending ? <LoaderCircle aria-hidden="true" className="size-3.5 animate-spin" /> : <Download aria-hidden="true" className="size-3.5" />}
         {pending ? "Capturando e lendo…" : "Capturar este PDF"}
@@ -215,12 +215,12 @@ export function OfficialDocumentDiscoveryControls({
 }) {
   const [state, action, pending] = useActionState(discoverNoticeDocumentsAction, initialState);
   return (
-    <div className="mt-4 rounded-xl border border-sky-300/10 bg-[#07111d] p-3">
+    <div className="mt-4 rounded-xl border border-els-info/10 bg-els-bg p-3">
       <form action={action}>
         <input type="hidden" name="sourceDocumentPublicId" value={sourceDocumentPublicId} />
         <button
           disabled={pending}
-          className="inline-flex min-h-9 items-center gap-2 rounded-lg border border-sky-300/20 bg-sky-300/8 px-3 text-xs font-bold text-sky-100 disabled:opacity-50"
+          className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-els-info/20 bg-els-info/8 px-3 text-xs font-bold text-els-fg disabled:opacity-50"
         >
           {pending ? <LoaderCircle aria-hidden="true" className="size-3.5 animate-spin" /> : <Search aria-hidden="true" className="size-3.5" />}
           {pending ? "Procurando anexos…" : "Procurar PDF do edital"}
@@ -251,10 +251,10 @@ export function NoticeDocumentReviewControls({
 }) {
   const [state, action, pending] = useActionState(reviewNoticeDocumentAction, initialState);
   return (
-    <form action={action} className="mt-4 rounded-xl border border-white/8 bg-black/15 p-3">
+    <form action={action} className="mt-4 rounded-xl border border-els-line bg-els-sink p-3">
       <input type="hidden" name="snapshotPublicId" value={snapshotPublicId} />
       {selfReview ? (
-        <p className="mb-3 rounded-lg border border-amber-300/15 bg-amber-300/[.055] p-3 text-xs leading-5 text-amber-100/85">
+        <p className="mb-3 rounded-lg border border-els-amber/15 bg-els-amber/[.055] p-3 text-xs leading-5 text-els-amber-ink">
           Você capturou este PDF: a aprovação fica registrada como autorrevisão. Requisitos e questões continuam exigindo revisão própria.
         </p>
       ) : null}
@@ -266,10 +266,10 @@ export function NoticeDocumentReviewControls({
       />
       <Feedback state={state} />
       <div className="mt-3 flex flex-wrap gap-2">
-        <button name="decision" value="approve" disabled={pending} className="min-h-9 rounded-lg bg-emerald-300 px-3 text-xs font-extrabold text-emerald-950 disabled:opacity-50">
+        <button name="decision" value="approve" disabled={pending} className="min-h-11 rounded-lg bg-els-green px-3 text-xs font-extrabold text-els-on-amber disabled:opacity-50">
           Aprovar captura
         </button>
-        <button name="decision" value="reject" disabled={pending} className="min-h-9 rounded-lg border border-rose-300/20 bg-rose-300/8 px-3 text-xs font-bold text-rose-100 disabled:opacity-50">
+        <button name="decision" value="reject" disabled={pending} className="min-h-11 rounded-lg border border-els-danger/20 bg-els-danger/8 px-3 text-xs font-bold text-els-fg disabled:opacity-50">
           Rejeitar
         </button>
       </div>
@@ -282,7 +282,7 @@ export function ExtractSnapshotButton({ snapshotPublicId }: { snapshotPublicId: 
   return (
     <form action={action} className="mt-4">
       <input type="hidden" name="snapshotPublicId" value={snapshotPublicId} />
-      <button disabled={pending} className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-amber-300 px-4 text-xs font-extrabold text-amber-950 disabled:opacity-50">
+      <button disabled={pending} className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-els-amber px-4 text-xs font-extrabold text-els-on-amber disabled:opacity-50">
         {pending ? <LoaderCircle aria-hidden="true" className="size-4 animate-spin" /> : <Sparkles aria-hidden="true" className="size-4" />}
         {pending ? "Extraindo programa…" : "Extrair conteúdo programático"}
       </button>
@@ -325,7 +325,7 @@ export function SyllabusImportForm({
   );
   return (
     <form action={action} className="mt-5 grid gap-4 sm:grid-cols-2">
-      <label className="text-xs font-semibold text-slate-400 sm:col-span-2">
+      <label className="text-xs font-semibold text-els-fg-3 sm:col-span-2">
         Fonte aprovada do edital
         <select name="sourceDocumentPublicId" required className={fieldClass}>
           <option value="">Selecione</option>
@@ -336,7 +336,7 @@ export function SyllabusImportForm({
           ))}
         </select>
       </label>
-      <label className="text-xs font-semibold text-slate-400">
+      <label className="text-xs font-semibold text-els-fg-3">
         Matéria
         <select
           name="subjectId"
@@ -351,7 +351,7 @@ export function SyllabusImportForm({
           ))}
         </select>
       </label>
-      <label className="text-xs font-semibold text-slate-400">
+      <label className="text-xs font-semibold text-els-fg-3">
         Assunto
         <select name="topicId" required className={fieldClass} disabled={!subjectId}>
           <option value="">Selecione</option>
@@ -360,7 +360,7 @@ export function SyllabusImportForm({
           ))}
         </select>
       </label>
-      <label className="text-xs font-semibold text-slate-400 sm:col-span-2">
+      <label className="text-xs font-semibold text-els-fg-3 sm:col-span-2">
         Dispositivo legal oficial usado para elaborar
         <select name="legalArticleId" required className={fieldClass}>
           <option value="">Selecione</option>
@@ -371,7 +371,7 @@ export function SyllabusImportForm({
           ))}
         </select>
       </label>
-      <label className="text-xs font-semibold text-slate-400 sm:col-span-2">
+      <label className="text-xs font-semibold text-els-fg-3 sm:col-span-2">
         Localização no edital
         <input
           name="sourceLocator"
@@ -382,7 +382,7 @@ export function SyllabusImportForm({
           className={fieldClass}
         />
       </label>
-      <label className="text-xs font-semibold text-slate-400 sm:col-span-2">
+      <label className="text-xs font-semibold text-els-fg-3 sm:col-span-2">
         Itens do conteúdo programático — um por linha
         <textarea
           name="syllabusText"
@@ -396,12 +396,12 @@ export function SyllabusImportForm({
       <div className="sm:col-span-2">
         <button
           disabled={pending || !sources.length}
-          className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-sky-300 px-5 text-sm font-extrabold text-sky-950 disabled:opacity-50"
+          className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-els-info px-5 text-sm font-extrabold text-els-on-amber disabled:opacity-50"
         >
           {pending ? <LoaderCircle aria-hidden="true" className="size-4 animate-spin" /> : <FilePlus2 aria-hidden="true" className="size-4" />}
           {pending ? "Separando itens…" : "Importar para revisão"}
         </button>
-        {!sources.length ? <p className="mt-3 text-xs text-amber-200">Aprove ao menos uma fonte antes de importar.</p> : null}
+        {!sources.length ? <p className="mt-3 text-xs text-els-amber-ink">Aprove ao menos uma fonte antes de importar.</p> : null}
         <Feedback state={state} />
       </div>
     </form>
@@ -428,23 +428,23 @@ export function RequirementMappingControls({
     [subjectId, topics],
   );
   return (
-    <form action={action} className="mt-4 grid gap-3 rounded-xl border border-amber-300/10 bg-amber-300/[.025] p-3 sm:grid-cols-2">
+    <form action={action} className="mt-4 grid gap-3 rounded-xl border border-els-amber/10 bg-els-amber/[.025] p-3 sm:grid-cols-2">
       <input type="hidden" name="requirementId" value={requirementId} />
-      <label className="text-xs font-semibold text-slate-400">
+      <label className="text-xs font-semibold text-els-fg-3">
         Matéria sugerida
         <select name="subjectId" required className={fieldClass} value={subjectId} onChange={(event) => setSubjectId(event.target.value)}>
           <option value="">Selecione</option>
           {subjects.map((subject) => <option key={subject.id} value={subject.id}>{subject.name}</option>)}
         </select>
       </label>
-      <label className="text-xs font-semibold text-slate-400">
+      <label className="text-xs font-semibold text-els-fg-3">
         Assunto
         <select name="topicId" required className={fieldClass} disabled={!subjectId}>
           <option value="">Selecione</option>
           {availableTopics.map((topic) => <option key={topic.id} value={topic.id}>{topic.name}</option>)}
         </select>
       </label>
-      <label className="text-xs font-semibold text-slate-400 sm:col-span-2">
+      <label className="text-xs font-semibold text-els-fg-3 sm:col-span-2">
         Dispositivo legal oficial
         <select name="legalArticleId" required className={fieldClass}>
           <option value="">Selecione</option>
@@ -454,7 +454,7 @@ export function RequirementMappingControls({
         </select>
       </label>
       <div className="sm:col-span-2">
-        <button disabled={pending} className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-amber-300 px-4 text-xs font-extrabold text-amber-950 disabled:opacity-50">
+        <button disabled={pending} className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-els-amber px-4 text-xs font-extrabold text-els-on-amber disabled:opacity-50">
           {pending ? <LoaderCircle aria-hidden="true" className="size-4 animate-spin" /> : <Check aria-hidden="true" className="size-4" />}
           {pending ? "Mapeando…" : "Enviar para revisão"}
         </button>
@@ -467,9 +467,9 @@ export function RequirementMappingControls({
 export function RequirementReviewControls({ requirementId }: { requirementId: number }) {
   const [state, action, pending] = useActionState(reviewRequirementAction, initialState);
   return (
-    <form action={action} className="mt-4 rounded-xl border border-white/8 bg-[#07111d] p-3">
+    <form action={action} className="mt-4 rounded-xl border border-els-line bg-els-bg p-3">
       <input type="hidden" name="requirementId" value={requirementId} />
-      <label className="text-[11px] font-semibold text-slate-400">
+      <label className="text-[11px] font-semibold text-els-fg-3">
         Nota da revisão humana
         <textarea
           name="notes"
@@ -482,10 +482,10 @@ export function RequirementReviewControls({ requirementId }: { requirementId: nu
       </label>
       <Feedback state={state} />
       <div className="mt-3 flex flex-wrap gap-2">
-        <button name="decision" value="approve" disabled={pending} className="min-h-9 rounded-lg bg-emerald-300 px-3 text-xs font-extrabold text-emerald-950 disabled:opacity-50">
+        <button name="decision" value="approve" disabled={pending} className="min-h-11 rounded-lg bg-els-green px-3 text-xs font-extrabold text-els-on-amber disabled:opacity-50">
           Aprovar requisito
         </button>
-        <button name="decision" value="reject" disabled={pending} className="min-h-9 rounded-lg border border-rose-300/20 bg-rose-300/8 px-3 text-xs font-bold text-rose-100 disabled:opacity-50">
+        <button name="decision" value="reject" disabled={pending} className="min-h-11 rounded-lg border border-els-danger/20 bg-els-danger/8 px-3 text-xs font-bold text-els-fg disabled:opacity-50">
           Suspender
         </button>
       </div>
@@ -500,7 +500,7 @@ export function GenerateRequirementButton({ requirementId }: { requirementId: nu
       <input type="hidden" name="requirementId" value={requirementId} />
       <button
         disabled={pending}
-        className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-violet-300 px-4 text-xs font-extrabold text-violet-950 disabled:opacity-50"
+        className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-els-info px-4 text-xs font-extrabold text-els-on-amber disabled:opacity-50"
       >
         {pending ? <LoaderCircle aria-hidden="true" className="size-4 animate-spin" /> : <Sparkles aria-hidden="true" className="size-4" />}
         {pending ? "Gerando…" : "Gerar rascunho inédito"}

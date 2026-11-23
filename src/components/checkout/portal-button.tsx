@@ -39,14 +39,14 @@ export function PortalButton({ className }: { className?: string }) {
         onClick={openPortal}
         disabled={loading}
         className={cn(
-          "inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[.045] px-4 text-sm font-semibold text-slate-200 transition hover:border-amber-300/25 hover:text-white disabled:cursor-wait disabled:opacity-60",
+          "inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-els-line bg-els-raise px-4 text-sm font-semibold text-els-fg-2 transition hover:border-els-amber/25 hover:text-els-fg disabled:cursor-wait disabled:opacity-60",
           className,
         )}
       >
         {loading ? <LoaderCircle className="size-4 animate-spin" /> : <ExternalLink className="size-4" />}
         Gerenciar na Stripe
       </button>
-      {error && <p className="mt-2 text-xs text-rose-300" role="alert">{error}</p>}
+      {error && <p className="mt-2 text-xs text-els-danger-ink" role="alert">{error}</p>}
     </div>
   );
 }
