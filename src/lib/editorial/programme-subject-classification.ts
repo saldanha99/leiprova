@@ -26,6 +26,7 @@ export const PROGRAMME_CLASSIFICATION_SCOPES = {
   "pcpr-delegado-01-2026-historico-objetiva": "Delegado de Polícia",
   "pcpr-agente-policia-judiciaria-01-2026-historico-objetiva": "Agente de Polícia Judiciária",
   "pcpr-papiloscopista-policial-01-2026-historico-objetiva": "Papiloscopista Policial",
+  "pgmmanaus-procurador-3a-classe-01-2026-historico-objetiva": "Procurador do Município de 3ª Classe",
   "mpgo-promotor-substituto-63-2025-historico-objetiva": "Promotora e Promotor de Justiça Substituto",
   // Lote Cebraspe histórico.
   "sefazrn-auditor-fiscal-5-2025-historico-objetiva": "Auditor Fiscal de Receitas Estaduais",
@@ -39,6 +40,8 @@ export const PROGRAMME_CLASSIFICATION_SCOPES = {
 export const CEBRASPE_PROGRAMME_SCOPES: ReadonlySet<string> = new Set(["sefaz-al-auditor-fiscal-2026", "sefazrn-auditor-fiscal-5-2025-historico-objetiva",
   "tcern-auditor-direito-1-2025-historico-objetiva", "tjmt-notas-registro-provimento-48-2025-historico-objetiva", "trt10-analista-area-judiciaria-1-2024-historico-objetiva",
   "pgeal-procurador-1-2026-historico-objetiva", "pcdf-delegado-1-2026-historico-objetiva"]);
+/** PGM-Manaus: edital publicado no DOM de Manaus (FCC). */
+export const DOM_MANAUS_PROGRAMME_SCOPES: ReadonlySet<string> = new Set(["pgmmanaus-procurador-3a-classe-01-2026-historico-objetiva"]);
 export const PROGRAMME_SUBJECT_CLASSIFICATION_ACTION = "editorial.programme.subject_classified";
 export const PROGRAMME_CLASSIFICATION_BATCH_LIMIT = 100;
 const digest = (value: unknown) => createHash("sha256").update(JSON.stringify(value)).digest("hex");
@@ -76,6 +79,8 @@ export const PROGRAMME_SECTION_HEADINGS = [...PROGRAMME_CANONICAL_SUBJECTS, "Dir
   // PCPR Agente e Papiloscopista (blocos próprios do Anexo I).
   "Contabilidade Geral", "Estatística", "Direito Penal e Legislação Penal Extravagante", "Direito Processual Penal e Legislação Processual Penal Extravagante",
   "Biologia", "Física", "Química", "Direito Penal Aplicado", "Direito Processual Penal Aplicado",
+  // PGM-Manaus.
+  "Direito Municipal",
   // PCDF Delegado (títulos inline com dois-pontos) e TJPE Juiz Substituto.
   "Direito Administrativo e Legislação Complementar", "Direito Constitucional e Legislação Complementar", "Direito Civil e Legislação Complementar", "Direito Empresarial e Legislação Complementar", "Direito Penal e Legislação Complementar", "Direito Tributário e Legislação Complementar", "Direito Processual Penal e Legislação Complementar", "Direito Ambiental e Legislação Complementar", "Medicina Legal", "Direito do Consumidor", "Direito da Criança e do Adolescente", "Noções Gerais de Direito e Formação Humanística"] as const;
 export function programmeCanonicalSubject(heading: string) {
@@ -225,7 +230,8 @@ export async function classifyStandingProgrammeSubjects(db: PostgresJsDatabase<t
     for (const item of input.requirements) {
       const row = rows.find(row => row.id === item.requirementId)!, source = sources.find(source => source.id === row.snapshotId), subject = subjects.find(subject => subject.id === item.subjectId);
       if (!source || source.sourceDocumentId !== row.sourceDocumentId || !subject || source.policy !== "official_document" || !["official_document", "metadata_only"].includes(source.sourcePolicy) || !Array.isArray(source.pageTexts)) throw new Error("Snapshot/catálogo oficial ausente.");
-      const expectedSource = CEBRASPE_PROGRAMME_SCOPES.has(input.opportunitySlug) ? "cebraspe" : "fgv-conhecimento";
+      const expectedSource = DOM_MANAUS_PROGRAMME_SCOPES.has(input.opportunitySlug) ? "dom-manaus"
+        : CEBRASPE_PROGRAMME_SCOPES.has(input.opportunitySlug) ? "cebraspe" : "fgv-conhecimento";
       assertApprovedProgrammeSourceUrls(source.sourceUrl, source.url, source.sourcePolicy, expectedSource);
       assertProgrammeSubjectEvidence(row, item, source, subject);
     }
