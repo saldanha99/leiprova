@@ -146,7 +146,7 @@ export function NoticeSourceForm({
 export function NoticeSourceReviewControls({ publicId }: { publicId: string }) {
   const [state, action, pending] = useActionState(reviewNoticeSourceAction, initialState);
   return (
-    <form action={action} className="mt-4 rounded-xl border border-els-line bg-black/15 p-3">
+    <form action={action} className="mt-4 rounded-xl border border-els-line bg-els-sink p-3">
       <input type="hidden" name="publicId" value={publicId} />
       <label className="text-[11px] font-semibold text-els-fg-3">
         Nota da revisão humana
@@ -165,7 +165,7 @@ export function NoticeSourceReviewControls({ publicId }: { publicId: string }) {
           name="decision"
           value="approve"
           disabled={pending}
-          className="inline-flex min-h-9 items-center gap-2 rounded-lg bg-els-green px-3 text-xs font-extrabold text-els-on-amber disabled:opacity-50"
+          className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-els-green px-3 text-xs font-extrabold text-els-on-amber disabled:opacity-50"
         >
           <Check aria-hidden="true" className="size-3.5" /> Aprovar fonte
         </button>
@@ -173,7 +173,7 @@ export function NoticeSourceReviewControls({ publicId }: { publicId: string }) {
           name="decision"
           value="reject"
           disabled={pending}
-          className="inline-flex min-h-9 items-center gap-2 rounded-lg border border-els-danger/20 bg-els-danger/8 px-3 text-xs font-bold text-els-fg disabled:opacity-50"
+          className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-els-danger/20 bg-els-danger/8 px-3 text-xs font-bold text-els-fg disabled:opacity-50"
         >
           <RotateCcw aria-hidden="true" className="size-3.5" /> Rejeitar
         </button>
@@ -198,7 +198,7 @@ function CaptureCandidateButton({
       <p className="mt-1 truncate text-[10px] text-els-fg-4" title={candidate.url}>{candidate.url}</p>
       <button
         disabled={pending}
-        className="mt-3 inline-flex min-h-9 items-center gap-2 rounded-lg bg-els-info px-3 text-xs font-extrabold text-els-on-amber disabled:opacity-50"
+        className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-lg bg-els-info px-3 text-xs font-extrabold text-els-on-amber disabled:opacity-50"
       >
         {pending ? <LoaderCircle aria-hidden="true" className="size-3.5 animate-spin" /> : <Download aria-hidden="true" className="size-3.5" />}
         {pending ? "Capturando e lendo…" : "Capturar este PDF"}
@@ -220,7 +220,7 @@ export function OfficialDocumentDiscoveryControls({
         <input type="hidden" name="sourceDocumentPublicId" value={sourceDocumentPublicId} />
         <button
           disabled={pending}
-          className="inline-flex min-h-9 items-center gap-2 rounded-lg border border-els-info/20 bg-els-info/8 px-3 text-xs font-bold text-els-fg disabled:opacity-50"
+          className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-els-info/20 bg-els-info/8 px-3 text-xs font-bold text-els-fg disabled:opacity-50"
         >
           {pending ? <LoaderCircle aria-hidden="true" className="size-3.5 animate-spin" /> : <Search aria-hidden="true" className="size-3.5" />}
           {pending ? "Procurando anexos…" : "Procurar PDF do edital"}
@@ -251,10 +251,10 @@ export function NoticeDocumentReviewControls({
 }) {
   const [state, action, pending] = useActionState(reviewNoticeDocumentAction, initialState);
   return (
-    <form action={action} className="mt-4 rounded-xl border border-els-line bg-black/15 p-3">
+    <form action={action} className="mt-4 rounded-xl border border-els-line bg-els-sink p-3">
       <input type="hidden" name="snapshotPublicId" value={snapshotPublicId} />
       {selfReview ? (
-        <p className="mb-3 rounded-lg border border-els-amber/15 bg-els-amber/[.055] p-3 text-xs leading-5 text-els-amber-ink/85">
+        <p className="mb-3 rounded-lg border border-els-amber/15 bg-els-amber/[.055] p-3 text-xs leading-5 text-els-amber-ink">
           Você capturou este PDF: a aprovação fica registrada como autorrevisão. Requisitos e questões continuam exigindo revisão própria.
         </p>
       ) : null}
@@ -266,10 +266,10 @@ export function NoticeDocumentReviewControls({
       />
       <Feedback state={state} />
       <div className="mt-3 flex flex-wrap gap-2">
-        <button name="decision" value="approve" disabled={pending} className="min-h-9 rounded-lg bg-els-green px-3 text-xs font-extrabold text-els-on-amber disabled:opacity-50">
+        <button name="decision" value="approve" disabled={pending} className="min-h-11 rounded-lg bg-els-green px-3 text-xs font-extrabold text-els-on-amber disabled:opacity-50">
           Aprovar captura
         </button>
-        <button name="decision" value="reject" disabled={pending} className="min-h-9 rounded-lg border border-els-danger/20 bg-els-danger/8 px-3 text-xs font-bold text-els-fg disabled:opacity-50">
+        <button name="decision" value="reject" disabled={pending} className="min-h-11 rounded-lg border border-els-danger/20 bg-els-danger/8 px-3 text-xs font-bold text-els-fg disabled:opacity-50">
           Rejeitar
         </button>
       </div>
@@ -482,10 +482,10 @@ export function RequirementReviewControls({ requirementId }: { requirementId: nu
       </label>
       <Feedback state={state} />
       <div className="mt-3 flex flex-wrap gap-2">
-        <button name="decision" value="approve" disabled={pending} className="min-h-9 rounded-lg bg-els-green px-3 text-xs font-extrabold text-els-on-amber disabled:opacity-50">
+        <button name="decision" value="approve" disabled={pending} className="min-h-11 rounded-lg bg-els-green px-3 text-xs font-extrabold text-els-on-amber disabled:opacity-50">
           Aprovar requisito
         </button>
-        <button name="decision" value="reject" disabled={pending} className="min-h-9 rounded-lg border border-els-danger/20 bg-els-danger/8 px-3 text-xs font-bold text-els-fg disabled:opacity-50">
+        <button name="decision" value="reject" disabled={pending} className="min-h-11 rounded-lg border border-els-danger/20 bg-els-danger/8 px-3 text-xs font-bold text-els-fg disabled:opacity-50">
           Suspender
         </button>
       </div>
@@ -500,7 +500,7 @@ export function GenerateRequirementButton({ requirementId }: { requirementId: nu
       <input type="hidden" name="requirementId" value={requirementId} />
       <button
         disabled={pending}
-        className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-violet-300 px-4 text-xs font-extrabold text-violet-950 disabled:opacity-50"
+        className="inline-flex min-h-10 items-center gap-2 rounded-xl bg-els-info px-4 text-xs font-extrabold text-els-on-amber disabled:opacity-50"
       >
         {pending ? <LoaderCircle aria-hidden="true" className="size-4 animate-spin" /> : <Sparkles aria-hidden="true" className="size-4" />}
         {pending ? "Gerando…" : "Gerar rascunho inédito"}

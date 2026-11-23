@@ -89,7 +89,7 @@ export function FlashcardDeck({ cards }: { cards: Flashcard[] }) {
         </div>
         <div className="flex flex-wrap items-center gap-3">
           {revealed && (
-            <a href={card.officialUrl} target="_blank" rel="noreferrer" className="inline-flex min-h-10 items-center gap-2 text-xs font-semibold text-els-green-ink">
+            <a href={card.officialUrl} target="_blank" rel="noreferrer" className="inline-flex min-h-10 items-center gap-2 text-xs font-semibold text-els-green-ink min-h-11">
               Fonte oficial <ExternalLink className="size-3.5" />
             </a>
           )}

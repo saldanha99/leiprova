@@ -33,7 +33,7 @@ export default async function ActivateAccountAccessPage({
           <Link href="/recuperar-acesso" className="inline-flex min-h-12 items-center justify-center rounded-xl bg-els-amber px-5 text-sm font-bold text-els-on-amber transition hover:bg-els-amber">
             Solicitar novo link
           </Link>
-          <Link href="/entrar" className="text-sm font-semibold text-els-fg-3 transition hover:text-els-fg">Voltar para entrar</Link>
+          <Link href="/entrar" className="text-sm font-semibold text-els-fg-3 transition hover:text-els-fg min-h-11 inline-flex items-center">Voltar para entrar</Link>
         </div>
       </AuthShell>
     );

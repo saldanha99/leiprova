@@ -165,6 +165,7 @@ export default function SourcesAndUpdatesPage() {
           </div>
         </header>
 
+        <div data-theme="light" className="border-t border-els-line">
         <div className="mx-auto max-w-6xl space-y-20 px-5 py-16 sm:py-20">
           <section aria-labelledby="inventario-title" className="grid gap-8 lg:grid-cols-[1fr_.85fr]">
             <div>
@@ -183,7 +184,7 @@ export default function SourcesAndUpdatesPage() {
                   Separadamente, o laboratório ilustrativo da página inicial contém três microexemplos não persistidos no quiz: Constituição, art. 5º, LIV; Constituição, art. 37, caput; e Código Penal, art. 1º. Esses trechos foram novamente conferidos nas páginas oficiais em 17 de agosto de 2026.
                 </p>
               </div>
-              <a className="mt-6 inline-flex items-center gap-2 font-semibold text-els-amber-ink underline decoration-els-amber-ink/30 underline-offset-4 hover:text-els-amber-ink" href={CONSTITUTION_OFFICIAL_URL} rel="noreferrer">
+              <a className="mt-6 inline-flex items-center gap-2 font-semibold text-els-amber-ink underline decoration-els-amber-ink/30 underline-offset-4 hover:text-els-amber-ink min-h-11" href={CONSTITUTION_OFFICIAL_URL} rel="noreferrer">
                 Abrir o texto constitucional utilizado
                 <ExternalLink aria-hidden="true" className="size-4" />
               </a>
@@ -217,7 +218,7 @@ export default function SourcesAndUpdatesPage() {
             </div>
           </section>
 
-          <aside className="rounded-2xl border border-els-amber/20 bg-els-amber/[0.045] p-5 text-sm leading-7 text-els-amber-ink/80">
+          <aside className="rounded-2xl border border-els-amber/20 bg-els-amber/[0.045] p-5 text-sm leading-7 text-els-amber-ink">
             <strong className="text-els-amber-ink">Pendência editorial declarada:</strong> os {DEMO_QUESTIONS.length} itens do beta inicial não possuem revisão humana independente registrada. Esse recorte não descreve o inventário comercial. As inéditas da fábrica são liberadas pelo processo automático autorizado pelo proprietário em 11 de outubro de 2026, com conferência posterior e suspensão de inconsistências; não são anunciadas como revisão humana independente.
           </aside>
 
@@ -267,7 +268,7 @@ export default function SourcesAndUpdatesPage() {
                   <h3 className="mt-4 text-lg font-semibold text-els-fg">{source.title}</h3>
                   <p className="mt-2 text-sm leading-7 text-els-fg-3">{source.text}</p>
                   {source.href && (
-                    <a className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-els-amber-ink hover:text-els-amber-ink" href={source.href} rel="noreferrer">
+                    <a className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-els-amber-ink hover:text-els-amber-ink min-h-11" href={source.href} rel="noreferrer">
                       {source.label}
                       <ExternalLink aria-hidden="true" className="size-3.5" />
                     </a>
@@ -350,11 +351,11 @@ export default function SourcesAndUpdatesPage() {
                 O Portal da Legislação também possui política própria de reutilização. A fonte, a URL e a data de acesso devem acompanhar o conteúdo. Os trechos exibidos na Edital Lei Seca são meramente informativos e não oficiais e não substituem a publicação no Diário Oficial da União.
               </p>
               <div className="flex flex-wrap gap-4">
-                <a className="inline-flex items-center gap-2 font-semibold text-els-amber-ink underline decoration-els-amber-ink/30 underline-offset-4 hover:text-els-amber-ink" href="https://www.planalto.gov.br/ccivil_03/leis/l9610.htm" rel="noreferrer">
+                <a className="inline-flex items-center gap-2 font-semibold text-els-amber-ink underline decoration-els-amber-ink/30 underline-offset-4 hover:text-els-amber-ink min-h-11" href="https://www.planalto.gov.br/ccivil_03/leis/l9610.htm" rel="noreferrer">
                   Lei de Direitos Autorais
                   <ExternalLink aria-hidden="true" className="size-4" />
                 </a>
-                <a className="inline-flex items-center gap-2 font-semibold text-els-amber-ink underline decoration-els-amber-ink/30 underline-offset-4 hover:text-els-amber-ink" href="https://www.planalto.gov.br/ccivil_03/portaria/p130-21-ccivil.htm" rel="noreferrer">
+                <a className="inline-flex min-h-11 items-center gap-2 font-semibold text-els-amber-ink underline decoration-els-amber-ink/30 underline-offset-4 hover:text-els-amber-ink" href="https://www.planalto.gov.br/ccivil_03/portaria/p130-21-ccivil.htm" rel="noreferrer">
                   Portaria PR nº 130/2021
                   <ExternalLink aria-hidden="true" className="size-4" />
                 </a>
@@ -388,6 +389,7 @@ export default function SourcesAndUpdatesPage() {
             title="Confira a fonte dentro de uma questão real"
             description="Consulte as preparações disponíveis, o programa e as fontes indicadas. Questões, referências de provas anteriores e exemplos da demonstração têm suas próprias informações de origem e aprovação."
           />
+        </div>
         </div>
       </article>
     </PublicGuideShell>

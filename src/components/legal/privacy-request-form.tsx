@@ -144,7 +144,7 @@ export function PrivacyRequestForm() {
             <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-els-green-ink" aria-hidden="true" />
             <div>
               <p className="font-semibold">Solicitação registrada.</p>
-              <p className="mt-1 leading-6 text-els-green-ink/75">
+              <p className="mt-1 leading-6 text-els-green-ink">
                 Protocolo <strong className="text-els-green-ink">{state.protocol}</strong>.{" "}
                 {state.emailStatus === "sent"
                   ? "A confirmação foi enviada ao e-mail informado."

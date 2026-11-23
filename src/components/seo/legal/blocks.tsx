@@ -16,7 +16,7 @@ export function Breadcrumbs({ crumbs }: { crumbs: readonly Crumb[] }) {
                 {crumb.name}
               </span>
             ) : (
-              <Link className="hover:text-els-amber-ink" href={crumb.path}>
+              <Link className="inline-flex min-h-11 items-center hover:text-els-amber-ink" href={crumb.path}>
                 {crumb.name}
               </Link>
             )}
@@ -43,7 +43,7 @@ export function SourceSeal({
       Texto oficial: {sourceLabel(versionSourceUrl)} · versão verificada em{" "}
       <time dateTime={verifiedAt.toISOString()}>{brDate(verifiedAt)}</time> · última alteração do conteúdo em{" "}
       <time dateTime={contentChangedAt.toISOString()}>{brDate(contentChangedAt)}</time> ·{" "}
-      <a className="font-semibold text-els-amber-ink underline-offset-4 hover:underline" href={officialUrl} rel="noopener">
+      <a className="inline-flex min-h-11 items-center font-semibold text-els-amber-ink underline-offset-4 hover:underline" href={officialUrl} rel="noopener">
         ver publicação no {sourceLabel(officialUrl)}
       </a>
     </p>

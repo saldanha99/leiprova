@@ -34,7 +34,7 @@ export function QuestionReportStatusForm({ reportId, status }: { reportId: numbe
         id={`report-status-${reportId}`}
         name="to"
         defaultValue={targets[0]}
-        className="min-h-9 rounded-lg border border-els-line bg-els-surface px-2 text-xs font-semibold text-els-fg-2 outline-none focus:border-els-amber/40"
+        className="min-h-11 rounded-lg border border-els-line bg-els-surface px-2 text-xs font-semibold text-els-fg-2 outline-none focus:border-els-amber/40"
       >
         {targets.map((target) => (
           <option key={target} value={target}>
@@ -45,7 +45,7 @@ export function QuestionReportStatusForm({ reportId, status }: { reportId: numbe
       <button
         type="submit"
         disabled={pending}
-        className="inline-flex min-h-9 items-center gap-1.5 rounded-lg bg-els-amber px-3 text-xs font-extrabold text-els-on-amber transition hover:bg-els-amber-2 disabled:cursor-wait disabled:opacity-50"
+        className="inline-flex min-h-11 items-center gap-1.5 rounded-lg bg-els-amber px-3 text-xs font-extrabold text-els-on-amber transition hover:bg-els-amber-2 disabled:cursor-wait disabled:opacity-50"
       >
         <Check aria-hidden="true" className="size-3.5" />
         {pending ? "Salvando..." : "Aplicar"}

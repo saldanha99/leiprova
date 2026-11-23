@@ -88,7 +88,7 @@ export default async function NoticeEnginePage() {
     { label: "Fontes pendentes", value: snapshot.metrics.pendingSources, icon: FileSearch, tone: "bg-els-amber/10 text-els-amber-ink" },
     { label: "PDFs aprovados", value: snapshot.metrics.approvedSnapshots, icon: Database, tone: "bg-els-info/10 text-els-info-ink" },
     { label: "Requisitos revisados", value: snapshot.metrics.reviewedRequirements, icon: CheckCircle2, tone: "bg-els-info/10 text-els-info-ink" },
-    { label: "Rascunhos gerados", value: snapshot.metrics.generatedQuestions, icon: Sparkles, tone: "bg-violet-300/10 text-violet-300" },
+    { label: "Rascunhos gerados", value: snapshot.metrics.generatedQuestions, icon: Sparkles, tone: "bg-els-info/10 text-els-info-ink" },
   ];
 
   return (
@@ -108,7 +108,7 @@ export default async function NoticeEnginePage() {
           <div className="mt-5 flex flex-wrap gap-3 text-xs font-semibold text-els-fg-2">
             <span className="inline-flex items-center gap-2"><ShieldCheck className="size-4 text-els-green-ink" /> origem permitida</span>
             <span className="inline-flex items-center gap-2"><BookOpenCheck className="size-4 text-els-amber-ink" /> norma oficial revisada</span>
-            <span className="inline-flex items-center gap-2"><Sparkles className="size-4 text-violet-300" /> geração por regras verificáveis</span>
+            <span className="inline-flex items-center gap-2"><Sparkles className="size-4 text-els-info-ink" /> geração por regras verificáveis</span>
           </div>
         </div>
       </header>
@@ -215,7 +215,7 @@ export default async function NoticeEnginePage() {
             {snapshot.sourceDocuments.map((item) => {
               const canReview = item.status === "pending_review";
               return (
-                <article key={item.publicId} className="rounded-2xl border border-els-line bg-black/10 p-4">
+                <article key={item.publicId} className="rounded-2xl border border-els-line bg-els-sink p-4">
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="min-w-0">
                       <p className="text-[11px] font-semibold text-els-fg-3">{item.opportunityTitle}</p>
@@ -228,7 +228,7 @@ export default async function NoticeEnginePage() {
                   <div className="mt-3 flex flex-wrap gap-2 text-[11px] text-els-fg-4">
                     <span>HTTP {item.httpStatus}</span><span>·</span><span>{item.sourceHost}</span><span>·</span><span>{dateFormatter.format(item.observedAt)}</span>
                   </div>
-                  <a href={item.sourceUrl} target="_blank" rel="noreferrer" className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-els-amber-ink hover:text-els-amber-ink">
+                  <a href={item.sourceUrl} target="_blank" rel="noreferrer" className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-els-amber-ink hover:text-els-amber-ink min-h-11">
                     Abrir fonte oficial <ExternalLink aria-hidden="true" className="size-3.5" />
                   </a>
                   <p className="mt-3 text-[11px] leading-5 text-els-fg-4">
@@ -259,7 +259,7 @@ export default async function NoticeEnginePage() {
             {snapshot.documentSnapshots.map((item) => {
               const canReview = item.status === "pending_review";
               return (
-                <article key={item.publicId} className="rounded-2xl border border-els-line bg-black/10 p-4">
+                <article key={item.publicId} className="rounded-2xl border border-els-line bg-els-sink p-4">
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="min-w-0">
                       <p className="text-[11px] font-semibold text-els-info-ink">{item.opportunityTitle}</p>
@@ -296,10 +296,10 @@ export default async function NoticeEnginePage() {
       <section className="mt-5 rounded-[1.5rem] border border-els-line bg-els-surface p-5 sm:p-6">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <span className="text-xs font-bold uppercase tracking-[.14em] text-violet-300">Fila de geração</span>
+            <span className="text-xs font-bold uppercase tracking-[.14em] text-els-info-ink">Fila de geração</span>
             <h2 className="mt-2 text-xl font-semibold text-els-fg">Requisitos do edital</h2>
           </div>
-          <Link href="/admin/fabrica-autoral" className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-violet-300/15 bg-violet-300/[.045] px-3 text-xs font-bold text-violet-200">
+          <Link href="/admin/fabrica-autoral" className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-els-info/15 bg-els-info/[.045] px-3 text-xs font-bold text-els-info-ink">
             Abrir Fábrica Autoral <ArrowRight aria-hidden="true" className="size-3.5" />
           </Link>
         </div>
@@ -309,7 +309,7 @@ export default async function NoticeEnginePage() {
               const canReview = item.editorialStatus === "pending_review";
               const canGenerate = item.editorialStatus === "reviewed" && item.sourceDocumentStatus === "approved" && item.assignment;
               return (
-                <article key={item.id} className="rounded-2xl border border-els-line bg-black/10 p-4">
+                <article key={item.id} className="rounded-2xl border border-els-line bg-els-sink p-4">
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="min-w-0">
                       <p className="text-[11px] font-semibold text-els-info-ink">{item.opportunityTitle}</p>

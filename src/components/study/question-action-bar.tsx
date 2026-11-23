@@ -163,7 +163,7 @@ export function QuestionActionBar({
 }
 
 const barButtonClass =
-  "inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-els-line bg-els-raise px-3 text-[11px] font-semibold text-els-fg-2 transition hover:border-els-line-strong hover:text-els-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-els-amber disabled:cursor-wait disabled:opacity-60";
+  "inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-els-line bg-els-raise px-3 text-[11px] font-semibold text-els-fg-2 transition hover:border-els-line-strong hover:text-els-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-els-amber disabled:cursor-wait disabled:opacity-60";
 
 function BarButton({ active, controls, icon: Icon, label, onClick }: { active: boolean; controls: string; icon: typeof Flag; label: string; onClick: () => void }) {
   return (

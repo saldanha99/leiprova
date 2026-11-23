@@ -57,7 +57,7 @@ export default async function EditorialFactoryPage({
 
   const metrics = [
     { label: "Autorais registradas", value: snapshot.metrics.total, icon: Fingerprint, tone: "text-els-info-ink bg-els-info/10" },
-    { label: "Rascunhos gerados", value: snapshot.metrics.drafts, icon: FilePenLine, tone: "text-violet-300 bg-violet-300/10" },
+    { label: "Rascunhos gerados", value: snapshot.metrics.drafts, icon: FilePenLine, tone: "text-els-info-ink bg-els-info/10" },
     { label: "Na fila", value: snapshot.metrics.pending, icon: Clock3, tone: "text-els-amber-ink bg-els-amber/10" },
     { label: "Liberadas", value: snapshot.metrics.reviewed, icon: CheckCircle2, tone: "text-els-green-ink bg-els-green/10" },
     { label: "Reprovadas", value: snapshot.metrics.suspended, icon: FileLock2, tone: "text-els-danger-ink bg-els-danger/10" },
@@ -102,12 +102,12 @@ export default async function EditorialFactoryPage({
 
       {snapshot.metrics.drafts > 0 ? (
         <section
-          className="mt-5 rounded-[1.5rem] border border-violet-300/15 bg-[linear-gradient(120deg,color-mix(in_oklch,var(--els-info)_8%,transparent),color-mix(in_oklch,var(--els-info)_3.5%,transparent))] p-5 sm:p-6"
+          className="mt-5 rounded-[1.5rem] border border-els-info/15 bg-[linear-gradient(120deg,color-mix(in_oklch,var(--els-info)_8%,transparent),color-mix(in_oklch,var(--els-info)_3.5%,transparent))] p-5 sm:p-6"
           aria-labelledby="pilot-title"
         >
           <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-center">
             <div className="max-w-3xl">
-              <span className="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-[.14em] text-violet-200">
+              <span className="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-[.14em] text-els-info-ink">
                 <Sparkles aria-hidden="true" className="size-3.5" />
                 Lote piloto ativo
               </span>
@@ -120,9 +120,9 @@ export default async function EditorialFactoryPage({
               </p>
             </div>
             <div className="grid shrink-0 grid-cols-3 gap-2 text-center text-[10px] font-bold uppercase tracking-[.08em] text-els-fg-3">
-              <span className="rounded-xl border border-violet-300/12 bg-black/10 px-3 py-3 text-violet-200">1. Conferir</span>
-              <span className="rounded-xl border border-els-amber/12 bg-black/10 px-3 py-3 text-els-amber-ink">2. Revisar</span>
-              <span className="rounded-xl border border-els-green/12 bg-black/10 px-3 py-3 text-els-green-ink">3. Liberar</span>
+              <span className="rounded-xl border border-els-info/12 bg-els-sink px-3 py-3 text-els-info-ink">1. Conferir</span>
+              <span className="rounded-xl border border-els-amber/12 bg-els-sink px-3 py-3 text-els-amber-ink">2. Revisar</span>
+              <span className="rounded-xl border border-els-green/12 bg-els-sink px-3 py-3 text-els-green-ink">3. Liberar</span>
             </div>
           </div>
         </section>
@@ -231,8 +231,8 @@ export default async function EditorialFactoryPage({
             <h2 className="font-semibold text-els-fg">Detalhes do perfil selecionado</h2>
             <div className="mt-4 space-y-5">
               {snapshot.profiles.map((profile) => (
-                <details key={profile.id} className="group rounded-xl border border-els-line bg-black/10 p-3">
-                  <summary className="cursor-pointer list-none text-sm font-bold text-els-fg-2">{profile.bankName}</summary>
+                <details key={profile.id} className="group rounded-xl border border-els-line bg-els-sink p-3">
+                  <summary className="flex min-h-11 cursor-pointer list-none items-center text-sm font-bold text-els-fg-2">{profile.bankName}</summary>
                   <div className="mt-3 border-t border-els-line pt-3">
                     <p className="text-xs font-semibold text-els-info-ink">Demanda de raciocínio</p>
                     <p className="mt-1 text-xs leading-5 text-els-fg-3">{profile.reasoningDemand}</p>
@@ -267,7 +267,7 @@ export default async function EditorialFactoryPage({
               const canReview = item.editorialStatus === "pending_review" && item.creatorUserId !== null;
               const canClaim = item.editorialStatus === "draft" && !item.creatorUserId;
               return (
-                <article key={item.publicId} className="rounded-2xl border border-els-line bg-black/10 p-4">
+                <article key={item.publicId} className="rounded-2xl border border-els-line bg-els-sink p-4">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <span className={`rounded-lg border px-2.5 py-1 text-[10px] font-bold uppercase tracking-[.1em] ${statusClasses[item.editorialStatus] ?? statusClasses.draft}`}>
                       {statusLabels[item.editorialStatus] ?? item.editorialStatus}
@@ -303,7 +303,7 @@ export default async function EditorialFactoryPage({
                             href={item.sourceUrl}
                             target="_blank"
                             rel="noreferrer"
-                            className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-els-amber/15 bg-els-amber/[.045] px-2.5 text-[11px] font-bold text-els-amber-ink transition hover:bg-els-amber/[.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-els-amber/50"
+                            className="inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-els-amber/15 bg-els-amber/[.045] px-2.5 text-[11px] font-bold text-els-amber-ink transition hover:bg-els-amber/[.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-els-amber/50"
                           >
                             Conferir no portal oficial
                             <ExternalLink aria-hidden="true" className="size-3.5" />
@@ -329,7 +329,7 @@ export default async function EditorialFactoryPage({
                                 className={`rounded-lg border p-3 ${
                                   option.isCorrect
                                     ? "border-els-green/20 bg-els-green/[.055]"
-                                    : "border-els-line bg-black/10"
+                                    : "border-els-line bg-els-sink"
                                 }`}
                               >
                                 <div className="flex items-start gap-2.5">
@@ -366,8 +366,8 @@ export default async function EditorialFactoryPage({
                         )}
                       </section>
 
-                      <section className="rounded-lg border border-els-line bg-black/10 p-3" aria-label="Explicação editorial">
-                        <p className="text-[10px] font-extrabold uppercase tracking-[.12em] text-violet-300">Explicação proposta</p>
+                      <section className="rounded-lg border border-els-line bg-els-sink p-3" aria-label="Explicação editorial">
+                        <p className="text-[10px] font-extrabold uppercase tracking-[.12em] text-els-info-ink">Explicação proposta</p>
                         <p className="mt-2 text-xs leading-6 text-els-fg-3">{item.explanation}</p>
                       </section>
                     </div>
@@ -379,7 +379,7 @@ export default async function EditorialFactoryPage({
                     {item.promptVersion ? ` · protocolo: ${item.promptVersion}` : ""}
                     {item.reviewerName ? ` · revisor: ${item.reviewerName}` : ""}
                   </div>
-                  <p className="mt-2 text-[11px] font-semibold text-els-info-ink/80">
+                  <p className="mt-2 text-[11px] font-semibold text-els-info-ink">
                     Originalidade textual interna: {Math.max(0, 100 - Math.round(item.similarityMaxBps / 100))}%
                     {item.similarityReferencePublicId ? " · comparação registrada" : " · primeiro item da base"}
                   </p>

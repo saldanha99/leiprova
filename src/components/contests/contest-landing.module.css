@@ -306,7 +306,7 @@
   position: sticky;
   top: 0;
   z-index: 20;
-  background: #071116f5;
+  background: color-mix(in oklch, var(--els-bg) 96%, transparent);
   backdrop-filter: blur(15px);
   border-block: 1px solid var(--line);
 }

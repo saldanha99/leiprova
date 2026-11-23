@@ -184,7 +184,7 @@ export function StripeConnectPanel({
                 href="https://docs.stripe.com/connect/how-connect-works"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-els-amber-ink hover:text-els-amber-ink"
+                className="inline-flex items-center gap-2 text-els-amber-ink hover:text-els-amber-ink min-h-11"
               >
                 Disponibilidade oficial <ArrowUpRight className="size-3.5" />
               </a>
@@ -192,7 +192,7 @@ export function StripeConnectPanel({
                 href="https://docs.stripe.com/connect/separate-charges-and-transfers?locale=pt-BR"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-els-info-ink hover:text-els-fg"
+                className="inline-flex items-center gap-2 text-els-info-ink hover:text-els-fg min-h-11"
               >
                 Modelo de cobrança <ArrowUpRight className="size-3.5" />
               </a>
@@ -245,7 +245,7 @@ export function StripeConnectPanel({
             <ReadinessItem ok={readiness.enabled}>Chave geral STRIPE_CONNECT_ENABLED liberada</ReadinessItem>
           </ul>
           {readiness.requirements.length > 0 && (
-            <div className="mt-6 rounded-xl border border-els-line bg-black/10 p-4">
+            <div className="mt-6 rounded-xl border border-els-line bg-els-sink p-4">
               <p className="text-[10px] font-bold uppercase tracking-[.12em] text-els-fg-3">Pendências técnicas</p>
               <ul className="mt-2 grid gap-1 text-xs leading-5 text-els-fg-3">
                 {readiness.requirements.map((requirement) => <li key={requirement}>• {requirement}</li>)}
@@ -368,7 +368,7 @@ export function StripeConnectPanel({
 
       <footer className="mt-5 flex flex-col gap-3 rounded-2xl border border-els-line bg-els-raise p-4 text-xs leading-5 text-els-fg-3 sm:flex-row sm:items-center sm:justify-between">
         <p className="flex items-start gap-2"><FileLock2 aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-els-green-ink" />As chaves ficam somente no servidor; esta tela nunca recebe segredos nem dados bancários.</p>
-        <Link href="/admin" className="font-semibold text-els-fg-2 hover:text-els-fg">Voltar à visão geral</Link>
+        <Link href="/admin" className="font-semibold text-els-fg-2 hover:text-els-fg min-h-11 inline-flex items-center">Voltar à visão geral</Link>
       </footer>
     </main>
   );

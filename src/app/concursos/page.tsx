@@ -110,7 +110,7 @@ export default async function ContestsPage() {
                 </div>
               </div>
 
-              <aside className="rounded-[1.7rem] border border-els-amber/20 bg-els-amber/[0.055] p-6 text-sm leading-7 text-els-amber-ink/80">
+              <aside className="rounded-[1.7rem] border border-els-amber/20 bg-els-amber/[0.055] p-6 text-sm leading-7 text-els-amber-ink">
                 <p className="flex items-center gap-2 font-extrabold text-els-amber-ink">
                   <BadgeCheck aria-hidden="true" className="size-5" />
                   Um objetivo ou vários caminhos?
@@ -125,6 +125,7 @@ export default async function ContestsPage() {
           </div>
         </header>
 
+        <div data-theme="light" className="border-t border-els-line">
         <div className="mx-auto max-w-6xl space-y-20 px-5 py-16 sm:py-20">
           <ContestCatalogBrowser cards={cards} />
           <aside className="rounded-3xl border border-els-green/15 bg-els-green/[0.035] p-7">
@@ -138,6 +139,7 @@ export default async function ContestsPage() {
               Conhecer o método <ArrowRight size={16} aria-hidden="true" />
             </Link>
           </aside>
+        </div>
         </div>
       </article>
     </PublicGuideShell>

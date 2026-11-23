@@ -64,7 +64,7 @@ export default async function LegalActPage({
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-7 sm:px-7 lg:px-9 lg:py-10">
-      <Link href="/app/leis" className="mb-5 inline-flex items-center gap-2 text-xs font-semibold text-els-fg-3 transition hover:text-els-fg">
+      <Link href="/app/leis" className="mb-5 inline-flex items-center gap-2 text-xs font-semibold text-els-fg-3 transition hover:text-els-fg min-h-11">
         <ArrowLeft className="size-3.5" /> Todas as leis
       </Link>
       <PageHeader
@@ -242,7 +242,7 @@ function RangeSelect({
   return (
     <label className="grid gap-2 text-xs font-semibold text-els-fg-2">
       {label}
-      <select name={name} defaultValue={selected} className="min-h-11 rounded-xl border border-els-line bg-els-bg/50 px-3 text-sm text-els-fg outline-none focus:border-els-amber/50 focus:ring-4 focus:ring-els-amber/5">
+      <select name={name} defaultValue={selected} className="min-h-11 w-full min-w-0 max-w-full rounded-xl border border-els-line bg-els-bg/50 px-3 text-sm text-els-fg outline-none focus:border-els-amber/50 focus:ring-4 focus:ring-els-amber/5">
         {articles.map((article) => (
           <option key={article.articleOrder} value={article.articleOrder}>{article.articleRef} · {article.questionCount}</option>
         ))}

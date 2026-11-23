@@ -89,7 +89,7 @@ export function ExamLicenseDecisionControls({
         <textarea name="notes" required minLength={20} maxLength={2000} className={`${field} min-h-20 py-3`} />
       </label>
       <label className="flex items-start gap-2 text-[11px] leading-5 text-els-fg-2 sm:col-span-2">
-        <input type="checkbox" name="attestation" className="mt-1 size-4 accent-violet-300" />
+        <input type="checkbox" name="attestation" className="mt-1 size-4 accent-els-info" />
         <span>
           Conferi titular, documentos, uso comercial, reprodução, armazenamento,
           atribuição, território, prazo, revogação e integridade do arquivo.
@@ -100,7 +100,7 @@ export function ExamLicenseDecisionControls({
           name="decision"
           value="grant"
           disabled={pending}
-          className="min-h-9 rounded-lg bg-violet-300 px-3 text-xs font-extrabold text-violet-950 disabled:opacity-50"
+          className="min-h-11 rounded-lg bg-els-info px-3 text-xs font-extrabold text-els-on-amber disabled:opacity-50"
         >
           Registrar concessão
         </button>
@@ -108,7 +108,7 @@ export function ExamLicenseDecisionControls({
           name="decision"
           value="deny"
           disabled={pending}
-          className="min-h-9 rounded-lg border border-els-danger/20 bg-els-danger/8 px-3 text-xs font-bold text-els-fg disabled:opacity-50"
+          className="min-h-11 rounded-lg border border-els-danger/20 bg-els-danger/8 px-3 text-xs font-bold text-els-fg disabled:opacity-50"
         >
           Registrar negativa
         </button>
@@ -348,7 +348,7 @@ function ReviewControls({
           name="decision"
           value="approve"
           disabled={pending}
-          className="inline-flex min-h-9 items-center gap-2 rounded-lg bg-els-green px-3 text-xs font-extrabold text-els-on-amber disabled:opacity-50"
+          className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-els-green px-3 text-xs font-extrabold text-els-on-amber disabled:opacity-50"
         >
           <Check className="size-3.5" />
           {approveLabel}
@@ -357,7 +357,7 @@ function ReviewControls({
           name="decision"
           value="reject"
           disabled={pending}
-          className="inline-flex min-h-9 items-center gap-2 rounded-lg border border-els-danger/20 bg-els-danger/8 px-3 text-xs font-bold text-els-fg disabled:opacity-50"
+          className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-els-danger/20 bg-els-danger/8 px-3 text-xs font-bold text-els-fg disabled:opacity-50"
         >
           <RotateCcw className="size-3.5" />
           Rejeitar
@@ -655,25 +655,25 @@ export function LicensedPreviousExamImportForm({
       </label>
 
       {selectedDocument ? (
-        <div className="rounded-xl border border-violet-300/15 bg-violet-300/[.035] p-3 text-[11px] leading-5 text-els-fg-3">
+        <div className="rounded-xl border border-els-info/15 bg-els-info/[.035] p-3 text-[11px] leading-5 text-els-fg-3">
           <p>
-            <strong className="text-violet-200">Titular:</strong>{" "}
+            <strong className="text-els-info-ink">Titular:</strong>{" "}
             {selectedDocument.rightsHolder ?? "não informado"}
           </p>
           <p className="break-all">
-            <strong className="text-violet-200">Evidência:</strong>{" "}
+            <strong className="text-els-info-ink">Evidência:</strong>{" "}
             {selectedDocument.licenseReference ?? "não informada"}
           </p>
           <p>
-            <strong className="text-violet-200">Versão da evidência:</strong>{" "}
+            <strong className="text-els-info-ink">Versão da evidência:</strong>{" "}
             {selectedDocument.licenseEvidenceChecksumSha256 ?? "não informada"}
           </p>
           <p>
-            <strong className="text-violet-200">Gabarito vinculado:</strong>{" "}
+            <strong className="text-els-info-ink">Gabarito vinculado:</strong>{" "}
             {selectedAnswerKey?.title ?? "selecione o gabarito exato"}
           </p>
           <p className="break-all">
-            <strong className="text-violet-200">Versão do gabarito:</strong>{" "}
+            <strong className="text-els-info-ink">Versão do gabarito:</strong>{" "}
             {selectedAnswerKey?.licenseEvidenceChecksumSha256 ?? "não informada"}
           </p>
           <p className="mt-2">
@@ -726,7 +726,7 @@ export function LicensedPreviousExamImportForm({
             !selectedAnswerKey ||
             compatibleSubjects.length === 0
           }
-          className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-violet-300 px-5 text-sm font-extrabold text-violet-950 disabled:opacity-50"
+          className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-els-info px-5 text-sm font-extrabold text-els-on-amber disabled:opacity-50"
         >
           <FileJson2 className="size-4" />
           {pending ? "Validando lote integral…" : "Importar para revisão"}
@@ -817,7 +817,7 @@ export function LicensedPreviousExamReviewControls({
                     className={`rounded-lg border p-2.5 ${
                       option.isCorrect
                         ? "border-els-green/20 bg-els-green/[.045]"
-                        : "border-els-line bg-black/10"
+                        : "border-els-line bg-els-sink"
                     }`}
                   >
                     <strong className="text-els-fg-2">{option.optionKey}.</strong>{" "}
@@ -924,7 +924,7 @@ function RevocationControls({
       <Feedback state={state} />
       <button
         disabled={pending}
-        className="mt-3 inline-flex min-h-9 items-center gap-2 rounded-lg bg-els-danger px-3 text-xs font-extrabold text-els-on-amber disabled:opacity-50"
+        className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-lg bg-els-danger px-3 text-xs font-extrabold text-els-on-amber disabled:opacity-50"
       >
         <AlertTriangle className="size-3.5" />
         {pending ? "Bloqueando…" : label}

@@ -11,7 +11,7 @@ export function SupplierIdentityBlock() {
 
   if (!supplier) {
     return (
-      <p className="rounded-xl border border-els-amber/15 bg-els-amber/6 px-4 py-3 text-sm leading-6 text-els-amber-ink/80">
+      <p className="rounded-xl border border-els-amber/15 bg-els-amber/6 px-4 py-3 text-sm leading-6 text-els-amber-ink">
         A identificação completa do fornecedor ainda não foi publicada. Enquanto isso, não há
         oferta comercial ativa: o checkout permanece bloqueado no próprio código, e não apenas
         por configuração.

@@ -51,9 +51,9 @@ export default async function PurchasesPage() {
         autenticada do pagamento.
       </p>
       <div className="mt-8 flex flex-wrap gap-5 text-sm font-bold text-els-amber-ink">
-        <Link href="/app/quiz">Ir para os treinos</Link>
-        <Link href="/app/assinatura">Gerenciar Master</Link>
-        <Link href="/concursos">Explorar concursos</Link>
+        <Link className="inline-flex min-h-11 items-center" href="/app/quiz">Ir para os treinos</Link>
+        <Link className="inline-flex min-h-11 items-center" href="/app/assinatura">Gerenciar Master</Link>
+        <Link className="inline-flex min-h-11 items-center" href="/concursos">Explorar concursos</Link>
       </div>
       {user.stripeCustomerId && (
         <div className="mt-6">

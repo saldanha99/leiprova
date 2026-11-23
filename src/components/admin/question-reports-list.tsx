@@ -50,7 +50,7 @@ function StatusFilters({ filters, counts }: { filters: QuestionReportFilters; co
             href={questionReportFiltersHref({ ...filters, status: item.value, page: 1 })}
             aria-current={active ? "page" : undefined}
             className={cn(
-              "inline-flex min-h-9 items-center gap-2 rounded-full border px-3 text-xs font-bold transition",
+              "inline-flex min-h-11 items-center gap-2 rounded-full border px-3 text-xs font-bold transition",
               active
                 ? "border-els-amber/30 bg-els-amber/12 text-els-amber-ink"
                 : "border-els-line text-els-fg-3 hover:border-els-line-strong hover:text-els-fg",
@@ -78,7 +78,7 @@ function ReasonFilter({ filters }: { filters: QuestionReportFilters }) {
         id="report-reason-filter"
         name="motivo"
         defaultValue={filters.reason ?? ""}
-        className="min-h-9 rounded-lg border border-els-line bg-els-surface px-2 text-xs font-semibold text-els-fg-2 outline-none focus:border-els-amber/40"
+        className="min-h-11 rounded-lg border border-els-line bg-els-surface px-2 text-xs font-semibold text-els-fg-2 outline-none focus:border-els-amber/40"
       >
         <option value="">Todos os motivos</option>
         {QUESTION_REPORT_REASONS.map((reason) => (
@@ -89,7 +89,7 @@ function ReasonFilter({ filters }: { filters: QuestionReportFilters }) {
       </select>
       <button
         type="submit"
-        className="min-h-9 rounded-lg border border-els-line px-3 text-xs font-bold text-els-fg-2 transition hover:border-els-line-strong hover:text-els-fg"
+        className="min-h-11 rounded-lg border border-els-line px-3 text-xs font-bold text-els-fg-2 transition hover:border-els-line-strong hover:text-els-fg"
       >
         Filtrar
       </button>
@@ -99,7 +99,7 @@ function ReasonFilter({ filters }: { filters: QuestionReportFilters }) {
 
 function QuestionDetails({ question }: { question: AdminQuestionReport["question"] }) {
   return (
-    <details className="group mt-3 rounded-xl border border-els-line bg-black/15">
+    <details className="group mt-3 rounded-xl border border-els-line bg-els-sink">
       <summary className="flex min-h-10 cursor-pointer list-none items-center justify-between gap-2 px-3 text-xs font-bold text-els-amber-ink hover:text-els-amber-ink">
         <span>Abrir questão</span>
         <ChevronRight aria-hidden="true" className="size-4 transition group-open:rotate-90" />
@@ -232,7 +232,7 @@ export function QuestionReportsList({ data, filters }: { data: AdminQuestionRepo
           {filters.page > 1 ? (
             <Link
               href={questionReportFiltersHref({ ...filters, page: filters.page - 1 })}
-              className="inline-flex min-h-9 items-center gap-1 rounded-lg border border-els-line px-3 text-els-fg-2 hover:text-els-fg"
+              className="inline-flex min-h-11 items-center gap-1 rounded-lg border border-els-line px-3 text-els-fg-2 hover:text-els-fg"
             >
               <ChevronLeft aria-hidden="true" className="size-4" />
               Anteriores
@@ -244,7 +244,7 @@ export function QuestionReportsList({ data, filters }: { data: AdminQuestionRepo
           {data.hasNextPage ? (
             <Link
               href={questionReportFiltersHref({ ...filters, page: filters.page + 1 })}
-              className="inline-flex min-h-9 items-center gap-1 rounded-lg border border-els-line px-3 text-els-fg-2 hover:text-els-fg"
+              className="inline-flex min-h-11 items-center gap-1 rounded-lg border border-els-line px-3 text-els-fg-2 hover:text-els-fg"
             >
               Próximos
               <ChevronRight aria-hidden="true" className="size-4" />

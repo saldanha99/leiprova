@@ -121,7 +121,7 @@ export function CheckoutClient({ planSlug, publishableKey, buttonLabel }: Checko
           <AlertTriangle className="mt-0.5 size-5 shrink-0 text-els-danger-ink" aria-hidden="true" />
           <div>
             <strong className="block font-semibold">Não foi possível iniciar o checkout</strong>
-            <p className="mt-1 leading-6 text-els-fg/70">{error}</p>
+            <p className="mt-1 leading-6 text-els-fg">{error}</p>
           </div>
         </div>
       </div>

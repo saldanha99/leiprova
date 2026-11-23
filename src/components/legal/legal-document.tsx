@@ -16,12 +16,12 @@ export function LegalDocument({
 }) {
   return (
     <main className="min-h-screen bg-els-bg text-els-fg-2">
-      <header className="border-b border-els-line bg-els-bg"><div className="mx-auto flex max-w-5xl items-center justify-between px-5 py-4"><LeiProvaMark /><Link href="/" className="text-sm font-semibold text-els-fg-3 hover:text-els-fg">Voltar ao site</Link></div></header>
+      <header className="border-b border-els-line bg-els-bg"><div className="mx-auto flex max-w-5xl items-center justify-between px-5 py-4"><LeiProvaMark /><Link href="/" className="text-sm font-semibold text-els-fg-3 hover:text-els-fg min-h-11 inline-flex items-center">Voltar ao site</Link></div></header>
       <article className="mx-auto max-w-3xl px-5 py-12 sm:py-16">
         <p className="text-xs font-bold uppercase tracking-[.16em] text-els-amber-ink">Documento do produto</p>
         <h1 className="mt-3 text-4xl font-semibold tracking-[-.04em]">{title}</h1>
         <p className="mt-3 text-sm text-els-fg-3">Última atualização: {updatedAt}</p>
-        {notice && <p className="mt-7 rounded-xl border border-els-amber/15 bg-els-amber/6 px-4 py-3 text-sm leading-6 text-els-amber-ink/80">{notice}</p>}
+        {notice && <p className="mt-7 rounded-xl border border-els-amber/15 bg-els-amber/6 px-4 py-3 text-sm leading-6 text-els-amber-ink">{notice}</p>}
         <div className="legal-copy mt-10 space-y-8 text-sm leading-7 text-els-fg-3">{children}</div>
       </article>
     </main>

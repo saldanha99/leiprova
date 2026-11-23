@@ -297,7 +297,7 @@ function AnswerOptions({
     <fieldset className="mt-7 border-t border-els-line pt-6">
       <legend className="px-1 text-sm font-semibold text-els-fg-2">Escolha a redação exata</legend>
       {!confidence && !response && (
-        <p id="confidence-hint" className="mt-1 text-xs leading-5 text-els-amber-ink/75">
+        <p id="confidence-hint" className="mt-1 text-xs leading-5 text-els-amber-ink">
           Registre sua confiança acima para liberar as alternativas.
         </p>
       )}
@@ -389,7 +389,7 @@ function SessionGuide() {
           </div>
         ))}
       </div>
-      <div className="mt-7 flex gap-3 rounded-xl border border-els-green/10 bg-els-green/[.045] p-3.5 text-xs leading-5 text-els-green-ink/75">
+      <div className="mt-7 flex gap-3 rounded-xl border border-els-green/10 bg-els-green/[.045] p-3.5 text-xs leading-5 text-els-green-ink">
         <LockKeyhole className="mt-0.5 size-4 shrink-0 text-els-green-ink" aria-hidden="true" />
         <p>Seu avanço desta demonstração fica salvo somente neste navegador.</p>
       </div>
@@ -539,13 +539,13 @@ function CompletionScreen({
         <div className="p-5 sm:p-8 lg:p-10">
           <div className="grid gap-3 sm:grid-cols-3">
             <div className="rounded-2xl border border-els-green/15 bg-els-green/[.055] p-5">
-              <p className="text-xs font-semibold text-els-green-ink/70">Acertos</p>
+              <p className="text-xs font-semibold text-els-green-ink">Acertos</p>
               <p className="mt-2 text-3xl font-semibold tracking-[-.04em] text-els-fg">
                 {correctCount}<span className="text-base text-els-fg-3">/{questions.length}</span>
               </p>
             </div>
             <div className="rounded-2xl border border-els-amber/15 bg-els-amber/[.05] p-5">
-              <p className="text-xs font-semibold text-els-amber-ink/70">Aproveitamento</p>
+              <p className="text-xs font-semibold text-els-amber-ink">Aproveitamento</p>
               <p className="mt-2 text-3xl font-semibold tracking-[-.04em] text-els-fg">{score}%</p>
             </div>
             <div className="rounded-2xl border border-els-line bg-els-raise p-5">

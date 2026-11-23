@@ -179,7 +179,7 @@ export default async function ContestCalendarPage() {
                           {item.title}
                         </h3>
                         {date ? (
-                          <p className="mt-3 text-sm font-semibold text-els-amber-ink/90">{date}</p>
+                          <p className="mt-3 text-sm font-semibold text-els-amber-ink">{date}</p>
                         ) : null}
                         <div className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-sm font-extrabold">
                           {contest && !closed ? (

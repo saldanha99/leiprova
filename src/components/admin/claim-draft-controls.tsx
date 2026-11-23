@@ -29,7 +29,7 @@ export function ClaimDraftControls({ publicId }: { publicId: string }) {
         </div>
       </div>
 
-      <label className="mt-3 flex cursor-pointer items-start gap-2.5 rounded-lg border border-els-line bg-black/10 p-2.5 text-[11px] leading-5 text-els-fg-3">
+      <label className="mt-3 flex cursor-pointer items-start gap-2.5 rounded-lg border border-els-line bg-els-sink p-2.5 text-[11px] leading-5 text-els-fg-3">
         <input
           type="checkbox"
           name="cleanRoomAttestation"

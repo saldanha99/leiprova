@@ -22,7 +22,7 @@ function Feedback({ state }: { state: SourceActionState }) {
 
 export function LegalSyncButton({ slug }: { slug: string }) {
   const [state, action, pending] = useActionState(syncLegalSourceAction, initialState);
-  return <form action={action} className="mt-3"><input type="hidden" name="slug" value={slug} /><button disabled={pending} className="inline-flex min-h-9 items-center gap-2 rounded-lg border border-els-amber/20 bg-els-amber/8 px-3 text-xs font-bold text-els-amber-ink disabled:opacity-50"><RefreshCcw className={`size-3.5 ${pending ? "animate-spin" : ""}`} />{pending ? "Consultando…" : "Conferir agora"}</button><Feedback state={state} /></form>;
+  return <form action={action} className="mt-3"><input type="hidden" name="slug" value={slug} /><button disabled={pending} className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-els-amber/20 bg-els-amber/8 px-3 text-xs font-bold text-els-amber-ink disabled:opacity-50"><RefreshCcw className={`size-3.5 ${pending ? "animate-spin" : ""}`} />{pending ? "Consultando…" : "Conferir agora"}</button><Feedback state={state} /></form>;
 }
 
 export function LegalTextCaptureButton({
@@ -38,7 +38,7 @@ export function LegalTextCaptureButton({
       <input type="hidden" name="slug" value={slug} />
       <button
         disabled={pending || !enabled}
-        className="inline-flex min-h-9 items-center gap-2 rounded-lg border border-els-green/20 bg-els-green/8 px-3 text-xs font-bold text-els-green-ink disabled:opacity-40"
+        className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-els-green/20 bg-els-green/8 px-3 text-xs font-bold text-els-green-ink disabled:opacity-40"
       >
         <RefreshCcw className={`size-3.5 ${pending ? "animate-spin" : ""}`} />
         {pending ? "Capturando artigos…" : "Capturar texto consolidado"}
@@ -55,13 +55,13 @@ export function LegalTextCaptureButton({
 
 export function PortalVerifyButton({ portalId }: { portalId: number }) {
   const [state, action, pending] = useActionState(verifyExamPortalAction, initialState);
-  return <form action={action} className="mt-3"><input type="hidden" name="portalId" value={portalId} /><button disabled={pending} className="inline-flex min-h-9 items-center gap-2 rounded-lg border border-els-info/20 bg-els-info/8 px-3 text-xs font-bold text-els-fg disabled:opacity-50"><RefreshCcw className={`size-3.5 ${pending ? "animate-spin" : ""}`} />{pending ? "Verificando…" : "Verificar portal"}</button><Feedback state={state} /></form>;
+  return <form action={action} className="mt-3"><input type="hidden" name="portalId" value={portalId} /><button disabled={pending} className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-els-info/20 bg-els-info/8 px-3 text-xs font-bold text-els-fg disabled:opacity-50"><RefreshCcw className={`size-3.5 ${pending ? "animate-spin" : ""}`} />{pending ? "Verificando…" : "Verificar portal"}</button><Feedback state={state} /></form>;
 }
 
 export function SnapshotReviewControls({ publicId }: { publicId: string }) {
   const [state, action, pending] = useActionState(reviewLegalSnapshotAction, initialState);
   return (
-    <form action={action} className="mt-4 rounded-xl border border-els-line bg-black/15 p-3">
+    <form action={action} className="mt-4 rounded-xl border border-els-line bg-els-sink p-3">
       <input type="hidden" name="publicId" value={publicId} />
       <label className="text-[11px] font-semibold text-els-fg-3">
         Nota da revisão humana
@@ -80,7 +80,7 @@ export function SnapshotReviewControls({ publicId }: { publicId: string }) {
           name="decision"
           value="approve"
           disabled={pending}
-          className="inline-flex min-h-9 items-center gap-2 rounded-lg bg-els-green px-3 text-xs font-extrabold text-els-on-amber disabled:opacity-50"
+          className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-els-green px-3 text-xs font-extrabold text-els-on-amber disabled:opacity-50"
         >
           <Check className="size-3.5" />
           Aprovar referência
@@ -89,7 +89,7 @@ export function SnapshotReviewControls({ publicId }: { publicId: string }) {
           name="decision"
           value="reject"
           disabled={pending}
-          className="inline-flex min-h-9 items-center gap-2 rounded-lg border border-els-danger/20 bg-els-danger/8 px-3 text-xs font-bold text-els-fg disabled:opacity-50"
+          className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-els-danger/20 bg-els-danger/8 px-3 text-xs font-bold text-els-fg disabled:opacity-50"
         >
           <RotateCcw className="size-3.5" />
           Rejeitar
@@ -121,7 +121,7 @@ export function LegalTextReviewControls({ publicId }: { publicId: string }) {
           name="decision"
           value="approve"
           disabled={pending}
-          className="inline-flex min-h-9 items-center gap-2 rounded-lg bg-els-green px-3 text-xs font-extrabold text-els-on-amber disabled:opacity-50"
+          className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-els-green px-3 text-xs font-extrabold text-els-on-amber disabled:opacity-50"
         >
           <Check className="size-3.5" />
           Aprovar versão e artigos
@@ -130,7 +130,7 @@ export function LegalTextReviewControls({ publicId }: { publicId: string }) {
           name="decision"
           value="reject"
           disabled={pending}
-          className="inline-flex min-h-9 items-center gap-2 rounded-lg border border-els-danger/20 bg-els-danger/8 px-3 text-xs font-bold text-els-fg disabled:opacity-50"
+          className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-els-danger/20 bg-els-danger/8 px-3 text-xs font-bold text-els-fg disabled:opacity-50"
         >
           <RotateCcw className="size-3.5" />
           Rejeitar
@@ -155,9 +155,9 @@ export function ExamMetadataForm({
   const [careerTrackId, setCareerTrackId] = useState("");
   const [specializationId, setSpecializationId] = useState("");
   const selectedCareer = careers.find((career) => String(career.id) === careerTrackId);
-  const field = "min-h-11 w-full rounded-xl border border-els-line bg-els-bg px-3 text-sm text-els-fg-2 outline-none focus:border-els-amber/40";
+  const field = "min-h-11 w-full min-w-0 max-w-full rounded-xl border border-els-line bg-els-bg px-3 text-sm text-els-fg-2 outline-none focus:border-els-amber/40";
   return (
-    <form action={action} className="mt-5 grid gap-4 sm:grid-cols-2">
+    <form action={action} className="mt-5 grid gap-4 sm:grid-cols-2 [&>*]:min-w-0">
       <label className="text-xs font-semibold text-els-fg-3">
         Banca
         <select name="bankId" required className={`${field} mt-2`}>

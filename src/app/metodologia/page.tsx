@@ -143,6 +143,7 @@ export default function MethodologyPage() {
           </div>
         </header>
 
+        <div data-theme="light" className="border-t border-els-line">
         <div className="mx-auto max-w-6xl space-y-20 px-5 py-16 sm:py-20">
           <section aria-labelledby="fluxo-title">
             <div className="max-w-3xl">
@@ -229,7 +230,7 @@ export default function MethodologyPage() {
               <p className="mt-5 text-sm leading-7 text-els-fg-2">
                 Os serviços e dados abertos da LexML podem ajudar a localizar registros, identificadores e relações entre atos. Essa integração funciona como apoio à descoberta e ao versionamento; a publicação jurídica continua vinculada à fonte oficial competente e à aprovação editorial identificada.
               </p>
-              <a className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-els-info-ink hover:text-els-info-ink" href="https://projeto.lexml.gov.br/open-data" rel="noreferrer">
+              <a className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-els-info-ink hover:text-els-info-ink min-h-11" href="https://projeto.lexml.gov.br/open-data" rel="noreferrer">
                 Conhecer os dados abertos da LexML
                 <ExternalLink aria-hidden="true" className="size-4" />
               </a>
@@ -274,6 +275,7 @@ export default function MethodologyPage() {
               </Link>
             </div>
           </section>
+        </div>
         </div>
       </article>
     </PublicGuideShell>

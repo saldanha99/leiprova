@@ -244,7 +244,7 @@ export function QuizBuilder({
                   <strong className="mt-4 block text-sm text-els-fg">{mode.name}</strong>
                   <span className="mt-1.5 block text-xs leading-5 text-els-fg-3">{mode.description}</span>
                   {mode.slug === "previous_exam" && (
-                    <span className="mt-3 block rounded-lg border border-els-info/10 bg-els-info/5 px-2.5 py-2 text-[11px] leading-4 text-els-info-ink/70">Somente provas com uso autorizado e revisão editorial.</span>
+                    <span className="mt-3 block rounded-lg border border-els-info/10 bg-els-info/5 px-2.5 py-2 text-[11px] leading-4 text-els-info-ink">Somente provas com uso autorizado e revisão editorial.</span>
                   )}
                   {mode.slug === "original_style" && (
                     <span className="mt-3 block text-[11px] font-semibold text-els-green-ink">Conteúdo original, sem reprodução da banca</span>
@@ -552,7 +552,7 @@ function QuizSummary({
           value={`${config.count} itens · ${config.timed ? (config.mode === "previous_exam" ? "cronômetro da edição/recorte" : `${formatDuration(config.count * 90)} cronometrados`) : "tempo livre"}`}
         />
       </dl>
-      <div className="mt-5 rounded-xl border border-els-line bg-black/15 p-3 text-[11px] leading-5 text-els-fg-3">
+      <div className="mt-5 rounded-xl border border-els-line bg-els-sink p-3 text-[11px] leading-5 text-els-fg-3">
         <p className="flex items-start gap-2"><Banknote className="mt-0.5 size-3.5 shrink-0 text-els-fg-4" />Questões anteriores aparecem apenas quando houver licença e revisão editorial para o recorte.</p>
       </div>
       {error && <p role="alert" className="mt-4 rounded-xl border border-els-danger/15 bg-els-danger/6 p-3 text-xs leading-5 text-els-danger-ink">{error}</p>}
@@ -605,7 +605,7 @@ function TimingOption({ icon: Icon, label, helper, selected, onClick }: { icon: 
 
 function CatalogNotice({ message }: { message: string }) {
   return (
-    <div className="mt-5 flex items-start gap-3 rounded-2xl border border-els-info/12 bg-els-info/5 p-4 text-xs leading-5 text-els-fg/70">
+    <div className="mt-5 flex items-start gap-3 rounded-2xl border border-els-info/12 bg-els-info/5 p-4 text-xs leading-5 text-els-fg">
       <ShieldCheck className="mt-0.5 size-4 shrink-0 text-els-info-ink" />
       <p>{message}</p>
     </div>

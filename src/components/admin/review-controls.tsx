@@ -31,7 +31,7 @@ export function ReviewControls({
   );
 
   return (
-    <form action={formAction} className="mt-4 rounded-xl border border-els-line bg-black/15 p-3">
+    <form action={formAction} className="mt-4 rounded-xl border border-els-line bg-els-sink p-3">
       <input type="hidden" name="publicId" value={publicId} />
       <input type="hidden" name="dossierFingerprint" value={dossierFingerprint} />
       <label htmlFor={`notes-${publicId}`} className="text-xs font-semibold text-els-fg-3">

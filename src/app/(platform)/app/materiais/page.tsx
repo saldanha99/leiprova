@@ -151,7 +151,7 @@ export default async function MaterialsPage() {
                     </span>
                     <Link
                       href={`/app/materiais/cadernos/${notebook.publicId}`}
-                      className="inline-flex min-h-9 items-center gap-2 rounded-lg bg-els-info px-3 text-xs font-bold text-els-on-amber"
+                      className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-els-info px-3 text-xs font-bold text-els-on-amber"
                     >
                       Abrir <ArrowRight className="size-3.5" />
                     </Link>
@@ -236,7 +236,7 @@ export default async function MaterialsPage() {
                 </p>
                 <Link
                   href={`/app/treinar?tema=${encodeURIComponent(error.topic)}`}
-                  className="mt-4 inline-flex items-center gap-2 text-xs font-semibold text-els-amber-ink"
+                  className="mt-4 inline-flex items-center gap-2 text-xs font-semibold text-els-amber-ink min-h-11"
                 >
                   Revisar este tema <ArrowRight className="size-3.5" />
                 </Link>

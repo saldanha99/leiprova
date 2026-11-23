@@ -140,7 +140,7 @@ export function AuthoringForm({ profiles, articles, subjects, topics }: Authorin
           ))}
         </select>
         {article ? (
-          <div className="mt-3 rounded-2xl border border-els-line bg-black/15 p-4">
+          <div className="mt-3 rounded-2xl border border-els-line bg-els-sink p-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <span className="inline-flex items-center gap-2 text-xs font-semibold text-els-green-ink">
                 <FileText aria-hidden="true" className="size-3.5" />
@@ -150,7 +150,7 @@ export function AuthoringForm({ profiles, articles, subjects, topics }: Authorin
                 href={article.sourceUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-els-amber-ink hover:text-els-amber-ink"
+                className="inline-flex min-h-11 items-center gap-1.5 text-xs font-bold text-els-amber-ink hover:text-els-amber-ink"
               >
                 Abrir fonte
                 <ExternalLink aria-hidden="true" className="size-3.5" />

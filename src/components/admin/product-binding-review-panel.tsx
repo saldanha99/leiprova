@@ -28,7 +28,7 @@ export function BindingDecisionPreview({ state, pending, action }: { state: Bind
     <ul className="space-y-2">{dossier.links.map((link) => <li key={link.label}><a href={link.url} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center break-all text-sm text-els-green-ink underline">{link.label} ↗</a></li>)}</ul>
     {dossier.blockers.length > 0 && <div className="rounded-xl border border-els-amber/25 bg-els-amber-2/5 p-4">
       <h3 className="font-semibold text-els-amber-ink">Bloqueios de aprovação</h3>
-      <ul className="mt-3 list-disc space-y-2 pl-5 text-sm leading-6 text-els-amber-ink/90">{dossier.blockers.map((message) => <li key={message}>{message}</li>)}</ul>
+      <ul className="mt-3 list-disc space-y-2 pl-5 text-sm leading-6 text-els-amber-ink">{dossier.blockers.map((message) => <li key={message}>{message}</li>)}</ul>
       <p className="mt-3 text-xs leading-6 text-els-fg-2">Rejeitar a proposta não aprova estes requisitos e não invalida a questão globalmente.</p>
     </div>}
     <form action={action} className="space-y-4 rounded-xl border border-els-line-strong p-5">

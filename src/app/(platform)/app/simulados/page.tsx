@@ -83,7 +83,7 @@ export default async function SimulationsPage() {
             <p className="text-xs font-bold uppercase tracking-[.15em] text-els-green-ink">Por edição oficial</p>
             <h2 className="mt-2 text-2xl font-semibold tracking-[-.03em]">Simulados alinhados ao edital</h2>
           </div>
-          <Link href="/app/quiz" className="inline-flex items-center gap-2 text-sm font-semibold text-els-amber-ink">Montar outro recorte <ArrowRight className="size-4" /></Link>
+          <Link href="/app/quiz" className="inline-flex items-center gap-2 text-sm font-semibold text-els-amber-ink min-h-11">Montar outro recorte <ArrowRight className="size-4" /></Link>
         </div>
         {editionRounds.length ? (
           <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -94,7 +94,7 @@ export default async function SimulationsPage() {
                 <p className="mt-2 text-xs leading-5 text-els-fg-3">{round.description}</p>
                 <div className="mt-auto flex items-center justify-between gap-3 pt-5">
                   <span className="text-[11px] text-els-fg-4">{round.meta}</span>
-                  <Link href={round.href} className="inline-flex min-h-9 items-center gap-2 rounded-lg bg-els-amber px-3 text-xs font-bold text-els-on-amber">Preparar <ArrowRight className="size-3.5" /></Link>
+                  <Link href={round.href} className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-els-amber px-3 text-xs font-bold text-els-on-amber">Preparar <ArrowRight className="size-3.5" /></Link>
                 </div>
               </article>
             ))}

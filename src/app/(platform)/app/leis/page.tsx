@@ -27,8 +27,8 @@ export default async function LawsPage() {
               </div>
             </div>
             <div className="flex flex-wrap gap-2">
-              <a href={act.officialUrl} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-2 rounded-xl border border-els-line px-4 py-2.5 text-xs font-semibold text-els-fg-2 transition hover:border-els-green/20 hover:text-els-fg">Fonte oficial <ExternalLink className="size-3.5" /></a>
-              <Link href={`/app/leis/${act.slug}`} className="inline-flex items-center justify-center gap-2 rounded-xl bg-els-amber px-4 py-2.5 text-xs font-bold text-els-on-amber transition hover:bg-els-amber">Estudar por artigo <ArrowRight className="size-3.5" /></Link>
+              <a href={act.officialUrl} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-2 rounded-xl border border-els-line px-4 py-2.5 text-xs font-semibold text-els-fg-2 transition hover:border-els-green/20 hover:text-els-fg min-h-11">Fonte oficial <ExternalLink className="size-3.5" /></a>
+              <Link href={`/app/leis/${act.slug}`} className="inline-flex items-center justify-center gap-2 rounded-xl bg-els-amber px-4 py-2.5 text-xs font-bold text-els-on-amber transition hover:bg-els-amber min-h-11">Estudar por artigo <ArrowRight className="size-3.5" /></Link>
             </div>
           </article>
         )) : (

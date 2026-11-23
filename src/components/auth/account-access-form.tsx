@@ -73,7 +73,7 @@ export function RequestAccountAccessForm({ action }: { action: AccessAction }) {
             Se existir uma conta com esse endereço, enviaremos um link pessoal com validade de 24 horas.
           </p>
         </div>
-        <Link href="/entrar" className="text-center text-sm font-semibold text-els-amber-ink transition hover:text-els-amber-ink">
+        <Link href="/entrar" className="text-center text-sm font-semibold text-els-amber-ink transition hover:text-els-amber-ink min-h-11 inline-flex items-center">
           Voltar para entrar
         </Link>
       </div>

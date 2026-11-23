@@ -34,7 +34,7 @@ export default async function RegisterPage({
           <Link href="/demo" className="inline-flex min-h-12 items-center justify-center rounded-xl bg-els-amber px-5 text-sm font-bold text-els-on-amber">
             Fazer a demonstração
           </Link>
-          <Link href="/entrar" className="text-sm font-semibold text-els-fg-3 hover:text-els-fg">
+          <Link href="/entrar" className="text-sm font-semibold text-els-fg-3 hover:text-els-fg min-h-11 inline-flex items-center">
             Já fui convidado para a beta
           </Link>
         </div>

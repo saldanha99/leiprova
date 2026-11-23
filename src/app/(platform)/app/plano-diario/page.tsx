@@ -31,7 +31,7 @@ export default async function DailyPlanPage() {
           <section className="mt-8 overflow-hidden rounded-[1.75rem] border border-els-amber/15 bg-[radial-gradient(circle_at_top_right,color-mix(in_oklch,var(--els-amber)_10%,transparent),transparent_40%),var(--els-bg-2)] p-6 sm:p-8">
             <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
               <div><p className="text-xs font-bold uppercase tracking-[.15em] text-els-amber-ink">{new Intl.DateTimeFormat("pt-BR", { dateStyle: "full", timeZone: "America/Sao_Paulo" }).format(new Date(`${plan.dateIso}T12:00:00-03:00`))}</p><h2 className="mt-2 text-3xl font-semibold tracking-[-.04em]">{plan.target.title}</h2><p className="mt-2 text-sm text-els-fg-3">{plan.target.articles[0].articleRef} a {plan.target.articles.at(-1)?.articleRef} · {plan.target.questionCount} questões no recorte</p></div>
-              <a href={plan.target.officialUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 text-xs font-semibold text-els-green-ink">Fonte oficial <ExternalLink className="size-3.5" /></a>
+              <a href={plan.target.officialUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 text-xs font-semibold text-els-green-ink min-h-11">Fonte oficial <ExternalLink className="size-3.5" /></a>
             </div>
             <div className="mt-6 flex items-center gap-3"><div className="h-2 flex-1 overflow-hidden rounded-full bg-els-raise"><div className="h-full rounded-full bg-gradient-to-r from-els-amber to-els-green" style={{ width: `${Math.round((plan.completedCount / 3) * 100)}%` }} /></div><strong className="text-sm">{plan.completedCount}/3</strong></div>
           </section>

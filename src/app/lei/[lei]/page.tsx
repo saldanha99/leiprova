@@ -110,7 +110,7 @@ export default async function LawPageRoute({ params }: { params: Params }) {
             <dd className="text-els-fg-2">Vigente (versão verificada em {brDate(law.versionVerifiedAt)})</dd>
             <dt className="font-bold text-els-fg-3">Texto oficial</dt>
             <dd>
-              <a className="font-semibold text-els-amber-ink hover:underline" href={law.officialUrl} rel="noopener">
+              <a className="inline-flex min-h-11 items-center font-semibold text-els-amber-ink hover:underline" href={law.officialUrl} rel="noopener">
                 {sourceLabel(law.officialUrl)}
               </a>
             </dd>

@@ -127,7 +127,7 @@ export function NewConnectPartnerButton({ enabled }: { enabled: boolean }) {
       </button>
 
       {open && (
-        <div className="mt-4 rounded-2xl border border-els-line bg-black/15 p-4 sm:p-5">
+        <div className="mt-4 rounded-2xl border border-els-line bg-els-sink p-4 sm:p-5">
           {request.result ? (
             <OnboardingLink result={request.result} />
           ) : (
@@ -180,7 +180,7 @@ export function ConnectPartnerOnboardingButton({
         <OnboardingLink result={request.result} />
       ) : (
         <>
-          <button type="button" disabled={!enabled || request.loading} onClick={createLink} className="inline-flex min-h-9 items-center justify-center gap-2 rounded-lg border border-els-line px-3 text-[11px] font-bold text-els-fg-2 enabled:hover:bg-els-raise-hover disabled:text-els-fg-4">
+          <button type="button" disabled={!enabled || request.loading} onClick={createLink} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-els-line px-3 text-[11px] font-bold text-els-fg-2 enabled:hover:bg-els-raise-hover disabled:text-els-fg-4">
             {request.loading && <LoaderCircle aria-hidden="true" className="size-3.5 animate-spin" />}
             Gerar formulário
           </button>

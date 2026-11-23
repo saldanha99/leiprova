@@ -94,7 +94,7 @@ export default async function ReviewMapsPage({ searchParams }: { searchParams: S
         </form>
         <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-els-line pt-5 print:mt-0 print:border-slate-200 print:pt-0">
           <div><p className="text-xs font-bold uppercase tracking-[.15em] text-els-amber-ink print:text-amber-700">{act.shortTitle}</p><h2 className="mt-1 text-2xl font-semibold">{selectedArticles[0]?.articleRef} a {selectedArticles.at(-1)?.articleRef}</h2></div>
-          <a href={act.officialUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 text-xs font-semibold text-els-green-ink print:text-emerald-700">Fonte oficial <ExternalLink className="size-3.5" /></a>
+          <a href={act.officialUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 text-xs font-semibold text-els-green-ink print:text-emerald-700 min-h-11">Fonte oficial <ExternalLink className="size-3.5" /></a>
         </div>
       </section>
 
@@ -111,7 +111,7 @@ export default async function ReviewMapsPage({ searchParams }: { searchParams: S
               <span className="rounded-lg bg-els-raise p-2 text-els-fg-3 print:bg-slate-50"><Target className="mb-1 size-3.5 text-els-green-ink print:text-emerald-700" />Treino: {article.attemptCount}</span>
               <span className="rounded-lg bg-els-raise p-2 text-els-fg-3 print:bg-slate-50"><Gauge className="mb-1 size-3.5 text-els-info-ink print:text-sky-700" />Precisão: {article.accuracy === null ? "—" : `${article.accuracy}%`}</span>
             </div>
-            <details className="group mt-4 print:block"><summary className="cursor-pointer text-xs font-semibold text-els-green-ink print:hidden">Ver texto completo</summary><p className="mt-2 hidden text-xs leading-5 text-els-fg-4 group-open:block print:block print:text-slate-700"><HighlightedLegalText text={article.literalText} theme={highlightTheme} /></p></details>
+            <details className="group mt-4 print:block"><summary className="cursor-pointer text-xs font-semibold text-els-green-ink print:hidden min-h-11 inline-flex items-center">Ver texto completo</summary><p className="mt-2 hidden text-xs leading-5 text-els-fg-4 group-open:block print:block print:text-slate-700"><HighlightedLegalText text={article.literalText} theme={highlightTheme} /></p></details>
           </article>
         ))}
       </section>

@@ -173,7 +173,7 @@ export default async function PreviousExamsAdminPage() {
       label: "Documentos com licença",
       value: snapshot.metrics.licensedDocumentsApproved,
       icon: ShieldCheck,
-      tone: "text-violet-300 bg-violet-300/10",
+      tone: "text-els-info-ink bg-els-info/10",
     },
     {
       label: "Vínculos pendentes",
@@ -233,10 +233,10 @@ export default async function PreviousExamsAdminPage() {
         ))}
       </section>
 
-      <section className="mt-5 rounded-2xl border border-violet-300/15 bg-els-surface p-5 sm:p-6">
+      <section className="mt-5 rounded-2xl border border-els-info/15 bg-els-surface p-5 sm:p-6">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <p className="text-xs font-extrabold uppercase tracking-[.17em] text-violet-300">
+            <p className="text-xs font-extrabold uppercase tracking-[.17em] text-els-info-ink">
               Licenciamento automatizado
             </p>
             <h2 className="mt-2 text-2xl font-semibold text-els-fg">
@@ -256,8 +256,8 @@ export default async function PreviousExamsAdminPage() {
         {snapshot.licenseRequests.length ? (
           <div className="mt-5 grid gap-3 lg:grid-cols-2">
             {snapshot.licenseRequests.map((request) => (
-              <article key={request.publicId} className="rounded-xl border border-els-line bg-black/10 p-4">
-                <p className="font-semibold text-violet-100">{request.editionTitle}</p>
+              <article key={request.publicId} className="rounded-xl border border-els-line bg-els-sink p-4">
+                <p className="font-semibold text-els-info-ink">{request.editionTitle}</p>
                 <p className="mt-1 text-xs text-els-fg-3">{request.bankName} · {request.editionPublicId}</p>
                 <dl className="mt-3 grid gap-2 text-xs text-els-fg-2 sm:grid-cols-2">
                   <div><dt className="text-els-fg-3">Situação</dt><dd>{licenseStatusLabel[request.status] ?? request.status}</dd></div>
@@ -302,7 +302,7 @@ export default async function PreviousExamsAdminPage() {
             nova, cadastre primeiro seus metadados em{" "}
             <Link
               href="/admin/fontes-oficiais"
-              className="font-bold text-els-info-ink"
+              className="font-bold text-els-info-ink min-h-11 inline-flex items-center"
             >
               Fontes oficiais
             </Link>
@@ -331,8 +331,8 @@ export default async function PreviousExamsAdminPage() {
         </article>
       </section>
 
-      <section className="mt-5 rounded-[1.5rem] border border-violet-300/15 bg-els-surface p-5 sm:p-6">
-        <span className="text-xs font-bold uppercase tracking-[.14em] text-violet-300">
+      <section className="mt-5 rounded-[1.5rem] border border-els-info/15 bg-els-surface p-5 sm:p-6">
+        <span className="text-xs font-bold uppercase tracking-[.14em] text-els-info-ink">
           3 · Entrada licenciada
         </span>
         <h2 className="mt-2 text-xl font-semibold text-els-fg">
@@ -368,7 +368,7 @@ export default async function PreviousExamsAdminPage() {
             return (
               <article
                 key={batch.batchPublicId}
-                className="rounded-2xl border border-els-line bg-black/10 p-4"
+                className="rounded-2xl border border-els-line bg-els-sink p-4"
               >
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
@@ -384,7 +384,7 @@ export default async function PreviousExamsAdminPage() {
                     href={batch.licenseEvidenceUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center gap-1.5 text-xs font-bold text-violet-300"
+                    className="inline-flex items-center gap-1.5 text-xs font-bold text-els-info-ink"
                   >
                     Evidência da licença <ExternalLink className="size-3.5" />
                   </a>
@@ -392,7 +392,7 @@ export default async function PreviousExamsAdminPage() {
                     href={batch.answerKeyLicenseEvidenceUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center gap-1.5 text-xs font-bold text-violet-300"
+                    className="inline-flex items-center gap-1.5 text-xs font-bold text-els-info-ink"
                   >
                     Evidência do gabarito <ExternalLink className="size-3.5" />
                   </a>
@@ -434,7 +434,7 @@ export default async function PreviousExamsAdminPage() {
             .map((document) => (
               <article
                 key={document.publicId}
-                className="rounded-2xl border border-els-line bg-black/10 p-4"
+                className="rounded-2xl border border-els-line bg-els-sink p-4"
               >
                 <strong className="text-sm text-els-fg">{document.title}</strong>
                 <p className="mt-1 text-xs text-els-fg-3">
@@ -451,7 +451,7 @@ export default async function PreviousExamsAdminPage() {
             .map((reference) => (
               <article
                 key={reference.publicId}
-                className="rounded-2xl border border-els-line bg-black/10 p-4"
+                className="rounded-2xl border border-els-line bg-els-sink p-4"
               >
                 <strong className="text-sm text-els-fg">
                   {productName(reference.productSlug)}
@@ -466,7 +466,7 @@ export default async function PreviousExamsAdminPage() {
             ))}
         </div>
 
-        <div className="mt-5 rounded-2xl border border-els-line bg-black/10 p-4">
+        <div className="mt-5 rounded-2xl border border-els-line bg-els-sink p-4">
           <h3 className="text-sm font-semibold text-els-fg">
             Suspender uma questão real específica
           </h3>
@@ -496,7 +496,7 @@ export default async function PreviousExamsAdminPage() {
               return (
                 <article
                   key={document.publicId}
-                  className="rounded-2xl border border-els-line bg-black/10 p-4"
+                  className="rounded-2xl border border-els-line bg-els-sink p-4"
                 >
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>
@@ -567,7 +567,7 @@ export default async function PreviousExamsAdminPage() {
               return (
                 <article
                   key={reference.publicId}
-                  className="rounded-2xl border border-els-line bg-black/10 p-4"
+                  className="rounded-2xl border border-els-line bg-els-sink p-4"
                 >
                   <strong className="text-sm text-els-fg">
                     {productName(reference.productSlug)}
@@ -588,7 +588,7 @@ export default async function PreviousExamsAdminPage() {
                     href={reference.answerKeyDocumentUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="ml-3 mt-2 inline-flex items-center gap-1.5 text-xs font-bold text-violet-300"
+                    className="ml-3 mt-2 inline-flex items-center gap-1.5 text-xs font-bold text-els-info-ink"
                   >
                     {reference.answerKeyDocumentTitle}{" "}
                     <ExternalLink className="size-3.5" />

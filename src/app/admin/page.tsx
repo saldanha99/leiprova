@@ -94,7 +94,7 @@ const metricTones = {
   amber: "bg-els-amber/10 text-els-amber-ink",
   emerald: "bg-els-green/10 text-els-green-ink",
   sky: "bg-els-info/10 text-els-info-ink",
-  violet: "bg-violet-300/10 text-violet-300",
+  violet: "bg-els-info/10 text-els-info-ink",
 } as const;
 
 function MetricCard({ label, value, detail, icon: Icon, tone }: MetricCardProps) {

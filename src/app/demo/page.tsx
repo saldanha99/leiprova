@@ -98,7 +98,7 @@ export default function DemoPage() {
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-4">
           <LeiProvaMark href="/" />
           <div className="flex items-center gap-4 text-sm font-semibold">
-            <Link className="text-els-fg-3 hover:text-els-fg" href={LOGIN_HREF}>
+            <Link className="inline-flex min-h-11 items-center text-els-fg-3 hover:text-els-fg" href={LOGIN_HREF}>
               Entrar
             </Link>
             <Link
@@ -125,10 +125,10 @@ export default function DemoPage() {
                 : "Abaixo está a mecânica do treino, passo a passo. As questões desta demonstração ainda estão em revisão humana, então nenhuma delas é exibida aqui como material de estudo."}
             </p>
             <div className="mt-6 flex flex-wrap gap-4 text-sm font-semibold">
-              <Link className="text-els-amber-ink underline decoration-els-amber-ink/30 underline-offset-4 hover:text-els-amber-ink" href="/como-memorizar-lei-seca">
+              <Link className="text-els-amber-ink underline decoration-els-amber-ink/30 underline-offset-4 hover:text-els-amber-ink min-h-11 inline-flex items-center" href="/como-memorizar-lei-seca">
                 Entender o método
               </Link>
-              <Link className="text-els-amber-ink underline decoration-els-amber-ink/30 underline-offset-4 hover:text-els-amber-ink" href="/fontes-e-atualizacao">
+              <Link className="text-els-amber-ink underline decoration-els-amber-ink/30 underline-offset-4 hover:text-els-amber-ink min-h-11 inline-flex items-center" href="/fontes-e-atualizacao">
                 Ver fontes e atualização
               </Link>
             </div>
@@ -184,7 +184,7 @@ export default function DemoPage() {
                 </div>
               </dl>
               <Link
-                className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-els-amber-ink hover:text-els-amber-ink"
+                className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-els-amber-ink hover:text-els-amber-ink min-h-11"
                 href="/fontes-e-atualizacao"
               >
                 Como revisamos e publicamos

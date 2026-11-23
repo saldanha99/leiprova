@@ -41,14 +41,14 @@ export function SavedFilterForm({
   return (
     <form ref={formRef} action={action} className="grid gap-4" aria-label="Salvar filtro de artigos">
       <input name="legalActSlug" type="hidden" value={legalActSlug} />
-      <label className="grid gap-2 text-xs font-semibold text-els-fg-2">
+      <label className="grid min-w-0 gap-2 text-xs font-semibold text-els-fg-2">
         Nome do filtro
         <input
           name="name"
           required
           maxLength={80}
           placeholder="Ex.: CF — direitos fundamentais"
-          className="min-h-11 rounded-xl border border-els-line bg-els-bg/45 px-3 text-sm text-els-fg outline-none placeholder:text-els-fg-4 focus:border-els-amber/50 focus:ring-4 focus:ring-els-amber/5"
+          className="min-h-11 w-full min-w-0 max-w-full rounded-xl border border-els-line bg-els-bg/45 px-3 text-sm text-els-fg outline-none placeholder:text-els-fg-4 focus:border-els-amber/50 focus:ring-4 focus:ring-els-amber/5"
         />
       </label>
       <div className="grid grid-cols-2 gap-3">
@@ -84,12 +84,12 @@ function ArticleSelect({
   defaultValue: number;
 }) {
   return (
-    <label className="grid gap-2 text-xs font-semibold text-els-fg-2">
+    <label className="grid min-w-0 gap-2 text-xs font-semibold text-els-fg-2">
       {label}
       <select
         name={name}
         defaultValue={defaultValue}
-        className="min-h-11 rounded-xl border border-els-line bg-els-bg/45 px-3 text-sm text-els-fg outline-none focus:border-els-amber/50 focus:ring-4 focus:ring-els-amber/5"
+        className="min-h-11 w-full min-w-0 max-w-full rounded-xl border border-els-line bg-els-bg/45 px-3 text-sm text-els-fg outline-none focus:border-els-amber/50 focus:ring-4 focus:ring-els-amber/5"
       >
         {articles.map((article) => (
           <option key={article.articleOrder} value={article.articleOrder}>
@@ -111,23 +111,23 @@ export function NotebookCreateForm() {
 
   return (
     <form ref={formRef} action={action} className="grid gap-3">
-      <label className="grid gap-2 text-xs font-semibold text-els-fg-2">
+      <label className="grid min-w-0 gap-2 text-xs font-semibold text-els-fg-2">
         Nome do caderno
         <input
           name="name"
           required
           maxLength={80}
           placeholder="Ex.: Prazos que eu confundo"
-          className="min-h-11 rounded-xl border border-els-line bg-els-bg/45 px-3 text-sm text-els-fg outline-none placeholder:text-els-fg-4 focus:border-els-info/50 focus:ring-4 focus:ring-els-info/5"
+          className="min-h-11 w-full min-w-0 max-w-full rounded-xl border border-els-line bg-els-bg/45 px-3 text-sm text-els-fg outline-none placeholder:text-els-fg-4 focus:border-els-info/50 focus:ring-4 focus:ring-els-info/5"
         />
       </label>
-      <label className="grid gap-2 text-xs font-semibold text-els-fg-2">
+      <label className="grid min-w-0 gap-2 text-xs font-semibold text-els-fg-2">
         Descrição <span className="font-normal text-els-fg-4">opcional</span>
         <input
           name="description"
           maxLength={240}
           placeholder="O que você quer reforçar neste caderno?"
-          className="min-h-11 rounded-xl border border-els-line bg-els-bg/45 px-3 text-sm text-els-fg outline-none placeholder:text-els-fg-4 focus:border-els-info/50 focus:ring-4 focus:ring-els-info/5"
+          className="min-h-11 w-full min-w-0 max-w-full rounded-xl border border-els-line bg-els-bg/45 px-3 text-sm text-els-fg outline-none placeholder:text-els-fg-4 focus:border-els-info/50 focus:ring-4 focus:ring-els-info/5"
         />
       </label>
       {state.message && (
@@ -172,7 +172,7 @@ export function NotebookPicker({
         <select
           id={`notebook-${questionPublicId}`}
           name="notebookPublicId"
-          className="min-h-10 flex-1 rounded-lg border border-els-line bg-els-bg/55 px-3 text-xs text-els-fg outline-none focus:border-els-info/50"
+          className="min-h-11 min-w-0 flex-1 rounded-lg border border-els-line bg-els-bg/55 px-3 text-xs text-els-fg outline-none focus:border-els-info/50"
         >
           {notebooks.map((notebook) => (
             <option key={notebook.publicId} value={notebook.publicId}>

@@ -1369,3 +1369,10 @@ body:has(.els-ui) {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
   }
 }
+
+/* Laboratório: link da fonte com alvo de toque de 44 px */
+.els-ui .lab-feedback__source a {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+}

@@ -43,7 +43,7 @@ export default async function LawsHubPage() {
           <ul className="divide-y divide-els-line">
             {laws.map((law) => (
               <li className="flex items-baseline justify-between gap-4 py-3" key={law.path}>
-                <Link className="font-semibold text-els-amber-ink hover:underline" href={law.path}>
+                <Link className="inline-flex min-h-11 items-center font-semibold text-els-amber-ink hover:underline" href={law.path}>
                   {lawHeadline(law)}
                 </Link>
                 <span className="shrink-0 text-sm text-els-fg-3">{law.reviewedQuestionCount} questões</span>

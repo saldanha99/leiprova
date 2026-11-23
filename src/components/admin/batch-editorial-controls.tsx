@@ -65,7 +65,7 @@ export function BatchClaimControls({
           {claimableCount} {claimableCount === 1 ? "rascunho disponível" : "rascunhos disponíveis"}
         </h2>
 
-        <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-xl border border-els-line bg-black/20 p-3.5">
+        <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-xl border border-els-line bg-els-sink p-3.5">
           <input
             type="checkbox"
             name="cleanRoomAttestation"
@@ -123,7 +123,7 @@ export function BatchApprovalControls({ reviewableCount }: { reviewableCount: nu
           : "Nenhuma questão pendente de revisão no momento."}
       </p>
 
-      <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-xl border border-els-line bg-black/20 p-3.5">
+      <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-xl border border-els-line bg-els-sink p-3.5">
         <input
           type="checkbox"
           name="reviewAttestation"
@@ -147,7 +147,7 @@ export function BatchApprovalControls({ reviewableCount }: { reviewableCount: nu
           rows={2}
           maxLength={1500}
           disabled={reviewableCount <= 0}
-          className="mt-1.5 w-full rounded-xl border border-els-line bg-black/20 p-3 text-xs leading-5 text-els-fg-2 outline-none focus-visible:ring-2 focus-visible:ring-els-green/50"
+          className="mt-1.5 w-full rounded-xl border border-els-line bg-els-sink p-3 text-xs leading-5 text-els-fg-2 outline-none focus-visible:ring-2 focus-visible:ring-els-green/50"
         />
       </label>
 

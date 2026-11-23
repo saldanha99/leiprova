@@ -18,6 +18,7 @@
   --els-surface-2: oklch(0.24 0.034 258);
   --els-raise: oklch(1 0 0 / 0.045);
   --els-raise-hover: oklch(1 0 0 / 0.08);
+  --els-sink: oklch(0 0 0 / 0.16);
 
   /* Linhas */
   --els-line: oklch(0.78 0.04 258 / 0.13);
@@ -58,6 +59,7 @@
   --els-surface-2: oklch(0.972 0.006 258);
   --els-raise: oklch(0.24 0.04 258 / 0.04);
   --els-raise-hover: oklch(0.24 0.04 258 / 0.075);
+  --els-sink: oklch(0.24 0.04 258 / 0.035);
 
   --els-line: oklch(0.3 0.03 258 / 0.13);
   --els-line-strong: oklch(0.3 0.03 258 / 0.24);
@@ -76,9 +78,9 @@
   --els-green: oklch(0.62 0.12 168);
   --els-green-2: oklch(0.55 0.11 168);
   --els-green-ink: oklch(0.5 0.1 168);
-  --els-info: oklch(0.6 0.13 250);
+  --els-info: oklch(0.68 0.12 250);
   --els-info-ink: oklch(0.5 0.12 250);
-  --els-danger: oklch(0.6 0.19 25);
+  --els-danger: oklch(0.68 0.17 25);
   --els-danger-ink: oklch(0.52 0.17 25);
 
   --els-shadow: 0 1px 2px oklch(0.24 0.04 258 / 0.06), 0 14px 34px -22px oklch(0.24 0.04 258 / 0.3);
@@ -139,6 +141,7 @@
   --color-els-surface-2: var(--els-surface-2);
   --color-els-raise: var(--els-raise);
   --color-els-raise-hover: var(--els-raise-hover);
+  --color-els-sink: var(--els-sink);
   --color-els-line: var(--els-line);
   --color-els-line-strong: var(--els-line-strong);
   --color-els-fg: var(--els-fg);
