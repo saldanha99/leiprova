@@ -14,6 +14,7 @@ describe("carga de leis do registro oficial", () => {
     expect(parseLawLoadArgs(["--", "lei=lei-drogas-2006", "lei=lei-tortura-1997"])).toEqual({
       apply: false,
       captureOnly: false,
+      approveCamaraUpdated: false,
       slugs: ["lei-drogas-2006", "lei-tortura-1997"],
     });
     expect(parseLawLoadArgs(["--apply", "lei=lei-drogas-2006"]).apply).toBe(true);
@@ -39,7 +40,7 @@ describe("carga de leis do registro oficial", () => {
   });
 
   it("captura Planalto somente como pendente, sem ativar fontes pela exceção de questões", () => {
-    expect(parseLawLoadArgs(["--capture-only", "lei=lei-geral-protecao-dados-2018"])).toEqual({ apply: false, captureOnly: true, slugs: ["lei-geral-protecao-dados-2018"] });
+    expect(parseLawLoadArgs(["--capture-only", "lei=lei-geral-protecao-dados-2018"])).toEqual({ apply: false, captureOnly: true, approveCamaraUpdated: false, slugs: ["lei-geral-protecao-dados-2018"] });
     expect(script).toContain("getPlanaltoConsolidatedSource(source.monitorUrl) && !captureOnly");
     const pendingBranch = script.slice(script.indexOf("if (captureOnly) {"), script.indexOf("versionsActivated: 0") + 22);
     expect(pendingBranch).toContain('status: "pending_review"');

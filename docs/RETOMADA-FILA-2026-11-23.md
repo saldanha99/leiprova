@@ -101,3 +101,63 @@ combinadas com o Dev Wise Wolf (redesenho só no front, na `feat/redesenho-els`)
   (16), Escuta Protegida (29) e LONMP (82).
 - Testes: 4 falhas em `tests/fgv-historical-lote1.test.ts` são anteriores a esta rodada (o teste ainda espera o TJPE
   sem gabarito definitivo) e 29 em `cp-reconciliation-preview` dependem da captura privada do CP em `.local`.
+
+## Terceira rodada (noite de 23/11): "tudo autorizado, resolva tudo"
+
+Regra do Vinícius: autorização não é aprovação às cegas; o que não bater com a fonte oficial não é aprovado.
+
+- **5 leis aprovadas** (`2c8fdd3`, `--approve-camara-updated`): texto atualizado da Câmara recapturado na execução e
+  conferido por amostragem no Planalto (artigos e último artigo). Versões vigentes: Lei Geral do Esporte v150
+  (164 artigos, `dc6d053a…`), Henry Borel v151 (34, `680413d3…`), Software v152 (16, `890f1ce9…`), Escuta
+  Protegida v153 (29, `86000b1e…`), LONMP v154 (82, `41bb0cff…`). Backup `before-5-leis-camara-20261123.dump`.
+- **PGM-Manaus admitida** (`f101288`, `41776b8`, `dedab0f`): edital do DOM nº 6343 (02/07/2026, Edição Extra),
+  `8cb56a3c…`, baixado no navegador pelo Chefe de Gabinete (o WAF do DOM recusa o servidor). URL oficial
+  `https://dom.manaus.am.gov.br/pdf/2026/julho/DOM%206343%2002.07.2026%20Edicao%20Extra.pdf`. Oportunidade
+  `a48823c2-…`, 179 requisitos (auditoria 147515), 167 classificados (12 de Direito Municipal fora). Sem contrato
+  nem prova anterior: caderno e gabarito ficam no portal da FCC, cujo robots proíbe a consulta.
+- **Constituição Federal não aprovada.** A captura de texto do Senado (4040, `f5a8b069…`) difere da v65 só nos
+  arts. 7, 40, 198 e 201: EC 141/2026 (art. 7º, XIII: 40 horas semanais; § 1º, §§ 2º e 3º) e EC 140/2026 (arts.
+  40 § 5º-A, 198 IV/§§ 4º-A, 4º-B e 10, 201 § 8º-A). Esses 4 artigos têm 174 vínculos e 188 questões; 6 questões
+  falam em 44 horas. A CF inteira sustenta 6.182 vínculos, 6.136 questões e 28 produtos. O carregador só troca a
+  versão, e o filtro da loja exige versão corrente: aprovar agora tiraria todas essas questões das ofertas.
+- **legal_change**: das 16 leis, 10 têm o texto consolidado do Senado idêntico ao aprovado (só a página de
+  declarações mudou); não aprovadas, porque o texto oficial ainda não reflete as alterações declaradas. CTN (16
+  artigos alterados, 20 acrescidos; 130 vínculos e 153 questões nos alterados) e ECA (art. 4º; 9 vínculos) têm
+  texto novo e esperam o mesmo operador da CF. CP, LGPD e Lei 14.133 têm fonte própria e ficam fora.
+- **Próximo passo**: operador de transição de versão legal (religar os artigos sem mudança, reabrir só os vínculos
+  dos artigos alterados, ensaio em clone) para CF, CTN e ECA.
+- **TCE-MA**: ainda sem gabarito na Cebraspe em 23/11 à noite.
+
+## Operador de transição de versão de lei (noite de 23/11)
+
+`scripts/transition-legal-version.ts lei=<slug> text=<sha256> [retire=<ids>] [--rehearse | --apply fingerprint=<sha>]`
+(`src/lib/editorial/legal-version-transition.ts`, `e2e3f13`, `7ae41c8`). Recaptura o texto oficial fora da
+transação e exige o mesmo hash da captura pendente. Numa transação serializável aprova a captura, cria a versão nova
+e supera a antiga. Nos artigos sem mudança, religa no lugar vínculos e questões (o certificado depende só do vínculo
+e do conteúdo da questão; o `updated_at` da questão é preservado). Nos artigos alterados, suspende vínculos e
+certificados e devolve as questões ao estado de rascunho da fábrica, para a fila normal (aprovador da fábrica e nova
+proposta de vínculo); as questões em `retire` ficam suspensas. Requisitos revisados não são editados: o artigo novo
+entra em `opportunity_requirement_articles`. Antes do commit confere, por produto liberado, depois = antes − questões
+dos artigos alterados, e que nada ficou na versão superada.
+
+- **Ensaio em clone** (Postgres 17 isolado na VPS, restaurado de `before-deploy-3-20261123.dump`, sem app/Stripe/
+  workers; já removido): CF, CTN e ECA aplicados; por produto, perda só das questões dos artigos alterados; nenhum
+  produto abaixo de 68; o aprovador da fábrica reconheceu os rascunhos devolvidos (43 no TRF-5) e os aprovaria.
+  Recibos em `.local/editorial/cursos-pendentes-20261123/clone-ensaio/`. O clone recém-restaurado precisou de
+  `ANALYZE` (sem estatísticas a contagem estourou 300 s).
+- **Produção** (backup antes de cada uma):
+
+| Lei | Versão nova | Hash | Vínculos religados | Questões religadas | Vínculos suspensos | Questões à fila | Retiradas | Perda por produto | Auditoria |
+|---|---|---|---:|---:|---:|---:|---:|---:|---|
+| Constituição Federal | 156 | `f5a8b069…` | 6.527 | 6.944 | 177 | 184 | 4 | 161 em 14 produtos | 150123 |
+| CTN | 157 | `f77c252e…` | 368 | 390 | 153 | 153 | 0 | 60 em 5 produtos | 150159 |
+| ECA | 158 | `f53cd741…` | 491 | 543 | 9 | 9 | 0 | 9 em 5 produtos | 152716 |
+
+  Nenhum produto ficou abaixo de 68. Questões retiradas (art. 7º, XIII, 44 horas): 8814, 8912, 11122 e 11171.
+  As 11864 (inciso XIV) e 11888 (resposta sobre redução de jornada) seguem válidas e foram para a fila.
+  Uma hora depois, a fila normal já tinha reaprovado 324 das 346 devolvidas.
+- O ECA conflitou 3 vezes por serialização com a cadeia de liberação; foi aplicado com o motor pausado e as travas da
+  cadeia e da preparação seguras. Uma rodada da cadeia (16:46) falhou por serialização com estas transições e se
+  repete sozinha.
+- **Vigia semanal** (`deploy/legal-text-weekly-watch.sh`, `0e098ce`): rotina do OpenBot aos domingos às 04:30 (BRT).
+  Recaptura as 10 leis em que só a página de declarações mudou e aplica a transição quando o texto consolidado mudar.
