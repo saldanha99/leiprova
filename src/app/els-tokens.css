@@ -8,7 +8,9 @@
  * passam a ler daqui, então o CSS legado acompanha o mesmo sistema.
  */
 
-:root {
+:root,
+[data-theme="dark"] {
+  color-scheme: dark;
   /* Fundos: do mais profundo ao mais elevado */
   --els-bg: oklch(0.155 0.03 258);
   --els-bg-2: oklch(0.18 0.032 258);
@@ -21,32 +23,80 @@
   --els-line: oklch(0.78 0.04 258 / 0.13);
   --els-line-strong: oklch(0.78 0.04 258 / 0.24);
 
-  /* Texto (fg-3 e fg-4 calibrados para ≥ 4.5:1 sobre --els-surface) */
+  /* Texto (fg-3 e fg-4 ≥ 4.5:1 sobre todas as superfícies do tema) */
   --els-fg: oklch(0.975 0.006 258);
   --els-fg-2: oklch(0.87 0.02 258);
   --els-fg-3: oklch(0.74 0.028 258);
   --els-fg-4: oklch(0.66 0.03 258);
 
-  /* Marca */
+  /* Marca: preenchimento (fundo de botão/selo) e "ink" (texto e ícone) */
   --els-amber: oklch(0.84 0.15 78);
   --els-amber-2: oklch(0.9 0.11 85);
   --els-amber-strong: oklch(0.77 0.16 68);
   --els-on-amber: oklch(0.2 0.04 60);
+  --els-amber-ink: oklch(0.84 0.15 78);
   --els-green: oklch(0.8 0.14 168);
   --els-green-2: oklch(0.88 0.1 168);
+  --els-green-ink: oklch(0.8 0.14 168);
   --els-info: oklch(0.78 0.12 240);
+  --els-info-ink: oklch(0.78 0.12 240);
   --els-danger: oklch(0.72 0.17 22);
+  --els-danger-ink: oklch(0.72 0.17 22);
 
-  /* Forma */
+  --els-shadow: 0 1px 0 oklch(1 0 0 / 0.04) inset, 0 18px 44px -24px oklch(0 0 0 / 0.65);
+  --els-shadow-lg: 0 1px 0 oklch(1 0 0 / 0.05) inset, 0 34px 80px -36px oklch(0 0 0 / 0.8);
+  --els-focus: oklch(0.84 0.15 78 / 0.85);
+}
+
+/* Tema claro: mesma identidade, mesmos nomes de token. Vale para o app inteiro
+ * (data-theme no contêiner) ou para uma seção da página pública. */
+[data-theme="light"] {
+  color-scheme: light;
+  --els-bg: oklch(0.985 0.004 85);
+  --els-bg-2: oklch(0.962 0.007 85);
+  --els-surface: oklch(1 0 0);
+  --els-surface-2: oklch(0.972 0.006 258);
+  --els-raise: oklch(0.24 0.04 258 / 0.04);
+  --els-raise-hover: oklch(0.24 0.04 258 / 0.075);
+
+  --els-line: oklch(0.3 0.03 258 / 0.13);
+  --els-line-strong: oklch(0.3 0.03 258 / 0.24);
+
+  /* Calibrados: fg-4 ≥ 4.7:1 e inks ≥ 4.9:1 sobre bg, bg-2, surface e surface-2 */
+  --els-fg: oklch(0.24 0.04 258);
+  --els-fg-2: oklch(0.36 0.035 258);
+  --els-fg-3: oklch(0.47 0.03 258);
+  --els-fg-4: oklch(0.53 0.028 258);
+
+  --els-amber: oklch(0.82 0.155 76);
+  --els-amber-2: oklch(0.86 0.13 82);
+  --els-amber-strong: oklch(0.74 0.16 66);
+  --els-on-amber: oklch(0.2 0.04 60);
+  --els-amber-ink: oklch(0.53 0.12 62);
+  --els-green: oklch(0.62 0.12 168);
+  --els-green-2: oklch(0.55 0.11 168);
+  --els-green-ink: oklch(0.5 0.1 168);
+  --els-info: oklch(0.6 0.13 250);
+  --els-info-ink: oklch(0.5 0.12 250);
+  --els-danger: oklch(0.6 0.19 25);
+  --els-danger-ink: oklch(0.52 0.17 25);
+
+  --els-shadow: 0 1px 2px oklch(0.24 0.04 258 / 0.06), 0 14px 34px -22px oklch(0.24 0.04 258 / 0.3);
+  --els-shadow-lg: 0 1px 2px oklch(0.24 0.04 258 / 0.06), 0 28px 64px -34px oklch(0.24 0.04 258 / 0.38);
+  --els-focus: oklch(0.6 0.15 66 / 0.9);
+}
+
+:root {
   --els-radius-sm: 10px;
   --els-radius: 14px;
   --els-radius-lg: 20px;
   --els-radius-xl: 28px;
-  --els-shadow: 0 1px 0 oklch(1 0 0 / 0.04) inset, 0 18px 44px -24px oklch(0 0 0 / 0.65);
-  --els-shadow-lg: 0 1px 0 oklch(1 0 0 / 0.05) inset, 0 34px 80px -36px oklch(0 0 0 / 0.8);
-  --els-focus: oklch(0.84 0.15 78 / 0.85);
+}
 
-  /* Variáveis legadas (globals.css, laboratório, planos, cabeçalho) → tokens */
+/* Variáveis legadas → tokens. Redeclaradas em cada contêiner com tema para
+ * resolverem no tema certo (custom properties herdam o valor já calculado). */
+:root,
+[data-theme] {
   --background: var(--els-bg);
   --foreground: var(--els-fg);
   --navy-950: oklch(0.13 0.028 258);
@@ -63,16 +113,16 @@
   --text: var(--els-fg);
   --text-soft: var(--els-fg-2);
   --muted: var(--els-fg-3);
-  --amber: var(--els-amber);
-  --amber-bright: var(--els-amber-2);
+  --amber: var(--els-amber-ink);
+  --amber-bright: var(--els-amber-ink);
   --amber-deep: var(--els-amber-strong);
   --amber-soft: oklch(0.84 0.15 78 / 0.12);
-  --emerald: var(--els-green);
-  --emerald-bright: var(--els-green-2);
+  --emerald: var(--els-green-ink);
+  --emerald-bright: var(--els-green-ink);
   --emerald-soft: oklch(0.8 0.14 168 / 0.12);
-  --blue: var(--els-info);
+  --blue: var(--els-info-ink);
   --blue-soft: oklch(0.78 0.12 240 / 0.12);
-  --danger: var(--els-danger);
+  --danger: var(--els-danger-ink);
   --radius-sm: 12px;
   --radius-md: 18px;
   --radius-lg: 24px;
@@ -99,6 +149,10 @@
   --color-els-amber-2: var(--els-amber-2);
   --color-els-amber-strong: var(--els-amber-strong);
   --color-els-on-amber: var(--els-on-amber);
+  --color-els-danger-ink: var(--els-danger-ink);
+  --color-els-info-ink: var(--els-info-ink);
+  --color-els-green-ink: var(--els-green-ink);
+  --color-els-amber-ink: var(--els-amber-ink);
   --color-els-green: var(--els-green);
   --color-els-green-2: var(--els-green-2);
   --color-els-info: var(--els-info);

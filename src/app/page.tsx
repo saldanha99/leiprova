@@ -260,36 +260,18 @@ export default async function Home() {
               </ul>
             </div>
 
-            <div className="els-visual">
-              <figure className="els-browser">
-                <div className="els-browser__bar" aria-hidden="true">
-                  <i />
-                  <i />
-                  <i />
-                  <span>editaleiseca.com.br/app/treinar</span>
-                </div>
-                <Image
-                  src="/assets/app/rodada-desktop.webp"
-                  alt="Tela real do app: rodada de questões com a alternativa correta e a errada destacadas"
-                  width={1920}
-                  height={1200}
-                  preload
-                  quality={80}
-                  sizes="(max-width: 960px) 92vw, 600px"
-                />
-              </figure>
-              <figure className="els-phone">
-                <Image
-                  src="/assets/app/rodada-celular.webp"
-                  alt="A mesma rodada no celular, com a escolha de confiança antes das alternativas"
-                  width={780}
-                  height={1560}
-                  quality={80}
-                  sizes="(max-width: 640px) 34vw, 190px"
-                />
-              </figure>
-              <p className="els-visual__caption">Telas reais do app, com uma conta de demonstração.</p>
-            </div>
+            <figure className="els-hero-media">
+              <Image
+                src="/assets/leiprova-ecosystem.png"
+                alt="Edital Lei Seca em notebook, celular e tablet com questões, texto legal e painel de desempenho"
+                width={1586}
+                height={992}
+                preload
+                quality={75}
+                sizes="(max-width: 960px) 94vw, 620px"
+              />
+              <figcaption>Interface ilustrativa</figcaption>
+            </figure>
           </div>
 
           <div className="els-container els-features" aria-label="Recursos em destaque">
@@ -305,7 +287,7 @@ export default async function Home() {
           </div>
         </section>
 
-        <section className="els-section els-section--alt" id="metodo" aria-labelledby="method-title">
+        <section className="els-section" data-theme="light" id="metodo" aria-labelledby="method-title">
           <div className="els-container">
             <div className="els-head--center">
               <span className="els-kicker">Um ciclo que faz sentido</span>
@@ -357,9 +339,9 @@ export default async function Home() {
           </div>
         </section>
 
-        <section className="els-section els-section--alt" id="recursos" aria-labelledby="showcase-title">
+        <section className="els-section" data-theme="light" id="recursos" aria-labelledby="showcase-title">
           <div className="els-container">
-            <span className="els-kicker">Uma preparação que acompanha você</span>
+            <span className="els-kicker">Veja por dentro</span>
             <h2 className="els-h2" id="showcase-title">
               Um só progresso. <em>Três telas.</em>
             </h2>
@@ -369,18 +351,36 @@ export default async function Home() {
             </p>
 
             <div className="els-showcase">
-              <figure className="els-frame">
+              <div className="els-visual">
+              <figure className="els-browser">
+                <div className="els-browser__bar" aria-hidden="true">
+                  <i />
+                  <i />
+                  <i />
+                  <span>editaleiseca.com.br/app/treinar</span>
+                </div>
                 <Image
-                  src="/assets/leiprova-ecosystem.png"
-                  alt="Edital Lei Seca em notebook, celular e tablet com questões, texto legal e painel de desempenho"
-                  width={1586}
-                  height={992}
+                  src="/assets/app/rodada-desktop.webp"
+                  alt="Tela real do app: rodada de questões com a alternativa correta e a errada destacadas"
+                  width={1920}
+                  height={1200}
                   loading="lazy"
                   quality={80}
-                  sizes="(max-width: 960px) 100vw, 720px"
+                  sizes="(max-width: 960px) 92vw, 720px"
                 />
-                <figcaption>Interface ilustrativa</figcaption>
               </figure>
+              <figure className="els-phone">
+                <Image
+                  src="/assets/app/rodada-celular.webp"
+                  alt="A mesma rodada no celular, com a escolha de confiança antes das alternativas"
+                  width={780}
+                  height={1560}
+                  quality={80}
+                  sizes="(max-width: 640px) 34vw, 190px"
+                />
+              </figure>
+              <p className="els-visual__caption">Telas reais do app, com uma conta de demonstração.</p>
+              </div>
 
               <div className="els-benefits">
                 <article className="els-benefit">
@@ -543,7 +543,7 @@ export default async function Home() {
           </div>
         </section>
 
-        <section className="els-section els-pricing" id="planos" aria-labelledby="pricing-title">
+        <section className="els-section els-pricing" data-theme="light" id="planos" aria-labelledby="pricing-title">
           <div className="els-container">
             <div className="els-head--center">
               <span className="els-kicker">{annualDiscountPercentage}% de desconto no anual</span>
@@ -570,7 +570,7 @@ export default async function Home() {
           </div>
         </section>
 
-        <section className="els-section els-section--alt" aria-labelledby="guarantee-title">
+        <section className="els-section els-section--tight" data-theme="light" aria-labelledby="guarantee-title">
           <div className="els-container els-guarantee">
             <div className="els-seal" aria-hidden="true">
               <div>
@@ -598,7 +598,7 @@ export default async function Home() {
           </div>
         </section>
 
-        <section className="els-section" aria-labelledby="faq-title">
+        <section className="els-section els-section--alt" data-theme="light" aria-labelledby="faq-title">
           <div className="els-container els-faq">
             <div>
               <span className="els-kicker">Perguntas frequentes</span>

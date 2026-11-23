@@ -80,7 +80,7 @@ body:has(.els-ui) {
 }
 
 .els-logo__accent {
-  color: var(--els-amber);
+  color: var(--els-amber-ink);
 }
 
 .els-logo--compact .els-monogram {
@@ -217,7 +217,7 @@ body:has(.els-ui) {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  color: var(--els-amber);
+  color: var(--els-amber-ink);
   font-size: 12.5px;
   font-weight: 800;
   letter-spacing: 0.12em;
@@ -235,7 +235,7 @@ body:has(.els-ui) {
 }
 
 .els-h2 em {
-  color: var(--els-amber);
+  color: var(--els-amber-ink);
   font-style: normal;
 }
 
@@ -267,7 +267,7 @@ body:has(.els-ui) {
 .els-mark {
   padding: 0;
   background: linear-gradient(transparent 92%, oklch(0.84 0.15 78 / 0.45) 92%);
-  color: var(--els-amber);
+  color: var(--els-amber-ink);
 }
 
 /* Hero */
@@ -297,7 +297,7 @@ body:has(.els-ui) {
 
 .els-eyebrow svg {
   flex: none;
-  color: var(--els-amber);
+  color: var(--els-amber-ink);
 }
 
 .els-h1 {
@@ -346,10 +346,56 @@ body:has(.els-ui) {
 }
 
 .els-assure svg {
-  color: var(--els-green);
+  color: var(--els-green-ink);
 }
 
-/* Telas reais do app no hero */
+/* Seções claras na página pública: mesmos tokens, tema trocado por data-theme */
+
+.els-ui [data-theme] {
+  background-color: var(--els-bg);
+  color: var(--els-fg);
+}
+
+.els-ui [data-theme].els-section--alt {
+  background-color: var(--els-bg-2);
+}
+
+.els-section--tight {
+  padding-block: 56px;
+}
+
+/* Mockup do ecossistema no hero (o mesmo do site no ar, otimizado) */
+
+.els-hero-media {
+  position: relative;
+  margin: 0;
+}
+
+.els-hero-media::before {
+  position: absolute;
+  inset: 6% 4% 10%;
+  z-index: -1;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, oklch(0.84 0.15 78 / 0.16), transparent 74%);
+  content: "";
+  filter: blur(10px);
+}
+
+.els-hero-media img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.els-hero-media figcaption {
+  margin-top: 6px;
+  color: var(--els-fg-4);
+  font-size: 12px;
+  font-weight: 650;
+  text-align: right;
+}
+
+/* Telas reais do app ("Veja por dentro") */
 
 .els-visual {
   position: relative;
@@ -463,7 +509,7 @@ body:has(.els-ui) {
 
 .els-features svg {
   flex: none;
-  color: var(--els-amber);
+  color: var(--els-amber-ink);
 }
 
 /* Cartões genéricos */
@@ -500,7 +546,7 @@ body:has(.els-ui) {
 
 .els-step__num {
   display: block;
-  color: var(--els-amber);
+  color: var(--els-amber-ink);
   font-size: 2.4rem;
   font-weight: 780;
   letter-spacing: -0.05em;
@@ -531,7 +577,7 @@ body:has(.els-ui) {
 
 .els-step__detail svg,
 .els-icon {
-  color: var(--els-green);
+  color: var(--els-green-ink);
 }
 
 .els-icon-box {
@@ -541,7 +587,7 @@ body:has(.els-ui) {
   place-items: center;
   border-radius: 12px;
   background: var(--amber-soft);
-  color: var(--els-amber);
+  color: var(--els-amber-ink);
 }
 
 .els-more {
@@ -595,7 +641,7 @@ body:has(.els-ui) {
 .els-ui .lab-question-card__prompt mark.is-correct {
   border-color: var(--els-green);
   background: var(--emerald-soft);
-  color: var(--els-green);
+  color: var(--els-green-ink);
 }
 
 .els-ui .lab-question-card__prompt mark.is-wrong {
@@ -725,7 +771,7 @@ body:has(.els-ui) {
 
 .els-checks svg {
   flex: none;
-  color: var(--els-green);
+  color: var(--els-green-ink);
 }
 
 .els-panel {
@@ -778,7 +824,7 @@ body:has(.els-ui) {
 .els-chips .is-active {
   border-color: oklch(0.84 0.15 78 / 0.45);
   background: oklch(0.84 0.15 78 / 0.12);
-  color: var(--els-amber);
+  color: var(--els-amber-ink);
 }
 
 .els-bars {
@@ -992,7 +1038,7 @@ body:has(.els-ui) {
 .els-note svg {
   flex: none;
   margin-top: 2px;
-  color: var(--els-green);
+  color: var(--els-green-ink);
 }
 
 /* Garantia */
@@ -1028,7 +1074,7 @@ body:has(.els-ui) {
   place-items: center;
   border: 2px solid var(--els-amber);
   border-radius: 50%;
-  color: var(--els-amber);
+  color: var(--els-amber-ink);
   text-align: center;
 }
 
@@ -1124,7 +1170,7 @@ body:has(.els-ui) {
   display: inline-flex;
   min-height: 44px;
   align-items: center;
-  color: var(--els-amber);
+  color: var(--els-amber-ink);
   font-weight: 800;
   text-decoration: underline;
   text-underline-offset: 3px;
@@ -1154,7 +1200,7 @@ body:has(.els-ui) {
 
 .els-final h2 span {
   display: block;
-  color: var(--els-amber);
+  color: var(--els-amber-ink);
 }
 
 .els-final p {
@@ -1165,7 +1211,7 @@ body:has(.els-ui) {
 }
 
 .els-final .els-kicker {
-  color: var(--els-amber);
+  color: var(--els-amber-ink);
 }
 
 .els-final .button--glass {

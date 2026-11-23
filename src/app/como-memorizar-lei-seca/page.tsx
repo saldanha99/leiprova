@@ -164,7 +164,7 @@ export default function MemorizeDryLawPage() {
             <GuideBreadcrumbs current="Como memorizar lei seca" tone="els" />
             <div className="mt-9 grid gap-10 lg:grid-cols-[1.2fr_.8fr] lg:items-center">
               <div>
-                <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-els-green">
+                <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-els-green-ink">
                   Método Edital Lei Seca
                 </p>
                 <h1 className="mt-4 max-w-4xl text-[2.5rem] font-extrabold leading-[1.02] tracking-[-0.05em] text-els-fg sm:text-6xl">
@@ -179,7 +179,7 @@ export default function MemorizeDryLawPage() {
               </div>
 
               <div className="rounded-[1.5rem] border border-els-line bg-els-surface p-6 shadow-[var(--shadow-deep)] sm:p-8">
-                <div className="flex items-center gap-3 text-els-amber">
+                <div className="flex items-center gap-3 text-els-amber-ink">
                   <Route aria-hidden="true" className="size-6" />
                   <span className="text-xs font-extrabold uppercase tracking-[0.16em]">A metáfora da rota</span>
                 </div>
@@ -194,10 +194,11 @@ export default function MemorizeDryLawPage() {
           </div>
         </header>
 
+        <div data-theme="light" className="border-t border-els-line">
         <div className="mx-auto max-w-6xl space-y-20 px-5 py-16 sm:py-20">
           <section aria-labelledby="sequencia-title">
             <div className="max-w-3xl">
-              <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-els-amber">Sequência prática</p>
+              <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-els-amber-ink">Sequência prática</p>
               <h2 id="sequencia-title" className="mt-3 text-3xl font-bold leading-tight tracking-[-0.04em] text-els-fg sm:text-4xl">
                 Quatro movimentos em uma sessão curta
               </h2>
@@ -211,10 +212,10 @@ export default function MemorizeDryLawPage() {
                 return (
                   <li key={step.number} className="rounded-[1.25rem] border border-els-line bg-els-surface p-6">
                     <div className="flex items-center justify-between">
-                      <span className="grid size-11 place-items-center rounded-2xl bg-els-amber/12 text-els-amber">
+                      <span className="grid size-11 place-items-center rounded-2xl bg-els-amber/12 text-els-amber-ink">
                         <Icon aria-hidden="true" className="size-5" />
                       </span>
-                      <span className="text-2xl font-semibold text-els-amber">{step.number}</span>
+                      <span className="text-2xl font-semibold text-els-amber-ink">{step.number}</span>
                     </div>
                     <h3 className="mt-5 text-xl font-bold tracking-[-0.01em] text-els-fg">{step.title}</h3>
                     <p className="mt-3 text-sm leading-7 text-els-fg-3">{step.text}</p>
@@ -227,7 +228,7 @@ export default function MemorizeDryLawPage() {
           <section aria-labelledby="rota-title" className="rounded-[1.5rem] border border-els-line bg-els-bg-2 p-6 sm:p-10">
             <div className="grid gap-10 lg:grid-cols-[.8fr_1.2fr] lg:items-center">
               <div>
-                <span className="grid size-14 place-items-center rounded-2xl bg-els-green/12 text-els-green">
+                <span className="grid size-14 place-items-center rounded-2xl bg-els-green/12 text-els-green-ink">
                   <MapPinned aria-hidden="true" className="size-7" />
                 </span>
                 <h2 id="rota-title" className="mt-6 text-3xl font-bold leading-tight tracking-[-0.04em] text-els-fg">
@@ -244,7 +245,7 @@ export default function MemorizeDryLawPage() {
                   [BrainCircuit, "Recuperação na prova", "O objetivo é acessar a redação com menos pistas externas — sem confundir familiaridade com domínio."],
                 ].map(([Icon, title, text], index) => (
                   <li key={title as string} className="relative flex gap-4 rounded-2xl border border-els-line bg-els-surface p-5">
-                    <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-els-green/12 text-els-green">
+                    <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-els-green/12 text-els-green-ink">
                       <Icon aria-hidden="true" className="size-5" />
                     </span>
                     <div>
@@ -260,7 +261,7 @@ export default function MemorizeDryLawPage() {
 
           <section aria-labelledby="evidencias-title" className="grid gap-8 lg:grid-cols-[1fr_.75fr]">
             <div>
-              <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-els-green">O que sustenta o método</p>
+              <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-els-green-ink">O que sustenta o método</p>
               <h2 id="evidencias-title" className="mt-3 text-3xl font-bold leading-tight tracking-[-0.04em] text-els-fg">
                 Recuperação ativa e prática distribuída
               </h2>
@@ -280,19 +281,19 @@ export default function MemorizeDryLawPage() {
               <h3 className="font-semibold text-els-fg">Fontes científicas consultadas</h3>
               <ul className="mt-5 space-y-4 text-sm leading-6 text-els-fg-3">
                 <li>
-                  <a className="font-semibold text-els-amber underline decoration-els-amber/40 underline-offset-4 hover:text-els-fg" href="https://doi.org/10.1126/science.1152408" rel="noreferrer">
+                  <a className="font-semibold text-els-amber-ink underline decoration-els-amber-ink/40 underline-offset-4 hover:text-els-fg" href="https://doi.org/10.1126/science.1152408" rel="noreferrer">
                     Karpicke &amp; Roediger (2008), Science
                   </a>
                   <p className="mt-1">Recuperação repetida e retenção posterior.</p>
                 </li>
                 <li>
-                  <a className="font-semibold text-els-amber underline decoration-els-amber/40 underline-offset-4 hover:text-els-fg" href="https://pubmed.ncbi.nlm.nih.gov/16719566/" rel="noreferrer">
+                  <a className="font-semibold text-els-amber-ink underline decoration-els-amber-ink/40 underline-offset-4 hover:text-els-fg" href="https://pubmed.ncbi.nlm.nih.gov/16719566/" rel="noreferrer">
                     Cepeda et al. (2006), Psychological Bulletin
                   </a>
                   <p className="mt-1">Síntese quantitativa sobre prática distribuída.</p>
                 </li>
                 <li>
-                  <a className="font-semibold text-els-amber underline decoration-els-amber/40 underline-offset-4 hover:text-els-fg" href="https://doi.org/10.1177/1529100612453266" rel="noreferrer">
+                  <a className="font-semibold text-els-amber-ink underline decoration-els-amber-ink/40 underline-offset-4 hover:text-els-fg" href="https://doi.org/10.1177/1529100612453266" rel="noreferrer">
                     Dunlosky et al. (2013), Psychological Science in the Public Interest
                   </a>
                   <p className="mt-1">Revisão de dez técnicas de aprendizagem.</p>
@@ -302,7 +303,7 @@ export default function MemorizeDryLawPage() {
           </section>
 
           <section aria-labelledby="faq-metodo-title">
-            <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-els-amber">Perguntas objetivas</p>
+            <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-els-amber-ink">Perguntas objetivas</p>
             <h2 id="faq-metodo-title" className="mt-3 text-3xl font-bold leading-tight tracking-[-0.04em] text-els-fg">
               O que considerar antes de montar a rotina
             </h2>
@@ -321,6 +322,7 @@ export default function MemorizeDryLawPage() {
             title="Faça a primeira passagem sem depender de cadastro"
             description="A demonstração usa questões originais assistidas por IA de Direito Constitucional, mostra a fonte oficial e corrige a palavra que mudou. A revisão humana independente ainda está pendente e o progresso fica apenas no seu navegador."
           />
+        </div>
         </div>
       </article>
     </PublicGuideShell>

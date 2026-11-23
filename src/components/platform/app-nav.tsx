@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 
 import { logoutAction } from "@/app/actions/auth";
+import { ThemeToggle } from "@/components/platform/theme-toggle";
 import { LeiProvaMark } from "@/components/ui/leiprova-mark";
 import type { AuthUser } from "@/lib/auth";
 
@@ -37,8 +38,9 @@ const navItems = [
 export function AppSidebar({ user }: { user: AuthUser }) {
   return (
     <aside className="sticky top-0 hidden h-screen w-[272px] shrink-0 border-r border-els-line bg-els-bg px-4 py-5 lg:flex lg:flex-col">
-      <div className="px-2">
+      <div className="flex items-center justify-between gap-2 px-2">
         <LeiProvaMark href="/app" />
+        <ThemeToggle />
       </div>
       <nav className="mt-9 grid gap-1.5" aria-label="Navegação principal">
         {navItems.map(({ href, label, icon: Icon }) => (
@@ -47,7 +49,7 @@ export function AppSidebar({ user }: { user: AuthUser }) {
             href={href}
             className="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-els-fg-3 transition hover:bg-els-raise hover:text-els-fg"
           >
-            <Icon className="size-[18px] text-els-fg-3 transition group-hover:text-els-amber" />
+            <Icon className="size-[18px] text-els-fg-3 transition group-hover:text-els-amber-ink" />
             {label}
           </Link>
         ))}
@@ -56,7 +58,7 @@ export function AppSidebar({ user }: { user: AuthUser }) {
         {user.role === "admin" && (
           <Link
             href="/admin"
-            className="mb-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-els-amber-2 transition hover:bg-els-raise hover:text-els-amber-2"
+            className="mb-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-els-amber-ink transition hover:bg-els-raise hover:text-els-amber-ink"
           >
             <ShieldCheck className="size-[18px]" /> Super admin
           </Link>
@@ -69,7 +71,7 @@ export function AppSidebar({ user }: { user: AuthUser }) {
         </Link>
         <div className="rounded-2xl border border-els-line bg-els-raise p-3">
           <div className="flex items-center gap-3">
-            <span className="grid size-9 place-items-center rounded-full bg-els-green/12 text-sm font-bold text-els-green-2">
+            <span className="grid size-9 place-items-center rounded-full bg-els-green/12 text-sm font-bold text-els-green-ink">
               {user.name.slice(0, 1).toUpperCase()}
             </span>
             <span className="min-w-0 flex-1">
@@ -100,8 +102,10 @@ export function MobileAppHeader({ user }: { user: AuthUser }) {
     <header className="sticky top-0 z-40 border-b border-els-line bg-els-bg/95 px-4 py-3 backdrop-blur lg:hidden">
       <div className="flex items-center justify-between">
         <LeiProvaMark href="/app" />
+        <div className="flex items-center gap-2">
+        <ThemeToggle />
         <details className="relative">
-          <summary className="grid size-10 cursor-pointer list-none place-items-center rounded-xl border border-els-line bg-els-raise font-bold text-els-green-2">
+          <summary className="grid size-11 cursor-pointer list-none place-items-center rounded-xl border border-els-line bg-els-raise font-bold text-els-green-ink">
             {user.name.slice(0, 1).toUpperCase()}
           </summary>
           <nav className="absolute right-0 top-12 grid w-64 gap-1 rounded-2xl border border-els-line bg-els-surface p-2 shadow-2xl">
@@ -111,30 +115,31 @@ export function MobileAppHeader({ user }: { user: AuthUser }) {
                 href={href}
                 className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-els-fg-2 hover:bg-els-raise"
               >
-                <Icon className="size-4 text-els-amber" /> {label}
+                <Icon className="size-4 text-els-amber-ink" /> {label}
               </Link>
             ))}
             {user.role === "admin" && (
               <Link
                 href="/admin"
-                className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-els-amber-2 hover:bg-els-raise"
+                className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-els-amber-ink hover:bg-els-raise"
               >
-                <ShieldCheck className="size-4 text-els-amber" /> Super admin
+                <ShieldCheck className="size-4 text-els-amber-ink" /> Super admin
               </Link>
             )}
             <Link
               href="/app/assinatura"
               className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-els-fg-2 hover:bg-els-raise"
             >
-              <CreditCard className="size-4 text-els-amber" /> Assinatura
+              <CreditCard className="size-4 text-els-amber-ink" /> Assinatura
             </Link>
             <form action={logoutAction}>
-              <button className="w-full rounded-xl px-3 py-2.5 text-left text-sm text-els-danger hover:bg-els-raise">
+              <button className="w-full rounded-xl px-3 py-2.5 text-left text-sm text-els-danger-ink hover:bg-els-raise">
                 Sair
               </button>
             </form>
           </nav>
         </details>
+        </div>
       </div>
     </header>
   );

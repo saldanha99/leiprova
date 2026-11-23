@@ -172,7 +172,7 @@ export function LiveStudySession({
   }
 
   if (loading) {
-    return <div className="grid min-h-[70vh] place-items-center"><div className="text-center"><LoaderCircle className="mx-auto size-7 animate-spin text-els-amber" /><p className="mt-3 text-sm text-els-fg-3">Montando sua sessão…</p></div></div>;
+    return <div className="grid min-h-[70vh] place-items-center"><div className="text-center"><LoaderCircle className="mx-auto size-7 animate-spin text-els-amber-ink" /><p className="mt-3 text-sm text-els-fg-3">Montando sua sessão…</p></div></div>;
   }
 
   if (completed) {
@@ -180,12 +180,12 @@ export function LiveStudySession({
     const xp = results.reduce((total, result) => total + result.xp, 0);
     return (
       <section className="mx-auto flex min-h-[78vh] max-w-3xl items-center px-4 py-10">
-        <div className="w-full rounded-[2rem] border border-els-green/15 bg-[linear-gradient(145deg,#0c1925,#0b1b1b)] p-7 text-center shadow-2xl sm:p-11">
-          <span className="mx-auto grid size-16 place-items-center rounded-2xl bg-els-amber/12 text-els-amber"><Trophy className="size-8" /></span>
-          <p className="mt-6 text-xs font-bold uppercase tracking-[.18em] text-els-green">Sessão concluída</p>
+        <div className="w-full rounded-[2rem] border border-els-green/15 bg-[linear-gradient(145deg,var(--els-surface-2),var(--els-surface))] p-7 text-center shadow-2xl sm:p-11">
+          <span className="mx-auto grid size-16 place-items-center rounded-2xl bg-els-amber/12 text-els-amber-ink"><Trophy className="size-8" /></span>
+          <p className="mt-6 text-xs font-bold uppercase tracking-[.18em] text-els-green-ink">Sessão concluída</p>
           <h1 className="mt-2 text-3xl font-semibold tracking-[-.04em] sm:text-4xl">Você recuperou {correct} de {questions.length} redações</h1>
           <p className="mx-auto mt-3 max-w-lg text-sm leading-6 text-els-fg-3">Os itens já entraram na sua fila de revisão conforme acerto e confiança.</p>
-          <div className="mx-auto mt-7 grid max-w-md grid-cols-2 gap-3"><div className="rounded-xl bg-els-raise p-4"><strong className="text-2xl text-els-green">{correct}</strong><p className="text-xs text-els-fg-3">acertos</p></div><div className="rounded-xl bg-els-raise p-4"><strong className="text-2xl text-els-amber">+{xp}</strong><p className="text-xs text-els-fg-3">XP</p></div></div>
+          <div className="mx-auto mt-7 grid max-w-md grid-cols-2 gap-3"><div className="rounded-xl bg-els-raise p-4"><strong className="text-2xl text-els-green-ink">{correct}</strong><p className="text-xs text-els-fg-3">acertos</p></div><div className="rounded-xl bg-els-raise p-4"><strong className="text-2xl text-els-amber-ink">+{xp}</strong><p className="text-xs text-els-fg-3">XP</p></div></div>
           <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row"><button onClick={() => window.location.reload()} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-els-amber px-5 text-sm font-bold text-els-on-amber"><RefreshCcw className="size-4" />Nova sessão</button><Link href="/app" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-els-line px-5 text-sm font-semibold text-els-fg">Voltar ao painel <ArrowRight className="size-4" /></Link></div>
         </div>
       </section>
@@ -196,7 +196,7 @@ export function LiveStudySession({
     return (
       <section className="mx-auto flex min-h-[70vh] max-w-3xl items-center px-5 py-10 text-center">
         <div className="w-full rounded-[1.75rem] border border-els-green/15 bg-els-surface p-7 shadow-2xl sm:p-10">
-          <span className="mx-auto grid size-14 place-items-center rounded-2xl bg-els-green/10 text-els-green"><CalendarCheck2 className="size-6" /></span>
+          <span className="mx-auto grid size-14 place-items-center rounded-2xl bg-els-green/10 text-els-green-ink"><CalendarCheck2 className="size-6" /></span>
           <h1 className="mt-5 text-2xl font-semibold">Nenhuma revisão pendente</h1>
           <p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-els-fg-3">Sua fila está em dia. Um novo treino alimenta as próximas revisões conforme seu desempenho.</p>
           <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
@@ -236,7 +236,7 @@ export function LiveStudySession({
 
       <section className="mt-5 overflow-hidden rounded-[1.75rem] border border-els-line bg-els-surface shadow-2xl shadow-black/20">
         <header className="border-b border-els-line px-5 py-5 sm:px-7">
-          <div className="flex flex-wrap items-center gap-2 text-[11px]"><span className="rounded-full bg-els-amber/10 px-2.5 py-1 font-bold text-els-amber-2">{question.articleRef}</span><span className="text-els-fg-4">{question.actTitle}</span><span className="ml-auto text-els-fg-4">verificado em {new Intl.DateTimeFormat("pt-BR").format(new Date(`${question.verifiedAt}T12:00:00`))}</span></div>
+          <div className="flex flex-wrap items-center gap-2 text-[11px]"><span className="rounded-full bg-els-amber/10 px-2.5 py-1 font-bold text-els-amber-ink">{question.articleRef}</span><span className="text-els-fg-4">{question.actTitle}</span><span className="ml-auto text-els-fg-4">verificado em {new Intl.DateTimeFormat("pt-BR").format(new Date(`${question.verifiedAt}T12:00:00`))}</span></div>
           <h1 className="mt-5 text-balance text-lg font-semibold leading-8 text-els-fg sm:text-xl">{question.prompt}</h1>
         </header>
 
@@ -260,7 +260,7 @@ export function LiveStudySession({
                     type="radio"
                     value={id}
                   />
-                  <Icon aria-hidden="true" className={cn("size-4 text-els-fg-3", confidence === id && "text-els-amber")} />
+                  <Icon aria-hidden="true" className={cn("size-4 text-els-fg-3", confidence === id && "text-els-amber-ink")} />
                   <span><strong className="block text-xs text-els-fg-2">{label}</strong><span className="text-[10px] text-els-fg-4">{helper}</span></span>
                 </label>
               ))}
@@ -294,7 +294,7 @@ export function LiveStudySession({
             </div>
           </fieldset>
 
-          {error && <p role="alert" className="rounded-xl border border-els-danger/15 bg-els-danger/6 px-4 py-3 text-sm text-els-danger">{error}</p>}
+          {error && <p role="alert" className="rounded-xl border border-els-danger/15 bg-els-danger/6 px-4 py-3 text-sm text-els-danger-ink">{error}</p>}
 
           {feedback ? (
             <div
@@ -305,10 +305,10 @@ export function LiveStudySession({
               role="status"
               tabIndex={-1}
             >
-              <div className="flex items-center gap-2"><span className={cn("grid size-8 place-items-center rounded-full", feedback.isCorrect ? "bg-els-green text-els-on-amber" : "bg-els-amber text-els-on-amber")}>{feedback.isCorrect ? <Check className="size-4" /> : <Sparkles className="size-4" />}</span><strong>{feedback.isCorrect ? "Redação recuperada" : "Compare a palavra decisiva"}</strong><span className="ml-auto text-xs font-bold text-els-amber">+{feedback.xp} XP</span></div>
+              <div className="flex items-center gap-2"><span className={cn("grid size-8 place-items-center rounded-full", feedback.isCorrect ? "bg-els-green text-els-on-amber" : "bg-els-amber text-els-on-amber")}>{feedback.isCorrect ? <Check className="size-4" /> : <Sparkles className="size-4" />}</span><strong>{feedback.isCorrect ? "Redação recuperada" : "Compare a palavra decisiva"}</strong><span className="ml-auto text-xs font-bold text-els-amber-ink">+{feedback.xp} XP</span></div>
               {feedback.literal ? <LiteralHighlightView literal={feedback.literal} className="mt-4" /> : <blockquote className="mt-4 border-l-2 border-els-green/40 pl-4 text-sm leading-7 text-els-fg-2">{feedback.literalText}</blockquote>}
               <p className="mt-4 text-sm leading-6 text-els-fg-3">{feedback.explanation}</p>
-              <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-xs"><a href={feedback.officialUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 font-semibold text-els-green">Conferir no Planalto <ExternalLink className="size-3.5" /></a><span className="text-els-fg-4">revisão agendada para {new Intl.DateTimeFormat("pt-BR").format(new Date(feedback.nextReviewAt))}</span></div>
+              <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-xs"><a href={feedback.officialUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 font-semibold text-els-green-ink">Conferir no Planalto <ExternalLink className="size-3.5" /></a><span className="text-els-fg-4">revisão agendada para {new Intl.DateTimeFormat("pt-BR").format(new Date(feedback.nextReviewAt))}</span></div>
               <p className="mt-3 text-[10px] leading-4 text-els-fg-4">Trecho meramente informativo e não oficial; não substitui a publicação no Diário Oficial da União.</p>
             </div>
           ) : (

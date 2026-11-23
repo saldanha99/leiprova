@@ -139,7 +139,7 @@ export function PublicGuideShell({
             <p className="flex items-center gap-2 font-semibold text-els-fg-2">
               <BookOpenCheck
                 aria-hidden="true"
-                className="size-4 text-els-amber"
+                className="size-4 text-els-amber-ink"
               />
               Edital Lei Seca
             </p>
@@ -173,7 +173,7 @@ export function GuideBreadcrumbs({
   const light = tone === "els";
   const link = light
     ? "inline-flex min-h-11 items-center hover:text-els-fg hover:underline"
-    : "hover:text-els-amber";
+    : "hover:text-els-amber-ink";
   return (
     <nav
       aria-label="Trilha de navegação"
@@ -193,7 +193,7 @@ export function GuideBreadcrumbs({
           <span aria-hidden="true">/</span>
         </>
       ) : null}
-      <span aria-current="page" className={light ? "text-els-amber" : "text-els-amber"}>
+      <span aria-current="page" className={light ? "text-els-amber-ink" : "text-els-amber-ink"}>
         {current}
       </span>
     </nav>
@@ -212,7 +212,7 @@ export function GuideCta({
   if (tone === "els") {
     return (
       <aside className="rounded-els-xl border border-els-amber/25 bg-[radial-gradient(70%_120%_at_0%_0%,oklch(0.84_0.15_78/0.12),transparent_60%)] bg-els-surface p-6 text-els-fg shadow-[var(--els-shadow)] sm:p-9">
-        <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-els-amber">Experimente na prática</p>
+        <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-els-amber-ink">Experimente na prática</p>
         <h2 className="mt-3 text-2xl font-bold leading-tight tracking-[-0.035em] sm:text-3xl">{title}</h2>
         <p className="mt-3 max-w-2xl text-sm leading-7 text-els-fg-2">{description}</p>
         <Link className="button button--amber mt-6" href="/demo">
@@ -225,7 +225,7 @@ export function GuideCta({
 
   return (
     <aside className="rounded-[2rem] border border-els-amber/20 bg-[radial-gradient(circle_at_20%_0%,rgba(251,191,36,.16),transparent_48%),#0b1624] p-6 sm:p-9">
-      <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-els-amber">
+      <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-els-amber-ink">
         Experimente na prática
       </p>
       <h2 className="mt-3 text-2xl font-semibold tracking-[-0.035em] sm:text-3xl">

@@ -110,7 +110,7 @@ export function QuestionActionBar({
       <div aria-label="Ações desta questão" className="flex flex-wrap gap-2" role="toolbar">
         <BarButton active={panel === "notebook"} controls={panelId("notebook")} icon={BookmarkPlus} label="Caderno" onClick={() => toggle("notebook")} />
         <button
-          className={cn(barButtonClass, reviewQueued && "border-els-green/30 bg-els-green/10 text-els-green-2")}
+          className={cn(barButtonClass, reviewQueued && "border-els-green/30 bg-els-green/10 text-els-green-ink")}
           disabled={review.status === "loading"}
           onClick={() => void queueReview()}
           type="button"
@@ -125,13 +125,13 @@ export function QuestionActionBar({
 
       <div aria-live="polite">
         {review.status === "ready" && (
-          <p className={cn("mt-2 text-[11px] leading-5", review.data.status === "queued" ? "text-els-green" : "text-els-fg-3")}>
+          <p className={cn("mt-2 text-[11px] leading-5", review.data.status === "queued" ? "text-els-green-ink" : "text-els-fg-3")}>
             {review.data.status === "queued"
               ? "Esta questão já aparece em Revisões para hoje. Ao respondê-la, o intervalo volta a seguir seu desempenho."
               : "Esta questão não entra na fila de revisão: a revisão usa só questões de lei seca vinculadas ao artigo."}
           </p>
         )}
-        {review.status === "error" && <p className="mt-2 text-[11px] leading-5 text-els-danger" role="alert">{review.message}</p>}
+        {review.status === "error" && <p className="mt-2 text-[11px] leading-5 text-els-danger-ink" role="alert">{review.message}</p>}
       </div>
 
       {panel === "notebook" && (
@@ -167,7 +167,7 @@ const barButtonClass =
 
 function BarButton({ active, controls, icon: Icon, label, onClick }: { active: boolean; controls: string; icon: typeof Flag; label: string; onClick: () => void }) {
   return (
-    <button aria-controls={controls} aria-expanded={active} className={cn(barButtonClass, active && "border-els-amber/40 bg-els-amber/10 text-els-amber-2")} onClick={onClick} type="button">
+    <button aria-controls={controls} aria-expanded={active} className={cn(barButtonClass, active && "border-els-amber/40 bg-els-amber/10 text-els-amber-ink")} onClick={onClick} type="button">
       <Icon aria-hidden="true" className="size-3.5" />
       {label}
     </button>
@@ -188,7 +188,7 @@ function LoadableView<T>({ state, onRetry, children }: { state: Loadable<T>; onR
   if (state.status === "error") {
     return (
       <div className="flex flex-wrap items-center gap-3 text-xs" role="alert">
-        <span className="text-els-danger">{state.message}</span>
+        <span className="text-els-danger-ink">{state.message}</span>
         <button className="font-bold text-els-fg-2 underline underline-offset-4" onClick={onRetry} type="button">Tentar de novo</button>
       </div>
     );
@@ -212,7 +212,7 @@ function HistoryList({ entries, optionLabels }: { entries: QuestionHistoryEntry[
           const label = entry.optionKey ? optionLabels?.[entry.optionKey] ?? entry.optionKey.toUpperCase() : "—";
           return (
             <li key={`${entry.answeredAt}-${index}`} className="flex items-center gap-3 rounded-lg bg-els-raise px-3 py-2 text-xs">
-              <span className={cn("grid size-6 shrink-0 place-items-center rounded-full", entry.isCorrect ? "bg-els-green text-els-on-amber" : "bg-els-danger/15 text-els-danger")}>
+              <span className={cn("grid size-6 shrink-0 place-items-center rounded-full", entry.isCorrect ? "bg-els-green text-els-on-amber" : "bg-els-danger/15 text-els-danger-ink")}>
                 {entry.isCorrect ? <Check className="size-3.5" /> : <X className="size-3.5" />}
               </span>
               <span className="min-w-0 flex-1">
@@ -275,7 +275,7 @@ function ReportForm({ questionPublicId, onCancel }: { questionPublicId: string; 
 
   if (state.status === "ready") {
     return (
-      <p className="flex items-start gap-2 text-xs leading-5 text-els-green-2" role="status">
+      <p className="flex items-start gap-2 text-xs leading-5 text-els-green-ink" role="status">
         <Check className="mt-0.5 size-3.5 shrink-0" />
         {state.data === "created"
           ? "Relato recebido. A equipe editorial confere a questão na fonte oficial e corrige se for o caso."
@@ -311,7 +311,7 @@ function ReportForm({ questionPublicId, onCancel }: { questionPublicId: string; 
         />
         <span className="justify-self-end text-[10px] font-normal text-els-fg-4">{notes.length}/{QUESTION_REPORT_NOTES_MAX}</span>
       </label>
-      {state.status === "error" && <p className="text-[11px] text-els-danger" role="alert">{state.message}</p>}
+      {state.status === "error" && <p className="text-[11px] text-els-danger-ink" role="alert">{state.message}</p>}
       <div className="flex flex-wrap items-center gap-2">
         <button
           className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-els-amber px-4 text-xs font-bold text-els-on-amber transition hover:bg-els-amber disabled:cursor-not-allowed disabled:opacity-40"
