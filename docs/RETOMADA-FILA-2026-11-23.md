@@ -127,3 +127,37 @@ Regra do Vinícius: autorização não é aprovação às cegas; o que não bate
 - **Próximo passo**: operador de transição de versão legal (religar os artigos sem mudança, reabrir só os vínculos
   dos artigos alterados, ensaio em clone) para CF, CTN e ECA.
 - **TCE-MA**: ainda sem gabarito na Cebraspe em 23/11 à noite.
+
+## Operador de transição de versão de lei (noite de 23/11)
+
+`scripts/transition-legal-version.ts lei=<slug> text=<sha256> [retire=<ids>] [--rehearse | --apply fingerprint=<sha>]`
+(`src/lib/editorial/legal-version-transition.ts`, `e2e3f13`, `7ae41c8`). Recaptura o texto oficial fora da
+transação e exige o mesmo hash da captura pendente. Numa transação serializável aprova a captura, cria a versão nova
+e supera a antiga. Nos artigos sem mudança, religa no lugar vínculos e questões (o certificado depende só do vínculo
+e do conteúdo da questão; o `updated_at` da questão é preservado). Nos artigos alterados, suspende vínculos e
+certificados e devolve as questões ao estado de rascunho da fábrica, para a fila normal (aprovador da fábrica e nova
+proposta de vínculo); as questões em `retire` ficam suspensas. Requisitos revisados não são editados: o artigo novo
+entra em `opportunity_requirement_articles`. Antes do commit confere, por produto liberado, depois = antes − questões
+dos artigos alterados, e que nada ficou na versão superada.
+
+- **Ensaio em clone** (Postgres 17 isolado na VPS, restaurado de `before-deploy-3-20261123.dump`, sem app/Stripe/
+  workers; já removido): CF, CTN e ECA aplicados; por produto, perda só das questões dos artigos alterados; nenhum
+  produto abaixo de 68; o aprovador da fábrica reconheceu os rascunhos devolvidos (43 no TRF-5) e os aprovaria.
+  Recibos em `.local/editorial/cursos-pendentes-20261123/clone-ensaio/`. O clone recém-restaurado precisou de
+  `ANALYZE` (sem estatísticas a contagem estourou 300 s).
+- **Produção** (backup antes de cada uma):
+
+| Lei | Versão nova | Hash | Vínculos religados | Questões religadas | Vínculos suspensos | Questões à fila | Retiradas | Perda por produto | Auditoria |
+|---|---|---|---:|---:|---:|---:|---:|---:|---|
+| Constituição Federal | 156 | `f5a8b069…` | 6.527 | 6.944 | 177 | 184 | 4 | 161 em 14 produtos | 150123 |
+| CTN | 157 | `f77c252e…` | 368 | 390 | 153 | 153 | 0 | 60 em 5 produtos | 150159 |
+| ECA | 158 | `f53cd741…` | 491 | 543 | 9 | 9 | 0 | 9 em 5 produtos | 152716 |
+
+  Nenhum produto ficou abaixo de 68. Questões retiradas (art. 7º, XIII, 44 horas): 8814, 8912, 11122 e 11171.
+  As 11864 (inciso XIV) e 11888 (resposta sobre redução de jornada) seguem válidas e foram para a fila.
+  Uma hora depois, a fila normal já tinha reaprovado 324 das 346 devolvidas.
+- O ECA conflitou 3 vezes por serialização com a cadeia de liberação; foi aplicado com o motor pausado e as travas da
+  cadeia e da preparação seguras. Uma rodada da cadeia (16:46) falhou por serialização com estas transições e se
+  repete sozinha.
+- **Vigia semanal** (`deploy/legal-text-weekly-watch.sh`, `0e098ce`): rotina do OpenBot aos domingos às 04:30 (BRT).
+  Recaptura as 10 leis em que só a página de declarações mudou e aplica a transição quando o texto consolidado mudar.
