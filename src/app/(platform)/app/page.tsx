@@ -88,7 +88,7 @@ export default async function DashboardPage() {
 
       <section className="mt-4 grid grid-cols-2 gap-4 xl:grid-cols-4">
         {[
-          { label: "Sequência", value: `${stats.streak} dias`, icon: Flame, color: "text-orange-300" },
+          { label: "Sequência", value: `${stats.streak} ${stats.streak === 1 ? "dia" : "dias"}`, icon: Flame, color: "text-orange-300" },
           { label: "Precisão geral", value: `${stats.accuracy}%`, icon: TrendingUp, color: "text-els-green" },
           { label: "Questões feitas", value: String(stats.answered), icon: CheckCircle2, color: "text-els-info" },
           { label: "Plano atual", value: stats.plan?.name ?? "Gratuito", icon: BookOpenCheck, color: "text-els-amber" },
