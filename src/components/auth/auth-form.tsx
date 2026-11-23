@@ -16,7 +16,7 @@ function SubmitButton({ label }: { label: string }) {
     <button
       type="submit"
       disabled={pending}
-      className="group mt-1 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-els-amber px-5 text-sm font-bold text-els-on-amber shadow-[0_14px_40px_color-mix(in_oklch,var(--els-amber)_18%,transparent)] transition hover:bg-els-amber disabled:cursor-wait disabled:opacity-70"
+      className="group mt-1 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-els-amber px-5 text-sm font-bold text-els-on-amber shadow-[0_14px_40px_color-mix(in_oklch,var(--els-amber)_18%,transparent)] transition hover:bg-els-amber-2 disabled:cursor-wait disabled:opacity-70"
     >
       {pending ? <LoaderCircle className="size-4 animate-spin" /> : label}
       {!pending && <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />}

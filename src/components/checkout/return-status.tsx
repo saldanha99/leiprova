@@ -111,7 +111,7 @@ export function ReturnStatus({ sessionId }: { sessionId: string }) {
       <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-els-fg-3">{content.description}</p>
 
       <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
-        <Link href="/app" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-els-amber px-5 text-sm font-bold text-els-on-amber transition hover:bg-els-amber">
+        <Link href="/app" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-els-amber px-5 text-sm font-bold text-els-on-amber transition hover:bg-els-amber-2">
           Ir para meus estudos
         </Link>
         {stage === "attention" && <PortalButton />}

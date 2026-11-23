@@ -64,7 +64,7 @@ export default async function DashboardPage() {
               </Link>
             </div>
             <div className="flex shrink-0 flex-col gap-2 sm:flex-row lg:flex-col">
-              <Link href="/app/quiz" className="group inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-els-amber px-5 text-sm font-bold text-els-on-amber transition hover:bg-els-amber">
+              <Link href="/app/quiz" className="group inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-els-amber px-5 text-sm font-bold text-els-on-amber transition hover:bg-els-amber-2">
                 Montar meu quiz <ArrowRight className="size-4 transition group-hover:translate-x-0.5" />
               </Link>
               <Link href="/app/treinar" className="inline-flex min-h-11 items-center justify-center rounded-xl border border-els-line bg-els-raise px-5 text-sm font-semibold text-els-fg-2 transition hover:bg-els-raise-hover">

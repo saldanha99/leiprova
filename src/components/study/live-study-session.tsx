@@ -312,7 +312,7 @@ export function LiveStudySession({
               <p className="mt-3 text-[10px] leading-4 text-els-fg-4">Trecho meramente informativo e não oficial; não substitui a publicação no Diário Oficial da União.</p>
             </div>
           ) : (
-            <button onClick={submitAnswer} disabled={!selected || !confidence || submitting} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-els-amber px-5 text-sm font-bold text-els-on-amber transition hover:bg-els-amber disabled:cursor-not-allowed disabled:opacity-35">{submitting ? <LoaderCircle className="size-4 animate-spin" /> : "Confirmar resposta"}<ArrowRight className="size-4" /></button>
+            <button onClick={submitAnswer} disabled={!selected || !confidence || submitting} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-els-amber px-5 text-sm font-bold text-els-on-amber transition hover:bg-els-amber-2 disabled:cursor-not-allowed disabled:opacity-35">{submitting ? <LoaderCircle className="size-4 animate-spin" /> : "Confirmar resposta"}<ArrowRight className="size-4" /></button>
           )}
 
           {feedback && (
@@ -323,7 +323,7 @@ export function LiveStudySession({
             />
           )}
 
-          {feedback && <button onClick={nextQuestion} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-els-amber px-5 text-sm font-bold text-els-on-amber transition hover:bg-els-amber">{index === questions.length - 1 ? "Ver resultado" : "Próxima questão"}<ArrowRight className="size-4" /></button>}
+          {feedback && <button onClick={nextQuestion} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-els-amber px-5 text-sm font-bold text-els-on-amber transition hover:bg-els-amber-2">{index === questions.length - 1 ? "Ver resultado" : "Próxima questão"}<ArrowRight className="size-4" /></button>}
         </div>
       </section>
     </main>

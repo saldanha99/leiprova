@@ -557,7 +557,7 @@ function QuizSummary({
       </div>
       {error && <p role="alert" className="mt-4 rounded-xl border border-els-danger/15 bg-els-danger/6 p-3 text-xs leading-5 text-els-danger-ink">{error}</p>}
       <button
-        className="mt-5 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-els-amber px-5 text-sm font-black text-els-on-amber transition hover:bg-els-amber focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-els-amber-2 focus-visible:ring-offset-2 focus-visible:ring-offset-els-surface disabled:cursor-not-allowed disabled:opacity-35"
+        className="mt-5 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-els-amber px-5 text-sm font-black text-els-on-amber transition hover:bg-els-amber-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-els-amber-2 focus-visible:ring-offset-2 focus-visible:ring-offset-els-surface disabled:cursor-not-allowed disabled:opacity-35"
         disabled={!canStart || loading}
         onClick={onStart}
         type="button"

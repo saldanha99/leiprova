@@ -222,6 +222,7 @@ export function CourseMethod() {
     <section
       id="beneficios"
       className={styles.method}
+      data-theme="light"
       aria-labelledby="metodo-title"
     >
       <div className={base.container}>

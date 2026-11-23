@@ -314,7 +314,7 @@ function ReportForm({ questionPublicId, onCancel }: { questionPublicId: string; 
       {state.status === "error" && <p className="text-[11px] text-els-danger-ink" role="alert">{state.message}</p>}
       <div className="flex flex-wrap items-center gap-2">
         <button
-          className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-els-amber px-4 text-xs font-bold text-els-on-amber transition hover:bg-els-amber disabled:cursor-not-allowed disabled:opacity-40"
+          className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-els-amber px-4 text-xs font-bold text-els-on-amber transition hover:bg-els-amber-2 disabled:cursor-not-allowed disabled:opacity-40"
           disabled={!reason || state.status === "loading"}
           type="submit"
         >

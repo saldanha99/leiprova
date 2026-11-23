@@ -17,7 +17,7 @@ export default function RecoverAccountAccessPage() {
           <span className="mx-auto grid size-14 place-items-center rounded-2xl border border-els-line bg-els-raise text-els-fg-2">
             <MailX className="size-6" aria-hidden="true" />
           </span>
-          <Link href="/entrar" className="inline-flex min-h-12 items-center justify-center rounded-xl bg-els-amber px-5 text-sm font-bold text-els-on-amber transition hover:bg-els-amber">
+          <Link href="/entrar" className="inline-flex min-h-12 items-center justify-center rounded-xl bg-els-amber px-5 text-sm font-bold text-els-on-amber transition hover:bg-els-amber-2">
             Voltar para entrar
           </Link>
         </div>

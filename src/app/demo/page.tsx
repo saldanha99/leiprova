@@ -102,7 +102,7 @@ export default function DemoPage() {
               Entrar
             </Link>
             <Link
-              className="rounded-xl bg-els-amber px-4 py-2.5 font-bold text-els-on-amber hover:bg-els-amber"
+              className="rounded-xl bg-els-amber px-4 py-2.5 font-bold text-els-on-amber hover:bg-els-amber-2"
               href={PLANS_HREF}
             >
               Ver planos
@@ -233,7 +233,7 @@ export default function DemoPage() {
             </p>
           </div>
           <Link
-            className="inline-flex shrink-0 items-center gap-2 rounded-2xl bg-els-amber px-6 py-4 text-sm font-bold text-els-on-amber hover:bg-els-amber"
+            className="inline-flex shrink-0 items-center gap-2 rounded-2xl bg-els-amber px-6 py-4 text-sm font-bold text-els-on-amber hover:bg-els-amber-2"
             href={PLANS_HREF}
           >
             Ver planos e preço

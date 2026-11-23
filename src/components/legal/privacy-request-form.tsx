@@ -157,7 +157,7 @@ export function PrivacyRequestForm() {
         <button
           type="submit"
           disabled={pending}
-          className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-els-amber px-5 text-sm font-bold text-els-on-amber transition hover:bg-els-amber disabled:cursor-not-allowed disabled:opacity-60 sm:justify-self-start"
+          className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-els-amber px-5 text-sm font-bold text-els-on-amber transition hover:bg-els-amber-2 disabled:cursor-not-allowed disabled:opacity-60 sm:justify-self-start"
         >
           {pending ? (
             <>

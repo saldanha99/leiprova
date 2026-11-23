@@ -342,7 +342,7 @@ export function AuthoringForm({ profiles, articles, subjects, topics }: Authorin
       <button
         type="submit"
         disabled={pending}
-        className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-els-amber px-5 text-sm font-extrabold text-els-on-amber transition hover:bg-els-amber disabled:cursor-wait disabled:opacity-60 sm:w-auto"
+        className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-els-amber px-5 text-sm font-extrabold text-els-on-amber transition hover:bg-els-amber-2 disabled:cursor-wait disabled:opacity-60 sm:w-auto"
       >
         <Send aria-hidden="true" className="size-4" />
         {pending ? "Enviando..." : "Enviar para revisão humana"}

@@ -38,7 +38,7 @@ export default async function CheckoutReturnPage({
             </p>
             <Link
               href="/#planos"
-              className="mt-7 inline-flex min-h-11 items-center justify-center rounded-xl bg-els-amber px-5 text-sm font-bold text-els-on-amber transition hover:bg-els-amber"
+              className="mt-7 inline-flex min-h-11 items-center justify-center rounded-xl bg-els-amber px-5 text-sm font-bold text-els-on-amber transition hover:bg-els-amber-2"
             >
               Voltar aos planos
             </Link>

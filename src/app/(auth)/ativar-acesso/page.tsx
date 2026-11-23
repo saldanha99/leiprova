@@ -30,7 +30,7 @@ export default async function ActivateAccountAccessPage({
           <span className="mx-auto grid size-14 place-items-center rounded-2xl border border-els-danger/15 bg-els-danger/[.06] text-els-danger-ink">
             <AlertTriangle className="size-6" aria-hidden="true" />
           </span>
-          <Link href="/recuperar-acesso" className="inline-flex min-h-12 items-center justify-center rounded-xl bg-els-amber px-5 text-sm font-bold text-els-on-amber transition hover:bg-els-amber">
+          <Link href="/recuperar-acesso" className="inline-flex min-h-12 items-center justify-center rounded-xl bg-els-amber px-5 text-sm font-bold text-els-on-amber transition hover:bg-els-amber-2">
             Solicitar novo link
           </Link>
           <Link href="/entrar" className="text-sm font-semibold text-els-fg-3 transition hover:text-els-fg min-h-11 inline-flex items-center">Voltar para entrar</Link>

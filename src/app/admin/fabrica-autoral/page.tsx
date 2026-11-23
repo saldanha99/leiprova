@@ -303,7 +303,7 @@ export default async function EditorialFactoryPage({
                             href={item.sourceUrl}
                             target="_blank"
                             rel="noreferrer"
-                            className="inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-els-amber/15 bg-els-amber/[.045] px-2.5 text-[11px] font-bold text-els-amber-ink transition hover:bg-els-amber/[.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-els-amber/50"
+                            className="inline-flex min-h-11 items-center gap-1.5 rounded-lg border border-els-amber/15 bg-els-amber/[.045] px-2.5 text-[11px] font-bold text-els-amber-ink transition hover:bg-els-amber-2/[.08] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-els-amber/50"
                           >
                             Conferir no portal oficial
                             <ExternalLink aria-hidden="true" className="size-3.5" />

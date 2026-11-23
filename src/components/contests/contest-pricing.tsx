@@ -59,6 +59,7 @@ export function ContestPricing({
             <article
               key={option.key}
               className={`${offer.card} ${option.key === "annual" ? offer.annual : ""}`}
+              data-theme={option.key === "annual" ? "light" : undefined}
               data-contest-plan={option.key}
             >
               <div className={offer.top}>

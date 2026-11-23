@@ -280,7 +280,7 @@ export default async function AdminOverviewPage() {
             </p>
             <Link
               href="/admin/stripe-connect"
-              className="mt-7 inline-flex min-h-11 items-center gap-2 rounded-xl bg-els-amber px-4 text-sm font-bold text-els-on-amber transition hover:bg-els-amber"
+              className="mt-7 inline-flex min-h-11 items-center gap-2 rounded-xl bg-els-amber px-4 text-sm font-bold text-els-on-amber transition hover:bg-els-amber-2"
             >
               Abrir configuração
               <ArrowRight aria-hidden="true" className="size-4" />

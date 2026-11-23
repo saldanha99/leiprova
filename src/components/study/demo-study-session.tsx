@@ -484,7 +484,7 @@ function AnswerFeedback({
       <button
         type="button"
         onClick={onAdvance}
-        className="group mt-6 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-els-amber px-5 text-sm font-bold text-els-on-amber shadow-[0_15px_45px_color-mix(in_oklch,var(--els-amber)_16%,transparent)] outline-none transition hover:bg-els-amber focus-visible:ring-2 focus-visible:ring-els-amber-2 focus-visible:ring-offset-2 focus-visible:ring-offset-els-surface"
+        className="group mt-6 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-els-amber px-5 text-sm font-bold text-els-on-amber shadow-[0_15px_45px_color-mix(in_oklch,var(--els-amber)_16%,transparent)] outline-none transition hover:bg-els-amber-2 focus-visible:ring-2 focus-visible:ring-els-amber-2 focus-visible:ring-offset-2 focus-visible:ring-offset-els-surface"
       >
         {isLast ? "Ver meu resultado" : "Próxima questão"}
         <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
@@ -624,7 +624,7 @@ function CompletionScreen({
               </p>
               <Link
                 href="/cadastro"
-                className="group relative mt-6 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-els-amber px-5 text-center text-sm font-bold text-els-on-amber shadow-[0_15px_45px_color-mix(in_oklch,var(--els-amber)_16%,transparent)] outline-none transition hover:bg-els-amber focus-visible:ring-2 focus-visible:ring-els-amber-2 focus-visible:ring-offset-2 focus-visible:ring-offset-els-surface-2"
+                className="group relative mt-6 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-els-amber px-5 text-center text-sm font-bold text-els-on-amber shadow-[0_15px_45px_color-mix(in_oklch,var(--els-amber)_16%,transparent)] outline-none transition hover:bg-els-amber-2 focus-visible:ring-2 focus-visible:ring-els-amber-2 focus-visible:ring-offset-2 focus-visible:ring-offset-els-surface-2"
               >
                 Criar minha conta grátis
                 <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />

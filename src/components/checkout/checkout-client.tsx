@@ -212,7 +212,7 @@ function PaymentForm({ buttonLabel }: { buttonLabel: string }) {
       <button
         type="submit"
         disabled={result.type !== "success" || !result.checkout.canConfirm || submitting}
-        className="flex min-h-14 w-full items-center justify-center gap-2 rounded-xl bg-els-amber px-5 text-sm font-extrabold text-els-on-amber shadow-[0_16px_50px_color-mix(in_oklch,var(--els-amber)_16%,transparent)] transition hover:bg-els-amber disabled:cursor-not-allowed disabled:opacity-45"
+        className="flex min-h-14 w-full items-center justify-center gap-2 rounded-xl bg-els-amber px-5 text-sm font-extrabold text-els-on-amber shadow-[0_16px_50px_color-mix(in_oklch,var(--els-amber)_16%,transparent)] transition hover:bg-els-amber-2 disabled:cursor-not-allowed disabled:opacity-45"
       >
         {submitting ? (
           <>

@@ -118,7 +118,7 @@ export default async function LegalActPage({
               className={cn(
                 "mt-5 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl px-5 text-sm font-bold transition",
                 selectedQuestionCount
-                  ? "bg-els-amber text-els-on-amber hover:bg-els-amber"
+                  ? "bg-els-amber text-els-on-amber hover:bg-els-amber-2"
                   : "pointer-events-none bg-els-raise text-els-fg-4",
               )}
             >

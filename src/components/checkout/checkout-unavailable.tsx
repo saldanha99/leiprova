@@ -20,7 +20,7 @@ export function CheckoutUnavailable({ invalidPlan = false }: { invalidPlan?: boo
               ? "O plano informado não está disponível. Escolha uma opção publicada na página de planos."
               : "Os pagamentos ainda não foram habilitados com segurança neste ambiente. Nenhuma cobrança pode ser feita agora."}
           </p>
-          <Link href="/#planos" className="mt-7 inline-flex min-h-11 items-center justify-center rounded-xl bg-els-amber px-5 text-sm font-bold text-els-on-amber transition hover:bg-els-amber">
+          <Link href="/#planos" className="mt-7 inline-flex min-h-11 items-center justify-center rounded-xl bg-els-amber px-5 text-sm font-bold text-els-on-amber transition hover:bg-els-amber-2">
             Voltar aos planos
           </Link>
         </section>

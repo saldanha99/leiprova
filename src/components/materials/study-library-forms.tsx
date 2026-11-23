@@ -63,7 +63,7 @@ export function SavedFilterForm({
       <button
         type="submit"
         disabled={pending}
-        className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-els-amber px-4 text-sm font-bold text-els-on-amber transition hover:bg-els-amber disabled:cursor-wait disabled:opacity-60"
+        className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-els-amber px-4 text-sm font-bold text-els-on-amber transition hover:bg-els-amber-2 disabled:cursor-wait disabled:opacity-60"
       >
         {pending ? <LoaderCircle className="size-4 animate-spin" /> : <Save className="size-4" />}
         Salvar este recorte
