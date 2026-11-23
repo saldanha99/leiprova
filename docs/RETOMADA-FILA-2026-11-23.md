@@ -101,3 +101,29 @@ combinadas com o Dev Wise Wolf (redesenho só no front, na `feat/redesenho-els`)
   (16), Escuta Protegida (29) e LONMP (82).
 - Testes: 4 falhas em `tests/fgv-historical-lote1.test.ts` são anteriores a esta rodada (o teste ainda espera o TJPE
   sem gabarito definitivo) e 29 em `cp-reconciliation-preview` dependem da captura privada do CP em `.local`.
+
+## Terceira rodada (noite de 23/11): "tudo autorizado, resolva tudo"
+
+Regra do Vinícius: autorização não é aprovação às cegas; o que não bater com a fonte oficial não é aprovado.
+
+- **5 leis aprovadas** (`2c8fdd3`, `--approve-camara-updated`): texto atualizado da Câmara recapturado na execução e
+  conferido por amostragem no Planalto (artigos e último artigo). Versões vigentes: Lei Geral do Esporte v150
+  (164 artigos, `dc6d053a…`), Henry Borel v151 (34, `680413d3…`), Software v152 (16, `890f1ce9…`), Escuta
+  Protegida v153 (29, `86000b1e…`), LONMP v154 (82, `41bb0cff…`). Backup `before-5-leis-camara-20261123.dump`.
+- **PGM-Manaus admitida** (`f101288`, `41776b8`, `dedab0f`): edital do DOM nº 6343 (02/07/2026, Edição Extra),
+  `8cb56a3c…`, baixado no navegador pelo Chefe de Gabinete (o WAF do DOM recusa o servidor). URL oficial
+  `https://dom.manaus.am.gov.br/pdf/2026/julho/DOM%206343%2002.07.2026%20Edicao%20Extra.pdf`. Oportunidade
+  `a48823c2-…`, 179 requisitos (auditoria 147515), 167 classificados (12 de Direito Municipal fora). Sem contrato
+  nem prova anterior: caderno e gabarito ficam no portal da FCC, cujo robots proíbe a consulta.
+- **Constituição Federal não aprovada.** A captura de texto do Senado (4040, `f5a8b069…`) difere da v65 só nos
+  arts. 7, 40, 198 e 201: EC 141/2026 (art. 7º, XIII: 40 horas semanais; § 1º, §§ 2º e 3º) e EC 140/2026 (arts.
+  40 § 5º-A, 198 IV/§§ 4º-A, 4º-B e 10, 201 § 8º-A). Esses 4 artigos têm 174 vínculos e 188 questões; 6 questões
+  falam em 44 horas. A CF inteira sustenta 6.182 vínculos, 6.136 questões e 28 produtos. O carregador só troca a
+  versão, e o filtro da loja exige versão corrente: aprovar agora tiraria todas essas questões das ofertas.
+- **legal_change**: das 16 leis, 10 têm o texto consolidado do Senado idêntico ao aprovado (só a página de
+  declarações mudou); não aprovadas, porque o texto oficial ainda não reflete as alterações declaradas. CTN (16
+  artigos alterados, 20 acrescidos; 130 vínculos e 153 questões nos alterados) e ECA (art. 4º; 9 vínculos) têm
+  texto novo e esperam o mesmo operador da CF. CP, LGPD e Lei 14.133 têm fonte própria e ficam fora.
+- **Próximo passo**: operador de transição de versão legal (religar os artigos sem mudança, reabrir só os vínculos
+  dos artigos alterados, ensaio em clone) para CF, CTN e ECA.
+- **TCE-MA**: ainda sem gabarito na Cebraspe em 23/11 à noite.
