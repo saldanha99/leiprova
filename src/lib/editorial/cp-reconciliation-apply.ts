@@ -6,8 +6,10 @@ import { CAMARA_CP_CORRECTION, CP63_EXPECTED_HELD_IDS, cpCorrectionSha256 } from
 import { CP_CUT_REFERENCE, assertCpCutFresh } from "../official-sources/cp-coordinated-cut";
 import {
   CP_ACT_ID,
+  CP_MONITOR_SNAPSHOT_ID,
   CP_RECEIPT_ID,
   CP_SUSPENSION_AUDIT_ID,
+  CP_TEXT_SNAPSHOT_ID,
   CP_CUT_INITIAL_AUDIT_ID,
   CP_V112_ID,
   validateCpReconciliationContext,
@@ -78,18 +80,26 @@ export async function applyCpReconciliation(
   const canonical = fresh.parsed.articles.map(a => [a.path, "", a.literalText].join("\n")).join("\n\n");
   const notes = `${CP_RECONCILIATION_APPLY_POLICY}; recaptura Câmara confrontada integralmente (402) com Lei 15.517; recibo ${CP_RECEIPT_ID} permanece suspenso; ${CP_CUT_REFERENCE}; humanReview:false.`;
 
-  const [monitor] = await tx.insert(schema.legalSourceSnapshots).values({
-    publicId: randomUUID(), legalActId: CP_ACT_ID, sourceUrl: CAMARA_CP_CORRECTION.url,
-    checksumSha256: CAMARA_CP_CORRECTION.canonicalSha256, normalizedContent: canonical, contentLength: [...canonical].length,
-    articleMarkerCount: 402, httpStatus: 200, status: "approved", initiatedByUserId: null, reviewedByUserId: actorId,
-    reviewedAt: now, reviewNotes: notes, fetchedAt: fresh.body.fetchedAt, lastSeenAt: fresh.body.fetchedAt,
-  }).returning();
-  const [text] = await tx.insert(schema.legalTextSnapshots).values({
-    publicId: randomUUID(), legalActId: CP_ACT_ID, monitorSnapshotId: monitor.id, sourceUrl: CAMARA_CP_CORRECTION.url,
-    checksumSha256: CAMARA_CP_CORRECTION.canonicalSha256, normalizedContent: canonical, contentLength: [...canonical].length,
-    articleCount: 402, parserVersion: fresh.parsed.parserVersion, status: "approved", initiatedByUserId: null,
-    reviewedByUserId: actorId, reviewedAt: now, reviewNotes: notes, fetchedAt: fresh.body.fetchedAt, lastSeenAt: fresh.body.fetchedAt,
-  }).returning();
+  // (legal_act_id, checksum) is unique, so the same corpus cannot get a new snapshot row.
+  // The rejected 2757/1660 are re-approved only if their stored content equals the fresh
+  // canonical body byte for byte; the original rejection stays in audit 10902.
+  const fetchedAt = fresh.body.fetchedAt.toISOString();
+  const [monitor] = await tx.execute<{ id: number; publicId: string }>(
+    sql`update legal_source_snapshots set status='approved', reviewed_by_user_id=${actorId}, reviewed_at=${now.toISOString()}::timestamptz,
+          review_notes=${notes}, last_seen_at=${fetchedAt}::timestamptz
+        where id=${CP_MONITOR_SNAPSHOT_ID} and legal_act_id=${CP_ACT_ID} and status='rejected'
+          and checksum_sha256=${CAMARA_CP_CORRECTION.canonicalSha256} and normalized_content=${canonical} and article_marker_count=402
+        returning id::int as id, public_id as "publicId"`
+  );
+  const [text] = await tx.execute<{ id: number; publicId: string }>(
+    sql`update legal_text_snapshots set status='approved', reviewed_by_user_id=${actorId}, reviewed_at=${now.toISOString()}::timestamptz,
+          review_notes=${notes}, last_seen_at=${fetchedAt}::timestamptz, updated_at=${now.toISOString()}::timestamptz
+        where id=${CP_TEXT_SNAPSHOT_ID} and legal_act_id=${CP_ACT_ID} and monitor_snapshot_id=${CP_MONITOR_SNAPSHOT_ID} and status='rejected'
+          and checksum_sha256=${CAMARA_CP_CORRECTION.canonicalSha256} and normalized_content=${canonical} and article_count=402
+          and parser_version=${fresh.parsed.parserVersion}
+        returning id::int as id, public_id as "publicId"`
+  );
+  if (!monitor || !text) throw new Error("Snapshots 2757/1660 não conferem byte a byte com a captura fresca; revertido.");
 
   const promoted = await tx.execute<{ id: number }>(
     sql`update legal_versions set status='current', verified_at=${fresh.body.fetchedAt.toISOString()}::timestamptz
@@ -120,7 +130,7 @@ export async function applyCpReconciliation(
       initialCutAuditId: CP_CUT_INITIAL_AUDIT_ID,
       suspensionAuditId: CP_SUSPENSION_AUDIT_ID,
       suspensionReason: preview.auditTrail.suspensionReason,
-      rejectedSnapshotsKept: [preview.snapshots.monitor2757.id, preview.snapshots.text1660.id],
+      snapshotsReapproved: [monitor.id, text.id],
       offersProjected: preview.offers.products.map(p => ({ slug: p.slug, before: p.currentValidCount, after: p.projectedValidCount })),
       questionsModified: 0, bindingsModified: 0, requirementsModified: 0, productsReleased: 0, flagsChanged: 0, pricesChanged: 0,
     },

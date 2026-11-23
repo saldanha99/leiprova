@@ -57,10 +57,12 @@ async function main() {
 
 if (process.argv[1]?.endsWith("apply-cp-reconciliation.ts")) {
   void main().catch((error: unknown) => {
-    const databaseError = error instanceof Error && (error.name === "PostgresError" || "cause" in error);
-    const message = error instanceof Error && !databaseError
-      ? error.message.replace(/postgres(?:ql)?:\/\/\S+/giu, "[conexão removida]")
-      : `Falha de banco: ${error instanceof Error ? error.message.replace(/postgres(?:ql)?:\/\/\S+/giu, "[conexão removida]") : "desconhecida"}`;
+    // Drizzle wraps the PostgresError in `cause`; its message never carries the query params.
+    const cause = error instanceof Error && error.cause instanceof Error ? error.cause : null;
+    const base = cause ?? (error instanceof Error ? error : null);
+    const message = base
+      ? `${cause ? "Falha de banco: " : ""}${base.message.replace(/postgres(?:ql)?:\/\/\S+/giu, "[conexão removida]")}`
+      : "Falha desconhecida.";
     console.error("Reconciliação CP bloqueada:", message);
     process.exitCode = 1;
   });
