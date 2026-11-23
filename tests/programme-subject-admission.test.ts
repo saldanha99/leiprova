@@ -3,7 +3,15 @@ import {ADDITIONAL_PROGRAMME_SUBJECTS,subjectAdmissionInputSchema,assertSubjectL
 const proof={opportunityId:7,roleName:'Juiz Federal Substituto',examEditionId:25,sourceDocumentId:10,snapshotId:356,url:'https://conhecimento.fgv.br/sites/default/files/synthetic.pdf',checksum:'a'.repeat(64),headingPage:1,headingQuote:'DIREITO PREVIDENCIÁRIO'};
 const input={schemaVersion:1,subjects:[{slug:'direito-previdenciario',name:'Direito Previdenciário',proofs:[proof]}]};
 describe('rótulos oficiais e admissão da taxonomia',()=>{
- it('aceita somente nomes e cargos expressamente delimitados',()=>{expect(subjectAdmissionInputSchema.parse(input).subjects).toHaveLength(1);expect(Object.keys(ADDITIONAL_PROGRAMME_SUBJECTS)).toHaveLength(20);});
+ it('aceita somente nomes e cargos expressamente delimitados',()=>{expect(subjectAdmissionInputSchema.parse(input).subjects).toHaveLength(1);expect(Object.keys(ADDITIONAL_PROGRAMME_SUBJECTS)).toHaveLength(31);});
+ it('PCDF: título inline abre o item 1; menção em prosa ou título sem item continuam recusados',()=>{
+  expect(()=>assertSubjectLabelProof('medicina-legal','MEDICINA LEGAL: 1 Perícia e peritos.','x\nMEDICINA LEGAL: 1 Perícia e peritos.\ny')).not.toThrow();
+  expect(()=>assertSubjectLabelProof('direito-penal-e-legislacao-complementar','DIREITO PENAL E LEGISLAÇÃO COMPLEMENTAR: 1 Princípios.','DIREITO PENAL E LEGISLAÇÃO COMPLEMENTAR: 1 Princípios.')).not.toThrow();
+  expect(()=>assertSubjectLabelProof('medicina-legal','MEDICINA LEGAL: 1 ','MEDICINA LEGAL: 1 ')).toThrow();
+  expect(()=>assertSubjectLabelProof('direito-civil-e-legislacao-complementar','DIREITO CIVIL E LEGISLAÇÃO COMPLEMENTAR: I DIREITO CIVIL: 1 Lei','DIREITO CIVIL E LEGISLAÇÃO COMPLEMENTAR: I DIREITO CIVIL: 1 Lei')).not.toThrow();
+  expect(()=>assertSubjectLabelProof('direito-do-consumidor','DIREITO DO CONSUMIDOR: 1 Teoria.','DIREITO DO CONSUMIDOR: 1 Teoria.')).toThrow();
+  expect(()=>assertSubjectLabelProof('direito-do-consumidor','DIREITO DO CONSUMIDOR','DIREITO DO CONSUMIDOR')).not.toThrow();
+ });
  it('não cria sinônimos, combinações genéricas ou cargos de outra preparação',()=>{
   for(const value of [{...input,subjects:[{...input.subjects[0],name:'Legislação Especial'}]},{...input,subjects:[{...input.subjects[0],proofs:[{...proof,roleName:'Delegado'}]}]}])expect(()=>subjectAdmissionInputSchema.parse(value)).toThrow();
  });
