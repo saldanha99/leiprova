@@ -132,6 +132,7 @@ export async function transitionLegalVersion(tx: Tx, request: TransitionRequest)
     from ${mapping} where m.unchanged and q.legal_article_id=m.old_id returning q.id::int id`);
   // Artigos alterados: suspende vínculo/certificado e manda a questão para a fila normal.
   const suspended = await tx.execute<{ id: string }>(sql`update contest_product_question_bindings b set status='suspended', updated_at=${now}::timestamptz,
+      reviewed_by_user_id=coalesce(b.reviewed_by_user_id, ${request.actorId}), reviewed_at=coalesce(b.reviewed_at, ${now}::timestamptz),
       review_notes=${`${notes} Artigo alterado pela nova redação; questão devolvida à fila de revisão.`}
     from ${mapping} where not m.unchanged and b.legal_article_id=m.old_id and b.status in ('approved','pending_review') returning b.id`);
   if (suspended.length) await tx.execute(sql`update question_contract_certifications set status='suspended'
