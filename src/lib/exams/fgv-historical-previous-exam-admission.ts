@@ -423,7 +423,11 @@ export async function reviewFgvHistoricalRegistration(tx: postgres.TransactionSq
   if (assignments.length !== 1) throw new Error("Examinador FGV único e ligado à fonte aprovada obrigatório.");
   const today = saoPauloCalendarDate(new Date());
   if (target.examDate >= today) throw new Error("Prova ainda não realizada.");
-  const existing = await tx`select id from exam_editions where public_id=${target.editionPublicId} or (institution_acronym=${target.institution} and jurisdiction_code=${target.jurisdiction} and career_track_id=${identity.careerId} and specialization_id is null and exam_date=${target.examDate}::date) limit 1`;
+  // Same institution/career/date is a different edition only when the role differs (PCPR 01/2026:
+  // Agente and Papiloscopista share career and date); the title carries the role literally.
+  const existing = await tx`select id from exam_editions where public_id=${target.editionPublicId} or source_external_id=${target.editionSourceExternalId}
+    or (institution_acronym=${target.institution} and jurisdiction_code=${target.jurisdiction} and career_track_id=${identity.careerId} and specialization_id is null
+      and exam_date=${target.examDate}::date and title=${target.editionTitle}) limit 1`;
   if (existing.length) throw new Error("Edição já existente; não duplicar nem alterar IDs/documentos históricos.");
   const newer = await tx`select id from exam_editions where institution_acronym=${target.institution} and jurisdiction_code=${target.jurisdiction} and career_track_id=${identity.careerId}
     and specialization_id is null and status in ('held','published') and exam_date>${target.examDate}::date and exam_date<${today}::date limit 1`;
