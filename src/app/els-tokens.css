@@ -15,6 +15,7 @@
   --els-surface: oklch(0.205 0.033 258);
   --els-surface-2: oklch(0.24 0.034 258);
   --els-raise: oklch(1 0 0 / 0.045);
+  --els-raise-hover: oklch(1 0 0 / 0.08);
 
   /* Linhas */
   --els-line: oklch(0.78 0.04 258 / 0.13);
@@ -78,6 +79,7 @@
   --radius-xl: 32px;
   --shadow-card: var(--els-shadow);
   --shadow-deep: var(--els-shadow-lg);
+  --container: 1200px;
 }
 
 @theme inline {
@@ -86,6 +88,7 @@
   --color-els-surface: var(--els-surface);
   --color-els-surface-2: var(--els-surface-2);
   --color-els-raise: var(--els-raise);
+  --color-els-raise-hover: var(--els-raise-hover);
   --color-els-line: var(--els-line);
   --color-els-line-strong: var(--els-line-strong);
   --color-els-fg: var(--els-fg);

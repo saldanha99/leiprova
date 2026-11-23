@@ -44,7 +44,7 @@ export default async function DashboardPage() {
       </header>
 
       <section className="mt-7 grid gap-4 xl:grid-cols-[1.25fr_.75fr]">
-        <article className="relative overflow-hidden rounded-[1.75rem] border border-els-amber/15 bg-[linear-gradient(135deg,#111b28_0%,#0b1623_58%,#0d201e_100%)] p-6 shadow-2xl shadow-black/15 sm:p-8">
+        <article className="relative overflow-hidden rounded-[1.75rem] border border-els-amber/15 bg-[linear-gradient(135deg,var(--els-surface-2)_0%,var(--els-surface)_58%,oklch(0.22_0.04_168)_100%)] p-6 shadow-2xl shadow-black/15 sm:p-8">
           <div className="pointer-events-none absolute -right-24 -top-24 size-72 rounded-full bg-els-amber/8 blur-3xl" />
           <div className="relative flex h-full flex-col justify-between gap-8 lg:flex-row lg:items-end">
             <div className="max-w-xl">
@@ -67,7 +67,7 @@ export default async function DashboardPage() {
               <Link href="/app/quiz" className="group inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-els-amber px-5 text-sm font-bold text-els-on-amber transition hover:bg-els-amber">
                 Montar meu quiz <ArrowRight className="size-4 transition group-hover:translate-x-0.5" />
               </Link>
-              <Link href="/app/treinar" className="inline-flex min-h-11 items-center justify-center rounded-xl border border-els-line bg-els-raise px-5 text-sm font-semibold text-els-fg-2 transition hover:bg-els-raise">
+              <Link href="/app/treinar" className="inline-flex min-h-11 items-center justify-center rounded-xl border border-els-line bg-els-raise px-5 text-sm font-semibold text-els-fg-2 transition hover:bg-els-raise-hover">
                 Treino rápido
               </Link>
             </div>
@@ -114,7 +114,7 @@ export default async function DashboardPage() {
               return (
                 <div key={day.date} className="flex h-full flex-col items-center justify-end gap-2">
                   <span className="text-[10px] font-semibold text-els-fg-3">{day.answered || ""}</span>
-                  <div className="w-full max-w-10 rounded-t-lg bg-gradient-to-t from-emerald-500/70 to-els-green" style={{ height: `${height}%`, opacity: day.answered ? 1 : 0.15 }} />
+                  <div className="w-full max-w-10 rounded-t-lg bg-gradient-to-t from-els-green/70 to-els-green" style={{ height: `${height}%`, opacity: day.answered ? 1 : 0.15 }} />
                   <span className="text-[11px] text-els-fg-4">{weekDay}</span>
                 </div>
               );
@@ -127,7 +127,7 @@ export default async function DashboardPage() {
           <p className="mt-1 text-xs text-els-fg-3">trilha inicial sugerida</p>
           <div className="mt-6 grid gap-3">
             {focuses.map(({ article, topic, count }, index) => (
-              <Link key={`${article}-${topic}-${index}`} href="/app/treinar" className="group flex items-center gap-3 rounded-xl border border-els-line bg-els-raise p-3 transition hover:border-els-amber/20 hover:bg-els-raise">
+              <Link key={`${article}-${topic}-${index}`} href="/app/treinar" className="group flex items-center gap-3 rounded-xl border border-els-line bg-els-raise p-3 transition hover:border-els-amber/20 hover:bg-els-raise-hover">
                 <span className="grid size-9 place-items-center rounded-lg bg-els-amber/8 text-xs font-bold text-els-amber-2">{index + 1}</span>
                 <span className="min-w-0 flex-1"><strong className="block text-sm text-els-fg-2">{article}</strong><span className="block truncate text-xs text-els-fg-3">{topic}</span></span>
                 <span className="text-[11px] text-els-fg-4">{count} {count === 1 ? "item" : "itens"}</span>
