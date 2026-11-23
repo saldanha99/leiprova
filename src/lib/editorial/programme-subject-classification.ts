@@ -24,6 +24,8 @@ export const PROGRAMME_CLASSIFICATION_SCOPES = {
   "tjrj-analista-sem-especialidade-lxii-2025-historico-objetiva": "Analista Judiciário – Sem Especialidade",
   "tjms-notas-registro-provimento-vi-2025-historico-objetiva": "Outorga de Delegações de Notas e de Registro — Ingresso por Provimento",
   "pcpr-delegado-01-2026-historico-objetiva": "Delegado de Polícia",
+  "pcpr-agente-policia-judiciaria-01-2026-historico-objetiva": "Agente de Polícia Judiciária",
+  "pcpr-papiloscopista-policial-01-2026-historico-objetiva": "Papiloscopista Policial",
   "mpgo-promotor-substituto-63-2025-historico-objetiva": "Promotora e Promotor de Justiça Substituto",
   // Lote Cebraspe histórico.
   "sefazrn-auditor-fiscal-5-2025-historico-objetiva": "Auditor Fiscal de Receitas Estaduais",
@@ -71,6 +73,9 @@ export const PROGRAMME_SECTION_HEADINGS = [...PROGRAMME_CANONICAL_SUBJECTS, "Dir
   "Atos Normativos do Conselho Nacional de Justiça – CNJ", "Conhecimentos Gerais", "Legislação Especial do Estado de Mato Grosso do Sul", "Legislação Especial Federal",
   // PCPR Delegado: títulos numerados inline com dois-pontos.
   "Legislação Penal e Legislação Processual Penal Extravagante", "Direito Administrativo e Gestão Pública", "Legislação Estadual e Institucional", "Ciências Forenses",
+  // PCPR Agente e Papiloscopista (blocos próprios do Anexo I).
+  "Contabilidade Geral", "Estatística", "Direito Penal e Legislação Penal Extravagante", "Direito Processual Penal e Legislação Processual Penal Extravagante",
+  "Biologia", "Física", "Química", "Direito Penal Aplicado", "Direito Processual Penal Aplicado",
   // PCDF Delegado (títulos inline com dois-pontos) e TJPE Juiz Substituto.
   "Direito Administrativo e Legislação Complementar", "Direito Constitucional e Legislação Complementar", "Direito Civil e Legislação Complementar", "Direito Empresarial e Legislação Complementar", "Direito Penal e Legislação Complementar", "Direito Tributário e Legislação Complementar", "Direito Processual Penal e Legislação Complementar", "Direito Ambiental e Legislação Complementar", "Medicina Legal", "Direito do Consumidor", "Direito da Criança e do Adolescente", "Noções Gerais de Direito e Formação Humanística"] as const;
 export function programmeCanonicalSubject(heading: string) {
