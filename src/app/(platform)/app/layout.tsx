@@ -27,6 +27,8 @@ export default async function PlatformLayout({ children }: { children: ReactNode
       id={THEME_ROOT_ID}
       data-theme={savedTheme ?? "dark"}
       {...themeRoot}
+      // o script de 1ª visita pode trocar data-theme antes da hidratação
+      suppressHydrationWarning
       className="min-h-screen bg-els-bg text-els-fg lg:flex"
     >
       {savedTheme ? null : <script dangerouslySetInnerHTML={{ __html: themeBootScript(THEME_ROOT_ID) }} />}

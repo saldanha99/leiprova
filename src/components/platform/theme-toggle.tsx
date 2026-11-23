@@ -6,6 +6,9 @@ import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { THEME_COOKIE, THEME_ROOT_ATTR, THEME_STORAGE_KEY, type ElsTheme } from "@/lib/theme";
 
+/** Evento para manter sincronizados os botões montados na mesma página (menu e cabeçalho móvel). */
+const THEME_EVENT = "els-theme-change";
+
 function rootOf(node: HTMLElement | null) {
   return node?.closest<HTMLElement>(`[${THEME_ROOT_ATTR}]`) ?? null;
 }
@@ -18,6 +21,9 @@ export function ThemeToggle({ className }: { className?: string }) {
   useEffect(() => {
     const current = rootOf(ref.current)?.getAttribute("data-theme");
     setTheme(current === "light" ? "light" : "dark");
+    const sync = (event: Event) => setTheme((event as CustomEvent<ElsTheme>).detail);
+    window.addEventListener(THEME_EVENT, sync);
+    return () => window.removeEventListener(THEME_EVENT, sync);
   }, []);
 
   function toggle() {
@@ -31,6 +37,7 @@ export function ThemeToggle({ className }: { className?: string }) {
     }
     document.cookie = `${THEME_COOKIE}=${next}; path=/; max-age=31536000; samesite=lax`;
     setTheme(next);
+    window.dispatchEvent(new CustomEvent<ElsTheme>(THEME_EVENT, { detail: next }));
   }
 
   const isLight = theme === "light";

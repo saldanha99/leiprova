@@ -105,7 +105,7 @@
   --navy-800: oklch(0.19 0.033 258);
   --navy-750: var(--els-surface);
   --navy-700: var(--els-surface-2);
-  --surface: oklch(0.205 0.033 258 / 0.82);
+  --surface: color-mix(in oklch, var(--els-surface) 82%, transparent);
   --surface-strong: var(--els-surface);
   --surface-soft: var(--els-raise);
   --border: var(--els-line);
