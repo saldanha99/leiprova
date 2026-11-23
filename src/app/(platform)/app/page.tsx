@@ -59,7 +59,7 @@ export default async function DashboardPage() {
                 </div>
                 <span className="text-sm font-bold text-els-fg">{stats.todayAnswered}/{goal}</span>
               </div>
-              <Link href="/app/plano-diario" className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-els-green">
+              <Link href="/app/plano-diario" className="mt-3 inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-els-green">
                 Seguir plano diário <ArrowRight className="size-4" />
               </Link>
             </div>
@@ -82,7 +82,7 @@ export default async function DashboardPage() {
           <p className="mt-7 text-4xl font-semibold tracking-[-.04em]">{stats.dueReviews}</p>
           <h2 className="mt-1 font-semibold">revisões para hoje</h2>
           <p className="mt-2 text-sm leading-6 text-els-fg-3">Erros e acertos de baixa confiança voltam antes.</p>
-          <Link href="/app/revisoes" className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-els-green">Abrir fila <ArrowRight className="size-4" /></Link>
+          <Link href="/app/revisoes" className="mt-4 inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-els-green">Abrir fila <ArrowRight className="size-4" /></Link>
         </article>
       </section>
 

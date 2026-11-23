@@ -947,7 +947,7 @@ body:has(.els-ui) {
 
 .els-ui .pricing-switch small {
   background: var(--els-amber);
-  color: var(--els-fg);
+  color: var(--els-on-amber);
 }
 
 .els-ui .pricing-card,
@@ -964,7 +964,7 @@ body:has(.els-ui) {
   border-color: var(--els-amber-strong);
   background: var(--els-amber);
   box-shadow: none;
-  color: var(--els-fg);
+  color: var(--els-on-amber);
 }
 
 .els-ui .pricing-card__annual-price strong,

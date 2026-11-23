@@ -216,7 +216,7 @@ export function LiveStudySession({
   return (
     <main className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-7 lg:px-9 lg:py-9">
       <div className="flex items-center justify-between gap-4">
-        <Link href={mode === "revisao" ? "/app/revisoes" : topic ? "/app/materiais" : "/app"} className="inline-flex items-center gap-2 text-sm font-semibold text-els-fg-3 transition hover:text-els-fg"><ArrowLeft className="size-4" />{mode === "revisao" ? "Revisões" : topic ? "Materiais" : "Painel"}</Link>
+        <Link href={mode === "revisao" ? "/app/revisoes" : topic ? "/app/materiais" : "/app"} className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-els-fg-3 transition hover:text-els-fg"><ArrowLeft className="size-4" />{mode === "revisao" ? "Revisões" : topic ? "Materiais" : "Painel"}</Link>
         <span className="rounded-full border border-els-line bg-els-raise px-3 py-1.5 text-xs text-els-fg-3">{index + 1} de {questions.length}</span>
       </div>
       <div

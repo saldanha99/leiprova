@@ -66,7 +66,7 @@ describe("identidade pública da Edital Lei Seca", () => {
     for (const html of [platformLogo, landingLogo]) {
       // Logo do redesenho (23/11/2026): monograma ELS + "Edital / Lei Seca".
       expect(html).toContain('class="els-monogram"');
-      expect(html).toContain('<span>Edital</span><span class="els-logo__accent">Lei Seca</span>');
+      expect(html).toContain('<span>Edital</span> <span class="els-logo__accent">Lei Seca</span>');
       expect(html).not.toMatch(/Lei\s*Prova/i);
     }
   });
@@ -79,7 +79,7 @@ describe("identidade pública da Edital Lei Seca", () => {
     const tour = renderToStaticMarkup(createElement(ContestProductTour));
     for (const html of [hero, tour]) {
       expect(html).toContain(`role="img" aria-label="${BRAND_NAME}"`);
-      expect(html).toContain('<span>Edital</span><span class="els-logo__accent">Lei Seca</span>');
+      expect(html).toContain('<span>Edital</span> <span class="els-logo__accent">Lei Seca</span>');
       expect(html).not.toMatch(/edita<(?:b|span)>lume/);
     }
   });

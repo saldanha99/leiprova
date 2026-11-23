@@ -30,7 +30,7 @@ export function ElsLogo({ compact = false, className }: { compact?: boolean; cla
       <ElsMonogram />
       {!compact ? (
         <span className="els-logo__word editalume-logo__word">
-          <span>Edital</span>
+          <span>Edital</span>{" "}
           <span className="els-logo__accent">Lei Seca</span>
         </span>
       ) : null}

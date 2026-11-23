@@ -16,7 +16,7 @@ export function LeiProvaMark({
   return (
     <Link
       href={href}
-      className={cn("inline-flex items-center", className)}
+      className={cn("inline-flex min-h-11 items-center", className)}
       aria-label={`${BRAND_NAME} — página inicial`}
     >
       <EditalumeLogo compact={compact} />
