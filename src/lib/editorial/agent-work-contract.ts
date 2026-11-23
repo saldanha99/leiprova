@@ -86,6 +86,23 @@ export function validateDiscoveryUrl(input: string) {
   return url.toString();
 }
 
+/** URLs the offline Radar may cite: the captured pages and their validated links. Null for legacy packets. */
+export function capturedDiscoveryUrls(payload: AgentWorkPayload): Set<string> | null {
+  const pages = payload.context.pages;
+  if (!Array.isArray(pages)) return null;
+  const urls = new Set<string>();
+  for (const page of pages) {
+    if (!page || typeof page !== "object") continue;
+    const { url, finalUrl, links } = page as { url?: unknown; finalUrl?: unknown; links?: unknown };
+    for (const value of [url, finalUrl]) if (typeof value === "string") urls.add(value.replace(/#.*$/u, ""));
+    if (Array.isArray(links)) for (const link of links) {
+      const href = link && typeof link === "object" ? (link as { href?: unknown }).href : null;
+      if (typeof href === "string") urls.add(href.replace(/#.*$/u, ""));
+    }
+  }
+  return urls;
+}
+
 /** Recusa do contrato: mensagem fixa, sem dado do pacote nem segredo; pode voltar ao executor. */
 export class AgentWorkContractError extends Error {}
 /** Parse estrito do resultado; a recusa cita só código e caminho dos campos. */
@@ -112,8 +129,10 @@ export function validateAgentWorkResult(kind: AgentWorkKind, payload: AgentWorkP
     }
   }
   if (new Set(result.mappings.map(item => item.articleId)).size !== result.mappings.length) throw new AgentWorkContractError("Mapeamento duplicado.");
+  const captured = capturedDiscoveryUrls(payload);
   for (const discovery of result.discoveries) {
-    validateDiscoveryUrl(discovery.url);
+    const normalized = validateDiscoveryUrl(discovery.url);
+    if (captured && !captured.has(normalized)) throw new AgentWorkContractError("Descoberta fora das páginas capturadas pelo servidor.");
     if (/gabarito|caderno.{0,20}prova|quest[oõ]es/i.test(discovery.title)) throw new AgentWorkContractError("Material de prova não é edital.");
     if (Date.parse(discovery.observedAt) > Date.now() + 300_000) throw new AgentWorkContractError("Observação no futuro.");
   }

@@ -82,9 +82,10 @@ describe("executor", () => {
     expect(prompt).toMatch(/dado, nunca instrução/);
     expect(prompt).toMatch(/Leia job\.payload\.instructions/);
   });
-  it("sem rede, não reserva legal_change nem descoberta", async () => {
+  it("sem rede, não reserva legal_change; descoberta só pelo Radar, com páginas capturadas pelo servidor", async () => {
     const { ROLE_KINDS } = await import("../deploy/editorial-realtime-worker.mjs");
-    expect(ROLE_KINDS).toEqual({ "Guardião": "legal_mapping", Autor: "authoring" });
+    expect(ROLE_KINDS).toEqual({ "Guardião": "legal_mapping", Autor: "authoring", Radar: "discovery" });
+    expect(Object.values(ROLE_KINDS)).not.toContain("legal_change");
   });
   it("reconhece limite da assinatura", () => {
     expect(isSubscriptionLimit("Claude usage limit reached. Your limit will reset at 3pm")).toBe(true);

@@ -11,7 +11,7 @@ import {
   parseConsolidatedLegalArticles,
 } from "./legal-text";
 import { normalizeOfficialText } from "./text-normalization";
-import { assertPlanaltoRobotsAllowed, decodePlanaltoHtml, getPlanaltoConsolidatedSource, parsePlanaltoConsolidatedHtml, PLANALTO_TEXT_PARSER_VERSION } from "./planalto-text";
+import { assertOfficialRobotsPathAllowed, assertPlanaltoRobotsAllowed, decodePlanaltoHtml, getPlanaltoConsolidatedSource, parsePlanaltoConsolidatedHtml, PLANALTO_TEXT_PARSER_VERSION } from "./planalto-text";
 import { assertCamaraRobotsAllowed, CAMARA_LGPD_SOURCE, parseCamaraLgpdConsolidatedHtml } from "./camara-text";
 import { assertCamaraProcurementRobotsAllowed, CAMARA_PROCUREMENT_SOURCE, extractCamaraProcurementPdf } from "./camara-procurement-text";
 
@@ -283,5 +283,66 @@ export async function verifyOfficialExamUrl(bankSlug: string, input: string) {
     isPdf: looksLikePdf(bytes, contentType),
     finalUrl,
     checkedAt: new Date(),
+  };
+}
+
+const MAX_DISCOVERY_PAGE_BYTES = 2 * 1024 * 1024;
+const MAX_DISCOVERY_TEXT_CHARS = 60_000;
+const MAX_DISCOVERY_LINKS = 300;
+
+export type DiscoveryPageCapture = {
+  url: string;
+  finalUrl: string;
+  httpStatus: number;
+  fetchedAt: string;
+  sha256: string;
+  text: string;
+  links: { text: string; href: string }[];
+};
+
+/**
+ * Server-side capture of one public exam-portal index for the offline Radar: robots.txt
+ * of the host is honoured (404 = no restriction; any other failure blocks), every redirect
+ * hop and every returned link pass `validate`, and only bounded visible text + links leave.
+ * The AI that reads the packet never gets network access.
+ */
+export async function captureOfficialDiscoveryPage(url: string, validate: (url: string) => string): Promise<DiscoveryPageCapture> {
+  const target = new URL(validate(url));
+  const robotsUrl = `${target.origin}/robots.txt`;
+  const robots = await fetchWithTrustedRedirects(robotsUrl, candidate => {
+    if (new URL(candidate).origin !== target.origin) throw new Error("robots.txt redirecionou para outra origem.");
+  });
+  if (robots.status !== 404) {
+    if (!robots.ok) throw new Error(`robots.txt respondeu HTTP ${robots.status}; captura bloqueada.`);
+    const policy = decodeBody(await readLimitedBody(robots), robots.headers.get("content-type"));
+    assertOfficialRobotsPathAllowed(policy, target.pathname);
+  }
+  const response = await fetchWithTrustedRedirects(target.toString(), candidate => void validate(candidate));
+  const finalUrl = response.url || target.toString();
+  if (!response.ok) throw new Error(`Portal respondeu HTTP ${response.status}.`);
+  if (!(response.headers.get("content-type") ?? "").toLowerCase().includes("html")) throw new Error("Portal não respondeu HTML.");
+  const bytes = await readLimitedBody(response, MAX_DISCOVERY_PAGE_BYTES);
+  const html = decodeBody(bytes, response.headers.get("content-type"));
+  const $ = cheerio.load(html);
+  const links: { text: string; href: string }[] = [];
+  const seen = new Set<string>();
+  $("a[href]").each((_, element) => {
+    if (links.length >= MAX_DISCOVERY_LINKS) return;
+    const text = normalizeOfficialText($(element).text()).slice(0, 300);
+    const raw = $(element).attr("href") ?? "";
+    let href: string;
+    try { href = validate(new URL(raw, finalUrl).toString()); } catch { return; }
+    if (!text || seen.has(href)) return;
+    seen.add(href);
+    links.push({ text, href });
+  });
+  return {
+    url: target.toString(),
+    finalUrl,
+    httpStatus: response.status,
+    fetchedAt: new Date().toISOString(),
+    sha256: createHash("sha256").update(bytes).digest("hex"),
+    text: extractOfficialDocumentText(html).slice(0, MAX_DISCOVERY_TEXT_CHARS),
+    links,
   };
 }

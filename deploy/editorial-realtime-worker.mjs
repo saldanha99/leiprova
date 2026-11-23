@@ -15,10 +15,11 @@ import { budgetAllows, budgetMonth, chargeBudget, codexShouldRun, loadBudget, ro
 
 export { budgetAllows, budgetMonth, chargeBudget, codexShouldRun, loadBudget, rolloverBudget };
 
-export const ROLES = { "Guardião": "guardiao", Autor: "autor" };
-// Sem rede, o motor só reserva o que se resolve com o corpus do pacote.
-// legal_change exige consultar a fonte oficial: fica com o Guardião do Maestri.
-export const ROLE_KINDS = { "Guardião": "legal_mapping", Autor: "authoring" };
+export const ROLES = { "Guardião": "guardiao", Autor: "autor", Radar: "radar" };
+// Sem rede, o motor só reserva o que se resolve com o pacote. Desde 23/11/2026 o Radar
+// (discovery) entra: o servidor captura o índice público do portal (robots respeitado) e
+// põe texto/links em context.pages. legal_change ainda exige consultar a fonte oficial.
+export const ROLE_KINDS = { "Guardião": "legal_mapping", Autor: "authoring", Radar: "discovery" };
 const JOB_KEY = /^[a-z0-9:._-]{1,220}$/;
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 const HASH = /^[a-f0-9]{64}$/;
@@ -74,7 +75,8 @@ export function readConfig(env) {
     codexSwitchFile: absolute("EDITORIAL_CODEX_SWITCH_FILE") || (executor === "claude" ? path.join(stateDir, "codex-switch.signal") : ""),
     projectDir: env.EDITORIAL_PROJECT_DIR?.trim() || "/opt/leiprova",
     container: env.EDITORIAL_CONTAINER?.trim() || "leiprova-editorial-automation",
-    slots: { "Guardião": int("EDITORIAL_SLOTS_GUARDIAO", 1, 0, 8), Autor: int("EDITORIAL_SLOTS_AUTOR", 2, 0, 8) },
+    slots: { "Guardião": int("EDITORIAL_SLOTS_GUARDIAO", 1, 0, 8), Autor: int("EDITORIAL_SLOTS_AUTOR", 2, 0, 8),
+      Radar: int("EDITORIAL_SLOTS_RADAR", 1, 0, 2) },
     // API paga (decisões do proprietário em 19/11 e 21/11/2026): teto de US$ 50 por mês-calendário UTC,
     // parada em 100% (US$ 50). A chave fica fora do repositório e só chega à CLI enquanto houver orçamento.
     apiSecretFile: env.EDITORIAL_API_SECRET_FILE?.trim() || "/etc/leiprova/editorial-realtime.secret",
@@ -236,8 +238,10 @@ function run(bin, args, { input, cwd, timeoutMs, env }) {
 export const lastLine = (text) => text.trim().split("\n").pop() ?? "";
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+let privateWrites = 0;
 async function writePrivate(file, text) {
-  const temp = `${file}.${process.pid}.tmp`;
+  // Vagas do mesmo processo gravam o heartbeat ao mesmo tempo: o sufixo precisa ser único por escrita.
+  const temp = `${file}.${process.pid}.${(privateWrites += 1)}.tmp`;
   await writeFile(temp, text, { mode: 0o600 });
   await rename(temp, file);
 }

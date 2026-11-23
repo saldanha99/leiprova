@@ -86,3 +86,20 @@ describe("contrato da ponte editorial",()=>{
     expect(validateDiscoveryUrl("https://www.cebraspe.org.br/concursos/")).toContain("cebraspe.org.br");
   });
 });
+
+describe("Radar offline: descobertas só das páginas capturadas pelo servidor",()=>{
+  const page={url:"https://conhecimento.fgv.br/concursos",finalUrl:"https://conhecimento.fgv.br/concursos",fetchedAt:"2026-11-23T12:00:00.000Z",
+    links:[{text:"Edital TJ sintético",href:"https://conhecimento.fgv.br/concursos/tj-sintetico"}]};
+  const radar:AgentWorkPayload={version:AGENT_WORK_VERSION,title:"Radar sintético",instructions:"Somente teste.",articles:[],
+    sourceUrls:["https://conhecimento.fgv.br/concursos"],context:{date:"2026-11-23",bank:"fgv",pages:[page]}};
+  const discovery=(url:string)=>({...base,discoveries:[{title:"Edital TJ sintético",url,kind:"notice",role:"Analista",bank:"fgv",
+    jurisdiction:"BR",observedAt:"2026-11-23T12:00:00.000Z",evidence:"Link listado no índice público capturado."}]});
+  it("aceita link presente na captura e recusa URL que não estava nela",()=>{
+    expect(()=>validateAgentWorkResult("discovery",radar,discovery("https://conhecimento.fgv.br/concursos/tj-sintetico"))).not.toThrow();
+    expect(()=>validateAgentWorkResult("discovery",radar,discovery("https://conhecimento.fgv.br/concursos/inventado"))).toThrow(AgentWorkContractError);
+  });
+  it("pacote antigo sem páginas segue a regra anterior",()=>{
+    const legacy={...radar,context:{date:"2026-11-23",bank:"fgv"}};
+    expect(()=>validateAgentWorkResult("discovery",legacy,discovery("https://conhecimento.fgv.br/concursos/inventado"))).not.toThrow();
+  });
+});

@@ -7,6 +7,7 @@ import { MINIMUM_COURSE_QUESTION_COUNT } from "@/lib/commerce/minimum-course-con
 import { STYLE_PROFILE_SEEDS } from "./style-profiles";
 import { suggestLegalRequirementMapping, type MappingArticle } from "./legal-requirement-mapping";
 import { discoveryPortalPolicy } from "./discovery-policy";
+import { captureOfficialDiscoveryPage, type DiscoveryPageCapture } from "@/lib/official-sources/fetch";
 import { prepareCourseIntake } from "./course-intake";
 import { officialQuestionContractSchema, questionContractFingerprint } from "./official-question-contract";
 import { currentQuestionContractExists } from "./question-contract-query";
@@ -233,15 +234,31 @@ export async function prepareAgentWork(db:AgentDatabase, now=new Date(), options
   for(const portal of portals) {
     const policy=discoveryPortalPolicy(portal.bank,portal.url);
     const urls=policy.urls.map(validateDiscoveryUrl);
-    if(await enqueueAgentWork(db,`discovery:${portal.bank}:${date}`,"discovery",{
+    const key=`discovery:${portal.bank}:${date}`;
+    // The realtime engine has no network by design (since ~25/10 nothing claimed the old
+    // agent-browser radar). The server captures the public index once per portal/day, under
+    // robots, and the offline Radar only extracts from it. A job already captured today is
+    // left alone, so the 5-minute cycle never refetches or resets it.
+    const [existing]=await db.execute<{captured:boolean}>(sql`select (payload->'context' ? 'pages') as captured
+      from editorial_agent_work where job_key=${key}`);
+    if(existing?.captured) continue;
+    const pages:DiscoveryPageCapture[]=[];const failures:string[]=[];
+    if(!policy.blocked) for(const url of urls) {
+      try { pages.push(await captureOfficialDiscoveryPage(url,validateDiscoveryUrl)); }
+      catch(error) { failures.push(`${url}: ${error instanceof Error ? error.message.slice(0,200) : "falha de captura"}`); }
+    }
+    const blocked=policy.blocked ?? (pages.length ? null : "portal_capture_failed");
+    if(await enqueueAgentWork(db,key,"discovery",{
       version:AGENT_WORK_VERSION,title:`Radar de editais — ${portal.bank} — ${date}`,articles:[],sourceUrls:urls,
-      instructions:"Use agent-browser para consultar este portal oficial e suas páginas de concursos. Liste até 20 editais/retificações/avisos recentes pertinentes às carreiras jurídicas, cartórios, policiais, tribunais, procuradorias, fiscal/controle, legislativa ou trabalhista. Registre URL oficial, cargo, UF, banca quando comprovada e evidência. Não ler/copiar questões ou gabaritos; não burlar bloqueios. Se não houver novidades, prepared com discoveries vazio e resumo da cobertura. Se houver bloqueio de acesso, blocked com motivo, sem inventar concursos. Somente propostas, nenhuma publicação.",
-      context:{date,bank:portal.bank,humanReviewRequired:true,coverage:"listed_official_portal_not_all_Brazil",accessPolicy:policy.limitation}})) {
+      instructions:"Leia context.pages: texto e links do portal oficial, capturados pelo servidor hoje respeitando robots. Não navegue. Liste até 20 editais/retificações/avisos recentes pertinentes às carreiras jurídicas, cartórios, policiais, tribunais, procuradorias, fiscal/controle, legislativa ou trabalhista. Cada discovery.url deve ser uma das URLs de context.pages[].links[].href ou context.pages[].finalUrl; registre cargo, UF, banca quando comprovada e evidência (trecho da página). Não ler/copiar questões ou gabaritos. Se não houver novidades, prepared com discoveries vazio e resumo da cobertura. Sem inventar concursos. Somente propostas, nenhuma publicação.",
+      context:{date,bank:portal.bank,humanReviewRequired:true,coverage:"listed_official_portal_not_all_Brazil",accessPolicy:policy.limitation,
+        pages,captureFailures:failures}})) {
       discovery++;
-      if(policy.blocked) await db.execute(sql`update editorial_agent_work set status='blocked',
-        last_error_code=${policy.blocked},result=${JSON.stringify({schemaVersion:1,publicationAllowed:false,outcome:'blocked',
-          summary:'Coleta suspensa por bloqueio observado no portal.',limitations:[policy.limitation],evidence:[],mappings:[],discoveries:[],questions:[]})}::jsonb,
-        updated_at=now() where job_key=${`discovery:${portal.bank}:${date}`} and status='pending'`);
+      if(blocked) await db.execute(sql`update editorial_agent_work set status='blocked',
+        last_error_code=${blocked},result=${JSON.stringify({schemaVersion:1,publicationAllowed:false,outcome:'blocked',
+          summary:policy.blocked?'Coleta suspensa por bloqueio observado no portal.':'O servidor não conseguiu capturar o portal hoje.',
+          limitations:[policy.blocked?policy.limitation:failures.join(" | ").slice(0,8000)||"Falha de captura."],evidence:[],mappings:[],discoveries:[],questions:[]})}::jsonb,
+        updated_at=now() where job_key=${key} and status='pending'`);
     }
   }
   const changes=await db.execute<{id:number;title:string;url:string;checksum:string;status:string}>(sql`
