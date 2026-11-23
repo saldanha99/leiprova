@@ -436,8 +436,8 @@
 
 .phaseTabs { display: flex; flex-wrap: wrap; gap: 9px; margin: 28px 0; }
 .phaseTabs button { display: inline-flex; align-items: center; gap: 9px; border: 1px solid color-mix(in oklch, var(--els-fg) 12.5%, transparent); border-radius: 999px; padding: 10px 15px; min-height: 44px; background: color-mix(in oklch, var(--els-fg) 1.6%, transparent); color: var(--els-info-ink); font-size: 12px; font-weight: 700; cursor: pointer; }
-.phaseTabs button[aria-pressed="true"] { background: var(--els-amber); border-color: var(--els-amber); color: var(--els-surface); }
-.phaseTabs button span { font-size: 11px; opacity: .8; }
+.phaseTabs button[aria-pressed="true"] { background: var(--els-amber); border-color: var(--els-amber); color: var(--els-on-amber); }
+.phaseTabs button span { font-size: 11px; }
 .phaseTabs button:focus-visible, .catalogFilters select:focus-visible, .catalogFilters input:focus-visible, .resultsHeading button:focus-visible, .card a:focus-visible { outline: 2px solid var(--els-amber); outline-offset: 4px; }
 .resultsHeading { display: flex; justify-content: space-between; align-items: center; gap: 15px; margin-bottom: 12px; }
 .resultsHeading button { min-height: 44px; color: var(--els-info-ink); font-size: 12px; text-decoration: underline; cursor: pointer; }

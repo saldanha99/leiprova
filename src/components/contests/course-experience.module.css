@@ -415,8 +415,8 @@
   line-height: 1.8;
 }
 .method {
-  background: var(--els-amber);
-  color: var(--els-surface-2);
+  background: var(--els-bg-2);
+  color: var(--els-fg);
   padding: 100px 0 65px;
   scroll-margin-top: 62px;
 }

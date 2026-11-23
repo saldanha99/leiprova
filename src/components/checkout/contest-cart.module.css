@@ -555,10 +555,10 @@
 .unavailable {
   margin: 16px 0;
   padding: 13px;
-  border: 1px solid var(--els-amber);
+  border: 1px solid color-mix(in oklch, var(--els-amber) 40%, transparent);
   border-radius: 7px;
   color: var(--els-amber-ink);
-  background: var(--els-amber);
+  background: color-mix(in oklch, var(--els-amber) 12.5%, transparent);
   font-size: 11px;
   line-height: 1.8;
 }

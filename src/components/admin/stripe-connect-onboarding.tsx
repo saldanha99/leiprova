@@ -145,7 +145,7 @@ export function NewConnectPartnerButton({ enabled }: { enabled: boolean }) {
                 <input name="email" type="email" required maxLength={254} autoComplete="email" className="min-h-11 rounded-xl border border-els-line bg-els-bg px-3 text-sm text-els-fg outline-none focus:border-els-amber/50" />
               </label>
               {request.error && <p role="alert" className="text-xs leading-5 text-els-danger-ink">{request.error}</p>}
-              <button type="submit" disabled={request.loading} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-els-amber px-4 text-sm font-bold text-els-bg hover:bg-els-amber-2 disabled:opacity-60">
+              <button type="submit" disabled={request.loading} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-els-amber px-4 text-sm font-bold text-els-on-amber hover:bg-els-amber-2 disabled:opacity-60">
                 {request.loading && <LoaderCircle aria-hidden="true" className="size-4 animate-spin" />}
                 Criar conta e gerar formulário
               </button>
