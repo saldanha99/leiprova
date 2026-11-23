@@ -47,6 +47,8 @@ export const FGV_HISTORICAL_PREVIOUS_PAIRS: Readonly<Record<string, string>> = {
   "pc-df-delegado-de-policia-reta-final": "pcdf-delegado-1-2026-objetiva-p1",
   "tj-pe-juiz-de-direito-2026": "tjpe-juiz-substituto-01-2026-objetiva",
   "pc-pr-delegado-2026": "pcpr-delegado-01-2026-objetiva",
+  "pc-pr-agente-2026": "pcpr-agente-policia-judiciaria-01-2026-objetiva",
+  "pc-pr-papiloscopista-2026": "pcpr-papiloscopista-policial-01-2026-objetiva",
 };
 
 type Pair = Readonly<{ productSlug: string; editionPublicId: string }>;

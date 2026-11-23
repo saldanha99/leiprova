@@ -13,16 +13,21 @@ import { STRIPE_COMMERCE_DATABASE_PREFLIGHT_QUERY, withStripeCommerceDatabasePre
 // Nenhuma escrita sem --apply; live exige destino e conta explicitamente identificados.
 async function main() {
   const args = process.argv.slice(2);
+  // --only=<slug> (repetível): cria/confere só esses concursos e não toca o Master. Serve para
+  // acrescentar produto novo com assinaturas existentes, sem a troca do catálogo Master.
+  const only = args.filter((arg) => arg.startsWith("--only=")).map((arg) => arg.slice("--only=".length));
   if (
-    args.some((arg) => !["--apply", "--reactivate", "--mode=test", "--mode=live"].includes(arg))
+    args.some((arg) => !arg.startsWith("--only=") && !["--apply", "--reactivate", "--mode=test", "--mode=live"].includes(arg))
   )
-    throw new Error("Opções aceitas: --mode=test|live, --apply e --reactivate.");
+    throw new Error("Opções aceitas: --mode=test|live, --apply, --reactivate e --only=<slug>.");
+  if (only.some((slug) => !CONTEST_CATALOG.some((contest) => contest.slug === slug)) || new Set(only).size !== only.length)
+    throw new Error("--only exige slugs distintos do catálogo central.");
   if (args.includes("--mode=test") && args.includes("--mode=live"))
     throw new Error("Escolha somente um modo.");
   const mode = args.includes("--mode=live") ? "live" : "test";
   const reactivate = args.includes("--reactivate");
   if (!process.argv.includes("--apply")) {
-    console.log(JSON.stringify({ ...stripeCatalogSyncPreview(mode), reactivate }));
+    console.log(JSON.stringify({ ...stripeCatalogSyncPreview(mode), reactivate, ...(only.length ? { only, masterTouched: false } : {}) }));
     return;
   }
   const key = process.env.STRIPE_SECRET_KEY ?? "";
@@ -70,12 +75,12 @@ async function main() {
         );
       const pendingBilling =
         await db`select id from subscriptions where status in ('active','trialing','past_due') limit 1`;
-      if (mode === "live" && pendingBilling.length)
+      if (mode === "live" && pendingBilling.length && !only.length)
         throw new Error(
           "Há assinaturas existentes. A troca do catálogo Master exige reconciliação específica antes de continuar.",
         );
       const knownMasterPrices: Record<string, string | null> = {};
-      for (const plan of PLANS) {
+      for (const plan of only.length ? [] : PLANS) {
         const rows =
           await db`select id, stripe_price_id from plans where slug=${plan.slug} and amount_cents=${plan.priceCents} and currency='brl' and billing_type=${plan.billingMonths === 12 ? "year" : "month"}`;
         if (rows.length !== 1)
@@ -84,7 +89,7 @@ async function main() {
           );
         knownMasterPrices[plan.slug] = rows[0].stripe_price_id;
       }
-      for (const contest of CONTEST_CATALOG) {
+      for (const contest of only.length ? CONTEST_CATALOG.filter((item) => only.includes(item.slug)) : CONTEST_CATALOG) {
         const [known] = await db`select stripe_product_id, stripe_price_monthly, stripe_price_annual from contest_store_products where slug=${contest.slug}`;
         const catalog = await ensureContestStripeCatalog(stripe, mode, contest, {
           reactivate,
@@ -106,6 +111,10 @@ async function main() {
           updated[0].stripe_price_annual !== annual || updated[0].stripe_mode !== mode) {
           throw new Error("Vínculo local do concurso divergiu durante a sincronização. Revise os IDs antes de retomar.");
         }
+      }
+      if (only.length) {
+        console.log(`Concursos ${only.join(", ")} sincronizados em ${mode.toUpperCase()}; Master não alterado. Nenhuma liberação editorial, cobrança ou flag de venda alterada.`);
+        return;
       }
       const master = await ensureMasterStripeCatalog(stripe, mode, { reactivate, knownPriceIds: knownMasterPrices });
       for (const { plan, priceId } of master.prices) {

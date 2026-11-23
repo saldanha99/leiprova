@@ -19,6 +19,8 @@ export type ProgrammeLayout = Readonly<{
     /** Pontuação literal entre o título inline e o conteúdo; "." por padrão ("1. DIREITO PENAL: 1.1 …" usa ":"). */
     inlineSeparator?: ":" }>[];
   ignoreLines: readonly string[];
+  /** Carimbo fixo colado ao texto pelo visualizador oficial ("SEM VALOR OFICIAL" no DOM de Manaus): sai de cada linha antes da extração. */
+  removeLiterals?: readonly string[];
   /** Programa em prosa corrida ("1. … 2. …" na mesma linha): cada item numerado vira um fragmento. */
   splitInlineItems?: boolean;
   /** Linha literal que abre o cargo seguinte no mesmo anexo; a extração termina nela e ela é obrigatória. */
@@ -29,7 +31,9 @@ export type ProgrammeLayout = Readonly<{
    * "sentences": programa em prosa sem numeração; cada período literal é um requisito. */
   itemMode?: "top-level-numbers" | "second-level-numbers" | "sentences";
 }>;
-export type PreviewDocumentRecipe = Readonly<{ key: string; url: string; title: string; pages: number; programmePages: readonly [number, number] | null; layout?: ProgrammeLayout }>;
+export type PreviewDocumentRecipe = Readonly<{ key: string; url: string; title: string; pages: number; programmePages: readonly [number, number] | null; layout?: ProgrammeLayout;
+  /** PDF que a origem recusa ao servidor (WAF): entra só pelo arquivo baixado da URL oficial, com este SHA-256. */
+  operatorDownloadSha256?: string }>;
 export type NextOfficialCourseRecipe = Readonly<{
   productSlug: string; institution: string; role: string; jurisdiction: string; cycle: string; bankScope: string;
   portalUrl: string; examDate: string; examDateEvidence: Readonly<{ documentKey: string; page: number; item: string; quote: string; actualDayIndependentlyVerified: boolean; corroboratingUrl: string | null; limitation: string | null }>; stage: string; stageObservedOn: string; proposedMode: "historical_training";
@@ -586,6 +590,47 @@ export const NEXT_OFFICIAL_COURSE_RECIPES: readonly NextOfficialCourseRecipe[] =
     ] },
     limitations: ["Só os conhecimentos específicos de Papiloscopista Policial (Anexo I); os conhecimentos gerais (Língua Portuguesa, Raciocínio Lógico-Matemático e Realidade do Paraná) não são lei seca e ficam fora.", "O item 1 (Tecnologia e Sistemas de Informação…, título quebrado em duas linhas) não é lei seca e fica fora do programa admitido.", "No edital, os itens de Direito Constitucional e Administrativo do Papiloscopista mantêm a numeração 8.x e 9.x do bloco do Agente; o texto é o literal da página.", "Itens agrupados pelo número de segundo nível; subitens ficam no item.", "Treino histórico da objetiva com legislação atual; não reproduz o caderno aplicado."],
   },
+  // PGM-Manaus 01/2026 (FCC). O edital está no DOM nº 6343 (Edição Extra, 02/07/2026); o WAF do DOM recusa o servidor
+  // e o robots da FCC proíbe /concursos/ e PDFs. O PDF entra pelo arquivo baixado no navegador, com o SHA-256 fixado.
+  {
+    productSlug: "pgm-manaus-procurador-do-municipio-2026", institution: "Procuradoria Geral do Município de Manaus", role: "Procurador do Município de 3ª Classe",
+    jurisdiction: "AM", cycle: "Edital nº 01/2026", bankScope: "Fundação Carlos Chagas, responsável pela realização do concurso (item 1.1), sob a Comissão de Concurso Público da PGM",
+    portalUrl: "https://www.concursosfcc.com.br/concursoInscricaoAberta.html", examDate: "2026-09-20", examDateEvidence: { documentKey: "pgmmanaus-notice", page: 6, item: "6.2", quote: "a) Prova Objetiva: 20/09/2026, no período da MANHÃ;", actualDayIndependentlyVerified: false, corroboratingUrl: "https://dom.manaus.am.gov.br/pdf/2026/julho/DOM%206343%2002.07.2026%20Edicao%20Extra.pdf", limitation: "Data prevista no edital; o resultado e o gabarito ficam no portal da FCC, cujo robots proíbe a consulta automatizada." },
+    stage: "Objetiva prevista para 20/09/2026 (item 6.2); discursivas em 29/11 e 06/12/2026",
+    stageObservedOn: "2026-11-23", proposedMode: "historical_training", expectedSubjects: 12,
+    documents: [
+      { key: "pgmmanaus-notice", url: "https://dom.manaus.am.gov.br/pdf/2026/julho/DOM%206343%2002.07.2026%20Edicao%20Extra.pdf", title: "Edital nº 01/2026 PGM-Manaus — Procurador do Município de 3ª Classe (DOM nº 6343, Edição Extra, 02/07/2026)", pages: 20, programmePages: [14, 19],
+        operatorDownloadSha256: "8cb56a3c5c1506c4d0b90772f39936713634c5874eb0b160c6efdcfd80d8b163", layout: {
+        headings: [
+          { line: "DIREITO CONSTITUCIONAL", subject: "Direito Constitucional" },
+          { line: "DIREITO ADMINISTRATIVO", subject: "Direito Administrativo" },
+          { line: "DIREITO TRIBUTÁRIO", subject: "Direito Tributário" },
+          { line: "DIREITO PROCESSUAL CIVIL", subject: "Direito Processual Civil" },
+          { line: "DIREITO FINANCEIRO", subject: "Direito Financeiro" },
+          { line: "DIREITO CIVIL", subject: "Direito Civil" },
+          { line: "DIREITO PREVIDENCIÁRIO", subject: "Direito Previdenciário" },
+          { line: "DIREITO AMBIENTAL", subject: "Direito Ambiental" },
+          { line: "DIREITO EMPRESARIAL", subject: "Direito Empresarial" },
+          { line: "DIREITO DO TRABALHO", subject: "Direito do Trabalho" },
+          { line: "DIREITO PROCESSUAL DO TRABALHO", subject: "Direito Processual do Trabalho" },
+          { line: "DIREITO MUNICIPAL", subject: "Direito Municipal" },
+        ],
+        ignoreLines: ["Manaus, [a-zçá-]+-feira, 02 de julho de 2026\\.?", "DOM \\| Edição Extra 6343 \\| Página \\d+", "ANEXO II", "CONTEÚDO PROGRAMÁTICO"],
+        removeLiterals: ["SEM VALOR OFICIAL"],
+        stopLine: "ANEXO III",
+        splitInlineItems: true,
+      } },
+    ],
+    overlays: [],
+    identityClaims: [
+      { document: "pgmmanaus-notice", page: 1, contains: ["PROCURADORIA GERAL DO MUNICÍPIO DE MANAUS", "PROCURADOR DO MUNICÍPIO DE 3ª CLASSE", "EDITAL Nº 01/2026 DE ABERTURA DE INSCRIÇÕES", "responsabilidade da Fundação Carlos Chagas"] },
+      { document: "pgmmanaus-notice", page: 6, contains: ["a) Prova Objetiva: 20/09/2026, no período da MANHÃ;"] },
+      { document: "pgmmanaus-notice", page: 8, contains: ["8.1 A Prova Objetiva de caráter eliminatório e classificatório, será", "(cinco) alternativas cada, versando sobre disciplinas constantes do"] },
+      { document: "pgmmanaus-notice", page: 14, contains: ["ANEXO II", "CONTEÚDO PROGRAMÁTICO", "DIREITO CONSTITUCIONAL"] },
+    ],
+    previousExam: { cycle: "Edital nº 01/2026 — objetiva prevista para 20/09/2026", role: "Procurador do Município de 3ª Classe — prova objetiva", portalUrl: "https://www.concursosfcc.com.br/concursoInscricaoAberta.html", examDate: "2026-09-20", answerKeyFinality: "definitive_document", documents: [] },
+    limitations: ["Caderno e gabarito ficam no portal da FCC, cujo robots proíbe /concursos/ e PDFs: prova anterior não registrada (bloqueio explícito).", "Itens numerados de primeiro nível; a linha seguinte continua o item.", "O carimbo \"SEM VALOR OFICIAL\" do visualizador do DOM, colado ao fim de uma linha por página, é removido do texto dos requisitos.", "Direito Municipal cita a Lei Orgânica e leis de Manaus, fora do corpus federal.", "Treino histórico da objetiva com legislação atual; não simula as discursivas."],
+  },
   // Lote Cebraspe histórico (18/11/2026): títulos inline com dois-pontos ("DIREITO CIVIL: 1 …"), itens numerados corridos.
   {
     productSlug: "sefaz-rn-auditor-fiscal-reta-final", institution: "Secretaria de Estado da Fazenda do Rio Grande do Norte", role: "Auditor Fiscal de Receitas Estaduais",
@@ -864,6 +909,7 @@ function extractLayoutSections(recipe: PreviewDocumentRecipe, layout: ProgrammeL
   pages: for (let index = start - 1; index < end; index += 1) {
     for (const raw of capture.pageTexts[index].split(/\n+/u)) {
       let line = raw.replace(/\s+/g, " ").trim();
+      for (const literal of layout.removeLiterals ?? []) line = line.split(literal).join(" ").replace(/\s+/g, " ").trim();
       if (!line) continue;
       if (!started) { started = normalized(line) === startKey; continue; }
       if (stopKey !== null && current && normalized(line) === stopKey) { stopped = true; break pages; }

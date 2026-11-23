@@ -275,12 +275,42 @@ export async function captureOfficialPdf(
   buildDirectOfficialDocumentCandidate(candidate.url, sourceId, candidate.label);
   const { response, finalUrl } = await fetchOfficialResource(candidate.url, sourceId);
   const bytes = await readLimitedBody(response, MAX_OFFICIAL_DOCUMENT_BYTES, sourceId);
+  return parseOfficialPdfBytes(bytes, finalUrl, safeFileName(response, finalUrl), candidate.label, sourceId);
+}
+
+/**
+ * Official PDF that the server cannot download (a WAF refuses automated clients) but that an
+ * operator downloaded from the same official URL. The URL still passes the source policy and the
+ * bytes must match the SHA-256 recorded at download time; the parsing is the same as a fetch.
+ */
+export async function captureOfficialPdfFromBytes(
+  bytes: Uint8Array,
+  officialUrl: string,
+  label: string,
+  sourceId: OfficialOpportunitySourceId,
+  expectedSha256: string,
+): Promise<CapturedOfficialDocument> {
+  if (bytes.byteLength > MAX_OFFICIAL_DOCUMENT_BYTES) throw new OfficialDocumentFetchError("document_size_limit", "policy", sourceId);
+  if (!/^[a-f0-9]{64}$/u.test(expectedSha256) || createHash("sha256").update(bytes).digest("hex") !== expectedSha256) {
+    throw new OfficialDocumentFetchError("document_checksum_mismatch", "policy", sourceId);
+  }
+  const official = parseOfficialOpportunityDocumentUrl(officialUrl, sourceId);
+  const fileName = decodeURIComponent(new URL(official.url).pathname.split("/").filter(Boolean).at(-1) ?? "documento.pdf");
+  return parseOfficialPdfBytes(bytes, official.url, fileName, label, sourceId);
+}
+
+async function parseOfficialPdfBytes(
+  bytes: Uint8Array,
+  finalUrl: string,
+  fileName: string,
+  label: string,
+  sourceId: OfficialOpportunitySourceId,
+): Promise<CapturedOfficialDocument> {
   if (bytes.byteLength < 5 || new TextDecoder("ascii").decode(bytes.slice(0, 5)) !== "%PDF-") {
     throw new OfficialDocumentFetchError("invalid_pdf_signature", "pdf_signature", sourceId);
   }
 
-  const fileName = safeFileName(response, finalUrl);
-  if (isProhibitedExamMaterial(`${candidate.label} ${fileName} ${finalUrl}`)) {
+  if (isProhibitedExamMaterial(`${label} ${fileName} ${finalUrl}`)) {
     throw new OfficialDocumentFetchError("prohibited_exam_material", "policy", sourceId);
   }
 

@@ -19,10 +19,12 @@ const CEBRASPE = "https://cdn.cebraspe.org.br/concursos/";
 export const COMPOSITE_BANKS = {
   fgv: { bankSlug: "fgv", sourceId: "fgv-conhecimento", publisher: "FGV Conhecimento", shortName: "FGV", organizerName: "Fundação Getulio Vargas — etapa objetiva" },
   cebraspe: { bankSlug: "cebraspe", sourceId: "cebraspe", publisher: "Cebraspe", shortName: "Cebraspe", organizerName: "Cebraspe — etapa objetiva" },
+  // FCC: o robots do portal proíbe /concursos/ e PDFs; o edital vem do Diário Oficial do órgão (aqui, DOM de Manaus).
+  fcc: { bankSlug: "fcc", sourceId: "dom-manaus", publisher: "Diário Oficial do Município de Manaus", shortName: "FCC", organizerName: "Fundação Carlos Chagas — etapa objetiva" },
 } as const;
 export function compositeBank(target: object) {
   const bank = "bank" in target ? target.bank : "fgv";
-  if (bank !== "fgv" && bank !== "cebraspe") throw new Error("Banca fora das admissões compostas configuradas.");
+  if (bank !== "fgv" && bank !== "cebraspe" && bank !== "fcc") throw new Error("Banca fora das admissões compostas configuradas.");
   return COMPOSITE_BANKS[bank];
 }
 export const COMPOSITE_ADMISSION_TARGETS = [
@@ -72,6 +74,8 @@ export const COMPOSITE_ADMISSION_TARGETS = [
   { productSlug: "pc-pr-papiloscopista-2026", slug: "pcpr-papiloscopista-policial-01-2026-historico-objetiva", acronym: "PCPR", notice: "01/2026-Papiloscopista", category: "carreiras-policiais", career: "policia-civil", noticeDate: "2026-07-06", statusDate: "2026-11-13", cycleYear: 2026, lifecycleStatus: "result_published", commission: "Comissão de Concurso da PCPR", stages: [
     { title: "Resultado preliminar da prova objetiva (reprocessamento)", url: `${FGV}pcpr2026-resultado-prova-objetiva_reprocessamento-v2.pdf`, publishedOn: "2026-11-13" },
   ] },
+  // PGM-Manaus 01/2026 (FCC): edital do DOM nº 6343; sem etapa de resultado verificável (portal da FCC fora do robots).
+  { productSlug: "pgm-manaus-procurador-do-municipio-2026", slug: "pgmmanaus-procurador-3a-classe-01-2026-historico-objetiva", acronym: "PGM-MANAUS", notice: "01/2026-Procurador", category: "procuradorias", career: "procurador", bank: "fcc", noticeDate: "2026-07-02", statusDate: "2026-09-20", cycleYear: 2026, lifecycleStatus: "exam_held", commission: "Comissão de Concurso Público da PGM-Manaus", replacesEmptyOpportunitySlug: "pgm-manaus-2026", stages: [] },
   // Lote Cebraspe histórico.
   { productSlug: "sefaz-rn-auditor-fiscal-reta-final", slug: "sefazrn-auditor-fiscal-5-2025-historico-objetiva", acronym: "SEFAZ-RN", notice: "5/2025-SEAD/SEFAZ/RN", category: "fiscal-e-controle", career: "auditor-fiscal", noticeDate: "2025-12-19", statusDate: "2026-06-03", cycleYear: 2025, lifecycleStatus: "homologated", commission: "Secretaria de Estado da Administração do RN (SEAD/RN)", bank: "cebraspe", stages: [
     { title: "Homologação do concurso público", url: `${CEBRASPE}sefaz_rn_25_auditor/arquivos/7FCCAEB394A2FAE0DDB458D4BF39B41FD0ADBD3D0777F36C455FAF45C5D9D60F.pdf`, publishedOn: "2026-06-03" },

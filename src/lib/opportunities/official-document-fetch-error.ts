@@ -28,6 +28,7 @@ const MESSAGES = {
   pdf_needs_ocr: "O PDF não contém texto pesquisável suficiente; OCR ainda não está habilitado.",
   pdf_text_limit: "O texto extraído excede o limite operacional de 2 milhões de caracteres.",
   pdf_cleanup_failed: "Não foi possível liberar os recursos do leitor de PDF.",
+  document_checksum_mismatch: "O arquivo não corresponde ao SHA-256 registrado no download oficial.",
 } as const;
 
 export type OfficialDocumentFetchErrorCode = keyof typeof MESSAGES | `official_http_${number}`;
