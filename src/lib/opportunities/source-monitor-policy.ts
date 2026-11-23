@@ -83,6 +83,14 @@ export const OFFICIAL_OPPORTUNITY_SOURCE_POLICIES = [
     allowedHosts: ["manaus.am.gov.br", "www.manaus.am.gov.br"],
     allowedPathPrefixes: ["/noticia/", "/pgm/"],
   },
+  // DOM de Manaus: o WAF recusa downloads automatizados do servidor; o PDF entra só como arquivo
+  // baixado pelo navegador, com a URL oficial e o SHA-256 conferidos (PGM-Manaus 01/2026, 23/11/2026).
+  {
+    id: "dom-manaus",
+    publisher: "Diário Oficial do Município de Manaus",
+    allowedHosts: ["dom.manaus.am.gov.br"],
+    allowedPathPrefixes: ["/pdf/"],
+  },
   {
     id: "fcc-concursos",
     publisher: "Fundação Carlos Chagas",

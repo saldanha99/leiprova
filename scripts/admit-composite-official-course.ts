@@ -1,15 +1,16 @@
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { relative, resolve, sep } from "node:path";
 
 import { admitCompositeOfficialCourse, assertCompositeHashes, compositeBank, compositeCourseTarget, compositeProgrammeRequirements, verifyCompositeMetadata, COMPOSITE_ADMISSION_TARGETS } from "../src/lib/editorial/composite-course-admission";
 import { buildNextOfficialCoursePreview } from "../src/lib/editorial/official-course-preview-candidates";
-import { captureOfficialPdf, type CapturedOfficialDocument } from "../src/lib/opportunities/official-document-fetch";
+import { captureOfficialPdf, captureOfficialPdfFromBytes, type CapturedOfficialDocument } from "../src/lib/opportunities/official-document-fetch";
 import { buildDirectOfficialDocumentCandidate } from "../src/lib/opportunities/official-document-policy";
 import { safeOfficialCourseDossierError } from "./prepare-official-course-dossiers";
 
 export function parseCompositeCourseArgs(argv: readonly string[]) {
   const slugs: string[] = [];
   const expectedHashes = new Map<string, string>();
+  const documentFiles = new Map<string, string>();
   let expectedProgrammeHash = "";
   let output = ".local/editorial/composite-course-admission-20261012";
   let apply = false;
@@ -22,6 +23,11 @@ export function parseCompositeCourseArgs(argv: readonly string[]) {
       const match = /^--expected-document=([a-z0-9-]+):([a-f0-9]{64})$/u.exec(arg);
       if (!match || expectedHashes.has(match[1])) throw new Error("Hash documental inválido ou repetido.");
       expectedHashes.set(match[1], match[2]);
+    } else if (arg.startsWith("--document-file=")) {
+      // PDF baixado pelo navegador da URL oficial, quando o WAF da origem recusa o servidor (DOM de Manaus).
+      const match = /^--document-file=([a-z0-9-]+):(\/[^\0]+\.pdf)$/u.exec(arg);
+      if (!match || documentFiles.has(match[1])) throw new Error("Arquivo documental inválido ou repetido.");
+      documentFiles.set(match[1], match[2]);
     } else throw new Error("Argumento desconhecido/repetido; operador delimitado a prévia ou aplicação explícita.");
   }
   if (new Set(slugs).size !== slugs.length) throw new Error("Produto repetido.");
@@ -34,7 +40,7 @@ export function parseCompositeCourseArgs(argv: readonly string[]) {
   const outputDirectory = resolve(output);
   const child = relative(resolve(".local"), outputDirectory);
   if (!child || child === ".." || child.startsWith(`..${sep}`) || child.startsWith(sep)) throw new Error("Saída privada abaixo de .local obrigatória.");
-  return { products, expectedHashes, expectedProgrammeHash, apply, outputDirectory };
+  return { products, expectedHashes, expectedProgrammeHash, apply, outputDirectory, documentFiles };
 }
 
 async function main() {
@@ -47,7 +53,14 @@ async function main() {
     const capturedAt = new Map<string, string>();
     // At most four bounded PDFs, fetched sequentially; never fetch question text into this map.
     for (const doc of recipe.documents) {
-      const capture = await captureOfficialPdf(buildDirectOfficialDocumentCandidate(doc.url, sourceId, doc.title), sourceId);
+      // Documento com SHA-256 de download do operador fixado na receita: só entra pelo arquivo
+      // informado, conferido contra esse hash e a URL oficial; os demais seguem pela captura de rede.
+      const pinned = "operatorDownloadSha256" in doc ? doc.operatorDownloadSha256 : undefined;
+      const file = args.documentFiles.get(doc.key);
+      if (Boolean(pinned) !== Boolean(file)) throw new Error("Arquivo local só para documento com hash de download fixado na receita, e obrigatório nele.");
+      const capture = pinned && file
+        ? await captureOfficialPdfFromBytes(new Uint8Array(await readFile(file)), doc.url, doc.title, sourceId, pinned)
+        : await captureOfficialPdf(buildDirectOfficialDocumentCandidate(doc.url, sourceId, doc.title), sourceId);
       captures.set(doc.key, capture);
       capturedAt.set(doc.key, new Date().toISOString());
     }
