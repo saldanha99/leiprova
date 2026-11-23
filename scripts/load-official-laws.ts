@@ -44,12 +44,15 @@ export function parseLawLoadArgs(argv: readonly string[]) {
   const args = argv.filter((arg) => arg !== "--");
   const apply = args.includes("--apply");
   const captureOnly = args.includes("--capture-only");
+  // Ativação de texto atualizado da Câmara (leis sem compilação no Senado) só com decisão explícita,
+  // depois da conferência independente por amostragem; sem a flag, elas seguem só capturáveis.
+  const approveCamaraUpdated = args.includes("--approve-camara-updated");
   const providerArgs = args.filter((arg) => arg.startsWith("--provider="));
   if (providerArgs.length > 1) throw new Error("Informe somente um provedor de compilação.");
   const provider = providerArgs[0]?.slice("--provider=".length);
   if (provider !== undefined && !["camara", "planalto", "senado"].includes(provider)) throw new Error("Provedor de compilação inválido.");
   const slugs = args
-    .filter((arg) => arg !== "--apply" && arg !== "--capture-only" && !arg.startsWith("--provider="))
+    .filter((arg) => arg !== "--apply" && arg !== "--capture-only" && arg !== "--approve-camara-updated" && !arg.startsWith("--provider="))
     .map((arg) => {
       const [verb, slug, extra] = arg.split("=");
       if (verb !== "lei" || extra !== undefined || !SLUG.test(slug ?? "")) {
@@ -60,13 +63,14 @@ export function parseLawLoadArgs(argv: readonly string[]) {
     });
   if (!slugs.length) throw new Error("Informe ao menos uma lei=<slug>.");
   if (new Set(slugs).size !== slugs.length) throw new Error("A mesma lei aparece mais de uma vez.");
-  return { apply, captureOnly, slugs, ...(provider ? { provider: provider as LegalTextProvider } : {}) };
+  if (approveCamaraUpdated && (captureOnly || provider !== "camara")) throw new Error("--approve-camara-updated exige --provider=camara e ativação (sem --capture-only).");
+  return { apply, captureOnly, approveCamaraUpdated, slugs, ...(provider ? { provider: provider as LegalTextProvider } : {}) };
 }
 
 class PreviewRollback extends Error {}
 
 async function main() {
-  const { apply, captureOnly, slugs, provider } = parseLawLoadArgs(process.argv.slice(2));
+  const { apply, captureOnly, approveCamaraUpdated, slugs, provider } = parseLawLoadArgs(process.argv.slice(2));
   const reviewer = parseOpportunityApprovalReviewerIdentity({
     ADMIN_EMAILS: process.env.ADMIN_EMAILS,
     OPPORTUNITY_APPROVAL_REFERENCE: process.env.LEGAL_LOAD_REFERENCE,
@@ -80,7 +84,7 @@ async function main() {
   try {
     for (const slug of slugs) {
       const source = getOfficialLegalSource(slug)!;
-      if (provider === "camara" && getCamaraUpdatedTextSource(source.monitorUrl) && !captureOnly) {
+      if (provider === "camara" && getCamaraUpdatedTextSource(source.monitorUrl) && !captureOnly && !approveCamaraUpdated) {
         throw new Error("Texto atualizado da Câmara exige --capture-only e revisão posterior no painel; a autorização da fábrica não aprova fontes.");
       }
       if (getPlanaltoConsolidatedSource(source.monitorUrl) && !captureOnly) {
@@ -106,7 +110,9 @@ async function main() {
             throw new Error("A carga exige exatamente um administrador identificado.");
           }
           const operatorId = operators[0].id;
-          const notes = `Carregada sob autorização do proprietário (${reviewer.approvalReference}): compilação oficial do Senado, ${articles.length} artigos conferidos pelo parser.`;
+          const notes = approveCamaraUpdated
+            ? `Aprovada sob autorização do proprietário (${reviewer.approvalReference}): texto atualizado da Câmara (${captured.sourceUrl}), recapturado nesta execução, ${articles.length} artigos conferidos pelo parser e por amostragem no Planalto.`
+            : `Carregada sob autorização do proprietário (${reviewer.approvalReference}): compilação oficial do Senado, ${articles.length} artigos conferidos pelo parser.`;
 
           await transaction
             .insert(legalActs)

@@ -123,6 +123,10 @@ describe("texto atualizado da Câmara para leis sem compilação no Senado", () 
     expect(parsed.normalizedContent).not.toContain("revogado");
     expect(() => parseCamaraUpdatedLawHtml(html.replace("9.609", "9.610"), "https://legis.senado.leg.br/norma/551485")).toThrow();
     const loader = (await import("node:fs")).readFileSync("scripts/load-official-laws.ts", "utf8");
-    expect(loader).toContain('provider === "camara" && getCamaraUpdatedTextSource(source.monitorUrl) && !captureOnly');
+    expect(loader).toContain('provider === "camara" && getCamaraUpdatedTextSource(source.monitorUrl) && !captureOnly && !approveCamaraUpdated');
+    const { parseLawLoadArgs } = await import("../scripts/load-official-laws");
+    expect(() => parseLawLoadArgs(["--approve-camara-updated", "--capture-only", "--provider=camara", "lei=lei-programa-computador-1998"])).toThrow();
+    expect(() => parseLawLoadArgs(["--approve-camara-updated", "lei=lei-programa-computador-1998"])).toThrow();
+    expect(parseLawLoadArgs(["--apply", "--approve-camara-updated", "--provider=camara", "lei=lei-programa-computador-1998"]).approveCamaraUpdated).toBe(true);
   });
 });
