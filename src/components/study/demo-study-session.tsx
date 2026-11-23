@@ -258,7 +258,7 @@ function ConfidencePicker({
               disabled={disabled}
               onClick={() => onChange(option.id)}
               className={cn(
-                "flex min-h-16 items-center gap-3 rounded-xl border border-white/8 bg-slate-950/45 px-3.5 py-3 text-left text-slate-300 outline-none transition hover:border-white/20 hover:bg-white/[.045] focus-visible:ring-2 focus-visible:ring-amber-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[#09111d] disabled:cursor-default",
+                "flex min-h-16 items-center gap-3 rounded-xl border border-white/8 bg-slate-950/45 px-3.5 py-3 text-left text-slate-300 outline-none transition hover:border-white/20 hover:bg-white/[.045] focus-visible:ring-2 focus-visible:ring-amber-300 focus-visible:ring-offset-2 focus-visible:ring-offset-els-surface disabled:cursor-default",
                 isSelected && option.selectedClass,
               )}
             >
@@ -319,7 +319,7 @@ function AnswerOptions({
               className={cn(
                 "group flex min-h-16 w-full items-start gap-3 rounded-2xl border border-white/8 bg-slate-950/55 p-3.5 text-left text-sm leading-6 text-slate-300 outline-none transition sm:gap-4 sm:p-4 sm:text-[15px]",
                 confidence && !response &&
-                  "cursor-pointer hover:-translate-y-0.5 hover:border-amber-300/35 hover:bg-amber-300/[.035] focus-visible:ring-2 focus-visible:ring-amber-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[#09111d]",
+                  "cursor-pointer hover:-translate-y-0.5 hover:border-amber-300/35 hover:bg-amber-300/[.035] focus-visible:ring-2 focus-visible:ring-amber-300 focus-visible:ring-offset-2 focus-visible:ring-offset-els-surface",
                 !confidence && !response && "cursor-not-allowed opacity-55",
                 revealCorrect && "border-emerald-300/50 bg-emerald-300/[.08] text-emerald-50",
                 revealWrong && "border-rose-300/45 bg-rose-300/[.07] text-rose-50",
@@ -484,7 +484,7 @@ function AnswerFeedback({
       <button
         type="button"
         onClick={onAdvance}
-        className="group mt-6 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-amber-400 px-5 text-sm font-bold text-slate-950 shadow-[0_15px_45px_rgba(251,191,36,.16)] outline-none transition hover:bg-amber-300 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:ring-offset-2 focus-visible:ring-offset-[#09111d]"
+        className="group mt-6 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-amber-400 px-5 text-sm font-bold text-slate-950 shadow-[0_15px_45px_rgba(251,191,36,.16)] outline-none transition hover:bg-amber-300 focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:ring-offset-2 focus-visible:ring-offset-els-surface"
       >
         {isLast ? "Ver meu resultado" : "Próxima questão"}
         <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />

@@ -106,11 +106,11 @@ export function QuestionActionBar({
   const reviewQueued = review.status === "ready" && review.data.status === "queued";
 
   return (
-    <div className={cn("border-t border-white/8 pt-4", className)}>
+    <div className={cn("border-t border-els-line pt-4", className)}>
       <div aria-label="Ações desta questão" className="flex flex-wrap gap-2" role="toolbar">
         <BarButton active={panel === "notebook"} controls={panelId("notebook")} icon={BookmarkPlus} label="Caderno" onClick={() => toggle("notebook")} />
         <button
-          className={cn(barButtonClass, reviewQueued && "border-emerald-300/30 bg-emerald-300/10 text-emerald-200")}
+          className={cn(barButtonClass, reviewQueued && "border-els-green/30 bg-els-green/10 text-els-green-2")}
           disabled={review.status === "loading"}
           onClick={() => void queueReview()}
           type="button"
@@ -125,13 +125,13 @@ export function QuestionActionBar({
 
       <div aria-live="polite">
         {review.status === "ready" && (
-          <p className={cn("mt-2 text-[11px] leading-5", review.data.status === "queued" ? "text-emerald-300" : "text-slate-500")}>
+          <p className={cn("mt-2 text-[11px] leading-5", review.data.status === "queued" ? "text-els-green" : "text-els-fg-3")}>
             {review.data.status === "queued"
               ? "Esta questão já aparece em Revisões para hoje. Ao respondê-la, o intervalo volta a seguir seu desempenho."
               : "Esta questão não entra na fila de revisão: a revisão usa só questões de lei seca vinculadas ao artigo."}
           </p>
         )}
-        {review.status === "error" && <p className="mt-2 text-[11px] leading-5 text-rose-300" role="alert">{review.message}</p>}
+        {review.status === "error" && <p className="mt-2 text-[11px] leading-5 text-els-danger" role="alert">{review.message}</p>}
       </div>
 
       {panel === "notebook" && (
@@ -163,11 +163,11 @@ export function QuestionActionBar({
 }
 
 const barButtonClass =
-  "inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-white/10 bg-white/[.03] px-3 text-[11px] font-semibold text-slate-300 transition hover:border-white/20 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 disabled:cursor-wait disabled:opacity-60";
+  "inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-els-line bg-els-raise px-3 text-[11px] font-semibold text-els-fg-2 transition hover:border-els-line-strong hover:text-els-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-els-amber disabled:cursor-wait disabled:opacity-60";
 
 function BarButton({ active, controls, icon: Icon, label, onClick }: { active: boolean; controls: string; icon: typeof Flag; label: string; onClick: () => void }) {
   return (
-    <button aria-controls={controls} aria-expanded={active} className={cn(barButtonClass, active && "border-amber-300/40 bg-amber-300/10 text-amber-100")} onClick={onClick} type="button">
+    <button aria-controls={controls} aria-expanded={active} className={cn(barButtonClass, active && "border-els-amber/40 bg-els-amber/10 text-els-amber-2")} onClick={onClick} type="button">
       <Icon aria-hidden="true" className="size-3.5" />
       {label}
     </button>
@@ -176,8 +176,8 @@ function BarButton({ active, controls, icon: Icon, label, onClick }: { active: b
 
 function PanelFrame({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
   return (
-    <section aria-label={title} className="mt-3 rounded-xl border border-white/8 bg-slate-950/40 p-4" id={id}>
-      <p className="text-[10px] font-bold uppercase tracking-[.14em] text-slate-500">{title}</p>
+    <section aria-label={title} className="mt-3 rounded-xl border border-els-line bg-els-bg/40 p-4" id={id}>
+      <p className="text-[10px] font-bold uppercase tracking-[.14em] text-els-fg-3">{title}</p>
       <div className="mt-3">{children}</div>
     </section>
   );
@@ -188,38 +188,38 @@ function LoadableView<T>({ state, onRetry, children }: { state: Loadable<T>; onR
   if (state.status === "error") {
     return (
       <div className="flex flex-wrap items-center gap-3 text-xs" role="alert">
-        <span className="text-rose-300">{state.message}</span>
-        <button className="font-bold text-slate-200 underline underline-offset-4" onClick={onRetry} type="button">Tentar de novo</button>
+        <span className="text-els-danger">{state.message}</span>
+        <button className="font-bold text-els-fg-2 underline underline-offset-4" onClick={onRetry} type="button">Tentar de novo</button>
       </div>
     );
   }
-  return <p className="inline-flex items-center gap-2 text-xs text-slate-500"><LoaderCircle className="size-3.5 animate-spin" />Carregando…</p>;
+  return <p className="inline-flex items-center gap-2 text-xs text-els-fg-3"><LoaderCircle className="size-3.5 animate-spin" />Carregando…</p>;
 }
 
 const ORIGIN_LABEL: Record<QuestionHistoryEntry["origin"], string> = { treino: "Treino", quiz: "Quiz", simulado: "Simulado" };
 
 function HistoryList({ entries, optionLabels }: { entries: QuestionHistoryEntry[]; optionLabels?: Record<string, string> }) {
-  if (!entries.length) return <p className="text-xs leading-5 text-slate-500">Nenhuma resposta registrada ainda nesta questão.</p>;
+  if (!entries.length) return <p className="text-xs leading-5 text-els-fg-3">Nenhuma resposta registrada ainda nesta questão.</p>;
   const correct = entries.filter((entry) => entry.isCorrect).length;
   const formatter = new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit", timeZone: "America/Sao_Paulo" });
   return (
     <>
-      <p className="text-xs text-slate-400">
-        <strong className="text-slate-100">{correct}</strong> {correct === 1 ? "acerto" : "acertos"} em <strong className="text-slate-100">{entries.length}</strong> {entries.length === 1 ? "resposta" : "respostas"}
+      <p className="text-xs text-els-fg-3">
+        <strong className="text-els-fg">{correct}</strong> {correct === 1 ? "acerto" : "acertos"} em <strong className="text-els-fg">{entries.length}</strong> {entries.length === 1 ? "resposta" : "respostas"}
       </p>
       <ol className="mt-3 grid gap-1.5">
         {entries.map((entry, index) => {
           const label = entry.optionKey ? optionLabels?.[entry.optionKey] ?? entry.optionKey.toUpperCase() : "—";
           return (
-            <li key={`${entry.answeredAt}-${index}`} className="flex items-center gap-3 rounded-lg bg-white/[.03] px-3 py-2 text-xs">
-              <span className={cn("grid size-6 shrink-0 place-items-center rounded-full", entry.isCorrect ? "bg-emerald-300 text-slate-950" : "bg-rose-300/15 text-rose-200")}>
+            <li key={`${entry.answeredAt}-${index}`} className="flex items-center gap-3 rounded-lg bg-els-raise px-3 py-2 text-xs">
+              <span className={cn("grid size-6 shrink-0 place-items-center rounded-full", entry.isCorrect ? "bg-els-green text-els-on-amber" : "bg-els-danger/15 text-els-danger")}>
                 {entry.isCorrect ? <Check className="size-3.5" /> : <X className="size-3.5" />}
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block font-semibold text-slate-200">{entry.isCorrect ? "Acertou" : "Errou"} · marcou {label}</span>
-                <span className="block text-[11px] text-slate-500">{formatter.format(new Date(entry.answeredAt))}</span>
+                <span className="block font-semibold text-els-fg-2">{entry.isCorrect ? "Acertou" : "Errou"} · marcou {label}</span>
+                <span className="block text-[11px] text-els-fg-3">{formatter.format(new Date(entry.answeredAt))}</span>
               </span>
-              <span className="shrink-0 rounded-full border border-white/8 px-2 py-0.5 text-[10px] font-semibold text-slate-500">{ORIGIN_LABEL[entry.origin]}</span>
+              <span className="shrink-0 rounded-full border border-els-line px-2 py-0.5 text-[10px] font-semibold text-els-fg-3">{ORIGIN_LABEL[entry.origin]}</span>
             </li>
           );
         })}
@@ -231,22 +231,22 @@ function HistoryList({ entries, optionLabels }: { entries: QuestionHistoryEntry[
 function ClassStats({ data }: { data: StatsData }) {
   if (!data.available) {
     return (
-      <p className="text-xs leading-5 text-slate-500">
+      <p className="text-xs leading-5 text-els-fg-3">
         Poucas respostas ainda. O percentual da turma aparece a partir de {CLASS_STATS_MIN_ANSWERS} respostas de alunos.
       </p>
     );
   }
-  const tone = data.correctPercent >= 70 ? "bg-emerald-300" : data.correctPercent >= 40 ? "bg-amber-300" : "bg-rose-300";
+  const tone = data.correctPercent >= 70 ? "bg-els-green" : data.correctPercent >= 40 ? "bg-els-amber" : "bg-els-danger";
   return (
     <div>
       <div className="flex items-end justify-between gap-3">
-        <p><strong className="text-2xl font-semibold text-slate-100">{data.correctPercent}%</strong> <span className="text-xs text-slate-400">de acerto</span></p>
-        <span className="text-[11px] text-slate-500">{data.answers.toLocaleString("pt-BR")} respostas</span>
+        <p><strong className="text-2xl font-semibold text-els-fg">{data.correctPercent}%</strong> <span className="text-xs text-els-fg-3">de acerto</span></p>
+        <span className="text-[11px] text-els-fg-3">{data.answers.toLocaleString("pt-BR")} respostas</span>
       </div>
-      <div aria-hidden="true" className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/7">
+      <div aria-hidden="true" className="mt-3 h-1.5 overflow-hidden rounded-full bg-els-raise">
         <div className={cn("h-full rounded-full", tone)} style={{ width: `${data.correctPercent}%` }} />
       </div>
-      <p className="mt-2 text-[10px] leading-4 text-slate-600">Todas as respostas de alunos nesta questão, no treino e no quiz. Atualizado a cada poucos minutos.</p>
+      <p className="mt-2 text-[10px] leading-4 text-els-fg-4">Todas as respostas de alunos nesta questão, no treino e no quiz. Atualizado a cada poucos minutos.</p>
     </div>
   );
 }
@@ -275,7 +275,7 @@ function ReportForm({ questionPublicId, onCancel }: { questionPublicId: string; 
 
   if (state.status === "ready") {
     return (
-      <p className="flex items-start gap-2 text-xs leading-5 text-emerald-200" role="status">
+      <p className="flex items-start gap-2 text-xs leading-5 text-els-green-2" role="status">
         <Check className="mt-0.5 size-3.5 shrink-0" />
         {state.data === "created"
           ? "Relato recebido. A equipe editorial confere a questão na fonte oficial e corrige se for o caso."
@@ -286,10 +286,10 @@ function ReportForm({ questionPublicId, onCancel }: { questionPublicId: string; 
 
   return (
     <form className="grid gap-3" onSubmit={(event) => void submit(event)}>
-      <label className="grid gap-1.5 text-xs font-semibold text-slate-300" htmlFor={`${fieldId}-reason`}>
+      <label className="grid gap-1.5 text-xs font-semibold text-els-fg-2" htmlFor={`${fieldId}-reason`}>
         O que está errado?
         <select
-          className="min-h-10 rounded-lg border border-white/10 bg-slate-950/55 px-3 text-xs text-white outline-none focus:border-amber-300/50"
+          className="min-h-10 rounded-lg border border-els-line bg-els-bg/55 px-3 text-xs text-els-fg outline-none focus:border-els-amber/50"
           id={`${fieldId}-reason`}
           onChange={(event) => setReason(event.target.value as QuestionReportReason | "")}
           required
@@ -299,29 +299,29 @@ function ReportForm({ questionPublicId, onCancel }: { questionPublicId: string; 
           {QUESTION_REPORT_REASONS.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}
         </select>
       </label>
-      <label className="grid gap-1.5 text-xs font-semibold text-slate-300" htmlFor={`${fieldId}-notes`}>
-        <span>Detalhes <span className="font-normal text-slate-600">{reason === "other" ? "obrigatório" : "opcional"}</span></span>
+      <label className="grid gap-1.5 text-xs font-semibold text-els-fg-2" htmlFor={`${fieldId}-notes`}>
+        <span>Detalhes <span className="font-normal text-els-fg-4">{reason === "other" ? "obrigatório" : "opcional"}</span></span>
         <textarea
-          className="min-h-20 resize-y rounded-lg border border-white/10 bg-slate-950/55 px-3 py-2 text-xs leading-5 text-white outline-none placeholder:text-slate-600 focus:border-amber-300/50"
+          className="min-h-20 resize-y rounded-lg border border-els-line bg-els-bg/55 px-3 py-2 text-xs leading-5 text-els-fg outline-none placeholder:text-els-fg-4 focus:border-els-amber/50"
           id={`${fieldId}-notes`}
           maxLength={QUESTION_REPORT_NOTES_MAX}
           onChange={(event) => setNotes(event.target.value)}
           placeholder="Ex.: o inciso citado foi alterado pela Lei nº …"
           value={notes}
         />
-        <span className="justify-self-end text-[10px] font-normal text-slate-600">{notes.length}/{QUESTION_REPORT_NOTES_MAX}</span>
+        <span className="justify-self-end text-[10px] font-normal text-els-fg-4">{notes.length}/{QUESTION_REPORT_NOTES_MAX}</span>
       </label>
-      {state.status === "error" && <p className="text-[11px] text-rose-300" role="alert">{state.message}</p>}
+      {state.status === "error" && <p className="text-[11px] text-els-danger" role="alert">{state.message}</p>}
       <div className="flex flex-wrap items-center gap-2">
         <button
-          className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-amber-400 px-4 text-xs font-bold text-slate-950 transition hover:bg-amber-300 disabled:cursor-not-allowed disabled:opacity-40"
+          className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-els-amber px-4 text-xs font-bold text-els-on-amber transition hover:bg-els-amber disabled:cursor-not-allowed disabled:opacity-40"
           disabled={!reason || state.status === "loading"}
           type="submit"
         >
           {state.status === "loading" ? <LoaderCircle className="size-3.5 animate-spin" /> : <Flag className="size-3.5" />}
           Enviar relato
         </button>
-        <button className="inline-flex min-h-10 items-center px-3 text-xs font-semibold text-slate-500 transition hover:text-white" onClick={onCancel} type="button">Cancelar</button>
+        <button className="inline-flex min-h-10 items-center px-3 text-xs font-semibold text-els-fg-3 transition hover:text-els-fg" onClick={onCancel} type="button">Cancelar</button>
       </div>
     </form>
   );

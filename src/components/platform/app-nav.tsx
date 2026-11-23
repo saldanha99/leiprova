@@ -36,7 +36,7 @@ const navItems = [
 
 export function AppSidebar({ user }: { user: AuthUser }) {
   return (
-    <aside className="sticky top-0 hidden h-screen w-[272px] shrink-0 border-r border-white/8 bg-[#07101b] px-4 py-5 lg:flex lg:flex-col">
+    <aside className="sticky top-0 hidden h-screen w-[272px] shrink-0 border-r border-els-line bg-els-bg px-4 py-5 lg:flex lg:flex-col">
       <div className="px-2">
         <LeiProvaMark href="/app" />
       </div>
@@ -45,38 +45,38 @@ export function AppSidebar({ user }: { user: AuthUser }) {
           <Link
             key={href}
             href={href}
-            className="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-400 transition hover:bg-white/[.055] hover:text-white"
+            className="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-els-fg-3 transition hover:bg-els-raise hover:text-els-fg"
           >
-            <Icon className="size-[18px] text-slate-500 transition group-hover:text-amber-300" />
+            <Icon className="size-[18px] text-els-fg-3 transition group-hover:text-els-amber" />
             {label}
           </Link>
         ))}
       </nav>
-      <div className="mt-auto border-t border-white/8 pt-4">
+      <div className="mt-auto border-t border-els-line pt-4">
         {user.role === "admin" && (
           <Link
             href="/admin"
-            className="mb-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-amber-200 transition hover:bg-white/[.055] hover:text-amber-100"
+            className="mb-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-els-amber-2 transition hover:bg-els-raise hover:text-els-amber-2"
           >
             <ShieldCheck className="size-[18px]" /> Super admin
           </Link>
         )}
         <Link
           href="/app/assinatura"
-          className="mb-3 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-slate-400 transition hover:bg-white/[.055] hover:text-white"
+          className="mb-3 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-els-fg-3 transition hover:bg-els-raise hover:text-els-fg"
         >
           <CreditCard className="size-[18px]" /> Assinatura
         </Link>
-        <div className="rounded-2xl border border-white/8 bg-white/[.035] p-3">
+        <div className="rounded-2xl border border-els-line bg-els-raise p-3">
           <div className="flex items-center gap-3">
-            <span className="grid size-9 place-items-center rounded-full bg-emerald-300/12 text-sm font-bold text-emerald-200">
+            <span className="grid size-9 place-items-center rounded-full bg-els-green/12 text-sm font-bold text-els-green-2">
               {user.name.slice(0, 1).toUpperCase()}
             </span>
             <span className="min-w-0 flex-1">
-              <strong className="block truncate text-sm text-slate-100">
+              <strong className="block truncate text-sm text-els-fg">
                 {user.name}
               </strong>
-              <span className="block truncate text-[11px] text-slate-500">
+              <span className="block truncate text-[11px] text-els-fg-3">
                 {user.email}
               </span>
             </span>
@@ -84,7 +84,7 @@ export function AppSidebar({ user }: { user: AuthUser }) {
           <form action={logoutAction} className="mt-3">
             <button
               type="submit"
-              className="flex w-full items-center justify-center gap-2 rounded-lg border border-white/8 px-3 py-2 text-xs font-semibold text-slate-400 transition hover:border-white/15 hover:text-white"
+              className="flex w-full items-center justify-center gap-2 rounded-lg border border-els-line px-3 py-2 text-xs font-semibold text-els-fg-3 transition hover:border-els-line-strong hover:text-els-fg"
             >
               <Settings2 className="size-3.5" /> Sair da conta
             </button>
@@ -97,39 +97,39 @@ export function AppSidebar({ user }: { user: AuthUser }) {
 
 export function MobileAppHeader({ user }: { user: AuthUser }) {
   return (
-    <header className="sticky top-0 z-40 border-b border-white/8 bg-[#07101b]/95 px-4 py-3 backdrop-blur lg:hidden">
+    <header className="sticky top-0 z-40 border-b border-els-line bg-els-bg/95 px-4 py-3 backdrop-blur lg:hidden">
       <div className="flex items-center justify-between">
         <LeiProvaMark href="/app" />
         <details className="relative">
-          <summary className="grid size-10 cursor-pointer list-none place-items-center rounded-xl border border-white/10 bg-white/5 font-bold text-emerald-200">
+          <summary className="grid size-10 cursor-pointer list-none place-items-center rounded-xl border border-els-line bg-els-raise font-bold text-els-green-2">
             {user.name.slice(0, 1).toUpperCase()}
           </summary>
-          <nav className="absolute right-0 top-12 grid w-64 gap-1 rounded-2xl border border-white/10 bg-[#0a1522] p-2 shadow-2xl">
+          <nav className="absolute right-0 top-12 grid w-64 gap-1 rounded-2xl border border-els-line bg-els-surface p-2 shadow-2xl">
             {navItems.map(({ href, label, icon: Icon }) => (
               <Link
                 key={href}
                 href={href}
-                className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-slate-300 hover:bg-white/5"
+                className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-els-fg-2 hover:bg-els-raise"
               >
-                <Icon className="size-4 text-amber-300" /> {label}
+                <Icon className="size-4 text-els-amber" /> {label}
               </Link>
             ))}
             {user.role === "admin" && (
               <Link
                 href="/admin"
-                className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-amber-200 hover:bg-white/5"
+                className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-els-amber-2 hover:bg-els-raise"
               >
-                <ShieldCheck className="size-4 text-amber-300" /> Super admin
+                <ShieldCheck className="size-4 text-els-amber" /> Super admin
               </Link>
             )}
             <Link
               href="/app/assinatura"
-              className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-slate-300 hover:bg-white/5"
+              className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-els-fg-2 hover:bg-els-raise"
             >
-              <CreditCard className="size-4 text-amber-300" /> Assinatura
+              <CreditCard className="size-4 text-els-amber" /> Assinatura
             </Link>
             <form action={logoutAction}>
-              <button className="w-full rounded-xl px-3 py-2.5 text-left text-sm text-rose-200 hover:bg-white/5">
+              <button className="w-full rounded-xl px-3 py-2.5 text-left text-sm text-els-danger hover:bg-els-raise">
                 Sair
               </button>
             </form>

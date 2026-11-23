@@ -34,7 +34,6 @@ import { PricingPlans } from "@/components/landing/PricingPlans";
 import { JsonLd } from "@/components/seo/json-ld";
 import { isMasterCommerceOpen } from "@/lib/commerce/master-gate";
 import { isContactEnabled } from "@/lib/launch";
-import { elsFontVariables } from "@/lib/els-fonts";
 import { getAnnualDiscountPercentage } from "@/lib/plans";
 import {
   ORGANIZATION_ID,
@@ -66,7 +65,7 @@ export const metadata: Metadata = {
   },
 };
 
-export const viewport = { themeColor: "#fbfaf6" };
+export const viewport = { themeColor: "#08101d" };
 
 export const dynamic = "force-dynamic";
 
@@ -208,13 +207,13 @@ export default async function Home() {
   const primaryHref = primaryCtaHref(commerceOpen, true);
 
   return (
-    <div className={`els-light ${elsFontVariables}`} id="inicio" lang="pt-BR">
+    <div className="els-ui" id="inicio" lang="pt-BR">
       <JsonLd data={homeStructuredData} />
       <a className="skip-link" href="#conteudo">
         Pular para o conteúdo
       </a>
 
-      <LandingHeader commerceOpen={commerceOpen} brandVariant="els" />
+      <LandingHeader commerceOpen={commerceOpen} />
 
       <main id="conteudo">
         <section className="els-hero" aria-labelledby="hero-title">
@@ -261,38 +260,35 @@ export default async function Home() {
               </ul>
             </div>
 
-            <div className="els-sheet" aria-label="Exemplo de treino de literalidade">
-              <div className="els-sheet__top">
-                <span className="els-sheet__ref">Constituição Federal · art. 5º, LIV</span>
-                <span className="els-pill">
-                  <ShieldCheck aria-hidden="true" size={13} />
-                  Fonte oficial
-                </span>
-              </div>
-              <p className="els-sheet__text els-serif">
-                Ninguém será privado da liberdade ou de seus{" "}
-                <span className="els-blank" aria-hidden="true">
-                  bens
-                </span>
-                <span className="sr-only">lacuna</span>{" "}
-                sem o devido processo legal.
-              </p>
-              <div className="els-sheet__options">
-                {["bens", "direitos", "recursos"].map((option, index) => (
-                  <a key={option} href="#laboratorio" aria-label={`Testar a alternativa ${option} no laboratório`}>
-                    <b aria-hidden="true">{String.fromCharCode(65 + index)}</b>
-                    {option}
-                  </a>
-                ))}
-              </div>
-              <div className="els-sheet__foot">
-                <span>
-                  Próxima ação: <strong>6 artigos para revisar</strong>
-                </span>
-                <span className="els-meter" aria-hidden="true">
+            <div className="els-visual">
+              <figure className="els-browser">
+                <div className="els-browser__bar" aria-hidden="true">
                   <i />
-                </span>
-              </div>
+                  <i />
+                  <i />
+                  <span>editaleiseca.com.br/app/treinar</span>
+                </div>
+                <Image
+                  src="/assets/app/rodada-desktop.webp"
+                  alt="Tela real do app: rodada de questões com a alternativa correta e a errada destacadas"
+                  width={1920}
+                  height={1200}
+                  preload
+                  quality={80}
+                  sizes="(max-width: 960px) 92vw, 600px"
+                />
+              </figure>
+              <figure className="els-phone">
+                <Image
+                  src="/assets/app/rodada-celular.webp"
+                  alt="A mesma rodada no celular, com a escolha de confiança antes das alternativas"
+                  width={780}
+                  height={1560}
+                  quality={80}
+                  sizes="(max-width: 640px) 34vw, 190px"
+                />
+              </figure>
+              <p className="els-visual__caption">Telas reais do app, com uma conta de demonstração.</p>
             </div>
           </div>
 
@@ -586,7 +582,7 @@ export default async function Home() {
               <span className="els-kicker">
                 {commerceOpen ? "Conheça sem pressa" : "Política prevista para o lançamento"}
               </span>
-              <h2 className="els-serif" id="guarantee-title">
+              <h2 id="guarantee-title">
                 Sete dias para sentir se o método cabe na sua rotina.
               </h2>
               <p>
@@ -639,7 +635,7 @@ export default async function Home() {
         <section className="els-final" aria-labelledby="final-cta-title">
           <div className="els-container">
             <span className="els-kicker">Seu próximo artigo pode virar memória hoje</span>
-            <h2 className="els-serif" id="final-cta-title">
+            <h2 id="final-cta-title">
               Leia. Escolha. Erre melhor. <span>Acerte quando valer ponto.</span>
             </h2>
             <p>
@@ -663,7 +659,7 @@ export default async function Home() {
       <footer className="els-footer">
         <div className="els-container els-footer__top">
           <div className="els-footer__brand">
-            <BrandMark variant="els" />
+            <BrandMark />
             <p>
               Uma plataforma de treino ativo para quem precisa lembrar da redação legal quando a prova
               apertar.

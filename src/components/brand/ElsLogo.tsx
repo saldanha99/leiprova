@@ -26,10 +26,10 @@ export function ElsMonogram({ className }: { className?: string }) {
 /** Assinatura completa: monograma + "Edital / Lei Seca" em duas linhas. */
 export function ElsLogo({ compact = false, className }: { compact?: boolean; className?: string }) {
   return (
-    <span className={cn("els-logo", compact && "els-logo--compact", className)} aria-hidden="true">
+    <span className={cn("els-logo editalume-logo", compact && "els-logo--compact", className)} aria-hidden="true">
       <ElsMonogram />
       {!compact ? (
-        <span className="els-logo__word">
+        <span className="els-logo__word editalume-logo__word">
           <span>Edital</span>
           <span className="els-logo__accent">Lei Seca</span>
         </span>

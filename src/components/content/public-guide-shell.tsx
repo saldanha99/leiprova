@@ -7,10 +7,9 @@ import { LeiProvaMark } from "@/components/ui/leiprova-mark";
 import { ContestMegaMenu } from "@/components/contests/contest-mega-menu";
 import catalogStyles from "@/components/contests/contest-catalog.module.css";
 import { BRAND_NAME } from "@/lib/brand";
-import { elsFontVariables } from "@/lib/els-fonts";
 
-/** "light": tema claro do redesenho (opt-in por página); "dark" mantém o visual atual. */
-export type GuideTone = "dark" | "light";
+/** "els": sistema visual novo (redesenho ELS, opt-in por página); "classic" mantém o layout atual. */
+export type GuideTone = "classic" | "els";
 
 const FOOTER_LINKS = [
   { href: "/concursos", label: "Concursos" },
@@ -25,7 +24,7 @@ const FOOTER_LINKS = [
 export function PublicGuideShell({
   children,
   mobileActionBar = false,
-  tone = "dark",
+  tone = "classic",
 }: {
   children: ReactNode;
   mobileActionBar?: boolean;
@@ -33,9 +32,9 @@ export function PublicGuideShell({
 }) {
   const footerPadding = mobileActionBar ? " max-[680px]:pb-[calc(90px+env(safe-area-inset-bottom))]" : "";
 
-  if (tone === "light") {
+  if (tone === "els") {
     return (
-      <div className={`els-light ${elsFontVariables}`}>
+      <div className="els-ui">
         <a className="skip-link" href="#conteudo">
           Pular para o conteúdo
         </a>
@@ -47,19 +46,19 @@ export function PublicGuideShell({
             <nav className="flex items-center gap-1 text-sm font-semibold" aria-label="Navegação pública">
               <ContestMegaMenu />
               <Link
-                className="hidden min-h-11 items-center rounded-lg px-3 text-[var(--ink-2)] hover:text-[var(--ink)] md:inline-flex"
+                className="hidden min-h-11 items-center rounded-lg px-3 text-els-fg-2 hover:text-els-fg md:inline-flex"
                 href="/metodologia"
               >
                 Metodologia
               </Link>
               <Link
-                className="hidden min-h-11 items-center rounded-lg px-3 text-[var(--ink-2)] hover:text-[var(--ink)] sm:inline-flex"
+                className="hidden min-h-11 items-center rounded-lg px-3 text-els-fg-2 hover:text-els-fg sm:inline-flex"
                 href="/fontes-e-atualizacao"
               >
                 Fontes
               </Link>
               <Link
-                className="hidden min-h-11 items-center gap-2 rounded-xl border border-[var(--line-2)] bg-white px-3 text-[var(--ink)] hover:border-[var(--ink)] sm:inline-flex"
+                className="hidden min-h-11 items-center gap-2 rounded-xl border border-els-line-strong bg-els-surface px-3 text-els-fg hover:border-els-fg sm:inline-flex"
                 href="/"
               >
                 <Home aria-hidden="true" className="size-4" />
@@ -82,7 +81,7 @@ export function PublicGuideShell({
               {FOOTER_LINKS.map((item) => (
                 <Link
                   key={item.href}
-                  className="inline-flex min-h-11 items-center text-[var(--ink-2)] hover:text-[var(--ink)] hover:underline"
+                  className="inline-flex min-h-11 items-center text-els-fg-2 hover:text-els-fg hover:underline"
                   href={item.href}
                 >
                   {item.label}
@@ -96,35 +95,35 @@ export function PublicGuideShell({
   }
 
   return (
-    <div className="min-h-screen bg-[#060b13] text-slate-100">
+    <div className="min-h-screen bg-els-bg text-els-fg">
       <a
         href="#conteudo"
-        className="fixed left-3 top-3 z-50 -translate-y-40 rounded-xl bg-amber-300 px-4 py-3 text-sm font-extrabold text-slate-950 transition-transform focus:translate-y-0"
+        className="fixed left-3 top-3 z-50 -translate-y-40 rounded-xl bg-els-amber px-4 py-3 text-sm font-extrabold text-els-on-amber transition-transform focus:translate-y-0"
       >
         Pular para o conteúdo
       </a>
-      <header className="border-b border-white/8 bg-[#07101b]/95 backdrop-blur">
+      <header className="border-b border-els-line bg-els-bg/95 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-4">
           <LeiProvaMark className={catalogStyles.compactBrand} />
           <nav
-            className="flex items-center gap-2 text-sm font-semibold text-slate-400"
+            className="flex items-center gap-2 text-sm font-semibold text-els-fg-3"
             aria-label="Navegação pública"
           >
             <ContestMegaMenu />
             <Link
-              className="hidden rounded-lg px-3 py-2 hover:bg-white/5 hover:text-white md:inline-flex"
+              className="hidden rounded-lg px-3 py-2 hover:bg-els-raise hover:text-els-fg md:inline-flex"
               href="/metodologia"
             >
               Metodologia
             </Link>
             <Link
-              className="hidden rounded-lg px-3 py-2 hover:bg-white/5 hover:text-white sm:inline-flex"
+              className="hidden rounded-lg px-3 py-2 hover:bg-els-raise hover:text-els-fg sm:inline-flex"
               href="/fontes-e-atualizacao"
             >
               Fontes
             </Link>
             <Link
-              className="hidden items-center gap-2 rounded-xl border border-white/10 px-3 py-2 hover:border-white/20 hover:text-white sm:inline-flex"
+              className="hidden items-center gap-2 rounded-xl border border-els-line px-3 py-2 hover:border-els-line-strong hover:text-els-fg sm:inline-flex"
               href="/"
             >
               <Home aria-hidden="true" className="size-4" />
@@ -134,13 +133,13 @@ export function PublicGuideShell({
         </div>
       </header>
       <main id="conteudo">{children}</main>
-      <footer className={`border-t border-white/8 bg-[#050a11]${footerPadding}`}>
-        <div className="mx-auto grid max-w-6xl gap-7 px-5 py-10 text-sm text-slate-500 sm:grid-cols-[1fr_auto] sm:items-end">
+      <footer className={`border-t border-els-line bg-els-bg${footerPadding}`}>
+        <div className="mx-auto grid max-w-6xl gap-7 px-5 py-10 text-sm text-els-fg-3 sm:grid-cols-[1fr_auto] sm:items-end">
           <div>
-            <p className="flex items-center gap-2 font-semibold text-slate-300">
+            <p className="flex items-center gap-2 font-semibold text-els-fg-2">
               <BookOpenCheck
                 aria-hidden="true"
-                className="size-4 text-amber-300"
+                className="size-4 text-els-amber"
               />
               Edital Lei Seca
             </p>
@@ -151,7 +150,7 @@ export function PublicGuideShell({
           </div>
           <div className="flex flex-wrap gap-x-5 gap-y-2 font-semibold">
             {FOOTER_LINKS.map((item) => (
-              <Link key={item.href} className="hover:text-white" href={item.href}>
+              <Link key={item.href} className="hover:text-els-fg" href={item.href}>
                 {item.label}
               </Link>
             ))}
@@ -165,21 +164,21 @@ export function PublicGuideShell({
 export function GuideBreadcrumbs({
   current,
   parent,
-  tone = "dark",
+  tone = "classic",
 }: {
   current: string;
   parent?: { label: string; href: string };
   tone?: GuideTone;
 }) {
-  const light = tone === "light";
+  const light = tone === "els";
   const link = light
-    ? "inline-flex min-h-11 items-center hover:text-[var(--ink)] hover:underline"
-    : "hover:text-amber-300";
+    ? "inline-flex min-h-11 items-center hover:text-els-fg hover:underline"
+    : "hover:text-els-amber";
   return (
     <nav
       aria-label="Trilha de navegação"
       className={`flex flex-wrap items-center gap-2 text-xs font-bold uppercase tracking-[0.12em] ${
-        light ? "text-[var(--ink-3)]" : "text-slate-500"
+        light ? "text-els-fg-3" : "text-els-fg-3"
       }`}
     >
       <Link className={link} href="/">
@@ -194,7 +193,7 @@ export function GuideBreadcrumbs({
           <span aria-hidden="true">/</span>
         </>
       ) : null}
-      <span aria-current="page" className={light ? "text-[var(--amber-ink)]" : "text-amber-300"}>
+      <span aria-current="page" className={light ? "text-els-amber" : "text-els-amber"}>
         {current}
       </span>
     </nav>
@@ -204,18 +203,18 @@ export function GuideBreadcrumbs({
 export function GuideCta({
   title,
   description,
-  tone = "dark",
+  tone = "classic",
 }: {
   title: string;
   description: string;
   tone?: GuideTone;
 }) {
-  if (tone === "light") {
+  if (tone === "els") {
     return (
-      <aside className="rounded-[1.5rem] bg-[var(--ink)] p-6 text-white sm:p-9">
-        <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-[#f6c15f]">Experimente na prática</p>
-        <h2 className="els-serif mt-3 text-2xl font-semibold leading-tight sm:text-3xl">{title}</h2>
-        <p className="mt-3 max-w-2xl text-sm leading-7 text-[#c9d2df]">{description}</p>
+      <aside className="rounded-els-xl border border-els-amber/25 bg-[radial-gradient(70%_120%_at_0%_0%,oklch(0.84_0.15_78/0.12),transparent_60%)] bg-els-surface p-6 text-els-fg shadow-[var(--els-shadow)] sm:p-9">
+        <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-els-amber">Experimente na prática</p>
+        <h2 className="mt-3 text-2xl font-bold leading-tight tracking-[-0.035em] sm:text-3xl">{title}</h2>
+        <p className="mt-3 max-w-2xl text-sm leading-7 text-els-fg-2">{description}</p>
         <Link className="button button--amber mt-6" href="/demo">
           Fazer uma sessão gratuita
           <ArrowRight aria-hidden="true" className="size-4" />
@@ -225,18 +224,18 @@ export function GuideCta({
   }
 
   return (
-    <aside className="rounded-[2rem] border border-amber-300/20 bg-[radial-gradient(circle_at_20%_0%,rgba(251,191,36,.16),transparent_48%),#0b1624] p-6 sm:p-9">
-      <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-amber-300">
+    <aside className="rounded-[2rem] border border-els-amber/20 bg-[radial-gradient(circle_at_20%_0%,rgba(251,191,36,.16),transparent_48%),#0b1624] p-6 sm:p-9">
+      <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-els-amber">
         Experimente na prática
       </p>
       <h2 className="mt-3 text-2xl font-semibold tracking-[-0.035em] sm:text-3xl">
         {title}
       </h2>
-      <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-400">
+      <p className="mt-3 max-w-2xl text-sm leading-7 text-els-fg-3">
         {description}
       </p>
       <Link
-        className="mt-6 inline-flex min-h-12 items-center gap-2 rounded-xl bg-amber-300 px-5 py-3 text-sm font-extrabold text-slate-950 transition hover:bg-amber-200"
+        className="mt-6 inline-flex min-h-12 items-center gap-2 rounded-xl bg-els-amber px-5 py-3 text-sm font-extrabold text-els-on-amber transition hover:bg-els-amber-2"
         href="/demo"
       >
         Fazer uma sessão gratuita

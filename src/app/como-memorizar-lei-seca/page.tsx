@@ -152,41 +152,41 @@ const STEPS = [
   },
 ] as const;
 
-export const viewport = { themeColor: "#fbfaf6" };
+export const viewport = { themeColor: "#08101d" };
 
 export default function MemorizeDryLawPage() {
   return (
-    <PublicGuideShell tone="light">
+    <PublicGuideShell tone="els">
       <JsonLd data={structuredData} />
       <article>
-        <header className="border-b border-[var(--line)] bg-[var(--paper)]">
+        <header className="border-b border-els-line bg-els-bg">
           <div className="mx-auto max-w-6xl px-5 py-14 sm:py-20">
-            <GuideBreadcrumbs current="Como memorizar lei seca" tone="light" />
+            <GuideBreadcrumbs current="Como memorizar lei seca" tone="els" />
             <div className="mt-9 grid gap-10 lg:grid-cols-[1.2fr_.8fr] lg:items-center">
               <div>
-                <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-[#0a6457]">
+                <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-els-green">
                   Método Edital Lei Seca
                 </p>
-                <h1 className="els-serif mt-4 max-w-4xl text-[2.5rem] font-bold leading-[1.05] tracking-[-0.02em] text-[var(--ink)] sm:text-6xl">
+                <h1 className="mt-4 max-w-4xl text-[2.5rem] font-extrabold leading-[1.02] tracking-[-0.05em] text-els-fg sm:text-6xl">
                   Como memorizar lei seca sem depender só da releitura
                 </h1>
-                <p className="mt-6 max-w-3xl text-lg leading-8 text-[var(--ink-2)]">
+                <p className="mt-6 max-w-3xl text-lg leading-8 text-els-fg-2">
                   Leia um trecho curto, tente recuperar a redação sem olhar, corrija a diferença e volte ao artigo em sessões espaçadas. Essa sequência transforma a lei em prática verificável — sem prometer aprovação e sem substituir compreensão, jurisprudência ou edital.
                 </p>
-                <p className="mt-5 text-sm text-[var(--ink-3)]">
+                <p className="mt-5 text-sm text-els-fg-3">
                   Publicado pela Edital Lei Seca em 17 de agosto de 2026; fontes científicas conferidas nesta data.
                 </p>
               </div>
 
-              <div className="rounded-[1.5rem] border border-[var(--line)] bg-white p-6 shadow-[var(--shadow-deep)] sm:p-8">
-                <div className="flex items-center gap-3 text-[var(--amber-ink)]">
+              <div className="rounded-[1.5rem] border border-els-line bg-els-surface p-6 shadow-[var(--shadow-deep)] sm:p-8">
+                <div className="flex items-center gap-3 text-els-amber">
                   <Route aria-hidden="true" className="size-6" />
                   <span className="text-xs font-extrabold uppercase tracking-[0.16em]">A metáfora da rota</span>
                 </div>
-                <p className="els-serif mt-5 text-2xl font-semibold leading-9 text-[var(--ink)]">
+                <p className="mt-5 text-2xl font-bold leading-9 tracking-[-0.03em] text-els-fg">
                   Um caminho repetido deixa de exigir GPS o tempo todo.
                 </p>
-                <p className="mt-4 text-sm leading-7 text-[var(--ink-3)]">
+                <p className="mt-4 text-sm leading-7 text-els-fg-3">
                   No estudo, cada tentativa ajuda você a reconhecer os “marcos” do artigo: quem pode agir, em qual condição, dentro de qual prazo e com qual exceção. É uma analogia para orientar a prática, não uma medição literal do cérebro.
                 </p>
               </div>
@@ -197,11 +197,11 @@ export default function MemorizeDryLawPage() {
         <div className="mx-auto max-w-6xl space-y-20 px-5 py-16 sm:py-20">
           <section aria-labelledby="sequencia-title">
             <div className="max-w-3xl">
-              <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-[var(--amber-ink)]">Sequência prática</p>
-              <h2 id="sequencia-title" className="mt-3 els-serif text-3xl font-semibold leading-tight text-[var(--ink)] sm:text-4xl">
+              <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-els-amber">Sequência prática</p>
+              <h2 id="sequencia-title" className="mt-3 text-3xl font-bold leading-tight tracking-[-0.04em] text-els-fg sm:text-4xl">
                 Quatro movimentos em uma sessão curta
               </h2>
-              <p className="mt-4 text-base leading-8 text-[var(--ink-3)]">
+              <p className="mt-4 text-base leading-8 text-els-fg-3">
                 A plataforma usa questões de múltipla escolha para exigir uma decisão antes de mostrar a correção. Assim, “parece familiar” e “consigo lembrar” deixam de ser a mesma coisa.
               </p>
             </div>
@@ -209,31 +209,31 @@ export default function MemorizeDryLawPage() {
               {STEPS.map((step) => {
                 const Icon = step.icon;
                 return (
-                  <li key={step.number} className="rounded-[1.25rem] border border-[var(--line)] bg-white p-6">
+                  <li key={step.number} className="rounded-[1.25rem] border border-els-line bg-els-surface p-6">
                     <div className="flex items-center justify-between">
-                      <span className="grid size-11 place-items-center rounded-2xl bg-[var(--amber-soft)] text-[var(--amber-ink)]">
+                      <span className="grid size-11 place-items-center rounded-2xl bg-els-amber/12 text-els-amber">
                         <Icon aria-hidden="true" className="size-5" />
                       </span>
-                      <span className="els-serif text-2xl font-semibold text-[var(--amber-ink)]">{step.number}</span>
+                      <span className="text-2xl font-semibold text-els-amber">{step.number}</span>
                     </div>
-                    <h3 className="mt-5 text-xl font-bold tracking-[-0.01em] text-[var(--ink)]">{step.title}</h3>
-                    <p className="mt-3 text-sm leading-7 text-[var(--ink-3)]">{step.text}</p>
+                    <h3 className="mt-5 text-xl font-bold tracking-[-0.01em] text-els-fg">{step.title}</h3>
+                    <p className="mt-3 text-sm leading-7 text-els-fg-3">{step.text}</p>
                   </li>
                 );
               })}
             </ol>
           </section>
 
-          <section aria-labelledby="rota-title" className="rounded-[1.5rem] border border-[var(--line)] bg-[var(--paper-2)] p-6 sm:p-10">
+          <section aria-labelledby="rota-title" className="rounded-[1.5rem] border border-els-line bg-els-bg-2 p-6 sm:p-10">
             <div className="grid gap-10 lg:grid-cols-[.8fr_1.2fr] lg:items-center">
               <div>
-                <span className="grid size-14 place-items-center rounded-2xl bg-[var(--emerald-soft)] text-[var(--teal)]">
+                <span className="grid size-14 place-items-center rounded-2xl bg-els-green/12 text-els-green">
                   <MapPinned aria-hidden="true" className="size-7" />
                 </span>
-                <h2 id="rota-title" className="mt-6 els-serif text-3xl font-semibold leading-tight text-[var(--ink)]">
+                <h2 id="rota-title" className="mt-6 text-3xl font-bold leading-tight tracking-[-0.04em] text-els-fg">
                   O que muda quando você percorre a mesma rota
                 </h2>
-                <p className="mt-4 text-sm leading-7 text-[var(--ink-3)]">
+                <p className="mt-4 text-sm leading-7 text-els-fg-3">
                   A dificuldade não desaparece de forma mágica. Você cria referências recuperáveis e descobre em quais trechos ainda se perde.
                 </p>
               </div>
@@ -243,15 +243,15 @@ export default function MemorizeDryLawPage() {
                   [Route, "Novas passagens", "Prazos, exceções e competências começam a funcionar como marcos do caminho."],
                   [BrainCircuit, "Recuperação na prova", "O objetivo é acessar a redação com menos pistas externas — sem confundir familiaridade com domínio."],
                 ].map(([Icon, title, text], index) => (
-                  <li key={title as string} className="relative flex gap-4 rounded-2xl border border-[var(--line)] bg-white p-5">
-                    <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-[var(--emerald-soft)] text-[var(--teal)]">
+                  <li key={title as string} className="relative flex gap-4 rounded-2xl border border-els-line bg-els-surface p-5">
+                    <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-els-green/12 text-els-green">
                       <Icon aria-hidden="true" className="size-5" />
                     </span>
                     <div>
-                      <h3 className="font-semibold text-[var(--ink)]">{title as string}</h3>
-                      <p className="mt-1 text-sm leading-6 text-[var(--ink-3)]">{text as string}</p>
+                      <h3 className="font-semibold text-els-fg">{title as string}</h3>
+                      <p className="mt-1 text-sm leading-6 text-els-fg-3">{text as string}</p>
                     </div>
-                    {index < 2 && <ArrowDown aria-hidden="true" className="absolute -bottom-3 left-8 z-10 size-4 text-[var(--line-2)]" />}
+                    {index < 2 && <ArrowDown aria-hidden="true" className="absolute -bottom-3 left-8 z-10 size-4 text-els-line-strong" />}
                   </li>
                 ))}
               </ol>
@@ -260,11 +260,11 @@ export default function MemorizeDryLawPage() {
 
           <section aria-labelledby="evidencias-title" className="grid gap-8 lg:grid-cols-[1fr_.75fr]">
             <div>
-              <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-[#0a6457]">O que sustenta o método</p>
-              <h2 id="evidencias-title" className="mt-3 els-serif text-3xl font-semibold leading-tight text-[var(--ink)]">
+              <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-els-green">O que sustenta o método</p>
+              <h2 id="evidencias-title" className="mt-3 text-3xl font-bold leading-tight tracking-[-0.04em] text-els-fg">
                 Recuperação ativa e prática distribuída
               </h2>
-              <div className="mt-6 space-y-5 text-sm leading-7 text-[var(--ink-3)]">
+              <div className="mt-6 space-y-5 text-sm leading-7 text-els-fg-3">
                 <p>
                   A prática de recuperação exige tentar lembrar antes de rever. Em experimento publicado na revista <em>Science</em>, a recuperação repetida teve efeito positivo sobre a lembrança posterior, enquanto apenas continuar estudando itens já aprendidos não produziu o mesmo resultado naquele desenho experimental.
                 </p>
@@ -276,23 +276,23 @@ export default function MemorizeDryLawPage() {
                 </p>
               </div>
             </div>
-            <aside className="rounded-[1.25rem] border border-[var(--line)] bg-white p-6">
-              <h3 className="font-semibold text-[var(--ink)]">Fontes científicas consultadas</h3>
-              <ul className="mt-5 space-y-4 text-sm leading-6 text-[var(--ink-3)]">
+            <aside className="rounded-[1.25rem] border border-els-line bg-els-surface p-6">
+              <h3 className="font-semibold text-els-fg">Fontes científicas consultadas</h3>
+              <ul className="mt-5 space-y-4 text-sm leading-6 text-els-fg-3">
                 <li>
-                  <a className="font-semibold text-[var(--amber-ink)] underline decoration-[var(--amber-ink)]/40 underline-offset-4 hover:text-[var(--ink)]" href="https://doi.org/10.1126/science.1152408" rel="noreferrer">
+                  <a className="font-semibold text-els-amber underline decoration-els-amber/40 underline-offset-4 hover:text-els-fg" href="https://doi.org/10.1126/science.1152408" rel="noreferrer">
                     Karpicke &amp; Roediger (2008), Science
                   </a>
                   <p className="mt-1">Recuperação repetida e retenção posterior.</p>
                 </li>
                 <li>
-                  <a className="font-semibold text-[var(--amber-ink)] underline decoration-[var(--amber-ink)]/40 underline-offset-4 hover:text-[var(--ink)]" href="https://pubmed.ncbi.nlm.nih.gov/16719566/" rel="noreferrer">
+                  <a className="font-semibold text-els-amber underline decoration-els-amber/40 underline-offset-4 hover:text-els-fg" href="https://pubmed.ncbi.nlm.nih.gov/16719566/" rel="noreferrer">
                     Cepeda et al. (2006), Psychological Bulletin
                   </a>
                   <p className="mt-1">Síntese quantitativa sobre prática distribuída.</p>
                 </li>
                 <li>
-                  <a className="font-semibold text-[var(--amber-ink)] underline decoration-[var(--amber-ink)]/40 underline-offset-4 hover:text-[var(--ink)]" href="https://doi.org/10.1177/1529100612453266" rel="noreferrer">
+                  <a className="font-semibold text-els-amber underline decoration-els-amber/40 underline-offset-4 hover:text-els-fg" href="https://doi.org/10.1177/1529100612453266" rel="noreferrer">
                     Dunlosky et al. (2013), Psychological Science in the Public Interest
                   </a>
                   <p className="mt-1">Revisão de dez técnicas de aprendizagem.</p>
@@ -302,22 +302,22 @@ export default function MemorizeDryLawPage() {
           </section>
 
           <section aria-labelledby="faq-metodo-title">
-            <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-[var(--amber-ink)]">Perguntas objetivas</p>
-            <h2 id="faq-metodo-title" className="mt-3 els-serif text-3xl font-semibold leading-tight text-[var(--ink)]">
+            <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-els-amber">Perguntas objetivas</p>
+            <h2 id="faq-metodo-title" className="mt-3 text-3xl font-bold leading-tight tracking-[-0.04em] text-els-fg">
               O que considerar antes de montar a rotina
             </h2>
             <div className="mt-8 space-y-3">
               {FAQS.map((item, index) => (
-                <details key={item.question} open={index === 0} className="rounded-2xl border border-[var(--line)] bg-white p-5 open:border-[#c77800]/40">
-                  <summary className="flex min-h-11 cursor-pointer list-none items-center pr-4 font-semibold text-[var(--ink)]">{item.question}</summary>
-                  <p className="mt-3 max-w-4xl text-sm leading-7 text-[var(--ink-3)]">{item.answer}</p>
+                <details key={item.question} open={index === 0} className="rounded-2xl border border-els-line bg-els-surface p-5 open:border-els-amber/40">
+                  <summary className="flex min-h-11 cursor-pointer list-none items-center pr-4 font-semibold text-els-fg">{item.question}</summary>
+                  <p className="mt-3 max-w-4xl text-sm leading-7 text-els-fg-3">{item.answer}</p>
                 </details>
               ))}
             </div>
           </section>
 
           <GuideCta
-            tone="light"
+            tone="els"
             title="Faça a primeira passagem sem depender de cadastro"
             description="A demonstração usa questões originais assistidas por IA de Direito Constitucional, mostra a fonte oficial e corrige a palavra que mudou. A revisão humana independente ainda está pendente e o progresso fica apenas no seu navegador."
           />

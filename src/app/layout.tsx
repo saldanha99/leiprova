@@ -8,7 +8,7 @@ import { BRAND_NAME, BRAND_TAGLINE } from "@/lib/brand";
 import { SITE_URL, SOCIAL_IMAGE, SOCIAL_IMAGE_PATH, siteIdentityGraph } from "@/lib/seo";
 
 import "./globals.css";
-import "./els-light.css";
+import "./els-ui.css";
 
 const manrope = Manrope({
   variable: "--font-manrope",

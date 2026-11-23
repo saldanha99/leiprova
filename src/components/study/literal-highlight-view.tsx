@@ -12,9 +12,9 @@ function Segments({ segments }: { segments: LiteralSegment[] }) {
         segment.kind === "plain" ? (
           <span key={index}>{segment.text}</span>
         ) : segment.kind === "match" ? (
-          <mark key={index} className="rounded bg-emerald-300/15 px-0.5 text-emerald-50">{segment.text}</mark>
+          <mark key={index} className="rounded bg-els-green/15 px-0.5 text-emerald-50">{segment.text}</mark>
         ) : (
-          <mark key={index} className="rounded bg-rose-400/25 px-0.5 font-semibold text-rose-50 underline decoration-rose-300 decoration-2 underline-offset-4">
+          <mark key={index} className="rounded bg-els-danger/25 px-0.5 font-semibold text-rose-50 underline decoration-els-danger decoration-2 underline-offset-4">
             {segment.text}
           </mark>
         ),
@@ -25,22 +25,22 @@ function Segments({ segments }: { segments: LiteralSegment[] }) {
 
 export function LiteralHighlightView({ literal, className }: { literal: LiteralFeedback; className?: string }) {
   return (
-    <figure className={cn("rounded-xl border border-white/8 bg-slate-950/40 p-4", className)}>
+    <figure className={cn("rounded-xl border border-els-line bg-els-bg/40 p-4", className)}>
       <figcaption className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] font-bold uppercase tracking-[.14em]">
-        <span className="text-amber-200">{literal.articleRef}</span>
-        <span className="text-slate-500">{literal.actTitle}</span>
+        <span className="text-els-amber-2">{literal.articleRef}</span>
+        <span className="text-els-fg-3">{literal.actTitle}</span>
         <span className="ml-auto flex items-center gap-3 normal-case tracking-normal font-semibold">
-          <span className="inline-flex items-center gap-1.5 text-emerald-200"><span aria-hidden className="size-2 rounded-full bg-emerald-300" />o item confirma</span>
-          {literal.hasTrap && <span className="inline-flex items-center gap-1.5 text-rose-200"><span aria-hidden className="size-2 rounded-full bg-rose-400" />ponto da pegadinha</span>}
+          <span className="inline-flex items-center gap-1.5 text-els-green-2"><span aria-hidden className="size-2 rounded-full bg-els-green" />o item confirma</span>
+          {literal.hasTrap && <span className="inline-flex items-center gap-1.5 text-els-danger"><span aria-hidden className="size-2 rounded-full bg-els-danger" />ponto da pegadinha</span>}
         </span>
       </figcaption>
-      <blockquote className="whitespace-pre-line text-sm leading-7 text-slate-300">
+      <blockquote className="whitespace-pre-line text-sm leading-7 text-els-fg-2">
         <Segments segments={literal.excerpt ?? literal.segments} />
       </blockquote>
       {literal.excerpt && (
-        <details className="mt-3 border-t border-white/8 pt-3 text-xs">
-          <summary className="cursor-pointer font-semibold text-slate-400 hover:text-white">Ver o artigo inteiro</summary>
-          <blockquote className="mt-3 whitespace-pre-line text-sm leading-7 text-slate-400">
+        <details className="mt-3 border-t border-els-line pt-3 text-xs">
+          <summary className="cursor-pointer font-semibold text-els-fg-3 hover:text-els-fg">Ver o artigo inteiro</summary>
+          <blockquote className="mt-3 whitespace-pre-line text-sm leading-7 text-els-fg-3">
             <Segments segments={literal.segments} />
           </blockquote>
         </details>

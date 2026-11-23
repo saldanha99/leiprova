@@ -14,14 +14,7 @@ const NAV_ITEMS = [
   { href: "#planos", label: "Planos" },
 ] as const;
 
-export function LandingHeader({
-  commerceOpen,
-  brandVariant = "classic",
-}: {
-  commerceOpen: boolean;
-  /** "els": cabeçalho do tema claro, com o monograma novo. */
-  brandVariant?: "classic" | "els";
-}) {
+export function LandingHeader({ commerceOpen }: { commerceOpen: boolean }) {
   const { href: primaryHref, label: primaryLabel } = primaryCta(
     commerceOpen,
     "Começar agora",
@@ -36,7 +29,7 @@ export function LandingHeader({
       <div
         className={`site-container landing-header__inner max-sm:!gap-2 ${catalogStyles.compactBrand}`}
       >
-        <BrandMark variant={brandVariant} />
+        <BrandMark />
         <ContestMegaMenu />
 
         <nav className="landing-header__nav" aria-label="Navegação principal">

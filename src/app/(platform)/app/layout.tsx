@@ -15,7 +15,7 @@ export default async function PlatformLayout({ children }: { children: ReactNode
   const user = await requireUser(requestHeaders.get(PROTECTED_PATH_HEADER) ?? "/app");
 
   return (
-    <div className="min-h-screen bg-[#050b12] text-white lg:flex">
+    <div className="min-h-screen bg-els-bg text-els-fg lg:flex">
       <AppSidebar user={user} />
       <div className="min-w-0 flex-1">
         <MobileAppHeader user={user} />
