@@ -137,8 +137,15 @@ export async function transitionLegalVersion(tx: Tx, request: TransitionRequest)
     from ${mapping} where not m.unchanged and b.legal_article_id=m.old_id and b.status in ('approved','pending_review') returning b.id`);
   if (suspended.length) await tx.execute(sql`update question_contract_certifications set status='suspended'
     where binding_id in (${sql.join(suspended.map((b) => sql`${b.id}`), sql`,`)}) and status='approved'`);
+  // A fila normal (aprovador da fábrica) só pega rascunho sem autor registrado: a questão volta ao estado de
+  // rascunho importado e é reavaliada contra o texto vigente; as retiradas ficam suspensas com a proveniência.
+  const reopenToQueue = sql`q.id not in ${ids(retire)} and q.editorial_status in ('reviewed','draft')`;
   const reopened = await tx.execute<{ id: number; status: string }>(sql`update questions q set legal_article_id=m.new_id,
       editorial_status=case when q.id in ${ids(retire)} then 'suspended' when q.editorial_status='reviewed' then 'draft' else q.editorial_status end,
+      created_by_user_id=case when ${reopenToQueue} then null else q.created_by_user_id end,
+      reviewed_by_user_id=case when ${reopenToQueue} then null else q.reviewed_by_user_id end,
+      clean_room_attested_at=case when ${reopenToQueue} then null else q.clean_room_attested_at end,
+      submitted_at=case when ${reopenToQueue} then null else q.submitted_at end,
       review_notes=${`${notes} Artigo alterado; revisão contra o texto vigente.`}, updated_at=${now}::timestamptz
     from ${mapping} where not m.unchanged and q.legal_article_id=m.old_id returning q.id::int id, q.editorial_status status`);
 
