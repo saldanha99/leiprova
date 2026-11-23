@@ -63,3 +63,41 @@ motor da VPS só reserva mapeamento e autoria e roda a IA sem rede, por desenho.
   - pgm-manaus (opp. 6): nenhum requisito extraído.
   - tce-ma (opp. 14) e pc-pr agente (opp. 5): o contrato é de um cargo só e o edital cobre vários. Falta a
     escolha do cargo (decisão do Vinícius).
+
+## Segunda rodada (tarde de 23/11): decisões do Vinícius para o item 3
+
+Decisões: PC-PR com Agente de Polícia Judiciária e Papiloscopista Policial separados (o edital não tem cargo
+"Investigador"); TCE-MA com Analista – Direito (cargo 3) e Técnico (cargo 16); 2 produtos novos no Stripe live
+com o preço padrão do catálogo; publicação da migration 0058. Publicações `120dea2` e `fe0ecea` (site 200),
+combinadas com o Dev Wise Wolf (redesenho só no front, na `feat/redesenho-els`).
+
+- **PC-DF Delegado** (`d7511cf`): os títulos do edital são "X e Legislação Complementar". 9 disciplinas literais
+  admitidas (fingerprint `88a21af7…`) e 190 de 193 requisitos classificados; os 3 restantes têm o título quebrado em
+  duas linhas.
+- **TJ-PE Juiz Substituto**: Direito do Consumidor e Direito da Criança e do Adolescente admitidos e 26 requisitos
+  classificados (57 de Noções Gerais/Formação Humanística ficam fora, como nos outros tribunais; 3 sem prova por
+  fragmentos). Contrato MC5 aprovado (`374db105…`, item 10.4, p. 23), porque o gabarito definitivo já existe.
+- **PC-PR Agente e Papiloscopista** (`120dea2`, `fe0ecea`, `5a43ed6`, `685557e`): receitas pelo bloco próprio de
+  cada cargo no Anexo I (Agente p. 70–73, Papiloscopista p. 73–76, do item 2 em diante; o item 1 não é lei seca).
+  Admitidos: oportunidades 38 e 39, 57 requisitos cada (auditorias 145985 e 146001). Prova anterior (caderno Tipo 1 +
+  gabarito definitivo) registrada e aprovada; contratos MC5 `a668ef5b…` e `7ec37f37…`; 4 disciplinas penais
+  admitidas (`ae07b874…`) e 61 requisitos classificados. A checagem de edição duplicada passou a considerar o título
+  (cargo), já que Agente e Papiloscopista têm a mesma carreira e data.
+- **Stripe**: `--only=<slug>` no sincronizador cria ou confere só os concursos indicados, sem tocar o Master (o
+  sync em lote recusa porque há assinaturas). `pc-pr-papiloscopista-2026` criado em live (produto + 2 preços,
+  R$ 67/mês e R$ 347/ano); `pc-pr-agente-2026` renomeado. Catálogo com 85 produtos.
+- **TCE-MA** (pendente): prova aplicada em 22/11; a Cebraspe ainda não publicou caderno nem gabarito. Admitir o
+  Analista – Direito (cargo 3, p. 48–51) e o Técnico (cargo 16, p. 67–68), com `startLine`/`stopLine` como no
+  TCE-RN, assim que sair o gabarito. Os 149 requisitos atuais da oportunidade 14 misturam parte geral, cargo 3 e
+  cargo 16.
+- **PGM-Manaus** (bloqueado por fonte): o edital só está no DOM de Manaus, que não responde dos servidores, e na FCC,
+  cujo robots proíbe `/concursos/` e PDFs. A notícia da Prefeitura não anexa o PDF.
+- **legal_change** (`8de3820`): o servidor calcula o diff de parágrafos entre a fotografia aprovada e a pendente mais
+  recente de cada lei; o Guardião analisa offline. 16 tarefas, uma por lei; as antigas, repetidas ou sem diff
+  ficaram `superseded`. A Constituição Federal tem captura pendente diferente da aprovada desde 30/10 (provável
+  emenda nova): revisar no painel.
+- **5 leis sem texto no Senado** (`5bab4aa`, migration 0058): texto atualizado da Câmara (IDs pelo LexML), só
+  captura `pending_review` para revisão no painel: Lei Geral do Esporte (164 artigos), Henry Borel (34), Software
+  (16), Escuta Protegida (29) e LONMP (82).
+- Testes: 4 falhas em `tests/fgv-historical-lote1.test.ts` são anteriores a esta rodada (o teste ainda espera o TJPE
+  sem gabarito definitivo) e 29 em `cp-reconciliation-preview` dependem da captura privada do CP em `.local`.
