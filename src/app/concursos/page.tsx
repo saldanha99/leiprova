@@ -73,21 +73,21 @@ export default async function ContestsPage() {
     Object.fromEntries(released.map((item) => [item.slug, item.preparationMode as PreparationMode])));
 
   return (
-    <PublicGuideShell>
+    <PublicGuideShell tone="els">
       <JsonLd data={contestsStructuredData} />
       <article>
-        <header className="relative overflow-hidden border-b border-white/8 bg-[radial-gradient(circle_at_80%_0%,rgba(45,212,164,.15),transparent_35%),radial-gradient(circle_at_5%_20%,rgba(251,191,36,.1),transparent_30%),#07101b]">
+        <header className="relative overflow-hidden border-b border-els-line bg-[radial-gradient(circle_at_80%_0%,color-mix(in_oklch,var(--els-green)_15%,transparent),transparent_35%),radial-gradient(circle_at_5%_20%,color-mix(in_oklch,var(--els-amber)_10%,transparent),transparent_30%),var(--els-bg)]">
           <div className="mx-auto max-w-6xl px-5 py-14 sm:py-20">
-            <GuideBreadcrumbs current="Concursos" />
+            <GuideBreadcrumbs tone="els" current="Concursos" />
             <div className="mt-9 grid gap-10 lg:grid-cols-[1.2fr_.8fr] lg:items-end">
               <div>
-                <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-emerald-300">
+                <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-els-green-ink">
                   Seu próximo capítulo
                 </p>
-                <h1 className="mt-4 max-w-4xl text-4xl font-semibold tracking-[-0.05em] text-white sm:text-6xl">
+                <h1 className="mt-4 max-w-4xl text-4xl font-semibold tracking-[-0.05em] text-els-fg sm:text-6xl">
                   Seu próximo concurso começa aqui.
                 </h1>
-                <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-300">
+                <p className="mt-6 max-w-3xl text-lg leading-8 text-els-fg-2">
                   Da primeira leitura à reta final: encontre a preparação para
                   seu objetivo. Filtre por carreira, banca e estado e acompanhe
                   os editais abertos, as novidades e as provas já realizadas.
@@ -102,7 +102,7 @@ export default async function ContestsPage() {
                   </a>
                   <Link
                     href="/concursos/calendario"
-                    className="inline-flex min-h-11 items-center gap-2 text-sm font-bold text-emerald-300 underline underline-offset-4"
+                    className="inline-flex min-h-11 items-center gap-2 text-sm font-bold text-els-green-ink underline underline-offset-4"
                   >
                     Calendário: inscrições, provas e encerrados{" "}
                     <ArrowRight size={16} aria-hidden="true" />
@@ -110,8 +110,8 @@ export default async function ContestsPage() {
                 </div>
               </div>
 
-              <aside className="rounded-[1.7rem] border border-amber-300/20 bg-amber-300/[0.055] p-6 text-sm leading-7 text-amber-100/80">
-                <p className="flex items-center gap-2 font-extrabold text-amber-200">
+              <aside className="rounded-[1.7rem] border border-els-amber/20 bg-els-amber/[0.055] p-6 text-sm leading-7 text-els-amber-ink/80">
+                <p className="flex items-center gap-2 font-extrabold text-els-amber-ink">
                   <BadgeCheck aria-hidden="true" className="size-5" />
                   Um objetivo ou vários caminhos?
                 </p>
@@ -127,14 +127,14 @@ export default async function ContestsPage() {
 
         <div className="mx-auto max-w-6xl space-y-20 px-5 py-16 sm:py-20">
           <ContestCatalogBrowser cards={cards} />
-          <aside className="rounded-3xl border border-emerald-300/15 bg-emerald-300/[0.035] p-7">
-            <h2 className="text-2xl font-semibold text-white">Estude com direção.</h2>
-            <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-400">
+          <aside className="rounded-3xl border border-els-green/15 bg-els-green/[0.035] p-7">
+            <h2 className="text-2xl font-semibold text-els-fg">Estude com direção.</h2>
+            <p className="mt-3 max-w-3xl text-sm leading-7 text-els-fg-3">
               Cada preparação segue o cargo e o programa da sua edição. Leia a lei,
               treine a literalidade e volte aos pontos que precisam de revisão.
               Os cards indicam quando o material já está disponível.
             </p>
-            <Link className="mt-5 inline-flex min-h-11 items-center gap-2 text-sm font-bold text-amber-300" href="/metodologia">
+            <Link className="mt-5 inline-flex min-h-11 items-center gap-2 text-sm font-bold text-els-amber-ink" href="/metodologia">
               Conhecer o método <ArrowRight size={16} aria-hidden="true" />
             </Link>
           </aside>

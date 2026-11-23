@@ -58,7 +58,7 @@ export default async function SimulationsPage() {
       />
 
       <section className="mt-8">
-        <div><p className="text-xs font-bold uppercase tracking-[.15em] text-amber-300">Acervo disponível agora</p><h2 className="mt-2 text-2xl font-semibold tracking-[-.03em]">Simulados autorais por banca</h2></div>
+        <div><p className="text-xs font-bold uppercase tracking-[.15em] text-els-amber-ink">Acervo disponível agora</p><h2 className="mt-2 text-2xl font-semibold tracking-[-.03em]">Simulados autorais por banca</h2></div>
         {bankRounds.length ? (
           <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             {bankRounds.map((round) => (
@@ -73,34 +73,34 @@ export default async function SimulationsPage() {
             ))}
           </div>
         ) : (
-          <div className="mt-5 rounded-2xl border border-dashed border-white/10 bg-[#09131f] p-8 text-center text-sm text-slate-500">Nenhum simulado autoral revisado está disponível neste momento.</div>
+          <div className="mt-5 rounded-2xl border border-dashed border-els-line bg-els-surface p-8 text-center text-sm text-els-fg-3">Nenhum simulado autoral revisado está disponível neste momento.</div>
         )}
       </section>
 
       <section className="mt-8">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[.15em] text-emerald-300">Por edição oficial</p>
+            <p className="text-xs font-bold uppercase tracking-[.15em] text-els-green-ink">Por edição oficial</p>
             <h2 className="mt-2 text-2xl font-semibold tracking-[-.03em]">Simulados alinhados ao edital</h2>
           </div>
-          <Link href="/app/quiz" className="inline-flex items-center gap-2 text-sm font-semibold text-amber-300">Montar outro recorte <ArrowRight className="size-4" /></Link>
+          <Link href="/app/quiz" className="inline-flex items-center gap-2 text-sm font-semibold text-els-amber-ink">Montar outro recorte <ArrowRight className="size-4" /></Link>
         </div>
         {editionRounds.length ? (
           <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {editionRounds.map((round) => (
-              <article key={round.href} className="flex min-h-56 flex-col rounded-2xl border border-white/8 bg-[#09131f] p-5">
-                <span className="grid size-10 place-items-center rounded-xl bg-emerald-300/10 text-emerald-300"><Building2 className="size-5" /></span>
-                <h3 className="mt-5 font-semibold text-slate-100">{round.title}</h3>
-                <p className="mt-2 text-xs leading-5 text-slate-500">{round.description}</p>
+              <article key={round.href} className="flex min-h-56 flex-col rounded-2xl border border-els-line bg-els-surface p-5">
+                <span className="grid size-10 place-items-center rounded-xl bg-els-green/10 text-els-green-ink"><Building2 className="size-5" /></span>
+                <h3 className="mt-5 font-semibold text-els-fg">{round.title}</h3>
+                <p className="mt-2 text-xs leading-5 text-els-fg-3">{round.description}</p>
                 <div className="mt-auto flex items-center justify-between gap-3 pt-5">
-                  <span className="text-[11px] text-slate-600">{round.meta}</span>
-                  <Link href={round.href} className="inline-flex min-h-9 items-center gap-2 rounded-lg bg-amber-400 px-3 text-xs font-bold text-slate-950">Preparar <ArrowRight className="size-3.5" /></Link>
+                  <span className="text-[11px] text-els-fg-4">{round.meta}</span>
+                  <Link href={round.href} className="inline-flex min-h-9 items-center gap-2 rounded-lg bg-els-amber px-3 text-xs font-bold text-els-on-amber">Preparar <ArrowRight className="size-3.5" /></Link>
                 </div>
               </article>
             ))}
           </div>
         ) : (
-          <div className="mt-5 rounded-2xl border border-dashed border-white/10 bg-[#09131f] p-8 text-center text-sm text-slate-500">As rodadas por edital aparecem depois que a edição, a banca e o programa forem revisados.</div>
+          <div className="mt-5 rounded-2xl border border-dashed border-els-line bg-els-surface p-8 text-center text-sm text-els-fg-3">As rodadas por edital aparecem depois que a edição, a banca e o programa forem revisados.</div>
         )}
       </section>
     </main>
@@ -109,13 +109,13 @@ export default async function SimulationsPage() {
 
 function PresetCard({ icon: Icon, title, description, meta, href }: { icon: typeof FileCheck2; title: string; description: string; meta: string; href: string }) {
   return (
-    <article className="flex min-h-64 flex-col rounded-[1.5rem] border border-amber-300/12 bg-[radial-gradient(circle_at_top_right,rgba(251,191,36,.08),transparent_42%),#09131f] p-6">
-      <span className="grid size-11 place-items-center rounded-xl bg-amber-300/10 text-amber-300"><Icon className="size-5" /></span>
+    <article className="flex min-h-64 flex-col rounded-[1.5rem] border border-els-amber/12 bg-[radial-gradient(circle_at_top_right,color-mix(in_oklch,var(--els-amber)_8%,transparent),transparent_42%),var(--els-bg-2)] p-6">
+      <span className="grid size-11 place-items-center rounded-xl bg-els-amber/10 text-els-amber-ink"><Icon className="size-5" /></span>
       <h2 className="mt-5 text-xl font-semibold">{title}</h2>
-      <p className="mt-2 text-sm leading-6 text-slate-500">{description}</p>
+      <p className="mt-2 text-sm leading-6 text-els-fg-3">{description}</p>
       <div className="mt-auto flex items-center justify-between gap-3 pt-6">
-        <span className="text-[11px] text-slate-600">{meta}</span>
-        <Link href={href} className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-white/10 px-4 text-xs font-bold text-white">Abrir <ArrowRight className="size-3.5" /></Link>
+        <span className="text-[11px] text-els-fg-4">{meta}</span>
+        <Link href={href} className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-els-line px-4 text-xs font-bold text-els-fg">Abrir <ArrowRight className="size-3.5" /></Link>
       </div>
     </article>
   );

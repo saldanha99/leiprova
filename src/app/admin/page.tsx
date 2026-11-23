@@ -91,28 +91,28 @@ type MetricCardProps = {
 };
 
 const metricTones = {
-  amber: "bg-amber-300/10 text-amber-300",
-  emerald: "bg-emerald-300/10 text-emerald-300",
-  sky: "bg-sky-300/10 text-sky-300",
+  amber: "bg-els-amber/10 text-els-amber-ink",
+  emerald: "bg-els-green/10 text-els-green-ink",
+  sky: "bg-els-info/10 text-els-info-ink",
   violet: "bg-violet-300/10 text-violet-300",
 } as const;
 
 function MetricCard({ label, value, detail, icon: Icon, tone }: MetricCardProps) {
   return (
-    <article className="rounded-2xl border border-white/8 bg-[#09131f] p-5">
+    <article className="rounded-2xl border border-els-line bg-els-surface p-5">
       <div className="flex items-start justify-between gap-4">
         <span className={`grid size-10 place-items-center rounded-xl ${metricTones[tone]}`}>
           <Icon aria-hidden="true" className="size-[18px]" />
         </span>
-        <span className="rounded-full border border-white/7 bg-white/[.025] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[.12em] text-slate-600">
+        <span className="rounded-full border border-els-line bg-els-raise px-2.5 py-1 text-[10px] font-bold uppercase tracking-[.12em] text-els-fg-4">
           Banco real
         </span>
       </div>
-      <p className="mt-6 text-3xl font-semibold tracking-[-.045em] text-white">
+      <p className="mt-6 text-3xl font-semibold tracking-[-.045em] text-els-fg">
         {numberFormatter.format(value)}
       </p>
-      <h2 className="mt-1 text-sm font-semibold text-slate-200">{label}</h2>
-      <p className="mt-2 text-xs leading-5 text-slate-500">{detail}</p>
+      <h2 className="mt-1 text-sm font-semibold text-els-fg-2">{label}</h2>
+      <p className="mt-2 text-xs leading-5 text-els-fg-3">{detail}</p>
     </article>
   );
 }
@@ -122,7 +122,7 @@ function RatioBar({ label, value, total }: { label: string; value: number; total
 
   return (
     <div
-      className="h-2 overflow-hidden rounded-full bg-white/7"
+      className="h-2 overflow-hidden rounded-full bg-els-raise"
       role="progressbar"
       aria-label={label}
       aria-valuemin={0}
@@ -130,7 +130,7 @@ function RatioBar({ label, value, total }: { label: string; value: number; total
       aria-valuenow={percentage}
     >
       <div
-        className="h-full rounded-full bg-gradient-to-r from-amber-400 to-emerald-300"
+        className="h-full rounded-full bg-gradient-to-r from-els-amber to-els-green"
         style={{ width: `${percentage}%` }}
       />
     </div>
@@ -190,19 +190,19 @@ export default async function AdminOverviewPage() {
     <main className="mx-auto w-full max-w-[1440px] px-4 py-6 sm:px-7 lg:px-9 lg:py-9">
       <header className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <span className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[.17em] text-amber-300">
+          <span className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[.17em] text-els-amber-ink">
             <Sparkles aria-hidden="true" className="size-3.5" />
             Super admin
           </span>
           <h1 className="mt-2 text-3xl font-semibold tracking-[-.04em] sm:text-4xl">
             Visão geral da operação
           </h1>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-els-fg-3">
             Indicadores consolidados diretamente do PostgreSQL, sem dados demonstrativos.
           </p>
         </div>
-        <span className="inline-flex w-fit items-center gap-2 rounded-full border border-emerald-300/15 bg-emerald-300/8 px-3 py-1.5 text-xs font-semibold text-emerald-200">
-          <span aria-hidden="true" className="size-1.5 rounded-full bg-emerald-300" />
+        <span className="inline-flex w-fit items-center gap-2 rounded-full border border-els-green/15 bg-els-green/8 px-3 py-1.5 text-xs font-semibold text-els-green-ink">
+          <span aria-hidden="true" className="size-1.5 rounded-full bg-els-green" />
           Atualizado nesta visita
         </span>
       </header>
@@ -214,20 +214,20 @@ export default async function AdminOverviewPage() {
       </section>
 
       <section className="mt-4 grid gap-4 xl:grid-cols-[1.15fr_.85fr]">
-        <article className="rounded-[1.5rem] border border-white/8 bg-[#09131f] p-5 sm:p-6">
+        <article className="rounded-[1.5rem] border border-els-line bg-els-surface p-5 sm:p-6">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <h2 className="font-semibold text-white">Leitura operacional</h2>
-              <p className="mt-1 text-xs text-slate-500">Proporções calculadas com o catálogo atual.</p>
+              <h2 className="font-semibold text-els-fg">Leitura operacional</h2>
+              <p className="mt-1 text-xs text-els-fg-3">Proporções calculadas com o catálogo atual.</p>
             </div>
-            <ClipboardCheck aria-hidden="true" className="size-5 text-emerald-300" />
+            <ClipboardCheck aria-hidden="true" className="size-5 text-els-green-ink" />
           </div>
 
           <div className="mt-7 grid gap-6">
             <div>
               <div className="mb-2 flex items-center justify-between gap-4 text-xs">
-                <span className="font-semibold text-slate-300">Revisor humano registrado</span>
-                <span className="text-slate-500">
+                <span className="font-semibold text-els-fg-2">Revisor humano registrado</span>
+                <span className="text-els-fg-3">
                   {numberFormatter.format(overview.questions.humanReviewed)} de {numberFormatter.format(overview.questions.reviewed)}
                 </span>
               </div>
@@ -239,8 +239,8 @@ export default async function AdminOverviewPage() {
             </div>
             <div>
               <div className="mb-2 flex items-center justify-between gap-4 text-xs">
-                <span className="font-semibold text-slate-300">Provas publicadas</span>
-                <span className="text-slate-500">
+                <span className="font-semibold text-els-fg-2">Provas publicadas</span>
+                <span className="text-els-fg-3">
                   {numberFormatter.format(overview.exams.published)} de {numberFormatter.format(overview.exams.total)}
                 </span>
               </div>
@@ -252,8 +252,8 @@ export default async function AdminOverviewPage() {
             </div>
             <div>
               <div className="mb-2 flex items-center justify-between gap-4 text-xs">
-                <span className="font-semibold text-slate-300">Quizzes concluídos</span>
-                <span className="text-slate-500">
+                <span className="font-semibold text-els-fg-2">Quizzes concluídos</span>
+                <span className="text-els-fg-3">
                   {numberFormatter.format(overview.sessions.completed)} de {numberFormatter.format(overview.sessions.total)}
                 </span>
               </div>
@@ -266,21 +266,21 @@ export default async function AdminOverviewPage() {
           </div>
         </article>
 
-        <article className="relative overflow-hidden rounded-[1.5rem] border border-amber-300/15 bg-[linear-gradient(145deg,#111b28_0%,#0b1623_64%,#10211f_100%)] p-5 sm:p-6">
-          <div className="pointer-events-none absolute -right-16 -top-20 size-52 rounded-full bg-amber-300/8 blur-3xl" />
+        <article className="relative overflow-hidden rounded-[1.5rem] border border-els-amber/15 bg-[linear-gradient(145deg,var(--els-surface)_0%,var(--els-bg-2)_64%,var(--els-bg-2)_100%)] p-5 sm:p-6">
+          <div className="pointer-events-none absolute -right-16 -top-20 size-52 rounded-full bg-els-amber/8 blur-3xl" />
           <div className="relative">
-            <span className="grid size-11 place-items-center rounded-2xl bg-amber-300/10 text-amber-300">
+            <span className="grid size-11 place-items-center rounded-2xl bg-els-amber/10 text-els-amber-ink">
               <CreditCard aria-hidden="true" className="size-5" />
             </span>
-            <h2 className="mt-6 text-xl font-semibold tracking-[-.025em] text-white">
+            <h2 className="mt-6 text-xl font-semibold tracking-[-.025em] text-els-fg">
               Stripe Connect
             </h2>
-            <p className="mt-2 text-sm leading-6 text-slate-400">
+            <p className="mt-2 text-sm leading-6 text-els-fg-3">
               Área reservada para preparar parceiros, regras de divisão e a ativação controlada dos repasses.
             </p>
             <Link
               href="/admin/stripe-connect"
-              className="mt-7 inline-flex min-h-11 items-center gap-2 rounded-xl bg-amber-400 px-4 text-sm font-bold text-slate-950 transition hover:bg-amber-300"
+              className="mt-7 inline-flex min-h-11 items-center gap-2 rounded-xl bg-els-amber px-4 text-sm font-bold text-els-on-amber transition hover:bg-els-amber"
             >
               Abrir configuração
               <ArrowRight aria-hidden="true" className="size-4" />

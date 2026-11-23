@@ -39,9 +39,9 @@ export function ResumeContestOrder({ orderId, items, totalCents, publishableKey 
   if (clientSecret && publishableKey) return <ContestPayment publishableKey={publishableKey} clientSecret={clientSecret}
     orderId={orderId} totalCents={totalCents} billingLabel={items[0]?.accessKey === "annual" ? "/ano" : "/mês"} />;
   return <div className="mt-5">
-    <button type="button" onClick={resume} disabled={pending} className="min-h-11 rounded-lg border border-emerald-300/30 px-4 text-xs font-bold text-emerald-200 disabled:opacity-50">
+    <button type="button" onClick={resume} disabled={pending} className="min-h-11 rounded-lg border border-els-green/30 px-4 text-xs font-bold text-els-green-ink disabled:opacity-50">
       {pending ? "Recuperando pagamento…" : "Retomar a mesma seleção"}
     </button>
-    {message && <p role="status" className="mt-3 text-sm text-amber-100">{message}</p>}
+    {message && <p role="status" className="mt-3 text-sm text-els-amber-ink">{message}</p>}
   </div>;
 }

@@ -29,14 +29,14 @@ const initialState: PreviousExamActionState = {
 };
 
 const field =
-  "mt-2 min-h-11 w-full rounded-xl border border-white/10 bg-[#07111d] px-3 text-sm text-slate-200 outline-none focus:border-sky-300/40";
+  "mt-2 min-h-11 w-full rounded-xl border border-els-line bg-els-bg px-3 text-sm text-els-fg-2 outline-none focus:border-els-info/40";
 
 function Feedback({ state }: { state: PreviousExamActionState }) {
   return state.message ? (
     <p
       aria-live="polite"
       className={`mt-3 text-xs leading-5 ${
-        state.status === "success" ? "text-emerald-200" : "text-rose-200"
+        state.status === "success" ? "text-els-green-ink" : "text-els-danger-ink"
       }`}
     >
       {state.message}
@@ -54,13 +54,13 @@ export function ExamLicenseDecisionControls({
     initialState,
   );
   return (
-    <form action={action} className="mt-4 grid gap-3 rounded-xl border border-white/8 p-3 sm:grid-cols-2">
+    <form action={action} className="mt-4 grid gap-3 rounded-xl border border-els-line p-3 sm:grid-cols-2">
       <input type="hidden" name="publicId" value={publicId} />
-      <label className="text-[11px] font-semibold text-slate-400 sm:col-span-2">
+      <label className="text-[11px] font-semibold text-els-fg-3 sm:col-span-2">
         URL HTTPS da resposta ou contrato arquivado
         <input type="url" name="responseReference" required maxLength={2000} className={field} />
       </label>
-      <label className="text-[11px] font-semibold text-slate-400 sm:col-span-2">
+      <label className="text-[11px] font-semibold text-els-fg-3 sm:col-span-2">
         SHA-256 do arquivo conferido
         <input
           name="responseChecksumSha256"
@@ -72,23 +72,23 @@ export function ExamLicenseDecisionControls({
           className={`${field} font-mono`}
         />
       </label>
-      <label className="text-[11px] font-semibold text-slate-400">
+      <label className="text-[11px] font-semibold text-els-fg-3">
         Resposta recebida em
         <input type="date" name="responseReceivedAt" required className={field} />
       </label>
-      <label className="text-[11px] font-semibold text-slate-400">
+      <label className="text-[11px] font-semibold text-els-fg-3">
         Concedida em
         <input type="date" name="grantedAt" className={field} />
       </label>
-      <label className="text-[11px] font-semibold text-slate-400">
+      <label className="text-[11px] font-semibold text-els-fg-3">
         Validade, se houver
         <input type="date" name="expiresAt" className={field} />
       </label>
-      <label className="text-[11px] font-semibold text-slate-400 sm:col-span-2">
+      <label className="text-[11px] font-semibold text-els-fg-3 sm:col-span-2">
         Parecer da conferência
         <textarea name="notes" required minLength={20} maxLength={2000} className={`${field} min-h-20 py-3`} />
       </label>
-      <label className="flex items-start gap-2 text-[11px] leading-5 text-slate-300 sm:col-span-2">
+      <label className="flex items-start gap-2 text-[11px] leading-5 text-els-fg-2 sm:col-span-2">
         <input type="checkbox" name="attestation" className="mt-1 size-4 accent-violet-300" />
         <span>
           Conferi titular, documentos, uso comercial, reprodução, armazenamento,
@@ -108,7 +108,7 @@ export function ExamLicenseDecisionControls({
           name="decision"
           value="deny"
           disabled={pending}
-          className="min-h-9 rounded-lg border border-rose-300/20 bg-rose-300/8 px-3 text-xs font-bold text-rose-100 disabled:opacity-50"
+          className="min-h-9 rounded-lg border border-els-danger/20 bg-els-danger/8 px-3 text-xs font-bold text-els-fg disabled:opacity-50"
         >
           Registrar negativa
         </button>
@@ -143,7 +143,7 @@ export function ExamDocumentForm({ exams }: { exams: readonly ExamOption[] }) {
 
   return (
     <form action={action} className="mt-5 grid gap-4 md:grid-cols-2">
-      <label className="text-xs font-semibold text-slate-400 md:col-span-2">
+      <label className="text-xs font-semibold text-els-fg-3 md:col-span-2">
         Edição histórica
         <select name="examPublicId" required className={field}>
           <option value="">Selecione a edição exata</option>
@@ -157,7 +157,7 @@ export function ExamDocumentForm({ exams }: { exams: readonly ExamOption[] }) {
           ))}
         </select>
       </label>
-      <label className="text-xs font-semibold text-slate-400">
+      <label className="text-xs font-semibold text-els-fg-3">
         Tipo
         <select
           name="documentType"
@@ -175,7 +175,7 @@ export function ExamDocumentForm({ exams }: { exams: readonly ExamOption[] }) {
         </select>
       </label>
       {documentType === "question_booklet" ? (
-        <label className="text-xs font-semibold text-slate-400">
+        <label className="text-xs font-semibold text-els-fg-3">
           Total de questões no caderno
           <input
             type="number"
@@ -188,7 +188,7 @@ export function ExamDocumentForm({ exams }: { exams: readonly ExamOption[] }) {
           />
         </label>
       ) : null}
-      <label className="text-xs font-semibold text-slate-400">
+      <label className="text-xs font-semibold text-els-fg-3">
         Situação dos direitos
         <select
           name="sourcePolicy"
@@ -205,11 +205,11 @@ export function ExamDocumentForm({ exams }: { exams: readonly ExamOption[] }) {
           <option value="licensed_content">Licença escrita registrada</option>
         </select>
       </label>
-      <label className="text-xs font-semibold text-slate-400 md:col-span-2">
+      <label className="text-xs font-semibold text-els-fg-3 md:col-span-2">
         Título do documento
         <input name="title" required minLength={3} maxLength={500} className={field} />
       </label>
-      <label className="text-xs font-semibold text-slate-400 md:col-span-2">
+      <label className="text-xs font-semibold text-els-fg-3 md:col-span-2">
         URL direta no domínio oficial da banca
         <input
           type="url"
@@ -222,11 +222,11 @@ export function ExamDocumentForm({ exams }: { exams: readonly ExamOption[] }) {
       </label>
       {sourcePolicy === "licensed_content" ? (
         <>
-          <label className="text-xs font-semibold text-slate-400">
+          <label className="text-xs font-semibold text-els-fg-3">
             Titular que licenciou
             <input name="rightsHolder" required maxLength={500} className={field} />
           </label>
-          <label className="text-xs font-semibold text-slate-400">
+          <label className="text-xs font-semibold text-els-fg-3">
             Referência documental da licença
             <input
               type="url"
@@ -237,7 +237,7 @@ export function ExamDocumentForm({ exams }: { exams: readonly ExamOption[] }) {
               className={field}
             />
           </label>
-          <label className="text-xs font-semibold text-slate-400 md:col-span-2">
+          <label className="text-xs font-semibold text-els-fg-3 md:col-span-2">
             Base e escopo da autorização
             <textarea
               name="licenseBasis"
@@ -247,15 +247,15 @@ export function ExamDocumentForm({ exams }: { exams: readonly ExamOption[] }) {
               placeholder="Identifique o contrato e confirme reprodução, área paga, armazenamento e automação."
             />
           </label>
-          <label className="text-xs font-semibold text-slate-400">
+          <label className="text-xs font-semibold text-els-fg-3">
             Licenciada em
             <input type="date" name="licensedAt" required className={field} />
           </label>
-          <label className="text-xs font-semibold text-slate-400">
+          <label className="text-xs font-semibold text-els-fg-3">
             Validade (se houver)
             <input type="date" name="licenseExpiresAt" className={field} />
           </label>
-          <label className="text-xs font-semibold text-slate-400 md:col-span-2">
+          <label className="text-xs font-semibold text-els-fg-3 md:col-span-2">
             SHA-256 do arquivo de autorização conferido
             <input
               name="licenseEvidenceChecksumSha256"
@@ -268,7 +268,7 @@ export function ExamDocumentForm({ exams }: { exams: readonly ExamOption[] }) {
               placeholder="64 caracteres hexadecimais"
             />
           </label>
-          <label className="text-xs font-semibold text-slate-400">
+          <label className="text-xs font-semibold text-els-fg-3">
             Evidência conferida em
             <input
               type="date"
@@ -282,7 +282,7 @@ export function ExamDocumentForm({ exams }: { exams: readonly ExamOption[] }) {
       <div className="md:col-span-2">
         <button
           disabled={pending}
-          className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-sky-300 px-5 text-sm font-extrabold text-sky-950 disabled:opacity-50"
+          className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-els-info px-5 text-sm font-extrabold text-els-on-amber disabled:opacity-50"
         >
           <Link2 className="size-4" />
           {pending ? "Validando fonte…" : "Registrar para revisão"}
@@ -308,7 +308,7 @@ function ReviewControls({
 }) {
   const [state, formAction, pending] = useActionState(action, initialState);
   return (
-    <form action={formAction} className="mt-4 rounded-xl border border-white/8 p-3">
+    <form action={formAction} className="mt-4 rounded-xl border border-els-line p-3">
       <input type="hidden" name="publicId" value={publicId} />
       {dossierFingerprint ? (
         <input
@@ -317,7 +317,7 @@ function ReviewControls({
           value={dossierFingerprint}
         />
       ) : null}
-      <label className="text-[11px] font-semibold text-slate-400">
+      <label className="text-[11px] font-semibold text-els-fg-3">
         Nota da conferência humana
         <textarea
           name="notes"
@@ -329,11 +329,11 @@ function ReviewControls({
         />
       </label>
       {requiresLegalAttestation ? (
-        <label className="mt-3 flex items-start gap-2 text-[11px] leading-5 text-slate-300">
+        <label className="mt-3 flex items-start gap-2 text-[11px] leading-5 text-els-fg-2">
           <input
             type="checkbox"
             name="licenseReviewAttestation"
-            className="mt-1 size-4 accent-emerald-300"
+            className="mt-1 size-4 accent-els-green"
           />
           <span>
             Conferi juridicamente o titular, o escopo integral, as datas, a
@@ -348,7 +348,7 @@ function ReviewControls({
           name="decision"
           value="approve"
           disabled={pending}
-          className="inline-flex min-h-9 items-center gap-2 rounded-lg bg-emerald-300 px-3 text-xs font-extrabold text-emerald-950 disabled:opacity-50"
+          className="inline-flex min-h-9 items-center gap-2 rounded-lg bg-els-green px-3 text-xs font-extrabold text-els-on-amber disabled:opacity-50"
         >
           <Check className="size-3.5" />
           {approveLabel}
@@ -357,7 +357,7 @@ function ReviewControls({
           name="decision"
           value="reject"
           disabled={pending}
-          className="inline-flex min-h-9 items-center gap-2 rounded-lg border border-rose-300/20 bg-rose-300/8 px-3 text-xs font-bold text-rose-100 disabled:opacity-50"
+          className="inline-flex min-h-9 items-center gap-2 rounded-lg border border-els-danger/20 bg-els-danger/8 px-3 text-xs font-bold text-els-fg disabled:opacity-50"
         >
           <RotateCcw className="size-3.5" />
           Rejeitar
@@ -447,7 +447,7 @@ export function ProductExamReferenceForm({
 
   return (
     <form action={action} className="mt-5 grid gap-4 md:grid-cols-2">
-      <label className="text-xs font-semibold text-slate-400 md:col-span-2">
+      <label className="text-xs font-semibold text-els-fg-3 md:col-span-2">
         Produto com oportunidade revisada
         <select name="productSlug" required className={field}>
           <option value="">Selecione</option>
@@ -459,7 +459,7 @@ export function ProductExamReferenceForm({
           ))}
         </select>
       </label>
-      <label className="text-xs font-semibold text-slate-400">
+      <label className="text-xs font-semibold text-els-fg-3">
         Edição histórica
         <select
           name="examPublicId"
@@ -479,7 +479,7 @@ export function ProductExamReferenceForm({
           ))}
         </select>
       </label>
-      <label className="text-xs font-semibold text-slate-400">
+      <label className="text-xs font-semibold text-els-fg-3">
         Caderno principal aprovado
         <select name="documentPublicId" required className={field}>
           <option value="">Selecione</option>
@@ -493,7 +493,7 @@ export function ProductExamReferenceForm({
           ))}
         </select>
       </label>
-      <label className="text-xs font-semibold text-slate-400">
+      <label className="text-xs font-semibold text-els-fg-3">
         Gabarito oficial exato e aprovado
         <select name="answerKeyDocumentPublicId" required className={field}>
           <option value="">Selecione</option>
@@ -510,7 +510,7 @@ export function ProductExamReferenceForm({
       <div className="md:col-span-2">
         <button
           disabled={pending}
-          className="min-h-11 rounded-xl bg-amber-300 px-5 text-sm font-extrabold text-amber-950 disabled:opacity-50"
+          className="min-h-11 rounded-xl bg-els-amber px-5 text-sm font-extrabold text-els-on-amber disabled:opacity-50"
         >
           {pending ? "Conferindo identidade…" : "Propor vínculo exato"}
         </button>
@@ -610,7 +610,7 @@ export function LicensedPreviousExamImportForm({
 
   return (
     <form action={action} className="mt-5 grid gap-4">
-      <label className="text-xs font-semibold text-slate-400">
+      <label className="text-xs font-semibold text-els-fg-3">
         Caderno integral licenciado e aprovado
         <select
           name="documentPublicId"
@@ -634,7 +634,7 @@ export function LicensedPreviousExamImportForm({
         </select>
       </label>
 
-      <label className="text-xs font-semibold text-slate-400">
+      <label className="text-xs font-semibold text-els-fg-3">
         Gabarito oficial licenciado da mesma edição
         <select
           name="answerKeyDocumentPublicId"
@@ -655,7 +655,7 @@ export function LicensedPreviousExamImportForm({
       </label>
 
       {selectedDocument ? (
-        <div className="rounded-xl border border-violet-300/15 bg-violet-300/[.035] p-3 text-[11px] leading-5 text-slate-400">
+        <div className="rounded-xl border border-violet-300/15 bg-violet-300/[.035] p-3 text-[11px] leading-5 text-els-fg-3">
           <p>
             <strong className="text-violet-200">Titular:</strong>{" "}
             {selectedDocument.rightsHolder ?? "não informado"}
@@ -677,7 +677,7 @@ export function LicensedPreviousExamImportForm({
             {selectedAnswerKey?.licenseEvidenceChecksumSha256 ?? "não informada"}
           </p>
           <p className="mt-2">
-            <strong className="text-slate-300">Matérias permitidas no JSON:</strong>{" "}
+            <strong className="text-els-fg-2">Matérias permitidas no JSON:</strong>{" "}
             {compatibleSubjects.length
               ? compatibleSubjects
                   .map((subject) => `${subject.subjectId} · ${subject.subjectName}`)
@@ -687,7 +687,7 @@ export function LicensedPreviousExamImportForm({
         </div>
       ) : null}
 
-      <label className="text-xs font-semibold text-slate-400">
+      <label className="text-xs font-semibold text-els-fg-3">
         JSON completo do caderno
         <textarea
           name="payload"
@@ -698,18 +698,18 @@ export function LicensedPreviousExamImportForm({
           placeholder={licensedImportExample}
         />
       </label>
-      <p className="text-[11px] leading-5 text-slate-500">
+      <p className="text-[11px] leading-5 text-els-fg-3">
         O lote precisa ter exatamente o total do documento, ordens contínuas de
         1 até o fim, uma resposta correta e alternativas justificadas: duas em
         certo/errado ou quatro/cinco em múltipla escolha. A Edital Lei Seca não baixa
         nem raspa o PDF neste fluxo.
       </p>
-      <label className="flex items-start gap-3 rounded-xl border border-amber-300/15 bg-amber-300/[.035] p-3 text-xs leading-5 text-amber-100">
+      <label className="flex items-start gap-3 rounded-xl border border-els-amber/15 bg-els-amber/[.035] p-3 text-xs leading-5 text-els-amber-ink">
         <input
           type="checkbox"
           name="attestation"
           required
-          className="mt-1 size-4 accent-amber-300"
+          className="mt-1 size-4 accent-els-amber"
         />
         <span>
           Confirmo que este é o caderno completo, que a transcrição foi
@@ -802,13 +802,13 @@ export function LicensedPreviousExamReviewControls({
         {batch.questions.map((question) => (
           <details
             key={question.publicId}
-            className="rounded-xl border border-white/8 bg-[#07111d]"
+            className="rounded-xl border border-els-line bg-els-bg"
           >
-            <summary className="cursor-pointer px-3 py-3 text-xs font-bold text-slate-200">
+            <summary className="cursor-pointer px-3 py-3 text-xs font-bold text-els-fg-2">
               Questão {question.originalQuestionNumber ?? question.originalQuestionOrder} ·{" "}
               matéria {question.subjectId} · {question.type === "true_false" ? "Certo/errado" : "Múltipla escolha"}
             </summary>
-            <div className="space-y-3 border-t border-white/7 p-3 text-xs leading-5 text-slate-400">
+            <div className="space-y-3 border-t border-els-line p-3 text-xs leading-5 text-els-fg-3">
               <p>{question.prompt}</p>
               <ol className="space-y-2">
                 {(optionsByQuestion.get(question.id) ?? []).map((option) => (
@@ -816,31 +816,31 @@ export function LicensedPreviousExamReviewControls({
                     key={`${question.id}-${option.optionKey}`}
                     className={`rounded-lg border p-2.5 ${
                       option.isCorrect
-                        ? "border-emerald-300/20 bg-emerald-300/[.045]"
-                        : "border-white/7 bg-black/10"
+                        ? "border-els-green/20 bg-els-green/[.045]"
+                        : "border-els-line bg-black/10"
                     }`}
                   >
-                    <strong className="text-slate-200">{option.optionKey}.</strong>{" "}
+                    <strong className="text-els-fg-2">{option.optionKey}.</strong>{" "}
                     {option.text}
-                    <p className="mt-1 text-[11px] text-slate-600">
+                    <p className="mt-1 text-[11px] text-els-fg-4">
                       {option.rationale}
                     </p>
                   </li>
                 ))}
               </ol>
               <p>
-                <strong className="text-sky-200">Explicação:</strong>{" "}
+                <strong className="text-els-info-ink">Explicação:</strong>{" "}
                 {question.explanation}
               </p>
               <p>
-                <strong className="text-slate-300">Tema:</strong> {question.topic} ·
+                <strong className="text-els-fg-2">Tema:</strong> {question.topic} ·
                 dificuldade {question.difficulty}/5
               </p>
             </div>
           </details>
         ))}
       </div>
-      <label className="mt-4 block text-xs font-semibold text-slate-400">
+      <label className="mt-4 block text-xs font-semibold text-els-fg-3">
         Nota única da revisão integral
         <textarea
           name="notes"
@@ -851,11 +851,11 @@ export function LicensedPreviousExamReviewControls({
           placeholder="Registre a conferência do enunciado, alternativas, gabarito, explicações, matéria, numeração e licença do lote completo."
         />
       </label>
-      <label className="mt-3 flex items-start gap-3 rounded-xl border border-emerald-300/15 bg-emerald-300/[.035] p-3 text-xs leading-5 text-emerald-100">
+      <label className="mt-3 flex items-start gap-3 rounded-xl border border-els-green/15 bg-els-green/[.035] p-3 text-xs leading-5 text-els-green-ink">
         <input
           type="checkbox"
           name="reviewAttestation"
-          className="mt-1 size-4 accent-emerald-300"
+          className="mt-1 size-4 accent-els-green"
         />
         <span>
           Conferi pessoalmente todas as {batch.expectedQuestionCount} questões e
@@ -870,7 +870,7 @@ export function LicensedPreviousExamReviewControls({
           name="decision"
           value="approve"
           disabled={pending}
-          className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-emerald-300 px-4 text-xs font-extrabold text-emerald-950 disabled:opacity-50"
+          className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-els-green px-4 text-xs font-extrabold text-els-on-amber disabled:opacity-50"
         >
           <Check className="size-3.5" />
           {pending ? "Revalidando lote…" : "Aprovar lote completo"}
@@ -879,7 +879,7 @@ export function LicensedPreviousExamReviewControls({
           name="decision"
           value="reject"
           disabled={pending}
-          className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-rose-300/20 bg-rose-300/8 px-4 text-xs font-bold text-rose-100 disabled:opacity-50"
+          className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-els-danger/20 bg-els-danger/8 px-4 text-xs font-bold text-els-fg disabled:opacity-50"
         >
           <RotateCcw className="size-3.5" />
           Suspender lote completo
@@ -907,10 +907,10 @@ function RevocationControls({
   return (
     <form
       action={formAction}
-      className="mt-3 rounded-xl border border-rose-300/15 bg-rose-300/[.035] p-3"
+      className="mt-3 rounded-xl border border-els-danger/15 bg-els-danger/[.035] p-3"
     >
       <input type="hidden" name="publicId" value={publicId} />
-      <label className="text-[11px] font-semibold text-rose-100">
+      <label className="text-[11px] font-semibold text-els-fg">
         Motivo operacional ou jurídico
         <textarea
           name="notes"
@@ -924,7 +924,7 @@ function RevocationControls({
       <Feedback state={state} />
       <button
         disabled={pending}
-        className="mt-3 inline-flex min-h-9 items-center gap-2 rounded-lg bg-rose-300 px-3 text-xs font-extrabold text-rose-950 disabled:opacity-50"
+        className="mt-3 inline-flex min-h-9 items-center gap-2 rounded-lg bg-els-danger px-3 text-xs font-extrabold text-els-on-amber disabled:opacity-50"
       >
         <AlertTriangle className="size-3.5" />
         {pending ? "Bloqueando…" : label}
@@ -964,11 +964,11 @@ export function SuspendPreviousExamQuestionForm() {
   );
   return (
     <form action={action} className="mt-5 grid gap-4 md:grid-cols-2">
-      <label className="text-xs font-semibold text-slate-400">
+      <label className="text-xs font-semibold text-els-fg-3">
         Identificação pública da questão
         <input name="publicId" required maxLength={200} className={field} />
       </label>
-      <label className="text-xs font-semibold text-slate-400 md:col-span-2">
+      <label className="text-xs font-semibold text-els-fg-3 md:col-span-2">
         Motivo da suspensão
         <textarea
           name="notes"
@@ -981,7 +981,7 @@ export function SuspendPreviousExamQuestionForm() {
       <div className="md:col-span-2">
         <button
           disabled={pending}
-          className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-rose-300 px-5 text-sm font-extrabold text-rose-950 disabled:opacity-50"
+          className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-els-danger px-5 text-sm font-extrabold text-els-on-amber disabled:opacity-50"
         >
           <AlertTriangle className="size-4" />
           {pending ? "Suspendendo…" : "Suspender questão real"}

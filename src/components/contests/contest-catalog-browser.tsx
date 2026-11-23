@@ -38,7 +38,7 @@ export function ContestCatalogBrowser({ cards }: { cards: ShowcaseCard[] }) {
       <h2 id="catalogo-planejado-title" className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
         Seu edital. Sua próxima conquista.
       </h2>
-      <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-400">
+      <p className="mt-4 max-w-3xl text-sm leading-7 text-els-fg-3">
         Explore as carreiras e acompanhe cada concurso. A situação do edital e a
         disponibilidade da preparação aparecem em cada card. Novidades são edições
         publicadas nos últimos 30 dias; datas e bancas vêm de fontes oficiais revisadas.

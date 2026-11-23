@@ -25,7 +25,7 @@ export default async function LawsHubPage() {
   const now = new Date();
 
   return (
-    <PublicGuideShell>
+    <PublicGuideShell tone="els">
       <JsonLd data={lawsHubJsonLd(laws.map((law) => ({ label: lawHeadline(law), path: law.path })), DESCRIPTION)} />
       <article className="mx-auto max-w-3xl px-5 py-10 sm:py-14">
         <Breadcrumbs
@@ -34,19 +34,19 @@ export default async function LawsHubPage() {
             { name: "Leis", path: PATH },
           ]}
         />
-        <h1 className="mt-6 text-3xl font-semibold tracking-[-0.04em] text-white sm:text-4xl">Leis cobradas em concursos</h1>
-        <p className="mt-5 text-lg leading-8 text-slate-200">
+        <h1 className="mt-6 text-3xl font-semibold tracking-[-0.04em] text-els-fg sm:text-4xl">Leis cobradas em concursos</h1>
+        <p className="mt-5 text-lg leading-8 text-els-fg-2">
           {laws.length} normas com texto oficial verificado, em ordem de presença nos programas das preparações acompanhadas
           pelo Edital Lei Seca. Contagens de questões da nossa base em {brDate(now)}.
         </p>
         <Section id="lista" title="Normas">
-          <ul className="divide-y divide-white/5">
+          <ul className="divide-y divide-els-line">
             {laws.map((law) => (
               <li className="flex items-baseline justify-between gap-4 py-3" key={law.path}>
-                <Link className="font-semibold text-amber-300 hover:underline" href={law.path}>
+                <Link className="font-semibold text-els-amber-ink hover:underline" href={law.path}>
                   {lawHeadline(law)}
                 </Link>
-                <span className="shrink-0 text-sm text-slate-400">{law.reviewedQuestionCount} questões</span>
+                <span className="shrink-0 text-sm text-els-fg-3">{law.reviewedQuestionCount} questões</span>
               </li>
             ))}
           </ul>

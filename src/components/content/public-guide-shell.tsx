@@ -224,7 +224,7 @@ export function GuideCta({
   }
 
   return (
-    <aside className="rounded-[2rem] border border-els-amber/20 bg-[radial-gradient(circle_at_20%_0%,rgba(251,191,36,.16),transparent_48%),#0b1624] p-6 sm:p-9">
+    <aside className="rounded-[2rem] border border-els-amber/20 bg-[radial-gradient(circle_at_20%_0%,color-mix(in_oklch,var(--els-amber)_16%,transparent),transparent_48%),var(--els-bg-2)] p-6 sm:p-9">
       <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-els-amber-ink">
         Experimente na prática
       </p>

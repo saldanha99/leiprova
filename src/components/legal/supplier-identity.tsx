@@ -11,7 +11,7 @@ export function SupplierIdentityBlock() {
 
   if (!supplier) {
     return (
-      <p className="rounded-xl border border-amber-300/15 bg-amber-300/6 px-4 py-3 text-sm leading-6 text-amber-100/80">
+      <p className="rounded-xl border border-els-amber/15 bg-els-amber/6 px-4 py-3 text-sm leading-6 text-els-amber-ink/80">
         A identificação completa do fornecedor ainda não foi publicada. Enquanto isso, não há
         oferta comercial ativa: o checkout permanece bloqueado no próprio código, e não apenas
         por configuração.
@@ -20,39 +20,39 @@ export function SupplierIdentityBlock() {
   }
 
   return (
-    <dl className="grid gap-x-6 gap-y-2 rounded-xl border border-white/8 bg-white/2 px-4 py-4 sm:grid-cols-[auto_1fr]">
-      <dt className="text-slate-500">Razão social</dt>
-      <dd className="text-slate-200">{supplier.legalName}</dd>
+    <dl className="grid gap-x-6 gap-y-2 rounded-xl border border-els-line bg-els-raise px-4 py-4 sm:grid-cols-[auto_1fr]">
+      <dt className="text-els-fg-3">Razão social</dt>
+      <dd className="text-els-fg-2">{supplier.legalName}</dd>
       {supplier.tradeName && (
         <>
-          <dt className="text-slate-500">Nome fantasia</dt>
-          <dd className="text-slate-200">{supplier.tradeName}</dd>
+          <dt className="text-els-fg-3">Nome fantasia</dt>
+          <dd className="text-els-fg-2">{supplier.tradeName}</dd>
         </>
       )}
-      <dt className="text-slate-500">CNPJ</dt>
-      <dd className="text-slate-200">{supplier.taxId}</dd>
-      <dt className="text-slate-500">Endereço</dt>
-      <dd className="text-slate-200">{supplier.address}</dd>
-      <dt className="text-slate-500">Endereço eletrônico</dt>
-      <dd className="text-slate-200">
+      <dt className="text-els-fg-3">CNPJ</dt>
+      <dd className="text-els-fg-2">{supplier.taxId}</dd>
+      <dt className="text-els-fg-3">Endereço</dt>
+      <dd className="text-els-fg-2">{supplier.address}</dd>
+      <dt className="text-els-fg-3">Endereço eletrônico</dt>
+      <dd className="text-els-fg-2">
         {supplier.email.startsWith("https://") || supplier.email.startsWith("http://") ? (
           <a
-            className="font-semibold text-amber-300 transition hover:text-amber-200"
+            className="font-semibold text-els-amber-ink transition hover:text-els-amber-ink"
             href={supplier.email}
           >
             Acessar canal digital
           </a>
         ) : (
           <a
-            className="font-semibold text-amber-300 transition hover:text-amber-200"
+            className="font-semibold text-els-amber-ink transition hover:text-els-amber-ink"
             href={`mailto:${supplier.email}`}
           >
             {supplier.email}
           </a>
         )}
       </dd>
-      <dt className="text-slate-500">Atendimento</dt>
-      <dd className="text-slate-200">{supplier.supportChannel}</dd>
+      <dt className="text-els-fg-3">Atendimento</dt>
+      <dd className="text-els-fg-2">{supplier.supportChannel}</dd>
     </dl>
   );
 }
@@ -73,7 +73,7 @@ export function DataProtectionContact() {
   return (
     <p>
       Encarregado pelo tratamento de dados pessoais:{" "}
-      <a className="font-semibold text-amber-300 hover:text-amber-200" href={`mailto:${contact}`}>
+      <a className="font-semibold text-els-amber-ink hover:text-els-amber-ink" href={`mailto:${contact}`}>
         {contact}
       </a>
       . Os pedidos são respondidos nos prazos da Lei 13.709/2018.

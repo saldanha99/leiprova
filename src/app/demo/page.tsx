@@ -92,17 +92,17 @@ const structuredData = {
 
 export default function DemoPage() {
   return (
-    <main className="bg-[#060b13] text-white">
+    <main className="bg-els-bg text-els-fg">
       <JsonLd data={structuredData} />
-      <header className="border-b border-white/8 bg-[#07101b]">
+      <header className="border-b border-els-line bg-els-bg">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-4">
           <LeiProvaMark href="/" />
           <div className="flex items-center gap-4 text-sm font-semibold">
-            <Link className="text-slate-400 hover:text-white" href={LOGIN_HREF}>
+            <Link className="text-els-fg-3 hover:text-els-fg" href={LOGIN_HREF}>
               Entrar
             </Link>
             <Link
-              className="rounded-xl bg-amber-400 px-4 py-2.5 font-bold text-slate-950 hover:bg-amber-300"
+              className="rounded-xl bg-els-amber px-4 py-2.5 font-bold text-els-on-amber hover:bg-els-amber"
               href={PLANS_HREF}
             >
               Ver planos
@@ -110,81 +110,81 @@ export default function DemoPage() {
           </div>
         </div>
       </header>
-      <section className="border-b border-white/8 bg-[radial-gradient(circle_at_80%_0%,rgba(45,212,164,.12),transparent_34%),#07101b]">
+      <section className="border-b border-els-line bg-[radial-gradient(circle_at_80%_0%,color-mix(in_oklch,var(--els-green)_12%,transparent),transparent_34%),var(--els-bg)]">
         <div className="mx-auto grid max-w-6xl gap-8 px-5 py-12 lg:grid-cols-[1fr_.9fr] lg:items-center lg:py-16">
           <div>
-            <p className="text-xs font-extrabold uppercase tracking-[0.17em] text-amber-300">Demonstração pública</p>
+            <p className="text-xs font-extrabold uppercase tracking-[0.17em] text-els-amber-ink">Demonstração pública</p>
             <h1 className="mt-4 text-4xl font-semibold tracking-[-0.05em] sm:text-5xl">
               {demoSurface.kind === "reviewed_session"
                 ? "Treine a literalidade antes de criar uma conta"
                 : "Veja como o treino de literalidade funciona"}
             </h1>
-            <p className="mt-5 max-w-2xl text-base leading-8 text-slate-300">
+            <p className="mt-5 max-w-2xl text-base leading-8 text-els-fg-2">
               {demoSurface.kind === "reviewed_session"
                 ? "A sessão abaixo contém cinco questões da Constituição Federal já revisadas. Você escolhe uma alternativa, declara sua confiança e recebe correção imediata com a redação e a fonte utilizadas."
                 : "Abaixo está a mecânica do treino, passo a passo. As questões desta demonstração ainda estão em revisão humana, então nenhuma delas é exibida aqui como material de estudo."}
             </p>
             <div className="mt-6 flex flex-wrap gap-4 text-sm font-semibold">
-              <Link className="text-amber-300 underline decoration-amber-300/30 underline-offset-4 hover:text-amber-200" href="/como-memorizar-lei-seca">
+              <Link className="text-els-amber-ink underline decoration-els-amber-ink/30 underline-offset-4 hover:text-els-amber-ink" href="/como-memorizar-lei-seca">
                 Entender o método
               </Link>
-              <Link className="text-amber-300 underline decoration-amber-300/30 underline-offset-4 hover:text-amber-200" href="/fontes-e-atualizacao">
+              <Link className="text-els-amber-ink underline decoration-els-amber-ink/30 underline-offset-4 hover:text-els-amber-ink" href="/fontes-e-atualizacao">
                 Ver fontes e atualização
               </Link>
             </div>
           </div>
           {demoSurface.kind === "reviewed_session" ? (
-            <article className="rounded-[1.6rem] border border-white/10 bg-[#0a1420] p-6">
+            <article className="rounded-[1.6rem] border border-els-line bg-els-surface p-6">
               <div className="flex items-center justify-between gap-4">
-                <span className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.12em] text-emerald-300">
+                <span className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.12em] text-els-green-ink">
                   <BookOpenCheck aria-hidden="true" className="size-4" />
                   Exemplo da sessão
                 </span>
-                <span className="rounded-full bg-white/5 px-3 py-1 text-xs text-slate-400">
+                <span className="rounded-full bg-els-raise px-3 py-1 text-xs text-els-fg-3">
                   {demoSurface.questions[0].articleRef}
                 </span>
               </div>
-              <h2 className="mt-5 text-lg font-semibold leading-7 text-white">{demoSurface.questions[0].prompt}</h2>
-              <p className="mt-4 flex items-start gap-2 text-xs leading-6 text-slate-400">
-                <ShieldCheck aria-hidden="true" className="mt-1 size-4 shrink-0 text-emerald-300" />
+              <h2 className="mt-5 text-lg font-semibold leading-7 text-els-fg">{demoSurface.questions[0].prompt}</h2>
+              <p className="mt-4 flex items-start gap-2 text-xs leading-6 text-els-fg-3">
+                <ShieldCheck aria-hidden="true" className="mt-1 size-4 shrink-0 text-els-green-ink" />
                 Questão revisada. Texto conferido em{" "}
                 {demoSurface.questions[0].verifiedAt.split("-").reverse().join("/")}.
               </p>
-              <a className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-amber-300 hover:text-amber-200" href={demoSurface.questions[0].officialUrl} rel="noreferrer">
+              <a className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-els-amber-ink hover:text-els-amber-ink" href={demoSurface.questions[0].officialUrl} rel="noreferrer">
                 Abrir a fonte oficial
                 <ExternalLink aria-hidden="true" className="size-4" />
               </a>
-              <p className="mt-4 text-[10px] leading-5 text-slate-600">
+              <p className="mt-4 text-[10px] leading-5 text-els-fg-4">
                 Conteúdo meramente informativo e não oficial; não substitui a publicação no Diário Oficial da União.
               </p>
             </article>
           ) : (
             <article
               aria-labelledby="demo-estado-editorial"
-              className="rounded-[1.6rem] border border-amber-300/25 bg-[#0a1420] p-6"
+              className="rounded-[1.6rem] border border-els-amber/25 bg-els-surface p-6"
             >
-              <span className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.12em] text-amber-300">
+              <span className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.12em] text-els-amber-ink">
                 <ShieldCheck aria-hidden="true" className="size-4" />
                 Estado editorial
               </span>
-              <h2 id="demo-estado-editorial" className="mt-5 text-lg font-semibold leading-7 text-white">
+              <h2 id="demo-estado-editorial" className="mt-5 text-lg font-semibold leading-7 text-els-fg">
                 Conteúdo jurídico em revisão humana
               </h2>
-              <p className="mt-4 text-sm leading-7 text-slate-300">{editorialState}</p>
+              <p className="mt-4 text-sm leading-7 text-els-fg-2">{editorialState}</p>
               <dl className="mt-5 grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <dt className="text-xs uppercase tracking-[0.12em] text-slate-500">Itens aguardando revisão</dt>
-                  <dd className="mt-1 text-2xl font-semibold tabular-nums text-white">{demoSurface.pendingCount}</dd>
+                  <dt className="text-xs uppercase tracking-[0.12em] text-els-fg-3">Itens aguardando revisão</dt>
+                  <dd className="mt-1 text-2xl font-semibold tabular-nums text-els-fg">{demoSurface.pendingCount}</dd>
                 </div>
                 <div>
-                  <dt className="text-xs uppercase tracking-[0.12em] text-slate-500">Norma coberta</dt>
-                  <dd className="mt-1 text-sm leading-6 text-slate-300">
+                  <dt className="text-xs uppercase tracking-[0.12em] text-els-fg-3">Norma coberta</dt>
+                  <dd className="mt-1 text-sm leading-6 text-els-fg-2">
                     {demoSurface.legalActs.join(", ") || "—"}
                   </dd>
                 </div>
               </dl>
               <Link
-                className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-amber-300 hover:text-amber-200"
+                className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-els-amber-ink hover:text-els-amber-ink"
                 href="/fontes-e-atualizacao"
               >
                 Como revisamos e publicamos
@@ -201,39 +201,39 @@ export default function DemoPage() {
           <h2 id="demo-interface" className="text-2xl font-semibold tracking-[-0.03em]">
             A mecânica do treino
           </h2>
-          <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-400">
+          <p className="mt-3 max-w-2xl text-sm leading-7 text-els-fg-3">
             Demonstração neutra da interface, sem afirmação jurídica. Quando a revisão humana estiver registrada, esta
             mesma tela passa a rodar a sessão real de questões.
           </p>
           <ol className="mt-8 grid gap-4 sm:grid-cols-3">
             {INTERFACE_STEPS.map((step, index) => (
-              <li key={step.title} className="rounded-2xl border border-white/10 bg-[#0a1420] p-5">
-                <span className="flex size-8 items-center justify-center rounded-full bg-white/5 text-sm font-bold text-amber-300">
+              <li key={step.title} className="rounded-2xl border border-els-line bg-els-surface p-5">
+                <span className="flex size-8 items-center justify-center rounded-full bg-els-raise text-sm font-bold text-els-amber-ink">
                   {index + 1}
                 </span>
-                <h3 className="mt-4 text-base font-semibold text-white">{step.title}</h3>
-                <p className="mt-2 text-sm leading-6 text-slate-400">{step.detail}</p>
+                <h3 className="mt-4 text-base font-semibold text-els-fg">{step.title}</h3>
+                <p className="mt-2 text-sm leading-6 text-els-fg-3">{step.detail}</p>
               </li>
             ))}
           </ol>
-          <p className="mt-8 flex items-start gap-2 text-xs leading-6 text-slate-500">
-            <BookOpenCheck aria-hidden="true" className="mt-1 size-4 shrink-0 text-slate-600" />
+          <p className="mt-8 flex items-start gap-2 text-xs leading-6 text-els-fg-3">
+            <BookOpenCheck aria-hidden="true" className="mt-1 size-4 shrink-0 text-els-fg-4" />
             Nenhuma questão jurídica é servida nesta página enquanto a revisão humana não estiver registrada.
           </p>
         </section>
       )}
-      <section className="border-t border-white/8 bg-[#07101b]">
+      <section className="border-t border-els-line bg-els-bg">
         <div className="mx-auto flex max-w-6xl flex-col gap-5 px-5 py-10 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 className="text-xl font-semibold tracking-[-0.03em] text-white">
+            <h2 className="text-xl font-semibold tracking-[-0.03em] text-els-fg">
               Quer o método completo?
             </h2>
-            <p className="mt-2 max-w-xl text-sm leading-7 text-slate-400">
+            <p className="mt-2 max-w-xl text-sm leading-7 text-els-fg-3">
               Veja o plano, o preço e o que entra no roteiro de literalidade.
             </p>
           </div>
           <Link
-            className="inline-flex shrink-0 items-center gap-2 rounded-2xl bg-amber-400 px-6 py-4 text-sm font-bold text-slate-950 hover:bg-amber-300"
+            className="inline-flex shrink-0 items-center gap-2 rounded-2xl bg-els-amber px-6 py-4 text-sm font-bold text-els-on-amber hover:bg-els-amber"
             href={PLANS_HREF}
           >
             Ver planos e preço

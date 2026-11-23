@@ -37,20 +37,20 @@ export default async function PurchasesPage() {
   };
   return (
     <main className="mx-auto max-w-5xl px-5 py-12">
-      <p className="text-xs font-bold uppercase tracking-widest text-emerald-300">
+      <p className="text-xs font-bold uppercase tracking-widest text-els-green-ink">
         SEUS OBJETIVOS, ORGANIZADOS
       </p>
       <h1 className="mt-4 text-4xl font-semibold tracking-tight">
         Meus concursos e compras
       </h1>
-      <p className="mt-5 text-sm leading-7 text-slate-400">
+      <p className="mt-5 text-sm leading-7 text-els-fg-3">
         {entitlement.hasFullAccess
           ? "Seu Master está ativo. Os concursos liberados estão incluídos durante a vigência da assinatura."
           : "Cada assinatura individual libera somente a edição indicada, durante o período pago."}{" "}
         O retorno da Stripe sozinho não libera acesso: aguardamos a confirmação
         autenticada do pagamento.
       </p>
-      <div className="mt-8 flex flex-wrap gap-5 text-sm font-bold text-amber-200">
+      <div className="mt-8 flex flex-wrap gap-5 text-sm font-bold text-els-amber-ink">
         <Link href="/app/quiz">Ir para os treinos</Link>
         <Link href="/app/assinatura">Gerenciar Master</Link>
         <Link href="/concursos">Explorar concursos</Link>
@@ -58,7 +58,7 @@ export default async function PurchasesPage() {
       {user.stripeCustomerId && (
         <div className="mt-6">
           <PortalButton />
-          <p className="mt-2 text-xs text-slate-400">
+          <p className="mt-2 text-xs text-els-fg-3">
             Gerencie pagamentos e cancele a renovação. O cancelamento ao fim do
             período mantém o acesso já pago.
           </p>
@@ -68,7 +68,7 @@ export default async function PurchasesPage() {
         {orders.map((order) => (
           <section
             key={order.id}
-            className="rounded-2xl border border-white/15 bg-white/3 p-6"
+            className="rounded-2xl border border-els-line-strong bg-els-raise p-6"
           >
             <div className="flex flex-wrap justify-between gap-3">
               <h2 className="font-semibold">
@@ -93,10 +93,10 @@ export default async function PurchasesPage() {
               return (
                 <p
                   key={line.productSlug}
-                  className="mt-4 text-sm leading-7 text-slate-300"
+                  className="mt-4 text-sm leading-7 text-els-fg-2"
                 >
                   {contest ? contestTitle(contest) : line.productSlug}
-                  <span className="block text-xs text-slate-500">
+                  <span className="block text-xs text-els-fg-3">
                     {purchase
                       ? `${purchase.status === "active" && purchase.accessEndsAt > new Date() ? "Válido até" : "Acesso encerrado / suspenso"} ${purchase.accessEndsAt.toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" })}`
                       : `${line.months} ${line.months === 1 ? "mês" : "meses"} após confirmação`}{" "}
@@ -111,7 +111,7 @@ export default async function PurchasesPage() {
               );
             })}
             {order.subscriptionStatus && (
-              <p className="mt-4 text-xs text-slate-400">
+              <p className="mt-4 text-xs text-els-fg-3">
                 {order.cancelAtPeriodEnd
                   ? "Renovação cancelada; acesso até o fim do período pago."
                   : ((
@@ -144,7 +144,7 @@ export default async function PurchasesPage() {
           </section>
         ))}
         {!orders.length && (
-          <p className="rounded-2xl border border-white/15 p-7 text-sm text-slate-400">
+          <p className="rounded-2xl border border-els-line-strong p-7 text-sm text-els-fg-3">
             Você ainda não tem compras avulsas neste ambiente.
           </p>
         )}

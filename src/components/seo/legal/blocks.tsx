@@ -6,17 +6,17 @@ import { brDate, sourceLabel } from "@/lib/seo/legal-format";
 
 export function Breadcrumbs({ crumbs }: { crumbs: readonly Crumb[] }) {
   return (
-    <nav aria-label="Trilha de navegação" className="text-xs font-bold uppercase tracking-[0.12em] text-slate-400">
+    <nav aria-label="Trilha de navegação" className="text-xs font-bold uppercase tracking-[0.12em] text-els-fg-3">
       <ol className="flex flex-wrap items-center gap-2">
         {crumbs.map((crumb, index) => (
           <li key={crumb.path} className="flex items-center gap-2">
             {index > 0 ? <span aria-hidden="true">/</span> : null}
             {index === crumbs.length - 1 ? (
-              <span aria-current="page" className="text-amber-300">
+              <span aria-current="page" className="text-els-amber-ink">
                 {crumb.name}
               </span>
             ) : (
-              <Link className="hover:text-amber-300" href={crumb.path}>
+              <Link className="hover:text-els-amber-ink" href={crumb.path}>
                 {crumb.name}
               </Link>
             )}
@@ -39,11 +39,11 @@ export function SourceSeal({
   contentChangedAt: Date;
 }) {
   return (
-    <p className="mt-5 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm leading-6 text-slate-300">
+    <p className="mt-5 rounded-xl border border-els-line bg-els-raise px-4 py-3 text-sm leading-6 text-els-fg-2">
       Texto oficial: {sourceLabel(versionSourceUrl)} · versão verificada em{" "}
       <time dateTime={verifiedAt.toISOString()}>{brDate(verifiedAt)}</time> · última alteração do conteúdo em{" "}
       <time dateTime={contentChangedAt.toISOString()}>{brDate(contentChangedAt)}</time> ·{" "}
-      <a className="font-semibold text-amber-300 underline-offset-4 hover:underline" href={officialUrl} rel="noopener">
+      <a className="font-semibold text-els-amber-ink underline-offset-4 hover:underline" href={officialUrl} rel="noopener">
         ver publicação no {sourceLabel(officialUrl)}
       </a>
     </p>
@@ -53,7 +53,7 @@ export function SourceSeal({
 export function Section({ id, title, children }: { id: string; title: string; children: ReactNode }) {
   return (
     <section aria-labelledby={`${id}-titulo`} className="mt-12" id={id}>
-      <h2 className="text-xl font-semibold tracking-[-0.02em] text-white sm:text-2xl" id={`${id}-titulo`}>
+      <h2 className="text-xl font-semibold tracking-[-0.02em] text-els-fg sm:text-2xl" id={`${id}-titulo`}>
         {title}
       </h2>
       <div className="mt-4">{children}</div>
@@ -69,8 +69,8 @@ export function FaqBlock({ items }: { items: readonly FaqItem[] }) {
       <dl className="space-y-5">
         {items.map((item) => (
           <div key={item.question}>
-            <dt className="font-semibold text-slate-100">{item.question}</dt>
-            <dd className="mt-1 text-sm leading-7 text-slate-400">{item.answer}</dd>
+            <dt className="font-semibold text-els-fg">{item.question}</dt>
+            <dd className="mt-1 text-sm leading-7 text-els-fg-3">{item.answer}</dd>
           </div>
         ))}
       </dl>
@@ -82,20 +82,20 @@ export function FaqBlock({ items }: { items: readonly FaqItem[] }) {
 export function AuthorNotice({ withQuestions }: { withQuestions: boolean }) {
   return (
     <Section id="autoria" title="Autoria e revisão">
-      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 text-sm leading-7 text-slate-400">
+      <div className="rounded-2xl border border-els-line bg-els-raise p-5 text-sm leading-7 text-els-fg-3">
         <p>
-          <strong className="text-slate-200">{EDITORIAL_AUTHOR_NAME}</strong>.{" "}
+          <strong className="text-els-fg-2">{EDITORIAL_AUTHOR_NAME}</strong>.{" "}
           {withQuestions
             ? "As questões e os comentários desta página são inéditos, produzidos com auxílio de IA a partir do texto oficial e liberados pela linha automática de validação autorizada pelo responsável pelo projeto. Essa aprovação não equivale a revisão humana independente de cada questão; itens com erro são suspensos."
             : "Os dados desta página saem do texto oficial da norma e da base de questões do Edital Lei Seca."}{" "}
           O texto da lei é reproduzido da fonte oficial indicada e não substitui o Diário Oficial nem o edital.
         </p>
         <p className="mt-3">
-          <Link className="font-semibold text-amber-300 underline-offset-4 hover:underline" href="/metodologia">
+          <Link className="font-semibold text-els-amber-ink underline-offset-4 hover:underline" href="/metodologia">
             Como produzimos e revisamos o conteúdo
           </Link>
           {" · "}
-          <Link className="font-semibold text-amber-300 underline-offset-4 hover:underline" href="/fontes-e-atualizacao">
+          <Link className="font-semibold text-els-amber-ink underline-offset-4 hover:underline" href="/fontes-e-atualizacao">
             Fontes e atualização
           </Link>
         </p>
@@ -107,11 +107,11 @@ export function AuthorNotice({ withQuestions }: { withQuestions: boolean }) {
 /** CTA as a plain <a> with a unique id and no target=_blank (LEI 10 tracking). */
 export function TrainCta({ id, href, title, description }: { id: string; href: string; title: string; description: string }) {
   return (
-    <aside className="mt-12 rounded-[2rem] border border-amber-300/20 bg-[#0b1624] p-6 sm:p-9">
+    <aside className="mt-12 rounded-[2rem] border border-els-amber/20 bg-els-surface p-6 sm:p-9">
       <h2 className="text-2xl font-semibold tracking-[-0.035em]">{title}</h2>
-      <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-400">{description}</p>
+      <p className="mt-3 max-w-2xl text-sm leading-7 text-els-fg-3">{description}</p>
       <a
-        className="mt-6 inline-flex min-h-12 items-center gap-2 rounded-xl bg-amber-300 px-5 py-3 text-sm font-extrabold text-slate-950 transition hover:bg-amber-200"
+        className="mt-6 inline-flex min-h-12 items-center gap-2 rounded-xl bg-els-amber px-5 py-3 text-sm font-extrabold text-els-on-amber transition hover:bg-els-amber-2"
         data-cta="train"
         href={href}
         id={id}

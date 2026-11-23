@@ -138,28 +138,28 @@ const UPDATE_STEPS = [
 
 export default function SourcesAndUpdatesPage() {
   return (
-    <PublicGuideShell>
+    <PublicGuideShell tone="els">
       <JsonLd data={structuredData} />
       <article>
-        <header className="relative overflow-hidden border-b border-white/8 bg-[radial-gradient(circle_at_85%_0%,rgba(105,167,255,.14),transparent_36%),radial-gradient(circle_at_5%_20%,rgba(251,191,36,.11),transparent_32%),#07101b]">
+        <header className="relative overflow-hidden border-b border-els-line bg-[radial-gradient(circle_at_85%_0%,color-mix(in_oklch,var(--els-info)_14%,transparent),transparent_36%),radial-gradient(circle_at_5%_20%,color-mix(in_oklch,var(--els-amber)_11%,transparent),transparent_32%),var(--els-bg)]">
           <div className="mx-auto max-w-6xl px-5 py-14 sm:py-20">
-            <GuideBreadcrumbs current="Fontes e atualização" />
+            <GuideBreadcrumbs tone="els" current="Fontes e atualização" />
             <div className="mt-9 max-w-5xl">
-              <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-emerald-300">
+              <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-els-green-ink">
                 Transparência editorial
               </p>
-              <h1 className="mt-4 text-4xl font-semibold tracking-[-0.05em] text-white sm:text-6xl">
+              <h1 className="mt-4 text-4xl font-semibold tracking-[-0.05em] text-els-fg sm:text-6xl">
                 De onde vêm as leis e as questões da Edital Lei Seca?
               </h1>
-              <p className="mt-6 max-w-4xl text-lg leading-8 text-slate-300">
+              <p className="mt-6 max-w-4xl text-lg leading-8 text-els-fg-2">
                 As preparações usam normas obtidas em fontes oficiais e questões originais assistidas por IA. Cada edição tem programa, cargo e perfil editorial próprios. A disponibilidade aparece no catálogo; referências de provas anteriores apontam para o órgão ou a organizadora quando o arquivo oficial foi conferido. A origem da aprovação fica identificada. O caminho de revisão automatizada autorizado para normas, editais, programas e inéditas não representa revisão humana independente de cada item.
               </p>
               <div className="mt-7 flex flex-wrap gap-3 text-xs font-bold">
-                <span className="rounded-full border border-emerald-300/20 bg-emerald-300/8 px-4 py-2 text-emerald-200">Fontes oficiais e versionadas</span>
-                <span className="rounded-full border border-blue-300/20 bg-blue-300/8 px-4 py-2 text-blue-200">Programa por cargo e edição</span>
-                <span className="rounded-full border border-amber-300/20 bg-amber-300/8 px-4 py-2 text-amber-200">Questões originais assistidas por IA</span>
-                <span className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-slate-300">Provas anteriores: referência oficial</span>
-                <span className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-slate-300">Disponibilidade no catálogo</span>
+                <span className="rounded-full border border-els-green/20 bg-els-green/8 px-4 py-2 text-els-green-ink">Fontes oficiais e versionadas</span>
+                <span className="rounded-full border border-els-info/20 bg-els-info/8 px-4 py-2 text-els-info-ink">Programa por cargo e edição</span>
+                <span className="rounded-full border border-els-amber/20 bg-els-amber/8 px-4 py-2 text-els-amber-ink">Questões originais assistidas por IA</span>
+                <span className="rounded-full border border-els-line bg-els-raise px-4 py-2 text-els-fg-2">Provas anteriores: referência oficial</span>
+                <span className="rounded-full border border-els-line bg-els-raise px-4 py-2 text-els-fg-2">Disponibilidade no catálogo</span>
               </div>
             </div>
           </div>
@@ -168,65 +168,65 @@ export default function SourcesAndUpdatesPage() {
         <div className="mx-auto max-w-6xl space-y-20 px-5 py-16 sm:py-20">
           <section aria-labelledby="inventario-title" className="grid gap-8 lg:grid-cols-[1fr_.85fr]">
             <div>
-              <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-amber-300">Demonstração e acervo comercial</p>
-              <h2 id="inventario-title" className="mt-3 text-3xl font-semibold tracking-[-0.045em] text-white sm:text-4xl">
+              <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-els-amber-ink">Demonstração e acervo comercial</p>
+              <h2 id="inventario-title" className="mt-3 text-3xl font-semibold tracking-[-0.045em] text-els-fg sm:text-4xl">
                 A demonstração tem escopo próprio
               </h2>
-              <div className="mt-6 space-y-5 text-sm leading-7 text-slate-400">
+              <div className="mt-6 space-y-5 text-sm leading-7 text-els-fg-3">
                 <p>
                   A demonstração inicial apresenta um recorte de Direito Constitucional: arts. {articleSummary} da Constituição Federal. Cada questão guarda a URL oficial, a data de verificação, a alternativa literal, o tipo de alteração usado nos distratores e a explicação.
                 </p>
                 <p>
-                  A fonte desse recorte da demonstração foi verificada em <strong className="font-semibold text-slate-200">16 de agosto de 2026</strong>. Essa data não significa que a Edital Lei Seca substitui o Diário Oficial nem garante que nenhuma mudança tenha ocorrido depois dela; é o marco editorial desse exemplo. Nos produtos, considere a versão e a data de cada item.
+                  A fonte desse recorte da demonstração foi verificada em <strong className="font-semibold text-els-fg-2">16 de agosto de 2026</strong>. Essa data não significa que a Edital Lei Seca substitui o Diário Oficial nem garante que nenhuma mudança tenha ocorrido depois dela; é o marco editorial desse exemplo. Nos produtos, considere a versão e a data de cada item.
                 </p>
                 <p>
                   Separadamente, o laboratório ilustrativo da página inicial contém três microexemplos não persistidos no quiz: Constituição, art. 5º, LIV; Constituição, art. 37, caput; e Código Penal, art. 1º. Esses trechos foram novamente conferidos nas páginas oficiais em 17 de agosto de 2026.
                 </p>
               </div>
-              <a className="mt-6 inline-flex items-center gap-2 font-semibold text-amber-300 underline decoration-amber-300/30 underline-offset-4 hover:text-amber-200" href={CONSTITUTION_OFFICIAL_URL} rel="noreferrer">
+              <a className="mt-6 inline-flex items-center gap-2 font-semibold text-els-amber-ink underline decoration-els-amber-ink/30 underline-offset-4 hover:text-els-amber-ink" href={CONSTITUTION_OFFICIAL_URL} rel="noreferrer">
                 Abrir o texto constitucional utilizado
                 <ExternalLink aria-hidden="true" className="size-4" />
               </a>
             </div>
 
-            <div className="rounded-[1.7rem] border border-white/9 bg-[#0a1420] p-6 sm:p-8">
+            <div className="rounded-[1.7rem] border border-els-line bg-els-surface p-6 sm:p-8">
               <div className="flex items-center justify-between gap-4">
-                <span className="grid size-12 place-items-center rounded-2xl bg-emerald-300/10 text-emerald-300">
+                <span className="grid size-12 place-items-center rounded-2xl bg-els-green/10 text-els-green-ink">
                   <FileCheck2 aria-hidden="true" className="size-6" />
                 </span>
-                <span className="rounded-full bg-amber-300/10 px-3 py-1 text-xs font-bold text-amber-200">Recorte inicial da demonstração</span>
+                <span className="rounded-full bg-els-amber/10 px-3 py-1 text-xs font-bold text-els-amber-ink">Recorte inicial da demonstração</span>
               </div>
               <dl className="mt-7 space-y-5 text-sm">
-                <div className="border-b border-white/8 pb-4">
-                  <dt className="text-slate-500">Norma</dt>
-                  <dd className="mt-1 font-semibold text-white">Constituição da República Federativa do Brasil de 1988</dd>
+                <div className="border-b border-els-line pb-4">
+                  <dt className="text-els-fg-3">Norma</dt>
+                  <dd className="mt-1 font-semibold text-els-fg">Constituição da República Federativa do Brasil de 1988</dd>
                 </div>
-                <div className="border-b border-white/8 pb-4">
-                  <dt className="text-slate-500">Origem</dt>
-                  <dd className="mt-1 font-semibold text-white">Portal da Legislação — Presidência da República</dd>
+                <div className="border-b border-els-line pb-4">
+                  <dt className="text-els-fg-3">Origem</dt>
+                  <dd className="mt-1 font-semibold text-els-fg">Portal da Legislação — Presidência da República</dd>
                 </div>
-                <div className="border-b border-white/8 pb-4">
-                  <dt className="text-slate-500">Conferência técnica da fonte</dt>
-                  <dd className="mt-1 font-semibold text-white">{verifiedDate.split("-").reverse().join("/")}</dd>
+                <div className="border-b border-els-line pb-4">
+                  <dt className="text-els-fg-3">Conferência técnica da fonte</dt>
+                  <dd className="mt-1 font-semibold text-els-fg">{verifiedDate.split("-").reverse().join("/")}</dd>
                 </div>
                 <div>
-                  <dt className="text-slate-500">Produção das questões</dt>
-                  <dd className="mt-1 font-semibold text-white">Original, assistida por IA e baseada no texto oficial</dd>
+                  <dt className="text-els-fg-3">Produção das questões</dt>
+                  <dd className="mt-1 font-semibold text-els-fg">Original, assistida por IA e baseada no texto oficial</dd>
                 </div>
               </dl>
             </div>
           </section>
 
-          <aside className="rounded-2xl border border-amber-300/20 bg-amber-300/[0.045] p-5 text-sm leading-7 text-amber-100/80">
-            <strong className="text-amber-200">Pendência editorial declarada:</strong> os {DEMO_QUESTIONS.length} itens do beta inicial não possuem revisão humana independente registrada. Esse recorte não descreve o inventário comercial. As inéditas da fábrica são liberadas pelo processo automático autorizado pelo proprietário em 11 de outubro de 2026, com conferência posterior e suspensão de inconsistências; não são anunciadas como revisão humana independente.
+          <aside className="rounded-2xl border border-els-amber/20 bg-els-amber/[0.045] p-5 text-sm leading-7 text-els-amber-ink/80">
+            <strong className="text-els-amber-ink">Pendência editorial declarada:</strong> os {DEMO_QUESTIONS.length} itens do beta inicial não possuem revisão humana independente registrada. Esse recorte não descreve o inventário comercial. As inéditas da fábrica são liberadas pelo processo automático autorizado pelo proprietário em 11 de outubro de 2026, com conferência posterior e suspensão de inconsistências; não são anunciadas como revisão humana independente.
           </aside>
 
           <section aria-labelledby="hierarquia-title">
-            <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-emerald-300">Hierarquia de fontes</p>
-            <h2 id="hierarquia-title" className="mt-3 text-3xl font-semibold tracking-[-0.045em] text-white sm:text-4xl">
+            <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-els-green-ink">Hierarquia de fontes</p>
+            <h2 id="hierarquia-title" className="mt-3 text-3xl font-semibold tracking-[-0.045em] text-els-fg sm:text-4xl">
               A fonte muda conforme a jurisdição
             </h2>
-            <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-400">
+            <p className="mt-4 max-w-3xl text-sm leading-7 text-els-fg-3">
               Para cada norma, registramos a página oficial específica e a data de acesso. Agregadores e mecanismos de busca podem ajudar a localizar um ato, mas não substituem a conferência no órgão competente.
             </p>
             <div className="mt-9 grid gap-4 md:grid-cols-2">
@@ -262,12 +262,12 @@ export default function SourcesAndUpdatesPage() {
                   label: null,
                 },
               ].map((source) => (
-                <article key={source.title} className="rounded-[1.5rem] border border-white/9 bg-[#0a1420] p-6">
-                  <BookOpenCheck aria-hidden="true" className="size-5 text-amber-300" />
-                  <h3 className="mt-4 text-lg font-semibold text-white">{source.title}</h3>
-                  <p className="mt-2 text-sm leading-7 text-slate-400">{source.text}</p>
+                <article key={source.title} className="rounded-[1.5rem] border border-els-line bg-els-surface p-6">
+                  <BookOpenCheck aria-hidden="true" className="size-5 text-els-amber-ink" />
+                  <h3 className="mt-4 text-lg font-semibold text-els-fg">{source.title}</h3>
+                  <p className="mt-2 text-sm leading-7 text-els-fg-3">{source.text}</p>
                   {source.href && (
-                    <a className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-amber-300 hover:text-amber-200" href={source.href} rel="noreferrer">
+                    <a className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-els-amber-ink hover:text-els-amber-ink" href={source.href} rel="noreferrer">
                       {source.label}
                       <ExternalLink aria-hidden="true" className="size-3.5" />
                     </a>
@@ -277,16 +277,16 @@ export default function SourcesAndUpdatesPage() {
             </div>
           </section>
 
-          <section aria-labelledby="atualizacao-title" className="rounded-[2rem] border border-white/9 bg-[#08111d] p-6 sm:p-10">
+          <section aria-labelledby="atualizacao-title" className="rounded-[2rem] border border-els-line bg-els-surface p-6 sm:p-10">
             <div className="max-w-4xl">
-              <p className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-[0.16em] text-amber-300">
+              <p className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-[0.16em] text-els-amber-ink">
                 <RefreshCcw aria-hidden="true" className="size-4" />
                 Atualização com decisão editorial auditável
               </p>
-              <h2 id="atualizacao-title" className="mt-3 text-3xl font-semibold tracking-[-0.045em] text-white sm:text-4xl">
+              <h2 id="atualizacao-title" className="mt-3 text-3xl font-semibold tracking-[-0.045em] text-els-fg sm:text-4xl">
                 Como uma mudança legislativa deve chegar ao aplicativo
               </h2>
-              <p className="mt-4 text-sm leading-7 text-slate-400">
+              <p className="mt-4 text-sm leading-7 text-els-fg-3">
                 O monitor periódico consulta as dez páginas federais registradas, normaliza o texto e compara sua impressão digital com o histórico. Uma mudança cria uma fotografia pendente; não modifica o acervo nem um gabarito. A sequência abaixo mantém o alerta automático e a decisão editorial separada.
               </p>
             </div>
@@ -294,10 +294,10 @@ export default function SourcesAndUpdatesPage() {
               {UPDATE_STEPS.map((step) => {
                 const Icon = step.icon;
                 return (
-                  <li key={step.title} className="rounded-2xl border border-white/8 bg-white/[0.025] p-5">
-                    <Icon aria-hidden="true" className="size-5 text-emerald-300" />
-                    <h3 className="mt-4 font-semibold text-white">{step.title}</h3>
-                    <p className="mt-2 text-sm leading-7 text-slate-400">{step.text}</p>
+                  <li key={step.title} className="rounded-2xl border border-els-line bg-els-raise p-5">
+                    <Icon aria-hidden="true" className="size-5 text-els-green-ink" />
+                    <h3 className="mt-4 font-semibold text-els-fg">{step.title}</h3>
+                    <p className="mt-2 text-sm leading-7 text-els-fg-3">{step.text}</p>
                   </li>
                 );
               })}
@@ -305,29 +305,29 @@ export default function SourcesAndUpdatesPage() {
           </section>
 
           <section aria-labelledby="questoes-title">
-            <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-emerald-300">Proveniência das questões</p>
-            <h2 id="questoes-title" className="mt-3 text-3xl font-semibold tracking-[-0.045em] text-white sm:text-4xl">
+            <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-els-green-ink">Proveniência das questões</p>
+            <h2 id="questoes-title" className="mt-3 text-3xl font-semibold tracking-[-0.045em] text-els-fg sm:text-4xl">
               Três tipos de conteúdo, três regras diferentes
             </h2>
             <div className="mt-9 grid gap-4 lg:grid-cols-3">
-              <article className="rounded-[1.5rem] border border-emerald-300/18 bg-emerald-300/[0.045] p-6">
-                <CheckCircle2 aria-hidden="true" className="size-6 text-emerald-300" />
-                <h3 className="mt-5 text-xl font-semibold text-white">Questões originais de lei seca assistidas por IA</h3>
-                <p className="mt-3 text-sm leading-7 text-slate-400">
+              <article className="rounded-[1.5rem] border border-els-green/18 bg-els-green/[0.045] p-6">
+                <CheckCircle2 aria-hidden="true" className="size-6 text-els-green-ink" />
+                <h3 className="mt-5 text-xl font-semibold text-els-fg">Questões originais de lei seca assistidas por IA</h3>
+                <p className="mt-3 text-sm leading-7 text-els-fg-3">
                   A alternativa correta reproduz o trecho oficial; os distratores recebem alterações controladas de palavra, prazo, condição, órgão ou alcance. Cada item publicado deve ter fonte e referência conferíveis. O recorte do beta inicial é identificado separadamente dos produtos.
                 </p>
               </article>
-              <article className="rounded-[1.5rem] border border-white/9 bg-[#0a1420] p-6">
-                <Scale aria-hidden="true" className="size-6 text-amber-300" />
-                <h3 className="mt-5 text-xl font-semibold text-white">Questões anteriores</h3>
-                <p className="mt-3 text-sm leading-7 text-slate-400">
+              <article className="rounded-[1.5rem] border border-els-line bg-els-surface p-6">
+                <Scale aria-hidden="true" className="size-6 text-els-amber-ink" />
+                <h3 className="mt-5 text-xl font-semibold text-els-fg">Questões anteriores</h3>
+                <p className="mt-3 text-sm leading-7 text-els-fg-3">
                   Os links oficiais de cadernos e gabaritos são referências para consulta. Incorporar questões anteriores ao treino exige autorização ou licença documentada, titular identificado, origem, edição e validade do direito de uso. Estar disponível para download não equivale a licença comercial.
                 </p>
               </article>
-              <article className="rounded-[1.5rem] border border-white/9 bg-[#0a1420] p-6">
-                <Bot aria-hidden="true" className="size-6 text-blue-300" />
-                <h3 className="mt-5 text-xl font-semibold text-white">Questões inéditas no estilo da banca</h3>
-                <p className="mt-3 text-sm leading-7 text-slate-400">
+              <article className="rounded-[1.5rem] border border-els-line bg-els-surface p-6">
+                <Bot aria-hidden="true" className="size-6 text-els-info-ink" />
+                <h3 className="mt-5 text-xl font-semibold text-els-fg">Questões inéditas no estilo da banca</h3>
+                <p className="mt-3 text-sm leading-7 text-els-fg-3">
                   A fábrica registra modelo, versão do processo, fonte oficial e perfil de banca e cargo. A linha automática valida, aprova e vincula as inéditas sob autorização do proprietário. A conferência posterior pode suspender erros. A publicação só ocorre quando os controles da preparação são atendidos.
                 </p>
               </article>
@@ -335,14 +335,14 @@ export default function SourcesAndUpdatesPage() {
           </section>
 
           <section aria-labelledby="direitos-title" className="grid gap-8 lg:grid-cols-[.8fr_1.2fr] lg:items-start">
-            <div className="rounded-[1.6rem] border border-amber-300/18 bg-amber-300/[0.04] p-6">
-              <AlertTriangle aria-hidden="true" className="size-6 text-amber-300" />
-              <h2 id="direitos-title" className="mt-5 text-2xl font-semibold tracking-[-0.035em] text-white">Público não significa domínio público</h2>
-              <p className="mt-3 text-sm leading-7 text-slate-400">
+            <div className="rounded-[1.6rem] border border-els-amber/18 bg-els-amber/[0.04] p-6">
+              <AlertTriangle aria-hidden="true" className="size-6 text-els-amber-ink" />
+              <h2 id="direitos-title" className="mt-5 text-2xl font-semibold tracking-[-0.035em] text-els-fg">Público não significa domínio público</h2>
+              <p className="mt-3 text-sm leading-7 text-els-fg-3">
                 Uma banca publicar caderno e gabarito prova que o arquivo pode ser acessado. Isso, sozinho, não concede autorização para copiar, adaptar, vender ou inserir o material integralmente em uma base comercial.
               </p>
             </div>
-            <div className="space-y-5 text-sm leading-7 text-slate-400">
+            <div className="space-y-5 text-sm leading-7 text-els-fg-3">
               <p>
                 A Lei nº 9.610/1998 exclui textos de leis, decretos, regulamentos, decisões judiciais e demais atos oficiais da proteção autoral prevista nessa lei. A mesma norma reserva ao autor os direitos de utilização, reprodução, adaptação, distribuição e inclusão em base de dados de obras protegidas. Por isso, tratamos texto normativo e caderno de prova como categorias distintas.
               </p>
@@ -350,11 +350,11 @@ export default function SourcesAndUpdatesPage() {
                 O Portal da Legislação também possui política própria de reutilização. A fonte, a URL e a data de acesso devem acompanhar o conteúdo. Os trechos exibidos na Edital Lei Seca são meramente informativos e não oficiais e não substituem a publicação no Diário Oficial da União.
               </p>
               <div className="flex flex-wrap gap-4">
-                <a className="inline-flex items-center gap-2 font-semibold text-amber-300 underline decoration-amber-300/30 underline-offset-4 hover:text-amber-200" href="https://www.planalto.gov.br/ccivil_03/leis/l9610.htm" rel="noreferrer">
+                <a className="inline-flex items-center gap-2 font-semibold text-els-amber-ink underline decoration-els-amber-ink/30 underline-offset-4 hover:text-els-amber-ink" href="https://www.planalto.gov.br/ccivil_03/leis/l9610.htm" rel="noreferrer">
                   Lei de Direitos Autorais
                   <ExternalLink aria-hidden="true" className="size-4" />
                 </a>
-                <a className="inline-flex items-center gap-2 font-semibold text-amber-300 underline decoration-amber-300/30 underline-offset-4 hover:text-amber-200" href="https://www.planalto.gov.br/ccivil_03/portaria/p130-21-ccivil.htm" rel="noreferrer">
+                <a className="inline-flex items-center gap-2 font-semibold text-els-amber-ink underline decoration-els-amber-ink/30 underline-offset-4 hover:text-els-amber-ink" href="https://www.planalto.gov.br/ccivil_03/portaria/p130-21-ccivil.htm" rel="noreferrer">
                   Portaria PR nº 130/2021
                   <ExternalLink aria-hidden="true" className="size-4" />
                 </a>
@@ -363,8 +363,8 @@ export default function SourcesAndUpdatesPage() {
           </section>
 
           <section aria-labelledby="compromissos-title">
-            <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-amber-300">Padrão de transparência</p>
-            <h2 id="compromissos-title" className="mt-3 text-3xl font-semibold tracking-[-0.045em] text-white">
+            <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-els-amber-ink">Padrão de transparência</p>
+            <h2 id="compromissos-title" className="mt-3 text-3xl font-semibold tracking-[-0.045em] text-els-fg">
               O que todo item deverá permitir conferir
             </h2>
             <ul className="mt-8 grid gap-3 md:grid-cols-2">
@@ -376,15 +376,15 @@ export default function SourcesAndUpdatesPage() {
                 "Sinalização ou suspensão quando houver dúvida de vigência.",
                 "Canal para reportar inconsistência de conteúdo — ainda em configuração.",
               ].map((commitment) => (
-                <li key={commitment} className="flex gap-3 rounded-2xl border border-white/8 bg-[#0a1420] p-4 text-sm leading-6 text-slate-300">
-                  <CheckCircle2 aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-emerald-300" />
+                <li key={commitment} className="flex gap-3 rounded-2xl border border-els-line bg-els-surface p-4 text-sm leading-6 text-els-fg-2">
+                  <CheckCircle2 aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-els-green-ink" />
                   {commitment}
                 </li>
               ))}
             </ul>
           </section>
 
-          <GuideCta
+          <GuideCta tone="els"
             title="Confira a fonte dentro de uma questão real"
             description="Consulte as preparações disponíveis, o programa e as fontes indicadas. Questões, referências de provas anteriores e exemplos da demonstração têm suas próprias informações de origem e aprovação."
           />

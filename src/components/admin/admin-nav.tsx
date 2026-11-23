@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 
 import { logoutAction } from "@/app/actions/auth";
+import { ThemeToggle } from "@/components/platform/theme-toggle";
 import { LeiProvaMark } from "@/components/ui/leiprova-mark";
 import type { AuthUser } from "@/lib/auth";
 import { BRAND_NAME } from "@/lib/brand";
@@ -107,8 +108,8 @@ function NavigationLinks({
             className={cn(
               "group flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-semibold transition",
               active
-                ? "border border-amber-300/15 bg-amber-300/10 text-amber-100"
-                : "border border-transparent text-slate-400 hover:bg-white/[.055] hover:text-white",
+                ? "border border-els-amber/15 bg-els-amber/10 text-els-amber-ink"
+                : "border border-transparent text-els-fg-3 hover:bg-els-raise-hover hover:text-els-fg",
               mobile && "min-h-12",
             )}
           >
@@ -117,8 +118,8 @@ function NavigationLinks({
               className={cn(
                 "size-[18px] transition",
                 active
-                  ? "text-amber-300"
-                  : "text-slate-500 group-hover:text-amber-300",
+                  ? "text-els-amber-ink"
+                  : "text-els-fg-3 group-hover:text-els-amber-ink",
               )}
             />
             {label}
@@ -131,16 +132,16 @@ function NavigationLinks({
 
 function AdminIdentity({ user }: { user: AuthUser }) {
   return (
-    <div className="rounded-2xl border border-white/8 bg-white/[.035] p-3">
+    <div className="rounded-2xl border border-els-line bg-els-raise p-3">
       <div className="flex items-center gap-3">
-        <span className="grid size-9 shrink-0 place-items-center rounded-full bg-amber-300/12 text-sm font-bold text-amber-200">
+        <span className="grid size-9 shrink-0 place-items-center rounded-full bg-els-amber/12 text-sm font-bold text-els-amber-ink">
           {user.name.slice(0, 1).toUpperCase()}
         </span>
         <span className="min-w-0 flex-1">
-          <strong className="block truncate text-sm text-slate-100">
+          <strong className="block truncate text-sm text-els-fg">
             {user.name}
           </strong>
-          <span className="block truncate text-[11px] text-slate-500">
+          <span className="block truncate text-[11px] text-els-fg-3">
             {user.email}
           </span>
         </span>
@@ -148,7 +149,7 @@ function AdminIdentity({ user }: { user: AuthUser }) {
       <form action={logoutAction} className="mt-3">
         <button
           type="submit"
-          className="flex min-h-10 w-full items-center justify-center gap-2 rounded-lg border border-white/8 px-3 text-xs font-semibold text-slate-400 transition hover:border-white/15 hover:text-white"
+          className="flex min-h-10 w-full items-center justify-center gap-2 rounded-lg border border-els-line px-3 text-xs font-semibold text-els-fg-3 transition hover:border-els-line-strong hover:text-els-fg"
         >
           <LogOut aria-hidden="true" className="size-3.5" />
           Sair da conta
@@ -163,10 +164,13 @@ export function AdminSidebar({ user }: { user: AuthUser }) {
   const roleLabel = user.role === "admin" ? "Super admin" : "Editor";
 
   return (
-    <aside className="sticky top-0 hidden h-screen w-[276px] shrink-0 border-r border-white/8 bg-[#07101b] px-4 py-5 lg:flex lg:flex-col">
+    <aside className="sticky top-0 hidden h-screen w-[276px] shrink-0 border-r border-els-line bg-els-bg px-4 py-5 lg:flex lg:flex-col">
       <div className="px-2">
-        <LeiProvaMark href={homeHref} />
-        <span className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-emerald-300/15 bg-emerald-300/8 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[.14em] text-emerald-200">
+        <div className="flex items-center justify-between gap-2">
+          <LeiProvaMark href={homeHref} />
+          <ThemeToggle />
+        </div>
+        <span className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-els-green/15 bg-els-green/8 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[.14em] text-els-green-ink">
           <ShieldCheck aria-hidden="true" className="size-3" />
           {roleLabel}
         </span>
@@ -176,10 +180,10 @@ export function AdminSidebar({ user }: { user: AuthUser }) {
         <NavigationLinks user={user} />
       </div>
 
-      <div className="mt-auto space-y-3 border-t border-white/8 pt-4">
+      <div className="mt-auto space-y-3 border-t border-els-line pt-4">
         <Link
           href="/app"
-          className="flex min-h-10 items-center justify-between rounded-xl px-3 text-xs font-semibold text-slate-500 transition hover:bg-white/[.045] hover:text-slate-200"
+          className="flex min-h-10 items-center justify-between rounded-xl px-3 text-xs font-semibold text-els-fg-3 transition hover:bg-els-raise-hover hover:text-els-fg-2"
         >
           Ver plataforma
           <ArrowUpRight aria-hidden="true" className="size-3.5" />
@@ -195,33 +199,35 @@ export function MobileAdminHeader({ user }: { user: AuthUser }) {
   const roleLabel = user.role === "admin" ? "Super admin" : "Editor";
 
   return (
-    <header className="sticky top-0 z-40 border-b border-white/8 bg-[#07101b]/95 px-4 py-3 backdrop-blur lg:hidden">
+    <header className="sticky top-0 z-40 border-b border-els-line bg-els-bg/95 px-4 py-3 backdrop-blur lg:hidden">
       <div className="flex items-center justify-between gap-4">
         <div className="flex min-w-0 items-center gap-3">
           <LeiProvaMark href={homeHref} compact />
           <div className="min-w-0">
-            <p className="truncate text-sm font-semibold text-white">
+            <p className="truncate text-sm font-semibold text-els-fg">
               {BRAND_NAME}
             </p>
-            <p className="text-[10px] font-bold uppercase tracking-[.13em] text-emerald-300">
+            <p className="text-[10px] font-bold uppercase tracking-[.13em] text-els-green-ink">
               {roleLabel}
             </p>
           </div>
         </div>
 
+        <div className="flex items-center gap-2">
+        <ThemeToggle />
         <details className="relative">
           <summary
             aria-label="Abrir menu da operação"
-            className="grid size-10 cursor-pointer list-none place-items-center rounded-xl border border-white/10 bg-white/5 font-bold text-amber-200"
+            className="grid size-11 cursor-pointer list-none place-items-center rounded-xl border border-els-line bg-els-raise font-bold text-els-amber-ink"
           >
             {user.name.slice(0, 1).toUpperCase()}
           </summary>
-          <div className="absolute right-0 top-12 w-[min(19rem,calc(100vw-2rem))] rounded-2xl border border-white/10 bg-[#0a1522] p-2 shadow-2xl">
+          <div className="absolute right-0 top-12 w-[min(19rem,calc(100vw-2rem))] rounded-2xl border border-els-line bg-els-surface p-2 shadow-2xl">
             <NavigationLinks user={user} mobile />
-            <div className="mt-2 border-t border-white/8 pt-2">
+            <div className="mt-2 border-t border-els-line pt-2">
               <Link
                 href="/app"
-                className="flex min-h-11 items-center justify-between rounded-xl px-3 text-sm font-semibold text-slate-400 hover:bg-white/5 hover:text-white"
+                className="flex min-h-11 items-center justify-between rounded-xl px-3 text-sm font-semibold text-els-fg-3 hover:bg-els-raise-hover hover:text-els-fg"
               >
                 Ver plataforma
                 <ArrowUpRight aria-hidden="true" className="size-4" />
@@ -229,7 +235,7 @@ export function MobileAdminHeader({ user }: { user: AuthUser }) {
               <form action={logoutAction}>
                 <button
                   type="submit"
-                  className="flex min-h-11 w-full items-center gap-3 rounded-xl px-3 text-left text-sm font-semibold text-rose-200 hover:bg-white/5"
+                  className="flex min-h-11 w-full items-center gap-3 rounded-xl px-3 text-left text-sm font-semibold text-els-danger-ink hover:bg-els-raise-hover"
                 >
                   <LogOut aria-hidden="true" className="size-4" />
                   Sair
@@ -238,6 +244,7 @@ export function MobileAdminHeader({ user }: { user: AuthUser }) {
             </div>
           </div>
         </details>
+        </div>
       </div>
     </header>
   );
