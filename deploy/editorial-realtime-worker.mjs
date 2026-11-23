@@ -18,8 +18,9 @@ export { budgetAllows, budgetMonth, chargeBudget, codexShouldRun, loadBudget, ro
 export const ROLES = { "Guardião": "guardiao", Autor: "autor", Radar: "radar" };
 // Sem rede, o motor só reserva o que se resolve com o pacote. Desde 23/11/2026 o Radar
 // (discovery) entra: o servidor captura o índice público do portal (robots respeitado) e
-// põe texto/links em context.pages. legal_change ainda exige consultar a fonte oficial.
-export const ROLE_KINDS = { "Guardião": "legal_mapping", Autor: "authoring", Radar: "discovery" };
+// põe texto/links em context.pages. legal_change (desde 23/11/2026) vem com o diff
+// entre a fotografia aprovada e a pendente calculado no servidor; a reserva só aceita pacote com diff.
+export const ROLE_KINDS = { "Guardião": "legal_mapping,legal_change", Autor: "authoring", Radar: "discovery" };
 const JOB_KEY = /^[a-z0-9:._-]{1,220}$/;
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 const HASH = /^[a-f0-9]{64}$/;
