@@ -104,7 +104,7 @@
 .breadcrumb a {
   display: inline-flex;
   align-items: center;
-  min-height: 32px;
+  min-height: 44px;
 }
 .breadcrumb a:hover {
   color: var(--accent);
