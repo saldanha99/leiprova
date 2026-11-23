@@ -766,6 +766,38 @@
       "publicationAllowed": false
     },
     {
+      "productSlug": "pc-pr-papiloscopista-2026",
+      "status": "official_edition_found",
+      "editionDescription": "PCPR 2026 — Papiloscopista Policial; Edital nº 01/2026 retificado em 31/7/2026 (separado do Agente por decisão do proprietário em 23/11/2026).",
+      "examStage": "Concurso em andamento; fase de homologação das inscrições observada no fim de agosto.",
+      "bankNames": [
+        "FGV"
+      ],
+      "officialUrls": [
+        "https://conhecimento.fgv.br/concursos/pcpr26",
+        "https://conhecimento.fgv.br/sites/default/files/concursos/copia-1-de-edital-01-2026-pcpr-publicacao.docx.pdf",
+        "https://conhecimento.fgv.br/sites/default/files/concursos/edital-02-2026-pcpr-retificacao.docx-1.pdf"
+      ],
+      "syllabusNotes": "Papiloscopista Policial tem bloco próprio no Anexo I (p. 73–76). Não herdar automaticamente o programa de Delegado ou Agente. PDF consolidado localizado, programa integral pendente.",
+      "requirementLocator": null,
+      "constraints": [
+        "Ajuste editorial de nomenclatura deve ser validado antes de publicar.",
+        "Validar programa, pesos e retificação de 31/7; nenhuma equivalência entre cargos presumida.",
+        "Dossiê de pesquisa: não equivale a curadoria de questões nem autoriza publicação. A meta de 68 exige questões distintas, pertinentes ao cargo/edição/programa e revisão humana."
+      ],
+      "evidence": [
+        {
+          "url": "https://conhecimento.fgv.br/concursos/pcpr26",
+          "title": "Concurso Público para a Polícia Civil do Estado do Paraná",
+          "kind": "organizer",
+          "observedFacts": "Conferido em agent-browser: página FGV iniciada em 6/7/2026, concurso em andamento para cadastro de reserva de Delegado, Agente de Polícia Judiciária e Papiloscopista; edital consolidado marcado retificado em 31/7/2026; homologação preliminar em 27/8 e recurso em 28/8. Links de edital e primeira retificação foram identificados, mas o PDF não foi lido integralmente nesta rodada.",
+          "checkedAt": "2026-09-06T15:39:53Z"
+        }
+      ],
+      "humanReview": "pending",
+      "publicationAllowed": false
+    },
+    {
       "productSlug": "pp-rn-policia-penal-2026",
       "status": "not_confirmed",
       "editionDescription": "Pista oficial de seleção SEAD/SEAPP-RN 2026 para Polícia Penal; edição integral ainda não conferida pelo navegador.",

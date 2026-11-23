@@ -17,7 +17,7 @@ const card = (item = edition, released = [product.slug]) => buildContestShowcase
 describe("vitrine: fatos do edital separados da disponibilidade", () => {
   it("não atribui banca, novidade ou pré-edital a pesquisa de mercado", () => {
     const rows = buildContestShowcase([], [], "2026-10-11");
-    expect(rows).toHaveLength(84);
+    expect(rows).toHaveLength(85);
     expect(rows.every((row) => row.phase === "planning" && !row.isNew && !row.available && row.bankSlug === null)).toBe(true);
   });
   it("inscrições abertas e novidade não implicam material pronto", () => {

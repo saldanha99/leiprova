@@ -64,6 +64,14 @@ export const COMPOSITE_ADMISSION_TARGETS = [
   { productSlug: "pc-pr-delegado-2026", slug: "pcpr-delegado-01-2026-historico-objetiva", acronym: "PCPR", notice: "01/2026-Delegado", category: "carreiras-policiais", career: "delegado", noticeDate: "2026-07-06", statusDate: "2026-11-13", cycleYear: 2026, lifecycleStatus: "result_published", commission: "Comissão de Concurso da PCPR", replacesEmptyOpportunitySlug: "pc-pr-2026", stages: [
     { title: "Resultado preliminar da prova objetiva (reprocessamento)", url: `${FGV}pcpr2026-resultado-prova-objetiva_reprocessamento-v2.pdf`, publishedOn: "2026-11-13" },
   ] },
+  // PCPR 01/2026, cargos de agente separados (decisão do proprietário, 23/11/2026). O produto do Agente estava na
+  // oportunidade de catálogo "pc-pr-2026" (só rascunhos); o do Papiloscopista é novo.
+  { productSlug: "pc-pr-agente-2026", slug: "pcpr-agente-policia-judiciaria-01-2026-historico-objetiva", acronym: "PCPR", notice: "01/2026-Agente", category: "carreiras-policiais", career: "policia-civil", noticeDate: "2026-07-06", statusDate: "2026-11-13", cycleYear: 2026, lifecycleStatus: "result_published", commission: "Comissão de Concurso da PCPR", replacesEmptyOpportunitySlug: "pc-pr-2026", stages: [
+    { title: "Resultado preliminar da prova objetiva (reprocessamento)", url: `${FGV}pcpr2026-resultado-prova-objetiva_reprocessamento-v2.pdf`, publishedOn: "2026-11-13" },
+  ] },
+  { productSlug: "pc-pr-papiloscopista-2026", slug: "pcpr-papiloscopista-policial-01-2026-historico-objetiva", acronym: "PCPR", notice: "01/2026-Papiloscopista", category: "carreiras-policiais", career: "policia-civil", noticeDate: "2026-07-06", statusDate: "2026-11-13", cycleYear: 2026, lifecycleStatus: "result_published", commission: "Comissão de Concurso da PCPR", stages: [
+    { title: "Resultado preliminar da prova objetiva (reprocessamento)", url: `${FGV}pcpr2026-resultado-prova-objetiva_reprocessamento-v2.pdf`, publishedOn: "2026-11-13" },
+  ] },
   // Lote Cebraspe histórico.
   { productSlug: "sefaz-rn-auditor-fiscal-reta-final", slug: "sefazrn-auditor-fiscal-5-2025-historico-objetiva", acronym: "SEFAZ-RN", notice: "5/2025-SEAD/SEFAZ/RN", category: "fiscal-e-controle", career: "auditor-fiscal", noticeDate: "2025-12-19", statusDate: "2026-06-03", cycleYear: 2025, lifecycleStatus: "homologated", commission: "Secretaria de Estado da Administração do RN (SEAD/RN)", bank: "cebraspe", stages: [
     { title: "Homologação do concurso público", url: `${CEBRASPE}sefaz_rn_25_auditor/arquivos/7FCCAEB394A2FAE0DDB458D4BF39B41FD0ADBD3D0777F36C455FAF45C5D9D60F.pdf`, publishedOn: "2026-06-03" },
