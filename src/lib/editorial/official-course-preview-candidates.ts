@@ -505,6 +505,87 @@ export const NEXT_OFFICIAL_COURSE_RECIPES: readonly NextOfficialCourseRecipe[] =
     ] },
     limitations: ["Só Delegado de Polícia; Agente de Polícia Judiciária e Papiloscopista têm programa próprio no mesmo anexo.", "Itens agrupados pelo número de segundo nível; subitens (1.1.1…) ficam no item.", "A 1ª retificação (Edital 02/2026) altera exame médico e títulos, sem mudar o Anexo I.", "Treino histórico da objetiva com legislação atual; legislação estadual do Paraná exige fonte oficial própria antes de vínculos."],
   },
+  // PCPR 01/2026 — Agente de Polícia Judiciária: decisão do proprietário (23/11/2026) de separar os cargos de agente em concursos próprios.
+  {
+    productSlug: "pc-pr-agente-2026", institution: "Polícia Civil do Estado do Paraná", role: "Agente de Polícia Judiciária",
+    jurisdiction: "PR", cycle: "Edital 01/2026", bankScope: "Fundação Getulio Vargas, executora do concurso, com a FUNDASEG e a Comissão de Concurso da PCPR",
+    portalUrl: "https://conhecimento.fgv.br/concursos/pcpr26", examDate: "2026-10-11", examDateEvidence: { documentKey: "pcpr-notice", page: 25, item: "9.1", quote: "Curitiba/PR, Londrina/PR e Cascavel/PR, no dia 11 de outubro de 2026 (domingo), no turno da", actualDayIndependentlyVerified: false, corroboratingUrl: `${FGV_FILES}cns201-agente-de-policia-judiciaria-cns201-tipo-1.pdf`, limitation: "O texto do gabarito não é extraído (política de material de prova); o portal publicou os cadernos em 13/10/2026 e o gabarito definitivo em 13/11/2026, compatíveis com a data do edital." },
+    stage: "Objetiva com gabarito definitivo (13/11/2026) e resultado preliminar publicado em 13/11/2026",
+    stageObservedOn: "2026-11-23", proposedMode: "historical_training", expectedSubjects: 9,
+    documents: [
+      { key: "pcpr-notice", url: `${FGV_FILES}copia-1-de-edital-01-2026-pcpr-publicacao.docx.pdf`, title: "Edital 01/2026 PCPR — Delegado, Agente de Polícia Judiciária e Papiloscopista, retificado em 31/07/2026", pages: 107, programmePages: [70, 73], layout: {
+        headings: [
+          { line: "2. CIÊNCIAS FORENSES", subject: "Ciências Forenses", inline: true, inlineSeparator: ":" },
+          { line: "3. CONTABILIDADE GERAL", subject: "Contabilidade Geral", inline: true, inlineSeparator: ":" },
+          { line: "4. ESTATÍSTICA", subject: "Estatística", inline: true, inlineSeparator: ":" },
+          { line: "5. LEGISLAÇÃO ESTADUAL E INSTITUCIONAL", subject: "Legislação Estadual e Institucional", inline: true, inlineSeparator: ":" },
+          { line: "6. DIREITO PENAL E LEGISLAÇÃO PENAL EXTRAVAGANTE", subject: "Direito Penal e Legislação Penal Extravagante", inline: true, inlineSeparator: ":" },
+          { line: "7. DIREITO PROCESSUAL PENAL E LEGISLAÇÃO PROCESSUAL PENAL EXTRAVAGANTE", subject: "Direito Processual Penal e Legislação Processual Penal Extravagante", inline: true, inlineSeparator: ":" },
+          { line: "8. DIREITO CONSTITUCIONAL", subject: "Direito Constitucional", inline: true, inlineSeparator: ":" },
+          { line: "9. DIREITO ADMINISTRATIVO", subject: "Direito Administrativo", inline: true, inlineSeparator: ":" },
+          { line: "10. DIREITOS HUMANOS", subject: "Direitos Humanos", inline: true, inlineSeparator: ":" },
+        ],
+        ignoreLines: ["CONHECIMENTOS ESPECÍFICOS"],
+        stopLine: "PAPILOSCOPISTA POLICIAL",
+        itemMode: "second-level-numbers",
+      } },
+    ],
+    overlays: [],
+    identityClaims: [
+      { document: "pcpr-notice", page: 1, contains: ["CONCURSO PÚBLICO DA POLÍCIA CIVIL DO PARANÁ", "EDITAL N.º 01/2026"] },
+      { document: "pcpr-notice", page: 2, contains: ["1.5 O concurso será executado sob a responsabilidade da Fundação Getulio Vargas, doravante"] },
+      { document: "pcpr-notice", page: 25, contains: ["no dia 11 de outubro de 2026 (domingo)"] },
+      { document: "pcpr-notice", page: 26, contains: ["9.6 A Prova Objetiva para o cargo de Agente de Polícia Judiciária totalizará 100"] },
+      { document: "pcpr-notice", page: 28, contains: ["contendo 5 (cinco) alternativas cada, e apenas"] },
+      { document: "pcpr-notice", page: 70, contains: ["AGENTE DE POLÍCIA JUDICIÁRIA", "CONHECIMENTOS ESPECÍFICOS"] },
+    ],
+    previousExam: { cycle: "Edital 01/2026 — objetiva aplicada em 11/10/2026", role: "Agente de Polícia Judiciária — prova objetiva", portalUrl: "https://conhecimento.fgv.br/concursos/pcpr26", examDate: "2026-10-11", answerKeyFinality: "definitive_document", documents: [
+      { type: "question_booklet", title: "PCPR 01/2026 — caderno Tipo 1 da prova objetiva de Agente de Polícia Judiciária", url: `${FGV_FILES}cns201-agente-de-policia-judiciaria-cns201-tipo-1.pdf` },
+      { type: "answer_key", title: "PCPR 01/2026 — gabarito oficial definitivo da prova objetiva", url: `${FGV_FILES}gabaritos-definitivos-v3.pdf` },
+    ] },
+    limitations: ["Só os conhecimentos específicos de Agente de Polícia Judiciária (Anexo I); os conhecimentos gerais (Língua Portuguesa, Raciocínio Lógico-Matemático e Realidade do Paraná) não são lei seca e ficam fora.", "O item 1 (Tecnologia e Sistemas de Informação…, título quebrado em duas linhas) não é lei seca e fica fora do programa admitido.", "Itens agrupados pelo número de segundo nível; subitens ficam no item.", "Treino histórico da objetiva com legislação atual; não reproduz o caderno aplicado."],
+  },
+  // PCPR 01/2026 — Papiloscopista Policial: decisão do proprietário (23/11/2026) de separar os cargos de agente em concursos próprios.
+  {
+    productSlug: "pc-pr-papiloscopista-2026", institution: "Polícia Civil do Estado do Paraná", role: "Papiloscopista Policial",
+    jurisdiction: "PR", cycle: "Edital 01/2026", bankScope: "Fundação Getulio Vargas, executora do concurso, com a FUNDASEG e a Comissão de Concurso da PCPR",
+    portalUrl: "https://conhecimento.fgv.br/concursos/pcpr26", examDate: "2026-10-11", examDateEvidence: { documentKey: "pcpr-notice", page: 25, item: "9.1", quote: "Curitiba/PR, Londrina/PR e Cascavel/PR, no dia 11 de outubro de 2026 (domingo), no turno da", actualDayIndependentlyVerified: false, corroboratingUrl: `${FGV_FILES}cns301-papiloscopista-policial-cns301-tipo-1.pdf`, limitation: "O texto do gabarito não é extraído (política de material de prova); o portal publicou os cadernos em 13/10/2026 e o gabarito definitivo em 13/11/2026, compatíveis com a data do edital." },
+    stage: "Objetiva com gabarito definitivo (13/11/2026) e resultado preliminar publicado em 13/11/2026",
+    stageObservedOn: "2026-11-23", proposedMode: "historical_training", expectedSubjects: 10,
+    documents: [
+      { key: "pcpr-notice", url: `${FGV_FILES}copia-1-de-edital-01-2026-pcpr-publicacao.docx.pdf`, title: "Edital 01/2026 PCPR — Delegado, Agente de Polícia Judiciária e Papiloscopista, retificado em 31/07/2026", pages: 107, programmePages: [73, 76], layout: {
+        headings: [
+          { line: "2. CIÊNCIAS FORENSES", subject: "Ciências Forenses", inline: true, inlineSeparator: ":" },
+          { line: "3. BIOLOGIA", subject: "Biologia", inline: true, inlineSeparator: ":" },
+          { line: "4. FÍSICA", subject: "Física", inline: true, inlineSeparator: ":" },
+          { line: "5. QUÍMICA", subject: "Química", inline: true, inlineSeparator: ":" },
+          { line: "6. LEGISLAÇÃO ESTADUAL E INSTITUCIONAL", subject: "Legislação Estadual e Institucional", inline: true, inlineSeparator: ":" },
+          { line: "7. DIREITO PENAL APLICADO", subject: "Direito Penal Aplicado", inline: true, inlineSeparator: ":" },
+          { line: "8. DIREITO PROCESSUAL PENAL APLICADO", subject: "Direito Processual Penal Aplicado", inline: true, inlineSeparator: ":" },
+          { line: "9. DIREITO CONSTITUCIONAL", subject: "Direito Constitucional", inline: true, inlineSeparator: ":" },
+          { line: "10. DIREITO ADMINISTRATIVO", subject: "Direito Administrativo", inline: true, inlineSeparator: ":" },
+          { line: "11. DIREITOS HUMANOS", subject: "Direitos Humanos", inline: true, inlineSeparator: ":" },
+        ],
+        ignoreLines: ["CONHECIMENTOS ESPECÍFICOS"],
+        startLine: "PAPILOSCOPISTA POLICIAL",
+        itemMode: "second-level-numbers",
+      } },
+    ],
+    overlays: [],
+    identityClaims: [
+      { document: "pcpr-notice", page: 1, contains: ["CONCURSO PÚBLICO DA POLÍCIA CIVIL DO PARANÁ", "EDITAL N.º 01/2026"] },
+      { document: "pcpr-notice", page: 2, contains: ["1.5 O concurso será executado sob a responsabilidade da Fundação Getulio Vargas, doravante"] },
+      { document: "pcpr-notice", page: 25, contains: ["no dia 11 de outubro de 2026 (domingo)"] },
+      { document: "pcpr-notice", page: 27, contains: ["9.7 A Prova Objetiva para o cargo de Papiloscopista Policial totalizará 100"] },
+      { document: "pcpr-notice", page: 28, contains: ["contendo 5 (cinco) alternativas cada, e apenas"] },
+      { document: "pcpr-notice", page: 73, contains: ["PAPILOSCOPISTA POLICIAL", "CONHECIMENTOS ESPECÍFICOS"] },
+    ],
+    previousExam: { cycle: "Edital 01/2026 — objetiva aplicada em 11/10/2026", role: "Papiloscopista Policial — prova objetiva", portalUrl: "https://conhecimento.fgv.br/concursos/pcpr26", examDate: "2026-10-11", answerKeyFinality: "definitive_document", documents: [
+      { type: "question_booklet", title: "PCPR 01/2026 — caderno Tipo 1 da prova objetiva de Papiloscopista Policial", url: `${FGV_FILES}cns301-papiloscopista-policial-cns301-tipo-1.pdf` },
+      { type: "answer_key", title: "PCPR 01/2026 — gabarito oficial definitivo da prova objetiva", url: `${FGV_FILES}gabaritos-definitivos-v3.pdf` },
+    ] },
+    limitations: ["Só os conhecimentos específicos de Papiloscopista Policial (Anexo I); os conhecimentos gerais (Língua Portuguesa, Raciocínio Lógico-Matemático e Realidade do Paraná) não são lei seca e ficam fora.", "O item 1 (Tecnologia e Sistemas de Informação…, título quebrado em duas linhas) não é lei seca e fica fora do programa admitido.", "No edital, os itens de Direito Constitucional e Administrativo do Papiloscopista mantêm a numeração 8.x e 9.x do bloco do Agente; o texto é o literal da página.", "Itens agrupados pelo número de segundo nível; subitens ficam no item.", "Treino histórico da objetiva com legislação atual; não reproduz o caderno aplicado."],
+  },
   // Lote Cebraspe histórico (18/11/2026): títulos inline com dois-pontos ("DIREITO CIVIL: 1 …"), itens numerados corridos.
   {
     productSlug: "sefaz-rn-auditor-fiscal-reta-final", institution: "Secretaria de Estado da Fazenda do Rio Grande do Norte", role: "Auditor Fiscal de Receitas Estaduais",

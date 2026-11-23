@@ -11,8 +11,8 @@ import {
   parseConsolidatedLegalArticles,
 } from "./legal-text";
 import { normalizeOfficialText } from "./text-normalization";
-import { assertPlanaltoRobotsAllowed, decodePlanaltoHtml, getPlanaltoConsolidatedSource, parsePlanaltoConsolidatedHtml, PLANALTO_TEXT_PARSER_VERSION } from "./planalto-text";
-import { assertCamaraRobotsAllowed, CAMARA_LGPD_SOURCE, parseCamaraLgpdConsolidatedHtml } from "./camara-text";
+import { assertOfficialRobotsPathAllowed, assertPlanaltoRobotsAllowed, decodePlanaltoHtml, getPlanaltoConsolidatedSource, parsePlanaltoConsolidatedHtml, PLANALTO_TEXT_PARSER_VERSION } from "./planalto-text";
+import { assertCamaraRobotsAllowed, CAMARA_LGPD_SOURCE, CAMARA_UPDATED_TEXT_PARSER_VERSION, getCamaraUpdatedTextSource, parseCamaraLgpdConsolidatedHtml, parseCamaraUpdatedLawHtml } from "./camara-text";
 import { assertCamaraProcurementRobotsAllowed, CAMARA_PROCUREMENT_SOURCE, extractCamaraProcurementPdf } from "./camara-procurement-text";
 
 const USER_AGENT = "LeiProva-OfficialSourceMonitor/1.0 (+https://leiprova.2b.app.br/fontes-e-atualizacao)";
@@ -168,7 +168,9 @@ async function readStrictLimitedBody(response: Response, limit: number) {
 export type LegalTextProvider = "senado" | "planalto" | "camara";
 
 export async function fetchOfficialConsolidatedLegalText(monitorUrl: string, options: { provider?: LegalTextProvider } = {}) {
-  if (options.provider === "camara" && monitorUrl !== CAMARA_LGPD_SOURCE.monitorUrl && monitorUrl !== CAMARA_PROCUREMENT_SOURCE.monitorUrl) throw new Error("A Câmara só foi configurada para identidades exatas da LGPD e Lei 14.133.");
+  const camaraUpdated = getCamaraUpdatedTextSource(monitorUrl);
+  if (options.provider === "camara" && camaraUpdated) return fetchCamaraUpdatedLegalText(monitorUrl, camaraUpdated.url);
+  if (options.provider === "camara" && monitorUrl !== CAMARA_LGPD_SOURCE.monitorUrl && monitorUrl !== CAMARA_PROCUREMENT_SOURCE.monitorUrl) throw new Error("A Câmara só foi configurada para identidades exatas da LGPD, Lei 14.133 e as leis de texto atualizado registradas.");
   if ((options.provider === "camara" || !options.provider) && monitorUrl === CAMARA_LGPD_SOURCE.monitorUrl) return fetchCamaraLgpdConsolidatedLegalText();
   if ((options.provider === "camara" || !options.provider) && monitorUrl === CAMARA_PROCUREMENT_SOURCE.monitorUrl) return fetchCamaraProcurementConsolidatedLegalText();
   const planalto = getPlanaltoConsolidatedSource(monitorUrl);
@@ -228,6 +230,24 @@ async function fetchCamaraProcurementConsolidatedLegalText() {
   return { sourceUrl: CAMARA_PROCUREMENT_SOURCE.url, checksumSha256: parsed.checksumSha256, normalizedContent: parsed.normalizedContent, contentLength: parsed.normalizedContent.length, articleCount: parsed.articles.length, parserVersion: CAMARA_PROCUREMENT_SOURCE.parserVersion, fetchedAt: new Date() };
 }
 
+async function fetchCamaraUpdatedLegalText(monitorUrl: string, url: string) {
+  const headers = { "User-Agent": "EditalLeiSeca-OfficialSourceMonitor/1.0 (+https://editaleiseca.com.br/fontes-e-atualizacao)", Accept: "text/html,text/plain;q=0.9" };
+  const robotsResponse = await fetch("https://www2.camara.leg.br/robots.txt", { redirect: "manual", headers, signal: AbortSignal.timeout(20_000), cache: "no-store" });
+  if (robotsResponse.status !== 404 && !robotsResponse.ok) throw new Error("Não foi possível conferir o robots.txt da Câmara; captura bloqueada.");
+  const robotsBytes = await readStrictLimitedBody(robotsResponse, 64 * 1024);
+  if (robotsResponse.status !== 404) assertCamaraRobotsAllowed(new TextDecoder("utf-8", { fatal: true }).decode(robotsBytes), url);
+  const response = await fetch(url, { redirect: "manual", headers, signal: AbortSignal.timeout(20_000), cache: "no-store" });
+  if (!response.ok) throw new Error(`O texto atualizado da Câmara respondeu com HTTP ${response.status}; não há contorno de bloqueio.`);
+  const contentType = response.headers.get("content-type");
+  if (!contentType?.toLowerCase().includes("html")) throw new Error("O texto atualizado da Câmara não respondeu como HTML.");
+  const charset = /charset\s*=\s*["']?([^;\s"']+)/iu.exec(contentType)?.[1];
+  if (charset && !/^utf-?8$/iu.test(charset)) throw new Error("O texto atualizado da Câmara não declarou UTF-8.");
+  const bytes = await readStrictLimitedBody(response, MAX_LEGAL_TEXT_BYTES);
+  const parsed = parseCamaraUpdatedLawHtml(new TextDecoder("utf-8", { fatal: true }).decode(bytes), monitorUrl);
+  if (parsed.normalizedContent.length < 1_000) throw new Error("O texto atualizado da Câmara não contém texto suficiente.");
+  return { sourceUrl: url, checksumSha256: parsed.checksumSha256, normalizedContent: parsed.normalizedContent, contentLength: parsed.normalizedContent.length, articleCount: parsed.articles.length, parserVersion: CAMARA_UPDATED_TEXT_PARSER_VERSION, fetchedAt: new Date() };
+}
+
 async function fetchCamaraLgpdConsolidatedLegalText() {
   const headers = { "User-Agent": "EditalLeiSeca-OfficialSourceMonitor/1.0 (+https://editaleiseca.com.br/fontes-e-atualizacao)", Accept: "text/html,text/plain;q=0.9" };
   const robotsResponse = await fetch("https://www2.camara.leg.br/robots.txt", { redirect: "manual", headers, signal: AbortSignal.timeout(20_000), cache: "no-store" });
@@ -283,5 +303,116 @@ export async function verifyOfficialExamUrl(bankSlug: string, input: string) {
     isPdf: looksLikePdf(bytes, contentType),
     finalUrl,
     checkedAt: new Date(),
+  };
+}
+
+const MAX_DISCOVERY_PAGE_BYTES = 2 * 1024 * 1024;
+const MAX_DISCOVERY_TEXT_CHARS = 60_000;
+const MAX_DISCOVERY_LINKS = 300;
+
+export type DiscoveryPageCapture = {
+  url: string;
+  finalUrl: string;
+  httpStatus: number;
+  fetchedAt: string;
+  sha256: string;
+  text: string;
+  links: { text: string; href: string }[];
+};
+
+/**
+ * Server-side capture of one public exam-portal index for the offline Radar: robots.txt
+ * of the host is honoured (404 = no restriction; any other failure blocks), every redirect
+ * hop and every returned link pass `validate`, and only bounded visible text + links leave.
+ * The AI that reads the packet never gets network access.
+ */
+export async function captureOfficialDiscoveryPage(url: string, validate: (url: string) => string): Promise<DiscoveryPageCapture> {
+  const target = new URL(validate(url));
+  const robotsUrl = `${target.origin}/robots.txt`;
+  const robots = await fetchWithTrustedRedirects(robotsUrl, candidate => {
+    if (new URL(candidate).origin !== target.origin) throw new Error("robots.txt redirecionou para outra origem.");
+  });
+  if (robots.status !== 404) {
+    if (!robots.ok) throw new Error(`robots.txt respondeu HTTP ${robots.status}; captura bloqueada.`);
+    const policy = decodeBody(await readLimitedBody(robots), robots.headers.get("content-type"));
+    assertOfficialRobotsPathAllowed(policy, target.pathname);
+  }
+  const response = await fetchWithTrustedRedirects(target.toString(), candidate => void validate(candidate));
+  const finalUrl = response.url || target.toString();
+  if (!response.ok) throw new Error(`Portal respondeu HTTP ${response.status}.`);
+  if (!(response.headers.get("content-type") ?? "").toLowerCase().includes("html")) throw new Error("Portal não respondeu HTML.");
+  const bytes = await readLimitedBody(response, MAX_DISCOVERY_PAGE_BYTES);
+  const html = decodeBody(bytes, response.headers.get("content-type"));
+  const $ = cheerio.load(html);
+  const links: { text: string; href: string }[] = [];
+  // Links the policy forbids following (e.g. FCC /concursos/, robots) are kept only as text:
+  // never fetched and never citable as discovery.url, but their label/code is evidence.
+  const listedOnly: string[] = [];
+  const seen = new Set<string>();
+  $("a[href]").each((_, element) => {
+    if (links.length + listedOnly.length >= MAX_DISCOVERY_LINKS) return;
+    const label = normalizeOfficialText($(element).text() || $(element).find("img[alt]").attr("alt") || $(element).attr("title") || "").slice(0, 300);
+    let absolute: string;
+    try { absolute = new URL($(element).attr("href") ?? "", finalUrl).toString(); } catch { return; }
+    if (seen.has(absolute)) return;
+    seen.add(absolute);
+    try { links.push({ text: label || absolute, href: validate(absolute) }); }
+    catch { if (absolute.startsWith(target.origin)) listedOnly.push(`${label || "(sem rótulo)"} — ${absolute}`); }
+  });
+  return {
+    url: target.toString(),
+    finalUrl,
+    httpStatus: response.status,
+    fetchedAt: new Date().toISOString(),
+    sha256: createHash("sha256").update(bytes).digest("hex"),
+    text: [extractOfficialDocumentText(html),
+      ...(listedOnly.length ? ["Links listados no índice que a política proíbe seguir (não acessados; cite a página do índice):", ...listedOnly] : [])]
+      .join("\n").slice(0, MAX_DISCOVERY_TEXT_CHARS),
+    links,
+  };
+}
+
+const CEBRASPE_EVENTS_API = "https://apis.cebraspe.org.br/cebraspe/eventos/tipo/concursos/";
+const CEBRASPE_INDEX = "https://www.cebraspe.org.br/concursos/";
+
+/**
+ * Cebraspe's index is a React shell (empty HTML); the list comes from its public JSON API
+ * (no robots.txt there: 404). Converted to the same capture shape, citing the public pages.
+ */
+export async function captureCebraspeDiscoveryIndex(validate: (url: string) => string): Promise<DiscoveryPageCapture> {
+  const robots = await fetchWithTrustedRedirects("https://apis.cebraspe.org.br/robots.txt", candidate => {
+    if (new URL(candidate).origin !== "https://apis.cebraspe.org.br") throw new Error("robots.txt redirecionou para outra origem.");
+  });
+  if (robots.status !== 404) {
+    if (!robots.ok) throw new Error(`robots.txt da API Cebraspe respondeu HTTP ${robots.status}; captura bloqueada.`);
+    assertOfficialRobotsPathAllowed(decodeBody(await readLimitedBody(robots), robots.headers.get("content-type")), new URL(CEBRASPE_EVENTS_API).pathname);
+  }
+  const response = await fetchWithTrustedRedirects(CEBRASPE_EVENTS_API, candidate => {
+    if (candidate !== CEBRASPE_EVENTS_API) throw new Error("API Cebraspe redirecionou.");
+  });
+  if (!response.ok || !(response.headers.get("content-type") ?? "").includes("json")) throw new Error(`API Cebraspe respondeu HTTP ${response.status}.`);
+  const bytes = await readLimitedBody(response, MAX_DISCOVERY_PAGE_BYTES);
+  const phases: unknown = JSON.parse(new TextDecoder("utf-8").decode(bytes));
+  if (!Array.isArray(phases)) throw new Error("API Cebraspe mudou de formato.");
+  const lines: string[] = [];
+  const links: { text: string; href: string }[] = [];
+  // Open/new phases first; closed ones last, so the cap drops old events, not new ones.
+  const ordered = [...phases].sort((a, b) => Number(/encerrad/i.test(String(a?.faseEvento))) - Number(/encerrad/i.test(String(b?.faseEvento))));
+  for (const phase of ordered) {
+    const name = typeof phase?.faseEvento === "string" ? phase.faseEvento : "Fase";
+    lines.push(`## ${name}`);
+    for (const event of Array.isArray(phase?.eventos) ? phase.eventos : []) {
+      if (typeof event?.eventoURL !== "string" || !/^[A-Za-z0-9_-]{2,120}$/u.test(event.eventoURL)) continue;
+      const title = String(event.eventoNomeAbreviado ?? event.eventoURL).slice(0, 200);
+      const line = `${title} | ano ${event.eventoAno ?? "?"} | vagas ${event.eventoTotalVagas ?? "?"} | inscrição aberta: ${event.isInscricaoAberta ? "sim" : "não"} | fase: ${name}`;
+      lines.push(line);
+      if (links.length < MAX_DISCOVERY_LINKS) {
+        try { links.push({ text: line, href: validate(`${CEBRASPE_INDEX}${event.eventoURL}`) }); } catch { /* not citable */ }
+      }
+    }
+  }
+  return {
+    url: CEBRASPE_INDEX, finalUrl: CEBRASPE_INDEX, httpStatus: response.status, fetchedAt: new Date().toISOString(),
+    sha256: createHash("sha256").update(bytes).digest("hex"), text: lines.join("\n").slice(0, MAX_DISCOVERY_TEXT_CHARS), links,
   };
 }

@@ -6,6 +6,10 @@ import { CAMARA_CP_CORRECTION, fetchCamaraCpCorrectionEvidence } from "../src/li
 import { CP_CUT_REFERENCE, CP_CUT_POLICY, assertCpCutFresh, requireCpCutDatabase } from "../src/lib/official-sources/cp-coordinated-cut";
 import { parseOpportunityApprovalReviewerIdentity } from "../src/lib/opportunities/approval-command";
 
+/** 3 x (fetch + 30 s) stays well inside the wrapper's 240 s timeout. */
+export const CP_CAPTURE_ATTEMPTS=3;
+export const CP_CAPTURE_RETRY_MS=30_000;
+
 export function parseCpSourceVerificationArgs(args: readonly string[]) {
   const argv=args[0]==="--"?args.slice(1):[...args];
   const apply=argv.includes("--apply"), fingerprints=argv.filter(a=>/^fingerprint=[a-f0-9]{64}$/u.test(a));
@@ -18,9 +22,14 @@ async function main() {
   const url=requireCpCutDatabase(process.env.MIGRATION_DATABASE_URL);
   if(process.env.LEGAL_STANDING_REVIEW_REFERENCE!==CP_CUT_REFERENCE) throw new Error("Autorização permanente exata ausente.");
   const identity=parseOpportunityApprovalReviewerIdentity({ADMIN_EMAILS:process.env.ADMIN_EMAILS,OPPORTUNITY_APPROVAL_REFERENCE:CP_CUT_REFERENCE});
-  // Failure is recorded and can only suspend. No retries, fallback or bypass.
+  // Failure is recorded and can only suspend; no fallback or bypass. A single network blip
+  // (12/10, rawSha null) closed the CP for six weeks, so the same official capture is tried
+  // up to CP_CAPTURE_ATTEMPTS times before the run counts as unavailable. Still fail closed.
   let fresh:Awaited<ReturnType<typeof fetchCamaraCpCorrectionEvidence>>|null=null;
-  try { fresh=await fetchCamaraCpCorrectionEvidence(); assertCpCutFresh(fresh.body.fetchedAt);assertCpCutFresh(fresh.amendment.fetchedAt); } catch { fresh=null; }
+  for(let attempt=1;attempt<=CP_CAPTURE_ATTEMPTS && !fresh;attempt++) {
+    if(attempt>1) await new Promise(r=>setTimeout(r,CP_CAPTURE_RETRY_MS));
+    try { const candidate=await fetchCamaraCpCorrectionEvidence(); assertCpCutFresh(candidate.body.fetchedAt);assertCpCutFresh(candidate.amendment.fetchedAt); fresh=candidate; } catch { fresh=null; }
+  }
   const client=postgres(url,{max:1,prepare:false,connect_timeout:5,idle_timeout:10});
   const db=drizzle(client,{schema});
   try {

@@ -70,7 +70,9 @@ export const PROGRAMME_SECTION_HEADINGS = [...PROGRAMME_CANONICAL_SUBJECTS, "Dir
   "Atos Normativos do Conselho Superior da Magistratura e da Presidência do TJMS", "Atos Normativos da Corregedoria-Geral de Justiça do Estado de Mato Grosso do Sul",
   "Atos Normativos do Conselho Nacional de Justiça – CNJ", "Conhecimentos Gerais", "Legislação Especial do Estado de Mato Grosso do Sul", "Legislação Especial Federal",
   // PCPR Delegado: títulos numerados inline com dois-pontos.
-  "Legislação Penal e Legislação Processual Penal Extravagante", "Direito Administrativo e Gestão Pública", "Legislação Estadual e Institucional", "Ciências Forenses"] as const;
+  "Legislação Penal e Legislação Processual Penal Extravagante", "Direito Administrativo e Gestão Pública", "Legislação Estadual e Institucional", "Ciências Forenses",
+  // PCDF Delegado (títulos inline com dois-pontos) e TJPE Juiz Substituto.
+  "Direito Administrativo e Legislação Complementar", "Direito Constitucional e Legislação Complementar", "Direito Civil e Legislação Complementar", "Direito Empresarial e Legislação Complementar", "Direito Penal e Legislação Complementar", "Direito Tributário e Legislação Complementar", "Direito Processual Penal e Legislação Complementar", "Direito Ambiental e Legislação Complementar", "Medicina Legal", "Direito do Consumidor", "Direito da Criança e do Adolescente", "Noções Gerais de Direito e Formação Humanística"] as const;
 export function programmeCanonicalSubject(heading: string) {
   const base = PROGRAMME_CANONICAL_SUBJECTS.find(subject => headingKey(subject) === headingKey(heading));
   if (base) return base;

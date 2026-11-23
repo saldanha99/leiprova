@@ -31,10 +31,10 @@ const cart = () => ({
   items: [{ productSlug: police[0].slug, accessKey: "monthly" }],
 });
 describe("catálogo comercial por edição", () => {
-  it("preserva as 84 preparações e oito categorias sem duplicar produtos regionais", () => {
-    expect(CONTEST_CATALOG).toHaveLength(84);
-    expect(new Set(CONTEST_CATALOG.map((item) => item.slug)).size).toBe(84);
-    expect(new Set(CONTEST_CATALOG.map(catalogContestPath)).size).toBe(84);
+  it("preserva as 85 preparações e oito categorias sem duplicar produtos regionais", () => {
+    expect(CONTEST_CATALOG).toHaveLength(85);
+    expect(new Set(CONTEST_CATALOG.map((item) => item.slug)).size).toBe(85);
+    expect(new Set(CONTEST_CATALOG.map(catalogContestPath)).size).toBe(85);
     expect(new Set(CONTEST_CATALOG.map((item) => item.categorySlug)).size).toBe(
       8,
     );
@@ -51,8 +51,9 @@ describe("catálogo comercial por edição", () => {
           opportunityJurisdictions.some((state) => state.code === code),
         ).toBe(true);
       expect(item.status).toBe("research");
-      expect(new URL(item.sourceUrl).hostname).toBe(
-        "www.decorandoaleiseca.com.br",
+      // Pesquisa de mercado, ou portal oficial para produto criado por decisão do proprietário (PCPR Papiloscopista, 23/11/2026).
+      expect(["www.decorandoaleiseca.com.br", "conhecimento.fgv.br", "www.cebraspe.org.br"]).toContain(
+        new URL(item.sourceUrl).hostname,
       );
     }
   });
@@ -68,13 +69,13 @@ describe("catálogo comercial por edição", () => {
     expect(ba).toHaveLength(2);
     expect(ba[0].slug).not.toBe(ba[1].slug);
   });
-  it("atribui 168 preços de Stripe distintos a partir da fonte central", () => {
+  it("atribui 170 preços de Stripe distintos a partir da fonte central", () => {
     const keys = CONTEST_CATALOG.flatMap((contest) =>
       CONTEST_ACCESS_OPTIONS.map((option) =>
         contestPriceLookupKey(contest.slug, option.key),
       ),
     );
-    expect(new Set(keys).size).toBe(168);
+    expect(new Set(keys).size).toBe(170);
   });
   it("renderiza páginas planejadas sem promessa de venda ou banca", () => {
     for (const category of contestCategories) {

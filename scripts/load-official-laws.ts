@@ -22,6 +22,7 @@ import {
 import { getOfficialLegalSource } from "../src/lib/official-sources/legal-registry";
 import { parseConsolidatedLegalArticles } from "../src/lib/official-sources/legal-text";
 import { getPlanaltoConsolidatedSource } from "../src/lib/official-sources/planalto-text";
+import { getCamaraUpdatedTextSource } from "../src/lib/official-sources/camara-text";
 import { CAMARA_PROCUREMENT_REVIEW_LIMITATIONS, CAMARA_PROCUREMENT_SOURCE } from "../src/lib/official-sources/camara-procurement-text";
 import {
   parseOpportunityApprovalReviewerIdentity,
@@ -79,6 +80,9 @@ async function main() {
   try {
     for (const slug of slugs) {
       const source = getOfficialLegalSource(slug)!;
+      if (provider === "camara" && getCamaraUpdatedTextSource(source.monitorUrl) && !captureOnly) {
+        throw new Error("Texto atualizado da Câmara exige --capture-only e revisão posterior no painel; a autorização da fábrica não aprova fontes.");
+      }
       if (getPlanaltoConsolidatedSource(source.monitorUrl) && !captureOnly) {
         throw new Error("Compilações alternativas do Planalto/Câmara exigem --capture-only e revisão posterior no painel; a autorização da fábrica não aprova fontes.");
       }

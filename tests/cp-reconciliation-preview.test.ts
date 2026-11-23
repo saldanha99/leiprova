@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { sql } from "drizzle-orm";
 import {
   computeCpReconciliationFingerprint,
   validateCpReconciliationContext,
@@ -176,6 +177,9 @@ function createMockExecutor(overrides: Partial<Record<string, unknown[]>> = {}):
           },
         ]) as T[];
       }
+      if (sqlText.includes("editorial.jargon_rewrite")) {
+        return (overrides["rewriteAudits"] ?? []) as T[];
+      }
       if (sqlText.includes("from audit_logs") && sqlText.includes(String(CP_CUT_INITIAL_AUDIT_ID))) {
         return (overrides["cutAudit"] ?? [{ id: CP_CUT_INITIAL_AUDIT_ID, action: "editorial.legal_cp.coordinated_cut" }]) as T[];
       }
@@ -330,7 +334,7 @@ describe("Fingerprint de reconciliação pós-suspensão (R7: estado observado c
     return {
       policy: CP_RECONCILIATION_POLICY,
       approvalReference: CP_RECONCILIATION_REFERENCE,
-      session: { database: "leiprova", role: "leiprova_owner", readOnly: "on" },
+      session: { database: "leiprova", role: "leiprova_owner" },
       source: {
         robotsStatus: 200,
         robotsSha256: "robots-fp-sample",
@@ -408,6 +412,7 @@ describe("Fingerprint de reconciliação pós-suspensão (R7: estado observado c
         editorialStatus: "reviewed",
         legalArticleId: CP_V112_ARTICLE_351_ID,
         contentHash: item[4],
+        rewriteAuditIds: [],
         bindingId: `binding-v112-${index}`,
         productSlug: CP_CUT_PRODUCT,
         opportunityId: 2,
@@ -913,6 +918,37 @@ describe("validateCpReconciliationContext (somente leitura)", () => {
     await expect(validateCpReconciliationContext(tx, fresh)).rejects.toThrow(
       /Hash do conteúdo da questão 1285 diverge do parecer técnico/
     );
+  });
+
+  it("aceita hash novo de questão quando há reescrita de jargão auditada e o certificado acompanha", async () => {
+    const fresh = createSyntheticFreshEvidence();
+    const base = createMockExecutor();
+    const [rows] = [await base.execute<Record<string, unknown>>(sql`join contest_product_question_bindings b on b.question_id = q.id`)];
+    const rewritten = rows.map((row, index) => index === 0 ? { ...row, contentHash: "rewritten-hash", certQuestionContentHash: "rewritten-hash" } : row);
+    const tx = createMockExecutor({ questionRows: rewritten, rewriteAudits: [{ questionId: CP_CUT_ITEMS[0][0], auditId: 133274 }] });
+    const result = await validateCpReconciliationContext(tx, fresh);
+    expect(result.mode).toBe("preview_only");
+    const pinned = await validateCpReconciliationContext(createMockExecutor(), fresh);
+    expect(result.fingerprint).not.toBe(pinned.fingerprint);
+  });
+
+  it("recusa reescrita auditada quando o certificado ficou com o hash antigo", async () => {
+    const fresh = createSyntheticFreshEvidence();
+    const base = createMockExecutor();
+    const rows = await base.execute<Record<string, unknown>>(sql`join contest_product_question_bindings b on b.question_id = q.id`);
+    const stale = rows.map((row, index) => index === 0 ? { ...row, contentHash: "rewritten-hash" } : row);
+    const tx = createMockExecutor({ questionRows: stale, rewriteAudits: [{ questionId: CP_CUT_ITEMS[0][0], auditId: 133274 }] });
+    await expect(validateCpReconciliationContext(tx, fresh)).rejects.toThrow(/Hash do certificado da questão 1285 diverge/);
+  });
+
+  it("modo apply exige transação de escrita e gera o mesmo fingerprint da prévia", async () => {
+    const fresh = createSyntheticFreshEvidence();
+    await expect(validateCpReconciliationContext(createMockExecutor(), fresh, { mode: "apply" })).rejects.toThrow(/transação de escrita/);
+    const preview = await validateCpReconciliationContext(createMockExecutor(), fresh);
+    const apply = await validateCpReconciliationContext(
+      createMockExecutor({ session: [{ database: "leiprova", role: "leiprova_owner", readOnly: "off" }] }), fresh, { mode: "apply" }
+    );
+    expect(apply.fingerprint).toBe(preview.fingerprint);
   });
 
   it("recusa quando o gabarito das alternativas divergir do gabarito oficial de corte", async () => {

@@ -27,9 +27,23 @@ export const ADDITIONAL_PROGRAMME_SUBJECTS = {
  'direito-de-pessoal-e-direito-previdenciario-publico':'Direito de Pessoal e Direito Previdenciário Público',
  'direito-tributario-e-processo-tributario':'Direito Tributário e Processo Tributário',
  'direito-financeiro':'Direito Financeiro',
+ // PCDF Delegado 1/2026 (Cebraspe) e TJPE Juiz Substituto 01/2026 (FGV): títulos literais dos anexos.
+ 'direito-administrativo-e-legislacao-complementar':'Direito Administrativo e Legislação Complementar',
+ 'direito-constitucional-e-legislacao-complementar':'Direito Constitucional e Legislação Complementar',
+ 'direito-civil-e-legislacao-complementar':'Direito Civil e Legislação Complementar',
+ 'direito-empresarial-e-legislacao-complementar':'Direito Empresarial e Legislação Complementar',
+ 'direito-penal-e-legislacao-complementar':'Direito Penal e Legislação Complementar',
+ 'direito-tributario-e-legislacao-complementar':'Direito Tributário e Legislação Complementar',
+ 'direito-processual-penal-e-legislacao-complementar':'Direito Processual Penal e Legislação Complementar',
+ 'direito-ambiental-e-legislacao-complementar':'Direito Ambiental e Legislação Complementar',
+ 'medicina-legal':'Medicina Legal',
+ 'direito-do-consumidor':'Direito do Consumidor',
+ 'direito-da-crianca-e-do-adolescente':'Direito da Criança e do Adolescente',
 } as const;
-export const SUBJECT_ADMISSION_SCOPES:Record<number,string>={7:'Juiz Federal Substituto',13:'Auditor Fiscal da Administração Tributária Estadual',19:'Promotor de Justiça Substituto',20:'Promotor de Justiça Substituto',21:'Procurador do Estado — Classe I'};
-export const SUBJECT_ADMISSION_SLUGS:Record<number,string>={7:'trf-5-juiz-federal-2026',13:'sefaz-al-auditor-fiscal-2026',19:'mpmt-promotor-substituto-2026-historico-objetiva',20:'mprj-promotor-substituto-xxxix-2026-historico-objetiva',21:'pgeac-procurador-classe-i-viii-2026-historico-objetiva'};
+export const SUBJECT_ADMISSION_SCOPES:Record<number,string>={7:'Juiz Federal Substituto',13:'Auditor Fiscal da Administração Tributária Estadual',19:'Promotor de Justiça Substituto',20:'Promotor de Justiça Substituto',21:'Procurador do Estado — Classe I',24:'Juiz Substituto',37:'Delegado de Polícia'};
+export const SUBJECT_ADMISSION_SLUGS:Record<number,string>={7:'trf-5-juiz-federal-2026',13:'sefaz-al-auditor-fiscal-2026',19:'mpmt-promotor-substituto-2026-historico-objetiva',20:'mprj-promotor-substituto-xxxix-2026-historico-objetiva',21:'pgeac-procurador-classe-i-viii-2026-historico-objetiva',24:'tjpe-juiz-substituto-01-2026-historico-objetiva',37:'pcdf-delegado-1-2026-historico-objetiva'};
+/** Escopos cujo edital aprovado vem do Cebraspe (demais: FGV Conhecimento). */
+export const CEBRASPE_SUBJECT_ADMISSION_OPPORTUNITIES:ReadonlySet<number>=new Set([13,37]);
 export const SUBJECT_ADMISSION_ACTION='editorial.programme.subject_catalog_admitted';
 const id=z.number().int().positive().safe(), hash=z.string().regex(/^[a-f0-9]{64}$/u);
 const slugs=Object.keys(ADDITIONAL_PROGRAMME_SUBJECTS) as [keyof typeof ADDITIONAL_PROGRAMME_SUBJECTS,...(keyof typeof ADDITIONAL_PROGRAMME_SUBJECTS)[]];
@@ -38,6 +52,8 @@ export const subjectAdmissionInputSchema=z.object({schemaVersion:z.literal(1),su
  for(const item of input.subjects){if(item.name!==ADDITIONAL_PROGRAMME_SUBJECTS[item.slug])ctx.addIssue({code:'custom',message:'Nome canônico exato obrigatório.'});for(const proof of item.proofs)if(SUBJECT_ADMISSION_SCOPES[proof.opportunityId]!==proof.roleName)ctx.addIssue({code:'custom',message:'Cargo fora dos cinco escopos.'});}
 });
 export const subjectNameKey=(value:string)=>value.normalize('NFKC').replace(/\s+/gu,' ').trim().toLocaleUpperCase('pt-BR');
+/** Cebraspe PCDF: the title opens item 1 (or part I) on its own line ("MEDICINA LEGAL: 1 …"). */
+const INLINE_ITEM_ONE_SUBJECTS:ReadonlySet<string>=new Set(['direito-administrativo-e-legislacao-complementar','direito-constitucional-e-legislacao-complementar','direito-civil-e-legislacao-complementar','direito-empresarial-e-legislacao-complementar','direito-penal-e-legislacao-complementar','direito-tributario-e-legislacao-complementar','direito-processual-penal-e-legislacao-complementar','direito-ambiental-e-legislacao-complementar','medicina-legal']);
 export function assertSubjectLabelProof(slug:keyof typeof ADDITIONAL_PROGRAMME_SUBJECTS,quote:string,page:string){
  const expected=ADDITIONAL_PROGRAMME_SUBJECTS[slug];
  const prefixes:Partial<Record<keyof typeof ADDITIONAL_PROGRAMME_SUBJECTS,string>>={
@@ -53,7 +69,9 @@ export function assertSubjectLabelProof(slug:keyof typeof ADDITIONAL_PROGRAMME_S
  if(sections[slug])matches ||= key===`${sections[slug]} – ${name}`;
  // These approved programmes start item 1 on the heading's own line.
  // Keep and prove that whole line; never accept an arbitrary prose mention.
- if(slug==='legislacao-tributaria-estadual'||slug==='reforma-tributaria')matches ||= key.startsWith(`${name}: 1 `)&&key.length>`${name}: 1 `.length;
+ if(slug==='legislacao-tributaria-estadual'||slug==='reforma-tributaria'||INLINE_ITEM_ONE_SUBJECTS.has(slug))matches ||= key.startsWith(`${name}: 1 `)&&key.length>`${name}: 1 `.length;
+ // PCDF: "DIREITO PENAL E LEGISLAÇÃO COMPLEMENTAR: I DIREITO PENAL: 1 …" (parte I na mesma linha).
+ if(INLINE_ITEM_ONE_SUBJECTS.has(slug))matches ||= key.startsWith(`${name}: I `)&&key.length>`${name}: I `.length;
  if(slug==='direito-civil-e-direito-empresarial')matches ||= key.startsWith(`${name} - PONTO 1. `)&&key.length>`${name} - PONTO 1. `.length;
  if(!matches||!page.split(/\r?\n/u).some(line=>subjectNameKey(line)===key))throw Error('Rótulo literal completo ausente na página oficial; não inferir disciplina de prosa.');
 }
@@ -93,7 +111,7 @@ export async function admitProgrammeSubjects(db:PostgresJsDatabase<typeof schema
    if(collisions.some(c=>c.slug!==item.slug||c.name!==item.name||!c.active)||collisions.length>1)throw Error('Nome/slug já usado por outra disciplina ou entrada inativa; não renomear/reativar.');
    for(const p of item.proofs){const s=sources.find(s=>s.id===p.snapshotId);
     if(!s||s.docId!==p.sourceDocumentId||s.oppId!==p.opportunityId||s.role!==p.roleName||s.slug!==SUBJECT_ADMISSION_SLUGS[p.opportunityId]||s.year!==2026||s.edition!==p.examEditionId||s.oppStatus!=='reviewed'||s.status!=='approved'||s.docStatus!=='approved'||s.policy!=='official_document'||!['official_document','metadata_only'].includes(s.docPolicy)||s.url!==p.url||s.checksum!==p.checksum||s.bytesChecksum!==p.checksum||!Array.isArray(s.pages)||!s.pages[p.headingPage-1])throw Error('Fonte/cargo/edição/bytes/página divergentes.');
-    assertApprovedProgrammeSourceUrls(s.docUrl,s.url,s.docPolicy,p.opportunityId===13?'cebraspe':'fgv-conhecimento');
+    assertApprovedProgrammeSourceUrls(s.docUrl,s.url,s.docPolicy,CEBRASPE_SUBJECT_ADMISSION_OPPORTUNITIES.has(p.opportunityId)?'cebraspe':'fgv-conhecimento');
     assertSubjectLabelProof(item.slug,p.headingQuote,s.pages[p.headingPage-1]);
    }
   }

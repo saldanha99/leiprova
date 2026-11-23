@@ -12,8 +12,25 @@ export const CAMARA_LGPD_SOURCE = {
   parserVersion: "camara-lgpd-consolidated-v1.0.1",
 } as const;
 
+/**
+ * "Texto atualizado" of the Câmara for laws the Senado does not publish as consolidated
+ * text. Capture only: the loader refuses to approve these, so they wait for admin review.
+ * Câmara ids come from LexML (urn → Câmara link) and the Câmara page itself.
+ */
+export const CAMARA_UPDATED_TEXT_SOURCES = {
+  "https://legis.senado.leg.br/norma/37151189": { url: "https://www2.camara.leg.br/legin/fed/lei/2023/lei-14597-14-junho-2023-794299-normaatualizada-pl.html", identity: /LEI\s+N[º°o]?\.?\s*14\.597,?\s+DE\s+14\s+DE\s+JUNHO\s+DE\s+2023/iu },
+  "https://legis.senado.leg.br/norma/35878228": { url: "https://www2.camara.leg.br/legin/fed/lei/2022/lei-14344-24-maio-2022-792692-normaatualizada-pl.html", identity: /LEI\s+N[º°o]?\.?\s*14\.344,?\s+DE\s+24\s+DE\s+MAIO\s+DE\s+2022/iu },
+  "https://legis.senado.leg.br/norma/551485": { url: "https://www2.camara.leg.br/legin/fed/lei/1998/lei-9609-19-fevereiro-1998-364738-normaatualizada-pl.html", identity: /LEI\s+N[º°o]?\.?\s*9\.609,?\s+DE\s+19\s+DE\s+FEVEREIRO\s+DE\s+1998/iu },
+  "https://legis.senado.leg.br/norma/17674073": { url: "https://www2.camara.leg.br/legin/fed/lei/2017/lei-13431-4-abril-2017-784569-normaatualizada-pl.html", identity: /LEI\s+N[º°o]?\.?\s*13\.431,?\s+DE\s+4\s+DE\s+ABRIL\s+DE\s+2017/iu },
+  "https://legis.senado.leg.br/norma/550501": { url: "https://www2.camara.leg.br/legin/fed/lei/1993/lei-8625-12-fevereiro-1993-363257-normaatualizada-pl.html", identity: /LEI\s+N[º°o]?\.?\s*8\.625,?\s+DE\s+12\s+DE\s+FEVEREIRO\s+DE\s+1993/iu },
+} as const;
+export const CAMARA_UPDATED_TEXT_PARSER_VERSION = "camara-updated-text-capture-v1.0.0";
+export function getCamaraUpdatedTextSource(monitorUrl: string) {
+  return (CAMARA_UPDATED_TEXT_SOURCES as Record<string, { url: string; identity: RegExp }>)[monitorUrl] ?? null;
+}
+
 export function isAllowedCamaraConsolidatedUrl(url: string) {
-  return url === CAMARA_LGPD_SOURCE.url;
+  return url === CAMARA_LGPD_SOURCE.url || Object.values(CAMARA_UPDATED_TEXT_SOURCES).some(source => source.url === url);
 }
 
 export function assertCamaraRobotsAllowed(robots: string, url: string) {
@@ -87,4 +104,57 @@ export function parseCamaraLgpdConsolidatedHtml(html: string, url: string) {
   const normalizedContent = articles.map((article) => article.literalText).join("\n\n");
   const canonicalContent = articles.map((article) => [article.path, "", article.literalText].join("\n")).join("\n\n");
   return { normalizedContent, articles, checksumSha256: createHash("sha256").update([CAMARA_LGPD_SOURCE.url, CAMARA_LGPD_SOURCE.parserVersion, canonicalContent].join("\n")).digest("hex"), corpusChecksumSha256: createHash("sha256").update(canonicalContent).digest("hex"), rawHtmlChecksumSha256: createHash("sha256").update(html).digest("hex"), excludedAmendmentArticles: [60], humanReviewRequired: true as const, publicationAllowed: false as const };
+}
+
+/** Generic "texto atualizado" parser (capture only, never auto-approved). Struck-through and
+ *  withdrawn provisions are dropped; the text ends at "Brasília,"; an active article cannot repeat. */
+export function parseCamaraUpdatedLawHtml(html: string, monitorUrl: string) {
+  const source = getCamaraUpdatedTextSource(monitorUrl);
+  if (!source) throw new Error("Lei fora das fontes de texto atualizado da Câmara configuradas.");
+  if (html.includes("\ufffd")) throw new Error("A compilação da Câmara contém erro de decodificação.");
+  const $ = cheerio.load(html);
+  $("script, noscript, svg, iframe, img").remove();
+  const identity = $("body").text().replace(/\s+/gu, " ").trim();
+  if (!/C[ÂA]MARA DOS DEPUTADOS/iu.test(identity) || !/Centro de Documenta[cç][aã]o e Informa[cç][aã]o/iu.test(identity) || !source.identity.test(identity)) {
+    throw new Error("A resposta não é o texto atualizado oficial desta lei na Câmara.");
+  }
+  $("style").each((_, element) => {
+    for (const rule of $(element).text().matchAll(/([^{}]+)\{([^{}]*)\}/gu)) {
+      if (!/text-decoration(?:-line)?\s*:[^;]*line-through/iu.test(rule[2])) continue;
+      try { $(rule[1].trim()).remove(); } catch { throw new Error("Marcação revogada da Câmara não interpretável."); }
+    }
+  });
+  $("style, strike, s, del").remove();
+  $("[style]").each((_, element) => {
+    if (/text-decoration(?:-line)?\s*:[^;]*line-through/iu.test($(element).attr("style") ?? "")) $(element).remove();
+  });
+  const paragraphs = $("body p").toArray().map((element) => $(element).text().replace(/\s+/gu, " ").trim()).filter(Boolean);
+  const lines: string[] = [];
+  const references = new Set<string>();
+  let started = false;
+  for (const paragraph of paragraphs) {
+    if (/^Bras[ií]lia,/iu.test(paragraph)) break;
+    const match = ARTICLE.exec(paragraph);
+    if (match) {
+      const reference = `${Number(match[1])}${match[2] ? `-${match[2].toUpperCase()}` : ""}`;
+      if (!ONLY_WITHDRAWN.test(paragraph)) {
+        if (references.has(reference)) throw new Error("A compilação da Câmara tem redação ativa duplicada.");
+        references.add(reference);
+      }
+      started = true;
+    }
+    if (!started) continue;
+    if (/^(?:CAP[IÍ]TULO|SE[CÇ][AÃ]O|T[IÍ]TULO|SUBSE[CÇ][AÃ]O|LIVRO)\b/iu.test(paragraph)) continue;
+    if (!match && paragraph === paragraph.toUpperCase() && /[A-ZÀ-ÖØ-Þ]{3}/u.test(paragraph) && !/^(?:[IVXLCDM]+\s*[-–—.]|§)/u.test(paragraph)) continue;
+    if (ONLY_WITHDRAWN.test(paragraph) || /^\([^()]*\b(?:VETAD[OA]|REVOGAD[OA])\b[^()]*\)\.?$/iu.test(paragraph)) continue;
+    const text = paragraph.replace(ANNOTATION, "").replace(/\s+/gu, " ").trim();
+    if (text) lines.push(text);
+  }
+  const articles = parseConsolidatedLegalArticles(normalizeOfficialText(lines.join("\n")))
+    .map((article, index) => ({ ...article, heading: null, articleOrder: index + 1 }));
+  if (!articles.some((article) => article.path === "art-1") || articles.length < 3) throw new Error("O texto atualizado da Câmara não tem a sequência mínima de artigos.");
+  const normalizedContent = articles.map((article) => article.literalText).join("\n\n");
+  const canonicalContent = articles.map((article) => [article.path, "", article.literalText].join("\n")).join("\n\n");
+  return { sourceUrl: source.url, normalizedContent, articles,
+    checksumSha256: createHash("sha256").update([source.url, CAMARA_UPDATED_TEXT_PARSER_VERSION, canonicalContent].join("\n")).digest("hex") };
 }

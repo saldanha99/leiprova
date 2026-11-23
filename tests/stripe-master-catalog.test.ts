@@ -142,20 +142,20 @@ function fixture() {
 }
 
 describe("catálogo Stripe Master único", () => {
-  it("planeja 84 concursos + um Master, com 170 preços distintos e nenhuma escrita", () => {
+  it("planeja 85 concursos + um Master, com 172 preços distintos e nenhuma escrita", () => {
     expect(stripeCatalogSyncPreview("live")).toEqual({
       mode: "dry-run",
       stripeMode: "live",
-      contests: 84,
-      contestPrices: 168,
+      contests: 85,
+      contestPrices: 170,
       contestBilling: [
         { interval: "month", amountCents: 6700 },
         { interval: "year", amountCents: 34700 },
       ],
       masterProducts: 1,
       masterPrices: 2,
-      totalProducts: 85,
-      totalPrices: 170,
+      totalProducts: 86,
+      totalPrices: 172,
       writes: false,
     });
     const keys = [
@@ -166,7 +166,7 @@ describe("catálogo Stripe Master único", () => {
       ),
       ...PLANS.map(masterPriceLookupKey),
     ];
-    expect(new Set(keys).size).toBe(170);
+    expect(new Set(keys).size).toBe(172);
     expect(stripeCatalogSyncPreview("test").stripeMode).toBe("test");
   });
 

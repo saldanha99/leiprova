@@ -213,11 +213,21 @@
     "slug": "pc-pr-agente-2026",
     "categorySlug": "carreiras-policiais",
     "acronym": "PC-PR",
-    "role": "Agente",
+    "role": "Agente de Polícia Judiciária",
     "editionLabel": "2026",
     "jurisdictionCodes": ["PR"],
     "status": "research",
     "sourceUrl": "https://www.decorandoaleiseca.com.br/reta-final/agente-pc-pr"
+  },
+  {
+    "slug": "pc-pr-papiloscopista-2026",
+    "categorySlug": "carreiras-policiais",
+    "acronym": "PC-PR",
+    "role": "Papiloscopista Policial",
+    "editionLabel": "2026",
+    "jurisdictionCodes": ["PR"],
+    "status": "research",
+    "sourceUrl": "https://conhecimento.fgv.br/concursos/pcpr26"
   },
   {
     "slug": "pp-rn-policia-penal-2026",

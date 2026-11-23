@@ -520,7 +520,10 @@ Objeto JSON estrito, sem cerca Markdown. Campos comuns:
   rationale}`, exatamente A–E para múltipla escolha ou A–B para certo/errado,
   uma correta, sem duplicatas. Citar a fonte do pacote e justificar cada opção.
 - **discovery:** `discoveries` contém até vinte objetos `{title,url,kind,role,
-  bank,jurisdiction,observedAt,evidence}`. `kind`: `notice|rectification|announcement`;
+  bank,jurisdiction,observedAt,evidence}`, todos texto: `evidence` de cada item é uma
+  string (o trecho da página capturada), não lista nem objeto; as fontes em objeto ficam
+  só no `evidence` do topo. `url` é um `links[].href` ou `finalUrl` de `context.pages`.
+  `kind`: `notice|rectification|announcement`;
   `bank: null` se não comprovada; data ISO UTC terminada em `Z`. Diferenciar notícia e edital.
   Sem novidades, prepared com lista vazia e resumo de cobertura. Se acesso falhar,
   blocked e limitação explícita, sem fabricar dados.

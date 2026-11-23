@@ -56,10 +56,10 @@ export type Executor = Tx | MockExecutor;
 export interface CpObservedState {
   policy: string;
   approvalReference: string;
+  /** Preview (read only) and apply (read write) must yield the same fingerprint. */
   session: {
     database: string;
     role: string;
-    readOnly: string;
   };
   source: {
     robotsStatus: number;
@@ -138,6 +138,8 @@ export interface CpObservedState {
     editorialStatus: string;
     legalArticleId: number;
     contentHash: string;
+    /** Audited jargon rewrites after the cut, when the hash differs from the opinion pin. */
+    rewriteAuditIds: readonly number[];
     bindingId: string;
     productSlug: string;
     opportunityId: number;
@@ -300,8 +302,10 @@ export function computeCpReconciliationFingerprint(state: CpObservedState): stri
 
 export async function validateCpReconciliationContext(
   tx: Executor,
-  fresh: FreshCpEvidence
+  fresh: FreshCpEvidence,
+  options: { mode?: "preview" | "apply" } = {}
 ): Promise<CpReconciliationPreviewResult> {
+  const mode = options.mode ?? "preview";
   assertCpCutFresh(fresh.body.fetchedAt);
   assertCpCutFresh(fresh.amendment.fetchedAt);
   assertCpCutFresh(fresh.robots.fetchedAt);
@@ -313,8 +317,11 @@ export async function validateCpReconciliationContext(
   if (session?.database !== "leiprova" || session?.role !== "leiprova_owner") {
     throw new Error("Alvo efetivo divergente: exige banco leiprova e role leiprova_owner.");
   }
-  if (session?.readOnly !== "on") {
+  if (mode === "preview" && session?.readOnly !== "on") {
     throw new Error("Transação somente leitura não confirmada: transaction_read_only deve ser 'on'.");
+  }
+  if (mode === "apply" && session?.readOnly !== "off") {
+    throw new Error("Aplicação exige transação de escrita explícita.");
   }
 
   // 2. Validar prova oficial fresca contra os pins canônicos (R5, R8)
@@ -671,6 +678,17 @@ export async function validateCpReconciliationContext(
   if (uniqueQuestionIds.size !== 5) {
     throw new Error("Identificadores de questões duplicados ou incompletos na checagem das 5 dependências.");
   }
+  const rewriteRows = await tx.execute<{ questionId: number; auditId: number }>(
+    sql`select entity_id::int as "questionId", id::int as "auditId" from audit_logs
+        where action = 'editorial.jargon_rewrite' and entity_type = 'question'
+          and entity_id in (${sql.join(CP_QUESTION_IDS.map(id => sql`${String(id)}`), sql`,`)})
+          and id > ${CP_CUT_INITIAL_AUDIT_ID}
+        order by id`
+  );
+  const rewriteAuditIdsByQuestion = new Map<number, number[]>();
+  for (const row of rewriteRows) {
+    rewriteAuditIdsByQuestion.set(row.questionId, [...(rewriteAuditIdsByQuestion.get(row.questionId) ?? []), row.auditId]);
+  }
   for (let i = 0; i < 5; i++) {
     const q = questionRows[i];
     const item = CP_CUT_ITEMS[i];
@@ -681,11 +699,15 @@ export async function validateCpReconciliationContext(
     if (q.id !== expectedId) {
       throw new Error(`Ordem ou ID da questão diverge: esperado ${expectedId}, observado ${q.id}.`);
     }
-    if (q.contentHash !== expectedContentHash) {
+    // The opinion pin holds unless an audited jargon rewrite (after the cut) changed the
+    // wording; then the certificate must already carry the new hash. Answer/options are
+    // still checked below, so a rewrite can never change the key.
+    const rewrites = rewriteAuditIdsByQuestion.get(q.id) ?? [];
+    if (q.contentHash !== expectedContentHash && rewrites.length === 0) {
       throw new Error(`Hash do conteúdo da questão ${q.id} diverge do parecer técnico: esperado ${expectedContentHash}, observado ${q.contentHash}.`);
     }
-    if (q.certQuestionContentHash !== expectedContentHash) {
-      throw new Error(`Hash do certificado da questão ${q.id} diverge: esperado ${expectedContentHash}, observado ${q.certQuestionContentHash}.`);
+    if (q.certQuestionContentHash !== q.contentHash) {
+      throw new Error(`Hash do certificado da questão ${q.id} diverge: esperado ${q.contentHash}, observado ${q.certQuestionContentHash}.`);
     }
     if (q.editorialStatus !== "reviewed" || q.legalArticleId !== CP_V112_ARTICLE_351_ID) {
       throw new Error(`Questão ${q.id} deve estar reviewed e vinculada ao Art. 351 (id ${CP_V112_ARTICLE_351_ID}).`);
@@ -830,7 +852,6 @@ export async function validateCpReconciliationContext(
     session: {
       database: session.database,
       role: session.role,
-      readOnly: session.readOnly,
     },
     source: {
       robotsStatus: fresh.robots.status,
@@ -911,6 +932,7 @@ export async function validateCpReconciliationContext(
       editorialStatus: q.editorialStatus,
       legalArticleId: q.legalArticleId,
       contentHash: q.contentHash,
+      rewriteAuditIds: q.contentHash === CP_CUT_ITEMS[questionRows.indexOf(q)][4] ? [] : (rewriteAuditIdsByQuestion.get(q.id) ?? []),
       bindingId: q.bindingId,
       productSlug: q.productSlug,
       opportunityId: q.opportunityId,

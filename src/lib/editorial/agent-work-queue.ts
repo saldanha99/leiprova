@@ -170,6 +170,7 @@ export async function claimAgentWork(db: AgentDatabase, now = new Date(), agent?
         select work.job_key ${CLAIM_FROM} ${mappingJoin}
         where work.status='pending' and work.attempts<3
         and (work.kind<>'authoring' or ${currentQuestionContractExists(sql`work.payload->>'questionContractId'`,sql`requirement.opportunity_id`)})
+        and (work.kind<>'legal_change' or (work.payload->'context') ? 'diff')
         ${thinArticleClaimGate}
         and work.kind in (${sql.join(kinds.map(kind=>sql`${kind}`),sql`,`)})
         order by case work.kind when 'legal_change' then 0 when 'authoring' then 1 when 'discovery' then 2 else 3 end,

@@ -7,6 +7,7 @@ import { MINIMUM_COURSE_QUESTION_COUNT } from "@/lib/commerce/minimum-course-con
 import { STYLE_PROFILE_SEEDS } from "./style-profiles";
 import { suggestLegalRequirementMapping, type MappingArticle } from "./legal-requirement-mapping";
 import { discoveryPortalPolicy } from "./discovery-policy";
+import { captureCebraspeDiscoveryIndex, captureOfficialDiscoveryPage, type DiscoveryPageCapture } from "@/lib/official-sources/fetch";
 import { prepareCourseIntake } from "./course-intake";
 import { officialQuestionContractSchema, questionContractFingerprint } from "./official-question-contract";
 import { currentQuestionContractExists } from "./question-contract-query";
@@ -39,6 +40,22 @@ export const AGENT_PREPARATION_CORPUS_HASH_SQL = sql`
   where a.editorial_status='reviewed' and a.source_rights='official_text' and v.status='current' and l.is_active
     and (v.valid_from is null or v.valid_from<=current_date) and (v.valid_until is null or v.valid_until>=current_date)
     and length(a.literal_text) between 20 and 80000`;
+
+/** Paragraph multiset diff between two normalized captures, bounded for the packet. */
+export function legalCaptureDiff(approved: string, pending: string, limitChars = 60_000) {
+  const split = (text: string) => text.split(/\n+/u).map(line => line.replace(/\s+/gu, " ").trim()).filter(Boolean);
+  const count = (lines: string[]) => lines.reduce((map, line) => map.set(line, (map.get(line) ?? 0) + 1), new Map<string, number>());
+  const before = split(approved), after = split(pending), beforeCount = count(before), afterCount = count(after);
+  const removed: string[] = [], added: string[] = [];
+  const left = new Map(afterCount);
+  for (const line of before) { const n = left.get(line) ?? 0; if (n > 0) left.set(line, n - 1); else removed.push(line); }
+  const right = new Map(beforeCount);
+  for (const line of after) { const n = right.get(line) ?? 0; if (n > 0) right.set(line, n - 1); else added.push(line); }
+  let budget = limitChars; let truncated = false;
+  const take = (lines: string[]) => lines.filter(line => { if (budget - line.length < 0) { truncated = true; return false; } budget -= line.length; return true; });
+  return { removed: take(removed), added: take(added), removedTotal: removed.length, addedTotal: added.length, truncated,
+    approvedParagraphs: before.length, pendingParagraphs: after.length };
+}
 
 export function mappingPreparationBatchQuery(corpusHash: string, batchSize: number) {
   const limit = preparationBatchSize(batchSize) + 1;
@@ -233,27 +250,55 @@ export async function prepareAgentWork(db:AgentDatabase, now=new Date(), options
   for(const portal of portals) {
     const policy=discoveryPortalPolicy(portal.bank,portal.url);
     const urls=policy.urls.map(validateDiscoveryUrl);
-    if(await enqueueAgentWork(db,`discovery:${portal.bank}:${date}`,"discovery",{
+    const key=`discovery:${portal.bank}:${date}`;
+    // The realtime engine has no network by design (since ~25/10 nothing claimed the old
+    // agent-browser radar). The server captures the public index once per portal/day, under
+    // robots, and the offline Radar only extracts from it. A job already captured today is
+    // left alone, so the 5-minute cycle never refetches or resets it.
+    const [existing]=await db.execute<{captured:boolean}>(sql`select (payload->'context' ? 'pages') as captured
+      from editorial_agent_work where job_key=${key}`);
+    if(existing?.captured) continue;
+    const pages:DiscoveryPageCapture[]=[];const failures:string[]=[];
+    if(!policy.blocked) for(const url of urls) {
+      try { pages.push(portal.bank==="cebraspe" ? await captureCebraspeDiscoveryIndex(validateDiscoveryUrl)
+        : await captureOfficialDiscoveryPage(url,validateDiscoveryUrl)); }
+      catch(error) { failures.push(`${url}: ${error instanceof Error ? error.message.slice(0,200) : "falha de captura"}`); }
+    }
+    const blocked=policy.blocked ?? (pages.length ? null : "portal_capture_failed");
+    if(await enqueueAgentWork(db,key,"discovery",{
       version:AGENT_WORK_VERSION,title:`Radar de editais — ${portal.bank} — ${date}`,articles:[],sourceUrls:urls,
-      instructions:"Use agent-browser para consultar este portal oficial e suas páginas de concursos. Liste até 20 editais/retificações/avisos recentes pertinentes às carreiras jurídicas, cartórios, policiais, tribunais, procuradorias, fiscal/controle, legislativa ou trabalhista. Registre URL oficial, cargo, UF, banca quando comprovada e evidência. Não ler/copiar questões ou gabaritos; não burlar bloqueios. Se não houver novidades, prepared com discoveries vazio e resumo da cobertura. Se houver bloqueio de acesso, blocked com motivo, sem inventar concursos. Somente propostas, nenhuma publicação.",
-      context:{date,bank:portal.bank,humanReviewRequired:true,coverage:"listed_official_portal_not_all_Brazil",accessPolicy:policy.limitation}})) {
+      instructions:"Leia context.pages: texto e links do portal oficial, capturados pelo servidor hoje respeitando robots. Não navegue. Liste até 20 editais/retificações/avisos recentes pertinentes às carreiras jurídicas, cartórios, policiais, tribunais, procuradorias, fiscal/controle, legislativa ou trabalhista. Cada discovery.url deve ser uma das URLs de context.pages[].links[].href ou context.pages[].finalUrl; registre cargo, UF, banca quando comprovada e evidência (trecho da página). Não ler/copiar questões ou gabaritos. Se não houver novidades, prepared com discoveries vazio e resumo da cobertura. Sem inventar concursos. Somente propostas, nenhuma publicação.",
+      context:{date,bank:portal.bank,humanReviewRequired:true,coverage:"listed_official_portal_not_all_Brazil",accessPolicy:policy.limitation,
+        pages,captureFailures:failures}})) {
       discovery++;
-      if(policy.blocked) await db.execute(sql`update editorial_agent_work set status='blocked',
-        last_error_code=${policy.blocked},result=${JSON.stringify({schemaVersion:1,publicationAllowed:false,outcome:'blocked',
-          summary:'Coleta suspensa por bloqueio observado no portal.',limitations:[policy.limitation],evidence:[],mappings:[],discoveries:[],questions:[]})}::jsonb,
-        updated_at=now() where job_key=${`discovery:${portal.bank}:${date}`} and status='pending'`);
+      if(blocked) await db.execute(sql`update editorial_agent_work set status='blocked',
+        last_error_code=${blocked},result=${JSON.stringify({schemaVersion:1,publicationAllowed:false,outcome:'blocked',
+          summary:policy.blocked?'Coleta suspensa por bloqueio observado no portal.':'O servidor não conseguiu capturar o portal hoje.',
+          limitations:[policy.blocked?policy.limitation:failures.join(" | ").slice(0,8000)||"Falha de captura."],evidence:[],mappings:[],discoveries:[],questions:[]})}::jsonb,
+        updated_at=now() where job_key=${key} and status='pending'`);
     }
   }
-  const changes=await db.execute<{id:number;title:string;url:string;checksum:string;status:string}>(sql`
-    select s.id::int,l.short_title title,s.source_url url,s.checksum_sha256 checksum,s.status
+  // Only the latest pending capture per act that already has an approved capture to compare:
+  // the monitor stores a new pending row each day while the same change is unreviewed. The
+  // server computes the paragraph diff, so the offline Guardião never needs the network.
+  const changes=await db.execute<{id:number;title:string;url:string;checksum:string;status:string;content:string;approvedId:number;approvedContent:string;approvedChecksum:string}>(sql`
+    select distinct on (s.legal_act_id) s.id::int,l.short_title title,s.source_url url,s.checksum_sha256 checksum,s.status,
+      s.normalized_content content,a.id::int as "approvedId",a.normalized_content as "approvedContent",a.checksum_sha256 as "approvedChecksum"
     from legal_source_snapshots s join legal_acts l on l.id=s.legal_act_id
-    where s.status='pending_review' and l.is_active order by s.id desc limit 40
+    join lateral (select x.id,x.normalized_content,x.checksum_sha256 from legal_source_snapshots x
+      where x.legal_act_id=s.legal_act_id and x.status='approved' order by x.id desc limit 1) a on true
+    where s.status='pending_review' and l.is_active order by s.legal_act_id,s.id desc limit 40
   `);
+  const changeKeys=changes.map(change=>`legal-change:${change.id}`);
+  await db.execute(sql`update editorial_agent_work set status='superseded',lease_token=null,lease_expires_at=null,
+    last_error_code='newer_pending_capture_or_no_diff',updated_at=now()
+    where kind='legal_change' and status in ('pending','blocked') ${changeKeys.length?sql`and job_key not in (${sql.join(changeKeys.map(key=>sql`${key}`),sql`,`)})`:sql``}`);
   for(const change of changes) {
+    const diff=legalCaptureDiff(change.approvedContent,change.content);
     if(await enqueueAgentWork(db,`legal-change:${change.id}`,"legal_change",{
       version:AGENT_WORK_VERSION,title:`Verificação de alteração — ${change.title}`,articles:[],sourceUrls:[change.url],
-      instructions:"Verifique a fonte normativa oficial usando agent-browser. Explique alteração ou ausência de mudança material, vigência e limitações. Não ativar versão, não marcar revisão humana nem publicar questões. Registre evidências e encaminhe à revisão administrativa.",
-      context:{snapshotId:change.id,checksum:change.checksum,status:change.status,humanReviewRequired:true}})) legalChanges++;
+      instructions:"Leia context.diff: parágrafos removidos e acrescentados entre a fotografia aprovada e a pendente desta fonte oficial, calculados pelo servidor. Não navegue. Diga se há mudança material (nova redação, dispositivo acrescido, revogado ou renumerado) ou só de forma (espaços, notas, links), cite os trechos e a norma alteradora quando constar do texto, e registre limitações (diff truncado, contexto ausente). Não ativar versão, não marcar revisão humana nem publicar questões; é análise para a revisão administrativa.",
+      context:{snapshotId:change.id,checksum:change.checksum,status:change.status,approvedSnapshotId:change.approvedId,approvedChecksum:change.approvedChecksum,diff,humanReviewRequired:true}})) legalChanges++;
   }
   return {mappings,authoring,discovery,legalChanges,courseIntake,...batches,humanReviewRequired:true,publicationAllowed:false};
 }
