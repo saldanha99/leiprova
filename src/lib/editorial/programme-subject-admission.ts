@@ -39,9 +39,14 @@ export const ADDITIONAL_PROGRAMME_SUBJECTS = {
  'medicina-legal':'Medicina Legal',
  'direito-do-consumidor':'Direito do Consumidor',
  'direito-da-crianca-e-do-adolescente':'Direito da Criança e do Adolescente',
+ // PCPR 01/2026 Agente de Polícia Judiciária e Papiloscopista Policial (títulos numerados "6. NOME: 6.1 …").
+ 'direito-penal-e-legislacao-penal-extravagante':'Direito Penal e Legislação Penal Extravagante',
+ 'direito-processual-penal-e-legislacao-processual-penal-extravagante':'Direito Processual Penal e Legislação Processual Penal Extravagante',
+ 'direito-penal-aplicado':'Direito Penal Aplicado',
+ 'direito-processual-penal-aplicado':'Direito Processual Penal Aplicado',
 } as const;
-export const SUBJECT_ADMISSION_SCOPES:Record<number,string>={7:'Juiz Federal Substituto',13:'Auditor Fiscal da Administração Tributária Estadual',19:'Promotor de Justiça Substituto',20:'Promotor de Justiça Substituto',21:'Procurador do Estado — Classe I',24:'Juiz Substituto',37:'Delegado de Polícia'};
-export const SUBJECT_ADMISSION_SLUGS:Record<number,string>={7:'trf-5-juiz-federal-2026',13:'sefaz-al-auditor-fiscal-2026',19:'mpmt-promotor-substituto-2026-historico-objetiva',20:'mprj-promotor-substituto-xxxix-2026-historico-objetiva',21:'pgeac-procurador-classe-i-viii-2026-historico-objetiva',24:'tjpe-juiz-substituto-01-2026-historico-objetiva',37:'pcdf-delegado-1-2026-historico-objetiva'};
+export const SUBJECT_ADMISSION_SCOPES:Record<number,string>={7:'Juiz Federal Substituto',13:'Auditor Fiscal da Administração Tributária Estadual',19:'Promotor de Justiça Substituto',20:'Promotor de Justiça Substituto',21:'Procurador do Estado — Classe I',24:'Juiz Substituto',37:'Delegado de Polícia',38:'Agente de Polícia Judiciária',39:'Papiloscopista Policial'};
+export const SUBJECT_ADMISSION_SLUGS:Record<number,string>={7:'trf-5-juiz-federal-2026',13:'sefaz-al-auditor-fiscal-2026',19:'mpmt-promotor-substituto-2026-historico-objetiva',20:'mprj-promotor-substituto-xxxix-2026-historico-objetiva',21:'pgeac-procurador-classe-i-viii-2026-historico-objetiva',24:'tjpe-juiz-substituto-01-2026-historico-objetiva',37:'pcdf-delegado-1-2026-historico-objetiva',38:'pcpr-agente-policia-judiciaria-01-2026-historico-objetiva',39:'pcpr-papiloscopista-policial-01-2026-historico-objetiva'};
 /** Escopos cujo edital aprovado vem do Cebraspe (demais: FGV Conhecimento). */
 export const CEBRASPE_SUBJECT_ADMISSION_OPPORTUNITIES:ReadonlySet<number>=new Set([13,37]);
 export const SUBJECT_ADMISSION_ACTION='editorial.programme.subject_catalog_admitted';
@@ -54,6 +59,7 @@ export const subjectAdmissionInputSchema=z.object({schemaVersion:z.literal(1),su
 export const subjectNameKey=(value:string)=>value.normalize('NFKC').replace(/\s+/gu,' ').trim().toLocaleUpperCase('pt-BR');
 /** Cebraspe PCDF: the title opens item 1 (or part I) on its own line ("MEDICINA LEGAL: 1 …"). */
 const INLINE_ITEM_ONE_SUBJECTS:ReadonlySet<string>=new Set(['direito-administrativo-e-legislacao-complementar','direito-constitucional-e-legislacao-complementar','direito-civil-e-legislacao-complementar','direito-empresarial-e-legislacao-complementar','direito-penal-e-legislacao-complementar','direito-tributario-e-legislacao-complementar','direito-processual-penal-e-legislacao-complementar','direito-ambiental-e-legislacao-complementar','medicina-legal']);
+const NUMBERED_INLINE_SUBJECTS:ReadonlySet<string>=new Set(['direito-penal-e-legislacao-penal-extravagante','direito-processual-penal-e-legislacao-processual-penal-extravagante','direito-penal-aplicado','direito-processual-penal-aplicado']);
 export function assertSubjectLabelProof(slug:keyof typeof ADDITIONAL_PROGRAMME_SUBJECTS,quote:string,page:string){
  const expected=ADDITIONAL_PROGRAMME_SUBJECTS[slug];
  const prefixes:Partial<Record<keyof typeof ADDITIONAL_PROGRAMME_SUBJECTS,string>>={
@@ -70,6 +76,8 @@ export function assertSubjectLabelProof(slug:keyof typeof ADDITIONAL_PROGRAMME_S
  // These approved programmes start item 1 on the heading's own line.
  // Keep and prove that whole line; never accept an arbitrary prose mention.
  if(slug==='legislacao-tributaria-estadual'||slug==='reforma-tributaria'||INLINE_ITEM_ONE_SUBJECTS.has(slug))matches ||= key.startsWith(`${name}: 1 `)&&key.length>`${name}: 1 `.length;
+ // PCPR: "6. DIREITO PENAL E LEGISLAÇÃO PENAL EXTRAVAGANTE: 6.1 …" (número da seção e item na mesma linha).
+ if(NUMBERED_INLINE_SUBJECTS.has(slug))matches ||= /^\d{1,2}\. /u.test(key)&&key.replace(/^\d{1,2}\. /u,'').startsWith(`${name}:`)&&(key.replace(/^\d{1,2}\. /u,'')===`${name}:`||/^\d{1,2}\.\d/u.test(key.replace(/^\d{1,2}\. /u,'').slice(name.length+1).trim()));
  // PCDF: "DIREITO PENAL E LEGISLAÇÃO COMPLEMENTAR: I DIREITO PENAL: 1 …" (parte I na mesma linha).
  if(INLINE_ITEM_ONE_SUBJECTS.has(slug))matches ||= key.startsWith(`${name}: I `)&&key.length>`${name}: I `.length;
  if(slug==='direito-civil-e-direito-empresarial')matches ||= key.startsWith(`${name} - PONTO 1. `)&&key.length>`${name} - PONTO 1. `.length;

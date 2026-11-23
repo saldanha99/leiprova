@@ -3,7 +3,12 @@ import {ADDITIONAL_PROGRAMME_SUBJECTS,subjectAdmissionInputSchema,assertSubjectL
 const proof={opportunityId:7,roleName:'Juiz Federal Substituto',examEditionId:25,sourceDocumentId:10,snapshotId:356,url:'https://conhecimento.fgv.br/sites/default/files/synthetic.pdf',checksum:'a'.repeat(64),headingPage:1,headingQuote:'DIREITO PREVIDENCIÁRIO'};
 const input={schemaVersion:1,subjects:[{slug:'direito-previdenciario',name:'Direito Previdenciário',proofs:[proof]}]};
 describe('rótulos oficiais e admissão da taxonomia',()=>{
- it('aceita somente nomes e cargos expressamente delimitados',()=>{expect(subjectAdmissionInputSchema.parse(input).subjects).toHaveLength(1);expect(Object.keys(ADDITIONAL_PROGRAMME_SUBJECTS)).toHaveLength(31);});
+ it('aceita somente nomes e cargos expressamente delimitados',()=>{expect(subjectAdmissionInputSchema.parse(input).subjects).toHaveLength(1);expect(Object.keys(ADDITIONAL_PROGRAMME_SUBJECTS)).toHaveLength(35);});
+ it('PCPR: título numerado inline; outro texto depois do título é recusado',()=>{
+  expect(()=>assertSubjectLabelProof('direito-penal-aplicado','7. DIREITO PENAL APLICADO: 7.1 Princípios básicos','7. DIREITO PENAL APLICADO: 7.1 Princípios básicos')).not.toThrow();
+  expect(()=>assertSubjectLabelProof('direito-processual-penal-e-legislacao-processual-penal-extravagante','7. DIREITO PROCESSUAL PENAL E LEGISLAÇÃO PROCESSUAL PENAL EXTRAVAGANTE:','7. DIREITO PROCESSUAL PENAL E LEGISLAÇÃO PROCESSUAL PENAL EXTRAVAGANTE:')).not.toThrow();
+  expect(()=>assertSubjectLabelProof('direito-penal-aplicado','7. DIREITO PENAL APLICADO: prosa qualquer','7. DIREITO PENAL APLICADO: prosa qualquer')).toThrow();
+ });
  it('PCDF: título inline abre o item 1; menção em prosa ou título sem item continuam recusados',()=>{
   expect(()=>assertSubjectLabelProof('medicina-legal','MEDICINA LEGAL: 1 Perícia e peritos.','x\nMEDICINA LEGAL: 1 Perícia e peritos.\ny')).not.toThrow();
   expect(()=>assertSubjectLabelProof('direito-penal-e-legislacao-complementar','DIREITO PENAL E LEGISLAÇÃO COMPLEMENTAR: 1 Princípios.','DIREITO PENAL E LEGISLAÇÃO COMPLEMENTAR: 1 Princípios.')).not.toThrow();
