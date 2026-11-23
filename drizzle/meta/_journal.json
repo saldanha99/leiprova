@@ -407,6 +407,13 @@
       "when": 1792195200000,
       "tag": "0057_seo_page_state",
       "breakpoints": true
+    },
+    {
+      "idx": 58,
+      "version": "7",
+      "when": 1792281600000,
+      "tag": "0058_camara_updated_text_capture",
+      "breakpoints": true
     }
   ]
 }

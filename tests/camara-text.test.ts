@@ -105,3 +105,24 @@ describe("captura pendente da LGPD atualizada da Câmara", () => {
     expect(snapshot.tables["public.legal_text_snapshots"].checkConstraints.legal_text_snapshots_url_check.value).toContain(url);
   });
 });
+
+describe("texto atualizado da Câmara para leis sem compilação no Senado", () => {
+  it("só aceita as cinco URLs registradas e exige captura pendente no carregador", async () => {
+    const { getCamaraUpdatedTextSource, isAllowedCamaraConsolidatedUrl, parseCamaraUpdatedLawHtml } = await import("@/lib/official-sources/camara-text");
+    const source = getCamaraUpdatedTextSource("https://legis.senado.leg.br/norma/551485");
+    expect(source?.url).toMatch(/lei-9609-19-fevereiro-1998-364738-normaatualizada-pl\.html$/u);
+    expect(isAllowedCamaraConsolidatedUrl(source!.url)).toBe(true);
+    expect(getCamaraUpdatedTextSource("https://legis.senado.leg.br/norma/1")).toBeNull();
+    const html = `<html><body><p>CÂMARA DOS DEPUTADOS</p><p>Centro de Documentação e Informação</p><p>LEI Nº 9.609, DE 19 DE FEVEREIRO DE 1998</p>
+      <p>Art. 1º Programa de computador é a expressão de um conjunto organizado de instruções em linguagem natural ou codificada.</p>
+      <p>CAPÍTULO II</p><p>Art. 2º O regime de proteção à propriedade intelectual de programa de computador é o conferido às obras literárias.</p>
+      <p><strike>Art. 3º Texto revogado que não pode entrar.</strike></p><p>Art. 3º Os programas de computador poderão, a critério do titular, ser registrados.</p>
+      <p>Brasília, 19 de fevereiro de 1998.</p><p>Art. 99. Assinatura fora do corpo.</p></body></html>`;
+    const parsed = parseCamaraUpdatedLawHtml(html, "https://legis.senado.leg.br/norma/551485");
+    expect(parsed.articles.map(a => a.path)).toEqual(["art-1", "art-2", "art-3"]);
+    expect(parsed.normalizedContent).not.toContain("revogado");
+    expect(() => parseCamaraUpdatedLawHtml(html.replace("9.609", "9.610"), "https://legis.senado.leg.br/norma/551485")).toThrow();
+    const loader = (await import("node:fs")).readFileSync("scripts/load-official-laws.ts", "utf8");
+    expect(loader).toContain('provider === "camara" && getCamaraUpdatedTextSource(source.monitorUrl) && !captureOnly');
+  });
+});

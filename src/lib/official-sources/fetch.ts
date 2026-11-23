@@ -12,7 +12,7 @@ import {
 } from "./legal-text";
 import { normalizeOfficialText } from "./text-normalization";
 import { assertOfficialRobotsPathAllowed, assertPlanaltoRobotsAllowed, decodePlanaltoHtml, getPlanaltoConsolidatedSource, parsePlanaltoConsolidatedHtml, PLANALTO_TEXT_PARSER_VERSION } from "./planalto-text";
-import { assertCamaraRobotsAllowed, CAMARA_LGPD_SOURCE, parseCamaraLgpdConsolidatedHtml } from "./camara-text";
+import { assertCamaraRobotsAllowed, CAMARA_LGPD_SOURCE, CAMARA_UPDATED_TEXT_PARSER_VERSION, getCamaraUpdatedTextSource, parseCamaraLgpdConsolidatedHtml, parseCamaraUpdatedLawHtml } from "./camara-text";
 import { assertCamaraProcurementRobotsAllowed, CAMARA_PROCUREMENT_SOURCE, extractCamaraProcurementPdf } from "./camara-procurement-text";
 
 const USER_AGENT = "LeiProva-OfficialSourceMonitor/1.0 (+https://leiprova.2b.app.br/fontes-e-atualizacao)";
@@ -168,7 +168,9 @@ async function readStrictLimitedBody(response: Response, limit: number) {
 export type LegalTextProvider = "senado" | "planalto" | "camara";
 
 export async function fetchOfficialConsolidatedLegalText(monitorUrl: string, options: { provider?: LegalTextProvider } = {}) {
-  if (options.provider === "camara" && monitorUrl !== CAMARA_LGPD_SOURCE.monitorUrl && monitorUrl !== CAMARA_PROCUREMENT_SOURCE.monitorUrl) throw new Error("A Câmara só foi configurada para identidades exatas da LGPD e Lei 14.133.");
+  const camaraUpdated = getCamaraUpdatedTextSource(monitorUrl);
+  if (options.provider === "camara" && camaraUpdated) return fetchCamaraUpdatedLegalText(monitorUrl, camaraUpdated.url);
+  if (options.provider === "camara" && monitorUrl !== CAMARA_LGPD_SOURCE.monitorUrl && monitorUrl !== CAMARA_PROCUREMENT_SOURCE.monitorUrl) throw new Error("A Câmara só foi configurada para identidades exatas da LGPD, Lei 14.133 e as leis de texto atualizado registradas.");
   if ((options.provider === "camara" || !options.provider) && monitorUrl === CAMARA_LGPD_SOURCE.monitorUrl) return fetchCamaraLgpdConsolidatedLegalText();
   if ((options.provider === "camara" || !options.provider) && monitorUrl === CAMARA_PROCUREMENT_SOURCE.monitorUrl) return fetchCamaraProcurementConsolidatedLegalText();
   const planalto = getPlanaltoConsolidatedSource(monitorUrl);
@@ -226,6 +228,24 @@ async function fetchCamaraProcurementConsolidatedLegalText() {
   const parsed = await extractCamaraProcurementPdf(bytes, CAMARA_PROCUREMENT_SOURCE.url);
   if (parsed.normalizedContent.length < 1_000) throw new Error("O PDF da Câmara não contém texto jurídico suficiente.");
   return { sourceUrl: CAMARA_PROCUREMENT_SOURCE.url, checksumSha256: parsed.checksumSha256, normalizedContent: parsed.normalizedContent, contentLength: parsed.normalizedContent.length, articleCount: parsed.articles.length, parserVersion: CAMARA_PROCUREMENT_SOURCE.parserVersion, fetchedAt: new Date() };
+}
+
+async function fetchCamaraUpdatedLegalText(monitorUrl: string, url: string) {
+  const headers = { "User-Agent": "EditalLeiSeca-OfficialSourceMonitor/1.0 (+https://editaleiseca.com.br/fontes-e-atualizacao)", Accept: "text/html,text/plain;q=0.9" };
+  const robotsResponse = await fetch("https://www2.camara.leg.br/robots.txt", { redirect: "manual", headers, signal: AbortSignal.timeout(20_000), cache: "no-store" });
+  if (robotsResponse.status !== 404 && !robotsResponse.ok) throw new Error("Não foi possível conferir o robots.txt da Câmara; captura bloqueada.");
+  const robotsBytes = await readStrictLimitedBody(robotsResponse, 64 * 1024);
+  if (robotsResponse.status !== 404) assertCamaraRobotsAllowed(new TextDecoder("utf-8", { fatal: true }).decode(robotsBytes), url);
+  const response = await fetch(url, { redirect: "manual", headers, signal: AbortSignal.timeout(20_000), cache: "no-store" });
+  if (!response.ok) throw new Error(`O texto atualizado da Câmara respondeu com HTTP ${response.status}; não há contorno de bloqueio.`);
+  const contentType = response.headers.get("content-type");
+  if (!contentType?.toLowerCase().includes("html")) throw new Error("O texto atualizado da Câmara não respondeu como HTML.");
+  const charset = /charset\s*=\s*["']?([^;\s"']+)/iu.exec(contentType)?.[1];
+  if (charset && !/^utf-?8$/iu.test(charset)) throw new Error("O texto atualizado da Câmara não declarou UTF-8.");
+  const bytes = await readStrictLimitedBody(response, MAX_LEGAL_TEXT_BYTES);
+  const parsed = parseCamaraUpdatedLawHtml(new TextDecoder("utf-8", { fatal: true }).decode(bytes), monitorUrl);
+  if (parsed.normalizedContent.length < 1_000) throw new Error("O texto atualizado da Câmara não contém texto suficiente.");
+  return { sourceUrl: url, checksumSha256: parsed.checksumSha256, normalizedContent: parsed.normalizedContent, contentLength: parsed.normalizedContent.length, articleCount: parsed.articles.length, parserVersion: CAMARA_UPDATED_TEXT_PARSER_VERSION, fetchedAt: new Date() };
 }
 
 async function fetchCamaraLgpdConsolidatedLegalText() {
