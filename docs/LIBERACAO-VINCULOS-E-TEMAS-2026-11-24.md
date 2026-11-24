@@ -61,6 +61,22 @@ Backup: `/opt/leiprova/.local/backups/vinculos-20261124/` (bindings, certificaç
   9.784 em "Atos administrativos". Arquivo: `docs/seo/topicos-amostra-media-100-2026-11-24.csv`.
 - Temas novos (50): **50/50** coerentes com o bloco oficial do artigo.
 
+## 6. Resultado (24/11, 18h08–18h29 UTC)
+
+- **Vínculos aprovados nesta operação: 3.732** (TJ-MS cartórios 2.378, PGE-AL 384, ENAM 342,
+  TJ-MT 271, TCE-RN 244, TRF-5 39, TJ-BA 22, TRF-2 21, TJ-RS 21, TJ-PR 9, PC-MA 1). A linha
+  automática aprovou outros 39 (PP-MA) no mesmo intervalo.
+- **Pendentes depois: 1.015**: 982 pelo tema (dependem do deploy da regra de acesso) e 33 com a
+  questão alterada (o motor repropõe). Suspensos: 344, corretos.
+- **Temas gravados sem deploy: 1.504** (alta 521, média 983), só em questões sem vínculo.
+  **Depois do deploy:** 16.614 propostas (alta 5.905, média 10.709), com `aplicar.sh alta,media`
+  (o script já usa as regras novas) e a mesma restrição de vínculo até conferir a regra no ar.
+- **Concursos em rascunho:** 55 avaliados pela linha, 0 passam a vender. Todos têm 0 questões e
+  esbarram em edital não revisado, categoria do catálogo e prova anterior, não em mapeamento.
+- **SEO:** 1.418 páginas indexáveis antes e depois (o gate não depende de vínculo nem de tema).
+  O controle de ondas só tem `off`/`0`/`all`; o ritmo de 50–100 páginas/dia exige uma onda nova
+  no código (`src/lib/seo/waves/`) e deploy.
+
 ## 5. Rollback
 
 ```sql
