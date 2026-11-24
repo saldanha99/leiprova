@@ -48,11 +48,12 @@ describe("destinos isolados do importador de propostas", () => {
     expect(requireProductBindingTarget(live, "https://leiprova.2b.app.br", "production", "import_pending_bindings").production).toBe(true);
     expect(() => requireProductBindingTarget(live.replace("leiprova_app@", "postgres@"), "https://leiprova.2b.app.br", "production", "import_pending_bindings")).toThrow();
   });
-  it("aceita requisito e questão sem tópico do catálogo, desde que coincidam (02–11/10/2026)", () => {
+  it("requisito sem tópico do catálogo não filtra por tópico; com tópico, exige o mesmo (02/10 e 24/11/2026)", () => {
     const query = new PgDialect().sqlToQuery(approvedProductQuestionExists(sql`${"pc-ma-delegado-2026"}`, sql`${1}`));
     // Programa extraído do edital não traz tópico; o vínculo se apoia em artigo, versão e citações.
-    expect(query.sql).toContain("verified_product_requirement.topic_id is not distinct from verified_product_question.topic_id");
-    expect(query.sql).not.toContain("verified_product_requirement.topic_id = verified_product_question.topic_id");
+    // O tema de SEO dado à questão (21/11) não pode tirá-la do produto.
+    expect(query.sql).toContain("(verified_product_requirement.topic_id is null or verified_product_requirement.topic_id = verified_product_question.topic_id)");
+    expect(query.sql).not.toContain("verified_product_requirement.topic_id is not distinct from verified_product_question.topic_id");
     expect(query.sql).toContain("verified_product_requirement.legal_article_id = verified_product_binding.legal_article_id or exists (");
     expect(query.sql).toContain("verified_product_covered_article.requirement_id = verified_product_requirement.id and verified_product_covered_article.legal_article_id = verified_product_binding.legal_article_id");
     expect(query.sql).toContain("verified_product_requirement.subject_id = verified_product_question.subject_id");

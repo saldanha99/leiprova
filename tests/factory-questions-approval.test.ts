@@ -47,6 +47,14 @@ describe("aprovação em massa das inéditas por autorização do proprietário"
   it("aprova vínculos novos também de produto já liberado", () => {
     expect(bindingReviewScript).toContain("product.status in ('draft','released')");
   });
+
+  it("revisa em lotes de até 250 e decide só os elegíveis, sem travar o produto (24/11/2026)", () => {
+    expect(bindingReviewScript).not.toContain("rows.length > 250");
+    expect(bindingReviewScript).toContain("rows.slice(start, start + 250)");
+    expect(bindingReviewScript).toContain('dossier.eligible && dossier.bindingStatus === "pending_review"');
+    // A prévia final, só com os elegíveis, ainda exige elegíveis = total antes de aplicar.
+    expect(bindingReviewScript.match(/preview\.eligible !== preview\.total/gu)?.length).toBe(1);
+  });
 });
 
 describe("conferência posterior e linha automática (decisão de 11/10/2026)", () => {

@@ -99,33 +99,54 @@ async function main() {
           and date_trunc('milliseconds',question.updated_at)=date_trunc('milliseconds',binding.question_updated_at)
       ) current_binding where ordinal=1 order by id
     `);
-    if (!rows.length || rows.length > 250) throw new ProductBindingReviewError("Nenhum conjunto atual e revisável de vínculos foi encontrado.");
+    if (!rows.length) throw new ProductBindingReviewError("Nenhum conjunto atual e revisável de vínculos foi encontrado.");
+    // Lotes de até 250 (limite do dossiê): o produto com mais pendências avança a cada rodada.
+    // Antes, acima de 250 a revisão era recusada por inteiro e o produto ficava parado.
+    const pendingCurrent = rows.length;
     const standingFactoryReviewReference=args.reference===FACTORY_STANDING_REVIEW_REFERENCE?args.reference:undefined;
     const notes = standingFactoryReviewReference
       ? `Revisão automatizada de aderência ao produto, edição e programa das inéditas da fábrica; sem revisão humana. Referência: ${args.reference}`
       : `Aderência ao produto, edição, programa e questões confirmada pelo proprietário. Referência: ${args.reference}`;
-    const input = {
+    const buildInput = (bindingIds: readonly string[]) => ({
       schemaVersion: 1 as const, productSlug: args.productSlug, opportunityPublicId: scope.opportunityPublicId,
-      examEditionPublicId: scope.examEditionPublicId, bindingIds: rows.map((row) => row.id), notes,
+      examEditionPublicId: scope.examEditionPublicId, bindingIds: [...bindingIds], notes,
       decision: "approve" as const, confirmations: { edition: true, program: true, adherence: true },
-    };
+    });
+    // Só os vínculos que passam na regra de acesso são decididos; os demais seguem pendentes,
+    // sem mudar a regra. Antes, um único inelegível travava o lote inteiro do produto.
+    // Percorre as pendências em janelas de 250 até juntar 250 elegíveis (ordem por id, determinística
+    // entre a prévia e a aplicação), para os inelegíveis não ocuparem a janela para sempre.
+    const eligibleIds: string[] = [];
+    let ineligible = 0;
+    for (let start = 0; start < rows.length && eligibleIds.length < 250; start += 250) {
+      const window = await reviewProductQuestionBindings(db, { input: buildInput(rows.slice(start, start + 250).map((row) => row.id)),
+        actorPublicId: args.actorPublicId, mode: "preview", standingFactoryReviewReference });
+      for (const dossier of window.dossiers ?? []) {
+        if (dossier.eligible && dossier.bindingStatus === "pending_review" && eligibleIds.length < 250) eligibleIds.push(dossier.bindingId);
+        else if (!dossier.eligible) ineligible += 1;
+      }
+    }
+    if (!eligibleIds.length) {
+      throw new ProductBindingReviewError(`O conjunto não pode ser decidido: elegíveis 0/${rows.length}.`);
+    }
+    const input = buildInput(eligibleIds);
     const preview = await reviewProductQuestionBindings(db, { input, actorPublicId: args.actorPublicId, mode: "preview",standingFactoryReviewReference });
     if (preview.eligible !== preview.total) {
-      throw new ProductBindingReviewError(
-        `O conjunto não pode ser decidido: elegíveis ${preview.eligible}/${preview.total}.`,
-      );
+      throw new ProductBindingReviewError(`O conjunto não pode ser decidido: elegíveis ${preview.eligible}/${preview.total}.`);
     }
     const fingerprint = operationFingerprint({ version: "current-product-bindings-review-v1", reference: args.reference,
       actorPublicId: args.actorPublicId, input, reviewFingerprint: preview.fingerprint });
     if (args.mode === "preview") {
       console.log(JSON.stringify({ mode: "preview", database: identity.name, fingerprint, total: preview.total,
-        eligible: preview.eligible, bindingIds: input.bindingIds, productReleased: false, checkoutEnabled: false }, null, 2));
+        eligible: preview.eligible, ineligibleKeptPending: ineligible, pendingCurrent,
+        bindingIds: input.bindingIds, productReleased: false, checkoutEnabled: false }, null, 2));
       return;
     }
     if (args.expectedFingerprint !== fingerprint) throw new ProductBindingReviewError("Dossiê ou contexto mudou; confira uma nova prévia.");
     const result = await reviewProductQuestionBindings(db, { input, actorPublicId: args.actorPublicId,
       mode: "apply", expectedFingerprint: preview.fingerprint,standingFactoryReviewReference });
-    console.log(JSON.stringify({ database: identity.name, ...result, operationFingerprint: fingerprint }, null, 2));
+    console.log(JSON.stringify({ database: identity.name, ...result, ineligibleKeptPending: ineligible, pendingCurrent,
+      operationFingerprint: fingerprint }, null, 2));
   } finally { await client.end(); }
 }
 

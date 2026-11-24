@@ -37,9 +37,11 @@ export function approvedProductQuestionExists(
       and (verified_product_requirement.legal_article_id = verified_product_binding.legal_article_id or exists (
         select 1 from opportunity_requirement_articles verified_product_covered_article
         where verified_product_covered_article.requirement_id = verified_product_requirement.id and verified_product_covered_article.legal_article_id = verified_product_binding.legal_article_id))
-      -- Tópico é filtro de estudo: requisito e questão precisam coincidir, inclusive
-      -- os dois sem tópico (programa extraído do edital não traz tópico do catálogo).
-      and verified_product_requirement.subject_id = verified_product_question.subject_id and verified_product_requirement.topic_id is not distinct from verified_product_question.topic_id
+      -- Tópico é filtro de estudo: requisito com tópico exige o mesmo tópico na questão;
+      -- requisito sem tópico (programa extraído do edital) não filtra por tópico, a mesma
+      -- regra da proposta e do serviço de vínculos. A classificação de temas de SEO
+      -- (21/11/2026) deu tema às questões e não pode tirá-las dos produtos.
+      and verified_product_requirement.subject_id = verified_product_question.subject_id and (verified_product_requirement.topic_id is null or verified_product_requirement.topic_id = verified_product_question.topic_id)
       and verified_product_source.status = 'approved'
       and verified_product_binding.evidence->>'sourceUrl' = verified_product_source.source_url
       and (verified_product_binding.source_snapshot_id is null or (

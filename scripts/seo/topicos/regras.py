@@ -57,7 +57,52 @@ RULES: list[tuple[str, str, str, str]] = [
     ("codigo-eleitoral-1965", r".*", "Direito Eleitoral", "Processo eleitoral"),
     ("lei-eleicoes-1997", r".*", "Direito Eleitoral", "Processo eleitoral"),
     ("lei-inelegibilidades-1990", r".*", "Direito Eleitoral", "Direitos políticos"),
+    # --- Temas novos (24/11/2026): blocos da estrutura oficial que a taxonomia de 45 não cobria.
+    # Vêm depois das regras acima: um bloco já coberto continua no tema antigo.
+    ("constituicao-federal-1988", r"T.TULO I\b", "Direito Constitucional", "Princípios fundamentais"),
+    ("constituicao-federal-1988", r"T.TULO III\b", "Direito Constitucional", "Organização do Estado"),
+    ("constituicao-federal-1988", r"T.TULO IV\b.*CAP.TULO I\b", "Direito Constitucional", "Poder Legislativo"),
+    ("constituicao-federal-1988", r"T.TULO IV\b.*CAP.TULO III\b", "Direito Constitucional", "Poder Judiciário"),
+    ("constituicao-federal-1988", r"T.TULO IV\b.*CAP.TULO IV\b", "Direito Constitucional", "Funções essenciais à Justiça"),
+    ("constituicao-federal-1988", r"T.TULO VI\b.*CAP.TULO II\b", "Direito Financeiro", "Finanças públicas e orçamento"),
+    ("constituicao-federal-1988", r"T.TULO VII\b", "Direito Constitucional", "Ordem econômica e financeira"),
+    ("constituicao-federal-1988", r"T.TULO VIII\b", "Direito Constitucional", "Ordem social"),
+    ("codigo-civil-2002", r"LIVRO III\b", "Direito Civil", "Direito das coisas"),
+    ("codigo-processo-civil-2015", r"PARTE ESPECIAL.*LIVRO I\b.*T.TULO II\b", "Direito Processual Civil", "Cumprimento de sentença"),
+    ("codigo-processo-civil-2015", r"PARTE ESPECIAL.*LIVRO I\b.*T.TULO III\b", "Direito Processual Civil", "Procedimentos especiais"),
+    ("codigo-processo-civil-2015", r"PARTE ESPECIAL.*LIVRO III\b.*T.TULO I\b", "Direito Processual Civil", "Processos nos tribunais"),
+    ("codigo-processo-penal", r"LIVRO I\b.*T.TULO V\b", "Direito Processual Penal", "Competência"),
+    ("codigo-processo-penal", r"LIVRO II\b", "Direito Processual Penal", "Processos em espécie"),
+    ("codigo-processo-penal", r"LIVRO III\b", "Direito Processual Penal", "Nulidades e recursos"),
+    ("codigo-tributario-nacional", r"LIVRO SEGUNDO.*T.TULO I\b", "Direito Tributário", "Legislação tributária"),
+    ("codigo-tributario-nacional", r"LIVRO SEGUNDO.*T.TULO IV\b", "Direito Tributário", "Administração tributária"),
+    ("lei-execucao-penal-1984", r".*", "Direito Processual Penal", "Execução penal"),
+    ("lei-juizados-especiais-1995", r"CAP.TULO II\b", "Direito Processual Civil", "Juizados especiais cíveis"),
+    ("lei-juizados-especiais-1995", r"CAP.TULO III\b", "Direito Processual Penal", "Juizados especiais criminais"),
+    ("lei-mandado-seguranca-2009", r".*", "Direito Processual Civil", "Mandado de segurança"),
+    ("lei-registros-publicos-1973", r".*", "Direito Civil", "Registros públicos"),
+    ("lei-introducao-normas-direito-brasileiro-1942", r".*", "Direito Civil", "Lei de Introdução (LINDB)"),
+    ("lei-improbidade-administrativa-1992", r".*", "Direito Administrativo", "Improbidade administrativa"),
+    ("codigo-defesa-consumidor-1990", r"T.TULO III\b", "Direito do Consumidor", "Defesa do consumidor em juízo"),
+    ("codigo-defesa-consumidor-1990", r"T.TULO I\b", "Direito do Consumidor", "Direitos do consumidor"),
+    ("lei-acao-civil-publica-1985", r".*", "Tutela Coletiva", "Ação civil pública"),
+    ("lei-geral-protecao-dados-2018", r".*", "Direito Digital", "Proteção de dados pessoais"),
+    ("politica-nacional-meio-ambiente-1981", r".*", "Direito Ambiental", "Política Nacional do Meio Ambiente"),
+    ("lei-beneficios-previdencia-1991", r".*", "Direito Previdenciário", "Benefícios do Regime Geral"),
+    ("lei-direito-financeiro-1964", r".*", "Direito Financeiro", "Finanças públicas e orçamento"),
+    ("lei-responsabilidade-fiscal-2000", r".*", "Direito Financeiro", "Responsabilidade fiscal"),
 ]
+
+# Temas criados em 24/11/2026 (matéria, nome). O slug sai do nome (ver slugify) e não pode
+# repetir um tema existente da mesma matéria.
+NEW_TOPICS = sorted({(subj, topic) for _slug, _rx, subj, topic in RULES[RULES.index(
+    ("constituicao-federal-1988", r"T.TULO I\b", "Direito Constitucional", "Princípios fundamentais")):]})
+
+
+def slugify(name: str) -> str:
+    import unicodedata
+    plain = unicodedata.normalize("NFKD", name).encode("ascii", "ignore").decode().lower()
+    return re.sub(r"[^a-z0-9]+", "-", plain).strip("-")
 
 LAW_LEVEL_SPECIAL = {
     # Legislação Especial: só quando a matéria da questão for essa (é tema de agrupamento).
@@ -85,9 +130,18 @@ def is_broad(slug: str, topic: str) -> bool:
     return (slug, topic) in BROAD
 
 
+# Blocos que a regra de lei inteira classificaria errado: ficam sem tema.
+# Amostra de 24/11/2026: o Cap. VI da Lei 9.605/1998 é infração ADMINISTRATIVA, não penal.
+EXCLUDE = [
+    ("lei-crimes-ambientais-1998", re.compile(r"DA INFRA[ÇC][ÃA]O ADMINISTRATIVA", re.IGNORECASE)),
+]
+
+
 def classify(slug: str, path: list[str]) -> tuple[str, str, str] | None:
     """Devolve (matéria, tema, regra) ou None."""
     joined = " > ".join(path)
+    if any(rule_slug == slug and rx.search(joined) for rule_slug, rx in EXCLUDE):
+        return None
     for rule_slug, rx, subj, topic in _COMPILED:
         if rule_slug == slug and rx.search(joined):
             return subj, topic, f"{slug}: /{rx.pattern}/"
