@@ -65,6 +65,7 @@ describe("candidatos oficiais internos de oportunidades", () => {
       "sefaz-al-auditor-fiscal-2026",
       "tce-ma-2026",
       "tc-df-analista-2026",
+      "camara-analista-legislativo-2026",
     ]);
     expect(getOfficialOpportunityCandidate("enam-2026-2")?.lifecycleStatus).toBe(
       "registration_open",
@@ -92,7 +93,7 @@ describe("candidatos oficiais internos de oportunidades", () => {
       candidate.officialSources.map((source) => source.url),
     );
 
-    expect(urls).toHaveLength(18);
+    expect(urls).toHaveLength(19);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls).not.toContain(
       "https://www.ba.gov.br/policiacivil/noticias/2026-03/24530/governo-da-bahia-alcanca-marca-de-9000-policiais-peritos-e-bombeiros",

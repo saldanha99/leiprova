@@ -615,6 +615,30 @@ export const OFFICIAL_OPPORTUNITY_CANDIDATES = Object.freeze([
       "O Edital nº 1 – TCDF/ANACE, de 8 de julho de 2026, executado pelo Cebraspe, prevê as provas objetivas e a discursiva em 22 de novembro de 2026.",
     officialUrl: "https://www.cebraspe.org.br/concursos/TC_DF_26_ANALISTA",
   }),
+  // Câmara dos Deputados — Analista Legislativo (decisão de 25/11/2026): um produto pela P1 de Conhecimentos
+  // Básicos, comum aos 11 cargos. Edital nº 1 – Câmara dos Deputados, de 2 de outubro de 2026 (Cebraspe).
+  bankNoticeCandidate("cebraspe", {
+    slug: "camara-analista-legislativo-2026",
+    title: "Câmara dos Deputados — Analista Legislativo 2026",
+    categorySlug: "area-legislativa",
+    careerSlug: "area-legislativa",
+    jurisdictionCode: "BR",
+    scope: "federal",
+    cycleYear: 2026,
+    institutionAcronym: "CD",
+    institutionName: "Câmara dos Deputados",
+    roleName: "Analista Legislativo",
+    officialNoticeNumber: "1/2026",
+    lifecycleStatus: "registration_closed",
+    statusAsOf: "2026-11-25",
+    noticePublishedAt: "2026-10-02",
+    registrationStartsAt: "2026-10-15",
+    registrationEndsAt: "2026-11-17",
+    examDate: "2027-01-17",
+    summary:
+      "O Edital nº 1 – Câmara dos Deputados, de 2 de outubro de 2026, executado pelo Cebraspe, prevê as provas objetivas e a discursiva em 17 de janeiro de 2027. O produto treina a P1 de Conhecimentos Básicos, comum aos cargos de Analista Legislativo.",
+    officialUrl: "https://www.cebraspe.org.br/concursos/CD_26_ANALISTA",
+  }),
 ] satisfies readonly InternalOpportunityCandidate[]);
 
 export function getOfficialOpportunityCandidate(slug: string) {

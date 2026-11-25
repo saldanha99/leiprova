@@ -30,9 +30,16 @@ describe("aprovação explícita das oportunidades oficiais", () => {
     expect(result.reduce((total, candidate) => total + candidate.sourceUrls.length, 0)).toBe(9);
   });
 
+  it("valida o edital da Câmara (Analista Legislativo) de 25/11 com prova futura", () => {
+    const result = validateOfficialOpportunityApprovalBatch(OFFICIAL_OPPORTUNITY_CANDIDATES.slice(15), "2026-11-25");
+
+    expect(result).toHaveLength(1);
+    expect(result.every((candidate) => candidate.catalogEligible)).toBe(true);
+  });
+
   it("valida os nove editais ativos de 28/09 com provas futuras", () => {
     const result = validateOfficialOpportunityApprovalBatch(
-      OFFICIAL_OPPORTUNITY_CANDIDATES.slice(6),
+      OFFICIAL_OPPORTUNITY_CANDIDATES.slice(6, 15),
       "2026-09-28",
     );
 

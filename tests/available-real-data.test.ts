@@ -15,8 +15,8 @@ const historical: readonly AvailableExamEdition[] = AVAILABLE_REAL_EXAM_EDITIONS
 );
 
 describe("carga de dados reais disponíveis", () => {
-  it("mantém treze edições atuais vinculáveis e vinte e cinco históricas oficiais", () => {
-    expect(validateAvailableRealExamEditions()).toHaveLength(38);
+  it("mantém catorze edições atuais vinculáveis e vinte e seis históricas oficiais", () => {
+    expect(validateAvailableRealExamEditions()).toHaveLength(40);
 
     const scheduled: readonly AvailableExamEdition[] = AVAILABLE_REAL_EXAM_EDITIONS.filter(
       (edition) => edition.status === "scheduled",
@@ -37,9 +37,10 @@ describe("carga de dados reais disponíveis", () => {
       ["sefaz-al-auditor-fiscal-2026", "2026-12-20"],
       ["tce-ma-2026", "2026-11-22"],
       ["tc-df-analista-2026", "2026-11-22"],
+      ["camara-analista-legislativo-2026", "2027-01-17"],
     ]);
     expect(scheduled.every((edition) => edition.opportunitySlug && edition.productSlugs?.length)).toBe(true);
-    expect(published).toHaveLength(25);
+    expect(published).toHaveLength(26);
     expect(published.every((edition) => edition.documents.length === 2)).toBe(true);
   });
 
@@ -52,8 +53,8 @@ describe("carga de dados reais disponíveis", () => {
       expect(booklets[0].expectedQuestionCount).toBeGreaterThan(0);
       expect(answerKeys).toHaveLength(1);
       expect(answerKeys[0].title).toMatch(/definitivo/iu);
-      // Toda prova histórica já foi aplicada antes do levantamento de 27/09/2026.
-      expect(edition.examDate < "2026-09-27").toBe(true);
+      // Toda prova histórica já foi aplicada antes do levantamento em que foi registrada.
+      expect(edition.examDate < "2026-11-25").toBe(true);
       expect(edition.productSlugs).toBeUndefined();
     }
   });

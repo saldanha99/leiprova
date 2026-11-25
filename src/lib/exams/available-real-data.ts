@@ -288,6 +288,16 @@ export const AVAILABLE_REAL_EXAM_EDITIONS = [
     examDate: "2026-11-22",
     productSlugs: ["tc-df-analista-2026"],
   }),
+  scheduledNotice("cebraspe", "CD_26_ANALISTA", {
+    publicId: "camara-analista-legislativo-2026",
+    careerSlug: "area-legislativa",
+    institutionAcronym: "CD",
+    jurisdictionCode: "BR",
+    title: "Câmara dos Deputados — Analista Legislativo 2026",
+    jurisdiction: "Brasil",
+    examDate: "2027-01-17",
+    productSlugs: ["camara-camara-dos-deputados-2026"],
+  }),
   // Últimas provas anteriores por produto, levantadas em 27/09/2026 nos portais
   // oficiais. Datas conferidas no gabarito, comunicado ou edital de cada prova;
   // detalhes e pendências em docs/research/provas-anteriores-2026-09-27.json.
@@ -477,6 +487,39 @@ export const AVAILABLE_REAL_EXAM_EDITIONS = [
         title: "TC-DF 2023 — Analista Administrativo de Controle Externo — gabarito definitivo P3 (itens 81 a 150)",
         sourceUrl: "https://cdn.cebraspe.org.br/concursos/TC_DF_23/arquivos/GAB_DEFINITIVO_895_TCDF_001_01.PDF",
         fileName: "GAB_DEFINITIVO_895_TCDF_001_01.PDF",
+        expectedQuestionCount: null,
+      },
+    ],
+  },
+  // Câmara dos Deputados: última prova do mesmo órgão e carreira (Cebraspe CD_25_NS, Edital nº 1 de 30/12/2025,
+  // aplicada em 08/03/2026). Só a P1 de conhecimentos gerais dos cargos 1 e 2 (Analista Legislativo), 90 itens C/E.
+  {
+    publicId: "camara-analista-legislativo-2025-p1",
+    sourceExternalId: "CD_25_NS",
+    careerSlug: "area-legislativa",
+    bankSlug: "cebraspe",
+    institutionAcronym: "CD",
+    jurisdictionCode: "BR",
+    title: "Câmara dos Deputados 2025 — Analista Legislativo — prova objetiva P1 (conhecimentos gerais)",
+    organizer: "Cebraspe",
+    jurisdiction: "Brasil",
+    officialUrl: "https://www.cebraspe.org.br/concursos/CD_25_NS",
+    examDate: "2026-03-08",
+    durationMinutes: null,
+    status: "published",
+    documents: [
+      {
+        documentType: "question_booklet",
+        title: "Câmara dos Deputados 2025 — prova objetiva P1, conhecimentos gerais para os cargos 1 e 2 (itens 1 a 90)",
+        sourceUrl: "https://cdn.cebraspe.org.br/concursos/CD_25_NS/arquivos/E61A04B682ABA7AF746F702D22B1516C4A4BC005855CE5CFFF5D2280F3E790CE.pdf",
+        fileName: "E61A04B682ABA7AF746F702D22B1516C4A4BC005855CE5CFFF5D2280F3E790CE.pdf",
+        expectedQuestionCount: 90,
+      },
+      {
+        documentType: "answer_key",
+        title: "Câmara dos Deputados 2025 — gabarito oficial definitivo da P1, conhecimentos gerais (itens 1 a 90)",
+        sourceUrl: "https://cdn.cebraspe.org.br/concursos/CD_25_NS/arquivos/BE7F1F9B1F3F90750D44E63070FDE8505D71F1BADD7F9A2096BB953B32081694.pdf",
+        fileName: "BE7F1F9B1F3F90750D44E63070FDE8505D71F1BADD7F9A2096BB953B32081694.pdf",
         expectedQuestionCount: null,
       },
     ],
