@@ -12,7 +12,7 @@ vi.mock("../src/lib/official-sources/fetch", () => ({ verifyOfficialExamUrl: vi.
 
 import { OFFICIAL_COURSE_STANDING_REFERENCE } from "../src/lib/editorial/official-course-dossier";
 import { buildNextOfficialCoursePreview, NEXT_OFFICIAL_COURSE_RECIPES, type ProgrammeSection } from "../src/lib/editorial/official-course-preview-candidates";
-import { admitCompositeOfficialCourse, assertCompositeFreshness, assertCompositeHashes, compositeCourseTarget, compositeProgrammeRequirements, COMPOSITE_ADMISSION_TARGETS } from "../src/lib/editorial/composite-course-admission";
+import { admitCompositeOfficialCourse, assertCompositeFreshness, assertCompositeHashes, compositeBank, compositeCourseTarget, compositeProgrammeRequirements, COMPOSITE_ADMISSION_TARGETS } from "../src/lib/editorial/composite-course-admission";
 import type { CapturedOfficialDocument } from "../src/lib/opportunities/official-document-fetch";
 import { parseOfficialOpportunitySourceUrl } from "../src/lib/opportunities/source-monitor-policy";
 import { parseCompositeCourseArgs } from "../scripts/admit-composite-official-course";
@@ -108,10 +108,12 @@ describe("bounded MPRJ/PGEAC composite admission", () => {
     expect(items).toHaveLength(3);
   });
   it("allows only the three exact metadata result paths, not directory-wide candidate lists", () => {
+    // Cada marco é conferido contra a política da banca do alvo (FGV por lista exata; Cebraspe por host/prefixo).
     for (const target of COMPOSITE_ADMISSION_TARGETS) for (const stage of target.stages) {
-      expect(parseOfficialOpportunitySourceUrl(stage.url, "fgv-conhecimento").url).toBe(stage.url);
-      expect(() => parseOfficialOpportunitySourceUrl(stage.url.replace(".pdf", "-different.pdf"), "fgv-conhecimento")).toThrow();
-      expect(() => parseOfficialOpportunitySourceUrl(stage.url.replace("conhecimento.fgv.br", "foreign.example"), "fgv-conhecimento")).toThrow();
+      const sourceId = compositeBank(target).sourceId;
+      expect(parseOfficialOpportunitySourceUrl(stage.url, sourceId).url).toBe(stage.url);
+      expect(() => parseOfficialOpportunitySourceUrl(stage.url.replace(new URL(stage.url).hostname, "foreign.example"), sourceId)).toThrow();
+      if (sourceId === "fgv-conhecimento") expect(() => parseOfficialOpportunitySourceUrl(stage.url.replace(".pdf", "-different.pdf"), sourceId)).toThrow();
     }
   });
   it("creates sources and organizers before reviewed transition and leaves product draft with zero mappings/questions", async()=>{

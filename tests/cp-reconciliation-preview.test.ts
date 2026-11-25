@@ -29,7 +29,6 @@ import {
   parseCamaraCpCorrectionCapture,
 } from "../src/lib/official-sources/camara-cp-correction-parser";
 import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
 import {
   CP_CUT_PRODUCT,
   CP_CUT_CONTRACT,
@@ -42,7 +41,8 @@ import {
 // URL oficial: https://www2.camara.leg.br/legin/fed/lei/2026/lei-15517-22-setembro-2026-800012-publicacaooriginal-181458-pl.html
 // SHA256 pin oficial: 44775d6c3fc157dfd63467295a6aa025285b304f762995577c8773eadc6ce596
 const FIXTURE_15517_URL = new URL("./fixtures/cp-lei15517-original-camara.html", import.meta.url);
-const CP_CURRENT_HTML_PATH = resolve(".local/editorial/lei12737-reconciliacao-20261012/cp-current-camara.html");
+// Texto oficial do Código Penal na Câmara, capturado em 12/10/2026 (hash bruto fixado em CAMARA_CP_CORRECTION.rawSha256).
+const CP_CURRENT_HTML_PATH = new URL("./fixtures/cp-current-camara-20261012.html", import.meta.url);
 
 function createSyntheticFreshEvidence(): FreshCpEvidence {
   const bodyBytes = readFileSync(CP_CURRENT_HTML_PATH);
@@ -485,7 +485,8 @@ describe("Fingerprint de reconciliação pós-suspensão (R7: estado observado c
   });
 });
 
-describe("validateCpReconciliationContext (somente leitura)", () => {
+// Cada caso faz o parse integral do CP oficial (fixture de 800 KB); com a suíte em paralelo passa de 5 s.
+describe("validateCpReconciliationContext (somente leitura)", { timeout: 30_000 }, () => {
   it("valida com sucesso estado pós-suspensão e projeta reabilitação sem autoria nova", async () => {
     const fresh = createSyntheticFreshEvidence();
     const tx = createMockExecutor();

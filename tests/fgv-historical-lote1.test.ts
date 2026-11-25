@@ -88,10 +88,9 @@ describe("lote FGV histórico — receitas e layout do anexo", () => {
     expect(requirements).toHaveLength(3);
   });
 
-  it("TJPE sem gabarito definitivo fica com prova anterior bloqueada e fora do cadastro", () => {
-    expect(previousExamAdmissionBlocker(recipeOf("tj-pe-juiz-de-direito-2026").previousExam)).toMatch(/missing answer_key/u);
-    for (const slug of LOTE.filter((slug) => slug !== "tj-pe-juiz-de-direito-2026")) expect(previousExamAdmissionBlocker(recipeOf(slug).previousExam)).toBeNull();
-    expect(() => fgvHistoricalPreviousExam("tj-pe-juiz-de-direito-2026")).toThrow();
+  it("todo o lote tem evidência completa de gabarito (TJPE com o definitivo de 11/11/2026)", () => {
+    for (const slug of LOTE) expect(previousExamAdmissionBlocker(recipeOf(slug).previousExam)).toBeNull();
+    expect(fgvHistoricalPreviousExam("tj-pe-juiz-de-direito-2026").editionPublicId).toBe("tjpe-juiz-substituto-01-2026-objetiva");
   });
 });
 
@@ -134,7 +133,7 @@ describe("lote FGV histórico — prova anterior por metadados", () => {
     const identity = [`--product=${target.productSlug}`, "--opportunity=0f7ba2b8-797e-4939-a86f-57077eea58a5", `--expected-notice-sha256=${target.noticeSha256}`];
     expect(parseFgvHistoricalPreviousExamArgs(identity)).toMatchObject({ apply: false, databasePreview: true });
     expect(parseFgvHistoricalPreviousExamArgs([...identity, "--apply", `--expected-fingerprint=${"a".repeat(64)}`]).apply).toBe(true);
-    for (const args of [[], ["--product=tj-pe-juiz-de-direito-2026"], [...identity, "--apply"], [identity[0], "--opportunity=nao-uuid", identity[2]], [identity[0], identity[1], "--expected-notice-sha256=" + "c".repeat(64)], [identity[0], "--output=../../public"]]) expect(() => parseFgvHistoricalPreviousExamArgs(args)).toThrow();
+    for (const args of [[], ["--product=produto-fora-do-lote"], [...identity, "--apply"], [identity[0], "--opportunity=nao-uuid", identity[2]], [identity[0], identity[1], "--expected-notice-sha256=" + "c".repeat(64)], [identity[0], "--output=../../public"]]) expect(() => parseFgvHistoricalPreviousExamArgs(args)).toThrow();
     expect(() => assertFgvRegistrationRequest({ productSlug: target.productSlug, mode: "apply", opportunityPublicId: "0f7ba2b8-797e-4939-a86f-57077eea58a5", expectedNoticeSha256: target.noticeSha256 })).toThrow();
   });
 
@@ -144,7 +143,7 @@ describe("lote FGV histórico — prova anterior por metadados", () => {
       expect(HISTORICAL_PREVIOUS_EXAMS.find((item) => item.productSlug === product)?.editionPublicId).toBe(edition);
     }
     expect(() => parsePreviousExamLinkCommand(["--standing", "tj-pr-juiz-de-direito-2025-2026=tjba-juiz-substituto-01-2026-objetiva"])).toThrow();
-    expect(() => parsePreviousExamLinkCommand(["--standing", "tj-pe-juiz-de-direito-2026=tjpe-juiz-substituto-01-2026-objetiva"])).toThrow();
+    expect(() => parsePreviousExamLinkCommand(["--standing", "tj-pe-juiz-de-direito-2026=tjba-juiz-substituto-01-2026-objetiva"])).toThrow();
   });
 });
 
@@ -154,10 +153,12 @@ describe("classificação de disciplinas do lote", () => {
       const { target, recipe } = compositeCourseTarget(slug);
       expect(PROGRAMME_CLASSIFICATION_SCOPES[target.slug as keyof typeof PROGRAMME_CLASSIFICATION_SCOPES]).toBe(recipe.role);
     }
-    // Disciplinas sem entrada exata no catálogo continuam fora da classificação.
+    // Consumidor e Criança e Adolescente entraram no catálogo com o TJPE (23/11/2026); as demais sem entrada exata ficam fora.
+    expect(programmeCanonicalSubject("DIREITO DO CONSUMIDOR")).toBe("Direito do Consumidor");
+    expect(programmeCanonicalSubject("DIREITO DA CRIANÇA E DO ADOLESCENTE")).toBe("Direito da Criança e do Adolescente");
     expect(programmeCanonicalSubject("DIREITO PENAL")).toBe("Direito Penal");
     expect(programmeCanonicalSubject("DIREITO FINANCEIRO E TRIBUTÁRIO")).toBe("Direito Financeiro e Tributário");
-    for (const heading of ["DIREITO DO CONSUMIDOR", "DIREITO DA CRIANÇA E DO ADOLESCENTE", "LEGISLAÇÃO DO MINISTÉRIO PÚBLICO", "NOÇÕES GERAIS DE DIREITO E FORMAÇÃO HUMANÍSTICA"]) expect(programmeCanonicalSubject(heading)).toBeNull();
+    for (const heading of ["LEGISLAÇÃO DO MINISTÉRIO PÚBLICO", "NOÇÕES GERAIS DE DIREITO E FORMAÇÃO HUMANÍSTICA"]) expect(programmeCanonicalSubject(heading)).toBeNull();
   });
 });
 
