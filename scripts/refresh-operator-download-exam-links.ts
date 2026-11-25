@@ -16,6 +16,7 @@ async function main() {
     const results = [];
     for (const pinned of OPERATOR_DOWNLOAD_EXAM_DOCUMENTS) {
       const checked = await verifyOfficialExamUrlWithOperatorDownload(pinned.bankSlug, pinned.url);
+      const downloadedAt = "operatorDownloadedAt" in checked ? checked.operatorDownloadedAt : null;
       const rows = await client.begin(apply ? "isolation level serializable" : "isolation level repeatable read read only", async (tx) => {
         await tx`set local statement_timeout = '30s'`;
         const documents = await tx<{ id: string; publicId: string }[]>`select document.id::text as id, document.public_id as "publicId"
@@ -28,11 +29,11 @@ async function main() {
         const [admin] = await tx<{ id: string }[]>`select id::text from users where role = 'admin' order by id limit 1`;
         await tx`insert into audit_logs (actor_user_id, action, entity_type, metadata)
           values (${admin.id}, 'automation.exam_link.operator_download_verified', 'exam_link_refresh', ${tx.json({ url: pinned.url, sha256: pinned.sha256,
-            operatorDownloadedAt: checked.operatorDownloadedAt ?? null, verifiedAt: checked.checkedAt.toISOString(), approvalReference: pinned.approvalReference,
+            operatorDownloadedAt: downloadedAt, verifiedAt: checked.checkedAt.toISOString(), approvalReference: pinned.approvalReference,
             documentPublicIds: documents.map((document) => document.publicId) })})`;
         return documents;
       });
-      results.push({ url: pinned.url, sha256: pinned.sha256, documents: rows.length, verifiedAt: checked.checkedAt.toISOString(), operatorDownloadedAt: checked.operatorDownloadedAt ?? null });
+      results.push({ url: pinned.url, sha256: pinned.sha256, documents: rows.length, verifiedAt: checked.checkedAt.toISOString(), operatorDownloadedAt: downloadedAt });
     }
     console.log(JSON.stringify({ mode: apply ? "applied" : "preview", results }, null, 2));
   } finally { await client.end(); }
