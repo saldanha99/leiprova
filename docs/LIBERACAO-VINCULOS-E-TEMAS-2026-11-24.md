@@ -96,3 +96,25 @@ delete from quiz_topics t using audit_logs a where a.action='seo.topic_created' 
   and t.id=a.entity_id::bigint and not exists (select 1 from questions q where q.topic_id=t.id);
 ```
 Código: `git revert` do commit desta operação.
+
+## 7. Vitrine e temas restantes (25/11/2026, 03h50–04h20 UTC)
+
+- **Causa da falha de 24/11:** o piso de 68 questões da vitrine (`minimumCourseContentSatisfied`)
+  validava todos os ~24,5 mil vínculos aprovados com o predicado completo só para comparar com 68:
+  46–55 s, acima do `statement_timeout` de 30 s, e a lista de produtos à venda ficava presa.
+  EXPLAIN ANALYZE (só leitura): preparação 0,5 ms, prova anterior 10 ms, piso 46,5 s.
+- **Correção (7ac932b):** mesma regra, mas a contagem para na 68ª questão válida (candidatas
+  distintas com `offset 0` e checagem por `(select exists …)`, para o Postgres não juntar a
+  checagem e validar tudo antes do `limit`). 47,5 s → 1,9 s, mesmos 31 produtos. Sem índice novo e
+  sem subir o `statement_timeout`.
+- **Deploy:** 04:01–04:07 UTC, 502 entre 04:05:21 e 04:05:34 (~15 s). Rollback: `1ba7698`.
+  Nenhum `statement timeout` da vitrine depois da troca do app. PC-PR Agente à venda:
+  R$ 67/mês e R$ 347/ano (preço da linha automática, sem alteração).
+- **Temas:** a proposta `aplicar.sh alta,media` deu 18.501 (alta 6.642, média 11.859; eram 16.614
+  em 24/11, entraram questões novas). Gravados 18.501 em 8 lotes de até 2.500
+  (`audit_logs` `seo.topic_classified`, `metadata.batch` = `2026-11-25-lote-00` a `-07`), com a
+  trava de não dar tema diferente do requisito com tema a uma questão vinculada. Questões válidas
+  nos 31 produtos liberados: 24.573 antes e depois.
+- **Backup:** `/opt/leiprova/.local/backups/temas-20261125/` (`questions.id/topic_id` antes,
+  `max(audit_logs.id)` = 216592, proposta e contagens antes/depois). Rollback dos temas: o SQL da
+  seção 5 com `metadata->>'batch' like '2026-11-25%'`.
