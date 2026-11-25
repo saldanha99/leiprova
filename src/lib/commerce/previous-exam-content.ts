@@ -114,13 +114,8 @@ function exactHistoricalScopeConditions() {
         and newer_edition.institution_acronym = exam_edition.institution_acronym
         and newer_edition.jurisdiction_code = exam_edition.jurisdiction_code
         and newer_edition.status in ('held', 'published')
-        and (
-          newer_edition.exam_date > exam_edition.exam_date
-          or (
-            newer_edition.exam_date = exam_edition.exam_date
-            and newer_edition.id > exam_edition.id
-          )
-        )
+        -- Mesma data = provas simultâneas (cargos diferentes do mesmo concurso), não edição mais nova.
+        and newer_edition.exam_date > exam_edition.exam_date
         and newer_edition.exam_date < (current_timestamp at time zone 'America/Sao_Paulo')::date
         and (exam_product.preparation_mode = 'historical_training' or opportunity.exam_date is null or newer_edition.exam_date < opportunity.exam_date)
     )`;

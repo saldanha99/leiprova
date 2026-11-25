@@ -80,8 +80,10 @@ describe("conteúdo real licenciado por produto", () => {
     expect(query.sql).not.toContain("assignment.quiz_bank_id = exam_edition.bank_id");
     expect(query.sql).not.toContain("newer_edition.bank_id");
     expect(query.sql).toContain("from exam_editions newer_edition");
-    expect(query.sql).toContain("newer_edition.exam_date = exam_edition.exam_date");
-    expect(query.sql).toContain("newer_edition.id > exam_edition.id");
+    // Só data posterior conta como edição mais nova: na mesma data são provas simultâneas de cargos
+    // diferentes (PC-PR Agente x Papiloscopista, 24/11/2026), e cada produto aponta a sua edição.
+    expect(query.sql).toContain("and newer_edition.exam_date > exam_edition.exam_date");
+    expect(query.sql).not.toContain("newer_edition.id > exam_edition.id");
     expect(query.sql).not.toContain("newer_edition.source_checked_at");
     expect(query.sql).not.toContain("newer_edition.official_url");
     expect(query.sql).toContain("exam_edition.status in ('held', 'published')");

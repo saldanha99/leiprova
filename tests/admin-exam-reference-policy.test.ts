@@ -186,6 +186,8 @@ describe("identidade da última prova por produto", () => {
     expect(reviewQueriesSource).toContain("from exam_editions newer_edition");
     expect(reviewQueriesSource).not.toContain("newer_edition.official_url");
     expect(reviewQueriesSource).not.toContain("newer_edition.source_checked_at");
+    // Mesma data = provas simultâneas de cargos diferentes (PC-PR Agente x Papiloscopista, 24/11/2026).
+    expect(reviewQueriesSource).not.toContain("newer_edition.id >");
     expect(actionsSource).toContain('from "@/lib/exams/previous-exam-review"');
   });
 
