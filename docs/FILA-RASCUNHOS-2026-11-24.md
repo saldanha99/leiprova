@@ -21,3 +21,13 @@ O catálogo tem 55 rascunhos (o "57" do pedido não bate com o banco). Só 3 tê
 Bloqueios comuns aos 52 sem edital: "sem edital oficial revisado", "categoria do catálogo diferente
 da do edital", "0 de 68 questões" e "sem prova anterior". Todos saem juntos quando o edital é
 admitido; não há trabalho útil antes disso.
+
+## Decisões do Vinícius (25/11/2026, via Chefe de Gabinete)
+
+- **PC-PR Agente:** aprovado à venda. A rotina do deploy de 24/11 às 23h faz o merge de
+  `fix/prova-anterior-mesma-data` na main antes do deploy e confere o produto à venda.
+- **TCE-MA:** treino histórico (`historical_training`) com a prova real, posicionado para o próximo concurso.
+- **TST e TCE-SP:** pré-edital (`pre_notice`) pelo último edital oficial, marcado como tal e atualizado quando o novo sair.
+- **Câmara e PGM-RJ:** dividir cada oferta em 2 produtos, um por cargo, cada um com suas questões.
+- Execução no fluxo normal (admissão, mapeamento e motor) a partir de 25/11 às 14h, junto com o item 3.
+  Nada vai à venda sem avisar o Chefe antes, exceto o PC-PR Agente.
