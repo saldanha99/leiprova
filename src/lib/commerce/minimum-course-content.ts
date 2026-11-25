@@ -55,10 +55,30 @@ export function priorityProductQuestionCount(
   )`.mapWith(Number);
 }
 
-/** Fecha novas vendas abaixo do piso; não revoga o restante do acesso já adquirido. */
+/** Fecha novas vendas abaixo do piso; não revoga o restante do acesso já adquirido.
+ * Mesma regra de approvedProductQuestionCount (cada questão passa pelo predicado
+ * completo de acesso), mas para ao achar a 68ª questão válida em vez de validar
+ * todo o acervo. 25/11/2026 (EXPLAIN ANALYZE em produção, 31 produtos liberados,
+ * ~24,5 mil vínculos): a vitrine levava 46–55 s e estourava o statement_timeout de
+ * 30 s; com a parada antecipada, 1,9 s e os mesmos 31 produtos. O `offset 0` e o
+ * `(select exists …)` impedem o Postgres de juntar a checagem à lista de
+ * candidatas, o que a faria rodar em todos os vínculos antes do `limit`. */
 export function minimumCourseContentSatisfied(
   productSlug: SQLWrapper,
   opportunityId?: SQLWrapper,
 ) {
-  return sql<boolean>`${approvedProductQuestionCount(productSlug, opportunityId)} >= ${MINIMUM_COURSE_QUESTION_COUNT}`;
+  return sql<boolean>`(
+    select count(*) from (
+      select 1 from (
+        select distinct floor_binding.question_id
+        from contest_product_question_bindings floor_binding
+        where floor_binding.product_slug = ${productSlug}
+          and floor_binding.status = 'approved'
+          ${opportunityId ? sql`and floor_binding.opportunity_id = ${opportunityId}` : sql``}
+        offset 0
+      ) floor_candidate
+      where (select ${approvedProductQuestionExists(productSlug, sql`floor_candidate.question_id`, opportunityId)})
+      limit ${MINIMUM_COURSE_QUESTION_COUNT}
+    ) floor_hit
+  ) >= ${MINIMUM_COURSE_QUESTION_COUNT}`;
 }

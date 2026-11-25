@@ -32,6 +32,18 @@ describe("piso editorial por produto", () => {
     const gate = new PgDialect().sqlToQuery(minimumCourseContentSatisfied(sql`${"concurso-x"}`));
     expect(gate.params.at(-1)).toBe(68);
   });
+  it("o piso para na 68ª questão válida, checando cada candidata com o predicado completo", () => {
+    const gate = new PgDialect().sqlToQuery(minimumCourseContentSatisfied(sql`${"concurso-x"}`, sql`${123}`));
+    expect(gate.sql).toMatch(/offset 0\s+\) floor_candidate/);
+    expect(gate.sql).toContain("where (select exists (");
+    expect(gate.sql).toContain("verified_product_binding.question_id = floor_candidate.question_id");
+    expect(gate.sql).toContain("verified_product_binding.evidence->'questionContent'");
+    expect(gate.sql).toContain("floor_binding.status = 'approved'");
+    expect(gate.sql).toMatch(/limit \$\d+\s+\) floor_hit\s+\) >= \$\d+$/);
+    expect(gate.params.filter((value) => value === 68)).toHaveLength(2);
+    expect(gate.params).toContain("concurso-x");
+    expect(gate.params).toContain(123);
+  });
 });
 
 describe("associação exata de página e produto", () => {
