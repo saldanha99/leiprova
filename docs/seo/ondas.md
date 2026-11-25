@@ -7,7 +7,10 @@ Atualizado em 21/11/2026. Base usada na seleção: dump de produção
 
 | Variável | Valores | Efeito |
 |---|---|---|
-| `SEO_WAVE` | vazio/`off` (padrão), `0`, `all` | Decide só o que entra no **sitemap**, no `llms.txt`/`llms-full.txt` e na fila do IndexNow. `off`: nenhuma URL de lei/artigo; `0`: os 300 artigos de `docs/seo/onda-0-300.txt` + as leis deles + `/leis`; `all`: tudo que passa no gate. |
+| `SEO_WAVE` | vazio/`off` (padrão), `0`, `paced`, `all` | Decide só o que entra no **sitemap**, no `llms.txt`/`llms-full.txt` e na fila do IndexNow. `off`: nenhuma URL de lei/artigo; `0`: os 300 artigos de `docs/seo/onda-0-300.txt` + as leis deles + `/leis`; `paced`: onda 0 + N artigos por dia (seção abaixo); `all`: tudo que passa no gate. |
+| `SEO_WAVE_START` | `AAAA-MM-DD` (vazio = nada além da onda 0) | Só com `paced`: 1º dia de liberação, no calendário de São Paulo. |
+| `SEO_WAVE_DAILY` | 50 a 100 (padrão 50) | Só com `paced`: artigos liberados por dia. Fora da faixa vira 50 ou 100. |
+| `SEO_WAVE_GSC_DATE` + `SEO_WAVE_GSC_INDEXED_PCT` | `AAAA-MM-DD` + 0–100 (vazios) | Só com `paced`: a última leitura do GSC (% "Indexada" no segmento `/sitemap/artigos-*.xml`). Aciona o freio. Os dois juntos; um só é ignorado. |
 | `SEO_DIRECT_ANSWER_REQUIRED` | `1` (padrão) ou `0` | Item "resposta direta autoral reviewed ≥ 40 palavras" do gate 3.2. Com `1`, nenhum artigo passa hoje (o banco não tem esse texto) e todas as páginas de lei/artigo ficam `noindex, follow`. `0` relaxa **só** esse item; os demais continuam obrigatórios. Decisão do proprietário. |
 | `INDEXNOW_KEY` | vazio (padrão) | Sem chave, nenhum envio ao IndexNow. |
 
@@ -96,6 +99,43 @@ Proposta para o motor editorial (sem gasto de API antes de autorização):
   liberação segue a linha já autorizada (`owner_standing_authorization`, `humanReview:false`),
   com o mesmo aviso de IA da página;
 - começar pelos 300 artigos da onda 0; o resumo entra no hash de conteúdo e move o lastmod.
+
+## Onda em ritmo diário (`SEO_WAVE=paced`), a partir de 25/11/2026
+
+Spec, seção 5: liberar ~50–100 páginas por dia, por nº de questões, com freio. Código em
+`src/lib/seo/wave.ts` (`pacedRelease`, `pacedOrder`, `resolveWaveScope`); testes em
+`tests/seo-wave-pace.test.ts`. Não há estado extra: o total liberado sai só da data e do `.env`.
+
+1. **Candidatos**: artigos que passam no gate hoje e estão fora da onda 0, ordenados por
+   questões `reviewed` com comentário (desc), empate pela ordem do artigo e depois pela URL.
+   A lista é recalculada a cada requisição; a base de 24/11 está em
+   `~/OpenBot/Shared/leiprova/seo-onda1-fora-hoje-2026-11-24.csv` (1.067 artigos).
+2. **Quantos**: `N = min(total, dia × SEO_WAVE_DAILY)`, com dia 1 = `SEO_WAVE_START`. O dia
+   vira à meia-noite de São Paulo. Entram a onda 0 + os N primeiros candidatos.
+3. **Leis**: as 10 da onda 0 continuam; outra lei entra no sitemap/`llms.txt` quando tiver
+   ≥ 10 artigos indexáveis liberados (e passar no gate da lei). No `llms.txt`, os
+   "mais cobrados" de cada lei mostram só artigos já liberados.
+4. **IndexNow**: o job diário (`deploy/seo-page-state.sh`, 04:30) envia as páginas da onda que
+   mudaram **e** as que entraram desde ontem (compara o escopo de hoje com o de ontem).
+5. **Freio** (leitura informada em `SEO_WAVE_GSC_DATE`/`_INDEXED_PCT`; vale a partir do dia
+   seguinte à leitura e só se ela for do dia 28 em diante, porque a meta de 70% é de 4–6 semanas):
+   - < 50% indexada e leitura no dia ≥ 42 (6 semanas): **para de crescer**; fica congelado no
+     total do dia da leitura. Reforçar ou tirar do índice os 20% piores e só então seguir
+     (nova leitura ≥ 50% ou novo `SEO_WAVE_START`).
+   - < 70%: **reduz para 50/dia** a partir do dia seguinte.
+   - ≥ 70%: segue o ritmo configurado.
+   Leitura do GSC só depois do fim do core update (seção 5).
+
+Simulação com o CSV de 24/11 (onda 0 já fora dele):
+
+| Ritmo | 1º dia | Menor nº de questões no 1º dia | Lei nova no 1º dia | Dias para os 1.067 |
+|---|---:|---:|---|---:|
+| 50/dia | 50 artigos de 23 leis (CF 8, CTN 7) | 31 | nenhuma (CTN com 7) | 22 |
+| 100/dia | 100 artigos de 31 leis | 20 | `/lei/codigo-tributario-nacional` (10) | 11 |
+
+Valores sugeridos para começar: `SEO_WAVE=paced`, `SEO_WAVE_START=<dia do deploy>`,
+`SEO_WAVE_DAILY=50`; subir para 100 só com leitura ≥ 70% no GSC. Mudar o `.env` de
+produção e o deploy dependem do OK do Vinícius.
 
 ## Próximas ondas
 

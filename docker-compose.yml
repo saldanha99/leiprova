@@ -104,6 +104,10 @@ services:
       CHECKOUT_PAYMENT_METHODS: ${CHECKOUT_PAYMENT_METHODS:-card}
       # SEO orgânico (docs/seo/ondas.md): onda fora do sitemap por padrão; IndexNow só com chave.
       SEO_WAVE: ${SEO_WAVE:-off}
+      SEO_WAVE_START: ${SEO_WAVE_START:-}
+      SEO_WAVE_DAILY: ${SEO_WAVE_DAILY:-50}
+      SEO_WAVE_GSC_DATE: ${SEO_WAVE_GSC_DATE:-}
+      SEO_WAVE_GSC_INDEXED_PCT: ${SEO_WAVE_GSC_INDEXED_PCT:-}
       SEO_DIRECT_ANSWER_REQUIRED: ${SEO_DIRECT_ANSWER_REQUIRED:-1}
       INDEXNOW_KEY: ${INDEXNOW_KEY:-}
       CONTEST_CHECKOUT_ENABLED: ${CONTEST_CHECKOUT_ENABLED:-false}

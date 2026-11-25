@@ -3,15 +3,16 @@ import "server-only";
 import { isDatabaseConfigured } from "@/lib/db/client";
 import { listLawSnapshots } from "@/lib/seo/legal-data";
 import type { LlmsLaw } from "@/lib/seo/llms";
-import { lawInWave, seoWave } from "@/lib/seo/wave";
+import { resolveWaveScope, saoPauloDate, scopeLaws, seoWave, wavePace } from "@/lib/seo/wave";
 
 /** Gate-passing laws of the active wave, already ranked by contest products. */
 export async function llmsLaws(): Promise<LlmsLaw[]> {
   const wave = seoWave();
   if (wave === "off" || !isDatabaseConfigured()) return [];
   const snapshots = await listLawSnapshots();
+  const scope = resolveWaveScope(scopeLaws(snapshots), wave, wavePace(), saoPauloDate(new Date()));
   return snapshots
-    .filter((snapshot) => snapshot.gate.status === "index" && lawInWave(snapshot.path, wave))
+    .filter((snapshot) => snapshot.gate.status === "index" && scope.hasLaw(snapshot.path))
     .map((snapshot) => ({
       label: snapshot.label,
       title: snapshot.law.title,
@@ -21,7 +22,7 @@ export async function llmsLaws(): Promise<LlmsLaw[]> {
       verifiedAt: snapshot.law.versionVerifiedAt,
       reviewedQuestions: snapshot.reviewedQuestionCount,
       topArticles: snapshot.topArticles
-        .filter((article) => article.gate.status === "index")
+        .filter((article) => article.gate.status === "index" && (wave !== "paced" || scope.hasArticle(article.path)))
         .map((article) => ({
           label: article.label,
           heading: article.heading,

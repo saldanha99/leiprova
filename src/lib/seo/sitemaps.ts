@@ -10,7 +10,7 @@ import { listLawSnapshots } from "@/lib/seo/legal-data";
 import { readPageStates } from "@/lib/seo/page-state-db";
 import { resolveLastModified } from "@/lib/seo/page-state";
 import { ARTICLES_PER_SITEMAP, type SitemapUrl, chunk, latest } from "@/lib/seo/sitemap-xml";
-import { articleInWave, lawInWave, seoWave } from "@/lib/seo/wave";
+import { resolveWaveScope, saoPauloDate, scopeLaws, seoWave, wavePace } from "@/lib/seo/wave";
 
 /** Static pages with the date of the last commit that changed each file. */
 export const STATIC_PAGES = [
@@ -68,14 +68,15 @@ export async function legalEntries(): Promise<{ laws: SitemapUrl[]; articles: Si
   if (wave === "off" || !isDatabaseConfigured()) return { laws: [], articles: [] };
   const snapshots = await listLawSnapshots();
   const states = await readPageStates();
+  const scope = resolveWaveScope(scopeLaws(snapshots), wave, wavePace(), saoPauloDate(new Date()));
   const laws: SitemapUrl[] = [];
   const articles: SitemapUrl[] = [];
   for (const snapshot of snapshots) {
-    if (snapshot.gate.status === "index" && lawInWave(snapshot.path, wave)) {
+    if (snapshot.gate.status === "index" && scope.hasLaw(snapshot.path)) {
       laws.push({ url: absoluteUrl(snapshot.path), lastModified: resolveLastModified(states.get(snapshot.path), snapshot) });
     }
     for (const article of snapshot.articles) {
-      if (article.gate.status !== "index" || !articleInWave(article.path, wave)) continue;
+      if (article.gate.status !== "index" || !scope.hasArticle(article.path)) continue;
       articles.push({ url: absoluteUrl(article.path), lastModified: resolveLastModified(states.get(article.path), article) });
     }
   }

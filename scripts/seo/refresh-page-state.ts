@@ -12,19 +12,29 @@ import { submitIndexNow } from "@/lib/seo/indexnow";
 import { listLaws, loadSnapshot } from "@/lib/seo/legal-data";
 import { currentLegalPages, readPageStates, writePageStates } from "@/lib/seo/page-state-db";
 import { planPageState } from "@/lib/seo/page-state";
-import { articleInWave, lawInWave, seoWave } from "@/lib/seo/wave";
+import { resolveWaveScope, saoPauloDate, scopeLaws, seoWave, shiftDate, wavePace } from "@/lib/seo/wave";
 
 async function main() {
   const apply = process.argv.includes("--apply");
   const snapshots = [];
   for (const law of await listLaws()) snapshots.push(await loadSnapshot(law));
   const current = currentLegalPages(snapshots);
-  const plan = planPageState(current, await readPageStates(), new Date());
+  const now = new Date();
+  const plan = planPageState(current, await readPageStates(), now);
   const wave = seoWave();
-  const notify = plan.changedPaths.filter((path) => (path.split("/").length > 3 ? articleInWave(path, wave) : lawInWave(path, wave)));
+  const pace = wavePace();
+  const today = saoPauloDate(now);
+  const laws = scopeLaws(snapshots);
+  const scope = resolveWaveScope(laws, wave, pace, today);
+  const yesterday = resolveWaveScope(laws, wave, pace, shiftDate(today, -1));
+  const inScope = (path: string, target = scope) => (path.split("/").length > 3 ? target.hasArticle(path) : target.hasLaw(path));
+  // Changed pages of the wave, plus indexable pages the paced wave released today (timer runs daily).
+  const released = current.filter((page) => page.indexable && inScope(page.path) && !inScope(page.path, yesterday)).map((page) => page.path);
+  const notify = [...new Set([...plan.changedPaths.filter((path) => inScope(path)), ...released])];
   const report = {
     mode: apply ? "apply" : "preview",
     wave,
+    ...(scope.release ? { paced: { ...scope.release, daily: pace.daily, start: pace.start, releasedToday: released.length } } : {}),
     pages: plan.rows.length,
     indexable: plan.rows.filter((row) => row.indexable).length,
     changed: plan.changedPaths.length,
