@@ -52,3 +52,19 @@ o app e as imagens publicadas não mudaram (sem deploy). Carga abaixo de 6 antes
 
 Item E: as 34 falhas eram de teste (fixture privada ausente do CP, expectativas do TJPE de antes de 18 e 23/11,
 marcos Cebraspe conferidos contra a política da FGV). Commit `ab4adfa`; suíte com 2.315 testes passando.
+
+## Decisões do Vinícius de 25/11 à tarde (via Chefe de Gabinete) e execução (16h–20h BRT)
+
+- **TCE-SP** (`tce-sp-auditor-dipe-direito-2026`): exceção da fonte Vunesp **só para a prova e o gabarito oficiais
+  do TCE-SP** (Edital 001/2026, prova de 11/10/2026); treino histórico (`historical_training`), página dizendo que a
+  prova já foi aplicada; à venda quando passar nos gates, preço do catálogo.
+- **Câmara** (`camara-camara-dos-deputados-2026`): pelo concurso novo do Cebraspe `CD_26_ANALISTA` (edital de
+  02/10/2026); um produto pela P1 de Conhecimentos Básicos, comum aos 11 cargos (escolha do Vinícius nesta tarde).
+- **PGM-RJ** (`pgm-rj-procurador-do-municipio-reta-final`): **parada** até existir prova objetiva com gabarito oficial
+  (9º Procurador do Município e 4º Procurador da Câmara Municipal só têm a fase escrita discursiva).
+
+| Produto | Resultado | Falta para vender |
+|---|---|---|
+| `tce-sp-auditor-dipe-direito-2026` | **Admitido como treino histórico.** Oportunidade `1ae7487a-2fef-43ca-9039-09c43329962b` (auditoria 254301): edital do site do TCE-SP (`f0bd1ce6…`) + 1ª rerratificação em texto, espelhamento da Vunesp (`7a02c823…`, download do operador); 10 disciplinas, 481 requisitos (programa `6324a4f5…`). Prova anterior registrada e aprovada (auditoria 254354, edição `tcesp-auditor-dipe-direito-001-2026-objetiva`): caderno 004 da Vunesp (`f59bb4da…`) e gabarito definitivo do DOE-TCESP de 05/11/2026 (questão 18 anulada). Contrato MC5 `3a467272…`. Backup `backups/before-tcesp-historico-20261125.dump` (`5e0ead3d…`). Commits `5e165ab`, `86c3326`, `e1f9647`. | 68 questões (motor). **Caderno da Vunesp precisa de novo download pelo navegador a cada ≤30 dias** (o WAF recusa o servidor): sem isso a conferência automática do link falha e a venda fecha sozinha ao passar dos 30 dias. Conhecimentos Gerais (22 requisitos) sem disciplina no catálogo. |
+| `camara-camara-dos-deputados-2026` | Código pronto (`537c323`): edital vigente `camara-analista-legislativo-2026` (Cebraspe `CD_26_ANALISTA`, prova 17/01/2027, `current_notice`) e prova anterior P1 do `CD_25_NS` (08/03/2026, 90 itens C/E, gabarito definitivo). Produto e preços já existem no Stripe (preço único do catálogo). | Aprovar a oportunidade, carga `content:feed:real`, aprovar o edital atualizado (Edital nº 1 conforme retificações até o nº 7, `aef00900…`); revisar só os requisitos da P1 (bloco 14.2.3); 68 questões (motor). |
+| `pgm-rj-procurador-do-municipio-reta-final` | Parado por decisão do Vinícius. | Prova objetiva com gabarito oficial. |
