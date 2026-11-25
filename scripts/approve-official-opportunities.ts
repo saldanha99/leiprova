@@ -153,10 +153,16 @@ function assertSameMaterialFields(
   }
 }
 
+// OPPORTUNITY_APPROVAL_ONLY_SLUG: aprova um único candidato (Câmara, 25/11/2026) sem reabrir os já revisados,
+// cujos campos de fase seguiram a vida real depois da aprovação original.
+const ONLY_SLUG = process.env.OPPORTUNITY_APPROVAL_ONLY_SLUG?.trim();
+const CANDIDATES = ONLY_SLUG ? OFFICIAL_OPPORTUNITY_CANDIDATES.filter((candidate) => candidate.slug === ONLY_SLUG) : OFFICIAL_OPPORTUNITY_CANDIDATES;
+if (ONLY_SLUG && CANDIDATES.length !== 1) throw new Error("OPPORTUNITY_APPROVAL_ONLY_SLUG não corresponde a um candidato oficial.");
+
 async function checkAllSources() {
   const uniqueSources = [
     ...new Map(
-      OFFICIAL_OPPORTUNITY_CANDIDATES.flatMap((candidate) => candidate.officialSources).map(
+      CANDIDATES.flatMap((candidate) => candidate.officialSources).map(
         (source) => [sourceKey(source), source] as const,
       ),
     ).values(),
@@ -751,7 +757,7 @@ async function main() {
   const databaseUrl = requireOpportunityApprovalDatabaseUrl(approvalEnvironment);
   const todayIso = saoPauloCalendarDate();
   const validations = validateOfficialOpportunityApprovalBatch(
-    OFFICIAL_OPPORTUNITY_CANDIDATES,
+    CANDIDATES,
     todayIso,
   );
 
@@ -797,7 +803,7 @@ async function main() {
       const reviewerUserId = reviewer.id;
 
       const catalog = await loadCatalog(transaction);
-      for (const candidate of OFFICIAL_OPPORTUNITY_CANDIDATES) {
+      for (const candidate of CANDIDATES) {
         const categoryId = catalog.categories.get(candidate.categorySlug);
         const careerTrackId = catalog.careers.get(candidate.careerSlug);
         if (!categoryId) throw new Error(`[${candidate.slug}] categoria ativa não encontrada.`);
@@ -825,7 +831,7 @@ async function main() {
       let approved = 0;
       let unchanged = 0;
 
-      for (const candidate of OFFICIAL_OPPORTUNITY_CANDIDATES) {
+      for (const candidate of CANDIDATES) {
         const categoryId = catalog.categories.get(candidate.categorySlug)!;
         const careerTrackId = catalog.careers.get(candidate.careerSlug)!;
         const opportunity = await ensureOpportunity(
@@ -945,7 +951,7 @@ async function main() {
           reviewerIdentityProvenance: reviewerIdentity.provenance,
           executionSource: reviewerIdentity.executionSource,
           approvalReference: reviewerIdentity.approvalReference,
-          candidates: OFFICIAL_OPPORTUNITY_CANDIDATES.length,
+          candidates: CANDIDATES.length,
           catalogEligible: validations.filter((validation) => validation.catalogEligible).length,
           sourcesChecked: sourceChecks.length,
           headRestricted: sourceChecks.filter(
