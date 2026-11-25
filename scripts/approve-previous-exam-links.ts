@@ -19,6 +19,7 @@ import {
   loadReferenceScope,
 } from "../src/lib/exams/previous-exam-review";
 import { verifyOfficialExamUrl } from "../src/lib/official-sources/fetch";
+import { verifyOfficialExamUrlWithOperatorDownload } from "../src/lib/official-sources/operator-download-exam-documents";
 import {
   parseOpportunityApprovalReviewerIdentity,
   requireOpportunityApprovalDatabaseUrl,
@@ -99,7 +100,8 @@ async function main() {
         const candidate = await loadDocumentReviewCandidate(db, document.publicId);
         if (!candidate) throw new Error(`Documento ausente: ${document.publicId}.`);
         if (standing && (candidate.sourcePolicy !== "metadata_only" || candidate.sourceUrl !== standingTarget.documents.find(item=>item.documentType===candidate.documentType)?.url)) throw new Error("Standing exige exatamente os documentos oficiais do alvo autorizado, como links externos: caderno Tipo 1 e a evidência final declarada pela edição.");
-        const checked = await verifyOfficialExamUrl(candidate.bankSlug, candidate.sourceUrl);
+        // Link da exceção de download do operador (Vunesp/TCE-SP): confere o PDF baixado no navegador, recente e com o hash fixado.
+        const checked = await verifyOfficialExamUrlWithOperatorDownload(candidate.bankSlug, candidate.sourceUrl);
         if (checked.finalUrl !== candidate.sourceUrl || checked.httpStatus < 200 || checked.httpStatus > 399 || !checked.isPdf) {
           throw new Error(`A URL oficial mudou ou deixou de entregar PDF: ${candidate.sourceUrl}.`);
         }

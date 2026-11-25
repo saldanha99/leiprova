@@ -27,6 +27,10 @@ export type ProgrammeLayout = Readonly<{
   stopLine?: string;
   /** Linhas literais que começam com número mas continuam o item anterior ("182 e Recomendação 190, …", Convenção da OIT). */
   continuationLines?: readonly string[];
+  /** Trechos de outro cargo no meio do anexo (TCE-SP: as demais especialidades entre os conhecimentos gerais e
+   * os específicos de Direito): da linha literal `from` até a linha literal `until`, inclusive, nada é lido.
+   * As duas linhas são obrigatórias e o salto só vale depois de aberta uma disciplina. */
+  skipBetween?: readonly Readonly<{ from: string; until: string }>[];
   /** Linha literal que abre o cargo no anexo ("CARGO 9: …"); antes dela nada é lido e ela é obrigatória. */
   startLine?: string;
   /** "top-level-numbers": "1 Tema. 1.1 Sub. 2 Tema." agrupa subitens no item de primeiro nível.
@@ -937,6 +941,67 @@ export const NEXT_OFFICIAL_COURSE_RECIPES: readonly NextOfficialCourseRecipe[] =
     skipRepeatedRequirements: true,
     limitations: ["Pré-edital: o programa é o do último edital oficial (II CNU, Edital nº 1/2023) e será conferido e atualizado quando o novo edital sair.", "O edital limita a cobrança à legislação vigente na publicação (jan/2023); o treino usa a legislação atual.", "Itens numerados de primeiro nível; a linha seguinte continua o item.", "Direito Individual, Coletivo e Constitucional do Trabalho são títulos próprios do anexo, sem equivalência automática no catálogo de disciplinas.", "Treino da objetiva com legislação atual; não simula as provas escritas, a oral nem os títulos."],
   },
+  // TCE-SP Auditor de Controle Externo – DIPE – Direito como treino histórico (decisão de 25/11/2026): Edital nº 001/2026
+  // (Vunesp), objetiva em 11/10/2026. Programa: conhecimentos gerais da 1ª rerratificação (reescreve "Legislação" com as NBASP)
+  // e específicos de Direito do edital (a rerratificação não os altera). A rerratificação em texto só existe no espelhamento
+  // da Vunesp, recusado ao servidor: entra pelo PDF baixado no navegador, com o SHA-256 abaixo (exceção do proprietário).
+  {
+    productSlug: "tce-sp-auditor-dipe-direito-2026", institution: "Tribunal de Contas do Estado de São Paulo", role: "Auditor de Controle Externo – DIPE – Especialidade: Direito",
+    jurisdiction: "SP", cycle: "Concurso Público para Auditor de Controle Externo – DIPE — Edital nº 001/2026 – TCESP", bankScope: "Fundação Vunesp, responsável pelo concurso (item 1.1), sob a Comissão Organizadora do TCE-SP",
+    portalUrl: "https://www.tce.sp.gov.br/concursos/auditor-controle-externo-dipe", examDate: "2026-10-11", examDateEvidence: { documentKey: "tcesp-notice", page: 15, item: "9.1", quote: "no dia 11 de outubro de 2026", actualDayIndependentlyVerified: true, corroboratingUrl: "https://www.tce.sp.gov.br/sites/default/files/concursos/Gabaritos%20das%20Provas.pdf", limitation: null },
+    stage: "Objetiva e escrita aplicadas em 11/10/2026; gabaritos em 14/10/2026; recursos julgados, gabarito definitivo e resultado da objetiva no DOE-TCESP de 05/11/2026",
+    stageObservedOn: "2026-11-25", proposedMode: "historical_training", expectedSubjects: 10,
+    documents: [
+      { key: "tcesp-notice", url: "https://www.tce.sp.gov.br/sites/default/files/concursos/TCESP%20-%20Edital%20de%20Abertura%20de%20Inscri%C3%A7%C3%B5es_0.pdf", title: "Edital de Abertura nº 001/2026 – TCESP, de 3 de julho de 2026 — Auditor de Controle Externo – DIPE", pages: 47, programmePages: [31, 40], layout: {
+        headings: [
+          { line: "Língua Portuguesa", subject: "Língua Portuguesa", inline: true, inlineSeparator: ":" },
+          { line: "Raciocínio Lógico e Analítico", subject: "Raciocínio Lógico e Analítico", inline: true, inlineSeparator: ":" },
+          { line: "Ética Pública e Integridade", subject: "Ética Pública e Integridade", inline: true, inlineSeparator: ":" },
+          { line: "Legislação", subject: "Legislação", inline: true, inlineSeparator: ":" },
+          { line: "Conhecimentos Específicos: Direito Constitucional", subject: "Direito Constitucional", inline: true, inlineSeparator: ":" },
+          { line: "Direito Administrativo", subject: "Direito Administrativo", inline: true, inlineSeparator: ":" },
+          { line: "Direito Tributário", subject: "Direito Tributário", inline: true, inlineSeparator: ":" },
+          { line: "Direito Penal", subject: "Direito Penal", inline: true, inlineSeparator: ":" },
+          { line: "Direito Civil e Empresarial", subject: "Direito Civil e Empresarial", inline: true, inlineSeparator: ":" },
+          { line: "Direito Financeiro", subject: "Direito Financeiro", inline: true, inlineSeparator: ":" },
+        ],
+        ignoreLines: ["\\d{1,2}"],
+        startLine: "CONHECIMENTOS GERAIS",
+        skipBetween: [{ from: "CONHECIMENTOS ESPECÍFICOS", until: "Auditor de Controle Externo – DIPE – Especialidade: Direito" }],
+        stopLine: "Auditor de Controle Externo – DIPE – Especialidade: Engenharia Civil",
+        itemMode: "sentences",
+      } },
+      { key: "tcesp-rerratification-1", url: "https://documento.vunesp.com.br/documento/stream/Nzc4NjgwOA%3d%3d", title: "1º Edital de Rerratificação ao Edital de Abertura nº 001/2026 – TCESP (DOE-TCESP de 06/08/2026), espelhamento da Vunesp", pages: 11, programmePages: [6, 6],
+        operatorDownloadSha256: "7a02c823daed08e19a851b714a3298db67d2fbb99568b0a5110cb0ad8d13705c", layout: {
+        headings: [
+          { line: "Língua Portuguesa", subject: "Língua Portuguesa", inline: true, inlineSeparator: ":" },
+          { line: "Raciocínio Lógico e Analítico", subject: "Raciocínio Lógico e Analítico", inline: true, inlineSeparator: ":" },
+          { line: "Ética Pública e Integridade", subject: "Ética Pública e Integridade", inline: true, inlineSeparator: ":" },
+          { line: "Legislação", subject: "Legislação", inline: true, inlineSeparator: ":" },
+        ],
+        ignoreLines: [],
+        startLine: "CONHECIMENTOS GERAIS",
+        stopLine: "CONHECIMENTOS ESPECÍFICOS",
+        itemMode: "sentences",
+      } },
+    ],
+    overlays: [{ key: "tcesp-rerratification-1", subjects: ["Língua Portuguesa", "Raciocínio Lógico e Analítico", "Ética Pública e Integridade", "Legislação"] }],
+    identityClaims: [
+      { document: "tcesp-notice", page: 1, contains: ["EDITAL – Nº 001/2026 – TCESP, DE 3 DE JULHO DE 2026", "AUDITOR DE CONTROLE EXTERNO", "Fundação VUNESP"] },
+      { document: "tcesp-notice", page: 15, contains: ["9.1. A Prova Objetiva e a Prova Escrita", "no dia 11 de outubro de 2026"] },
+      { document: "tcesp-notice", page: 16, contains: ["por 80 (oitenta) questões de múltipla escolha", "alternativas e apenas uma resposta correta"] },
+      { document: "tcesp-notice", page: 37, contains: ["Auditor de Controle Externo – DIPE – Especialidade: Direito"] },
+      { document: "tcesp-rerratification-1", page: 1, contains: ["1º EDITAL DE RERRATIFICAÇÃO AO EDITAL DE ABERTURA Nº 001/2026 – TCESP, DE 3 DE JULHO DE 2026"] },
+      { document: "tcesp-rerratification-1", page: 6, contains: ["ANEXO I – CONTEÚDO PROGRAMÁTICO", "CONHECIMENTOS GERAIS", "NBASP Princípios Fundadores"] },
+    ],
+    previousExam: { cycle: "Edital nº 001/2026 – TCESP, objetiva em 11/10/2026", role: "Auditor de Controle Externo – DIPE – Especialidade: Direito — prova objetiva (opção 004)", portalUrl: "https://www.tce.sp.gov.br/concursos/auditor-controle-externo-dipe", examDate: "2026-10-11", answerKeyFinality: "definitive_document", documents: [
+      { type: "question_booklet", title: "TCE-SP 001/2026 — caderno da prova objetiva 004 — Auditor de Controle Externo DIPE — Direito (versão de divulgação, Vunesp)", url: "https://documento.vunesp.com.br/documento/stream/NzkxNzc3Mw%3d%3d" },
+      { type: "answer_key", title: "TCE-SP 001/2026 — DOE-TCESP de 05/11/2026: julgamento dos recursos e gabarito definitivo das provas objetivas", url: "https://www.tce.sp.gov.br/sites/default/files/concursos/DOE-TCESP%20-%202026-11-05%20-%20Analise%20de%20Recursos%20contra%20as%20Provas%20Objetivas%2C%20Gabarito%20das%20Provas%20Objetivas%20e%20Resultado%20da%20Prova%20Objetiva.pdf" },
+    ] },
+    // Períodos curtos se repetem entre disciplinas ("Origem.", "Súmulas e jurisprudência…"): fica a primeira ocorrência.
+    skipRepeatedRequirements: true,
+    limitations: ["Treino histórico: a prova de 11/10/2026 já foi aplicada; o material treina para o próximo concurso com a legislação atual.", "Conhecimentos gerais pela 1ª rerratificação (DOE-TCESP de 06/08/2026), que reescreve o Anexo I nessa parte; específicos de Direito pelo edital, que a rerratificação não altera.", "A rerratificação e o caderno vêm da Vunesp por download do operador (WAF recusa o servidor), com SHA-256 fixado; edital e gabarito definitivo vêm do site do TCE-SP.", "Questão 18 anulada no julgamento de recursos (DOE-TCESP de 05/11/2026).", "Programa em prosa: cada período literal é um requisito.", "Não simula a prova escrita (estudo de caso)."],
+  },
 ];
 
 function normalized(value: string) { return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, " ").toLowerCase().trim(); }
@@ -955,6 +1020,9 @@ function extractLayoutSections(recipe: PreviewDocumentRecipe, layout: ProgrammeL
   // Anexo com vários cargos na mesma página: o cargo começa na linha literal que o abre.
   const startKey = layout.startLine ? normalized(layout.startLine) : null;
   let started = startKey === null;
+  const skips = (layout.skipBetween ?? []).map((skip) => ({ from: normalized(skip.from), until: normalized(skip.until) }));
+  let skipping: string | null = null;
+  let skipsDone = 0;
   let stopped = false;
   let continuesNext = false;
   let sentenceEnded = false;
@@ -966,6 +1034,8 @@ function extractLayoutSections(recipe: PreviewDocumentRecipe, layout: ProgrammeL
       if (!line) continue;
       if (!started) { started = normalized(line) === startKey; continue; }
       if (stopKey !== null && current && normalized(line) === stopKey) { stopped = true; break pages; }
+      if (skipping !== null) { if (normalized(line) === skipping) { skipping = null; skipsDone += 1; } continue; }
+      if (current && skips[skipsDone]?.from === normalized(line)) { skipping = skips[skipsDone].until; continue; }
       if (expectedContinuation !== null) {
         if (normalized(line) !== expectedContinuation) throw new Error("Continuação do título de disciplina diverge do layout.");
         expectedContinuation = null;
@@ -1032,6 +1102,7 @@ function extractLayoutSections(recipe: PreviewDocumentRecipe, layout: ProgrammeL
   }
   if (!started) throw new Error("Linha inicial do cargo ausente; composição bloqueada.");
   if (stopKey !== null && !stopped) throw new Error("Linha final do cargo ausente; composição bloqueada.");
+  if (skipping !== null || skipsDone !== skips.length) throw new Error("Trecho de outro cargo sem as linhas literais de início e fim; composição bloqueada.");
   if (sections.length !== headings.length) throw new Error("Título de disciplina ausente no anexo; composição bloqueada.");
   if (sections.some((section) => !section.fragments.length)) throw new Error("Disciplina sem conteúdo; composição bloqueada.");
   return sections;

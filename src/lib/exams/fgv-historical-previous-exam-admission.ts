@@ -7,6 +7,7 @@ import { requireStandingCourseMaintenanceDatabaseUrl } from "@/lib/editorial/off
 import { OFFICIAL_COURSE_STANDING_REFERENCE } from "@/lib/editorial/official-course-dossier";
 import { assertOfficialRobotsPathAllowed } from "@/lib/official-sources/planalto-text";
 import { verifyOfficialExamUrl } from "@/lib/official-sources/fetch";
+import { operatorDownloadExamDocument, verifyOfficialExamUrlWithOperatorDownload } from "@/lib/official-sources/operator-download-exam-documents";
 import { parseOpportunityApprovalReviewerIdentity } from "@/lib/opportunities/approval-command";
 import { saoPauloCalendarDate } from "@/lib/opportunities/catalog-policy";
 import { assertCebraspeHistoricalEvent, CEBRASPE_HISTORICAL_PREVIOUS_EXAMS } from "@/lib/exams/cebraspe-historical-previous-exams";
@@ -37,8 +38,9 @@ export type FgvHistoricalPreviousExam = Readonly<{
   examDateCorroboration: string;
   editionSourceExternalId: string; editionTitle: string;
   documents: readonly PortalDocument[];
-  /** Banca da objetiva; FGV por padrão. Cebraspe confere a API oficial do evento em vez do HTML do portal. */
-  bank?: "cebraspe";
+  /** Banca da objetiva; FGV por padrão. Cebraspe confere a API oficial do evento em vez do HTML do portal;
+   * Vunesp confere a página do concurso no site do órgão (o WAF da Vunesp recusa o servidor). */
+  bank?: "cebraspe" | "vunesp";
   /** Identificador do evento Cebraspe (eventoURL da API oficial). */
   cebraspeEventId?: string;
 }>;
@@ -295,7 +297,35 @@ export const FGV_HISTORICAL_PREVIOUS_EXAMS: readonly FgvHistoricalPreviousExam[]
 ];
 
 /** FGV e Cebraspe: mesmo núcleo transacional, conferência de portal própria por banca. */
-export const HISTORICAL_PREVIOUS_EXAMS: readonly FgvHistoricalPreviousExam[] = [...FGV_HISTORICAL_PREVIOUS_EXAMS, ...CEBRASPE_HISTORICAL_PREVIOUS_EXAMS];
+// TCE-SP Auditor DIPE — Direito (Vunesp), exceção do proprietário de 25/11/2026: edital e gabarito definitivo no site
+// do TCE-SP (conferidos pela página do concurso); o caderno só existe na Vunesp e entra por download do operador.
+const TCESP = "https://www.tce.sp.gov.br/sites/default/files/concursos/";
+export const VUNESP_HISTORICAL_PREVIOUS_EXAMS: readonly FgvHistoricalPreviousExam[] = [
+  {
+    bank: "vunesp",
+    productSlug: "tce-sp-auditor-dipe-direito-2026", editionPublicId: "tcesp-auditor-dipe-direito-001-2026-objetiva", opportunitySlug: "tcesp-auditor-dipe-direito-001-2026-historico-objetiva",
+    portalUrl: "https://www.tce.sp.gov.br/concursos/auditor-controle-externo-dipe", portalHeading: "Auditor de Controle Externo - DIPE",
+    portalNotice: { url: `${TCESP}TCESP%20-%20Edital%20de%20Abertura%20de%20Inscri%C3%A7%C3%B5es_0.pdf`, label: "TCESP - Edital de Abertura de Inscrições_0.pdf" },
+    role: "Auditor de Controle Externo – DIPE – Especialidade: Direito", jurisdiction: "SP", jurisdictionName: "São Paulo", institution: "TCE-SP", noticeNumber: "001/2026-TCESP", cycleYear: 2026, careerSlug: "controle-externo",
+    examDate: "2026-10-11", expectedQuestionCount: 80,
+    noticeUrl: `${TCESP}TCESP%20-%20Edital%20de%20Abertura%20de%20Inscri%C3%A7%C3%B5es_0.pdf`, noticeSha256: "f0bd1ce6195e38fb0e98e21c206df3f4758b1fdab45da1897ba95dd9975e51a6", noticePageCount: 47,
+    noticeChecks: [
+      { page: 16, pattern: "9\\.6\\. A Prova Objetiva[\\s\\S]*80 \\(oitenta\\) questões de múltipla escolha[\\s\\S]*5 \\(cinco\\) alternativas e apenas uma resposta correta" },
+      { page: 15, pattern: "9\\.1\\. A Prova Objetiva e a Prova Escrita[\\s\\S]*no dia 11 de outubro de 2026" },
+      { page: 37, pattern: "Auditor de Controle Externo – DIPE – Especialidade: Direito" },
+    ],
+    examDateCorroboration: "Gabaritos (DOE-TCESP de 14/10/2026) e julgamento de recursos (DOE-TCESP de 05/11/2026) das provas objetivas aplicadas em 11/10/2026, no site do TCE-SP",
+    editionSourceExternalId: "vunesp-tcsp2501-auditor-dipe-direito-objetiva", editionTitle: "TCE-SP 001/2026 — Auditor de Controle Externo – DIPE – Direito — objetiva (opção 004)",
+    documents: [
+      { documentType: "question_booklet", title: "TCE-SP 001/2026 — caderno da prova objetiva 004 — Auditor de Controle Externo DIPE — Direito (versão de divulgação, Vunesp)", label: "Caderno de Questões - Auditor de Controle Externo - DIPE - Especialidade: Direito", publishedOn: "2026-10-13",
+        url: "https://documento.vunesp.com.br/documento/stream/NzkxNzc3Mw%3d%3d" },
+      { documentType: "answer_key", title: "TCE-SP 001/2026 — DOE-TCESP de 05/11/2026: julgamento dos recursos e gabarito definitivo das provas objetivas", label: "DOE-TCESP - 2026-11-05 - Analise de Recursos contra as Provas Objetivas, Gabarito das Provas Objetivas e Resultado da Prova Objetiva.pdf", publishedOn: "2026-11-05",
+        url: `${TCESP}DOE-TCESP%20-%202026-11-05%20-%20Analise%20de%20Recursos%20contra%20as%20Provas%20Objetivas%2C%20Gabarito%20das%20Provas%20Objetivas%20e%20Resultado%20da%20Prova%20Objetiva.pdf` },
+    ],
+  },
+];
+
+export const HISTORICAL_PREVIOUS_EXAMS: readonly FgvHistoricalPreviousExam[] = [...FGV_HISTORICAL_PREVIOUS_EXAMS, ...CEBRASPE_HISTORICAL_PREVIOUS_EXAMS, ...VUNESP_HISTORICAL_PREVIOUS_EXAMS];
 
 export function fgvHistoricalPreviousExam(productSlug: string) {
   const target = HISTORICAL_PREVIOUS_EXAMS.find((item) => item.productSlug === productSlug);
@@ -319,6 +349,29 @@ export function assertFgvHistoricalAnchors(target: FgvHistoricalPreviousExam, ht
     if (block.find("time").attr("datetime")?.slice(0, 10) !== document.publishedOn) throw new Error("Data de publicação do link diverge da fonte oficial.");
     if (document.blockIncludes?.some((text) => !block.text().includes(text))) throw new Error("Caderno de cargo/etapa diferente.");
     verified.push({ href: document.url, label: document.label, publishedOn: document.publishedOn });
+  }
+  return createHash("sha256").update(JSON.stringify({ heading, notice: target.portalNotice, documents: verified })).digest("hex");
+}
+
+/** Página do concurso no site do órgão (Vunesp): edital e atos hospedados ali precisam estar linkados com o
+ * rótulo exato; documento fora do site do órgão só entra pela exceção de download do operador. */
+export function assertOrganHistoricalAnchors(target: FgvHistoricalPreviousExam, html: string) {
+  const $ = load(html);
+  const heading = $("h1").text().replace(/\s+/gu, " ").trim();
+  if (heading !== target.portalHeading) throw new Error("Portal de outro concurso; cadastro bloqueado.");
+  const portalHost = new URL(target.portalUrl).hostname;
+  const anchored = (url: string, label: string) => {
+    const matches = $("a").filter((_, anchor) => $(anchor).attr("href") === url);
+    return matches.length === 1 && matches.text().replace(/\s+/gu, " ").trim() === label;
+  };
+  if (!anchored(target.portalNotice.url, target.portalNotice.label)) throw new Error("Portal não referencia o edital aprovado esperado; cadastro bloqueado.");
+  const verified: { href: string; label: string; via: "organ_portal_anchor" | "operator_download" }[] = [];
+  for (const document of target.documents) {
+    if (new URL(document.url).hostname === portalHost) {
+      if (!anchored(document.url, document.label)) throw new Error("Anchor oficial ausente, duplicado ou com rótulo diferente.");
+      verified.push({ href: document.url, label: document.label, via: "organ_portal_anchor" });
+    } else if (operatorDownloadExamDocument(target.bank ?? "fgv", document.url)) verified.push({ href: document.url, label: document.label, via: "operator_download" });
+    else throw new Error("Documento fora do site do órgão sem exceção de download do operador.");
   }
   return createHash("sha256").update(JSON.stringify({ heading, notice: target.portalNotice, documents: verified })).digest("hex");
 }
@@ -348,6 +401,12 @@ export async function previewFgvHistoricalPreviousExam(target: FgvHistoricalPrev
     if (!target.cebraspeEventId) throw new Error("Evento Cebraspe obrigatório.");
     portal = await boundedOfficialText(cebraspeEventApiUrl(target.cebraspeEventId), 2 * 1024 * 1024, fetcher, ["application/json"]);
     portalAnchorsSha256 = assertCebraspeHistoricalEvent(target, JSON.parse(portal.text) as unknown);
+  } else if (target.bank === "vunesp") {
+    const origin = new URL(target.portalUrl).origin;
+    robots = await boundedOfficialText(`${origin}/robots.txt`, 64 * 1024, fetcher);
+    for (const url of [target.portalUrl, target.portalNotice.url, ...target.documents.map((document) => document.url).filter((url) => url.startsWith(`${origin}/`))]) assertOfficialRobotsPathAllowed(robots.text, new URL(url).pathname);
+    portal = await boundedOfficialText(target.portalUrl, 2 * 1024 * 1024, fetcher);
+    portalAnchorsSha256 = assertOrganHistoricalAnchors(target, portal.text);
   } else {
     robots = await boundedOfficialText("https://conhecimento.fgv.br/robots.txt", 64 * 1024, fetcher);
     for (const url of [target.portalUrl, target.portalNotice.url, ...target.documents.map((document) => document.url)]) assertOfficialRobotsPathAllowed(robots.text, new URL(url).pathname);
@@ -356,7 +415,7 @@ export async function previewFgvHistoricalPreviousExam(target: FgvHistoricalPrev
   }
   const documents = [];
   for (const document of target.documents) {
-    const metadata = await (options.verifier ?? verifyOfficialExamUrl)(target.bank ?? "fgv", document.url);
+    const metadata = await (options.verifier ?? verifyOfficialExamUrlWithOperatorDownload)(target.bank ?? "fgv", document.url);
     if (metadata.httpStatus !== 200 || !metadata.isPdf || metadata.finalUrl !== document.url || metadata.contentType?.split(";", 1)[0].trim().toLowerCase() !== "application/pdf") throw new Error("Link exato não retorna PDF oficial acessível.");
     documents.push({ ...document, ...metadata, distributionMode: "external_link", sourcePolicy: "metadata_only", sourceContentStored: false, status: "pending_review" });
   }
@@ -461,8 +520,8 @@ export async function reviewFgvHistoricalRegistration(tx: postgres.TransactionSq
     admissionApplied: true, latestEditionVerifiedInDatabase: true, editionPublicId: target.editionPublicId, noticeSha256: expectedNoticeSha256, examDate: target.examDate, documents: preview.documents,
     databaseWrites: 0, questionsImported: 0, referencesApproved: 0, productsReleased: 0, sourceContentStored: false, humanReview: false, publicationAllowed: false };
   if (request.expectedFingerprint !== fingerprint) throw new Error("Fingerprint da prévia divergiu; recapture e confira antes de apply.");
-  const portalTitle = target.bank === "cebraspe" ? target.portalHeading : `Concurso Público para o ${target.portalHeading}`;
-  const organizer = target.bank === "cebraspe" ? "Cebraspe — objetiva" : "Fundação Getulio Vargas — objetiva";
+  const portalTitle = target.bank === "cebraspe" || target.bank === "vunesp" ? target.portalHeading : `Concurso Público para o ${target.portalHeading}`;
+  const organizer = target.bank === "cebraspe" ? "Cebraspe — objetiva" : target.bank === "vunesp" ? "Fundação Vunesp — objetiva" : "Fundação Getulio Vargas — objetiva";
   const [edition] = await tx<{ id: string }[]>`insert into exam_editions(public_id,career_track_id,bank_id,institution_acronym,jurisdiction_code,source_external_id,title,organizer,jurisdiction,
     official_url,exam_date,status,source_policy,source_content_stored,source_page_title,source_http_status,source_checked_at,created_by_user_id,updated_by_user_id)
     values(${target.editionPublicId},${identity.careerId},${identity.bankId},${target.institution},${target.jurisdiction},${target.editionSourceExternalId},

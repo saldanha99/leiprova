@@ -94,6 +94,20 @@ export const OFFICIAL_OPPORTUNITY_SOURCE_POLICIES = [
     allowedHosts: ["dom.manaus.am.gov.br"],
     allowedPathPrefixes: ["/pdf/"],
   },
+  // TCE-SP Auditor DIPE, Edital 001/2026 (Vunesp). Exceção do proprietário de 25/11/2026: o edital vem do
+  // site do TCE-SP (captura normal); a 1ª rerratificação (DOE-TCESP 06/08/2026) só existe em texto no
+  // espelhamento da Vunesp (a cópia do TCE-SP é imagem escaneada). O WAF da Vunesp recusa o servidor:
+  // esse PDF entra só como arquivo baixado no navegador, com URL e SHA-256 fixados na receita.
+  {
+    id: "tcesp-vunesp",
+    publisher: "Tribunal de Contas do Estado de São Paulo",
+    allowedHosts: ["www.tce.sp.gov.br", "documento.vunesp.com.br"],
+    allowedPathPrefixes: ["/concursos/"],
+    allowedExactPaths: [
+      "/sites/default/files/concursos/TCESP%20-%20Edital%20de%20Abertura%20de%20Inscri%C3%A7%C3%B5es_0.pdf",
+      "/documento/stream/Nzc4NjgwOA%3d%3d",
+    ],
+  },
   {
     id: "fcc-concursos",
     publisher: "Fundação Carlos Chagas",

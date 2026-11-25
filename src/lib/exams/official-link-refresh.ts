@@ -4,6 +4,7 @@ import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import * as schema from "@/lib/db/schema";
 import { auditLogs } from "@/lib/db/schema";
 import { verifyOfficialExamUrl } from "@/lib/official-sources/fetch";
+import { verifyOfficialExamUrlWithOperatorDownload } from "@/lib/official-sources/operator-download-exam-documents";
 
 type Database = PostgresJsDatabase<typeof schema>;
 type Verify = typeof verifyOfficialExamUrl;
@@ -51,7 +52,8 @@ export function officialLinkFailureReason(
 export async function refreshApprovedOfficialExamLinks(
   db: Database,
   actorUserId: number,
-  verify: Verify = verifyOfficialExamUrl,
+  // Link da exceção de download do operador só renova com PDF recente em OPERATOR_EXAM_DOWNLOAD_DIR; sem ele, falha auditada.
+  verify: Verify = verifyOfficialExamUrlWithOperatorDownload,
 ) {
   const due = await db.execute<DueLink>(sql`
     select kind, id, "publicId", "bankSlug", url from (

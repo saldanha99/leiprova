@@ -27,6 +27,7 @@ export const PROGRAMME_CLASSIFICATION_SCOPES = {
   "pcpr-agente-policia-judiciaria-01-2026-historico-objetiva": "Agente de Polícia Judiciária",
   "pcpr-papiloscopista-policial-01-2026-historico-objetiva": "Papiloscopista Policial",
   "csjt-juiz-trabalho-substituto-ii-cnu-1-2023-historico-objetiva": "Juiz(a) do Trabalho Substituto(a)",
+  "tcesp-auditor-dipe-direito-001-2026-historico-objetiva": "Auditor de Controle Externo – DIPE – Especialidade: Direito",
   "pgmmanaus-procurador-3a-classe-01-2026-historico-objetiva": "Procurador do Município de 3ª Classe",
   "mpgo-promotor-substituto-63-2025-historico-objetiva": "Promotora e Promotor de Justiça Substituto",
   // Lote Cebraspe histórico.
@@ -82,6 +83,8 @@ export const PROGRAMME_SECTION_HEADINGS = [...PROGRAMME_CANONICAL_SUBJECTS, "Dir
   "Biologia", "Física", "Química", "Direito Penal Aplicado", "Direito Processual Penal Aplicado",
   // PGM-Manaus.
   "Direito Municipal",
+  // TCE-SP Auditor DIPE — Direito (conhecimentos gerais do Anexo I).
+  "Língua Portuguesa", "Raciocínio Lógico e Analítico", "Ética Pública e Integridade", "Legislação",
   // CSJT II CNU (TST pré-edital).
   "Direito Individual do Trabalho", "Direito Coletivo do Trabalho", "Direito Constitucional do Trabalho", "Direito da Criança, do Adolescente e do Jovem", "Direito Internacional e Comunitário", "Direitos Humanos e Direitos Humanos Sociais",
   // PCDF Delegado (títulos inline com dois-pontos) e TJPE Juiz Substituto.

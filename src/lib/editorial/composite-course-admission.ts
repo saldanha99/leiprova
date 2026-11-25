@@ -10,7 +10,7 @@ import { requireStandingCourseMaintenanceDatabaseUrl, assertStandingCourseProduc
 import type { CapturedOfficialDocument } from "@/lib/opportunities/official-document-fetch";
 import { checkOpportunitySourceMetadata } from "@/lib/opportunities/source-metadata-check";
 import type { OpportunitySourceMetadata } from "@/lib/opportunities/source-monitor-policy";
-import { verifyOfficialExamUrl } from "@/lib/official-sources/fetch";
+import { verifyOfficialExamUrlWithOperatorDownload } from "@/lib/official-sources/operator-download-exam-documents";
 
 const FGV = "https://conhecimento.fgv.br/sites/default/files/concursos/";
 const CEBRASPE = "https://cdn.cebraspe.org.br/concursos/";
@@ -21,10 +21,12 @@ export const COMPOSITE_BANKS = {
   cebraspe: { bankSlug: "cebraspe", sourceId: "cebraspe", publisher: "Cebraspe", shortName: "Cebraspe", organizerName: "Cebraspe — etapa objetiva" },
   // FCC: o robots do portal proíbe /concursos/ e PDFs; o edital vem do Diário Oficial do órgão (aqui, DOM de Manaus).
   fcc: { bankSlug: "fcc", sourceId: "dom-manaus", publisher: "Diário Oficial do Município de Manaus", shortName: "FCC", organizerName: "Fundação Carlos Chagas — etapa objetiva" },
+  // Vunesp: o WAF recusa o servidor; edital pelo site do TCE-SP e rerratificação/caderno por download do operador (exceção de 25/11/2026).
+  vunesp: { bankSlug: "vunesp", sourceId: "tcesp-vunesp", publisher: "Tribunal de Contas do Estado de São Paulo", shortName: "Vunesp", organizerName: "Fundação Vunesp — etapa objetiva" },
 } as const;
 export function compositeBank(target: object) {
   const bank = "bank" in target ? target.bank : "fgv";
-  if (bank !== "fgv" && bank !== "cebraspe" && bank !== "fcc") throw new Error("Banca fora das admissões compostas configuradas.");
+  if (bank !== "fgv" && bank !== "cebraspe" && bank !== "fcc" && bank !== "vunesp") throw new Error("Banca fora das admissões compostas configuradas.");
   return COMPOSITE_BANKS[bank];
 }
 export const COMPOSITE_ADMISSION_TARGETS = [
@@ -80,6 +82,10 @@ export const COMPOSITE_ADMISSION_TARGETS = [
   { productSlug: "tst-magistratura-do-trabalho-pre-edital", slug: "csjt-juiz-trabalho-substituto-ii-cnu-1-2023-historico-objetiva", acronym: "CSJT", notice: "1/2023-II CNU", category: "trabalhistas", career: "magistratura", noticeDate: "2023-01-06", statusDate: "2024-06-26", cycleYear: 2023, lifecycleStatus: "result_published", commission: "Comissão Executiva Nacional do II Concurso Nacional Unificado da Magistratura do Trabalho (CSJT)", scope: "national", stages: [
     { title: "Resultado definitivo da avaliação de títulos", url: `${FGV}374_csjt-resultado-definitivo-avaliacao-de-titulos-2024-06-26.pdf`, publishedOn: "2024-06-26" },
   ] },
+  // TCE-SP Auditor DIPE — Direito (treino histórico, decisão de 25/11/2026): Edital 001/2026 (Vunesp), objetiva de 11/10/2026.
+  // Sem marco de fase por metadados: o ato de resultado do DOE-TCESP traz lista de candidatos; a prova aplicada é comprovada
+  // pelo gabarito e pelo julgamento de recursos registrados como prova anterior.
+  { productSlug: "tce-sp-auditor-dipe-direito-2026", slug: "tcesp-auditor-dipe-direito-001-2026-historico-objetiva", acronym: "TCE-SP", notice: "001/2026-TCESP", category: "fiscal-e-controle", career: "controle-externo", bank: "vunesp", noticeDate: "2026-07-03", statusDate: "2026-11-05", cycleYear: 2026, lifecycleStatus: "exam_held", commission: "Comissão Organizadora do Concurso Público do TCE-SP", stages: [] },
   // Lote Cebraspe histórico.
   { productSlug: "sefaz-rn-auditor-fiscal-reta-final", slug: "sefazrn-auditor-fiscal-5-2025-historico-objetiva", acronym: "SEFAZ-RN", notice: "5/2025-SEAD/SEFAZ/RN", category: "fiscal-e-controle", career: "auditor-fiscal", noticeDate: "2025-12-19", statusDate: "2026-06-03", cycleYear: 2025, lifecycleStatus: "homologated", commission: "Secretaria de Estado da Administração do RN (SEAD/RN)", bank: "cebraspe", stages: [
     { title: "Homologação do concurso público", url: `${CEBRASPE}sefaz_rn_25_auditor/arquivos/7FCCAEB394A2FAE0DDB458D4BF39B41FD0ADBD3D0777F36C455FAF45C5D9D60F.pdf`, publishedOn: "2026-06-03" },
@@ -168,7 +174,7 @@ export async function verifyCompositeMetadata(productSlug: string) {
   }
   const previous: Record<string, unknown>[] = [];
   for (const doc of recipe.previousExam.documents) {
-    const metadata = await verifyOfficialExamUrl(compositeBank(target).bankSlug, doc.url);
+    const metadata = await verifyOfficialExamUrlWithOperatorDownload(compositeBank(target).bankSlug, doc.url);
     if (metadata.httpStatus !== 200 || !metadata.isPdf || metadata.finalUrl !== doc.url) throw new Error("Link oficial de prova/gabarito não verificado; não presumir disponibilidade.");
     previous.push({ ...doc, ...metadata, distributionMode: "external_link", sourceContentStored: false, approvedForProduct: false });
   }

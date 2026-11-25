@@ -4,7 +4,9 @@ export const OFFICIAL_EXAM_PORTALS = [
   {
     bankSlug: "vunesp",
     officialUrl: "https://www.vunesp.com.br/?b=v",
-    allowedHosts: ["vunesp.com.br", "www.vunesp.com.br", "documento.vunesp.com.br"],
+    // www.tce.sp.gov.br: o TCE-SP republica no próprio site os atos oficiais da prova Vunesp que ele
+    // publica no DOE-TCESP (gabaritos e julgamento de recursos), que o servidor alcança (exceção de 25/11/2026).
+    allowedHosts: ["vunesp.com.br", "www.vunesp.com.br", "documento.vunesp.com.br", "www.tce.sp.gov.br"],
   },
   {
     bankSlug: "fgv",
