@@ -30,7 +30,7 @@ export type FgvHistoricalPreviousExam = Readonly<{
   role: string; jurisdiction: string; jurisdictionName: string; institution: string; noticeNumber: string; cycleYear: number; careerSlug: string;
   examDate: string; expectedQuestionCount: number;
   /** Escopo da oportunidade admitida; estadual por padrão, regional nos TRFs. */
-  scope?: "state" | "regional";
+  scope?: "state" | "regional" | "national";
   noticeUrl: string; noticeSha256: string; noticePageCount: number;
   /** Trechos que precisam constar das páginas do edital aprovado (página iniciando em 1). */
   noticeChecks: readonly Readonly<{ page: number; pattern: string }>[];
@@ -271,6 +271,25 @@ export const FGV_HISTORICAL_PREVIOUS_EXAMS: readonly FgvHistoricalPreviousExam[]
     documents: [
       { documentType: "question_booklet", title: "PCPR 01/2026 — prova objetiva — Papiloscopista Policial — Tipo 1", label: "Tipo 1", publishedOn: "2026-10-13", url: `${FGV}cns301-papiloscopista-policial-cns301-tipo-1.pdf`, blockIncludes: ["Prova Objetiva", "Papiloscopista Policial"] },
       { documentType: "answer_key", title: "PCPR 01/2026 — gabarito oficial definitivo da prova objetiva", label: "Gabarito Oficial Definitivo da Prova Objetiva", publishedOn: "2026-11-13", url: `${FGV}gabaritos-definitivos-v3.pdf` },
+    ],
+  },  // TST pré-edital: prova anterior do II CNU da Magistratura do Trabalho (CSJT 2023).
+  {
+    productSlug: "tst-magistratura-do-trabalho-pre-edital", editionPublicId: "csjt-juiz-trabalho-substituto-ii-cnu-1-2023-objetiva", opportunitySlug: "csjt-juiz-trabalho-substituto-ii-cnu-1-2023-historico-objetiva",
+    portalUrl: "https://conhecimento.fgv.br/concursos/csjt23", portalHeading: "Conselho Superior da Justiça do Trabalho",
+    portalNotice: { url: `${FGV}csjt_edital-05-01-2023-integra-apos-a-setima-retificacao-em-17-1-2024_0_0.pdf`, label: "Edital (retificado em 24/01/2024)" },
+    role: "Juiz(a) do Trabalho Substituto(a)", jurisdiction: "BR", jurisdictionName: "Brasil", institution: "CSJT", scope: "national", noticeNumber: "1/2023-II CNU", cycleYear: 2023, careerSlug: "magistratura",
+    examDate: "2023-05-14", expectedQuestionCount: 100,
+    noticeUrl: `${FGV}csjt_edital-05-01-2023-integra-apos-a-setima-retificacao-em-17-1-2024_0_0.pdf`, noticeSha256: "62549d7a180f2674ed997d81717e98380284926e379c55da30dd3ec7a47525ae", noticePageCount: 71,
+    noticeChecks: [
+      { page: 24, pattern: "10\\.6 A Prova Objetiva Seletiva será composta por 100 \\(cem\\) questões de múltipla escolha" },
+      { page: 24, pattern: "com 05 \\(cinco\\) alternativas e apenas 01 \\(uma\\) resposta" },
+      { page: 23, pattern: "provável de 14 de maio de 2023" },
+    ],
+    examDateCorroboration: "Portal FGV: cadernos e gabarito preliminar em 16/05/2023; gabarito oficial definitivo em 22/06/2023, que declara a prova aplicada em 14/05/2023",
+    editionSourceExternalId: "fgv-csjt-ii-cnu-1-2023-objetiva", editionTitle: "CSJT II CNU 1/2023 — Juiz(a) do Trabalho Substituto(a) — objetiva",
+    documents: [
+      { documentType: "question_booklet", title: "CSJT 2023 — prova objetiva seletiva — Juiz(a) do Trabalho Substituto(a) — Tipo 1", label: "Tipo 1", publishedOn: "2023-05-16", url: `${FGV}juiza-do-trabalho-substitutoajuiz-substituto-tipo-1.pdf`, blockIncludes: ["Prova Objetiva Seletiva", "Juiz(a) do Trabalho Substituto(a)"] },
+      { documentType: "answer_key", title: "CSJT 2023 — gabarito oficial definitivo da prova objetiva seletiva", label: "Gabarito Oficial Definitivo da Prova Objetiva Seletiva", publishedOn: "2023-06-22", url: `${FGV}csjt-gabaritos-definitivos.pdf` },
     ],
   },
 ];

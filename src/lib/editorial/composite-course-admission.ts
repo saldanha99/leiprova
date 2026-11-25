@@ -76,6 +76,10 @@ export const COMPOSITE_ADMISSION_TARGETS = [
   ] },
   // PGM-Manaus 01/2026 (FCC): edital do DOM nº 6343; sem etapa de resultado verificável (portal da FCC fora do robots).
   { productSlug: "pgm-manaus-procurador-do-municipio-2026", slug: "pgmmanaus-procurador-3a-classe-01-2026-historico-objetiva", acronym: "PGM-MANAUS", notice: "01/2026-Procurador", category: "procuradorias", career: "procurador", bank: "fcc", noticeDate: "2026-07-02", statusDate: "2026-09-20", cycleYear: 2026, lifecycleStatus: "exam_held", commission: "Comissão de Concurso Público da PGM-Manaus", replacesEmptyOpportunitySlug: "pgm-manaus-2026", stages: [] },
+  // TST / Magistratura do Trabalho (pré-edital de 25/11/2026): edição de referência é o II CNU (CSJT, Edital nº 1/2023).
+  { productSlug: "tst-magistratura-do-trabalho-pre-edital", slug: "csjt-juiz-trabalho-substituto-ii-cnu-1-2023-historico-objetiva", acronym: "CSJT", notice: "1/2023-II CNU", category: "trabalhistas", career: "magistratura", noticeDate: "2023-01-06", statusDate: "2024-06-26", cycleYear: 2023, lifecycleStatus: "result_published", commission: "Comissão Executiva Nacional do II Concurso Nacional Unificado da Magistratura do Trabalho (CSJT)", scope: "national", stages: [
+    { title: "Resultado definitivo da avaliação de títulos", url: `${FGV}374_csjt-resultado-definitivo-avaliacao-de-titulos-2024-06-26.pdf`, publishedOn: "2024-06-26" },
+  ] },
   // Lote Cebraspe histórico.
   { productSlug: "sefaz-rn-auditor-fiscal-reta-final", slug: "sefazrn-auditor-fiscal-5-2025-historico-objetiva", acronym: "SEFAZ-RN", notice: "5/2025-SEAD/SEFAZ/RN", category: "fiscal-e-controle", career: "auditor-fiscal", noticeDate: "2025-12-19", statusDate: "2026-06-03", cycleYear: 2025, lifecycleStatus: "homologated", commission: "Secretaria de Estado da Administração do RN (SEAD/RN)", bank: "cebraspe", stages: [
     { title: "Homologação do concurso público", url: `${CEBRASPE}sefaz_rn_25_auditor/arquivos/7FCCAEB394A2FAE0DDB458D4BF39B41FD0ADBD3D0777F36C455FAF45C5D9D60F.pdf`, publishedOn: "2026-06-03" },

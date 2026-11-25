@@ -25,6 +25,8 @@ export type ProgrammeLayout = Readonly<{
   splitInlineItems?: boolean;
   /** Linha literal que abre o cargo seguinte no mesmo anexo; a extração termina nela e ela é obrigatória. */
   stopLine?: string;
+  /** Linhas literais que começam com número mas continuam o item anterior ("182 e Recomendação 190, …", Convenção da OIT). */
+  continuationLines?: readonly string[];
   /** Linha literal que abre o cargo no anexo ("CARGO 9: …"); antes dela nada é lido e ela é obrigatória. */
   startLine?: string;
   /** "top-level-numbers": "1 Tema. 1.1 Sub. 2 Tema." agrupa subitens no item de primeiro nível.
@@ -884,6 +886,57 @@ export const NEXT_OFFICIAL_COURSE_RECIPES: readonly NextOfficialCourseRecipe[] =
     skipRepeatedRequirements: true,
     limitations: ["Itens agrupados pelo número de primeiro nível; as partes \"I\" (disciplina) e \"II\" (legislação complementar) de cada bloco ficam na mesma disciplina.", "O último título ocupa duas linhas no PDF; a primeira é tratada como cabeçalho e a disciplina abre na linha \"PRIMEIROS SOCORROS:\".", "Edital consolidado até o Edital nº 7; a retificação de Direito Constitucional e Legislação Complementar e a renumeração de Medicina Legal (Edital nº 2) já estão no texto.", "Treino histórico da objetiva com legislação atual; Lei Orgânica e normas do DF exigem fonte oficial própria antes de vínculos."],
   },
+  // TST / Magistratura do Trabalho como pré-edital (decisão de 25/11/2026): sem edital novo, a base é o último
+  // edital oficial do mesmo cargo, o II Concurso Nacional Unificado (CSJT, FGV, Edital nº 1/2023). A admissão
+  // registra a edição de referência; o modo pre_notice é gravado depois pelo operador de modo de preparação.
+  {
+    productSlug: "tst-magistratura-do-trabalho-pre-edital", institution: "Conselho Superior da Justiça do Trabalho", role: "Juiz(a) do Trabalho Substituto(a)",
+    jurisdiction: "BR", cycle: "II Concurso Público Nacional Unificado — Edital de Abertura nº 1/2023", bankScope: "Fundação Getulio Vargas, assessoria técnica das cinco etapas (item 1.2), sob a Comissão Executiva Nacional do CSJT",
+    portalUrl: "https://conhecimento.fgv.br/concursos/csjt23", examDate: "2023-05-14", examDateEvidence: { documentKey: "csjt-notice", page: 23, item: "10.1", quote: "provável de 14 de maio de 2023, com duração de 5 (cinco) horas, das 13h às 18h,", actualDayIndependentlyVerified: true, corroboratingUrl: `${FGV_FILES}csjt-gabaritos-definitivos.pdf`, limitation: null },
+    stage: "Concurso encerrado: objetiva em 14/05/2023, gabarito definitivo em 22/06/2023, resultado definitivo da avaliação de títulos em 26/06/2024",
+    stageObservedOn: "2026-11-25", proposedMode: "historical_training", expectedSubjects: 15,
+    documents: [
+      { key: "csjt-notice", url: `${FGV_FILES}csjt_edital-05-01-2023-integra-apos-a-setima-retificacao-em-17-1-2024_0_0.pdf`, title: "Edital de Abertura nº 1/2023 — II Concurso Público Nacional Unificado da Magistratura do Trabalho (CSJT), íntegra após a sétima retificação", pages: 71, programmePages: [52, 66], layout: {
+        headings: [
+          { line: "DIREITO INDIVIDUAL DO TRABALHO", subject: "Direito Individual do Trabalho" },
+          { line: "DIREITO COLETIVO DO TRABALHO", subject: "Direito Coletivo do Trabalho" },
+          { line: "DIREITO ADMINISTRATIVO", subject: "Direito Administrativo" },
+          { line: "DIREITO PENAL", subject: "Direito Penal" },
+          { line: "NOÇÕES GERAIS DE DIREITO E FORMAÇÃO HUMANÍSTICA", subject: "Noções Gerais de Direito e Formação Humanística" },
+          { line: "DIREITO PROCESSUAL DO TRABALHO", subject: "Direito Processual do Trabalho" },
+          { line: "DIREITO CONSTITUCIONAL", subject: "Direito Constitucional" },
+          { line: "DIREITO CONSTITUCIONAL DO TRABALHO", subject: "Direito Constitucional do Trabalho" },
+          { line: "DIREITO CIVIL", subject: "Direito Civil" },
+          { line: "DIREITO DA CRIANÇA, DO ADOLESCENTE E DO JOVEM", subject: "Direito da Criança, do Adolescente e do Jovem" },
+          { line: "DIREITO PROCESSUAL CIVIL", subject: "Direito Processual Civil" },
+          { line: "DIREITO INTERNACIONAL E COMUNITÁRIO", subject: "Direito Internacional e Comunitário" },
+          { line: "DIREITO PREVIDENCIÁRIO", subject: "Direito Previdenciário" },
+          { line: "DIREITO EMPRESARIAL", subject: "Direito Empresarial" },
+          { line: "DIREITOS HUMANOS E DIREITOS HUMANOS SOCIAIS", subject: "Direitos Humanos e Direitos Humanos Sociais" },
+        ],
+        ignoreLines: ["CONSELHO SUPERIOR DA JUSTIÇA DO TRABALHO \\| CONCURSO PÚBLICO 2023 \\d+", "BLOCO (?:I|II|III)"],
+        // Marcador gráfico (U+F034) colado a cada título de disciplina no PDF.
+        removeLiterals: ["\uF034"],
+        startLine: "CARGO: JUIZ(A) DO TRABALHO SUBSTITUTO(A)",
+        // "182 e Recomendação 190, …" continua o item 9 de Direitos Humanos (Convenção 182 da OIT), não abre item.
+        continuationLines: ["182 e Recomendação 190, sobre as piores formas de trabalho infantil, da Organização Internacional"],
+      } },
+    ],
+    overlays: [],
+    identityClaims: [
+      { document: "csjt-notice", page: 1, contains: ["II CONCURSO PÚBLICO NACIONAL UNIFICADO PARA INGRESSO NA", "EDITAL DE ABERTURA Nº 1/2023", "cargos de Juiz(a) do Trabalho Substituto(a), com base nas instruções constantes da Resolução", "Trabalho será realizado pelo Conselho Superior da Justiça do Trabalho, com a adesão de", "a assessoria da Fundação Getulio Vargas, doravante"] },
+      { document: "csjt-notice", page: 23, contains: ["10.1 A Prova Objetiva Seletiva, de caráter eliminatório e classificatório, será realizada na data"] },
+      { document: "csjt-notice", page: 24, contains: ["10.6 A Prova Objetiva Seletiva será composta por 100 (cem) questões de múltipla escolha,"] },
+      { document: "csjt-notice", page: 52, contains: ["ANEXO II - CONTEÚDO PROGRAMÁTICO", "CARGO: JUIZ(A) DO TRABALHO SUBSTITUTO(A)"] },
+    ],
+    previousExam: { cycle: "II CNU da Magistratura do Trabalho — Edital nº 1/2023, objetiva em 14/05/2023", role: "Juiz(a) do Trabalho Substituto(a) — prova objetiva seletiva", portalUrl: "https://conhecimento.fgv.br/concursos/csjt23", examDate: "2023-05-14", answerKeyFinality: "definitive_document", documents: [
+      { type: "question_booklet", title: "CSJT 2023 — caderno Tipo 1 da prova objetiva seletiva — Juiz(a) do Trabalho Substituto(a)", url: `${FGV_FILES}juiza-do-trabalho-substitutoajuiz-substituto-tipo-1.pdf` },
+      { type: "answer_key", title: "CSJT 2023 — gabarito oficial definitivo da prova objetiva seletiva (22/06/2023)", url: `${FGV_FILES}csjt-gabaritos-definitivos.pdf` },
+    ] },
+    // O anexo repete itens literais em mais de uma disciplina; a fonte guarda a primeira ocorrência.
+    skipRepeatedRequirements: true,
+    limitations: ["Pré-edital: o programa é o do último edital oficial (II CNU, Edital nº 1/2023) e será conferido e atualizado quando o novo edital sair.", "O edital limita a cobrança à legislação vigente na publicação (jan/2023); o treino usa a legislação atual.", "Itens numerados de primeiro nível; a linha seguinte continua o item.", "Direito Individual, Coletivo e Constitucional do Trabalho são títulos próprios do anexo, sem equivalência automática no catálogo de disciplinas.", "Treino da objetiva com legislação atual; não simula as provas escritas, a oral nem os títulos."],
+  },
 ];
 
 function normalized(value: string) { return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, " ").toLowerCase().trim(); }
@@ -967,6 +1020,7 @@ function extractLayoutSections(recipe: PreviewDocumentRecipe, layout: ProgrammeL
         sentenceEnded = /\.$/u.test(line);
         continue;
       }
+      if (layout.continuationLines?.includes(line)) { current.fragments.push({ page: index + 1, text: line, start: false }); continue; }
       const parts = layout.splitInlineItems ? line.split(/\s+(?=\d{1,2}\.(?:\s+[A-ZÀ-Ö]|$))/u) : [line];
       for (const part of parts) {
         // Número de item isolado no fim da linha ("3.") abre o item da linha seguinte.
