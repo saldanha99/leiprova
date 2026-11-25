@@ -136,6 +136,8 @@ describe("consulta pública da última prova", () => {
     expect(dalSource).toContain("from exam_editions newer_edition");
     expect(dalSource).not.toContain("newer_edition.official_url");
     expect(dalSource).not.toContain("newer_edition.source_checked_at");
+    // Mesma data = provas simultâneas de cargos diferentes (PC-PR Agente x Papiloscopista, 24/11/2026).
+    expect(dalSource).not.toContain("newer_edition.id >");
   });
 
   it("degrada para ausência segura enquanto a migração não existe", async () => {

@@ -190,13 +190,8 @@ export async function loadReferenceScope(
           and newer_edition.institution_acronym = ${examEditions.institutionAcronym}
           and newer_edition.jurisdiction_code = ${examEditions.jurisdictionCode}
           and newer_edition.status in ('held', 'published')
-          and (
-            newer_edition.exam_date > ${examEditions.examDate}
-            or (
-              newer_edition.exam_date = ${examEditions.examDate}
-              and newer_edition.id > ${examEditions.id}
-            )
-          )
+          -- Mesma data = provas simultâneas (cargos diferentes do mesmo concurso), não edição mais nova.
+          and newer_edition.exam_date > ${examEditions.examDate}
           and newer_edition.exam_date < case when ${contestStoreProducts.preparationMode} = 'historical_training' then ${todayIso}::date else coalesce(${contestOpportunities.examDate}, ${todayIso}::date) end
           and newer_edition.exam_date < ${todayIso}::date
       )`.mapWith(Boolean),

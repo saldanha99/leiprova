@@ -229,13 +229,8 @@ export async function getApprovedContestExamReference(
               and newer_edition.institution_acronym = ${examEditions.institutionAcronym}
               and newer_edition.jurisdiction_code = ${examEditions.jurisdictionCode}
               and newer_edition.status in ('held', 'published')
-              and (
-                newer_edition.exam_date > ${examEditions.examDate}
-                or (
-                  newer_edition.exam_date = ${examEditions.examDate}
-                  and newer_edition.id > ${examEditions.id}
-                )
-              )
+              -- Mesma data = provas simultâneas (cargos diferentes do mesmo concurso), não edição mais nova.
+              and newer_edition.exam_date > ${examEditions.examDate}
               and newer_edition.exam_date < coalesce(${contestOpportunities.examDate}, ${referenceDateIso}::date)
               and newer_edition.exam_date < ${referenceDateIso}::date
           )`,
