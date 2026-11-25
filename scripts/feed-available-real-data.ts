@@ -44,7 +44,12 @@ async function main() {
     OPPORTUNITY_APPROVAL_REFERENCE: reference,
   });
   const databaseUrl = requireOpportunityApprovalDatabaseUrl({ MIGRATION_DATABASE_URL: process.env.MIGRATION_DATABASE_URL });
-  const editions = validateAvailableRealExamEditions();
+  // AVAILABLE_REAL_DATA_ONLY=id1,id2: carga só dessas edições (Câmara, 25/11/2026), sem reprocessar produtos que a
+  // admissão composta religou depois da carga original.
+  const only = process.env.AVAILABLE_REAL_DATA_ONLY?.split(",").map((value) => value.trim()).filter(Boolean) ?? [];
+  const all = validateAvailableRealExamEditions();
+  const editions = only.length ? all.filter((edition) => only.includes(edition.publicId)) : all;
+  if (only.length && editions.length !== new Set(only).size) throw new Error("AVAILABLE_REAL_DATA_ONLY contém edição inexistente.");
   const observations = new Map<string, Awaited<ReturnType<typeof observeOfficialSource>>>();
   for (const edition of editions) {
     observations.set(edition.officialUrl, await observeOfficialSource(edition.bankSlug, edition.officialUrl, "text/html"));
