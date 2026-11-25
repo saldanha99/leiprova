@@ -170,3 +170,12 @@ describe("contrato de formato — cláusula do MPGO", () => {
     expect(officialFormatEvidenceMatches("true_false", clause)).toBe(false);
   });
 });
+
+describe("contrato de formato — cláusula do CSJT II CNU (TST pré-edital)", () => {
+  it("reconhece \"05 (cinco) alternativas e apenas 01 (uma) resposta correta\"", () => {
+    const clause = "10.6 A Prova Objetiva Seletiva será composta por 100 (cem) questões de múltipla escolha,\nnumeradas sequencialmente, com 05 (cinco) alternativas e apenas 01 (uma) resposta\ncorreta";
+    expect(officialFormatEvidenceMatches("multiple_choice", clause)).toBe(true);
+    expect(officialFormatEvidenceMatches("multiple_choice", clause.replace("apenas 01 (uma)", "mais de 01 (uma)"))).toBe(false);
+    expect(officialFormatEvidenceMatches("true_false", clause)).toBe(false);
+  });
+});
