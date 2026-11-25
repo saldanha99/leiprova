@@ -44,6 +44,8 @@ export const CEBRASPE_PROGRAMME_SCOPES: ReadonlySet<string> = new Set(["sefaz-al
   "pgeal-procurador-1-2026-historico-objetiva", "pcdf-delegado-1-2026-historico-objetiva"]);
 /** PGM-Manaus: edital publicado no DOM de Manaus (FCC). */
 export const DOM_MANAUS_PROGRAMME_SCOPES: ReadonlySet<string> = new Set(["pgmmanaus-procurador-3a-classe-01-2026-historico-objetiva"]);
+// TCE-SP (Vunesp): edital no site do TCE-SP, origem da exceção de 25/11/2026.
+export const TCESP_VUNESP_PROGRAMME_SCOPES: ReadonlySet<string> = new Set(["tcesp-auditor-dipe-direito-001-2026-historico-objetiva"]);
 export const PROGRAMME_SUBJECT_CLASSIFICATION_ACTION = "editorial.programme.subject_classified";
 export const PROGRAMME_CLASSIFICATION_BATCH_LIMIT = 100;
 const digest = (value: unknown) => createHash("sha256").update(JSON.stringify(value)).digest("hex");
@@ -237,6 +239,7 @@ export async function classifyStandingProgrammeSubjects(db: PostgresJsDatabase<t
       const row = rows.find(row => row.id === item.requirementId)!, source = sources.find(source => source.id === row.snapshotId), subject = subjects.find(subject => subject.id === item.subjectId);
       if (!source || source.sourceDocumentId !== row.sourceDocumentId || !subject || source.policy !== "official_document" || !["official_document", "metadata_only"].includes(source.sourcePolicy) || !Array.isArray(source.pageTexts)) throw new Error("Snapshot/catálogo oficial ausente.");
       const expectedSource = DOM_MANAUS_PROGRAMME_SCOPES.has(input.opportunitySlug) ? "dom-manaus"
+        : TCESP_VUNESP_PROGRAMME_SCOPES.has(input.opportunitySlug) ? "tcesp-vunesp"
         : CEBRASPE_PROGRAMME_SCOPES.has(input.opportunitySlug) ? "cebraspe" : "fgv-conhecimento";
       assertApprovedProgrammeSourceUrls(source.sourceUrl, source.url, source.sourcePolicy, expectedSource);
       assertProgrammeSubjectEvidence(row, item, source, subject);
