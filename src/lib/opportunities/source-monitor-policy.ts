@@ -51,6 +51,9 @@ export const OFFICIAL_OPPORTUNITY_SOURCE_POLICIES = [
       "/sites/default/files/concursos/427_tjms-resultado-definitivo-prova-escrita-e-pratica-2026-08-25.pdf",
       "/sites/default/files/concursos/copia-1-de-edital-01-2026-pcpr-publicacao.docx.pdf",
       "/sites/default/files/concursos/pcpr2026-resultado-prova-objetiva_reprocessamento-v2.pdf",
+      // TST pré-edital: edital do II CNU da Magistratura do Trabalho (CSJT 2023) e resultado definitivo dos títulos (metadados).
+      "/sites/default/files/concursos/csjt_edital-05-01-2023-integra-apos-a-setima-retificacao-em-17-1-2024_0_0.pdf",
+      "/sites/default/files/concursos/374_csjt-resultado-definitivo-avaliacao-de-titulos-2024-06-26.pdf",
     ],
   },
   {
