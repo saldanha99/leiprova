@@ -56,7 +56,16 @@ const headingKey = (value: string) => normalize(value).toLocaleUpperCase("pt-BR"
 // Glifos de uso privado (ex.: marcador U+F034 colado ao título no PDF do TJMS) são gráfico, não texto.
 // Título no início do parágrafo ("DIREITO CIVIL. Lei de…", TJMS Cartórios; "1. DIREITO PENAL: 1.1 …", PCPR): o nome é o prefixo em maiúsculas antes do ponto ou dois-pontos (Cebraspe: "DIREITO CIVIL: 1 …").
 const inlineHeadingPrefix = (name: string) => /^([A-ZÀ-ÖØ-Þ][A-ZÀ-ÖØ-Þ ,–-]{3,}[A-ZÀ-ÖØ-Þ])[.:] \S/u.exec(name)?.[1] ?? name;
-export const programmeLiteralHeadingName = (line: string) => inlineHeadingPrefix(normalize(line).replace(/^[-]+\s*/u, "").replace(/^\d+(?:\.\d+)*[.)]?\s*[–—-]?\s*/u, "").split(" - Ponto 1.", 1)[0]);
+// Caixa mista ("Direito Administrativo: Conceito…", TCE-SP): só vale prefixo idêntico a um título já cadastrado;
+// o rótulo de bloco "Conhecimentos Específicos:" antes da disciplina não é título.
+const knownMixedCasePrefix = (name: string) => {
+  const match = /^([^:]{3,80}): \S/u.exec(name);
+  return match && PROGRAMME_SECTION_HEADINGS.some((heading) => headingKey(heading) === headingKey(match[1])) ? match[1] : null;
+};
+export const programmeLiteralHeadingName = (line: string) => {
+  const name = (normalize(line).replace(/^[-]+\s*/u, "").replace(/^\d+(?:\.\d+)*[.)]?\s*[–—-]?\s*/u, "").split(" - Ponto 1.", 1)[0]).replace(/^Conhecimentos Específicos: (?=[^:]+: \S)/u, "");
+  return knownMixedCasePrefix(name) ?? inlineHeadingPrefix(name);
+};
 const sha = z.string().regex(/^[a-f0-9]{64}$/u);
 const id = z.number().int().positive().safe();
 
