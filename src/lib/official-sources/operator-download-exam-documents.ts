@@ -46,5 +46,7 @@ export async function verifyOfficialExamUrlWithOperatorDownload(bankSlug: string
   const bytes = await readFile(file);
   if (createHash("sha256").update(bytes).digest("hex") !== pinned.sha256) throw new Error("PDF baixado difere do SHA-256 fixado na exceção; o documento oficial mudou.");
   if (new TextDecoder("latin1").decode(bytes.subarray(0, 5)) !== "%PDF-") throw new Error("Arquivo baixado não é PDF.");
-  return { httpStatus: 200, pageTitle: null, contentType: "application/pdf", isPdf: true, finalUrl: url, checkedAt: info.mtime, operatorDownloadSha256: pinned.sha256 };
+  // A conferência é esta (hash do arquivo agora); a hora do download fica registrada à parte, limitada a 24 h.
+  return { httpStatus: 200, pageTitle: null, contentType: "application/pdf", isPdf: true, finalUrl: url, checkedAt: options.now ?? new Date(),
+    operatorDownloadSha256: pinned.sha256, operatorDownloadedAt: info.mtime.toISOString() };
 }
