@@ -268,42 +268,47 @@ async function selectExamEdition(
     return null;
   }
 
-  const rows = await getDb()
-    .select({
-      id: examEditions.id,
-      publicId: examEditions.publicId,
-      title: examEditions.title,
-      examDate: examEditions.examDate,
-      durationMinutes: examEditions.durationMinutes,
-      status: examEditions.status,
-      officialUrl: examEditions.officialUrl,
-      careerTrackId: examEditions.careerTrackId,
-      specializationId: examEditions.specializationId,
-      bankId: quizBanks.id,
-      bankSlug: quizBanks.slug,
-      bankName: quizBanks.name,
-      bankIsActive: quizBanks.isActive,
-      sourceCheckedAt: examEditions.sourceCheckedAt,
-      scheduledProgramReviewed: editionHasOriginalTraining(
-        examEditions.id,
-        examEditions.bankId,
-      ),
-    })
-    .from(examEditions)
-    .innerJoin(quizBanks, eq(examEditions.bankId, quizBanks.id))
-    .where(
-      and(
-        examEditionConditions(
-          selection,
-          todayIso,
-          request.examEditionId,
-          request.mode === "original_style",
+  // jit=off: a subconsulta de inéditas tem custo estimado alto e o JIT levava ~14 s
+  // só para compilar (EXPLAIN ANALYZE em produção, 26/11/2026); executar leva ms.
+  const rows = await getDb().transaction(async (tx) => {
+    await tx.execute(sql`set local jit = off`);
+    return tx
+      .select({
+        id: examEditions.id,
+        publicId: examEditions.publicId,
+        title: examEditions.title,
+        examDate: examEditions.examDate,
+        durationMinutes: examEditions.durationMinutes,
+        status: examEditions.status,
+        officialUrl: examEditions.officialUrl,
+        careerTrackId: examEditions.careerTrackId,
+        specializationId: examEditions.specializationId,
+        bankId: quizBanks.id,
+        bankSlug: quizBanks.slug,
+        bankName: quizBanks.name,
+        bankIsActive: quizBanks.isActive,
+        sourceCheckedAt: examEditions.sourceCheckedAt,
+        scheduledProgramReviewed: editionHasOriginalTraining(
+          examEditions.id,
+          examEditions.bankId,
         ),
-        eq(quizBanks.isActive, true),
-      ),
-    )
-    .orderBy(desc(examEditions.examDate), desc(examEditions.id))
-    .limit(1);
+      })
+      .from(examEditions)
+      .innerJoin(quizBanks, eq(examEditions.bankId, quizBanks.id))
+      .where(
+        and(
+          examEditionConditions(
+            selection,
+            todayIso,
+            request.examEditionId,
+            request.mode === "original_style",
+          ),
+          eq(quizBanks.isActive, true),
+        ),
+      )
+      .orderBy(desc(examEditions.examDate), desc(examEditions.id))
+      .limit(1);
+  });
 
   const edition = rows[0];
   return edition &&

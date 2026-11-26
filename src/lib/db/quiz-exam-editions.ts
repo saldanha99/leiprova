@@ -39,6 +39,9 @@ const QUIZ_CATALOG_STATEMENT_TIMEOUT = sql.raw(`'120s'`);
 async function withCatalogTimeout<T>(run: (db: ReturnType<typeof getDb>) => Promise<T>): Promise<T> {
   return getDb().transaction(async (tx) => {
     await tx.execute(sql`set local statement_timeout = ${QUIZ_CATALOG_STATEMENT_TIMEOUT}`);
+    // A estimativa de custo das subconsultas de inéditas dispara o JIT, que sozinho
+    // levava ~14 s (EXPLAIN ANALYZE em produção, 26/11/2026) sem ganho de execução.
+    await tx.execute(sql`set local jit = off`);
     return run(tx as unknown as ReturnType<typeof getDb>);
   });
 }
