@@ -410,7 +410,18 @@ function CareerPathSection({
           {career.specializations.length > 0 && !config.specializationSlug ? (
             <CatalogNotice message="Escolha a especialização acima para consultar as edições sincronizadas." />
           ) : years.length === 0 ? (
-            <CatalogNotice message="Ainda não há edição oficial revisada e sincronizada para este recorte. A lei seca continua disponível sem atribuir uma banca fictícia." />
+            <>
+              <CatalogNotice message="Ainda não há edição oficial revisada e sincronizada para este recorte. A lei seca continua disponível sem atribuir uma banca fictícia." />
+              {config.mode !== "dry_law" ? (
+                <button
+                  className="mt-3 inline-flex min-h-11 w-full items-center justify-center rounded-xl border border-els-amber/35 bg-els-amber/8 px-4 text-sm font-bold text-els-amber-ink transition hover:border-els-amber/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-els-amber sm:w-auto"
+                  onClick={() => onChange({ mode: "dry_law", examEditionId: undefined, examYear: undefined, bankSlug: undefined })}
+                  type="button"
+                >
+                  Treinar a lei seca deste recorte
+                </button>
+              ) : null}
+            </>
           ) : (
             <div className="mt-5 grid gap-5 lg:grid-cols-[.6fr_1.4fr]">
               <fieldset>
@@ -444,6 +455,7 @@ function CareerPathSection({
                             <span>
                               <strong className="block text-sm text-els-fg">{edition.title}</strong>
                               {edition.scheduled ? <span className="mt-1 block text-xs font-semibold text-els-green-ink">Preparação para prova agendada · questões autorais</span> : null}
+                              {edition.programTraining === false && config.mode === "original_style" ? <span className="mt-1 block text-xs font-semibold text-els-fg-3">Inéditas no estilo {edition.bank.name} · treino geral da banca, sem recorte do edital</span> : null}
                               <span className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] text-els-fg-3">
                                 <span className="inline-flex items-center gap-1"><CalendarDays className="size-3" />{formatExamDate(edition.examDate)}</span>
                                 {(edition.organizer || edition.jurisdiction) && <span>{[edition.organizer, edition.jurisdiction].filter(Boolean).join(" · ")}</span>}

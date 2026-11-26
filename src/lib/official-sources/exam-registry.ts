@@ -11,7 +11,9 @@ export const OFFICIAL_EXAM_PORTALS = [
   {
     bankSlug: "fgv",
     officialUrl: "https://conhecimento.fgv.br/concursos",
-    allowedHosts: ["conhecimento.fgv.br"],
+    // oab.fgv.br: portal oficial da FGV para o Exame de Ordem Unificado (editais e gabaritos por edição),
+    // listado em conhecimento.fgv.br/exames (conferido em 26/11/2026).
+    allowedHosts: ["conhecimento.fgv.br", "oab.fgv.br"],
   },
   {
     bankSlug: "fcc",

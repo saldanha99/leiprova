@@ -11,6 +11,8 @@ export type QuizExamEditionCatalogItem = Readonly<{
   examYear: number;
   durationMinutes: number | null;
   status: EligibleQuizExamStatus;
+  /** Há inéditas revisadas ligadas ao programa desta edição exata. */
+  programTraining: boolean;
   organizer: string | null;
   jurisdiction: string | null;
   officialUrl: string;
@@ -32,6 +34,8 @@ export type QuizExamEditionCatalogItem = Readonly<{
 
 export type QuizExamEditionOption = Readonly<{
   scheduled?: true;
+  /** Sem inéditas ligadas ao programa: o quiz usa o treino geral da banca da edição. */
+  programTraining?: false;
   publicId: string;
   title: string;
   examDate: string;
@@ -175,6 +179,7 @@ export function buildQuizExamEditionCatalog(
           examYear: Number(examDate.slice(0, 4)),
           durationMinutes: row.durationMinutes,
           status: row.status as EligibleQuizExamStatus,
+          programTraining: row.scheduledProgramReviewed === true,
           organizer: row.organizer,
           jurisdiction: row.jurisdiction,
           officialUrl,
@@ -212,6 +217,7 @@ export function toQuizExamEditionOptions(
 ): QuizExamEditionOption[] {
   return editions.map((edition) => ({
     ...(edition.status === "scheduled" ? { scheduled: true as const } : {}),
+    ...(edition.programTraining ? {} : { programTraining: false as const }),
     publicId: edition.publicId,
     title: edition.title,
     examDate: edition.examDate,

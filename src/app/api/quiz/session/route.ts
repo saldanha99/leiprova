@@ -400,6 +400,10 @@ export async function POST(request: Request) {
       { status: 400 },
     );
   }
+  // Edição sem inéditas ligadas ao programa (ex.: Exame de Ordem recém-cadastrado):
+  // em vez de um quiz vazio, serve o treino geral da banca da edição, sem alegar
+  // cobertura do edital; a resposta informa programTraining=false.
+  const editionProgramTraining = selectedExamEdition?.scheduledProgramReviewed === true;
   const effectiveSelection =
     parsed.data.path === "career" && selectedExamEdition
       ? { ...selection, bankId: selectedExamEdition.bankId }
@@ -417,7 +421,7 @@ export async function POST(request: Request) {
       : parsed.data.mode === "original_style"
         ? originalStyleConditions(
             effectiveSelection,
-            selectedExamEdition?.id ?? null,
+            editionProgramTraining ? selectedExamEdition?.id ?? null : null,
           )
         : and(
             licensedPreviousQuestionConditions(effectiveSelection, now),
@@ -722,6 +726,7 @@ export async function POST(request: Request) {
               examDate: selectedExamEdition.examDate,
               durationMinutes: selectedExamEdition.durationMinutes,
               status: selectedExamEdition.status,
+              programTraining: editionProgramTraining,
               bank: {
                 slug: selectedExamEdition.bankSlug,
                 name: selectedExamEdition.bankName,

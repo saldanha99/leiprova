@@ -60,6 +60,7 @@ describe("catálogo de edições oficiais do quiz", () => {
       examYear: 2025,
       durationMinutes: 300,
       status: "published",
+      programTraining: false,
       organizer: "Conselho Federal da OAB",
       jurisdiction: "Nacional",
       officialUrl: "https://conhecimento.fgv.br/concursos/oab-2025",
@@ -147,8 +148,15 @@ describe("catálogo de edições oficiais do quiz", () => {
         careerSlug: "oab",
         specializationSlug: null,
         bank: { slug: "fgv", name: "FGV" },
+        programTraining: false,
       },
     ]);
+  });
+
+  it("marca no cliente apenas a edição sem inéditas ligadas ao programa", () => {
+    const [linked] = buildQuizExamEditionCatalog([{ ...baseRow, scheduledProgramReviewed: true }], "2025-12-31");
+    expect(linked.programTraining).toBe(true);
+    expect(toQuizExamEditionOptions([linked])[0]).not.toHaveProperty("programTraining");
   });
 });
 
