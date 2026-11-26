@@ -50,7 +50,13 @@ export function originalStyleConditions(selection: { bankId: number | null }, ex
  * Exige pelo menos uma questão publicável do programa; filtros de matéria ainda
  * podem reduzir o recorte a zero, sem prometer cobertura integral do edital. */
 export function editionHasOriginalTraining(examEditionId: number | SQLWrapper, bankId: number | SQLWrapper) {
-  return sql<boolean>`exists (
+  // Teste barato primeiro: sem oportunidade revisada ligada à edição, a busca pesada
+  // (que varre as inéditas da banca) não tem como achar nada. Mesmo resultado, sem a
+  // varredura que levava ~30 s em edições sem programa (ex.: Exame de Ordem, 26/11/2026).
+  return sql<boolean>`case when not exists (
+    select 1 from contest_opportunities guard_opportunity
+    where guard_opportunity.exam_edition_id = ${examEditionId} and guard_opportunity.editorial_status = 'reviewed'
+  ) then false else exists (
     select 1 from ${questions}
     join ${legalArticles} on ${legalArticles.id} = ${questions.legalArticleId}
     join ${legalVersions} on ${legalVersions.id} = ${legalArticles.legalVersionId}
@@ -58,5 +64,5 @@ export function editionHasOriginalTraining(examEditionId: number | SQLWrapper, b
     where ${authorialSourceConditions(bankId)}
       and ${exactEditionRequirementExists(examEditionId)}
       and ${originalQuestionContractExists(questions.id,questions.type,questions.styleBankId,questions.questionContractId,examEditionId)}
-  )`;
+  ) end`;
 }
